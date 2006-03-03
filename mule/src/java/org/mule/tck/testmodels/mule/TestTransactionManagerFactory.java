@@ -14,13 +14,13 @@
 
 package org.mule.tck.testmodels.mule;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * <code>TestTransactionManagerFactory</code> TODO

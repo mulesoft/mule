@@ -52,6 +52,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -653,8 +654,8 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         if (logger.isDebugEnabled()) {
             logger.debug("MessageContext:" + msgContext);
-            logger.debug("HEADER_CONTENT_TYPE:" + context.getProperty("Content-Type"));
-            logger.debug("HEADER_CONTENT_LOCATION:" + context.getProperty("Content-Location"));
+            logger.debug("HEADER_CONTENT_TYPE:" + context.getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+            logger.debug("HEADER_CONTENT_LOCATION:" + context.getProperty(HttpConstants.HEADER_CONTENT_LOCATION));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETLOCATION:" +

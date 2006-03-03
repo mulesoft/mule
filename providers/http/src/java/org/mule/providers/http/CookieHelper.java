@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import org.apache.commons.httpclient.Cookie;
@@ -30,34 +31,40 @@ import java.util.List;
 
 /**
  * Helper functions for parsing cookie headers
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CookieHelper {
+public class CookieHelper
+{
 
     /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(CookieHelper.class);
 
-    public static CookieSpec getCookieSpec(String spec) {
-        if(spec!=null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
-                return new NetscapeDraftSpec();
-            } else {
-                return new RFC2109Spec();
-            }
+    public static CookieSpec getCookieSpec(String spec)
+    {
+        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
+            return new NetscapeDraftSpec();
+        }
+        else {
+            return new RFC2109Spec();
+        }
     }
 
-    public static String getCookiePolicy(String spec) {
-        if(spec!=null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
-                return CookiePolicy.NETSCAPE;
-            } else {
-                return CookiePolicy.RFC_2109;
-            }
+    public static String getCookiePolicy(String spec)
+    {
+        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
+            return CookiePolicy.NETSCAPE;
+        }
+        else {
+            return CookiePolicy.RFC_2109;
+        }
     }
 
-    public static Cookie[] parseCookies(Header header, String spec) throws MalformedCookieException {
+    public static Cookie[] parseCookies(Header header, String spec) throws MalformedCookieException
+    {
         CookieSpec cookieSpec = getCookieSpec(spec);
         List cookies = new ArrayList();
         Cookie cookie = null;
@@ -70,14 +77,15 @@ public class CookieHelper {
                 nameValuePair = headerElement.getParameters()[k];
                 cookieSpec.parseAttribute(nameValuePair, cookie);
             }
-            if(cookie.isExpired()) {
-                if(logger.isDebugEnabled()) {
+            if (cookie.isExpired()) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Cookie: " + cookie.toString() + " has expired removing it");
                 }
-            } else {
+            }
+            else {
                 cookies.add(cookie);
             }
         }
-        return (Cookie[]) cookies.toArray(new Cookie[cookies.size()]);
+        return (Cookie[])cookies.toArray(new Cookie[cookies.size()]);
     }
 }

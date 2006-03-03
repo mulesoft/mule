@@ -53,8 +53,9 @@ public class ByteArrayToSerializable extends AbstractTransformer
                                            e);
         } finally {
             try {
-                if (ois != null)
+                if (ois != null) {
                     ois.close();
+                }
             } catch (IOException e) {
                 // ignore
             }

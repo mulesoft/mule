@@ -123,6 +123,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     {
         if(isCreateDispatcherPerRequest()) {
             destroyFtp(uri, client);
+            // TODO what's up here?
             UMOMessageDispatcher dispatcher = getDispatcher(uri.toString());
         } else {
             if (client != null && client.isConnected()) {

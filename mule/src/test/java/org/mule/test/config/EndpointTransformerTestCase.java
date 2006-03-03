@@ -8,11 +8,12 @@
  */
 package org.mule.test.config;
 
-import junit.framework.TestCase;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>

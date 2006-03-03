@@ -13,11 +13,11 @@
  */
 package org.mule.ra;
 
-import java.io.Serializable;
-
 import javax.naming.Referenceable;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
+
+import java.io.Serializable;
 
 /**
  * <code>MuleConnectionFactory</code> defines the connection factory interface

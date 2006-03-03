@@ -17,6 +17,7 @@ package org.mule.providers.oracle.jms;
 import oracle.jms.AQjmsQueueConnectionFactory;
 import oracle.jms.AQjmsSession;
 import oracle.jms.AQjmsTopicConnectionFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jms.Jms102bSupport;
@@ -34,6 +35,7 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
@@ -149,7 +151,9 @@ public class OracleJmsSupport extends Jms102bSupport {
 																			payloadFactory);
                 }
 	        }
-	        else throw new IllegalArgumentException("Session and domain type do not match");
+            else {
+                throw new IllegalArgumentException("Session and domain type do not match");
+            }
         } 
     }
 
@@ -166,8 +170,12 @@ public class OracleJmsSupport extends Jms102bSupport {
 	 */
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException {
     	Destination dest = super.createDestination(session, name, topic);
-    	if (dest != null) return dest;
-    	else throw new JMSException("Unable to create " + (topic ? "topic" : "queue") + ": " + name);
+    	if (dest != null) {
+            return dest;
+        }
+        else {
+            throw new JMSException("Unable to create " + (topic ? "topic" : "queue") + ": " + name);
+        }
     }
 
 	/**
@@ -183,8 +191,12 @@ public class OracleJmsSupport extends Jms102bSupport {
 	 */
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException {
     	Destination dest = super.createTemporaryDestination(session, topic);
-    	if (dest != null) return dest;
-    	else throw new JMSException("Unable to create temporary " + (topic ? "topic" : "queue"));
+    	if (dest != null) {
+            return dest;
+        }
+        else {
+            throw new JMSException("Unable to create temporary " + (topic ? "topic" : "queue"));
+        }
     }
 	
     /** Get the payload factory class, if defined, from the connector or endpoint's 
@@ -210,7 +222,9 @@ public class OracleJmsSupport extends Jms102bSupport {
             } catch (ClassNotFoundException e) { ex = e;
             } catch (IllegalAccessException e) { ex = e;
             } catch (InstantiationException e) { ex = e;
-            } if (ex != null) throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass);
+            } if (ex != null) {
+                throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass);
+            }
 	    }
     	return payloadFactory;
     }

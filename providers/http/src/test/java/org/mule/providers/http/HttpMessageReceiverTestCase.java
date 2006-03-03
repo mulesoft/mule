@@ -11,9 +11,11 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.transformers.UMOMessageToHttpResponse;
@@ -37,15 +39,15 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
-        return new HttpMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                       (UMOComponent) mockComponent.proxy(),
-                                       endpoint);
+        return new HttpMessageReceiver((AbstractConnector)endpoint.getConnector(),
+                (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception
     {
         endpoint = new MuleEndpoint("http://localhost:6789", true);
-        ((HttpConnector)endpoint.getConnector()).setDefaultResponseTransformer(new UMOMessageToHttpResponse());
+        ((HttpConnector)endpoint.getConnector())
+                .setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         return endpoint;
     }
 }

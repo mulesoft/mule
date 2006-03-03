@@ -57,8 +57,9 @@ public class ServiceProxy
 
     public static Class[] removeInterface(Class[] interfaces, Class iface)
     {
-        if (interfaces == null)
+        if (interfaces == null) {
             return null;
+        }
         List results = new ArrayList();
         for (int i = 0; i < interfaces.length; i++) {
             Class anInterface = interfaces[i];

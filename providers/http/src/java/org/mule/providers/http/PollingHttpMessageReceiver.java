@@ -12,17 +12,8 @@
  * the LICENSE.txt file. 
  *
  */
-package org.mule.providers.http;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+package org.mule.providers.http;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -36,10 +27,20 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Will poll an http URL and use the response as the input for a service
  * request.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,38 +50,50 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
 
     private int defaultBufferSize = 1024 * 32;
 
-    public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint) throws InitialisationException {
+    public PollingHttpMessageReceiver(UMOConnector connector,
+                                      UMOComponent component,
+                                      final UMOEndpoint endpoint) throws InitialisationException
+    {
         this(connector, component, endpoint, new Long(1000));
 
-        long pollingFrequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "pollingFrequency", -1);
-        if(pollingFrequency > 0) {
+        long pollingFrequency = PropertiesHelper.getLongProperty(endpoint.getProperties(),
+                "pollingFrequency", -1);
+        if (pollingFrequency > 0) {
             setFrequency(pollingFrequency);
         }
     }
 
-    public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint, Long frequency) throws InitialisationException {
+    public PollingHttpMessageReceiver(UMOConnector connector,
+                                      UMOComponent component,
+                                      final UMOEndpoint endpoint,
+                                      Long frequency) throws InitialisationException
+    {
         super(connector, component, endpoint, frequency);
         try {
             pollUrl = new URL(endpoint.getEndpointURI().getAddress());
-        } catch (MalformedURLException e) {
-            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, endpoint.getEndpointURI().getAddress(), "uri"), e, this);
+        }
+        catch (MalformedURLException e) {
+            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, endpoint
+                    .getEndpointURI().getAddress(), "uri"), e, this);
         }
     }
 
-    public void poll() throws Exception {
+    public void poll() throws Exception
+    {
         HttpURLConnection connection = (HttpURLConnection)pollUrl.openConnection();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int len = 0;
         int bytesWritten = 0;
         int contentLength = connection.getContentLength();
         boolean contentLengthNotSet = false;
-        if(contentLength < 0) {
+        if (contentLength < 0) {
             contentLength = defaultBufferSize;
             contentLengthNotSet = true;
         }
+        // TODO this is pretty dangerous for big payloads
         byte[] buffer = new byte[contentLength];
-        InputStream is =connection.getInputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(contentLength);
+        InputStream is = connection.getInputStream();
         // Ensure we read all bytes, http connections may be slow
         // to send all bytes in consistent stream. I've only seen
         // this when using Axis...
@@ -89,7 +102,8 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
             if (len != -1) {
                 baos.write(buffer, 0, len);
                 bytesWritten += len;
-            } else {
+            }
+            else {
                 if (contentLengthNotSet) {
                     contentLength = bytesWritten;
                 }
@@ -100,15 +114,15 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
 
         // Truncate repetitive headers
         Map respHeaders = new HashMap();
-		Iterator it = connection.getHeaderFields().entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry msgHeader = (Map.Entry) it.next();
-			if (msgHeader.getValue() != null) {
-				respHeaders.put(msgHeader.getKey(), ((List) msgHeader.getValue()).get(0));
-			}
-		}
+        Iterator it = connection.getHeaderFields().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry msgHeader = (Map.Entry)it.next();
+            if (msgHeader.getValue() != null) {
+                respHeaders.put(msgHeader.getKey(), ((List)msgHeader.getValue()).get(0));
+            }
+        }
 
-        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[] { buffer, respHeaders });
+        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{buffer,respHeaders});
 
         connection.disconnect();
         UMOMessage message = new MuleMessage(adapter);
@@ -119,9 +133,10 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
     {
         URL url = null;
         String connectUrl = (String)endpoint.getProperties().get("connectUrl");
-        if(connectUrl==null) {
+        if (connectUrl == null) {
             url = pollUrl;
-        } else {
+        }
+        else {
             url = new URL(connectUrl);
         }
         logger.debug("Using url to connect: " + pollUrl.toString());
@@ -129,7 +144,8 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         connection.disconnect();
     }
 
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
 
     }
 }

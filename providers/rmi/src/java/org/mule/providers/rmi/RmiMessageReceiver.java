@@ -13,6 +13,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.naming.Context;
+
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 
@@ -98,8 +99,9 @@ public class RmiMessageReceiver extends AbstractMessageReceiver
 
             // TODO [aperepel] consider AtomicBooleans here
             // for 'initialised/initialising' status, etc.
-            if (null == remoteObject)
+            if (null == remoteObject) {
                 initialize(getEndpoint());
+            }
         }
         catch (Exception e) {
             throw new ConnectException(e, this);
@@ -133,8 +135,9 @@ public class RmiMessageReceiver extends AbstractMessageReceiver
     {
         String className = connector.getServiceClassName();
 
-        if (null == className)
+        if (null == className) {
             throw new InitialisationException(new org.mule.config.i18n.Message("rmi", RmiConnector.NO_RMI_SERVICECLASS_SET), this);
+        }
 
         RmiAble remote = null;
 

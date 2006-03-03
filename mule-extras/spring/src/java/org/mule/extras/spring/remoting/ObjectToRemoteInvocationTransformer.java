@@ -38,8 +38,12 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (logger.isDebugEnabled()) logger.debug("HttpToRemoteInvocation.doTransform(" + src + ")");
-        if(src instanceof RemoteInvocation) return src;
+        if (logger.isDebugEnabled()) {
+            logger.debug("HttpToRemoteInvocation.doTransform(" + src + ")");
+        }
+        if(src instanceof RemoteInvocation) {
+            return src;
+        }
         
         try
         {

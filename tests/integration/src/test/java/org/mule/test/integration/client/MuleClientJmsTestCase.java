@@ -19,6 +19,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.jms.TextMessage;
+
 import java.util.HashMap;
 import java.util.Map;
 

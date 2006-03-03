@@ -36,7 +36,7 @@ public class NamedServiceTestComponent extends FunctionalTestComponent implement
     public String echo(String echo)
     {
         UMOEventContext context = RequestContext.getEventContext();
-        //todo need to determine how test there the request params are named
+        //TODO need to determine how test there the request params are named
         return echo;
     }
 

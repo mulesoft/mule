@@ -14,6 +14,7 @@
 package org.mule.providers.gs;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.space.SpaceMessageReceiver;

@@ -15,6 +15,7 @@ package org.mule.extras.pgp;
 
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
+
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.security.UMOAuthentication;
 

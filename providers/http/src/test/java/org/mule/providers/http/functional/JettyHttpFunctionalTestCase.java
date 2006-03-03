@@ -18,12 +18,12 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.lang.SystemUtils;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.Utility;
 
 import java.net.URI;
 
@@ -41,7 +41,8 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
     {
         try {
             return new MuleEndpointURI("jetty:http://localhost:60198");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -66,10 +67,11 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         PostMethod postMethod = new PostMethod(uri.toString());
         postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
         cnn = new HttpConnection(uri.getHost(), uri.getPort());
-        cnn.open();        
+        cnn.open();
         postMethod.execute(new HttpState(), cnn);
     }
-//
+
+    //
     protected void receiveAndTestResults() throws Exception
     {
         Thread.sleep(1000);
@@ -82,6 +84,6 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        assertTrue(msg.endsWith(TEST_MESSAGE + Utility.CRLF + " Received"));
+        assertTrue(msg.endsWith(TEST_MESSAGE + SystemUtils.LINE_SEPARATOR + " Received"));
     }
 }

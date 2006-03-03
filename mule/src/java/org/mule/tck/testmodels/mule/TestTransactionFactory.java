@@ -13,11 +13,11 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import com.mockobjects.dynamic.Mock;
+
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * <code>TestTransactionFactory</code> TODO

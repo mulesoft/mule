@@ -35,12 +35,13 @@ import org.apache.axis.transport.http.SocketHolder;
 import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
-import org.mule.util.Utility;
 
 import javax.xml.soap.MimeHeader;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -149,8 +150,9 @@ public class MuleHttpSender extends BasicHandler
                                             useFullURL);
 
             if (msgContext.isClient() && call!=null) {
-                if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
+                if (Boolean.TRUE.equals(call.getProperty("axis.one.way"))) {
                     return;
+                }
             }
 
             // Read the response back from the server
@@ -322,29 +324,33 @@ public class MuleHttpSender extends BasicHandler
 
                 java.util.Map.Entry me = (java.util.Map.Entry) e.next();
                 Object keyObj = me.getKey();
-                if (null == keyObj)
+                if (null == keyObj) {
                     continue;
+                }
                 String key = keyObj.toString().trim();
 
                 if (key.equalsIgnoreCase(HTTPConstants.HEADER_TRANSFER_ENCODING)) {
                     if (!http10) {
                         String val = me.getValue().toString();
-                        if (null != val && val.trim().equalsIgnoreCase(HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED))
+                        if (null != val && val.trim().equalsIgnoreCase(HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED)) {
                             httpChunkStream = true;
+                        }
                     }
                 } else if (key.equalsIgnoreCase(HTTPConstants.HEADER_CONNECTION)) {
                     if (!http10) {
                         String val = me.getValue().toString();
-                        if (val.trim().equalsIgnoreCase(HTTPConstants.HEADER_CONNECTION_CLOSE))
+                        if (val.trim().equalsIgnoreCase(HTTPConstants.HEADER_CONNECTION_CLOSE)) {
                             httpConnection = HTTPConstants.HEADER_CONNECTION_CLOSE;
+                        }
                     }
                     // HTTP 1.0 will always close.
                     // HTTP 1.1 will use persistent. //no need to specify
                 } else {
                     if (!http10 && key.equalsIgnoreCase(HTTPConstants.HEADER_EXPECT)) {
                         String val = me.getValue().toString();
-                        if (null != val && val.trim().equalsIgnoreCase(HTTPConstants.HEADER_EXPECT_100_Continue))
+                        if (null != val && val.trim().equalsIgnoreCase(HTTPConstants.HEADER_EXPECT_100_Continue)) {
                             httpContinueExpected = true;
+                        }
                     }
 
                     otherHeaders.append(key).append(": ").append(me.getValue()).append("\r\n");
@@ -733,9 +739,9 @@ public class MuleHttpSender extends BasicHandler
         msgContext.setResponseMessage(outMsg);
         if (log.isDebugEnabled()) {
             if (null == contentLength) {
-                log.debug(Utility.CRLF + Messages.getMessage("no00", "Content-Length"));
+                log.debug(SystemUtils.LINE_SEPARATOR + Messages.getMessage("no00", "Content-Length"));
             }
-            log.debug(Utility.CRLF + Messages.getMessage("xmlRecd00"));
+            log.debug(SystemUtils.LINE_SEPARATOR + Messages.getMessage("xmlRecd00"));
             log.debug("-----------------------------------------------");
             log.debug(outMsg.getSOAPEnvelope().toString());
         }

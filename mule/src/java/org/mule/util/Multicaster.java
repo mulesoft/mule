@@ -83,8 +83,9 @@ public class Multicaster
                 try {
                     item = iterator.next();
                     result = method.invoke(item, args);
-                    if (listener != null)
+                    if (listener != null) {
                         listener.afterExecute(item, method, args);
+                    }
                     if (result != null) {
                         results.add(result);
                     }

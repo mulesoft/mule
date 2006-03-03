@@ -38,10 +38,12 @@ public class DQEndpointBuilder extends ResourceNameEndpointBuilder
         } else if (lib == null) {
             throw new MalformedEndpointException("Could not extract Lib name: " + uri);
         } else {
-            if (!lib.startsWith("/"))
+            if (!lib.startsWith("/")) {
                 lib = "/" + lib;
-            if (!lib.endsWith("/"))
+            }
+            if (!lib.endsWith("/")) {
                 lib += "/";
+            }
             address = lib + uri.getHost();
         }
         // Resource info

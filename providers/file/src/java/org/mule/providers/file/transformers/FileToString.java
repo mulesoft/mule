@@ -39,18 +39,20 @@ public class FileToString extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof byte[])
-          if (encoding != null) {
-        	try {
-              return new String((byte[]) src, encoding);
-        	} catch (UnsupportedEncodingException ex){
-        	  return new String((byte[]) src);
-        	}
-          } else {
-            return new String((byte[]) src);
-          }
-        if (src instanceof String)
+        if (src instanceof byte[]) {
+            if (encoding != null) {
+            	try {
+                  return new String((byte[]) src, encoding);
+            	} catch (UnsupportedEncodingException ex){
+            	  return new String((byte[]) src);
+            	}
+              } else {
+                return new String((byte[]) src);
+              }
+        }
+        if (src instanceof String) {
             return src.toString();
+        }
 
         StringBuffer sb = new StringBuffer(new Long(((File) src).length()).intValue());
         char[] buf = new char[1024 * 8];
@@ -65,8 +67,9 @@ public class FileToString extends AbstractTransformer
             throw new TransformerException(this, e);
         } finally {
             try {
-                if (fr != null)
+                if (fr != null) {
                     fr.close();
+                }
             } catch (IOException e) {
                 logger.debug("Failed to close reader in transformer: " + e.getMessage());
             }

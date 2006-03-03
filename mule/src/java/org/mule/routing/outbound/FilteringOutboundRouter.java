@@ -133,13 +133,17 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         } else {
             UMOEndpoint ep = (UMOEndpoint)endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
-            if(logger.isDebugEnabled()) logger.debug("Uri before parsing is: " + uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Uri before parsing is: " + uri);
+            }
             Map props = new HashMap();
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
             props.putAll(message.getProperties());
             String newUriString = parser.parse(props, uri);
-            if(logger.isDebugEnabled()) logger.debug("Uri after parsing is: " + uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Uri after parsing is: " + uri);
+            }
             try {
                 UMOEndpointURI newUri = new MuleEndpointURI(newUriString);
                 if(!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme())) {

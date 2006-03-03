@@ -89,7 +89,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
     public void doDispose()
     {
-        if(groupChat!=null) groupChat.leave();
+        if(groupChat!=null) {
+            groupChat.leave();
+        }
         if (null != xmppConnection) {
             xmppConnection.close();
         }
@@ -159,7 +161,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         } else {
             groupChat.sendMessage(message);
         }
-        if(logger.isDebugEnabled()) logger.debug("packet successfully sent");
+        if(logger.isDebugEnabled()) {
+            logger.debug("packet successfully sent");
+        }
     }
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception

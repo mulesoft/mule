@@ -19,6 +19,7 @@ import org.mule.config.i18n.Message;
 import org.mule.tck.AbstractMuleTestCase;
 
 import javax.jms.JMSException;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

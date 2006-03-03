@@ -14,7 +14,6 @@
 */
 package org.mule.registry;
 
-import org.mule.registry.RegistryException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 

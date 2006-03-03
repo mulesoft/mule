@@ -13,9 +13,6 @@
  */
 package org.mule.extras.plexus;
 
-import java.io.Reader;
-import java.net.URL;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.mule.config.ConfigurationException;
@@ -27,6 +24,9 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.Utility;
+
+import java.io.Reader;
+import java.net.URL;
 
 /**
  * <code>PlexusContainerContext</code> integrate the plexus container with
@@ -90,8 +90,9 @@ public class PlexusContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if (configFile == null)
+        if (configFile == null) {
             return;
+        }
         try {
             URL url = Utility.getResource(configFile, getClass());
             if (url == null) {

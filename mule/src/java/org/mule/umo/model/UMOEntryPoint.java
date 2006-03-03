@@ -13,11 +13,10 @@
  */
 package org.mule.umo.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>UMOEntryPoint</code> defines the current entry method on a component

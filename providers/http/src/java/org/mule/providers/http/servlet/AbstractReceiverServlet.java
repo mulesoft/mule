@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.providers.http.servlet;
 
 import org.apache.commons.logging.Log;
@@ -25,6 +26,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -47,7 +49,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     public static final String PAYLOAD_PARAMETER_NAME = "org.mule.servlet.payload.param";
     public static final String DEFAULT_PAYLOAD_PARAMETER_NAME = "payload";
 
-
     public static final long DEFAULT_GET_TIMEOUT = 10000L;
 
     protected String payloadParameterName;
@@ -59,6 +60,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     {
         doInit();
     }
+
     public final void init(ServletConfig servletConfig) throws ServletException
     {
         String timeoutString = servletConfig.getInitParameter(REQUEST_TIMEOUT_PROPERTY);
@@ -88,10 +90,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         doInit(servletConfig);
     }
 
-
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-        
+
     }
 
     protected void doInit() throws ServletException
@@ -99,35 +100,42 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     }
 
-
-    protected void writeResponse(HttpServletResponse servletResponse, UMOMessage message) throws Exception
+    protected void writeResponse(HttpServletResponse servletResponse, UMOMessage message)
+            throws Exception
     {
         if (message == null) {
             servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
             if (feedback) {
                 servletResponse.setStatus(HttpServletResponse.SC_OK);
-                servletResponse.getWriter().write("Action was processed successfully. There was no result");
+                servletResponse.getWriter().write(
+                        "Action was processed successfully. There was no result");
             }
-        } else {
+        }
+        else {
             HttpResponse httpResponse = null;
-            if(message.getAdapter() instanceof WriterMessageAdapter) {
+            if (message.getAdapter() instanceof WriterMessageAdapter) {
                 WriterMessageAdapter adapter = (WriterMessageAdapter)message.getAdapter();
                 httpResponse = new HttpResponse();
                 httpResponse.setBodyString(adapter.getPayloadAsString());
-            } else {
+            }
+            else {
                 httpResponse = (HttpResponse)message.getPayload();
             }
 
-            String contentType = httpResponse.getFirstHeader("Content-Type").getValue();
-            if (contentType == null)
+            String contentType = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE)
+                    .getValue();
+            if (contentType == null) {
                 contentType = defaultContentType;
+            }
             if (!contentType.startsWith("text")) {
                 servletResponse.setContentType(contentType);
                 servletResponse.getOutputStream().write(httpResponse.getBodyBytes());
-            } else {
+            }
+            else {
 
                 servletResponse.setContentType(contentType);
-                //Encoding: tis method will check the charset on the content type
+                // Encoding: tis method will check the charset on the content
+                // type
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
             servletResponse.setStatus(HttpServletResponse.SC_OK);
@@ -139,8 +147,10 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         logger.error("message: " + exception.getMessage(), exception);
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         try {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message + ": " + exception.getMessage());
-        } catch (IOException e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message + ": "
+                    + exception.getMessage());
+        }
+        catch (IOException e) {
             logger.error("Failed to sendError on response: " + e.getMessage(), e);
         }
     }

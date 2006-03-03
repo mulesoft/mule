@@ -19,7 +19,6 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -41,6 +40,7 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -271,15 +271,18 @@ public class MuleResourceAdapter implements ResourceAdapter
 
     public boolean equals(Object o)
     {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof MuleResourceAdapter))
+        }
+        if (!(o instanceof MuleResourceAdapter)) {
             return false;
+        }
 
         final MuleResourceAdapter muleResourceAdapter = (MuleResourceAdapter) o;
 
-        if (info != null ? !info.equals(muleResourceAdapter.info) : muleResourceAdapter.info != null)
+        if (info != null ? !info.equals(muleResourceAdapter.info) : muleResourceAdapter.info != null) {
             return false;
+        }
 
         return true;
     }

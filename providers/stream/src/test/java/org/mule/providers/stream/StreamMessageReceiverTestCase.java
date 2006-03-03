@@ -13,6 +13,7 @@
 package org.mule.providers.stream;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;

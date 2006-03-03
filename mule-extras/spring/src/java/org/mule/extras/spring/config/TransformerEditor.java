@@ -13,12 +13,12 @@
  */
 package org.mule.extras.spring.config;
 
-import java.beans.PropertyEditorSupport;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.util.MuleObjectHelper;
+
+import java.beans.PropertyEditorSupport;
 
 /**
  * <code>TransformerEditor</code> is used to convert Transformer names into

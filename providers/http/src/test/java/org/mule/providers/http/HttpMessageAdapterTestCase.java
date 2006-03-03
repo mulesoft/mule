@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
@@ -54,7 +55,8 @@ public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         try {
             adapter = createAdapter(getInvalidMessage());
             fail("Message adapter should throw exception if an invalid messgae is set");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // expected
         }
     }

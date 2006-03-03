@@ -13,10 +13,10 @@
  */
 package org.mule.routing.filters;
 
-import java.util.regex.Pattern;
-
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+
+import java.util.regex.Pattern;
 
 /**
  * <code>RegExFilter</code> is used to match a rgular expression against a

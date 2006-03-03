@@ -15,6 +15,7 @@
 package org.mule.util.xa;
 
 import javax.transaction.xa.Xid;
+
 import java.util.HashMap;
 import java.util.Map;
 

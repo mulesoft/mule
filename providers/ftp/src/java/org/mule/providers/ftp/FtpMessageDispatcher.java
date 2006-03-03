@@ -24,8 +24,8 @@ import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -141,7 +141,9 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                     }
                 }
             }
-            if(fileList.size()==0) return null;
+            if(fileList.size()==0) {
+                return null;
+            }
 
             FTPFile file = (FTPFile)fileList.get(0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

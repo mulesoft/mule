@@ -78,14 +78,18 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
      */
     public int getStatus() throws TransactionStatusException
     {
-        if (rolledBack.get())
+        if (rolledBack.get()) {
             return STATUS_ROLLEDBACK;
-        if (committed.get())
+        }
+        if (committed.get()) {
             return STATUS_COMMITTED;
-        if (rollbackOnly.get())
+        }
+        if (rollbackOnly.get()) {
             return STATUS_MARKED_ROLLBACK;
-        if (started.get())
+        }
+        if (started.get()) {
             return STATUS_ACTIVE;
+        }
         return STATUS_NO_TRANSACTION;
     }
 

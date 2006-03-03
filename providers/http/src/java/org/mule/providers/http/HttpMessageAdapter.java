@@ -30,29 +30,32 @@ import java.util.Map;
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
  * payload and heads available a standard message adapter
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class HttpMessageAdapter extends AbstractMessageAdapter
- {
+{
     private Object message = null;
     private UMOTransformer trans = new SerializableToByteArray();
 
     private boolean http11 = true;
 
-    public HttpMessageAdapter(Object message) throws MessagingException {
+    public HttpMessageAdapter(Object message) throws MessagingException
+    {
         if (message instanceof Object[]) {
-            this.message = ((Object[]) message)[0];
-            if (((Object[]) message).length > 1) {
-                properties = (Map) ((Object[]) message)[1];
+            this.message = ((Object[])message)[0];
+            if (((Object[])message).length > 1) {
+                properties = (Map)((Object[])message)[1];
             }
-        } else if (message instanceof byte[]) {
+        }
+        else if (message instanceof byte[]) {
             this.message = message;
-        } else {
+        }
+        else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
-        String temp = (String) properties.get(HttpConnector.HTTP_VERSION_PROPERTY);
+        String temp = (String)properties.get(HttpConnector.HTTP_VERSION_PROPERTY);
         if (HttpConstants.HTTP10.equalsIgnoreCase(temp)) {
             http11 = false;
         }
@@ -63,7 +66,8 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayload()
      */
-    public Object getPayload() {
+    public Object getPayload()
+    {
         return message;
     }
 
@@ -74,55 +78,66 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if(message instanceof byte[]) {
-            return (byte[]) message;
-        } else if (message instanceof String) {
+        if (message instanceof byte[]) {
+            return (byte[])message;
+        }
+        else if (message instanceof String) {
             return message.toString().getBytes();
-        } else {
-            return (byte[]) trans.transform(message);
+        }
+        else {
+            return (byte[])trans.transform(message);
         }
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString(String encoding)
+     * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString(String
+     *      encoding)
      */
-    public String getPayloadAsString(String encoding) throws Exception {
-        if(message instanceof byte[]) {
-        	if (encoding != null){
+    public String getPayloadAsString(String encoding) throws Exception
+    {
+        if (message instanceof byte[]) {
+            if (encoding != null) {
                 return new String((byte[])message, encoding);
-        	} else {
-        	  return new String((byte[])message);
-        	}
-        } else {
+            }
+            else {
+                return new String((byte[])message);
+            }
+        }
+        else {
             return message.toString();
         }
     }
 
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
-    */
-    public Object getProperty(Object key) {
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
+     */
+    public Object getProperty(Object key)
+    {
         if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key)) {
             if (!http11) {
-                String connection = (String) super.getProperty(HttpConstants.HEADER_CONNECTION);
+                String connection = (String)super.getProperty(HttpConstants.HEADER_CONNECTION);
                 if (connection != null && connection.equalsIgnoreCase("close")) {
                     return "false";
-                } else {
+                }
+                else {
                     return "true";
                 }
-            } else {
+            }
+            else {
                 return (super.getProperty(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
             }
-        } else {
+        }
+        else {
             return super.getProperty(key);
         }
     }
 
-    public String getEncoding() {
+    public String getEncoding()
+    {
         String charset = null;
         Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
         if (contenttype != null) {
@@ -136,14 +151,16 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         if (charset != null) {
             return charset;
-        } else {
+        }
+        else {
             return MuleManager.getConfiguration().getEncoding();
         }
     }
 
-    public Header getHeader(String name) {
+    public Header getHeader(String name)
+    {
         String value = (String)getProperty(name);
-        if(value==null) {
+        if (value == null) {
             return null;
         }
         return new Header(name, value);

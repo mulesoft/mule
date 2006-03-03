@@ -13,9 +13,9 @@
  */
 package org.mule.routing.inbound;
 
-import java.util.Comparator;
-
 import org.mule.umo.UMOEvent;
+
+import java.util.Comparator;
 
 /**
  * <code>CorrelationEventResequencer</code> is used to resequence events

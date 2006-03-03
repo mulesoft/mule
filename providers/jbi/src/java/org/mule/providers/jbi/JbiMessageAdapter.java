@@ -19,6 +19,7 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import javax.activation.DataHandler;
 import javax.jbi.messaging.NormalizedMessage;
+
 import java.util.Iterator;
 import java.util.Set;
 

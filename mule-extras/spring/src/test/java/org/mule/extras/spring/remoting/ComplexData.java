@@ -38,7 +38,9 @@ public class ComplexData implements Serializable
         try
         {
             String foo = new String(someString);
-            if(someString == null) foo = "NULL";
+            if(someString == null) {
+                foo = "NULL";
+            }
             return "[ComplexData: [someString=" + foo + "][someInteger=" + someInteger + "]]";
         }
         catch (Exception e)

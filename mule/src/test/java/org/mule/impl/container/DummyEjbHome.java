@@ -15,6 +15,7 @@ package org.mule.impl.container;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBHome;
+
 import java.rmi.RemoteException;
 
 /**

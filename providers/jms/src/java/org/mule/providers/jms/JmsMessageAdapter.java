@@ -23,6 +23,7 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.util.Enumeration;
 
 /**

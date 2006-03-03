@@ -55,13 +55,17 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter {
         try {
             UMOEndpoint ep = (UMOEndpoint)endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
-            if(logger.isDebugEnabled()) logger.debug("Uri before parsing is: " + uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Uri before parsing is: " + uri);
+            }
             Map props = new HashMap();
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
             props.putAll(message.getProperties());
             uri = parser.parse(props, uri);
-            if(logger.isDebugEnabled()) logger.debug("Uri after parsing is: " + uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Uri after parsing is: " + uri);
+            }
             UMOEndpointURI newUri = new MuleEndpointURI(uri);
             if(!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme())) {
                 throw new CouldNotRouteOutboundMessageException(new Message(Messages.SCHEME_CANT_CHANGE_FOR_ROUTER_X_X,

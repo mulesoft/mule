@@ -91,12 +91,15 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 int priority = Message.DEFAULT_PRIORITY;
                 boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
-                if (ttlString != null)
+                if (ttlString != null) {
                     ttl = Long.parseLong(ttlString);
-                if (priorityString != null)
+                }
+                if (priorityString != null) {
                     priority = Integer.parseInt(priorityString);
-                if (persistentDeliveryString != null)
+                }
+                if (persistentDeliveryString != null) {
                     persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
+                }
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl);
             }

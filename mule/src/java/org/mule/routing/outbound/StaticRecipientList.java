@@ -16,11 +16,11 @@ package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
-import java.util.List;
-
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOMessage;
 import org.mule.util.Utility;
+
+import java.util.List;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to
@@ -38,13 +38,19 @@ public class StaticRecipientList extends AbstractRecipientList
     protected CopyOnWriteArrayList getRecipients(UMOMessage message)
     {
         CopyOnWriteArrayList list = createList(message.removeProperty("recipients"));
-        if(list == null) list = createList(RequestContext.getProperty("recipients"));
-        if(list==null) list = recipients;
+        if(list == null) {
+            list = createList(RequestContext.getProperty("recipients"));
+        }
+        if(list==null) {
+            list = recipients;
+        }
         return list;
     }
 
     private CopyOnWriteArrayList createList(Object list) {
-        if(list==null) return null;
+        if(list==null) {
+            return null;
+        }
         if(list instanceof String) {
             String[] temp = Utility.split(list.toString(), ",");
              return new CopyOnWriteArrayList(temp);

@@ -1,17 +1,18 @@
 /* 
-* $Header$
-* $Revision$
-* $Date$
-* ------------------------------------------------------------------------------------------------------
-* 
-* Copyright (c) SymphonySoft Limited. All rights reserved.
-* http://www.symphonysoft.com
-* 
-* The software in this package is published under the terms of the BSD
-* style license a copy of which has been included with this distribution in
-* the LICENSE.txt file. 
-*
-*/
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
+
 package org.mule.providers.soap.xfire;
 
 import org.codehaus.xfire.XFire;
@@ -32,6 +33,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 
 import javax.activation.DataHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -39,53 +41,59 @@ import java.util.Properties;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XFireMessageDispatcher extends AbstractMessageDispatcher {
+public class XFireMessageDispatcher extends AbstractMessageDispatcher
+{
 
     protected XFireConnector connector;
     protected Client client;
 
-    public XFireMessageDispatcher(XFireConnector connector) {
+    public XFireMessageDispatcher(XFireConnector connector)
+    {
         super(connector);
         this.connector = connector;
 
     }
 
-    public void doDispose() {
+    public void doDispose()
+    {
         client = null;
     }
 
-    protected String getMethod(UMOEvent event) throws DispatchException {
+    protected String getMethod(UMOEvent event) throws DispatchException
+    {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        String method = (String) endpointUri.getParams().remove("method");
+        String method = (String)endpointUri.getParams().remove("method");
 
         if (method == null) {
-            method = (String) event.getEndpoint().getProperties().get("method");
+            method = (String)event.getEndpoint().getProperties().get("method");
             if (method == null) {
-                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4),
-                        event.getMessage(),
-                        event.getEndpoint());
+                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event
+                        .getMessage(), event.getEndpoint());
             }
         }
         return method;
     }
 
-    protected Object[] getArgs(UMOEvent event) throws TransformerException {
+    protected Object[] getArgs(UMOEvent event) throws TransformerException
+    {
         Object payload = event.getTransformedMessage();
         Object[] args = new Object[0];
         if (payload instanceof Object[]) {
-            args = (Object[]) payload;
-        } else {
+            args = (Object[])payload;
+        }
+        else {
             args = new Object[]{payload};
         }
-        if (event.getMessage().getAttachmentNames() != null && event.getMessage().getAttachmentNames().size() > 0) {
+        if (event.getMessage().getAttachmentNames() != null
+                && event.getMessage().getAttachmentNames().size() > 0) {
             ArrayList attachments = new ArrayList();
             Iterator i = event.getMessage().getAttachmentNames().iterator();
             while (i.hasNext()) {
-                attachments.add(event.getMessage().getAttachment((String) i.next()));
+                attachments.add(event.getMessage().getAttachment((String)i.next()));
             }
             ArrayList temp = new ArrayList(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[0]));
@@ -94,29 +102,34 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher {
         return args;
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    public UMOMessage doSend(UMOEvent event) throws Exception
+    {
         Client client = getClient(event);
 
         String method = getMethod(event);
         Object[] response = client.invoke(method, getArgs(event));
-        if (response != null && response.length <=1) {
-            if(response.length == 1) {
+        if (response != null && response.length <= 1) {
+            if (response.length == 1) {
                 return new MuleMessage(response[0], event.getProperties());
-            } else {
+            }
+            else {
                 return null;
             }
-        } else {
+        }
+        else {
             return new MuleMessage(response, event.getProperties());
         }
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
+    public void doDispatch(UMOEvent event) throws Exception
+    {
         Client client = getClient(event);
         String method = getMethod(event);
         client.invoke(method, getArgs(event));
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
+    {
 
         String serviceName = getService(endpointUri);
 
@@ -127,7 +140,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher {
         client.setTimeout((int)timeout);
         client.setEndpointUri(endpointUri.toString());
 
-        String method = (String) endpointUri.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
+        String method = (String)endpointUri.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
         OperationInfo op = service.getServiceInfo().getOperation(method);
 
         Properties params = endpointUri.getUserParams();
@@ -137,55 +150,63 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher {
             args[i] = iterator.next().toString();
         }
 
-        UMOEndpoint ep = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint ep = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER);
         ep.initialise();
 
         Object[] response = client.invoke(op, args);
 
         if (response != null && response.length == 1) {
             return new MuleMessage(response[0], null);
-        } else {
+        }
+        else {
             return new MuleMessage(response, null);
         }
     }
 
-    protected Client getClient(UMOEvent event) throws Exception {
-        if(client==null) {
+    protected Client getClient(UMOEvent event) throws Exception
+    {
+        if (client == null) {
             String serviceName = getService(event.getEndpoint().getEndpointURI());
 
             XFire xfire = connector.getXfire();
             Service service = xfire.getServiceRegistry().getService(serviceName);
-            client = new Client(new MuleUniversalTransport(), service, event.getEndpoint().getEndpointURI().toString());
+            client = new Client(new MuleUniversalTransport(), service, event.getEndpoint()
+                    .getEndpointURI().toString());
 
             client.setXFire(xfire);
         }
-        if(client.getTimeout()!= event.getTimeout()) {
+        if (client.getTimeout() != event.getTimeout()) {
             client.setTimeout(event.getTimeout());
         }
         client.setEndpointUri(event.getEndpoint().getEndpointURI().toString());
         return client;
     }
 
-    public Object getDelegateSession() throws UMOException {
+    public Object getDelegateSession() throws UMOException
+    {
         return null;
     }
 
     /**
      * Get the service that is mapped to the specified request.
      */
-    protected String getService(UMOEndpointURI uri) {
+    protected String getService(UMOEndpointURI uri)
+    {
         String pathInfo = uri.getPath();
 
-        if (pathInfo == null || "".equals(pathInfo))
+        if (pathInfo == null || "".equals(pathInfo)) {
             return uri.getHost();
+        }
 
         String serviceName;
 
         int i = pathInfo.lastIndexOf("/");
 
         if (i > -1) {
-            serviceName = pathInfo.substring(i+1);
-        } else {
+            serviceName = pathInfo.substring(i + 1);
+        }
+        else {
             serviceName = pathInfo;
         }
 

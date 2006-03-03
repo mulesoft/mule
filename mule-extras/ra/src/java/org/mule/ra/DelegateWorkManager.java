@@ -13,14 +13,14 @@
  */
 package org.mule.ra;
 
+import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
+
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
-
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOWorkManager;
 
 /**
  * <code>DelegateWorkManager</code> TODO

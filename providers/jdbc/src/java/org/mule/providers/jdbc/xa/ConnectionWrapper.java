@@ -13,6 +13,10 @@
  */
 package org.mule.providers.jdbc.xa;
 
+import javax.sql.XAConnection;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,10 +30,6 @@ import java.sql.SQLWarning;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.Map;
-
-import javax.sql.XAConnection;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$

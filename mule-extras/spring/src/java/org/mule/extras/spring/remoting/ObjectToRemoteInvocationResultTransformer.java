@@ -38,7 +38,9 @@ public class ObjectToRemoteInvocationResultTransformer extends AbstractTransform
     {
         try
         {
-            if (logger.isDebugEnabled()) logger.debug("ObjectToRemoteInvocationResult.doTransform(" + src + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("ObjectToRemoteInvocationResult.doTransform(" + src + ")");
+            }
             
             RemoteInvocationResult rval;
 

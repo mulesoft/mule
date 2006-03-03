@@ -15,6 +15,7 @@
 
 package org.mule.providers.email;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
@@ -24,6 +25,7 @@ import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Part;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -67,12 +69,8 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 getPayloadAsString();
             } else {
                 InputStream is = messagePart.getInputStream();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buf = new byte[1024 * 32];
-                int len = 0;
-                while ((len = is.read(buf)) > -1) {
-                    baos.write(buf, 0, len);
-                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(32768);
+                IOUtils.copy(is, baos);
                 contentBuffer = baos.toByteArray();
             }
         }
@@ -95,7 +93,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 InputStream is = messagePart.getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                StringBuffer buffer = new StringBuffer();
+                StringBuffer buffer = new StringBuffer(32768);
                 String line = reader.readLine();
                 buffer.append(line);
 
@@ -135,7 +133,9 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 for (int i = 1; i < ((Multipart) content).getCount(); i++) {
                     part = ((Multipart) content).getBodyPart(i);
                     name = part.getFileName();
-                    if (name == null) name = String.valueOf(i - 1);
+                    if (name == null) {
+                        name = String.valueOf(i - 1);
+                    }
                     addAttachment(name, part.getDataHandler());
                 }
             } else {

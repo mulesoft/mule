@@ -11,10 +11,12 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
+import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.providers.http.ResponseWriter;
 import org.mule.transformers.AbstractTransformer;
@@ -27,28 +29,32 @@ import java.io.OutputStream;
 import java.util.Iterator;
 
 /**
- * Converts an Http Response object to String. Not that the response headers are not preserved.
- *
+ * Converts an Http Response object to String. Not that the response headers are
+ * not preserved.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpResponseToString extends AbstractTransformer {
+public class HttpResponseToString extends AbstractTransformer
+{
 
-    public HttpResponseToString() {
+    public HttpResponseToString()
+    {
         registerSourceType(HttpResponse.class);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException {
+    protected Object doTransform(Object src, String encoding) throws TransformerException
+    {
 
         try {
-            HttpResponse response = (HttpResponse) src;
+            HttpResponse response = (HttpResponse)src;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             OutputStream outstream = out;
             ResponseWriter writer = new ResponseWriter(outstream, encoding);
             writer.println(response.getStatusLine());
             Iterator item = response.getHeaderIterator();
             while (item.hasNext()) {
-                Header header = (Header) item.next();
+                Header header = (Header)item.next();
                 writer.print(header.toExternalForm());
             }
             writer.println();
@@ -56,10 +62,10 @@ public class HttpResponseToString extends AbstractTransformer {
 
             InputStream content = response.getBody();
             if (content != null) {
-                Header transferenc = response.getFirstHeader("Transfer-Encoding");
+                Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
                 if (transferenc != null) {
-                    response.removeHeaders("Content-Length");
-                    if (transferenc.getValue().indexOf("chunked") != -1) {
+                    response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
+                    if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
                         outstream = new ChunkedOutputStream(outstream);
 
                         byte[] tmp = new byte[1024];
@@ -68,10 +74,11 @@ public class HttpResponseToString extends AbstractTransformer {
                             outstream.write(tmp, 0, i);
                         }
                         if (outstream instanceof ChunkedOutputStream) {
-                            ((ChunkedOutputStream) outstream).finish();
+                            ((ChunkedOutputStream)outstream).finish();
                         }
                     }
-                } else {
+                }
+                else {
                     /**
                      * read the content when needed to embed content-length
                      */
@@ -88,13 +95,15 @@ public class HttpResponseToString extends AbstractTransformer {
             byte[] result = out.toByteArray();
             outstream.close();
             out.close();
-            if(getReturnClass().equals(String.class)) {
+            if (getReturnClass().equals(String.class)) {
                 return new String(result, encoding);
-            } else {
+            }
+            else {
                 return result;
             }
-        } catch (IOException e) {
-           throw new TransformerException(this, e);
+        }
+        catch (IOException e) {
+            throw new TransformerException(this, e);
         }
     }
 }

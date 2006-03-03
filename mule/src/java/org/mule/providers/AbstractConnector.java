@@ -14,6 +14,7 @@ package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -349,7 +350,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public final void stopConnector() throws UMOException
     {
-        if (isDisposed()) return;
+        if (isDisposed()) {
+            return;
+        }
 
         if (started.get()) {
             if (logger.isInfoEnabled()) {

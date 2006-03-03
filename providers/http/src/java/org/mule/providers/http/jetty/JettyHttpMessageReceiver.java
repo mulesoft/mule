@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.providers.http.jetty;
 
 import org.mortbay.http.HttpContext;
@@ -41,33 +42,41 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
     private Server httpServer;
 
-    public JettyHttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException {
+    public JettyHttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+            throws InitialisationException
+    {
         super(connector, component, endpoint);
     }
 
-    public void doConnect() throws Exception {
+    public void doConnect() throws Exception
+    {
         httpServer = new Server();
-        SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI().getPort()));
-// Todo
-//        socketListener.setMaxIdleTimeMs();
-//        socketListener.setMaxThreads();
-//        socketListener.setMinThreads();
+        SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI()
+                .getPort()));
+        // Todo
+        // socketListener.setMaxIdleTimeMs();
+        // socketListener.setMaxThreads();
+        // socketListener.setMinThreads();
         httpServer.addListener(socketListener);
 
         String path = endpoint.getEndpointURI().getPath();
-        if(path == null || "".equals(path)) {
-            path ="/";
+        if (path == null || "".equals(path)) {
+            path = "/";
         }
 
-        if(!path.endsWith("/")) path += "/";
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
 
         HttpContext context = httpServer.getContext(path);
         context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
-        if("rest".equals(endpoint.getEndpointURI().getScheme())) {
-            handler.addServlet("MuleRESTReceiverServlet", path + "*", MuleRESTReceiverServlet.class.getName());
-        } else {
+        if ("rest".equals(endpoint.getEndpointURI().getScheme())) {
+            handler.addServlet("MuleRESTReceiverServlet", path + "*", MuleRESTReceiverServlet.class
+                    .getName());
+        }
+        else {
             handler.addServlet("JettyReceiverServlet", path + "*", JettyReceiverServlet.class.getName());
         }
 
@@ -76,8 +85,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     }
 
-    public void doDisconnect() throws Exception {
-        //stop is automativcally called by Mule
+    public void doDisconnect() throws Exception
+    {
+        // stop is automativcally called by Mule
     }
 
     /**
@@ -85,29 +95,38 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
      * There is not need to dispose the connector as this is already done by the
      * framework
      */
-    protected void doDispose() {
+    protected void doDispose()
+    {
         try {
             httpServer.stop(false);
-        } catch (InterruptedException e) {
-            logger.error("Error disposing Jetty recevier on: " + endpoint.getEndpointURI().toString(), e);
+        }
+        catch (InterruptedException e) {
+            logger
+                    .error("Error disposing Jetty recevier on: " + endpoint.getEndpointURI().toString(),
+                            e);
         }
     }
 
-    public void doStart() throws UMOException {
+    public void doStart() throws UMOException
+    {
         try {
             httpServer.start();
-        } catch (Exception e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jetty Http Reciever"),e, this);
+        }
+        catch (Exception e) {
+            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jetty Http Reciever"),
+                    e, this);
         }
     }
 
-    public void doStop() throws UMOException {
+    public void doStop() throws UMOException
+    {
         try {
             httpServer.stop(true);
-        } catch (InterruptedException e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jetty Http Reciever"), e, this);
+        }
+        catch (InterruptedException e) {
+            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jetty Http Reciever"),
+                    e, this);
         }
     }
-
 
 }

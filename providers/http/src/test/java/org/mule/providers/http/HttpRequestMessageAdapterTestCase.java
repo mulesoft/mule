@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import org.mule.providers.http.servlet.HttpRequestMessageAdapter;
@@ -19,6 +20,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,57 +36,69 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTestCase {
-    public Object getValidMessage() throws Exception {
+public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTestCase
+{
+    public Object getValidMessage() throws Exception
+    {
         return getMockRequest("test message");
     }
 
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception {
+    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    {
         return new HttpRequestMessageAdapter(payload);
     }
 
-    public static HttpServletRequest getMockRequest(final String message) {
+    public static HttpServletRequest getMockRequest(final String message)
+    {
         Object proxy = Proxy.newProxyInstance(ServletConnectorTestCase.class.getClassLoader(),
-                new Class[]{HttpServletRequest.class},
-                new InvocationHandler() {
+                new Class[]{HttpServletRequest.class}, new InvocationHandler() {
                     private String payload = message;
                     private Map props = new HashMap();
 
-                    public Object invoke(Object proxy, Method method, Object[] args)
-                            throws Throwable {
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                    {
                         if ("getInputStream".equals(method.getName())) {
 
                             ServletInputStream s = new ServletInputStream() {
                                 ByteArrayInputStream is = new ByteArrayInputStream(payload.getBytes());
 
-                                public int read() throws IOException {
+                                public int read() throws IOException
+                                {
                                     return is.read();
                                 }
                             };
                             return s;
 
-                        } else if ("getAttribute".equals(method.getName())) {
+                        }
+                        else if ("getAttribute".equals(method.getName())) {
                             return props.get(args[0]);
-                        } else if ("setAttribute".equals(method.getName())) {
+                        }
+                        else if ("setAttribute".equals(method.getName())) {
                             props.put(args[0], args[1]);
-                        } else if ("equals".equals(method.getName())) {
+                        }
+                        else if ("equals".equals(method.getName())) {
                             return Boolean.valueOf(payload.equals(args[0]));
-                        } else if ("toString".equals(method.getName())) {
+                        }
+                        else if ("toString".equals(method.getName())) {
                             return payload;
-                        } else if ("getReader".equals(method.getName())) {
+                        }
+                        else if ("getReader".equals(method.getName())) {
                             return new BufferedReader(new StringReader(payload.toString()));
-                        } else if("getAttributeNames".equals(method.getName())) {
+                        }
+                        else if ("getAttributeNames".equals(method.getName())) {
                             return new Hashtable().elements();
-                        } else if("getHeaderNames".equals(method.getName())) {
+                        }
+                        else if ("getHeaderNames".equals(method.getName())) {
                             return new Hashtable().elements();
                         }
                         return null;
                     }
                 });
-        return (HttpServletRequest) proxy;
+        return (HttpServletRequest)proxy;
     }
 
-    public void testMessageRetrieval() throws Exception {
+    public void testMessageRetrieval() throws Exception
+    {
 
     }
 }

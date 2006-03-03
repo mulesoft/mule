@@ -14,10 +14,10 @@
  */
 package org.mule.providers.oracle.jms;
 
-import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.providers.oracle.jms.transformers.StringToXMLMessage;
 import org.mule.providers.oracle.jms.transformers.XMLMessageToString;
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>

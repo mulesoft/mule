@@ -15,6 +15,7 @@ package org.mule.providers.soap.glue;
 
 import electric.glue.context.ThreadContext;
 import electric.service.IService;
+
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -47,18 +48,22 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
             this.message = message;
         }
         String value = (String) ThreadContext.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (value != null)
+        if (value != null) {
             setReplyTo(value);
+        }
         value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (value != null)
+        if (value != null) {
             setCorrelationId(value);
+        }
 
         value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (value != null && !"-1".equals(value))
+        if (value != null && !"-1".equals(value)) {
             setCorrelationSequence(Integer.parseInt(value));
+        }
         value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (value != null && !"-1".equals(value))
+        if (value != null && !"-1".equals(value)) {
             setCorrelationGroupSize(Integer.parseInt(value));
+        }
     }
 
     /**

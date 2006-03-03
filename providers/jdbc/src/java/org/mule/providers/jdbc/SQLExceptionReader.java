@@ -13,8 +13,8 @@
  */
 package org.mule.providers.jdbc;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.ExceptionReader;
-import org.mule.util.Utility;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -36,7 +36,9 @@ public class SQLExceptionReader implements ExceptionReader {
     public Throwable getCause(Throwable t) {
         SQLException e = (SQLException)t;
         Throwable cause = e.getNextException();
-        if(cause==null) cause = e.getCause();
+        if(cause==null) {
+            cause = e.getCause();
+        }
         return cause;
     }
 
@@ -53,8 +55,12 @@ public class SQLExceptionReader implements ExceptionReader {
     public Map getInfo(Throwable t) {
         SQLException e = (SQLException)t;
         Map info = new HashMap();
-        if(e.getErrorCode() != 0) info.put("SQL Code", String.valueOf(e.getErrorCode()));
-        if(e.getSQLState() != null && !e.getSQLState().equals(Utility.EMPTY_STRING)) info.put("SQL State", e.getSQLState());
+        if(e.getErrorCode() != 0) {
+            info.put("SQL Code", String.valueOf(e.getErrorCode()));
+        }
+        if(e.getSQLState() != null && !e.getSQLState().equals(StringUtils.EMPTY)) {
+            info.put("SQL State", e.getSQLState());
+        }
         return info;
     }
 }

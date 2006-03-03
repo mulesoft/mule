@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.soap.xfire;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -30,14 +31,16 @@ public class SoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
 
         url = "xfire:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url);
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
     }
@@ -49,7 +52,8 @@ public class SoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
@@ -64,7 +68,8 @@ public class SoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals("soap", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
     }

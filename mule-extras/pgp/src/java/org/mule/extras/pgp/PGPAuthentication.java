@@ -13,10 +13,10 @@
  */
 package org.mule.extras.pgp;
 
-import org.mule.umo.security.UMOAuthentication;
-
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
+
+import org.mule.umo.security.UMOAuthentication;
 
 /**
  * @author ariva

@@ -89,7 +89,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     public void testClient() throws Exception
     {
-        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClient()")) return;
+        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClient()")) {
+            return;
+        }
 
         MuleClient client = new MuleClient();
         Map props = new HashMap();
@@ -103,7 +105,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     public void testClientWithPath() throws Exception
     {
-        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClientWithPath()")) return;
+        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClientWithPath()")) {
+            return;
+        }
 
         String requestAddress = "http://mule.codehaus.org/docs/apidocs/";
         MuleClient client = new MuleClient();

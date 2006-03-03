@@ -24,6 +24,7 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -42,11 +43,11 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
 import org.mule.util.TemplateParser;
-import org.mule.util.Utility;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected String getWsdlUrl(UMOEvent event) {
-        return event.getStringProperty(AxisConnector.WSDL_URL_PROPERTY, Utility.EMPTY_STRING);
+        return event.getStringProperty(AxisConnector.WSDL_URL_PROPERTY, StringUtils.EMPTY);
     }
 
     public void doDispatch(UMOEvent event) throws Exception {

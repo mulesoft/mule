@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.soap.xfire.wsdl;
 
 import org.mule.umo.UMOException;
@@ -20,13 +21,15 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates an XFire WSDL Message Dispatcher
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XFireWsdlMessageDispatcherFactory implements UMOMessageDispatcherFactory {
+public class XFireWsdlMessageDispatcherFactory implements UMOMessageDispatcherFactory
+{
 
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException {
+    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    {
         return new XFireWsdlMessageDispatcher((XFireWsdlConnector)connector);
     }
 }

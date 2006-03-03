@@ -15,6 +15,7 @@
 package org.mule.impl.model;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -354,7 +355,9 @@ public abstract class AbstractComponent implements UMOComponent {
                     }
                 }
             }
-            if(descriptor.isSingleton()) descriptor.setImplementation(component);
+            if(descriptor.isSingleton()) {
+                descriptor.setImplementation(component);
+            }
         } else {
             component = impl;
         }

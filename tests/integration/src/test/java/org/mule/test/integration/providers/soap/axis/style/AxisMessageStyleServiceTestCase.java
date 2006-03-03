@@ -16,6 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.xml.namespace.QName;
+
 import java.util.HashMap;
 import java.util.Map;
 

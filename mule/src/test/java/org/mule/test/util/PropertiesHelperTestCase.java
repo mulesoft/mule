@@ -15,9 +15,9 @@
 
 package org.mule.test.util;
 
+import org.apache.commons.lang.SystemUtils;
 import org.mule.util.CollectionUtil;
 import org.mule.util.PropertiesHelper;
-import org.mule.util.Utility;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,7 +132,7 @@ public class PropertiesHelperTestCase extends TestCase
     			new Object[]{"foo"}, new Object[]{"bar"});
 
     	assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
-    	assertEquals("{" + Utility.CRLF + "foo=bar" + Utility.CRLF + "}",
+    	assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR + "}",
 					PropertiesHelper.propertiesToString(props, true));
     }
 
@@ -145,9 +145,9 @@ public class PropertiesHelperTestCase extends TestCase
     			PropertiesHelper.propertiesToString(props, false));
 
     	assertEquals("{"
-                + Utility.CRLF + "foo=bar"
-                + Utility.CRLF + "foozle=doozle"
-                + Utility.CRLF + "}",
+                + SystemUtils.LINE_SEPARATOR + "foo=bar"
+                + SystemUtils.LINE_SEPARATOR + "foozle=doozle"
+                + SystemUtils.LINE_SEPARATOR + "}",
     			PropertiesHelper.propertiesToString(props, true));
     }
 

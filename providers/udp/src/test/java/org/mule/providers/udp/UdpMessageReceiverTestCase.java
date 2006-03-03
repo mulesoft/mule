@@ -14,6 +14,7 @@
 package org.mule.providers.udp;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;

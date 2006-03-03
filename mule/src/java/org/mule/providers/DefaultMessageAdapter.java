@@ -63,8 +63,12 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
     public DefaultMessageAdapter(Object message, Map properties, Map attachments)
     {
         this(message);
-        if(properties!=null) this.properties.putAll(properties);
-        if(attachments!=null) this.attachments.putAll(attachments);
+        if(properties!=null) {
+            this.properties.putAll(properties);
+        }
+        if(attachments!=null) {
+            this.attachments.putAll(attachments);
+        }
     }
 
     /**

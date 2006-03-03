@@ -553,8 +553,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties, UMOFilter filter) throws UMOException
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
-        if(properties!=null) ep.getProperties().putAll(properties);
-        if(filter!=null) ep.setFilter(filter);
+        if(properties!=null) {
+            ep.getProperties().putAll(properties);
+        }
+        if(filter!=null) {
+            ep.setFilter(filter);
+        }
         ep.initialise();
         manager.registerEndpoint(ep);
         return ep;

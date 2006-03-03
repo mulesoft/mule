@@ -34,6 +34,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
 import javax.resource.ResourceException;
+
 import java.util.Map;
 
 /**
@@ -159,8 +160,9 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public void close() throws ResourceException
     {
-        if (managedConnection == null)
+        if (managedConnection == null) {
             return; // connection is already closed
+        }
         managedConnection.removeConnection(this);
 
         // Send a close event to the App Server

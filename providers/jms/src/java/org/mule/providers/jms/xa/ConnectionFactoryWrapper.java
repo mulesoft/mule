@@ -13,10 +13,8 @@
  */
 package org.mule.providers.jms.xa;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -47,8 +45,10 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * @author Guillaume Nodet
@@ -177,19 +177,19 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
             }
             if (method.getName().equals("createSession")) {
                 XASession xas = ((XAConnection) xac).createXASession();
-                return (Session) Proxy.newProxyInstance(Session.class.getClassLoader(),
+                return Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                         new Class[] { Session.class },
                                                         new SessionInvocationHandler(xas.getSession(),
                                                                                      xas.getXAResource()));
             } else if (method.getName().equals("createQueueSession")) {
                 XAQueueSession xaqs = ((XAQueueConnection) xac).createXAQueueSession();
-                return (Session) Proxy.newProxyInstance(Session.class.getClassLoader(),
+                return Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                         new Class[] { QueueSession.class },
                                                         new SessionInvocationHandler(xaqs.getQueueSession(),
                                                                                      xaqs.getXAResource()));
             } else if (method.getName().equals("createTopicSession")) {
                 XATopicSession xats = ((XATopicConnection) xac).createXATopicSession();
-                return (Session) Proxy.newProxyInstance(Session.class.getClassLoader(),
+                return Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                         new Class[] { TopicSession.class },
                                                         new SessionInvocationHandler(xats.getTopicSession(),
                                                                                      xats.getXAResource()));

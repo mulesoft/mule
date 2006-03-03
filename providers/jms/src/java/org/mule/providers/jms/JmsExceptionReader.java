@@ -16,6 +16,7 @@ package org.mule.providers.jms;
 import org.mule.config.ExceptionReader;
 
 import javax.jms.JMSException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,9 @@ public class JmsExceptionReader implements ExceptionReader {
     public Throwable getCause(Throwable t) {
         JMSException e = (JMSException)t;
         Throwable cause = e.getLinkedException();
-        if(cause==null) cause = e.getCause();
+        if(cause==null) {
+            cause = e.getCause();
+        }
         return cause;
     }
 

@@ -117,7 +117,9 @@ public class FileMessageReceiver extends PollingMessageReceiver
 	    long fileAge = ((FileConnector) connector).getFileAge();
 	    long lastMod = file.lastModified();
 	    long now = (new java.util.Date()).getTime();
-	    if ((now - lastMod) < fileAge) return;
+	    if ((now - lastMod) < fileAge) {
+            return;
+        }
 	}
 
         File destinationFile = null;

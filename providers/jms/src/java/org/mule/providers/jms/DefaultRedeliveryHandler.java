@@ -20,6 +20,7 @@ import org.mule.umo.MessagingException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -66,8 +67,9 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
      */
     public void handleRedelivery(Message message) throws JMSException, MessagingException
     {
-        if (connector.getMaxRedelivery() <= 0)
+        if (connector.getMaxRedelivery() <= 0) {
             return;
+        }
 
         String id = message.getJMSMessageID();
         Integer i = (Integer) messages.remove(id);

@@ -76,7 +76,9 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher {
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
         String destination = endpointUri.toString();
 
-        if(logger.isInfoEnabled()) logger.info("Connecting to space '" + destination + "'");
+        if(logger.isInfoEnabled()) {
+            logger.info("Connecting to space '" + destination + "'");
+        }
         UMOSpace space = connector.getSpace(destination);
 
         Object result = space.take(timeout);
@@ -92,7 +94,9 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     public void doDispose() {
-        if(space!=null) space.dispose();
+        if(space!=null) {
+            space.dispose();
+        }
     }
 
 

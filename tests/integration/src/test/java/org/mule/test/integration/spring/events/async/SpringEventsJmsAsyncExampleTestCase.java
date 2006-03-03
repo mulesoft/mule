@@ -14,11 +14,11 @@
 package org.mule.test.integration.spring.events.async;
 
 import org.mule.MuleManager;
-import org.mule.test.integration.spring.events.OrderManagerBean;
-import org.mule.test.integration.spring.events.Order;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.test.integration.spring.events.Order;
+import org.mule.test.integration.spring.events.OrderManagerBean;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

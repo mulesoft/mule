@@ -157,7 +157,9 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
         String location = getWsdlEndpoint();
         location = location.substring(0, location.length() - 5);
-        if(location.endsWith("/")) location = location.substring(0, location.length() - 1);
+        if(location.endsWith("/")) {
+            location = location.substring(0, location.length() - 1);
+        }
         if(result.getPayloadAsString().indexOf("location=\"" + location) == -1) {
             assertTrue(result.getPayloadAsString().indexOf("location='" + location) > -1);
         } else {

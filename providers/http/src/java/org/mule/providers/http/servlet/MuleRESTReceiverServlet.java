@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http.servlet;
 
 import org.mule.MuleManager;
@@ -27,14 +28,15 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
  * <code>MuleRESTReceiverServlet</code> is used for sending a receiving events
  * from the Mule server via a serlet container. The servlet uses the REST style
- * of request processing GET METHOD will do a receive from an external source if an
- * endpoint parameter is set otherwise it behaves the same way as POST.
- * you can either specify the transport name i.e. to read from Jms orders.queue
+ * of request processing GET METHOD will do a receive from an external source if
+ * an endpoint parameter is set otherwise it behaves the same way as POST. you
+ * can either specify the transport name i.e. to read from Jms orders.queue
  * http://www.mycompany.com/rest/jms/orders/queue <p/> or a Mule endpoint name
  * to target a specific endpoint config. This would get the first email message
  * recieved by the orderEmailInbox endpoint. <p/>
@@ -55,29 +57,33 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throws ServletException, IOException
     {
         try {
-            if(httpServletRequest.getParameter("endpoint")!=null)
-            {
+            if (httpServletRequest.getParameter("endpoint") != null) {
                 UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
                 String timeoutString = httpServletRequest.getParameter("timeout");
                 long to = timeout;
                 if (timeoutString != null) {
                     to = new Long(timeoutString).longValue();
                 }
-                if (logger.isDebugEnabled())
-                    logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: " + to);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Making request using endpoint: " + endpoint.toString()
+                            + " timeout is: " + to);
+                }
 
-                UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(endpoint.getEndpointURI(),
-                                                                                                to);
+                UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(
+                        endpoint.getEndpointURI(), to);
 
                 writeResponse(httpServletResponse, returnMessage);
-            } else {
+            }
+            else {
                 AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-                UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(httpServletRequest));
+                UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(
+                        httpServletRequest));
                 UMOMessage returnMessage = receiver.routeMessage(message, true);
                 writeResponse(httpServletResponse, returnMessage);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             handleException(e, "Failed to route event through Servlet Receiver", httpServletResponse);
         }
     }
@@ -88,11 +94,13 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         try {
             AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(httpServletRequest));
+            UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(
+                    httpServletRequest));
             UMOMessage returnMessage = receiver.routeMessage(message, true);
             writeResponse(httpServletResponse, returnMessage);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             handleException(e, "Failed to Post event to Mule", httpServletResponse);
         }
     }
@@ -103,20 +111,23 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         try {
             AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(httpServletRequest));
+            UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(
+                    httpServletRequest));
             receiver.routeMessage(message, MuleManager.getConfiguration().isSynchronous());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback) {
-                httpServletResponse.getWriter().write("Item was created at endpointUri: " + receiver.getEndpointURI());
+                httpServletResponse.getWriter().write(
+                        "Item was created at endpointUri: " + receiver.getEndpointURI());
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             handleException(e, "Failed to Post event to Mule" + e.getMessage(), httpServletResponse);
         }
     }
 
-    protected void doDelete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-            throws ServletException, IOException
+    protected void doDelete(HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse) throws ServletException, IOException
     {
         try {
             UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
@@ -125,34 +136,38 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             if (timeoutString != null) {
                 to = new Long(timeoutString).longValue();
             }
-            if (logger.isDebugEnabled())
-                logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: " + to);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: "
+                        + to);
+            }
 
-            UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(endpoint.getEndpointURI(),
-                                                                                            to);
+            UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(
+                    endpoint.getEndpointURI(), to);
             if (returnMessage != null) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-            } else {
+            }
+            else {
                 httpServletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
-        } catch (Exception e) {
-            handleException(e,
-                            "Failed to Delete mule event via receive using uri: " + httpServletRequest.getPathInfo(),
-                            httpServletResponse);
+        }
+        catch (Exception e) {
+            handleException(e, "Failed to Delete mule event via receive using uri: "
+                    + httpServletRequest.getPathInfo(), httpServletResponse);
         }
     }
 
-    protected UMOEndpoint getEndpointForURI(HttpServletRequest httpServletRequest) throws EndpointException,
-            MalformedEndpointException
+    protected UMOEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
+            throws EndpointException, MalformedEndpointException
     {
         String endpointName = httpServletRequest.getParameter("endpoint");
-        if(endpointName==null) {
+        if (endpointName == null) {
             throw new EndpointException(new Message("http", 8, "endpoint"));
         }
 
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
         if (endpoint == null) {
-            //if we dont find an endpoint for the given name, lets check the servlet receivers
+            // if we dont find an endpoint for the given name, lets check the
+            // servlet receivers
             UMOMessageReceiver receiver = (UMOMessageReceiver)getReceivers().get(endpointName);
             if (receiver == null) {
                 throw new EndpointNotFoundException(endpointName);

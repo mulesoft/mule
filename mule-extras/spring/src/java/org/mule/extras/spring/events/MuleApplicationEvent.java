@@ -13,9 +13,6 @@
  */
 package org.mule.extras.spring.events;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOEventContext;
@@ -24,6 +21,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesHelper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>MuleApplicationEvent</code> is an Spring ApplicationEvent used to

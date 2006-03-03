@@ -41,7 +41,8 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         try {
             return new MuleEndpointURI("http://localhost:60198");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -49,7 +50,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-       return null;
+        return null;
     }
 
     protected UMOConnector createConnector() throws Exception
@@ -66,7 +67,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         PostMethod postMethod = new PostMethod(uri.toString());
         postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
         cnn = new HttpConnection(uri.getHost(), uri.getPort());
-        cnn.open();        
+        cnn.open();
         postMethod.execute(new HttpState(), cnn);
     }
 
@@ -83,10 +84,12 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", msg);
     }
 
-    protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         try {
             cnn.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
         }
     }

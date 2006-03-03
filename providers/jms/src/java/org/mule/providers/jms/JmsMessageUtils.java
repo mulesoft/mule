@@ -14,15 +14,9 @@
  */
 package org.mule.providers.jms;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.util.compression.CompressionHelper;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -37,9 +31,15 @@ import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.util.compression.CompressionHelper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>JmsMessageUtils</code> TODO -document class
@@ -136,9 +136,10 @@ public class JmsMessageUtils
                 result = baos.toByteArray();
                 baos.close();
                 if (result != null) {
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger.debug("JMSToObject: extracted " + ((byte[]) result).length
                                 + " bytes from JMS BytesMessage");
+                    }
                 }
             } else if (source instanceof TextMessage) {
                 result = ((TextMessage) source).getText();

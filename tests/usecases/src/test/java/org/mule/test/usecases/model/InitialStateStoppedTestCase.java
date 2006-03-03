@@ -19,7 +19,9 @@ public class InitialStateStoppedTestCase extends AbstractMuleTestCase {
 	private UMOManager manager;
     
 	public void testInitialStateStopped() throws Exception {    
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
 
         // "TestComponent" is initially stopped (initialState="stopped").
 		manager = new MuleXmlConfigurationBuilder().configure("initial-state-stopped-config.xml");

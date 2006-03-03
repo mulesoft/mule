@@ -29,10 +29,12 @@ public class FtpMessageAdapter extends AbstractMessageAdapter
 
     public FtpMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof byte[])
+        if (message instanceof byte[]) {
             this.message = (byte[]) message;
-        else
+        }
+        else {
             throw new MessageTypeNotSupportedException(message, getClass());
+        }
     }
 
     /**

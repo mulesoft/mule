@@ -490,8 +490,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // Register the multicaster descriptor
             registerMulticasterDescriptor();
 
-            if (!manager.isStarted())
+            if (!manager.isStarted()) {
                 manager.start();
+            }
         } catch (UMOException e) {
             throw new MuleRuntimeException(new Message("spring", 1), e);
         }
@@ -548,8 +549,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             String serviceName = null;
             if (ep.getPath() != null) {
                 String path = ep.getPath();
-                if (path.endsWith("/"))
+                if (path.endsWith("/")) {
                     path = path.substring(0, path.length() - 1);
+                }
                 int i = path.lastIndexOf("/");
                 if (i > -1) {
                     serviceName = path.substring(i + 1);
@@ -592,8 +594,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 for (Iterator iterator = connectors.entrySet().iterator(); iterator.hasNext();) {
                     entry = (Map.Entry) iterator.next();
                     c = (UMOConnector) entry.getValue();
-                    if (c.getName() == null)
+                    if (c.getName() == null) {
                         c.setName(entry.getKey().toString());
+                    }
                     MuleManager.getInstance().registerConnector(c);
                 }
             }
@@ -611,8 +614,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();) {
                     entry = (Map.Entry) iterator.next();
                     endpoint = (UMOEndpoint) entry.getValue();
-                    if (endpoint.getName() == null)
+                    if (endpoint.getName() == null) {
                         endpoint.setName(entry.getKey().toString());
+                    }
                     MuleManager.getInstance().registerEndpoint(endpoint);
                 }
             }
@@ -630,8 +634,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 for (Iterator iterator = transformers.entrySet().iterator(); iterator.hasNext();) {
                     entry = (Map.Entry) iterator.next();
                     t = (UMOTransformer) entry.getValue();
-                    if (t.getName() == null)
+                    if (t.getName() == null) {
                         t.setName(entry.getKey().toString());
+                    }
                     MuleManager.getInstance().registerTransformer(t);
                 }
             }
@@ -674,8 +679,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     protected ObjectFilter createFilter(String pattern)
     {
         try {
-            if (getSubscriptionFilter() == null)
+            if (getSubscriptionFilter() == null) {
                 setSubscriptionFilter(WildcardFilter.class);
+            }
             ObjectFilter filter = (ObjectFilter) ClassHelper.instanciateClass(getSubscriptionFilter(),
                                                                               new Object[] { pattern });
             return filter;

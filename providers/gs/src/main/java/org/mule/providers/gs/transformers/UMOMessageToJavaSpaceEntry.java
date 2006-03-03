@@ -14,6 +14,7 @@
 package org.mule.providers.gs.transformers;
 
 import net.jini.core.entry.Entry;
+
 import org.mule.providers.gs.JiniMessage;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;

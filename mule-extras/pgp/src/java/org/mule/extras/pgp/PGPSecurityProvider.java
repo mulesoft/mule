@@ -13,6 +13,11 @@
  */
 package org.mule.extras.pgp;
 
+import cryptix.message.Message;
+import cryptix.message.MessageException;
+import cryptix.message.SignedMessage;
+import cryptix.pki.KeyBundle;
+
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
@@ -22,11 +27,6 @@ import org.mule.umo.security.UMOSecurityContextFactory;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
-
-import cryptix.message.Message;
-import cryptix.message.MessageException;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva

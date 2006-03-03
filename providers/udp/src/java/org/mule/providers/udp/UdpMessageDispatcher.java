@@ -15,13 +15,6 @@ package org.mule.providers.udp;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -29,6 +22,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * <code>UdpMessageDispatcher</code> is responsible for dispatching MuleEvents as
@@ -89,8 +89,9 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         // If we're doing sync receive try and read return info from socket
         if (event.getEndpoint().isRemoteSync()) {
             DatagramPacket result = receive(socket, event.getTimeout());
-            if (result == null)
+            if (result == null) {
                 return null;
+            }
             UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
             return message;
         } else {
@@ -115,8 +116,9 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     {
         initialise(endpointUri.getAddress());
         DatagramPacket result = receive(socket, Integer.parseInt(String.valueOf(timeout)));
-        if (result == null)
+        if (result == null) {
             return null;
+        }
         UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
         return message;
     }
@@ -134,7 +136,8 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     public void doDispose()
     {
         initialised.set(false);
-        if (socket != null)
+        if (socket != null) {
             socket.close();
+        }
     }
 }

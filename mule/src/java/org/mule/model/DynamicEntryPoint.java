@@ -13,14 +13,9 @@
  */
 package org.mule.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.NullPayload;
@@ -29,7 +24,12 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
-import org.mule.config.MuleProperties;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>DynamicEntryPoint</code> is used to detemine the entry point on a

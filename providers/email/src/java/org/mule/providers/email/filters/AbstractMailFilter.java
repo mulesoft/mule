@@ -13,12 +13,12 @@
  */
 package org.mule.providers.email.filters;
 
-import javax.mail.Message;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+
+import javax.mail.Message;
 
 /**
  * <code>AbstractMailFilter</code> is a base class for all javax.mail.Message

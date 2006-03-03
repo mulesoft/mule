@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.providers.http;
 
 import org.mule.umo.UMOException;
@@ -33,6 +34,6 @@ public class HttpClientMessageDispatcherFactory implements UMOMessageDispatcherF
      */
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new HttpClientMessageDispatcher((HttpConnector) connector);
+        return new HttpClientMessageDispatcher((HttpConnector)connector);
     }
 }

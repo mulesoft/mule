@@ -14,9 +14,9 @@
  */
 package org.mule.umo.transformer;
 
-import java.io.Serializable;
-
 import org.mule.umo.lifecycle.Initialisable;
+
+import java.io.Serializable;
 
 /**
  * <code>UMOSimpleTransformer</code> manages the transformation and or

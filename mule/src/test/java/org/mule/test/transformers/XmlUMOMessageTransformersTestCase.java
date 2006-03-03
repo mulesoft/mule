@@ -98,10 +98,12 @@ public class XmlUMOMessageTransformersTestCase extends AbstractTransformerTestCa
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null)
+        if (src == null && result == null) {
             return true;
-        if (src == null || result == null)
+        }
+        if (src == null || result == null) {
             return false;
+        }
         if(src instanceof UMOMessage && result instanceof UMOMessage) {
             return ((UMOMessage)src).getPayload().equals(((UMOMessage)result).getPayload()) &&
                  ((UMOMessage)src).getProperty("object").equals(((UMOMessage)result).getProperty("object")) &&

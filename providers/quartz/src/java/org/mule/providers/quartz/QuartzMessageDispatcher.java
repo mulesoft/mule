@@ -100,8 +100,12 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher {
         String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
         String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
 
-        if (groupName == null) groupName = QuartzConnector.DEFAULT_GROUP_NAME;
-        if (jobGroupName == null) jobGroupName = groupName;
+        if (groupName == null) {
+            groupName = QuartzConnector.DEFAULT_GROUP_NAME;
+        }
+        if (jobGroupName == null) {
+            jobGroupName = groupName;
+        }
 
         jobDetail.setGroup(groupName);
 

@@ -65,8 +65,12 @@ public class StreamMessageAdapter extends AbstractMessageAdapter {
      * @return the current message
      */
     public Object getPayload() {
-        if(response!=null) return response;
-        if(in!=null) return in;
+        if(response!=null) {
+            return response;
+        }
+        if(in!=null) {
+            return in;
+        }
         return nullPayload;
     }
 

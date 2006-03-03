@@ -78,7 +78,9 @@ public class MuleTransport extends Transport {
     }
 
     public static boolean isTransportSupported(String protocol)  {
-        if(transports==null) initTransports();
+        if(transports==null) {
+            initTransports();
+        }
         return transports.get(protocol) != null;
     }
 

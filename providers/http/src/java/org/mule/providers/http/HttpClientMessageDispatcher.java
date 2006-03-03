@@ -110,7 +110,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
@@ -120,7 +120,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -130,7 +130,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String,
      *      org.mule.umo.UMOEvent)
      */
@@ -211,51 +211,64 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected HttpMethod getMethod(UMOEvent event) throws TransformerException {
-        String method = (String) event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+    protected HttpMethod getMethod(UMOEvent event) throws TransformerException
+    {
+        String method = (String)event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY,
+                HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod = null;
         Object body = event.getTransformedMessage();
 
-         if (body instanceof HttpMethod) {
-            httpMethod = (HttpMethod) body;
-        } else if ("GET".equalsIgnoreCase(method)) {
+        if (body instanceof HttpMethod) {
+            httpMethod = (HttpMethod)body;
+        }
+        else if ("GET".equalsIgnoreCase(method)) {
             httpMethod = new GetMethod(uri.toString());
-        } else {
+        }
+        else {
             PostMethod postMethod = new PostMethod(uri.toString());
 
             if (body instanceof String) {
                 ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
-                httpMethod = (HttpMethod) trans.transform(body.toString());
-            } else if (body instanceof HttpMethod) {
-                httpMethod = (HttpMethod) body;
-            } else if(body instanceof StreamMessageAdapter) {
-                postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body, event));
+                httpMethod = (HttpMethod)trans.transform(body.toString());
+            }
+            else if (body instanceof HttpMethod) {
+                httpMethod = (HttpMethod)body;
+            }
+            else if (body instanceof StreamMessageAdapter) {
+                postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body,
+                        event));
                 postMethod.setContentChunked(true);
                 httpMethod = postMethod;
-            } else{
+            }
+            else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
-                //todo MULE20 Encoding
-                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer /*, event.getEncoding()*/));
+                // todo MULE20 Encoding
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer /*
+                                                                                 * ,
+                                                                                 * event.getEncoding()
+                                                                                 */));
                 httpMethod = postMethod;
             }
 
         }
         httpMethod.setDoAuthentication(true);
         if (event.getCredentials() != null) {
-            String authScopeHost = event.getStringProperty("http.auth.scope.host",null);
+            String authScopeHost = event.getStringProperty("http.auth.scope.host", null);
             int authScopePort = event.getIntProperty("http.auth.scope.port", -1);
-            String authScopeRealm = event.getStringProperty("http.auth.scope.realm",null);
-            String authScopeScheme = event.getStringProperty("http.auth.scope.scheme",null);
-            client.getState().setCredentials(new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                    new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(event.getCredentials().getPassword())));
+            String authScopeRealm = event.getStringProperty("http.auth.scope.realm", null);
+            String authScopeScheme = event.getStringProperty("http.auth.scope.scheme", null);
+            client.getState().setCredentials(
+                    new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
+                    new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
+                            event.getCredentials().getPassword())));
         }
         return httpMethod;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     public UMOMessage doSend(UMOEvent event) throws Exception
@@ -349,7 +362,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         private StreamMessageAdapter messageAdapter;
         private UMOEvent event;
 
-        public StreamPayloadRequestEntity(StreamMessageAdapter messageAdapter, UMOEvent event) {
+        public StreamPayloadRequestEntity(StreamMessageAdapter messageAdapter, UMOEvent event)
+        {
             this.messageAdapter = messageAdapter;
             this.event = event;
         }

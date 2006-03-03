@@ -13,6 +13,7 @@
  */
 package org.mule.providers.jbi.components;
 
+import org.apache.commons.lang.SystemUtils;
 import org.mule.MuleManager;
 import org.mule.config.converters.QNameConverter;
 import org.mule.config.i18n.Message;
@@ -31,7 +32,6 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.Utility;
 
 import javax.jbi.JBIException;
 import javax.jbi.messaging.MessageExchange;
@@ -134,10 +134,10 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
                 if(logger.isDebugEnabled()) {
                     StringBuffer buf = new StringBuffer("Found the following endpoints for: ");
-                   	buf.append(targetService).append(Utility.CRLF);
+                   	buf.append(targetService).append(SystemUtils.LINE_SEPARATOR);
                     for (int i = 0; i < eps.length; i++) {
                         ServiceEndpoint ep = eps[i];
-                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append(Utility.CRLF);
+                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append(SystemUtils.LINE_SEPARATOR);
                     }
                     logger.debug(buf.toString());
                 }

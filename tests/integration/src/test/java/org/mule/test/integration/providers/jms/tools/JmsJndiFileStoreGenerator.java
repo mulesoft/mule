@@ -32,13 +32,13 @@ package org.mule.test.integration.providers.jms.tools;
 // //********* End Wave specific imports ****************
 
 // //********* ActiveMq specific imports ****************
-import java.io.File;
-import java.util.Hashtable;
+import com.sun.jndi.fscontext.RefFSContext;
+import com.sun.jndi.fscontext.RefFSContextFactory;
 
 import javax.naming.Context;
 
-import com.sun.jndi.fscontext.RefFSContext;
-import com.sun.jndi.fscontext.RefFSContextFactory;
+import java.io.File;
+import java.util.Hashtable;
 
 /**
  * <code>JmsJndiFileStoreGenerator</code> TODO

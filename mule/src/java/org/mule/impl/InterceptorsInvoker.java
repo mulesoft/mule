@@ -13,13 +13,13 @@
  */
 package org.mule.impl;
 
-import java.util.List;
-
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
+
+import java.util.List;
 
 /**
  * <code>InterceptorsInvoker</code> is used trigger an interceptor chain.

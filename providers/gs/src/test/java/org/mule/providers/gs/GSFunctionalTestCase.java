@@ -50,7 +50,9 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
     }
 
     public void testReceivesWithTemplates() throws Exception {
-        if(!isPrereqsMet("org.mule.providers.gs.GSFunctionalTestCase.testReceivesWithTemplates()")) return;
+        if(!isPrereqsMet("org.mule.providers.gs.GSFunctionalTestCase.testReceivesWithTemplates()")) {
+            return;
+        }
 
         MuleClient client = new MuleClient();
         Order order = new Order();

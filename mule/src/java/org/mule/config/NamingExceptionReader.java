@@ -13,10 +13,11 @@
  */
 package org.mule.config;
 
-import javax.naming.NamingException;
 import javax.naming.Name;
-import java.util.Map;
+import javax.naming.NamingException;
+
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * todo document

@@ -141,8 +141,9 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
 
                 doDispose();
 
-                if (reconnect(event, connector.getMaxRetryCount()))
+                if (reconnect(event, connector.getMaxRetryCount())) {
                     write(connectedSocket, payload);
+                }
             } else {
                 throw e;
             }

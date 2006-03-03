@@ -16,6 +16,7 @@
 package org.mule.test.providers.file;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.MuleManager;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
@@ -47,7 +48,9 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         super.doSetUp();
         //The working directory is deleted on tearDown
         File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
-        if(!dir.exists()) dir.mkdirs();
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
         validMessage = File.createTempFile("simple", ".mule", dir);
         assertNotNull(validMessage);
     }

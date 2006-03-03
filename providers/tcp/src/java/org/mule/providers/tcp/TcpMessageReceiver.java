@@ -15,6 +15,7 @@
 package org.mule.providers.tcp;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -33,6 +34,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -80,7 +82,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
         // this will cause the server thread to quit
         disposing.set(true);
         try {
-            if (serverSocket != null) serverSocket.close();
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
         } catch (IOException e) {
             logger.warn("Failed to close server socket: " + e.getMessage(), e);
         }
@@ -125,9 +129,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                         socket.setSoTimeout(connector.getReceiveTimeout());
                     }
                     socket.setTcpNoDelay(true);
-                    if (logger.isTraceEnabled()) logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
+                    }
                 } catch (java.io.InterruptedIOException iie) {
-                    if (logger.isDebugEnabled()) logger.debug("Interupted IO doing serverSocket.accept: " + iie.getMessage());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Interupted IO doing serverSocket.accept: " + iie.getMessage());
+                    }
                 } catch (Exception e) {
                     if (!connector.isDisposed() && !disposing.get()) {
                         logger.warn("Accept failed on socket: " + e, e);
@@ -156,8 +164,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
 
     public void doDispose() {
         try {
-            if (serverSocket != null && !serverSocket.isClosed())
+            if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
+            }
             serverSocket = null;
 
         } catch (Exception e) {
@@ -193,7 +202,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
             closed.set(true);
             try {
                 if (socket != null && !socket.isClosed()) {
-                    if (logger.isDebugEnabled()) logger.debug("Closing listener: " + socket.getLocalSocketAddress().toString());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Closing listener: " + socket.getLocalSocketAddress().toString());
+                    }
                     socket.close();
                 }
             } catch (IOException e) {

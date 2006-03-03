@@ -13,12 +13,12 @@
  */
 package org.mule.ra;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
-
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+
+import javax.resource.ResourceException;
+import javax.resource.spi.ManagedConnectionMetaData;
 
 /**
  * <code>MuleManagedConnectionMetaData</code> TODO

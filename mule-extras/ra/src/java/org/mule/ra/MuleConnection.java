@@ -13,12 +13,12 @@
  */
 package org.mule.ra;
 
-import java.util.Map;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 
 import javax.resource.ResourceException;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import java.util.Map;
 
 /**
  * <code>MuleConnection</code> defines the client connection methods for the

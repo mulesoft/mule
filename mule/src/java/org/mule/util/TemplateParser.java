@@ -101,7 +101,9 @@ public class TemplateParser
      * @return the parsed String
      */
     public List parse(Map props, List templates) {
-        if(templates==null) return new ArrayList();
+        if(templates==null) {
+            return new ArrayList();
+        }
         List list = new ArrayList(templates.size());
         for (Iterator iterator = templates.iterator(); iterator.hasNext();) {
             list.add(parse(props, iterator.next().toString()));
@@ -117,7 +119,9 @@ public class TemplateParser
      * @return the parsed String
      */
     public Map parse(Map props, Map templates) {
-        if(templates==null) return new HashMap();
+        if(templates==null) {
+            return new HashMap();
+        }
         Map map = new HashMap(templates.size());
         Map.Entry entry;
         for (Iterator iterator = templates.entrySet().iterator(); iterator.hasNext();) {

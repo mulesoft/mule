@@ -13,6 +13,7 @@
  */
 package org.mule.providers.stream;
 
+import org.apache.commons.lang.SystemUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -20,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.Utility;
 
 import java.io.InputStream;
 
@@ -96,8 +96,8 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
             //remove any trailing CR/LF
             String finalMessageString;
-            int noCRLFLength = fullBuffer.length() - Utility.CRLF.length();
-            if (fullBuffer.indexOf(Utility.CRLF, noCRLFLength) != -1) {
+            int noCRLFLength = fullBuffer.length() - SystemUtils.LINE_SEPARATOR.length();
+            if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1) {
                 finalMessageString = fullBuffer.substring(0, noCRLFLength);
             }
             else {

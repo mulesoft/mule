@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.providers.http.jetty;
 
 import org.mule.config.i18n.Message;
@@ -33,14 +34,18 @@ public class JettyReceiverServlet extends MuleReceiverServlet
 {
     private AbstractMessageReceiver receiver;
 
-    protected void doInit(ServletConfig servletConfig) throws ServletException {
-        receiver = (AbstractMessageReceiver) servletConfig.getServletContext().getAttribute("messageReceiver");
+    protected void doInit(ServletConfig servletConfig) throws ServletException
+    {
+        receiver = (AbstractMessageReceiver)servletConfig.getServletContext().getAttribute(
+                "messageReceiver");
         if (receiver == null) {
             throw new ServletException(new Message("http", 7).toString());
         }
     }
-    
-    protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest) throws EndpointException {
+
+    protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
+            throws EndpointException
+    {
         return receiver;
     }
 }

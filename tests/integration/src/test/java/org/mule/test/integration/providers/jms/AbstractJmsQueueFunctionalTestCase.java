@@ -14,6 +14,7 @@
 package org.mule.test.integration.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
 import org.mule.tck.functional.EventCallback;

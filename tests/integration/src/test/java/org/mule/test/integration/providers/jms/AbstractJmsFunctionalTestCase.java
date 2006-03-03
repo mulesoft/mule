@@ -34,6 +34,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.QueueConnection;
 import javax.jms.TopicConnection;
+
 import java.util.HashMap;
 
 /**
@@ -95,7 +96,9 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected void doTearDown() throws Exception
     {
         try {
-            if(cnn!=null) cnn.close();
+            if(cnn!=null) {
+                cnn.close();
+            }
         } catch (JMSException e) {
         }
     }

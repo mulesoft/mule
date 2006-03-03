@@ -16,6 +16,7 @@ package org.mule.providers.oracle.jms.transformers;
 
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
+
 import org.mule.config.i18n.Message;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractTransformer;
@@ -23,6 +24,7 @@ import org.mule.umo.transformer.TransformerException;
 import org.w3c.dom.Document;
 
 import javax.jms.JMSException;
+
 import java.sql.SQLException;
 
 /**
@@ -53,7 +55,9 @@ public class XMLMessageToDOM extends AbstractTransformer {
         Document document = null;
 
         // The source must be an AdtMessage.
-        if (!(adtMessage instanceof AdtMessage)) throw new TransformerException(Message.createStaticMessage("Object to transform must be of type AdtMessage."), this);
+        if (!(adtMessage instanceof AdtMessage)) {
+            throw new TransformerException(Message.createStaticMessage("Object to transform must be of type AdtMessage."), this);
+        }
 
         try {
             payload = ((AdtMessage) adtMessage).getAdtPayload();
@@ -62,7 +66,9 @@ public class XMLMessageToDOM extends AbstractTransformer {
         }
 
         // The message payload must be an XMLType.
-        if (!(payload instanceof XMLType)) throw new TransformerException(Message.createStaticMessage("The message payload must be an XMLType."), this);
+        if (!(payload instanceof XMLType)) {
+            throw new TransformerException(Message.createStaticMessage("The message payload must be an XMLType."), this);
+        }
 
         try {
             document = ((XMLType) payload).getDOM();

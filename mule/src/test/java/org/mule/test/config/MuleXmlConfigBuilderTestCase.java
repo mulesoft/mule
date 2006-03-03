@@ -1,6 +1,5 @@
 package org.mule.test.config;
 
-import junit.framework.Assert;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
@@ -22,6 +21,8 @@ import org.mule.util.ObjectPool;
 
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

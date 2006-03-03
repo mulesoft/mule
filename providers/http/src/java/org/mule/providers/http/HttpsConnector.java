@@ -11,7 +11,15 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
+
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.Utility;
+
+import javax.net.ssl.KeyManagerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,13 +27,6 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
-
-import javax.net.ssl.KeyManagerFactory;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.Utility;
 
 /**
  * <code>HttpsConnector</code> provides Https connectivity
@@ -83,22 +84,24 @@ public class HttpsConnector extends HttpConnector
             keystore = KeyStore.getInstance(keystoreType);
             InputStream is = Utility.loadResource(getKeyStore(), getClass());
             if (is == null) {
-                throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, "Keystore: "
-                        + getKeyStore()).getMessage());
+                throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
+                        "Keystore: " + getKeyStore()).getMessage());
             }
             keystore.load(is, getStorePassword().toCharArray());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()),
-                                              e,
-                                              this);
+        }
+        catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: "
+                    + getKeyStore()), e, this);
         }
         try {
             // Get key manager
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
             // Initialize the KeyManagerFactory to work with our keyStore
             keyManagerFactory.init(keystore, getStorePassword().toCharArray());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e, this);
+        }
+        catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e,
+                    this);
         }
 
         super.doInitialise();
@@ -110,14 +113,15 @@ public class HttpsConnector extends HttpConnector
             try {
                 String clientPath = Utility.getResourcePath(clientKeyStore, getClass());
                 if (clientPath == null) {
-                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: "
-                            + clientKeyStore), this);
+                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X,
+                            "ClientKeyStore: " + clientKeyStore), this);
                 }
                 System.setProperty("javax.net.ssl.keyStore", clientPath);
                 System.setProperty("javax.net.ssl.keyStorePassword", clientKeyStorePassword);
 
                 logger.info("Set Client Key store: javax.net.ssl.keyStore=" + clientPath);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: "
                         + clientKeyStore), this);
             }
@@ -125,11 +129,12 @@ public class HttpsConnector extends HttpConnector
 
         if (trustStore != null) {
             System.setProperty("javax.net.ssl.trustStore", getTrustStore());
-            if(getTrustStorePassword()!=null) {
+            if (getTrustStorePassword() != null) {
                 System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
             }
             logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
-        } else if (!isExplicitTrustStoreOnly()) {
+        }
+        else if (!isExplicitTrustStoreOnly()) {
             logger.info("Defaulting trust store to client Key Store");
             trustStore = getClientKeyStore();
             trustStorePassword = getClientKeyStorePassword();

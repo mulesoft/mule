@@ -29,6 +29,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -94,8 +95,9 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         // this will cause the server thread to quit
         disposing.set(true);
-        if (socket != null)
+        if (socket != null) {
             socket.close();
+        }
 
     }
 

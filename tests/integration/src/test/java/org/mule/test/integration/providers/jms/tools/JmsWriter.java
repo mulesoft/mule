@@ -15,10 +15,9 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.util.Utility;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -38,9 +37,10 @@ import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.util.Utility;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class JmsWriter
 {
@@ -132,8 +132,9 @@ public class JmsWriter
         boolean queue = false;
         if (args.length == 5) {
             noOfMessages = Integer.parseInt(args[4]);
-            if (args[3].equals("-q"))
+            if (args[3].equals("-q")) {
                 queue = true;
+            }
             String data = args[0];
             if (data.endsWith(".xml")) {
                 try {

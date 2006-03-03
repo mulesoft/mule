@@ -15,6 +15,7 @@
 package org.mule.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -116,7 +117,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             String resourceInfo = endpointUri.getResourceInfo();
             topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
             //todo MULE20 remove resource info support
-            if(!topic) topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(), "topic", false);
+            if(!topic) {
+                topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(), "topic", false);
+            }
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
             producer = connector.getJmsSupport().createProducer(session, dest);

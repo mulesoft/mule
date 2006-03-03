@@ -18,9 +18,6 @@ import com.mockobjects.dynamic.Mock;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.interceptors.InterceptorStack;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.Invocation;
@@ -28,6 +25,9 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO: document this class

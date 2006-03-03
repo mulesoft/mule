@@ -30,7 +30,7 @@ public class ClientBridgeTestCase extends FunctionalTestCase {
     public void testX () throws Exception {
         MuleClient client = new MuleClient();
         UMOMessage message =
-          (UMOMessage) client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
+          client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
 
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof ComplexData);

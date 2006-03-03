@@ -13,9 +13,9 @@
  */
 package org.mule.impl.container;
 
-import java.rmi.RemoteException;
-
 import javax.ejb.EJBObject;
+
+import java.rmi.RemoteException;
 
 /**
  * <code>Sender</code> TODO

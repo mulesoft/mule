@@ -15,11 +15,34 @@ package org.mule.test.integration.providers.jms.tools;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
+import javax.jms.TopicSubscriber;
+import javax.jms.XAConnection;
+import javax.jms.XAQueueConnection;
+import javax.jms.XAQueueConnectionFactory;
+import javax.jms.XASession;
+import javax.jms.XATopicConnection;
+import javax.jms.XATopicConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Reference;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -326,8 +349,9 @@ public class JmsTestUtils
         Queue queue = session.createQueue(queueName);
         QueueReceiver receiver = session.createReceiver(queue);
         Message msg = receiver.receive(timeout);
-        if (msg != null)
+        if (msg != null) {
             msg.acknowledge();
+        }
         receiver.close();
         session.close();
         return msg;
@@ -337,8 +361,9 @@ public class JmsTestUtils
     {
         TopicSubscriber receiver = getTopicSubscriber(cnn, topicName);
         Message msg = receiver.receive(timeout);
-        if (msg != null)
+        if (msg != null) {
             msg.acknowledge();
+        }
         receiver.close();
         return msg;
     }

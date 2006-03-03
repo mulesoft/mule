@@ -40,6 +40,7 @@ import javax.mail.URLName;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -110,8 +111,9 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     public void doDisconnect() throws Exception
     {
-        if (folder != null)
+        if (folder != null) {
             folder.close(true);
+        }
     }
 
     public void doStop()
@@ -203,8 +205,9 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
      */
     public synchronized void setFolder(Folder folder)
     {
-        if (folder == null)
+        if (folder == null) {
             throw new IllegalArgumentException("Mail folder cannot be null");
+        }
         this.folder = folder;
         synchronized (this.folder) {
             if (!this.folder.isOpen()) {
@@ -287,12 +290,14 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     protected void doDispose()
     {
         super.doDispose();
-        if (folder != null)
+        if (folder != null) {
             folder.removeMessageCountListener(this);
+        }
 
         try {
-            if (folder != null)
+            if (folder != null) {
                 folder.close(false);
+            }
         } catch (Exception e) {
             logger.error("Failed to close pop3  inbox: " + e.getMessage());
         }

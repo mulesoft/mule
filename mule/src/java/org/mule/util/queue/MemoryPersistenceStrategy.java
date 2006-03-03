@@ -17,7 +17,11 @@ package org.mule.util.queue;
 import org.doomdark.uuid.UUIDGenerator;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

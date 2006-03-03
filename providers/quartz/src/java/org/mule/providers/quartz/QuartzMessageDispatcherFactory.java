@@ -13,11 +13,11 @@
  */
 package org.mule.providers.quartz;
 
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.UMOException;
 import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * TCreates a QuartzMessageDispatcher instance

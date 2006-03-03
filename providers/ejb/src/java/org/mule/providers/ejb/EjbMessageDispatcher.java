@@ -76,8 +76,9 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
             // serverCodebasePath);
 
             // Set security manager
-            if (System.getSecurityManager() == null)
+            if (System.getSecurityManager() == null) {
                 System.setSecurityManager(new RMISecurityManager());
+            }
 
             remoteObject = getRemoteObject(event);
 

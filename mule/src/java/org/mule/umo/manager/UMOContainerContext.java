@@ -14,10 +14,10 @@
  */
 package org.mule.umo.manager;
 
-import java.io.Reader;
-
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
+
+import java.io.Reader;
 
 /**
  * <code>UMOContainerContext</code> defines the contract between Mule and an

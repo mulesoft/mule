@@ -48,8 +48,9 @@ public class UdpConnector extends AbstractServiceEnabledConnector
 
     public void setTimeout(int timeout)
     {
-        if (timeout < 1)
+        if (timeout < 1) {
             timeout = DEFAULT_SOCKET_TIMEOUT;
+        }
         this.timeout = timeout;
     }
 
@@ -60,8 +61,9 @@ public class UdpConnector extends AbstractServiceEnabledConnector
 
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1)
+        if (bufferSize < 1) {
             bufferSize = DEFAULT_BUFFER_SIZE;
+        }
         this.bufferSize = bufferSize;
     }
 

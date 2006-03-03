@@ -73,8 +73,9 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         URI uri = new URI(endpoint);
         String ep = uri.getScheme() + "://" + uri.getHost();
-        if (uri.getPort() != -1)
+        if (uri.getPort() != -1) {
             ep += ":" + uri.getPort();
+        }
 
         for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();

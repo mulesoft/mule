@@ -118,8 +118,9 @@ public class MuleMsgProvider extends MsgProvider
             Throwable t = RequestContext.getExceptionPayload().getException();
             if (t instanceof Exception) {
                 AxisFault fault = AxisFault.makeFault((Exception) t);
-                if (t instanceof RuntimeException)
+                if (t instanceof RuntimeException) {
                     fault.addFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION, "true");
+                }
                 throw fault;
             } else {
                 throw (Error) t;

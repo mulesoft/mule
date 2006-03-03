@@ -13,13 +13,13 @@
  */
 package org.mule.providers.jdbc.xa;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
+
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$

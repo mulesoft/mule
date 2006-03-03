@@ -17,6 +17,7 @@ package org.mule.providers.oracle.jms.transformers;
 import oracle.jms.AQjmsSession;
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
+
 import org.mule.config.i18n.Message;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractTransformer;

@@ -26,6 +26,7 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
 import javax.management.ObjectName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,9 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
 
     public void dispose() {
         try {
-           if(listenerObjectName!=null) mBeanServer.unregisterMBean(listenerObjectName);
+           if(listenerObjectName!=null) {
+            mBeanServer.unregisterMBean(listenerObjectName);
+        }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
         }

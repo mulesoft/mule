@@ -15,6 +15,7 @@
 package org.mule.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ExceptionHelper;
@@ -50,6 +51,7 @@ import javax.jms.XAConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -147,8 +149,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
                 throw new InitialisationException(new Message(Messages.X_IS_NULL, "jndiInitialFactory"), this);
             }
 
-            if (jndiProviderUrl != null)
+            if (jndiProviderUrl != null) {
                 props.put(Context.PROVIDER_URL, jndiProviderUrl);
+            }
 
             if (jndiProviderProperties != null) {
                 props.putAll(jndiProviderProperties);
@@ -323,7 +326,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             logger.debug("Retrieving jms session from current transaction");
             return session;
         }
-        if(logger.isDebugEnabled()) logger.debug("Retrieving new jms session from connection: topic=" + topic + ", transacted=" + (transacted || tx != null) + ", ack mode="+ acknowledgementMode + ", nolocal=" + noLocal);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Retrieving new jms session from connection: topic=" + topic + ", transacted=" + (transacted || tx != null) + ", ack mode="+ acknowledgementMode + ", nolocal=" + noLocal);
+        }
 
         session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode, noLocal);
         if (tx != null) {

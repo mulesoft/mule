@@ -13,13 +13,13 @@
  */
 package org.mule.config.builders;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationException;
 import org.mule.umo.manager.UMOManager;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to

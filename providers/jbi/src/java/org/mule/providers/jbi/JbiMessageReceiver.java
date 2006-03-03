@@ -26,7 +26,12 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jbi.component.ComponentContext;
-import javax.jbi.messaging.*;
+import javax.jbi.messaging.DeliveryChannel;
+import javax.jbi.messaging.ExchangeStatus;
+import javax.jbi.messaging.Fault;
+import javax.jbi.messaging.MessageExchange;
+import javax.jbi.messaging.MessagingException;
+import javax.jbi.messaging.NormalizedMessage;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 

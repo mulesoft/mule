@@ -15,11 +15,11 @@
 
 package org.mule.extras.jotm;
 
-import javax.transaction.TransactionManager;
-
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.transaction.TransactionManager;
 
 /**
  * This factory retrieves the transaction manager for <a

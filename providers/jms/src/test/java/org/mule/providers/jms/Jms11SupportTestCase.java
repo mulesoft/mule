@@ -15,16 +15,17 @@
 
 package org.mule.providers.jms;
 
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.FullConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.constraint.Constraint;
+
 import org.mule.tck.AbstractMuleTestCase;
 
+import javax.jms.JMSException;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.Queue;
-import javax.jms.JMSException;
 
 /**
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>

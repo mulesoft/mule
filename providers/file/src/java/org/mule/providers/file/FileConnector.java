@@ -143,7 +143,9 @@ public class FileConnector extends AbstractServiceEnabledConnector {
             }
             String tempMoveToPattern = (String) props.get(PROPERTY_MOVE_TO_PATTERN);
             if (tempMoveToPattern != null) {
-                if (logger.isDebugEnabled()) logger.debug("set moveTo Pattern to: " + tempMoveToPattern);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("set moveTo Pattern to: " + tempMoveToPattern);
+                }
                 moveToPattern = tempMoveToPattern;
             }
 
@@ -152,9 +154,13 @@ public class FileConnector extends AbstractServiceEnabledConnector {
                 polling = Long.parseLong(tempPolling);
             }
 
-            if (polling <= 0) polling = DEFAULT_POLLING_FREQUENCY;
+            if (polling <= 0) {
+                polling = DEFAULT_POLLING_FREQUENCY;
+            }
 
-            if (logger.isDebugEnabled()) logger.debug("set polling frequency to: " + polling);
+            if (logger.isDebugEnabled()) {
+                logger.debug("set polling frequency to: " + polling);
+            }
             String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
             if (tempFileAge != null) {
                 try {
@@ -337,8 +343,9 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     public void setSerialiseObjects(boolean serialiseObjects) {
         // set serialisable transformers on the connector if this is set
         if (serialiseObjects) {
-            if (serviceOverrides == null)
+            if (serviceOverrides == null) {
                 serviceOverrides = new Properties();
+            }
             serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
                     ByteArrayToSerializable.class.getName());
             serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
@@ -355,10 +362,12 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     public void setAutoDelete(boolean autoDelete) {
         this.autoDelete = autoDelete;
         if (!autoDelete) {
-            if (serviceOverrides == null)
+            if (serviceOverrides == null) {
                 serviceOverrides = new Properties();
-            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null)
+            }
+            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null) {
                 serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, FileMessageAdapter.class.getName());
+            }
         }
     }
 

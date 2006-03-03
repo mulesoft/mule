@@ -91,8 +91,9 @@ public class SpringContainerContext extends AbstractContainerContext implements 
      */
     public BeanFactory getBeanFactory()
     {
-        if (externalBeanFactory != null)
+        if (externalBeanFactory != null) {
             return externalBeanFactory;
+        }
         return beanFactory;
     }
 

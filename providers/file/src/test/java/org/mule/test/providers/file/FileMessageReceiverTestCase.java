@@ -16,6 +16,7 @@
 package org.mule.test.providers.file;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.MuleTestUtils;

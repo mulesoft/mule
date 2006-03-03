@@ -14,6 +14,7 @@
 package org.mule.providers.gs;
 
 import net.jini.core.transaction.server.TransactionManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;

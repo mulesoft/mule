@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.Header;
@@ -45,15 +46,17 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Object msg;
-        HttpMethod httpMethod = (HttpMethod) src;
+        HttpMethod httpMethod = (HttpMethod)src;
         Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
         try {
             if (contentType != null && !contentType.getValue().startsWith("text/")) {
                 msg = httpMethod.getResponseBody();
-            } else {
+            }
+            else {
                 msg = httpMethod.getResponseBodyAsString();
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new TransformerException(this, e);
         }
         // Standard headers

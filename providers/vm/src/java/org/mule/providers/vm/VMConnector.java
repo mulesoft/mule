@@ -15,8 +15,6 @@
 
 package org.mule.providers.vm;
 
-import java.util.Iterator;
-
 import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.Message;
@@ -40,6 +38,8 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassHelper;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
+
+import java.util.Iterator;
 
 /**
  * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule

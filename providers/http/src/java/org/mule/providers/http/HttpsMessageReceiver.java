@@ -11,7 +11,17 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
+
+import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -19,15 +29,6 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-
-import org.mule.providers.AbstractConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>HttpsMessageReceiver</code> is a Https server implementation used to
@@ -45,11 +46,12 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         super(connector, component, endpoint);
     }
 
-    protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException, KeyManagementException
+    protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException,
+            KeyManagementException
     {
         HttpsConnector cnn = null;
         ServerSocketFactory ssf = null;
-        cnn = (HttpsConnector) connector;
+        cnn = (HttpsConnector)connector;
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
         SSLContext sslc = SSLContext.getInstance(cnn.getSslType());
@@ -70,9 +72,10 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
                 || host.trim().equals("localhost")) {
-            serverSocket = (SSLServerSocket) ssf.createServerSocket(uri.getPort(), backlog);
-        } else {
-            serverSocket = (SSLServerSocket) ssf.createServerSocket(uri.getPort(), backlog, inetAddress);
+            serverSocket = (SSLServerSocket)ssf.createServerSocket(uri.getPort(), backlog);
+        }
+        else {
+            serverSocket = (SSLServerSocket)ssf.createServerSocket(uri.getPort(), backlog, inetAddress);
         }
         // Authenticate the client?
         serverSocket.setNeedClientAuth(cnn.isRequireClientAuthentication());

@@ -35,8 +35,9 @@ public class StringToByteArray extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof byte[])
+        if (src instanceof byte[]) {
             return src;
+        }
         return StringMessageHelper.getBytes((String) src);
     }
 }

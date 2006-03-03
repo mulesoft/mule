@@ -19,6 +19,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import javax.jbi.JBIException;
+
 import java.util.Map;
 
 /**

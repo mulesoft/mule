@@ -31,7 +31,9 @@ public class VmToAxisProxyTestCase  extends FunctionalTestCase {
 
     public void testWSProxy() throws Exception
     {
-        if(isOffline("org.mule.test.integration.providers.soap.axis.VmToAxisProxyTestCase.testWSProxy()")) return;
+        if(isOffline("org.mule.test.integration.providers.soap.axis.VmToAxisProxyTestCase.testWSProxy()")) {
+            return;
+        }
         
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("vm://proxy", "ibm", null);

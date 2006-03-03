@@ -13,18 +13,18 @@
  */
 package org.mule.test.integration.message;
 
-import javax.activation.DataHandler;
-
-import junit.framework.TestCase;
-
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.email.transformers.PlainTextDataSource;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.providers.email.transformers.PlainTextDataSource;
+
+import javax.activation.DataHandler;
+
+import junit.framework.TestCase;
 
 /**
  * @author jbraam

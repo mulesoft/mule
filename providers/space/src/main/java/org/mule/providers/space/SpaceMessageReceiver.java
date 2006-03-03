@@ -30,6 +30,7 @@ import org.mule.umo.space.UMOSpaceException;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
 import java.util.Properties;
 
 /**
@@ -75,7 +76,9 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
     public void run() {
         while (!disposing.get()) {
             if (connector.isStarted() && !disposing.get()) {
-                if(logger.isTraceEnabled()) logger.trace("Receiver starting on space: " + space);
+                if(logger.isTraceEnabled()) {
+                    logger.trace("Receiver starting on space: " + space);
+                }
 
                     try {
                         Object message = space.take(Long.MAX_VALUE);
@@ -122,7 +125,9 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
          */
         public void run() {
             try {
-                if(logger.isTraceEnabled()) logger.trace("worker listening on space " + space );
+                if(logger.isTraceEnabled()) {
+                    logger.trace("worker listening on space " + space );
+                }
 
                     //todo transactions
 

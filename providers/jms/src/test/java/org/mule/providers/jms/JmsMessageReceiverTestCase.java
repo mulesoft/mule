@@ -16,6 +16,7 @@
 package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;

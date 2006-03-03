@@ -15,6 +15,7 @@
 package org.mule.test.integration.providers.quartz;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;

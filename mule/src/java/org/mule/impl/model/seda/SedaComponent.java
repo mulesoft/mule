@@ -38,6 +38,7 @@ import org.mule.util.queue.QueueSession;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
 import java.util.NoSuchElementException;
 
 /**

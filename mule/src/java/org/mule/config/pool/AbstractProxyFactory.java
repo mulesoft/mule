@@ -19,7 +19,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.ClassHelper;
@@ -89,7 +88,9 @@ public abstract class AbstractProxyFactory implements ObjectFactory
             component = impl;
         }
         //If a singleton we can keep using the same instnace
-        if(descriptor.isSingleton()) descriptor.setImplementation(component);
+        if(descriptor.isSingleton()) {
+            descriptor.setImplementation(component);
+        }
 
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);

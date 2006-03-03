@@ -57,10 +57,12 @@ public class FileToByteArray extends AbstractTransformer
             throw new TransformerException(this, e);
         } finally {
             try {
-                if (fis != null)
+                if (fis != null) {
                     fis.close();
-                if (baos != null)
+                }
+                if (baos != null) {
                     baos.close();
+                }
             } catch (IOException e) {
                 logger.debug("Failed to close reader in transformer: " + e.getMessage());
             }

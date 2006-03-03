@@ -13,14 +13,14 @@
  */
 package org.mule.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get

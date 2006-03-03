@@ -13,10 +13,8 @@
  */
 package org.mule.ra;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Iterator;
-import java.util.Set;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionRequestInfo;
@@ -24,8 +22,10 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>RaHelper</code> is a collection of helper methods used by this RA
@@ -98,15 +98,19 @@ public class RaHelper
 
     static public boolean isPasswordCredentialEqual(PasswordCredential a, PasswordCredential b)
     {
-        if (a == b)
+        if (a == b) {
             return true;
-        if ((a == null) && (b != null))
+        }
+        if ((a == null) && (b != null)) {
             return false;
-        if ((a != null) && (b == null))
+        }
+        if ((a != null) && (b == null)) {
             return false;
+        }
 
-        if (!isEqual(a.getUserName(), b.getUserName()))
+        if (!isEqual(a.getUserName(), b.getUserName())) {
             return false;
+        }
 
         String p1 = null;
         String p2 = null;

@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http.servlet;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -27,11 +28,12 @@ import java.util.Map;
 
 public class ServletConnector extends AbstractServiceEnabledConnector
 {
-    //The real url that the servlet container is bound on.
-    //If this is not set the wsdl may not be generated correctly
+    // The real url that the servlet container is bound on.
+    // If this is not set the wsdl may not be generated correctly
     protected String servletUrl;
 
-    public ServletConnector() {
+    public ServletConnector()
+    {
         super();
         registerSupportedProtocol("http");
         registerSupportedProtocol("https");
@@ -47,11 +49,13 @@ public class ServletConnector extends AbstractServiceEnabledConnector
         return receivers;
     }
 
-    public String getServletUrl() {
+    public String getServletUrl()
+    {
         return servletUrl;
     }
 
-    public void setServletUrl(String servletUrl) {
+    public void setServletUrl(String servletUrl)
+    {
         this.servletUrl = servletUrl;
     }
 }

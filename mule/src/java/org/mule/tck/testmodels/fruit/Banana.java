@@ -15,10 +15,10 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import java.util.EventObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.EventObject;
 
 public class Banana implements Fruit
 {

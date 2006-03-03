@@ -15,9 +15,11 @@ package org.mule.providers.gs;
 
 import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.client.LocalTransactionManager;
+
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionFactory;
 import net.jini.core.transaction.server.TransactionManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.gs.space.GSSpace;
@@ -60,8 +62,7 @@ public class JiniTransaction extends AbstractSingleResourceTransaction {
         //We can only start the transaction when its bound as we need the Space to obtain the TransactionManager
         //Todo find a clean way of passing the Trsnasaction manager to the TransactionFactory
         try {
-            txManager = (LocalTransactionManager)
-                LocalTransactionManager.getInstance((IJSpace) ((GSSpace)resource).getJavaSpace());
+            txManager = LocalTransactionManager.getInstance((IJSpace) ((GSSpace)resource).getJavaSpace());
                 } catch (RemoteException e) {
                     throw new TransactionException(e);
                 }

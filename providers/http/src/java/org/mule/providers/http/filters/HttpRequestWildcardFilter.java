@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http.filters;
 
 import org.mule.providers.http.HttpConnector;
@@ -28,14 +29,17 @@ import org.mule.umo.UMOMessage;
  */
 public class HttpRequestWildcardFilter extends WildcardFilter
 {
-    public HttpRequestWildcardFilter() {
+    public HttpRequestWildcardFilter()
+    {
     }
 
-    public HttpRequestWildcardFilter(String pattern) {
+    public HttpRequestWildcardFilter(String pattern)
+    {
         super(pattern);
     }
 
-    public boolean accept(Object object) {
+    public boolean accept(Object object)
+    {
         if (object instanceof UMOMessage) {
             object = ((UMOMessage)object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         }

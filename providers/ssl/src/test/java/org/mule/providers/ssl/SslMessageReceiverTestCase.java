@@ -14,6 +14,7 @@
 package org.mule.providers.ssl;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;

@@ -1,17 +1,18 @@
 /* 
-* $Header$
-* $Revision$
-* $Date$
-* ------------------------------------------------------------------------------------------------------
-* 
-* Copyright (c) SymphonySoft Limited. All rights reserved.
-* http://www.symphonysoft.com
-* 
-* The software in this package is published under the terms of the BSD
-* style license a copy of which has been included with this distribution in
-* the LICENSE.txt file. 
-*
-*/
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
+
 package org.mule.providers.soap.xfire.transport;
 
 import org.apache.commons.logging.Log;
@@ -23,14 +24,11 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.DefaultEndpoint;
 import org.codehaus.xfire.transport.MapSession;
 import org.codehaus.xfire.transport.Session;
-import org.codehaus.xfire.transport.local.LocalTransport;
-import org.codehaus.xfire.transport.local.LocalChannel;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,18 +52,18 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
         this.workManager = workManager;
     }
 
-    protected Channel createNewChannel( String uri )
+    protected Channel createNewChannel(String uri)
     {
-        logger.debug( "Creating new channel for uri: " + uri );
+        logger.debug("Creating new channel for uri: " + uri);
 
-        MuleLocalChannel c = new MuleLocalChannel( uri, this, session );
+        MuleLocalChannel c = new MuleLocalChannel(uri, this, session);
         c.setWorkManager(workManager);
-        c.setEndpoint( new DefaultEndpoint() );
+        c.setEndpoint(new DefaultEndpoint());
 
         return c;
     }
 
-    public void setMaintainSession( boolean maintainSession )
+    public void setMaintainSession(boolean maintainSession)
     {
         this.maintainSession = maintainSession;
         resetSession();
@@ -73,12 +71,10 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
 
     public void resetSession()
     {
-        if( maintainSession )
-        {
+        if (maintainSession) {
             session = new MapSession();
         }
-        else
-        {
+        else {
             session = null;
         }
     }
@@ -90,12 +86,12 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
 
     public String[] getSupportedBindings()
     {
-        return new String[] { BINDING_ID };
+        return new String[]{BINDING_ID};
     }
 
     public String[] getKnownUriSchemes()
     {
-        return new String[]{ URI_PREFIX };
+        return new String[]{URI_PREFIX};
     }
 
     public String getName()
@@ -105,6 +101,6 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
 
     public String[] getSoapTransportIds()
     {
-        return new String[] { BINDING_ID };
+        return new String[]{BINDING_ID};
     }
 }

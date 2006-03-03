@@ -15,8 +15,6 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import java.util.HashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEvent;
@@ -24,6 +22,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+
+import java.util.HashMap;
 
 public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
 {

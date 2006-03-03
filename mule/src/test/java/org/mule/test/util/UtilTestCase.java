@@ -12,13 +12,13 @@
 
 package org.mule.test.util;
 
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.util.Utility;
+
 import java.io.File;
 import java.util.Date;
 
 import junit.framework.TestCase;
-
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.util.Utility;
 
 /**
  * <p/> <code>UtilTestCase</code> TODO (document class)
@@ -101,8 +101,9 @@ public class UtilTestCase extends TestCase
             dir.delete();
 
         } finally {
-            if (file != null)
+            if (file != null) {
                 file.delete();
+            }
         }
     }
 

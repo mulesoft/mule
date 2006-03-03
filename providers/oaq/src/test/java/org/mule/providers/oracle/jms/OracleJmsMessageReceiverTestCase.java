@@ -14,6 +14,8 @@
  */
 package org.mule.providers.oracle.jms;
 
+import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -21,8 +23,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>

@@ -13,20 +13,20 @@
  */
 package org.mule.providers.ssl;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.providers.tcp.TcpConnector;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.Utility;
+
+import javax.net.ssl.KeyManagerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
-
-import javax.net.ssl.KeyManagerFactory;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.tcp.TcpConnector;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.Utility;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given

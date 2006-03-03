@@ -29,7 +29,9 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase {
     public static final String OUTPUT = "twenty four";
 
     public void testXFireWsdlRequestResponse() throws Throwable {
-        if (isOffline("org.mule.test.integration.client.MuleClientXFireExternalTestCase.testRequestResponse()")) return;
+        if (isOffline("org.mule.test.integration.client.MuleClientXFireExternalTestCase.testRequestResponse()")) {
+            return;
+        }
 
         String url = "wsdl-xfire:" + WSDL_URL + "&method=" + METHOD;
         MuleClient client = null;
@@ -63,7 +65,9 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase {
 
 
     public void testDiscoveryWsdlRequestResponse() throws Throwable {
-        if(isOffline("org.mule.test.integration.client.MuleClientXFireExternalTestCase.testDiscoveryWsdlRequestResponse()")) return;
+        if(isOffline("org.mule.test.integration.client.MuleClientXFireExternalTestCase.testDiscoveryWsdlRequestResponse()")) {
+            return;
+        }
 
         String url = "wsdl:" + WSDL_URL + "&method=" + METHOD;
         MuleClient client = null;

@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.providers.http;
 
 import org.mule.config.i18n.Message;
@@ -89,28 +90,30 @@ public class HttpConnector extends TcpConnector
     /**
      * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
      */
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception {
-    	if (endpoint != null) {
-    		Map endpointProperties = endpoint.getProperties();
-    		if (endpointProperties != null) {
-	    		// normalize properties for HTTP
-	    		Map newProperties = new HashMap(endpointProperties.size());
-	   			for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();) {
-	   				Map.Entry entry = (Map.Entry)entries.next();
-	   				Object key = entry.getKey();
-	   				Object normalizedKey = HttpConstants.ALL_HEADER_NAMES.get(key);
-	   				if (normalizedKey != null) {
-	   					// normalized property exists
-	   					key = normalizedKey;
-	   				}
-	   				newProperties.put(key, entry.getValue());
-	   			}
-	   			// set normalized properties back on the endpoint
-	   			endpoint.setProperties(newProperties);
-    		}
-    	}
-    	// proceed as usual
-    	return super.registerListener(component, endpoint);
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint)
+            throws Exception
+    {
+        if (endpoint != null) {
+            Map endpointProperties = endpoint.getProperties();
+            if (endpointProperties != null) {
+                // normalize properties for HTTP
+                Map newProperties = new HashMap(endpointProperties.size());
+                for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();) {
+                    Map.Entry entry = (Map.Entry)entries.next();
+                    Object key = entry.getKey();
+                    Object normalizedKey = HttpConstants.ALL_HEADER_NAMES.get(key);
+                    if (normalizedKey != null) {
+                        // normalized property exists
+                        key = normalizedKey;
+                    }
+                    newProperties.put(key, entry.getValue());
+                }
+                // set normalized properties back on the endpoint
+                endpoint.setProperties(newProperties);
+            }
+        }
+        // proceed as usual
+        return super.registerListener(component, endpoint);
     }
 
     /**
@@ -205,26 +208,33 @@ public class HttpConnector extends TcpConnector
         this.keepAlive = keepAlive;
     }
 
-    public Map getReceivers() {
+    public Map getReceivers()
+    {
         return this.receivers;
     }
 
-    public String getCookieSpec() {
+    public String getCookieSpec()
+    {
         return cookieSpec;
     }
 
-    public void setCookieSpec(String cookieSpec) {
-        if(!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109))) {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "cookieSpec", cookieSpec).toString());
+    public void setCookieSpec(String cookieSpec)
+    {
+        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec
+                .equalsIgnoreCase(COOKIE_SPEC_RFC2109))) {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X,
+                    "cookieSpec", cookieSpec).toString());
         }
         this.cookieSpec = cookieSpec;
     }
 
-    public boolean isEnableCookies() {
+    public boolean isEnableCookies()
+    {
         return enableCookies;
     }
 
-    public void setEnableCookies(boolean enableCookies) {
+    public void setEnableCookies(boolean enableCookies)
+    {
         this.enableCookies = enableCookies;
     }
 }

@@ -14,8 +14,6 @@
  */
 package org.mule.providers.oracle.jms;
 
-import javax.jms.Message;
-
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 

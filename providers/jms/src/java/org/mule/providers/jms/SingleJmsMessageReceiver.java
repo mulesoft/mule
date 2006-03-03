@@ -128,7 +128,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     public void doStop() throws UMOException {
         try {
-            if(consumer!=null) consumer.setMessageListener(null);
+            if(consumer!=null) {
+                consumer.setMessageListener(null);
+            }
         } catch (JMSException e) {
             throw new LifecycleException(e, this);
         }
@@ -161,7 +163,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 	        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
 
             //todo MULE20 remove resource Info support
-            if(!topic) topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "topic", false);
+            if(!topic) {
+                topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "topic", false);
+            }
 
 	        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
 
@@ -176,8 +180,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 	        }
 	        String tempDurable = (String) endpoint.getProperties().get("durable");
 	        boolean durable = connector.isDurable();
-	        if (tempDurable != null)
-	            durable = Boolean.valueOf(tempDurable).booleanValue();
+	        if (tempDurable != null) {
+                durable = Boolean.valueOf(tempDurable).booleanValue();
+            }
 
 	        // Get the durable subscriber name if there is one
 	        String durableName = (String) endpoint.getProperties().get("durableName");

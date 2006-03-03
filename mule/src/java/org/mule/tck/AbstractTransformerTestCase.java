@@ -98,10 +98,12 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null)
+        if (src == null && result == null) {
             return true;
-        if (src == null || result == null)
+        }
+        if (src == null || result == null) {
             return false;
+        }
         return src.equals(result);
     }
 

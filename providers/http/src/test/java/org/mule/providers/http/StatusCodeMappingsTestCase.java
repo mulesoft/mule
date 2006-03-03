@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import org.mule.MuleException;
@@ -39,7 +40,8 @@ public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
         assertEquals("401", code);
 
         code = ExceptionHelper.getErrorMapping("blah", MuleException.class);
-        assertEquals(String.valueOf(new MuleException(Message.createStaticMessage("test")).getExceptionCode()), code);
+        assertEquals(String.valueOf(new MuleException(Message.createStaticMessage("test"))
+                .getExceptionCode()), code);
 
     }
 

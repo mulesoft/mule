@@ -24,6 +24,7 @@ import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalT
 import org.mule.umo.UMOTransactionFactory;
 
 import javax.jms.ConnectionFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 

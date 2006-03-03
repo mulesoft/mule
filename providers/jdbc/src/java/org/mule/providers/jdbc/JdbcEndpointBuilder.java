@@ -13,11 +13,11 @@
  */
 package org.mule.providers.jdbc;
 
-import java.net.URI;
-import java.util.Properties;
-
 import org.mule.impl.endpoint.AbstractEndpointBuilder;
 import org.mule.umo.endpoint.MalformedEndpointException;
+
+import java.net.URI;
+import java.util.Properties;
 
 /**
  * @author Guillaume Nodet

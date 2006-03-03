@@ -14,8 +14,6 @@
  */
 package org.mule.extras.hivemind;
 
-import java.io.Reader;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hivemind.ApplicationRuntimeException;
@@ -28,7 +26,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+
+import java.io.Reader;
 
 /**
  * <code>HiveMindContext</code> is a HiveMind Context that can expose

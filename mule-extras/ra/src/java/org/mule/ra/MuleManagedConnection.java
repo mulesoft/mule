@@ -21,13 +21,16 @@ import org.mule.impl.security.MuleCredentials;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
-import javax.resource.spi.*;
+import javax.resource.spi.ConnectionEvent;
+import javax.resource.spi.ConnectionEventListener;
+import javax.resource.spi.ConnectionRequestInfo;
+import javax.resource.spi.ManagedConnection;
+import javax.resource.spi.ManagedConnectionMetaData;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
+
 import java.io.PrintWriter;
-import java.lang.IllegalStateException;
-import java.lang.SecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -110,8 +113,9 @@ public class MuleManagedConnection implements ManagedConnection
         }
         MuleCredentials creds = null;
         if (user != null) {
-            if (password == null)
+            if (password == null) {
                 password = "";
+            }
             creds = new MuleCredentials(user, password.toCharArray());
         }
 
@@ -128,8 +132,9 @@ public class MuleManagedConnection implements ManagedConnection
 
     public void destroy() throws ResourceException
     {
-        if (destroyed)
+        if (destroyed) {
             return;
+        }
         destroyed = true;
 
         invalidateConnections();
@@ -294,10 +299,12 @@ public class MuleManagedConnection implements ManagedConnection
 
     public String getUsername()
     {
-        if (passCred != null)
+        if (passCred != null) {
             return passCred.getUserName();
-        else
+        }
+        else {
             return null;
+        }
     }
 
     /**

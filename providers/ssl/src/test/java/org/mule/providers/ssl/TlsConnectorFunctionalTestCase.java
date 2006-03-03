@@ -21,6 +21,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.net.ssl.SSLSocketFactory;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;

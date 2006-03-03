@@ -13,11 +13,11 @@
  */
 package org.mule.impl.message;
 
-import java.util.Map;
-
 import org.mule.config.ExceptionHelper;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
+
+import java.util.Map;
 
 /**
  * <code>ExceptionPayload</code> TODO

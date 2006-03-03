@@ -13,11 +13,11 @@
  */
 package org.mule.config.builders;
 
-import java.io.InputStream;
+import org.mule.config.ConfigurationException;
 
 import javax.servlet.ServletContext;
 
-import org.mule.config.ConfigurationException;
+import java.io.InputStream;
 
 /**
  * <code>WebappMuleXmlConfigurationBuilder</code> will first try and load

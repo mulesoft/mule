@@ -57,8 +57,9 @@ public class EjbMessageReceiver extends PollingMessageReceiver
         System.setProperty("java.security.policy", connector.getSecurityPolicy());
 
         // Set security manager
-        if (System.getSecurityManager() == null)
+        if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager());
+        }
 
         remoteObject = EjbConnectorUtil.getRemoteObject(getEndpoint(), connector);
 
@@ -77,8 +78,9 @@ public class EjbMessageReceiver extends PollingMessageReceiver
         try {
             Object result = invokedMethod.invoke(remoteObject, connector.getEjbAble().arguments());
 
-            if (null != result)
+            if (null != result) {
                 routeMessage(new MuleMessage(connector.getMessageAdapter(result).getPayload(), null), endpoint.isSynchronous());
+            }
         }
         catch (Exception e) {
             handleException(e);

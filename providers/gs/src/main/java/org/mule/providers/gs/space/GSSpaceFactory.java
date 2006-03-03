@@ -17,8 +17,10 @@ import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.client.ExternalEntry;
 import com.j_spaces.core.client.FinderException;
 import com.j_spaces.core.client.LocalTransactionManager;
+
 import net.jini.core.entry.Entry;
 import net.jini.core.transaction.server.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -82,8 +84,7 @@ public class GSSpaceFactory implements UMOSpaceFactory {
             //Transaction Factory
             if(endpoint.getTransactionConfig().getFactory()!=null) {
                 JiniTransactionFactory txFactory = (JiniTransactionFactory)endpoint.getTransactionConfig().getFactory();
-                TransactionManager transactionManager = (LocalTransactionManager)
-                            LocalTransactionManager.getInstance((IJSpace) space.getJavaSpace());
+                TransactionManager transactionManager = LocalTransactionManager.getInstance((IJSpace) space.getJavaSpace());
                 txFactory.setTransactionManager(transactionManager);
                 txFactory.setTransactionTimeout(((GSConnector)endpoint.getConnector()).getTransactionTimeout());
                 space.setTransactionFactory(txFactory);

@@ -13,12 +13,12 @@
  */
 package org.mule.extras.client;
 
-import java.lang.reflect.Method;
-
 import org.mule.config.MuleProperties;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+
+import java.lang.reflect.Method;
 
 /**
  * <code>AbstractEventTransformer</code> adds support for adding method

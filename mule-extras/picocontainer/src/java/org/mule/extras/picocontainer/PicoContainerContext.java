@@ -14,9 +14,6 @@
  */
 package org.mule.extras.picocontainer;
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
@@ -31,6 +28,9 @@ import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.SimpleReference;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * <code>PicoContainerContext</code> is a Pico Context that can expose
@@ -161,8 +161,9 @@ public class PicoContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if (configFile == null)
+        if (configFile == null) {
             return;
+        }
         try {
             String builderClassName = getBuilderClassName(configFile);
             String configString = Utility.loadResourceAsString(configFile, getClass());

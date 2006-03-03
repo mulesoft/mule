@@ -25,7 +25,9 @@ public class Client
         }
         finally
         {
-            if (manager != null) manager.dispose();
+            if (manager != null) {
+                manager.dispose();
+            }
         }
     }
 
@@ -42,7 +44,9 @@ public class Client
         }
         finally
         {
-            if (client != null) client.dispose();
+            if (client != null) {
+                client.dispose();
+            }
         }
     }
 

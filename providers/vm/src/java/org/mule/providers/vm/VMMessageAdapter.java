@@ -77,8 +77,9 @@ public class VMMessageAdapter extends AbstractMessageAdapter
      */
     private void setMessage(UMOMessage message) throws MessageTypeNotSupportedException
     {
-        if (message == null)
+        if (message == null) {
             throw new MessageTypeNotSupportedException(null, getClass());
+        }
         this.message = message;
     }
 

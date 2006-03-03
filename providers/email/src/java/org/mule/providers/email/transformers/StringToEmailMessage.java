@@ -14,6 +14,7 @@
  */
 package org.mule.providers.email.transformers;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -25,11 +26,11 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.TemplateParser;
-import org.mule.util.Utility;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,7 +79,9 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         String contentType = context.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
 
         Properties headers = new Properties();
-        if(connector.getCustomHeaders()!=null) headers.putAll(connector.getCustomHeaders());
+        if(connector.getCustomHeaders()!=null) {
+            headers.putAll(connector.getCustomHeaders());
+        }
         Properties otherHeaders = (Properties)context.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if(otherHeaders!=null) {
             Map props = new HashMap(MuleManager.getInstance().getProperties());
@@ -109,19 +112,19 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
 
-            if (from != null && !Utility.EMPTY_STRING.equals(from)) {
+            if (!StringUtils.isEmpty(from)) {
                 msg.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
             }
 
-            if (cc != null && !Utility.EMPTY_STRING.equals(cc)) {
+            if (!StringUtils.isEmpty(cc)) {
                 msg.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
             }
 
-            if (bcc != null && !Utility.EMPTY_STRING.equals(bcc)) {
+            if (!StringUtils.isEmpty(bcc)) {
                 msg.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
             }
 
-            if (replyTo != null && !Utility.EMPTY_STRING.equals(replyTo)) {
+            if (!StringUtils.isEmpty(replyTo)) {
                 msg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 

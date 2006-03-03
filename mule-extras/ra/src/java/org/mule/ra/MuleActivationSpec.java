@@ -13,17 +13,17 @@
  */
 package org.mule.ra;
 
-import java.util.Properties;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.util.Utility;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.util.Utility;
+import java.util.Properties;
 
 /**
  * <code>MuleActivationSpec</code> defines the contract between a Message

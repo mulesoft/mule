@@ -13,10 +13,10 @@
  */
 package org.mule.test.integration.transaction;
 
-import java.util.Map;
-
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
+
+import java.util.Map;
 
 /**
  * Simple component that receives messages from jdbc or jms and just forward the

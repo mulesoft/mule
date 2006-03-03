@@ -153,8 +153,9 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setReceiveTimeout(int timeout)
     {
-        if (timeout < 0)
+        if (timeout < 0) {
             timeout = DEFAULT_SOCKET_TIMEOUT;
+        }
         this.receiveTimeout = timeout;
     }
 
@@ -196,8 +197,9 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1)
+        if (bufferSize < 1) {
             bufferSize = DEFAULT_BUFFER_SIZE;
+        }
         this.bufferSize = bufferSize;
     }
 

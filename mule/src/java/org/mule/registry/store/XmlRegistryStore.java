@@ -15,12 +15,13 @@ package org.mule.registry.store;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+
+import org.mule.ManagementContext;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryException;
 import org.mule.registry.RegistryFactory;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.impl.AbstractRegistry;
-import org.mule.ManagementContext;
 
 import java.io.File;
 import java.io.FileReader;

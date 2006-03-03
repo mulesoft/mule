@@ -125,8 +125,9 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         try {
             // set mule configuration
             Map temp = context.getBeansOfType(MuleConfiguration.class, true, true);
-            if (temp.size() > 0)
+            if (temp.size() > 0) {
                 MuleManager.setConfiguration((MuleConfiguration) temp.values().iterator().next());
+            }
 
             // set environment properties
             setProperties((Map) getBean(MULE_ENVIRONMENT_PROPERTIES_BEAN_NAME, Map.class));
@@ -140,13 +141,15 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
             // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, true);
-            if (temp.size() > 0)
+            if (temp.size() > 0) {
                 manager.setTransactionManager(((UMOTransactionManagerFactory) temp.values().iterator().next()).create());
+            }
 
             // set security manager
             temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
-            if (temp.size() > 0)
+            if (temp.size() > 0) {
                 manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
+            }
 
             // set Transformers
             Map transformers = context.getBeansOfType(UMOTransformer.class, true, true);
@@ -200,18 +203,21 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
         // Entry point resolver
         Map epr = context.getBeansOfType(UMOEntryPointResolver.class, true, true);
-        if (epr.size() > 0)
+        if (epr.size() > 0) {
             model.setEntryPointResolver((UMOEntryPointResolver) epr.values().iterator().next());
+        }
 
         // Life cycle adapter factory
         Map lcaf = context.getBeansOfType(UMOLifecycleAdapterFactory.class, true, true);
-        if (lcaf.size() > 0)
+        if (lcaf.size() > 0) {
             model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory) lcaf.values().iterator().next());
+        }
 
         // Model exception strategy
         Object listener = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, ExceptionListener.class);
-        if (listener != null)
+        if (listener != null) {
             model.setExceptionListener((ExceptionListener) listener);
+        }
 
         manager.setModel(model);
 
@@ -246,8 +252,9 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setMessageEndpointIdentifiers(Map endpoints) throws InitialisationException
     {
-        if (endpoints == null)
+        if (endpoints == null) {
             return;
+        }
         Map.Entry entry;
         for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
@@ -265,8 +272,9 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setProperties(Map props)
     {
-        if (props == null)
+        if (props == null) {
             return;
+        }
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
@@ -308,8 +316,9 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setInterceptorStacks(Map stacks)
     {
-        if (stacks == null)
+        if (stacks == null) {
             return;
+        }
         for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();) {
 			Map.Entry entry = (Map.Entry) iterator.next();
 			String name = entry.getKey().toString();

@@ -16,6 +16,7 @@ package org.mule.providers.oracle.jms;
 
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
+
 import org.mule.providers.jms.JmsMessageAdapter;
 import org.mule.umo.MessagingException;
 
@@ -46,9 +47,13 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
     		if (adtMessage instanceof XMLType) {
     			return ((XMLType) adtMessage).getBytesValue();
     		}
-    		else return adtMessage.toString().getBytes();
-    	} 
-    	else return super.getPayloadAsBytes();
+            else {
+                return adtMessage.toString().getBytes();
+            }
+    	}
+        else {
+            return super.getPayloadAsBytes();
+        }
     }
     	
     /** If the message payload is XML, returns the XML as a string.
@@ -73,7 +78,9 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
     		if (adtMessage instanceof XMLType) {
     			return ((XMLType) adtMessage).getStringVal();
     		}
-    		else return adtMessage.toString();
+            else {
+                return adtMessage.toString();
+            }
     	}
     	else {
             return super.getPayloadAsString(encoding);

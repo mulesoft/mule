@@ -52,7 +52,9 @@ public class TradeStatus  implements java.io.Serializable {
         }
         TradeStatus history = (TradeStatus) __history.get();
         if (history != null) { return (history == obj); }
-        if (this == obj) return true;
+        if (this == obj) {
+            return true;
+        }
         __history.set(obj);
         __history.set(null);
         return true;

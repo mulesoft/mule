@@ -13,19 +13,19 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.MuleException;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.extras.client.RemoteDispatcher;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.extras.client.RemoteDispatcher;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.transformers.simple.ByteArrayToString;
-import org.mule.MuleException;
 
 import java.util.Date;
 import java.util.HashMap;

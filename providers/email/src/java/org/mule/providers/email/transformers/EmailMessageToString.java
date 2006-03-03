@@ -54,7 +54,7 @@ public class EmailMessageToString extends AbstractTransformer
             // For this impl we just pass back the email content
             Object result = msg.getContent();
             if (result instanceof String) {
-                return (String) result;
+                return result;
             } else {
                 // very simplisitic, only gets first part
                 MimeMultipart part = (MimeMultipart) result;

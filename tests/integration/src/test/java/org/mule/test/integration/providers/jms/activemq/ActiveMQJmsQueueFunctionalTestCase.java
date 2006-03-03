@@ -21,6 +21,7 @@ import org.mule.providers.jms.JmsConstants;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 
 import javax.jms.ConnectionFactory;
+
 import java.util.HashMap;
 
 /**

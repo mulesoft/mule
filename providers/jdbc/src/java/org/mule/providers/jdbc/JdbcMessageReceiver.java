@@ -15,6 +15,7 @@ package org.mule.providers.jdbc;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.TransactedPollingMessageReceiver;
@@ -26,7 +27,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.MuleManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

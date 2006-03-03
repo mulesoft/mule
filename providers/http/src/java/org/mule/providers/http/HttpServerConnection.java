@@ -122,8 +122,8 @@ public class HttpServerConnection
                 setKeepAlive(false);
                 return null;
             }
-            HttpRequest request = new HttpRequest(RequestLine.parseLine(line),
-                    HttpParser.parseHeaders(this.in, encoding), this.in);
+            HttpRequest request = new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(
+                    this.in, encoding), this.in);
             return request;
         }
         catch (IOException e) {

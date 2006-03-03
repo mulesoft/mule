@@ -120,15 +120,19 @@ public class MuleSoapHeadersHandler extends BasicHandler
         SOAPEnvelope env = msg.getSOAPPart().getEnvelope();
         MuleSoapHeaders headers = new MuleSoapHeaders(env.getHeader());
 
-        if (headers.getCorrelationId() != null)
+        if (headers.getCorrelationId() != null) {
             msgContext.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, headers.getCorrelationId());
-        if (headers.getCorrelationGroup() != null)
+        }
+        if (headers.getCorrelationGroup() != null) {
             msgContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, headers.getCorrelationGroup());
-        if (headers.getCorrelationSequence() != null)
+        }
+        if (headers.getCorrelationSequence() != null) {
             msgContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, headers.getCorrelationSequence());
+        }
 
-        if (headers.getReplyTo() != null)
+        if (headers.getReplyTo() != null) {
             msgContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, headers.getReplyTo());
+        }
     }
 
     /**

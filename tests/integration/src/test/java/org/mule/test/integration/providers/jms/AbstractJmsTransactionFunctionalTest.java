@@ -15,6 +15,7 @@
 package org.mule.test.integration.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -53,6 +54,7 @@ import javax.jms.QueueConnection;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.TopicConnection;
+
 import java.util.HashMap;
 
 /**
@@ -410,8 +412,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             public void onMessage(Message message)
             {
                 currentMsg = message;
-                if (countDown != null)
+                if (countDown != null) {
                     countDown.countDown();
+                }
             }
         });
     }

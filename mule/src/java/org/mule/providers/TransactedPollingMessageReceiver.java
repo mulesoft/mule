@@ -16,11 +16,6 @@ package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 
-import java.util.Iterator;
-import java.util.List;
-
-import javax.resource.spi.work.Work;
-
 import org.mule.config.ThreadingProfile;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
@@ -30,6 +25,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.concurrent.CountDownLatch;
+
+import javax.resource.spi.work.Work;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles
@@ -66,7 +66,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
     public void doStart() throws UMOException
     {
         //Connector property overrides any implied value
-        useMultipleReceivers = ((AbstractConnector)connector).isCreateMultipleTransactedReceivers();
+        useMultipleReceivers = connector.isCreateMultipleTransactedReceivers();
         ThreadingProfile tp = connector.getReceiverThreadingProfile();
         if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading()) {
             for (int i = 0; i < tp.getMaxThreadsActive(); i++) {

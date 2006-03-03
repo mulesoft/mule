@@ -28,6 +28,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.resource.spi.work.Work;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;

@@ -14,6 +14,7 @@
 package org.mule.test.integration.spring.transaction;
 
 import net.sf.hibernate.SessionFactory;
+
 import org.mule.extras.spring.transaction.SpringTransactionFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;

@@ -15,6 +15,7 @@
 package org.mule.util.queue;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.activeio.Packet;
 import org.activeio.journal.Journal;
 import org.activeio.journal.JournalEventListener;
@@ -29,8 +30,18 @@ import org.doomdark.uuid.UUIDGenerator;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * 
@@ -232,7 +243,6 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
      */
     public void run()
     {
-        long lastTime = 0;
         try {
             while (!Thread.interrupted()) {
                 Thread.sleep(100);

@@ -41,22 +41,26 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
     {
         if (!MuleObjectHelper.class.getName().equals(s)) {
             if (o instanceof UMOConnector) {
-                if (((UMOConnector) o).getName() == null || overwrite)
+                if (((UMOConnector) o).getName() == null || overwrite) {
                     ((UMOConnector) o).setName(s);
+                }
             } else if (o instanceof UMOTransformer) {
                 ((UMOTransformer) o).setName(s);
             } else if (o instanceof UMOEndpoint) {
                 // spring uses the class name of the object as the name if no
                 // other id is set
                 // this is no good for endpoints
-                if ((((UMOEndpoint) o).getName() == null || overwrite) && !MuleEndpoint.class.getName().equals(s))
+                if ((((UMOEndpoint) o).getName() == null || overwrite) && !MuleEndpoint.class.getName().equals(s)) {
                     ((UMOEndpoint) o).setName(s);
+                }
             } else if (o instanceof UMODescriptor) {
-                if (((UMODescriptor) o).getName() == null || overwrite)
+                if (((UMODescriptor) o).getName() == null || overwrite) {
                     ((UMODescriptor) o).setName(s);
+                }
             } else if (o instanceof UMOModel) {
-                if (((UMOModel) o).getName() == null || overwrite)
+                if (((UMOModel) o).getName() == null || overwrite) {
                     ((UMOModel) o).setName(s);
+                }
             } else if (o instanceof UMOAgent) {
                     ((UMOAgent) o).setName(s);
             }

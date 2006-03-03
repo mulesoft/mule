@@ -12,18 +12,18 @@
 
 package org.mule.providers.jms;
 
-import java.util.Enumeration;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.TextMessage;
-import javax.jms.ExceptionListener;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-import com.mockobjects.dynamic.Mock;
-import com.mockobjects.dynamic.C;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
+import javax.jms.TextMessage;
+
+import java.util.Enumeration;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -96,6 +96,6 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
                 return null;
             }
         });
-        return (TextMessage) message.proxy();
+        return message.proxy();
     }
 }

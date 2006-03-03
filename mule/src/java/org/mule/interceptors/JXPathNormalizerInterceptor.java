@@ -13,15 +13,15 @@
  */
 package org.mule.interceptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.jxpath.JXPathContext;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.Utility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <code>JXPathNormalizerInterceptor</code> can be used as a simple pre/post

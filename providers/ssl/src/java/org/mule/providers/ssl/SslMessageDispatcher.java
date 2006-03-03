@@ -13,17 +13,17 @@
  */
 package org.mule.providers.ssl;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.providers.tcp.TcpMessageDispatcher;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.providers.tcp.TcpMessageDispatcher;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over

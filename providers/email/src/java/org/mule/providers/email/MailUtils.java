@@ -13,10 +13,10 @@
  */
 package org.mule.providers.email;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Messages;
-import org.mule.util.Utility;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
@@ -25,6 +25,7 @@ import javax.mail.Session;
 import javax.mail.URLName;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+
 import java.util.Properties;
 
 /**
@@ -100,7 +101,9 @@ public class MailUtils
     }
 
     public static String internetAddressesToString(InternetAddress[] addresses) {
-        if(addresses==null || addresses.length==0) return Utility.EMPTY_STRING;
+        if(addresses==null || addresses.length==0) {
+            return StringUtils.EMPTY;
+        }
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < addresses.length; i++) {
             InternetAddress address = addresses[i];
@@ -118,7 +121,9 @@ public class MailUtils
     }
 
     public static String mailAddressesToString(Address[] addresses) {
-        if(addresses==null || addresses.length==0) return Utility.EMPTY_STRING;
+        if(addresses==null || addresses.length==0) {
+            return StringUtils.EMPTY;
+        }
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < addresses.length; i++) {
             Address address = addresses[i];

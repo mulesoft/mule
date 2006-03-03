@@ -30,7 +30,9 @@ public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
 {
     public void testRequestResponse() throws Throwable
     {
-        if(isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) return;
+        if(isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) {
+            return;
+        }
 
         String input =  "IBM";
         Map properties = new HashMap();

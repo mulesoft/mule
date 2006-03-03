@@ -13,10 +13,10 @@
  */
 package org.mule.impl.endpoint;
 
-import java.net.URI;
-
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import java.net.URI;
 
 /**
  * <code>EndpointBuilder</code> determines how a uri is translated to a

@@ -16,9 +16,11 @@ package org.mule.providers.gs.space;
 import com.j_spaces.core.client.ExternalEntry;
 import com.j_spaces.core.client.FinderException;
 import com.j_spaces.core.client.SpaceFinder;
+
 import net.jini.core.entry.Entry;
 import net.jini.core.transaction.Transaction;
 import net.jini.space.JavaSpace;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.space.AbstractSpace;

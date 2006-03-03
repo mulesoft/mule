@@ -16,6 +16,7 @@ package org.mule.test.integration.providers.jms.activemq;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
@@ -43,6 +44,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
 
 import javax.jms.ConnectionFactory;
+
 import java.util.HashMap;
 
 /**
@@ -133,7 +135,9 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
 
     public void testReconnection() throws Exception {
 
-        if(!isPrereqsMet("org.mule.test.integration.providers.jms.activemq.JmsReconnectionTestCase.testReconnection()")) return;
+        if(!isPrereqsMet("org.mule.test.integration.providers.jms.activemq.JmsReconnectionTestCase.testReconnection()")) {
+            return;
+        }
         
         MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
 

@@ -26,6 +26,7 @@ import org.apache.tools.ant.util.Watchdog;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 
 import javax.jms.JMSException;
+
 import java.io.File;
 
 /**

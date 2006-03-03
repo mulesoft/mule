@@ -34,6 +34,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
+
 import java.util.List;
 
 /**
@@ -220,8 +221,9 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     protected void closeConsumer(boolean force)
     {
         JmsThreadContext ctx = context.getContext();
-        if (ctx == null)
+        if (ctx == null) {
             return;
+        }
         // Close consumer
         if (force || !reuseSession || !reuseConsumer) {
             JmsUtils.closeQuietly(ctx.consumer);
@@ -266,8 +268,9 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 	        }
 	        String tempDurable = (String) endpoint.getProperties().get("durable");
 	        boolean durable = connector.isDurable();
-	        if (tempDurable != null)
-	            durable = Boolean.valueOf(tempDurable).booleanValue();
+	        if (tempDurable != null) {
+                durable = Boolean.valueOf(tempDurable).booleanValue();
+            }
 	
 	        // Get the durable subscriber name if there is one
 	        String durableName = (String) endpoint.getProperties().get("durableName");

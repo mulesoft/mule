@@ -17,6 +17,7 @@ import electric.glue.context.ServiceContext;
 import electric.registry.Registry;
 import electric.registry.RegistryException;
 import electric.service.IService;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -47,15 +48,17 @@ public class GlueInitialisationCallback implements InitialisationCallback
         this.service = service;
         this.servicePath = path;
         this.context = context;
-        if (context == null)
+        if (context == null) {
             this.context = new ServiceContext();
+        }
     }
 
     public void initialise(Object component) throws InitialisationException
     {
         // only call this once
-        if (invoked)
+        if (invoked) {
             return;
+        }
         if (component instanceof GlueInitialisable) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Calling axis initialisation for component: " + component.getClass().getName());

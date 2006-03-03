@@ -17,6 +17,7 @@ import electric.glue.context.ProxyContext;
 import electric.glue.context.ThreadContext;
 import electric.proxy.IProxy;
 import electric.registry.Registry;
+
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -152,11 +153,13 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher {
         }
 
         int value = event.getMessage().getCorrelationSequence();
-        if (value > 0)
+        if (value > 0) {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(value));
+        }
 
         value = event.getMessage().getCorrelationGroupSize();
-        if (value > 0)
+        if (value > 0) {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(value));
+        }
     }
 }

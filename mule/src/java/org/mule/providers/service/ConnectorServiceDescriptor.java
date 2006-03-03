@@ -292,7 +292,9 @@ public class ConnectorServiceDescriptor
     {
         if(getStreamMessageAdapter()==null) {
             streamMessageAdapter = StreamMessageAdapter.class.getName();
-            if(logger.isDebugEnabled()) logger.debug("No stream.message.adapter set in service description, defaulting to: " + streamMessageAdapter);
+            if(logger.isDebugEnabled()) {
+                logger.debug("No stream.message.adapter set in service description, defaulting to: " + streamMessageAdapter);
+            }
         }
         return createMessageAdapter(message, streamMessageAdapter);
     }
@@ -320,7 +322,9 @@ public class ConnectorServiceDescriptor
     public UMOSessionHandler createSessionHandler() throws ConnectorServiceException {
         if(getSessionHandler()==null) {
             sessionHandler = MuleSessionHandler.class.getName();
-            if(logger.isDebugEnabled()) logger.debug("No session.handler set in service description, defaulting to: " + sessionHandler);
+            if(logger.isDebugEnabled()) {
+                logger.debug("No session.handler set in service description, defaulting to: " + sessionHandler);
+            }
         }
         try {
             return (UMOSessionHandler)ClassHelper.instanciateClass(getSessionHandler(), ClassHelper.NO_ARGS, getClass());
@@ -529,29 +533,69 @@ public class ConnectorServiceDescriptor
     }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ConnectorServiceDescriptor)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ConnectorServiceDescriptor)) {
+            return false;
+        }
 
         final ConnectorServiceDescriptor connectorServiceDescriptor = (ConnectorServiceDescriptor) o;
 
-        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector) : connectorServiceDescriptor.connector != null) return false;
-        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory) : connectorServiceDescriptor.connectorFactory != null) return false;
-        if (defaultInboundTransformer != null ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer) : connectorServiceDescriptor.defaultInboundTransformer != null) return false;
-        if (defaultOutboundTransformer != null ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer) : connectorServiceDescriptor.defaultOutboundTransformer != null) return false;
-        if (defaultResponseTransformer != null ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer) : connectorServiceDescriptor.defaultResponseTransformer != null) return false;
-        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory) : connectorServiceDescriptor.dispatcherFactory != null) return false;
-        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder) : connectorServiceDescriptor.endpointBuilder != null) return false;
-        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter) : connectorServiceDescriptor.messageAdapter != null) return false;
-        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver) : connectorServiceDescriptor.messageReceiver != null) return false;
-        if (properties != null ? !properties.equals(connectorServiceDescriptor.properties) : connectorServiceDescriptor.properties != null) return false;
-        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol) : connectorServiceDescriptor.protocol != null) return false;
-        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError) : connectorServiceDescriptor.serviceError != null) return false;
-        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder) : connectorServiceDescriptor.serviceFinder != null) return false;
-        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation) : connectorServiceDescriptor.serviceLocation != null) return false;
-        if (sessionHandler != null ? !sessionHandler.equals(connectorServiceDescriptor.sessionHandler) : connectorServiceDescriptor.sessionHandler != null) return false;
-        if (streamMessageAdapter != null ? !streamMessageAdapter.equals(connectorServiceDescriptor.streamMessageAdapter) : connectorServiceDescriptor.streamMessageAdapter != null) return false;
-        if (transactedMessageReceiver != null ? !transactedMessageReceiver.equals(connectorServiceDescriptor.transactedMessageReceiver) : connectorServiceDescriptor.transactedMessageReceiver != null) return false;
-        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory) : connectorServiceDescriptor.transactionFactory != null) return false;
+        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector) : connectorServiceDescriptor.connector != null) {
+            return false;
+        }
+        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory) : connectorServiceDescriptor.connectorFactory != null) {
+            return false;
+        }
+        if (defaultInboundTransformer != null ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer) : connectorServiceDescriptor.defaultInboundTransformer != null) {
+            return false;
+        }
+        if (defaultOutboundTransformer != null ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer) : connectorServiceDescriptor.defaultOutboundTransformer != null) {
+            return false;
+        }
+        if (defaultResponseTransformer != null ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer) : connectorServiceDescriptor.defaultResponseTransformer != null) {
+            return false;
+        }
+        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory) : connectorServiceDescriptor.dispatcherFactory != null) {
+            return false;
+        }
+        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder) : connectorServiceDescriptor.endpointBuilder != null) {
+            return false;
+        }
+        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter) : connectorServiceDescriptor.messageAdapter != null) {
+            return false;
+        }
+        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver) : connectorServiceDescriptor.messageReceiver != null) {
+            return false;
+        }
+        if (properties != null ? !properties.equals(connectorServiceDescriptor.properties) : connectorServiceDescriptor.properties != null) {
+            return false;
+        }
+        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol) : connectorServiceDescriptor.protocol != null) {
+            return false;
+        }
+        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError) : connectorServiceDescriptor.serviceError != null) {
+            return false;
+        }
+        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder) : connectorServiceDescriptor.serviceFinder != null) {
+            return false;
+        }
+        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation) : connectorServiceDescriptor.serviceLocation != null) {
+            return false;
+        }
+        if (sessionHandler != null ? !sessionHandler.equals(connectorServiceDescriptor.sessionHandler) : connectorServiceDescriptor.sessionHandler != null) {
+            return false;
+        }
+        if (streamMessageAdapter != null ? !streamMessageAdapter.equals(connectorServiceDescriptor.streamMessageAdapter) : connectorServiceDescriptor.streamMessageAdapter != null) {
+            return false;
+        }
+        if (transactedMessageReceiver != null ? !transactedMessageReceiver.equals(connectorServiceDescriptor.transactedMessageReceiver) : connectorServiceDescriptor.transactedMessageReceiver != null) {
+            return false;
+        }
+        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory) : connectorServiceDescriptor.transactionFactory != null) {
+            return false;
+        }
 
         return true;
     }

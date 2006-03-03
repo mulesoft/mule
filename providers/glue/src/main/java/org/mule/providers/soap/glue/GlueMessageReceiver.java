@@ -22,6 +22,7 @@ import electric.service.virtual.VirtualService;
 import electric.util.Context;
 import electric.util.interceptor.ReceiveThreadContext;
 import electric.util.interceptor.SendThreadContext;
+
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;

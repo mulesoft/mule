@@ -15,6 +15,7 @@ package org.mule.transformers.codec;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
 import sun.misc.BASE64Encoder;
 
 /**

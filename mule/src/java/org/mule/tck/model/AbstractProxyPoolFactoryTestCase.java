@@ -14,6 +14,7 @@
 package org.mule.tck.model;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;

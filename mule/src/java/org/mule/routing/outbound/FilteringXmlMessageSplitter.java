@@ -157,7 +157,9 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             if (dom4jDoc != null) {
                 if (splitExpression.length() > 0) {
                     XPath xpath = dom4jDoc.createXPath(splitExpression);
-                    if (namespaces != null) xpath.setNamespaceURIs(namespaces);
+                    if (namespaces != null) {
+                        xpath.setNamespaceURIs(namespaces);
+                    }
                     List nodes = xpath.selectNodes(dom4jDoc);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Split into " + nodes.size());

@@ -14,16 +14,16 @@
 
 package org.mule.providers.tcp.protocols;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.providers.tcp.TcpProtocol;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.providers.tcp.TcpProtocol;
 
 /**
  * The DefaultProtocol class is an application level tcp protocol that does

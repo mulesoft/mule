@@ -13,15 +13,15 @@
  */
 package org.mule.test.transformers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -65,19 +65,23 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null)
+        if (src == null && result == null) {
             return true;
-        if (src == null || result == null)
+        }
+        if (src == null || result == null) {
             return false;
+        }
         return Arrays.equals((byte[]) src, (byte[]) result);
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null)
+        if (src == null && result == null) {
             return true;
-        if (src == null || result == null)
+        }
+        if (src == null || result == null) {
             return false;
+        }
         if (src instanceof Exception && result instanceof Exception) {
             return ((Exception) src).getMessage().equals(((Exception) result).getMessage());
         } else {

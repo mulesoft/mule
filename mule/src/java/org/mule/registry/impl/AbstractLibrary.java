@@ -14,10 +14,10 @@
 package org.mule.registry.impl;
 
 import org.mule.registry.Library;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryDescriptor;
 import org.mule.registry.RegistryException;
-import org.mule.registry.Registry;
 import org.mule.util.Utility;
 
 import java.io.File;

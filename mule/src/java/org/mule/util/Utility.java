@@ -11,8 +11,10 @@
  * LICENSE.txt file.
  *  
  */
+
 package org.mule.util;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -53,30 +55,16 @@ import java.util.zip.ZipFile;
 /**
  * <code>Utility</code> is a singleton grouping common functionality like
  * converting java.lang.String to different data types, reading files, etc
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public class Utility
 {
-    /**
-     * The current platform's CR/LF delimiter
-     */
-    public static final String CRLF = System.getProperty("line.separator");
 
-    /**
-     * Saves creation of unecessary string creation
-     */
-    public static final String EMPTY_STRING = "";
-
-    /**
-     * The default buffer size to use.
-     */
-    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-    
-
-    public static File createFile(String filename) throws IOException {
+    public static File createFile(String filename) throws IOException
+    {
         File file = new File(filename);
         if (!file.canWrite()) {
             String dirName = file.getPath();
@@ -91,14 +79,16 @@ public class Utility
         return file;
     }
 
-    public static String prepareWinFilename(String filename) {
+    public static String prepareWinFilename(String filename)
+    {
         filename = filename.replaceAll("<", "(");
         filename = filename.replaceAll(">", ")");
         filename = filename.replaceAll("[/\\*?|:;]", "-");
         return filename;
     }
 
-    public static File openDirectory(String directory) throws IOException {
+    public static File openDirectory(String directory) throws IOException
+    {
         File dir = new File(directory);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -114,18 +104,21 @@ public class Utility
      * argument is not null and is equal, ignoring case, to the string "true".
      * Otherwise, throws an exception.
      */
-    public static boolean getBooleanValue(String s) throws Exception {
+    public static boolean getBooleanValue(String s) throws Exception
+    {
         boolean result;
         s = s.trim();
         if (s.equalsIgnoreCase("true")) {
             result = true;
-        } else {
+        }
+        else {
             result = false;
         }
         return result;
     }
 
-    public static String getTimeStamp(String format) {
+    public static String getTimeStamp(String format)
+    {
 
         // Format the current time.
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -133,7 +126,8 @@ public class Utility
         return formatter.format(currentTime);
     }
 
-    public static String formatTimeStamp(Date dateTime, String format) {
+    public static String formatTimeStamp(Date dateTime, String format)
+    {
         // Format the current time.
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(dateTime);
@@ -142,7 +136,8 @@ public class Utility
     /**
      * Reads the incoming file and returns the content as a String object.
      */
-    public static synchronized String fileToString(String fileName) throws IOException {
+    public static synchronized String fileToString(String fileName) throws IOException
+    {
         StringBuffer sb = new StringBuffer();
         char[] buf = new char[1024 * 8];
 
@@ -157,22 +152,31 @@ public class Utility
 
     /**
      * Reads the incoming String into a file at at the given destination.
-     *
-     * @param filename name and path of the file to create
-     * @param data     the contents of the file
+     * 
+     * @param filename
+     *            name and path of the file to create
+     * @param data
+     *            the contents of the file
      * @return the new file.
-     * @throws IOException If the creating or writing to the file stream fails
+     * @throws IOException
+     *             If the creating or writing to the file stream fails
      */
-    public static File stringToFile(String filename, String data) throws IOException {
+    public static File stringToFile(String filename, String data) throws IOException
+    {
         return stringToFile(filename, data, false);
     }
 
-    public static synchronized File stringToFile(String filename, String data, boolean append) throws IOException {
+    public static synchronized File stringToFile(String filename, String data, boolean append)
+            throws IOException
+    {
         return stringToFile(filename, data, append, false);
     }
 
-    public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine)
-            throws IOException {
+    public static synchronized File stringToFile(String filename,
+            String data,
+            boolean append,
+            boolean newLine) throws IOException
+    {
         File f = createFile(filename);
         BufferedWriter writer = null;
         try {
@@ -181,7 +185,8 @@ public class Utility
             if (newLine) {
                 writer.newLine();
             }
-        } finally {
+        }
+        finally {
             if (writer != null) {
                 writer.close();
             }
@@ -189,14 +194,16 @@ public class Utility
         return f;
     }
 
-    public static String getStringFromDate(Date date, String format) {
+    public static String getStringFromDate(Date date, String format)
+    {
         // converts from date to strin using the standard TIME_STAMP_FORMAT
         // pattern
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
     }
 
-    public static Date getDateFromString(String date, String format) {
+    public static Date getDateFromString(String date, String format)
+    {
         // The date must always be in the format of TIME_STAMP_FORMAT
         // i.e. JAN 29 2001 22:50:40 GMT
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -206,20 +213,24 @@ public class Utility
         return formatter.parse(date, pos);
     }
 
-    public static File loadFile(String filename) throws IOException {
+    public static File loadFile(String filename) throws IOException
+    {
         File file = new File(filename);
         if (file.canRead()) {
             return file;
-        } else {
+        }
+        else {
             throw new IOException("File: " + filename + " can not be read");
         }
     }
 
-    public static byte[] objectToByteArray(Object src) throws IOException {
+    public static byte[] objectToByteArray(Object src) throws IOException
+    {
         if (src instanceof byte[]) {
-            return (byte[]) src;
-        } else if (src instanceof String) {
-            return ((String) src).getBytes();
+            return (byte[])src;
+        }
+        else if (src instanceof String) {
+            return ((String)src).getBytes();
         }
 
         byte[] dest = null;
@@ -231,15 +242,17 @@ public class Utility
             os.writeObject(src);
             os.flush();
             dest = bs.toByteArray();
-        } catch (IOException e) {
-            os.close();
-            bs.close();
+        }
+        catch (IOException e) {
+            IOUtils.closeQuietly(os);
+            IOUtils.closeQuietly(bs);
             throw e;
         }
         return dest;
     }
 
-    public static Object byteArrayToObject(byte[] src) throws IOException, ClassNotFoundException {
+    public static Object byteArrayToObject(byte[] src) throws IOException, ClassNotFoundException
+    {
         Object dest = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(src);
         ObjectInputStream ois = new ObjectInputStream(bais);
@@ -250,22 +263,26 @@ public class Utility
 
     /**
      * Load a given resource. Trying broader class loaders each time.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
+     * 
+     * @param resourceName
+     *            The name of the resource to load
+     * @param callingClass
+     *            The Class object of the calling object
      */
-    public static URL getResource(final String resourceName, final Class callingClass) {
+    public static URL getResource(final String resourceName, final Class callingClass)
+    {
         URL url = ClassHelper.getResource(resourceName, callingClass);
 
-
         if (url == null) {
-            url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run() {
+            url = (URL)AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run()
+                {
                     File f = new File(resourceName);
                     if (f.exists()) {
                         try {
                             return f.toURL();
-                        } catch (MalformedURLException e) {
+                        }
+                        catch (MalformedURLException e) {
                             return null;
                         }
                     }
@@ -276,22 +293,29 @@ public class Utility
         return url;
     }
 
-    public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException {
-        return loadResourceAsString(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
+    public static String loadResourceAsString(String resourceName, Class callingClass)
+            throws IOException
+    {
+        return loadResourceAsString(resourceName, callingClass, MuleManager.getConfiguration()
+                .getEncoding());
     }
-    
-    public static String loadResourceAsString(String resourceName, Class callingClass, String encoding) throws IOException {
+
+    public static String loadResourceAsString(String resourceName, Class callingClass, String encoding)
+            throws IOException
+    {
         URL url = getResource(resourceName, callingClass);
         String resource = null;
         if (url == null) {
             resource = fileToString(resourceName);
-        } else {
+        }
+        else {
             resource = fileToString(URLDecoder.decode(url.getFile(), encoding));
         }
         return resource;
     }
 
-    public static InputStream loadResource(String resourceName, Class callingClass) throws IOException {
+    public static InputStream loadResource(String resourceName, Class callingClass) throws IOException
+    {
         URL url = getResource(resourceName, callingClass);
         InputStream resource = null;
         if (url == null) {
@@ -299,17 +323,21 @@ public class Utility
             if (f.exists()) {
                 resource = new FileInputStream(f);
             }
-        } else {
+        }
+        else {
             resource = url.openStream();
         }
         return resource;
     }
 
-    public static String getResourcePath(String resourceName, Class callingClass) throws IOException {
+    public static String getResourcePath(String resourceName, Class callingClass) throws IOException
+    {
         return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
     }
 
-    public static String getResourcePath(String resourceName, Class callingClass, String encoding) throws IOException {
+    public static String getResourcePath(String resourceName, Class callingClass, String encoding)
+            throws IOException
+    {
         if (resourceName == null) {
             return null;
         }
@@ -320,7 +348,8 @@ public class Utility
             if (f.exists()) {
                 resource = f.getAbsolutePath();
             }
-        } else {
+        }
+        else {
             resource = URLDecoder.decode(url.toExternalForm(), encoding);
         }
         if (resource != null) {
@@ -335,18 +364,20 @@ public class Utility
         return resource;
     }
 
-    public static boolean deleteTree(File dir) {
+    public static boolean deleteTree(File dir)
+    {
         if (dir == null || !dir.exists()) {
             return true;
         }
         File[] files = dir.listFiles();
-        if(files!=null) {
+        if (files != null) {
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isDirectory()) {
                     if (!deleteTree(files[i])) {
                         return false;
                     }
-                } else {
+                }
+                else {
                     if (!files[i].delete()) {
                         return false;
                     }
@@ -356,7 +387,8 @@ public class Utility
         return dir.delete();
     }
 
-    public static String[] split(String string, String delim) {
+    public static String[] split(String string, String delim)
+    {
         StringTokenizer st = new StringTokenizer(string, delim);
         String[] results = new String[st.countTokens()];
         int i = 0;
@@ -366,7 +398,8 @@ public class Utility
         return results;
     }
 
-    public static String getFormattedDuration(long mills) {
+    public static String getFormattedDuration(long mills)
+    {
         long days = mills / 86400000;
         mills = mills - (days * 86400000);
         long hours = mills / 3600000;
@@ -380,20 +413,23 @@ public class Utility
         bf.append(days).append(" ").append(new Message(Messages.DAYS).getMessage()).append(", ");
         bf.append(hours).append(" ").append(new Message(Messages.HOURS).getMessage()).append(", ");
         bf.append(mins).append(" ").append(new Message(Messages.MINS).getMessage()).append(", ");
-        bf.append(secs).append(".").append(mills).append(" ").append(new Message(Messages.SEC).getMessage());
+        bf.append(secs).append(".").append(mills).append(" ").append(
+                new Message(Messages.SEC).getMessage());
         return bf.toString();
     }
 
     /**
      * Unzip the specified archive to the given directory
      */
-    public static void unzip(File archive, File directory) throws IOException {
+    public static void unzip(File archive, File directory) throws IOException
+    {
         ZipFile zip = null;
         if (directory.exists()) {
             if (!directory.isDirectory()) {
                 throw new IOException("Directory is not a directory: " + directory);
             }
-        } else {
+        }
+        else {
             if (!directory.mkdirs()) {
                 throw new IOException("Could not create directory: " + directory);
             }
@@ -401,119 +437,61 @@ public class Utility
         try {
             zip = new ZipFile(archive);
             for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
+                ZipEntry entry = (ZipEntry)entries.nextElement();
                 File f = new File(directory, entry.getName());
                 if (entry.isDirectory()) {
                     if (!f.mkdirs()) {
                         throw new IOException("Could not create directory: " + f);
                     }
-                } else {
+                }
+                else {
                     InputStream is = zip.getInputStream(entry);
                     OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-                    copy(is, os);
+                    IOUtils.copy(is, os);
                     is.close();
                     os.close();
                 }
             }
-        } finally {
+        }
+        finally {
             if (zip != null) {
                 zip.close();
             }
         }
     }
 
-
-    /**
-     * Copy bytes from an <code>InputStream</code> to an
-     * <code>OutputStream</code>.
-     * <p>
-     * This method buffers the input internally, so there is no need to use a
-     * <code>BufferedInputStream</code>.
-     *
-     * @param input  the <code>InputStream</code> to read from
-     * @param output  the <code>OutputStream</code> to write to
-     * @return the number of bytes copied
-     * @throws NullPointerException if the input or output is null
-     * @throws IOException if an I/O error occurs
-     */
-    public static int copy(InputStream input, OutputStream output)
-            throws IOException {
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-        int count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
-
-    public static void copy(URL url, File output) throws IOException {
+    public static void copy(URL url, File output) throws IOException
+    {
         InputStream is = null;
         FileOutputStream os = null;
         try {
             // Copy url content stream to file
             is = url.openStream();
             os = new FileOutputStream(output);
-            copy(is, os);
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
+            IOUtils.copy(is, os);
         }
-    }
-
-    /**
-     * Unconditionally close an <code>InputStream</code>.
-     * <p>
-     * Equivalent to {@link InputStream#close()}, except any exceptions will be ignored.
-     * This is typically used in finally blocks.
-     *
-     * @param input  the InputStream to close, may be null or already closed
-     */
-    public static void closeQuietly(InputStream input) {
-        try {
-            if (input != null) {
-                input.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
-        }
-    }
-
-    /**
-     * Unconditionally close an <code>OutputStream</code>.
-     * <p>
-     * Equivalent to {@link OutputStream#close()}, except any exceptions will be ignored.
-     * This is typically used in finally blocks.
-     *
-     * @param output  the OutputStream to close, may be null or already closed
-     */
-    public static void closeQuietly(OutputStream output) {
-        try {
-            if (output != null) {
-                output.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
+        finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(os);
         }
     }
 
     /** Reads the input stream into a string. */
-    public static String getInputStreamAsString(InputStream input) throws IOException {
+    public static String getInputStreamAsString(InputStream input) throws IOException
+    {
         return (readToString(new InputStreamReader(input)));
     }
 
     /** Reads the stream into a string. */
-    public static String readToString(Reader reader) throws IOException {
-        String text = "";
-
+    public static String readToString(Reader reader) throws IOException
+    {
         // Read the stream into an array of strings.
         List lines = readToStringList(reader);
 
         // Concatenate the array of strings into a single string.
         StringBuffer sb = new StringBuffer(lines.size() * 5);
         for (Iterator it = lines.iterator(); it.hasNext();) {
-            String line = (String) it.next();
+            String line = (String)it.next();
             if (sb.length() > 0) {
                 sb.append("\n");
             }
@@ -524,7 +502,8 @@ public class Utility
     }
 
     /** Reads the stream into a list of strings. */
-    public static List readToStringList(Reader reader) throws IOException {
+    public static List readToStringList(Reader reader) throws IOException
+    {
         List lines = new ArrayList();
         String line;
         BufferedReader buffer = new BufferedReader(reader);
@@ -535,7 +514,4 @@ public class Utility
         return (lines);
     }
 
-    public static boolean isEmpty(String value) {
-        return (value==null || EMPTY_STRING.equals(value));
-    }
 }

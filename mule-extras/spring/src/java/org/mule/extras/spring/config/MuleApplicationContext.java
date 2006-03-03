@@ -13,15 +13,15 @@
  */
 package org.mule.extras.spring.config;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * <code>MuleApplicationContext</code> is A Simple extension Application

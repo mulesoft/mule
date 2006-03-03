@@ -14,12 +14,13 @@
 package org.mule.providers.gs.filters;
 
 import net.jini.core.entry.Entry;
+
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class JavaSpaceTemplateFilter implements UMOFilter {
     }
 
     public void setExpectedType(String expectedType) {
-        if(NULL_VALUE.equalsIgnoreCase(expectedType) || Utility.EMPTY_STRING.equals(expectedType)) {
+        if(NULL_VALUE.equalsIgnoreCase(expectedType) || StringUtils.isEmpty(expectedType)) {
             expectedType=null;
         } else {
             this.expectedType = expectedType;
@@ -86,7 +87,9 @@ public class JavaSpaceTemplateFilter implements UMOFilter {
     public Entry getEntry() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException {
 
         if(entry==null) {
-            if(expectedType==null) return null; //Match all template
+            if(expectedType==null) {
+                return null; //Match all template
+            }
             entry = (Entry)ClassHelper.instanciateClass(expectedType, ClassHelper.NO_ARGS);
             if(entry.getClass().isAssignableFrom(Entry.class)) {
                 throw new IllegalArgumentException(new Message("gs", 1, expectedType).toString());

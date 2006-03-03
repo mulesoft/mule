@@ -13,14 +13,8 @@
  */
 package org.mule.ra;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
@@ -30,8 +24,14 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>MuleManagedConnectionFactory</code> TODO
@@ -142,8 +142,9 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
 
         String username = null;
 
-        if (pc != null)
+        if (pc != null) {
             username = pc.getUserName();
+        }
 
         Iterator it = connectionSet.iterator();
         while (it.hasNext()) {

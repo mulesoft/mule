@@ -13,9 +13,6 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -23,6 +20,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used

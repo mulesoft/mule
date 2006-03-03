@@ -34,6 +34,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
 import javax.resource.spi.work.Work;
+
 import java.beans.ExceptionListener;
 
 /**
@@ -177,7 +178,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 }
                 //Once a dispatcher has done its work we need to romve this property so that
                 //it is not propagated to the next request
-                if(result!=null) result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+                if(result!=null) {
+                    result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+                }
                 return result;
             } catch (DispatchException e) {
                 dispose();

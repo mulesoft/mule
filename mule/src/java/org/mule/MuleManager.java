@@ -14,6 +14,8 @@
 package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -73,6 +75,7 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -658,7 +661,9 @@ public class MuleManager implements UMOManager
                 initialiseConnectors();
                 initialiseEndpoints();
                 initialiseAgents();
-                if(model!=null) model.initialise();
+                if(model!=null) {
+                    model.initialise();
+                }
 
             } finally {
                 initialised.set(true);
@@ -705,7 +710,7 @@ public class MuleManager implements UMOManager
                                                               false);
 
         // if endpointUri is null do not setup server components
-        if (config.getServerUrl() == null || Utility.EMPTY_STRING.equals(config.getServerUrl().trim())) {
+        if (StringUtils.isEmpty(config.getServerUrl())) {
             logger.info("Server endpointUri is null, not registering Mule Admin agent");
             disable = true;
         }
@@ -713,7 +718,6 @@ public class MuleManager implements UMOManager
         if (!disable) {
             unregisterAgent(MuleAdminAgent.AGENT_NAME);
             registerAgent(new MuleAdminAgent());
-
         }
     }
 
@@ -747,7 +751,9 @@ public class MuleManager implements UMOManager
             if (queueManager != null) { queueManager.start(); }
             startConnectors();
             startAgents();
-            if(model!=null) model.start();
+            if(model!=null) {
+                model.start();
+            }
             started.set(true);
             starting.set(false);
             if(!config.isEmbedded()) {
@@ -1079,7 +1085,9 @@ public class MuleManager implements UMOManager
      */
     public UMOAgent unregisterAgent(String name) throws UMOException
     {
-        if(name==null) return null;
+        if(name==null) {
+            return null;
+        }
         UMOAgent agent = (UMOAgent)agents.remove(name);
         if(agent!=null) {
             agent.dispose();

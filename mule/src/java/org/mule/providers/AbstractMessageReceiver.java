@@ -16,6 +16,7 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -383,7 +384,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     public final void stop() {
          try {
-                if(connected.get()) disconnect();
+                if(connected.get()) {
+                    disconnect();
+                }
              } catch (Exception e) {
                 logger.error(e.getMessage(), e);
              }

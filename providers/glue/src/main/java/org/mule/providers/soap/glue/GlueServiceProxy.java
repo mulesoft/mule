@@ -14,6 +14,7 @@
 package org.mule.providers.soap.glue;
 
 import electric.service.IService;
+
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;

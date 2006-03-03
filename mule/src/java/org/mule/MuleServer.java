@@ -13,12 +13,6 @@
  */
 package org.mule;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
@@ -30,6 +24,12 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassHelper;
 import org.mule.util.StringMessageHelper;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local

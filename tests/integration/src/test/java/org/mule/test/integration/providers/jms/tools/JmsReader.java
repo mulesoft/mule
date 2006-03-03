@@ -15,9 +15,8 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -36,8 +35,9 @@ import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 public class JmsReader
 {
@@ -147,8 +147,9 @@ public class JmsReader
         int noOfMessages = 1;
         boolean queue = false;
         if (args.length == 5) {
-            if (args[2].equals("-q"))
+            if (args[2].equals("-q")) {
                 queue = true;
+            }
             noOfMessages = Integer.parseInt(args[3]);
             boolean isBlock = Boolean.valueOf(args[4]).booleanValue();
 

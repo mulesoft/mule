@@ -15,15 +15,15 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Orange implements Fruit, Callable
 {

@@ -28,6 +28,7 @@ import org.mule.umo.provider.UMOConnector;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -80,8 +81,9 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void doTearDown() throws Exception
     {
-        if (s != null)
+        if (s != null) {
             s.close();
+        }
     }
 
     protected void sendTestData(int iterations) throws Exception

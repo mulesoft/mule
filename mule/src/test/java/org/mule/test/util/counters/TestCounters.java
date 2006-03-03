@@ -6,13 +6,13 @@
  */
 package org.mule.test.util.counters;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
 import org.mule.util.counters.Counter;
 import org.mule.util.counters.CounterFactory;
 import org.mule.util.counters.CounterFactory.Type;
+
+import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 /**
  * @author Nodet

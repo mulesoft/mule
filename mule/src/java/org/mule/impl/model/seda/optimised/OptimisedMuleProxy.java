@@ -21,7 +21,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.MuleProxy;
@@ -164,7 +163,7 @@ public class OptimisedMuleProxy implements MuleProxy
     public void onEvent(QueueSession session, UMOEvent event)
     {
         this.queueSession = session;
-        this.event = (MuleEvent) event;
+        this.event = event;
     }
 
     public ComponentStatistics getStatistics()
@@ -377,7 +376,7 @@ public class OptimisedMuleProxy implements MuleProxy
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
                 }
                 // processResponse(result, replyTo, replyToHandler);
-                event = (MuleEvent) RequestContext.getEvent();
+                event = RequestContext.getEvent();
                 if (result != null && !event.isStopFurtherProcessing()) {
                     descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }

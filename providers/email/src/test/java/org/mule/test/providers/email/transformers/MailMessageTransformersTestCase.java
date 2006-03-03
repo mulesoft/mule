@@ -13,26 +13,25 @@
  */
 package org.mule.test.providers.email.transformers;
 
-import java.util.Properties;
+import com.mockobjects.dynamic.Mock;
+
+import org.mule.impl.AlreadyInitialisedException;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.providers.email.SmtpConnector;
+import org.mule.providers.email.transformers.EmailMessageToString;
+import org.mule.providers.email.transformers.StringToEmailMessage;
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.transformer.UMOTransformer;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.AlreadyInitialisedException;
-import org.mule.providers.email.SmtpConnector;
-import org.mule.providers.email.transformers.EmailMessageToString;
-import org.mule.providers.email.transformers.StringToEmailMessage;
-import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.transformer.UMOTransformer;
-
-import com.mockobjects.dynamic.Mock;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -103,8 +102,9 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            if (objSrc == null || objRes == null)
+            if (objSrc == null || objRes == null) {
                 return false;
+            }
             return objRes.equals(objSrc);
         }
         return super.compareResults(src, result);

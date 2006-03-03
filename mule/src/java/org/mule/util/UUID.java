@@ -14,9 +14,9 @@
  */
 package org.mule.util;
 
-import java.io.Serializable;
-
 import org.doomdark.uuid.UUIDGenerator;
+
+import java.io.Serializable;
 
 /**
  * <code>UUID</code> Generates a UUID using the doom dark JUG library

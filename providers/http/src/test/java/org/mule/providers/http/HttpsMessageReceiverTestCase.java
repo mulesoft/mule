@@ -11,9 +11,11 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.http;
 
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
@@ -30,10 +32,12 @@ import org.mule.umo.provider.UMOMessageReceiver;
 
 public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         MuleManager.getInstance().registerConnector(HttpsConnectorTestCase.createConnector(false));
         super.doSetUp();
     }
+
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
@@ -41,9 +45,8 @@ public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
-        return new HttpsMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                        (UMOComponent) mockComponent.proxy(),
-                                        endpoint);
+        return new HttpsMessageReceiver((AbstractConnector)endpoint.getConnector(),
+                (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

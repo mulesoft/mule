@@ -20,10 +20,12 @@ import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
 import net.sf.acegisecurity.providers.dao.memory.UserMap;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang.SystemUtils;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -34,7 +36,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.util.Utility;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -102,7 +103,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
 
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            System.out.println(status + Utility.CRLF + get.getResponseBodyAsString());
+            System.out.println(status + SystemUtils.LINE_SEPARATOR + get.getResponseBodyAsString());
 
         } finally {
             get.releaseConnection();
@@ -152,7 +153,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         try {
             int status = client.executeMethod(get);
             assertEquals(result, status);
-            System.out.println(status + Utility.CRLF + get.getResponseBodyAsString());
+            System.out.println(status + SystemUtils.LINE_SEPARATOR + get.getResponseBodyAsString());
 
         } finally {
             get.releaseConnection();

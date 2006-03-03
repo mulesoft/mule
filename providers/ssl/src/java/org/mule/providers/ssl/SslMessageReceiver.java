@@ -14,22 +14,22 @@
  */
 package org.mule.providers.ssl;
 
+import org.mule.providers.AbstractConnector;
+import org.mule.providers.tcp.TcpMessageReceiver;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.tcp.TcpMessageReceiver;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>SslMessageReceiver</code> acts like a tcp server to receive socket

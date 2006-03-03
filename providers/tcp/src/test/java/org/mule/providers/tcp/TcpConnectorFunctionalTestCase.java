@@ -51,8 +51,9 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void doTearDown() throws Exception
     {
-        if (s != null)
+        if (s != null) {
             s.close();
+        }
     }
 
     protected void sendTestData(int iterations) throws Exception

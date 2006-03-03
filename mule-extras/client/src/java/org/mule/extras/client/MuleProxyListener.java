@@ -13,15 +13,15 @@
  */
 package org.mule.extras.client;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * <code>MuleProxyListener</code> is a generic listent proxy that can be used

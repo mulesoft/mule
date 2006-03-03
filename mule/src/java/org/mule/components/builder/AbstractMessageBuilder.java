@@ -15,6 +15,7 @@ package org.mule.components.builder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
@@ -23,7 +24,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.config.MuleProperties;
 
 import java.util.ArrayList;
 import java.util.Iterator;
