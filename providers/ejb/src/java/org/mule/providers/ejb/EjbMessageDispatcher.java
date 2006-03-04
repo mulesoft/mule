@@ -69,7 +69,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
     {
         if (!initialised.get()) {
             String rmiPolicyPath = connector.getSecurityPolicy();
-            String serverCodebasePath = connector.getServerCodebase();
+            //String serverCodebasePath = connector.getServerCodebase();
 
             System.setProperty("java.security.policy", rmiPolicyPath);
             // System.setProperty("java.rmi.server.codebase",
@@ -93,7 +93,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
     }
 
     private EJBObject getRemoteObject(UMOEvent event) throws RemoteException, UnknownHostException {
-        EJBObject remoteObj = null;
+        EJBObject remoteObj;
 
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
@@ -196,8 +196,9 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
 
         Object result = invokedMethod.invoke(remoteObject, arguments);
 
-        return (null == result ? null
-                : new MuleMessage(connector.getMessageAdapter(result).getPayload(), null));
+        return (null == result
+                    ? null
+                    : new MuleMessage(connector.getMessageAdapter(result).getPayload()));
     }
 
     public Object getDelegateSession() throws UMOException

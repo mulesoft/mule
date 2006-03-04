@@ -79,7 +79,8 @@ public class EjbMessageReceiver extends PollingMessageReceiver
             Object result = invokedMethod.invoke(remoteObject, connector.getEjbAble().arguments());
 
             if (null != result) {
-                routeMessage(new MuleMessage(connector.getMessageAdapter(result).getPayload(), null), endpoint.isSynchronous());
+                final Object payload = connector.getMessageAdapter(result).getPayload();
+                routeMessage(new MuleMessage(payload), endpoint.isSynchronous());
             }
         }
         catch (Exception e) {
