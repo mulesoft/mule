@@ -13,13 +13,13 @@
  */
 package org.mule.test.filters.xml;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStream;
 
 /**
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
@@ -32,16 +32,13 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
     private JXPathFilter myFilter = null;
     private XmlToDomDocument transformer = null;
 
-    protected void doSetUp() throws Exception
-    {
+    protected void doSetUp() throws Exception {
         // Read Xml file
-        BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
-        String nextLine = "";
-        StringBuffer sb = new StringBuffer();
-        while ((nextLine = br.readLine()) != null) {
-            sb.append(nextLine);
-        }
-        xmlData = sb.toString();
+        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        final InputStream is = currentClassLoader.getResourceAsStream("cdcatalog.xml");
+        assertNotNull("Test resource not found.", is);
+
+        xmlData = IOUtils.toString(is);
 
         // new UMOFilter
         myFilter = new JXPathFilter();
