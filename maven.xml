@@ -10,10 +10,10 @@
     ======================================================================================
 
     maven idea		- will build an IDEA project and sub-modules for all sub-projects
-    			  (doesn't work with IDEA 5.0 :( ) 
+    			  (doesn't work with IDEA 5.0 :( )
     			  This will preseve your current workspace
     maven idea-new	- Will create a new multi-module project, overwriting your current workspace
-    
+
 
     maven eclipse - Creates an Eclipse project with sub modules and dependencies set up
 
@@ -462,9 +462,20 @@
                 </u:available>
             </j:if>
             <j:if test="${pom.artifactId!='mule-core'}">
+
                 <u:available file="${maven.src.dir}">
+                    <j:set var="src" value="${maven.src.dir}"/>
+                    <u:available file="${src}/main">
+                        <j:set var="src" value="${src}/main"/>
+                    </u:available>
+                    <echo>Src Dir is: ${src}</echo>
                     <copy todir="${basedir}/../../target/release/src/">
-                        <fileset dir="${maven.src.dir}"/>
+                        <fileset dir="${src}"/>
+                    </copy>
+                </u:available>
+                <u:available file="./src/main/java">
+                    <copy todir="${basedir}/../../target/release/src/">
+                        <fileset dir="./src/main/java"/>
                     </copy>
                 </u:available>
             </j:if>
@@ -478,14 +489,14 @@
 
         <j:set var="deploy.remote" value="true"/>
         <u:available file="${pom.siteDirectory}">
-            
+
             <!-- unzip doc site if there is one -->
             <u:available file="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz">
                 <delete dir="${pom.siteDirectory}/doc"/>
                 <untar src="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz"
                     dest="${pom.siteDirectory}" compression="gzip"/>
             </u:available>
-            
+
             <echo> Copying jars from ${mule.release.dist.dir}</echo>
             <copy todir="${pom.siteDirectory}/../dist/jars">
                 <fileset file="${mule.release.dist.dir}/*.jar"/>
