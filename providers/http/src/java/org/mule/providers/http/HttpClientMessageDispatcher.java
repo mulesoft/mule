@@ -222,7 +222,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         if (body instanceof HttpMethod) {
             httpMethod = (HttpMethod)body;
         }
-        else if ("GET".equalsIgnoreCase(method)) {
+        else if (HttpConstants.METHOD_GET.equalsIgnoreCase(method)) {
             httpMethod = new GetMethod(uri.toString());
         }
         else {
@@ -243,11 +243,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
-                // todo MULE20 Encoding
-                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer /*
-                                                                                 * ,
-                                                                                 * event.getEncoding()
-                                                                                 */));
+                // TODO MULE20 add Encoding
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer /* event.getEncoding() */));
                 httpMethod = postMethod;
             }
 
@@ -287,7 +284,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             String status = String.valueOf(httpMethod.getStatusCode());
 
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
-            logger.debug("Http response is: " + status);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Http response is: " + status);
+            }
             ExceptionPayload ep = null;
             if (httpMethod.getStatusCode() >= 400) {
                 logger.error(Utility.getInputStreamAsString(httpMethod.getResponseBodyAsStream()));
