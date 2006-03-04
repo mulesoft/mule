@@ -24,7 +24,6 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
 
 import javax.activation.DataHandler;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,6 +58,10 @@ public class MuleMessage implements UMOMessage
         }
         addProperties(properties);
     }
+
+     public MuleMessage(Object message, UMOMessage previous) {
+         this(message, null, previous);
+     }
 
     public MuleMessage(Object message, Map properties, UMOMessage previous) {
         if (message instanceof UMOMessageAdapter) {

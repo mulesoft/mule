@@ -13,6 +13,10 @@
  */
 package org.mule.impl.internal.notifications;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
@@ -27,6 +31,11 @@ import org.mule.umo.provider.UMOConnectable;
  */
 public class MessageNotification extends UMOServerNotification
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(MessageNotification.class);
+
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_DISPATCHED = MESSAGE_EVENT_ACTION_START_RANGE + 2;
     public static final int MESSAGE_SENT = MESSAGE_EVENT_ACTION_START_RANGE + 3;
@@ -38,9 +47,23 @@ public class MessageNotification extends UMOServerNotification
 
     public MessageNotification(UMOMessage resource, UMOEndpoint endpoint, String identifier, int action)
     {
-        super(resource, action);
+        super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
         this.endpoint = endpoint;
+
+    }
+
+    protected static UMOMessage cloneMessage(UMOMessage message) {
+        Object clonePayload = message.getPayload();
+        try {
+            clonePayload = BeanUtils.cloneBean(clonePayload);
+        } catch (Exception e) {
+            //If the clone fails we should just warn the developer that he is getting a reference to the payload of the message
+            //in his MessageNotifications
+            logger.warn("Failed to clone message payload, passing payload by reference. Error is: " + e.getMessage(), e);
+        }
+        UMOMessage clone = new MuleMessage(clonePayload, message);
+        return clone;
     }
 
     protected String getPayloadToString()
