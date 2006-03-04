@@ -46,7 +46,7 @@ public class MuleMessage implements UMOMessage
 
     public MuleMessage(Object message)
     {
-        this(message, null);
+        this(message, (Map) null);
     }
 
     public MuleMessage(Object message, Map properties)
@@ -381,7 +381,7 @@ public class MuleMessage implements UMOMessage
 
     public String toString()
     {
-        String id = null;
+        String id;
 
         try {
             id = getUniqueId();
