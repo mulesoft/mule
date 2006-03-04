@@ -19,14 +19,14 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.util.SpiHelper;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 /**
  * <code>SpiHelperTestCase</code> test the methods of the SpiHelper.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -60,8 +60,11 @@ public class SpiHelperTestCase extends TestCase
 
     public void testDiscoverFromPropertyFile() throws Exception
     {
+        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        final InputStream is = currentClassLoader.getResourceAsStream("test-spi.properties");
+        assertNotNull("Test resource not found.", is);
         Properties p = new Properties();
-        p.load(new FileInputStream("src/test/conf/test-spi.properties"));
+        p.load(is);
         assertNotNull(p);
         Class c = SpiHelper.findService(Fruit.class, p, getClass());
         assertNotNull(c);
