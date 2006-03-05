@@ -28,8 +28,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
-import java.util.Map;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -263,10 +261,10 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
 
         //Test Event timeout proporgation
-        UMOEvent event = new MuleEvent(new MuleMessage("hello", (Map)null), ep, MuleTestUtils.getTestSession(), false);
+        UMOEvent event = new MuleEvent(new MuleMessage("hello"), ep, MuleTestUtils.getTestSession(), false);
         assertEquals(2002, event.getTimeout());
 
-        event = new MuleEvent(new MuleMessage("hello", (Map)null), new MuleEndpoint("test://hello", true), MuleTestUtils.getTestSession(), true);
+        event = new MuleEvent(new MuleMessage("hello"), new MuleEndpoint("test://hello", true), MuleTestUtils.getTestSession(), true);
         //default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
     }
