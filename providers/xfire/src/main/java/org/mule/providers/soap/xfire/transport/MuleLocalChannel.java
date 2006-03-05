@@ -80,7 +80,7 @@ public class MuleLocalChannel extends AbstractChannel
             final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
             if (out != null) {
                 final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                        .getEncoding());
+                        .getEncoding(), context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
@@ -212,7 +212,7 @@ public class MuleLocalChannel extends AbstractChannel
         {
             try {
                 final XMLStreamReader reader = STAXUtils.createXMLStreamReader(stream, message
-                        .getEncoding());
+                        .getEncoding(), context);
                 final InMessage inMessage = new InMessage(reader, uri);
                 inMessage.setEncoding(message.getEncoding());
 
@@ -257,7 +257,7 @@ public class MuleLocalChannel extends AbstractChannel
         {
             try {
                 final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(stream, message
-                        .getEncoding());
+                        .getEncoding(), context);
                 message.getSerializer().writeMessage(message, writer, context);
 
                 writer.close();

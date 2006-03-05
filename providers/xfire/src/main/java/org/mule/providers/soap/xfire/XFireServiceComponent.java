@@ -90,9 +90,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        OutStreamMessageAdapter response = null;
-        UMOEndpointURI endpointURI = null;
-        String method = null;
+        OutStreamMessageAdapter response;
+        UMOEndpointURI endpointURI;
+        String method;
 
         if (eventContext.isStreaming()) {
             StreamMessageAdapter sma = (StreamMessageAdapter)eventContext.getMessage().getPayload();
@@ -272,7 +272,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
                 Attachments atts = new JavaMailAttachments(getMessageStream(eventContext), contentType);
 
                 XMLStreamReader reader = STAXUtils.createXMLStreamReader(atts.getSoapMessage()
-                        .getDataHandler().getInputStream(), encoding);
+                        .getDataHandler().getInputStream(), encoding, context);
                 InMessage message = new InMessage(reader, uri);
                 message.setProperty(SoapConstants.SOAP_ACTION, eventContext.getStringProperty(
                         SoapConstants.SOAP_ACTION, StringUtils.EMPTY));
@@ -289,7 +289,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
         else {
             XMLStreamReader reader = STAXUtils.createXMLStreamReader(getMessageStream(eventContext),
-                    encoding);
+                    encoding, context);
             InMessage message = new InMessage(reader, uri);
             context.getExchange().setInMessage(message);
             context.setCurrentMessage(message);
@@ -300,7 +300,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
-        InputStream is = null;
+        InputStream is;
         if (context.getMessage().getPayload() instanceof InputStream) {
             is = (InputStream)context.getMessage().getPayload();
         }

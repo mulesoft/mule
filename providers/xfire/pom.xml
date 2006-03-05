@@ -13,6 +13,22 @@
     <packaging>jar</packaging>
     <name>Xfire Provider</name>
     <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
+
+    <build>
+        <!--
+             For some reason it does not pick up the standard m2 folder structure here
+             as described in http://tinyurl.com/amty9
+             Make it work by explicitly specifying them
+             TODO fix it
+        -->
+        <sourceDirectory>src/main</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
@@ -20,9 +36,9 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>xfire</groupId>
+            <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-all</artifactId>
-            <version>1.0-M6</version>
+            <version>1.0</version>
             <!-- These transitive dependencies are not found on ibiblio and cause 
             the build to fail. -->
             <exclusions>
@@ -31,14 +47,24 @@
                     <artifactId>xmlbeans-jsr173-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javamail</groupId>
-                    <artifactId>javamail</artifactId>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.activation</groupId>
                     <artifactId>activation</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>1.0.2-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>1.3.1-rc5</version>
         </dependency>
     </dependencies>
 </project>

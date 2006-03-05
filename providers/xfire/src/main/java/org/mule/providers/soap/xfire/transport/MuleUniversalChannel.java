@@ -78,7 +78,7 @@ public class MuleUniversalChannel extends AbstractChannel
             final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
             if (out != null) {
                 final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                        .getEncoding());
+                        .getEncoding(), context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
@@ -117,7 +117,7 @@ public class MuleUniversalChannel extends AbstractChannel
     void writeWithoutAttachments(MessageContext context, OutMessage message, OutputStream out)
             throws XFireException
     {
-        XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding());
+        XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(), context);
 
         message.getSerializer().writeMessage(message, writer, context);
 
@@ -185,7 +185,7 @@ public class MuleUniversalChannel extends AbstractChannel
                     }
                     else {
                         XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                                .getEncoding());
+                                .getEncoding(), context);
                         message.getSerializer().writeMessage(message, writer, context);
                         try {
                             writer.flush();
@@ -212,7 +212,7 @@ public class MuleUniversalChannel extends AbstractChannel
         client.sendStream(getUri(), sp);
         // sender.hasResponse()
         if (sp.hasResponse()) {
-            InMessage inMessage = null;
+            InMessage inMessage;
             String ct = (String)sp.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
             InputStream in = sp.getResponse();
             if (ct.toLowerCase().indexOf("multipart/related") != -1) {
@@ -220,7 +220,7 @@ public class MuleUniversalChannel extends AbstractChannel
                     Attachments atts = new JavaMailAttachments(in, ct);
                     InputStream msgIs = atts.getSoapMessage().getDataHandler().getInputStream();
                     inMessage = new InMessage(STAXUtils.createXMLStreamReader(msgIs, message
-                            .getEncoding()), getUri());
+                            .getEncoding(), context), getUri());
                     inMessage.setAttachments(atts);
                 }
                 catch (MessagingException e) {
@@ -228,7 +228,7 @@ public class MuleUniversalChannel extends AbstractChannel
                 }
             }
             else {
-                inMessage = new InMessage(STAXUtils.createXMLStreamReader(in, message.getEncoding()),
+                inMessage = new InMessage(STAXUtils.createXMLStreamReader(in, message.getEncoding(), context),
                         getUri());
             }
             getEndpoint().onReceive(context, inMessage);

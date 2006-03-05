@@ -81,7 +81,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     protected Object[] getArgs(UMOEvent event) throws TransformerException
     {
         Object payload = event.getTransformedMessage();
-        Object[] args = new Object[0];
+        Object[] args;
         if (payload instanceof Object[]) {
             args = (Object[])payload;
         }
@@ -157,10 +157,10 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         Object[] response = client.invoke(op, args);
 
         if (response != null && response.length == 1) {
-            return new MuleMessage(response[0], null);
+            return new MuleMessage(response[0]);
         }
         else {
-            return new MuleMessage(response, null);
+            return new MuleMessage(response);
         }
     }
 
