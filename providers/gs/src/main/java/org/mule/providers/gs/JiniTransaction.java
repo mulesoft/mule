@@ -15,11 +15,9 @@ package org.mule.providers.gs;
 
 import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.client.LocalTransactionManager;
-
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionFactory;
 import net.jini.core.transaction.server.TransactionManager;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.gs.space.GSSpace;
@@ -33,19 +31,18 @@ import java.rmi.RemoteException;
 /**
  * Provides a Jini Transaction wrapper so that Jini transactions can be used in Mule.
  * As Jini does not use the standard JTA Transaction manager, the Jini TransactionManager
- * Must be set on the JiniTransactionFactory before any transactions are begun. 
- *
- * @see TransactionManager
- * @see JiniTransactionFactory
+ * Must be set on the JiniTransactionFactory before any transactions are begun.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
+ * @see TransactionManager
+ * @see JiniTransactionFactory
  */
 public class JiniTransaction extends AbstractSingleResourceTransaction {
 
     protected TransactionManager txManager;
     protected long timeout;
-    protected boolean unbound=true;
+    protected boolean unbound = true;
 
     public JiniTransaction(long timeout) {
         this.timeout = timeout;
@@ -62,15 +59,15 @@ public class JiniTransaction extends AbstractSingleResourceTransaction {
         //We can only start the transaction when its bound as we need the Space to obtain the TransactionManager
         //Todo find a clean way of passing the Trsnasaction manager to the TransactionFactory
         try {
-            txManager = LocalTransactionManager.getInstance((IJSpace) ((GSSpace)resource).getJavaSpace());
-                } catch (RemoteException e) {
-                    throw new TransactionException(e);
-                }
+            txManager = LocalTransactionManager.getInstance((IJSpace) ((GSSpace) resource).getJavaSpace());
+        } catch (RemoteException e) {
+            throw new TransactionException(e);
+        }
         try {
             Transaction.Created tCreated = TransactionFactory.create(txManager, timeout);
             Transaction transaction = tCreated.transaction;
             super.bindResource(resource, transaction);
-            unbound=false;
+            unbound = false;
         } catch (Exception e) {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "Jini"), e);
         }
@@ -85,23 +82,21 @@ public class JiniTransaction extends AbstractSingleResourceTransaction {
      */
     public void doBegin() throws TransactionException {
         //Do nothing here, the transacted cannot be created until it is bound
-        unbound=true;
+        unbound = true;
     }
 
 
-
     /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOTransaction#commit()
-     */
-    protected void doCommit() throws TransactionException
-    {
-        if(unbound) {
-                return;
-            }
+    * (non-Javadoc)
+    *
+    * @see org.mule.umo.UMOTransaction#commit()
+    */
+    protected void doCommit() throws TransactionException {
+        if (unbound) {
+            return;
+        }
         try {
-            ((Transaction)resource).commit();
+            ((Transaction) resource).commit();
         } catch (Exception e) {
             throw new IllegalTransactionStateException(new Message(Messages.TX_COMMIT_FAILED), e);
         }
@@ -112,13 +107,12 @@ public class JiniTransaction extends AbstractSingleResourceTransaction {
      *
      * @see org.mule.umo.UMOTransaction#rollback()
      */
-    protected void doRollback() throws TransactionException
-    {
+    protected void doRollback() throws TransactionException {
         try {
-            if(unbound) {
+            if (unbound) {
                 return;
             }
-            ((Transaction)resource).abort();
+            ((Transaction) resource).abort();
         } catch (Exception e) {
             throw new TransactionRollbackException(e);
         }
