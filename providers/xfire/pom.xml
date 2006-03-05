@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.codehaus.mule</groupId>
-		<artifactId>mule-providers</artifactId>
-		<relativePath>../pom.xml</relativePath>
-		<version>2.0-SNAPSHOT</version>
-	</parent>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-providers</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
     <artifactId>mule-xfire-provider</artifactId>
-	<packaging>jar</packaging>
+    <packaging>jar</packaging>
     <name>Xfire Provider</name>
     <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
     <dependencies>
@@ -26,19 +26,19 @@
             <!-- These transitive dependencies are not found on ibiblio and cause 
             the build to fail. -->
             <exclusions>
-            	<exclusion>
-            		<groupId>xmlbeans</groupId>
-            		<artifactId>xmlbeans-jsr173-api</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>javamail</groupId>
-            		<artifactId>javamail</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>javax.activation</groupId>
-            		<artifactId>activation</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>xmlbeans</groupId>
+                    <artifactId>xmlbeans-jsr173-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javamail</groupId>
+                    <artifactId>javamail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>
