@@ -13,6 +13,22 @@
     <packaging>jar</packaging>
     <name>GigaSpaces Provider</name>
     <description>Allows Mule to send and receive events via the GigaSpaces Jini implementation.</description>
+
+    <build>
+        <!--
+             For some reason it does not pick up the standard m2 folder structure here
+             as described in http://tinyurl.com/amty9
+             Make it work by explicitly specifying them
+             TODO fix it
+        -->
+        <sourceDirectory>src/main</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <!-- This transport is based on the Spaces transport -->
         <dependency>
