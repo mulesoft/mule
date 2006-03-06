@@ -404,24 +404,21 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (logger.isInfoEnabled()) {
             logger.info("Connector " + getClass().getName() + " has been disposed.");
         }
-
-        receivers = null;
-        dispatchers = null;
     }
 
     protected void disposeReceivers() {
         if (receivers != null) {
-            Map.Entry entry;
-            for (Iterator iterator = receivers.entrySet().iterator(); iterator.hasNext();) {
-                entry = (Map.Entry) iterator.next();
+            UMOMessageReceiver receiver;
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                receiver = (UMOMessageReceiver) iterator.next();
                 try {
-                    destroyReceiver(((UMOMessageReceiver) entry.getValue()), null);
-                } catch (Exception e) {
+                    destroyReceiver(receiver, receiver.getEndpoint());
+                } catch (Throwable e) {
                     logger.error("Failed to destroy receiver: " + e.getMessage(), e);
                 }
-                receivers.remove(entry.getKey());
-
             }
+            receivers.clear();
+            receivers = null;
             logger.debug("Receivers Disposed");
         }
     }
@@ -436,6 +433,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
                 umoMessageDispatcher.dispose();
             }
             dispatchers.clear();
+            dispatchers = null;
             logger.debug("Dispatchers Disposed");
         }
     }

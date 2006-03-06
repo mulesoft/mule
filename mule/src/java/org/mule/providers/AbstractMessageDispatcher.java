@@ -217,8 +217,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     }
 
     /**
-     * Template method to destroy any resources. some connector will want to
-     * cache dispatchers and destroy them themselves
+     * Template method to destroy any resources held by the Message Dispatcher
      */
     public final synchronized void dispose()
     {
@@ -229,11 +228,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     workManager.dispose();
                 }
             } finally {
-                connector.getDispatchers().values().remove(this);
                 disposed = true;
             }
         }
-
     }
 
     public UMOConnector getConnector()
