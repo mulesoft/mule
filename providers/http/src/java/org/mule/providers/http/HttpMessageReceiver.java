@@ -33,7 +33,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
 
 import javax.resource.spi.work.Work;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -257,11 +256,17 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(":").append(endpoint.getEndpointURI().getPort());
         // first check there is a receive on the root address
+        if(logger.isTraceEnabled()) {
+            logger.trace("Looking up receiver on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
+        }
         AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
         // If no receiver on the root and there is a request path, look up the
         // received based on the
         // root plus request path
         if (receiver == null && !"/".equals(path)) {
+            if(logger.isWarnEnabled()) {
+                logger.warn("No receiver found on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
+            }
             // remove anything after the last '/'
             int x = path.lastIndexOf("/");
             if (x > 1 && path.indexOf(".") > x) {
@@ -270,7 +275,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             else {
                 requestUri.append(path);
             }
+            if(logger.isTraceEnabled()) {
+                logger.trace("Secondary Look up of receiver on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
+            }
             receiver = connector.getReceiver(requestUri.toString());
+            if(logger.isWarnEnabled()) {
+                logger.warn("No receiver found with secondary lookup on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
+                logger.warn("Receivers on connector are: " + PropertiesHelper.propertiesToString(connector.getReceivers(), true));
+            }
         }
         return receiver;
     }
