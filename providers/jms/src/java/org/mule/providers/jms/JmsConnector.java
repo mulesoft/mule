@@ -531,7 +531,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public Session getSession(UMOEndpoint endpoint) throws Exception
     {
         String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 

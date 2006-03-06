@@ -160,11 +160,11 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
 	        // Create destination
 	        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-	        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+	        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
             //todo MULE20 remove resource Info support
             if(!topic) {
-                topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "topic", false);
+                topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);
             }
 
 	        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
@@ -178,14 +178,14 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 	            // to be backward compatable
 	            selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
 	        }
-	        String tempDurable = (String) endpoint.getProperties().get("durable");
+	        String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
 	        boolean durable = connector.isDurable();
 	        if (tempDurable != null) {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 
 	        // Get the durable subscriber name if there is one
-	        String durableName = (String) endpoint.getProperties().get("durableName");
+	        String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
 	        if (durableName == null && durable && dest instanceof Topic) {
 	            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
 	            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "

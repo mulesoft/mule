@@ -39,6 +39,9 @@ public class JmsConstants
     public static final String PERSISTENT_DELIVERY_PROPERTY = "persistentDelivery";
     public static final String PRIORITY_PROPERTY = "priority";
     public static final String JMS_SELECTOR_PROPERTY = "selector";
+    public static final String TOPIC_PROPERTY = "topic";
+    public static final String DURABLE_PROPERTY = "durable";
+    public static final String DURABLE_NAME_PROPERTY = "durableName";
     public static final String CACHE_JMS_SESSIONS_PROPERTY = "cacheJmsSessions";
 
 

@@ -53,7 +53,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     private JmsConnector connector;
     private Session delegateSession;
     private Session cachedSession;
-    private boolean cacheSession = false;
+    private boolean cacheJmsSession = false;
 
     public JmsMessageDispatcher(JmsConnector connector) {
         super(connector);
@@ -88,12 +88,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             txSession = connector.getCurrentSession();
 
             //Should we be caching sessions
-            cacheSession = PropertiesHelper.getBooleanProperty(event.getProperties(),
+            cacheJmsSession = PropertiesHelper.getBooleanProperty(event.getProperties(),
                     JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions());
             if(txSession!=null) {
-                cacheSession = false;
+                cacheJmsSession = false;
             }
-            if(cacheSession) {
+            if(cacheJmsSession) {
                 if(cachedSession==null) {
                     cachedSession = connector.getSession(event.getEndpoint());
                 }
@@ -115,10 +115,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             // the format is topic:destination
             boolean topic = false;
             String resourceInfo = endpointUri.getResourceInfo();
-            topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+            topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
             //todo MULE20 remove resource info support
             if(!topic) {
-                topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(), "topic", false);
+                topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(),
+                        JmsConstants.TOPIC_PROPERTY, false);
             }
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
@@ -233,7 +234,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         } finally {
             JmsUtils.closeQuietly(consumer);
             JmsUtils.closeQuietly(producer);
-            if (session != null && session != txSession) {
+            if (session != null && !cacheJmsSession && !session.equals(txSession)) {
                 JmsUtils.closeQuietly(session);
             }
         }
@@ -263,7 +264,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         try {
             boolean topic = false;
             String resourceInfo = endpointUri.getResourceInfo();
-            topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+            topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
             session = connector.getSession(false, topic);
             dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
