@@ -181,23 +181,18 @@ public class MuleEvent extends EventObject implements UMOEvent
     protected void fillProperties(UMOEvent previousEvent)
     {
         if (previousEvent != null && previousEvent.getProperties() != null) {
-            properties.putAll(previousEvent.getProperties());
+            properties = previousEvent.getProperties();
+        } else {
+            properties = new HashMap();
         }
+
         if (endpoint != null && endpoint.getProperties() != null) {
             properties.putAll(endpoint.getProperties());
             if (endpoint.getEndpointURI().getParams() != null) {
                 properties.putAll(endpoint.getEndpointURI().getParams());
             }
         }
-
         properties.putAll(message.getProperties());
-        //Todo I think the replyTO header lingers when ther is more than one replyTo used in a single request
-        //will investigate further after 1.1
-//        Map sysProps = PropertiesHelper.getPropertiesWithPrefix(properties, MuleProperties.PROPERTY_PREFIX);
-//        for (Iterator iterator = sysProps.keySet().iterator(); iterator.hasNext();) {
-//            String s = (String) iterator.next();
-//            properties.remove(s);
-//        }
         setCredentials();
     }
 
@@ -269,7 +264,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getTransformedMessageAsBytes()
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
