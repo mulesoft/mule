@@ -14,7 +14,6 @@
 package org.mule.providers.soap;
 
 import org.mule.config.MuleProperties;
-import org.mule.transformers.codec.Base64Encoder;
 import org.mule.umo.UMOEvent;
 import org.w3c.dom.Element;
 
@@ -45,8 +44,6 @@ public class MuleSoapHeaders
     public static final String MULE_NAMESPACE = "mule";
     public static final String MULE_HEADER = "header";
     public static final String ENV_REQUEST_HEADERS = "MULE_REQUEST_HEADERS";
-
-    private Base64Encoder encoder = new Base64Encoder();
 
     /**
      * Extracts header properties from a Mule event
