@@ -57,7 +57,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         // Parse the HTTP argument list and convert to a NameValuePair
         // collection
 
-        if (queryString == null || queryString.length() == 0) {
+        if (StringUtils.isEmpty(queryString)) {
             return 0;
         }
 
@@ -70,10 +70,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         }
         else {
             currentParam = queryString;
-            queryString = "";
+            queryString = StringUtils.EMPTY;
         }
         int parameterIndex = -1;
-        while (currentParam != "") {
+        while (!StringUtils.isEmpty(currentParam)) {
             String paramName, paramValue;
             equals = currentParam.indexOf("=");
             if (equals > -1) {
@@ -89,7 +89,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             }
             else {
                 currentParam = queryString;
-                queryString = "";
+                queryString = StringUtils.EMPTY;
             }
         }
         return parameterIndex + 1;
