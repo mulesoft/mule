@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -134,7 +135,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
-    protected ConcurrentHashMap receivers;
+    protected Map receivers;
 
     /**
      * Defines the dispatcher threading model
@@ -237,7 +238,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         // make sure we always have an exception strategy
         exceptionListener = new DefaultExceptionStrategy();
         dispatchers = new ConcurrentHashMap();
-        receivers = new ConcurrentHashMap();
+        receivers = new HashMap();
         connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
         enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
         supportedProtocols = new ArrayList();
