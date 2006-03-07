@@ -64,7 +64,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
     {
         this(message);
         if(properties!=null) {
-            this.properties.putAll(properties);
+            this.properties = properties;
         }
         if(attachments!=null) {
             this.attachments.putAll(attachments);
