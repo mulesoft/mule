@@ -129,14 +129,6 @@ public class LoanConsumer
         return results;
     }
 
-    public void requestRandom(int number, boolean sync) throws Exception
-    {
-
-        for (int i = 0; i < number; i++)
-        {
-            request(createRequest(), sync);
-        }
-    }
 
     public static void main(String[] args)
     {
@@ -194,26 +186,31 @@ public class LoanConsumer
                 {
                     System.out.println("\n[1] make a loan request");
                     System.out.println("[2] send 100 random requests");
+                    System.out.println("[3] send x requests");
                     System.out.println("[q] quit");
                     System.out.println("\nPlease make your selection: ");
 
                     response = getSelection();
-                    if (response == '2')
-                    {
-                        if(synchronous) {
-                            List list = loanConsumer.requestSend(100, "vm://LoanBrokerRequests");
-                            int i=1;
-                            for (Iterator iterator = list.iterator(); iterator.hasNext();i++)
-                            {
-                                System.out.println("Request " + i + ": " + iterator.next().toString());
-                            }
-                        } else {
-                            loanConsumer.requestDispatch(100, "vm://LoanBrokerRequests");
-                        }
-                    } else if (response == '1')
+                    if (response == '1')
                     {
                         LoanRequest request = getRequestFromUser();
                         loanConsumer.request(request, synchronous);
+                    } 
+                    else if (response == '2')
+                    {
+                        loanConsumer.sendRandomRequests(100, synchronous);
+                    } else if (response == '3')
+                    {
+                        byte[] buf = new byte[16];
+                        System.out.println("Enter number of requests:");
+                        System.in.read(buf);
+                        int number = Integer.valueOf(new String(buf).trim()).intValue();
+                        if(number < 1) {
+                            System.out.println("Number of requests must be at least 1");
+                        } else {
+                            loanConsumer.sendRandomRequests(number, synchronous);
+                        }
+
                     } else if (response == 'q')
                     {
                         System.out.println("Exiting now");
@@ -230,6 +227,19 @@ public class LoanConsumer
             System.err.println(e.getMessage());
             e.printStackTrace(System.err);
             System.exit(1);
+        }
+    }
+
+    protected void sendRandomRequests(int number, boolean synchronous) throws Exception {
+        if(synchronous) {
+            List list = this.requestSend(number, "vm://LoanBrokerRequests");
+            int i=1;
+            for (Iterator iterator = list.iterator(); iterator.hasNext();i++)
+            {
+                System.out.println("Request " + i + ": " + iterator.next().toString());
+            }
+        } else {
+            this.requestDispatch(number, "vm://LoanBrokerRequests");
         }
     }
 
