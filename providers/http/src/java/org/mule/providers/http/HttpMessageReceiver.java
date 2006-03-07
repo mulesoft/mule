@@ -264,9 +264,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         // received based on the
         // root plus request path
         if (receiver == null && !"/".equals(path)) {
-            if(logger.isWarnEnabled()) {
-                logger.warn("No receiver found on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
-            }
             // remove anything after the last '/'
             int x = path.lastIndexOf("/");
             if (x > 1 && path.indexOf(".") > x) {
@@ -279,7 +276,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 logger.trace("Secondary Look up of receiver on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
             }
             receiver = connector.getReceiver(requestUri.toString());
-            if(logger.isWarnEnabled()) {
+            if(receiver==null && logger.isWarnEnabled()) {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName() + "With URI key: " + requestUri.toString());
                 logger.warn("Receivers on connector are: " + PropertiesHelper.propertiesToString(connector.getReceivers(), true));
             }
