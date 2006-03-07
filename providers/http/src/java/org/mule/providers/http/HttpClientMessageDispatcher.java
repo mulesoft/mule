@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -83,6 +84,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                             .getProxyPassword()));
         }
         client.setState(state);
+        client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
     }
 
     /*
@@ -93,8 +95,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     public void doDispatch(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
-        execute(event, httpMethod, false);
-        httpMethod.releaseConnection();
+        execute(event, httpMethod, true);
         if (httpMethod.getStatusCode() >= 400) {
             logger.error(httpMethod.getResponseBodyAsString());
             throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
