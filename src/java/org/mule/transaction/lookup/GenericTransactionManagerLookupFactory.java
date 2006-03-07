@@ -14,6 +14,7 @@
  */
 package org.mule.transaction.lookup;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -124,7 +125,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
      */
     public void initialise() throws InitialisationException
     {
-        if (txManager == null && (jndiName == null || jndiName.trim().length() == 0)) {
+        if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName))) {
             throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "jndiName"), this);
         }
 

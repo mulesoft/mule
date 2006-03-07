@@ -13,6 +13,8 @@
  */
 package org.mule.management.stats.printers;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
@@ -79,7 +81,7 @@ public class HtmlTablePrinter extends AbstractTablePrinter
 
     protected String getProviderStatsHtml(String stats)
     {
-        if (stats == null || stats.trim().length() == 0) {
+        if (StringUtils.isEmpty(StringUtils.trim(stats))) {
             return "";
         }
 

@@ -13,6 +13,7 @@
  */
 package org.mule.providers.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -170,7 +171,7 @@ public class ConnectorServiceDescriptor
     private String removeProperty(String name)
     {
         String temp = (String) properties.remove(name);
-        if (temp != null && temp.trim().length() == 0) {
+        if (StringUtils.isEmpty(StringUtils.trim(temp))) {
             return null;
         } else {
             return temp;

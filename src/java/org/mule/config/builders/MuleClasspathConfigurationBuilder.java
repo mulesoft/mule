@@ -13,6 +13,7 @@
  */
 package org.mule.config.builders;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -62,7 +63,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
      */
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        if (configResources != null && !"".equals(configResources)) {
+        if (!StringUtils.isEmpty(configResources)) {
             if (configResources.indexOf(",") > -1) {
                 throw new ConfigurationException(new Message(Messages.ONLY_SINGLE_RESOURCE_CAN_BE_SPECIFIED));
             }

@@ -16,6 +16,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -51,10 +52,10 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -130,7 +131,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * A pool of dispatchers for this connector, the pool is keyed on
      * endpointUri
      */
-    protected ConcurrentHashMap dispatchers;
+    protected Map dispatchers;
 
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
@@ -427,7 +428,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected void disposeDispatchers()
     {
         if (dispatchers != null) {
-            // Map.Entry entry;
             logger.debug("Disposing Dispatchers");
             for (Iterator iterator = dispatchers.values().iterator(); iterator.hasNext();) {
                 UMOMessageDispatcher umoMessageDispatcher = (UMOMessageDispatcher) iterator.next();
@@ -513,9 +513,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         checkDisposed();
         UMOMessageDispatcher dispatcher = null;
-        if (endpoint == null || "".equals(endpoint)) {
-            endpoint = "ANY";
-        }
+
+        endpoint = StringUtils.defaultIfEmpty(endpoint, "ANY");
         if ("ANY".equals(endpoint) && dispatchers.size() > 0) {
             Map.Entry entry;
             for (Iterator iterator = dispatchers.entrySet().iterator(); iterator.hasNext();) {
