@@ -15,6 +15,7 @@
 
 package org.mule.providers.http.jetty;
 
+import org.apache.commons.lang.StringUtils;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -60,7 +61,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         httpServer.addListener(socketListener);
 
         String path = endpoint.getEndpointURI().getPath();
-        if (path == null || "".equals(path)) {
+        if (StringUtils.isEmpty(path)) {
             path = "/";
         }
 

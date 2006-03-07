@@ -14,6 +14,7 @@
  */
 package org.mule.providers.tcp;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
@@ -81,10 +82,8 @@ public class TcpStreamingMessageReceiver extends PollingMessageReceiver
     public void doConnect() throws ConnectException
     {
         URI uri = endpoint.getEndpointURI().getUri();
-        String host = uri.getHost();
-        if (host == null || host.length() == 0) {
-            host = "localhost";
-        }
+        String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
+
         try {
             logger.debug("Attempting to connect to server socket");
             InetAddress inetAddress = InetAddress.getByName(host);

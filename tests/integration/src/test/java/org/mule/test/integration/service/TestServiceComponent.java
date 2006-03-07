@@ -13,6 +13,7 @@
  */
 package org.mule.test.integration.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.components.simple.EchoService;
@@ -56,7 +57,7 @@ public class TestServiceComponent extends FunctionalTestComponent implements Ech
 
     public Person getPerson(String firstName)
     {
-        if(firstName==null ||"".equals(firstName)) {
+        if(StringUtils.isEmpty(firstName)) {
             throw new NullPointerException("Name parameter cannot be null");
         }
         Person p = (Person) people.get(firstName);

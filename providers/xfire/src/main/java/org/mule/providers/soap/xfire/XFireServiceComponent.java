@@ -347,7 +347,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     {
         String pathInfo = context.getEndpointURI().getPath();
 
-        if (pathInfo == null || "".equals(pathInfo)) {
+        if (StringUtils.isEmpty(pathInfo)) {
             return context.getEndpointURI().getHost();
         }
 

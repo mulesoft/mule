@@ -15,6 +15,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.OperationInfo;
@@ -195,7 +196,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     {
         String pathInfo = uri.getPath();
 
-        if (pathInfo == null || "".equals(pathInfo)) {
+        if (StringUtils.isEmpty(pathInfo)) {
             return uri.getHost();
         }
 

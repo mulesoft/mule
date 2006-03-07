@@ -14,6 +14,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.attachments.Attachment;
 import org.codehaus.xfire.attachments.SimpleAttachment;
@@ -112,19 +113,18 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
             MuleSoapHeaders header = new MuleSoapHeaders(messageContext.getInMessage().getHeader()
                     .getChildren().iterator());
 
-            if (header.getReplyTo() != null && !"".equals(header.getReplyTo())) {
+            if (!StringUtils.isEmpty(header.getReplyTo())) {
                 setReplyTo(header.getReplyTo());
             }
 
-            if (header.getCorrelationGroup() != null && !"".equals(header.getCorrelationGroup())
+            if (!StringUtils.isEmpty(header.getCorrelationGroup())
                     && !"-1".equals(header.getCorrelationGroup())) {
                 setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
             }
-            if (header.getCorrelationSequence() != null && !"".equals(header.getCorrelationSequence())
-                    && !"-1".equals(header.getCorrelationSequence())) {
+            if (!StringUtils.isEmpty(header.getCorrelationSequence())) {
                 setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
             }
-            if (header.getCorrelationId() != null && !"".equals(header.getCorrelationId())) {
+            if (!StringUtils.isEmpty(header.getCorrelationId())) {
                 setCorrelationId(header.getCorrelationId());
             }
         }

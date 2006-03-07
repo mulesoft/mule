@@ -16,6 +16,7 @@ package org.mule.providers.tcp;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -91,11 +92,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
     }
 
     protected ServerSocket createSocket(URI uri) throws Exception {
-        String host = uri.getHost();
+        String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         int backlog = ((TcpConnector) connector).getBacklog();
-        if (host == null || host.length() == 0) {
-            host = "localhost";
-        }
         InetAddress inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
                 || host.trim().equals("localhost")) {

@@ -14,6 +14,7 @@
  */
 package org.mule.providers.ssl;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -60,15 +61,11 @@ public class SslMessageReceiver extends TcpMessageReceiver
 
         ssf = sslc.getServerSocketFactory();
 
-        String host = uri.getHost();
-        InetAddress inetAddress = null;
+        String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         int backlog = cnn.getBacklog();
-        if (host == null || host.length() == 0) {
-            host = "localhost";
-        }
-
         SSLServerSocket serverSocket = null;
-        inetAddress = InetAddress.getByName(host);
+
+        InetAddress inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
                 || host.trim().equals("localhost")) {
             serverSocket = (SSLServerSocket) ssf.createServerSocket(uri.getPort(), backlog);
