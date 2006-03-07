@@ -13,7 +13,6 @@
  */
 package org.mule.impl.internal.notifications;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -54,14 +53,8 @@ public class MessageNotification extends UMOServerNotification
     }
 
     protected static UMOMessage cloneMessage(UMOMessage message) {
+        //Todo we probably need to support deep cloning here
         Object clonePayload = message.getPayload();
-        try {
-            clonePayload = BeanUtils.cloneBean(clonePayload);
-        } catch (Exception e) {
-            //If the clone fails we should just warn the developer that he is getting a reference to the payload of the message
-            //in his MessageNotifications
-            logger.warn("Failed to clone message payload, passing payload by reference. Error is: " + e.getMessage(), e);
-        }
         UMOMessage clone = new MuleMessage(clonePayload, message);
         return clone;
     }
