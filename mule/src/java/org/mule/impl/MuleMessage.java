@@ -173,9 +173,11 @@ public class MuleMessage implements UMOMessage
     public void addProperties(Map properties)
     {
         if (properties != null) {
-            for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-                Map.Entry entry = (Map.Entry) iter.next();
-                adapter.setProperty(entry.getKey(), entry.getValue());
+            synchronized(properties) {
+                for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    adapter.setProperty(entry.getKey(), entry.getValue());
+                }
             }
         }
     }
