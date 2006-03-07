@@ -11,18 +11,20 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.file.transformers;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * <code>FileToByteArray</code> reads the contents of a files as a byte array
+ * <code>FileToByteArray</code> reads the contents of a file as a byte array
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,35 +39,33 @@ public class FileToByteArray extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        File file = (File) src;
-        byte[] buf = new byte[8 * 1024];
+        File file = (File)src;
         if (file.length() == 0) {
-            logger.warn("File is empty: " + ((File) src).getAbsolutePath());
-            return new byte[] {};
+            logger.warn("File is empty: " + file.getAbsolutePath());
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
+
         FileInputStream fis = null;
-        ByteArrayOutputStream baos = null;
+        byte[] bytes = null;
+
         try {
-            fis = new FileInputStream((File) src);
-            baos = new ByteArrayOutputStream(new Long(((File) src).length()).intValue());
-            int len = 0;
-            while ((len = fis.read(buf)) != -1) {
-                baos.write(buf, 0, len);
-            }
-            return baos.toByteArray();
-        } catch (IOException e) {
+            fis = new FileInputStream(file);
+            // TODO Attention: arbitrary 4GB limit & also a great way to reap OOMs
+            int length = new Long(file.length()).intValue();
+            bytes = new byte[length];
+            fis.read(bytes);
+            return bytes;
+        }
+        // at least try..
+        catch (OutOfMemoryError oom) {
+            throw new TransformerException(this, oom);
+        }
+        catch (IOException e) {
             throw new TransformerException(this, e);
-        } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-                if (baos != null) {
-                    baos.close();
-                }
-            } catch (IOException e) {
-                logger.debug("Failed to close reader in transformer: " + e.getMessage());
-            }
+        }
+        finally {
+            IOUtils.closeQuietly(fis);
         }
     }
+
 }
