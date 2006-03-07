@@ -28,6 +28,7 @@
 
 package org.mule.providers.email;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -152,9 +153,8 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         Message msg = new MimeMessage(session);
         try {
             // to
-
             InternetAddress[] toAddrs = null;
-            if ((to != null) && !to.equals("")) {
+            if (!StringUtils.isEmpty(to)) {
                 toAddrs = InternetAddress.parse(to, false);
                 msg.setRecipients(Message.RecipientType.TO, toAddrs);
             } else {
@@ -169,17 +169,17 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
             msg.setFrom(new InternetAddress(from));
             // cc
             InternetAddress[] ccAddrs = null;
-            if ((cc != null) && !cc.equals("")) {
+            if (!StringUtils.isEmpty(cc)) {
                 ccAddrs = InternetAddress.parse(cc, false);
                 msg.setRecipients(Message.RecipientType.CC, ccAddrs);
             }
             InternetAddress[] bccAddrs = null;
-            if ((bcc != null) && !bcc.equals("")) {
+            if (!StringUtils.isEmpty(bcc)) {
                 bccAddrs = InternetAddress.parse(bcc, false);
                 msg.setRecipients(Message.RecipientType.BCC, bccAddrs);
             }
             // subject
-            if ((subject != null) && !subject.equals("")) {
+            if (!StringUtils.isEmpty(subject)) {
                 msg.setSubject(subject);
             } else {
                 msg.setSubject("(no subject)");

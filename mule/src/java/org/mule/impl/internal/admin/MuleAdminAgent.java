@@ -13,6 +13,7 @@
  */
 package org.mule.impl.internal.admin;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -102,8 +103,7 @@ public class MuleAdminAgent implements UMOAgent
         UMOManager manager = MuleManager.getInstance();
 
         try {
-
-            if ("".equals(serverEndpoint)) {
+            if (StringUtils.isEmpty(serverEndpoint)) {
                 // no serverUrl specified, warn a user
                 logger.warn("No serverEndpointUrl specified, MuleAdminAgent will not start. E.g. use " +
                         "<mule-environment-properties serverUrl=\"tcp://example.com:60504\"/> ");

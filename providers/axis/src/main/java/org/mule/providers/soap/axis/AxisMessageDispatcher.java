@@ -276,21 +276,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     private void setMessageContextProperties(UMOMessage message, MessageContext ctx) {
-        Object temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (temp != null && !"".equals(temp.toString())) {
-            message.setCorrelationId(temp.toString());
+        String temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        if (!StringUtils.isEmpty(temp)) {
+            message.setCorrelationId(temp);
         }
-        temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (temp != null && !"".equals(temp.toString())) {
-            message.setCorrelationGroupSize(Integer.parseInt(temp.toString()));
+        temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+        if (!StringUtils.isEmpty(temp)) {
+            message.setCorrelationGroupSize(Integer.parseInt(temp));
         }
-        temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (temp != null && !"".equals(temp.toString())) {
-            message.setCorrelationSequence(Integer.parseInt(temp.toString()));
+        temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+        if (!StringUtils.isEmpty(temp)) {
+            message.setCorrelationSequence(Integer.parseInt(temp));
         }
-        temp = ctx.getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (temp != null && !"".equals(temp.toString())) {
-            message.setReplyTo(temp.toString());
+        temp = ctx.getStrProp(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        if (!StringUtils.isEmpty(temp)) {
+            message.setReplyTo(temp);
         }
     }
 
@@ -430,7 +430,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
 
-            if ("".equals(namespace) || namespace == null) {
+            if (StringUtils.isEmpty(namespace)) {
                 if (entry.getValue() instanceof List) {
                     soapMethod = new SoapMethod(entry.getKey().toString(), (List) entry.getValue());
                 } else {

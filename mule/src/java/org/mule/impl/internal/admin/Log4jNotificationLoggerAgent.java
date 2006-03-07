@@ -13,6 +13,7 @@
  */
 package org.mule.impl.internal.admin;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -59,8 +60,8 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
      */
     public String getDescription()
     {
-        StringBuffer buf = new StringBuffer();
-        if (logFile != null && !"".equals(logFile)) {
+        StringBuffer buf = new StringBuffer(64);
+        if (!StringUtils.isEmpty(logFile)) {
             buf.append("Logging notifications to: ").append(logFile);
         }
         if (enableChainsaw) {

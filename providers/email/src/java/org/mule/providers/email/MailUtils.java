@@ -143,7 +143,7 @@ public class MailUtils
     public static InternetAddress[] stringToInternetAddresses(String address) throws AddressException
     {
         InternetAddress[] inetaddresses;
-        if (!(address == null || "".equals(address))) {
+        if (!StringUtils.isEmpty(address)) {
             inetaddresses = InternetAddress.parse(address, false);
         } else {
             throw new NullPointerException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "Email address").toString());

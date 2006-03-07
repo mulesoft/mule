@@ -14,6 +14,7 @@
  */
 package org.mule.providers.email;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -70,7 +71,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     {
         super(connector, component, endpoint, checkFrequency);
 
-        if ("".equals(backupFolder)) {
+        if (StringUtils.isEmpty(backupFolder)) {
             this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         } else {
             this.backupFolder = backupFolder;

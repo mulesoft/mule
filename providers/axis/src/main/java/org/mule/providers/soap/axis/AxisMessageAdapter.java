@@ -15,6 +15,7 @@ package org.mule.providers.soap.axis;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.attachments.AttachmentPart;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.soap.MuleSoapHeaders;
@@ -50,19 +51,17 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
             if (ctx != null) {
                 MuleSoapHeaders header = new MuleSoapHeaders(ctx.getMessage().getSOAPPart().getEnvelope().getHeader());
 
-                if (header.getReplyTo() != null && !"".equals(header.getReplyTo())) {
+                if (!StringUtils.isEmpty(header.getReplyTo())) {
                     setReplyTo(header.getReplyTo());
                 }
 
-                if (header.getCorrelationGroup() != null && !"".equals(header.getCorrelationGroup())
-                        && !"-1".equals(header.getCorrelationGroup())) {
+                if (!StringUtils.isEmpty(header.getCorrelationGroup())) {
                     setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
                 }
-                if (header.getCorrelationSequence() != null && !"".equals(header.getCorrelationSequence())
-                        && !"-1".equals(header.getCorrelationSequence())) {
+                if (!StringUtils.isEmpty(header.getCorrelationSequence())) {
                     setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
                 }
-                if (header.getCorrelationId() != null && !"".equals(header.getCorrelationId())) {
+                if (!StringUtils.isEmpty(header.getCorrelationId())) {
                     setCorrelationId(header.getCorrelationId());
                 }
 

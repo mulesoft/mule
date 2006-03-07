@@ -13,6 +13,7 @@
  */
 package org.mule.impl.endpoint;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -191,7 +192,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getEndpointName()
     {
-        return "".equals(endpointName) ? null : endpointName;
+        return (StringUtils.isEmpty(endpointName) ? null : endpointName);
     }
 
     public static boolean isMuleUri(String url)
@@ -384,7 +385,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getUsername()
     {
-        if (userInfo != null && !"".equals(userInfo)) {
+        if (!StringUtils.isEmpty(userInfo)) {
             int i = userInfo.indexOf(":");
             if (i == -1) {
                 return userInfo;
@@ -401,7 +402,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPassword()
     {
-        if (userInfo != null && !"".equals(userInfo)) {
+        if (!StringUtils.isEmpty(userInfo)) {
             int i = userInfo.indexOf(":");
             if (i > -1) {
                 return userInfo.substring(i + 1);

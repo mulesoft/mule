@@ -30,6 +30,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.axis.transport.http.ServletEndpointContextImpl;
 import org.apache.axis.utils.Admin;
 import org.apache.axis.utils.XMLUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
@@ -174,7 +175,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 }
             }
 
-            boolean hasNoPath = pathInfo == null || pathInfo.equals("") || pathInfo.equals("/");
+            boolean hasNoPath = (StringUtils.isEmpty(pathInfo) || pathInfo.equals("/"));
             if (!wsdlRequested && !listRequested && hasNoPath) {
                 reportAvailableServices(context, response);
             } else {
@@ -338,12 +339,9 @@ public class AxisServiceComponent implements Initialisable, Callable
         } catch (AxisFault fault) {
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
-            if (responseMsg == null) {
-                responseMsg = new Message(fault);
-            }
+            responseMsg = new Message(fault);
         } catch (Exception e) {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
-
             responseMsg = convertExceptionToAxisFault(e, responseMsg);
         }
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/xml");
@@ -679,7 +677,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         // Component Name is set by Mule so if its null we can skip this check
         if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null) {
             String servicePath = (String) service.getOption("servicePath");
-            if("".equals(endpointUri.getPath())) {
+            if(StringUtils.isEmpty(endpointUri.getPath())) {
                 if(!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName)) {
                     throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());                    
                 }
@@ -716,7 +714,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 //            exceptionLog.error(Messages.getMessage("genFault00"), af);
 //            throw af;
 //        }
-        if (soapAction.length() == 0) {
+        if (StringUtils.isEmpty(soapAction)) {
             soapAction = context.getEndpointURI().getAddress();
         }
         return soapAction;
@@ -725,7 +723,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected String getServiceName(UMOEventContext context, UMOEndpointURI endpointUri) throws AxisFault
     {
         String serviceName = endpointUri.getPath();
-        if (serviceName == null || serviceName.length() == 0) {
+        if (StringUtils.isEmpty(serviceName)) {
             serviceName = getSoapAction(context);
             serviceName = serviceName.replaceAll("\"", "");
             int i = serviceName.indexOf("/", serviceName.indexOf("//"));

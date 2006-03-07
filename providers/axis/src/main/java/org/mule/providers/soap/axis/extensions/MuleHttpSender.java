@@ -35,6 +35,7 @@ import org.apache.axis.transport.http.SocketHolder;
 import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 
@@ -454,7 +455,7 @@ public class MuleHttpSender extends BasicHandler
         if (useFullURL.value) {
             header.append(tmpURL.toExternalForm());
         } else {
-            header.append((((tmpURL.getFile() == null) || tmpURL.getFile().equals("")) ? "/" : tmpURL.getFile()));
+            header.append(StringUtils.isEmpty(tmpURL.getFile()) ? "/" : tmpURL.getFile());
         }
         header.append(header2.toString());
 
