@@ -99,27 +99,8 @@ public class Utility
         return dir;
     }
 
-    /**
-     * Allocates a Boolean object representing the value true if the string
-     * argument is not null and is equal, ignoring case, to the string "true".
-     * Otherwise, throws an exception.
-     */
-    public static boolean getBooleanValue(String s) throws Exception
-    {
-        boolean result;
-        s = s.trim();
-        if (s.equalsIgnoreCase("true")) {
-            result = true;
-        }
-        else {
-            result = false;
-        }
-        return result;
-    }
-
     public static String getTimeStamp(String format)
     {
-
         // Format the current time.
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         Date currentTime = new Date();
