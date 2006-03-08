@@ -20,7 +20,7 @@ import org.mule.impl.RequestContext;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when
- * errors specific to Message processing.
+ * errors specific to Message processing occur.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
