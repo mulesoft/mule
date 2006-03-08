@@ -142,23 +142,4 @@
             </properties>
         </dependency>
   </dependencies>
-    <build>
-        <sourceDirectory>.</sourceDirectory>
-        <unitTestSourceDirectory>hello/src/test</unitTestSourceDirectory>
-        <unitTestSourceDirectory>errorhandler/src/test</unitTestSourceDirectory>
-        <unitTest>
-<!--            <includes>-->
-<!--                <include>**/*TestCase.java</include>-->
-<!--            </includes>-->
-            <excludes>
-                <exclude>**/Abstract*.java</exclude>
-                <exclude>**/*TestCase.java</exclude>
-            </excludes>
-        </unitTest>
-        <resources>
-            <includes>
-                <include>${basedir}/../LICENSE.txt</include>
-            </includes>
-        </resources>
-    </build>
 </project>
