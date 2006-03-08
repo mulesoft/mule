@@ -134,13 +134,6 @@ public class UtilTestCase extends TestCase
         dir.delete();
     }
 
-    public void testConvertTools() throws Exception
-    {
-        assertTrue(Utility.getBooleanValue("true"));
-        assertTrue(!Utility.getBooleanValue("false"));
-        assertTrue(!Utility.getBooleanValue("blah"));
-    }
-
     public void testDateUtils() throws Exception
     {
         String date = "12/11/2002 12:06:47";
