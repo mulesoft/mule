@@ -77,9 +77,9 @@ public interface UMOMessageAdapter extends Serializable {
     Iterator getPropertyNames();
 
     /**
-     * Converts the message implementation into a String representation
+     * Converts the message implementation into a byte array representation
      *
-     * @return String representation of the message
+     * @return byte array of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     byte[] getPayloadAsBytes() throws Exception;
