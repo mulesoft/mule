@@ -15,6 +15,8 @@
 
 package org.mule.providers.file;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
@@ -22,7 +24,6 @@ import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.umo.transformer.TransformerException;
 
 import java.io.File;
 
@@ -38,15 +39,15 @@ import java.io.File;
 public class FileContentsMessageAdapter extends AbstractMessageAdapter
 {
     private FileToByteArray transformer = new FileToByteArray();
-
-    private byte[] message = null;
-    private File file = null;
+    private File file;
+    private byte[] fileContents;
 
     public FileContentsMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof File) {
-            setMessage((File) message);
-        } else {
+            this.setMessage((File)message);
+        }
+        else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
@@ -58,7 +59,15 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
      */
     public Object getPayload()
     {
-        return message;
+        synchronized (this) {
+            try {
+                return this.getPayloadAsBytes();
+            }
+            catch (Exception noPayloadException) {
+                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
+                        noPayloadException);
+            }
+        }
     }
 
     /*
@@ -68,19 +77,29 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return message;
+        synchronized (this) {
+            if (this.fileContents == null) {
+                this.fileContents = (byte[])this.transformer.transform(this.file);
+            }
+            return fileContents;
+        }
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding
+     *            The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte
+     *            array
      * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
+     * @throws Exception
+     *             Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception {
-        return new String(getPayloadAsBytes(), encoding);
+        synchronized (this) {
+            return new String(this.getPayloadAsBytes(), encoding);
+        }
     }
 
     /*
@@ -90,14 +109,39 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
      */
     private void setMessage(File message) throws MessagingException
     {
+        boolean fileIsValid;
+        Exception fileInvalidException;
+
         try {
-            this.file = message;
-            this.message = (byte[]) transformer.transform(message);
-            properties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
-            properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
-        } catch (TransformerException e) {
-            throw new MessagingException(new Message(Messages.FILE_X_DOES_NOT_EXIST, file.getAbsolutePath()), e);
+            fileIsValid = (message != null && message.isFile());
+            fileInvalidException = null;
         }
+        catch (Exception ex) {
+            // save any file access exceptions
+            fileInvalidException = ex;
+            fileIsValid = false;
+        }
+
+        if (!fileIsValid) {
+            Object exceptionArg;
+
+            if (fileInvalidException != null) {
+                exceptionArg = fileInvalidException;
+            }
+            else {
+                exceptionArg = ObjectUtils.toString(message, "null");
+            }
+
+            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST,
+                    ObjectUtils.toString(message, "null"));
+
+            throw new MessagingException(msg, exceptionArg);
+        }
+
+        // message byte[] payload will be populated lazily
+        this.file = message;
+        properties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        properties.put(FileConnector.PROPERTY_DIRECTORY, file.getParent());
     }
 
     public File getFile()
@@ -109,4 +153,5 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
     {
         return file.getAbsolutePath();
     }
+
 }
