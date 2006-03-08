@@ -207,7 +207,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
      * Try to move a file by renaming with backup attempt by copying/deleting
      * via NIO
      */
-    private boolean moveFile(File sourceFile, File destinationFile)
+    protected boolean moveFile(File sourceFile, File destinationFile)
     {
         // try fast file-system-level move/rename first
         boolean success = sourceFile.renameTo(destinationFile);
@@ -242,7 +242,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
     /**
      * Exception tolerant roll back method
      */
-    private boolean rollbackFileMove(File sourceFile, String destinationFilePath)
+    protected boolean rollbackFileMove(File sourceFile, String destinationFilePath)
     {
         boolean result = false;
         try {
