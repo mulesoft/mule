@@ -3,17 +3,20 @@ package org.mule.test.filters.xml;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.IsXmlFilter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.Utility;
+import org.apache.commons.io.IOUtils;
+
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class IsXmlFilterTestCase extends AbstractMuleTestCase {
 
-	IsXmlFilter filter;
+    private IsXmlFilter filter;
 
     protected void doSetUp() throws Exception {
-    	filter = new IsXmlFilter();
+        filter = new IsXmlFilter();
     }
 
     public void testFilterFalse() throws Exception {
@@ -29,7 +32,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
     }
 
     public void testFilterBytes() throws Exception {
-    	byte[] bytes = "<msg attrib=\"att1\">This is some nice XML!</msg>".getBytes();
+        byte[] bytes = "<msg attrib=\"att1\">This is some nice XML!</msg>".getBytes();
         assertTrue(filter.accept(new MuleMessage(bytes)));
     }
 
@@ -38,10 +41,21 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
     }
 
     public void testFilterLargeXml() throws Exception {
-        assertTrue(filter.accept(new MuleMessage(Utility.fileToString("src/test/conf/cdcatalog.xml"))));
+        final String xml = loadFromClasspath("cdcatalog.xml");
+        assertTrue(filter.accept(new MuleMessage(xml)));
     }
 
     public void testFilterLargeXmlFalse() throws Exception {
-        assertTrue(filter.accept(new MuleMessage(Utility.fileToString("src/test/conf/cdcatalog.html"))));
+        final String html = loadFromClasspath("cdcatalog.html");
+        assertTrue(filter.accept(new MuleMessage(html)));
     }
+
+    private String loadFromClasspath(final String name) throws IOException {
+        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        final InputStream is = currentClassLoader.getResourceAsStream(name);
+        assertNotNull("Test resource not found.", is);
+
+        return IOUtils.toString(is);
+    }
+
 }
