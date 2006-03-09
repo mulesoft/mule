@@ -11,12 +11,13 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file. 
  */
+
 package org.mule.transformers.compression;
 
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -27,40 +28,42 @@ import java.io.UnsupportedEncodingException;
  */
 public class GZipUncompressTransformer extends GZipCompressTransformer
 {
-    private CompressionStrategy strategy;
 
     public GZipUncompressTransformer()
     {
-        strategy = new GZipCompression();
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        setReturnClass(byte[].class);
+        super();
+        this.setStrategy(new GZipCompression());
+        this.registerSourceType(byte[].class);
+        this.setReturnClass(byte[].class);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        byte[] buf = uncompressMessage(src);
-        if (getReturnClass().equals(String.class)) {
-          if (encoding != null) {
-        	try {
-              return new String(buf, encoding);
-        	} catch (UnsupportedEncodingException ex){
-        	  return new String(buf);
-        	}
-          } else {
-            return new String(buf);
-          }
+        byte[] buffer = null;
+
+        try {
+            buffer = getStrategy().uncompressByteArray((byte[])src);
         }
-        return buf;
+        catch (IOException e) {
+            logger.error("Failed to uncompress message:", e);
+            throw new TransformerException(this, e);
+        }
+
+        if (getReturnClass().equals(String.class)) {
+            if (encoding != null) {
+                try {
+                    return new String(buffer, encoding);
+                }
+                catch (UnsupportedEncodingException ex) {
+                    return new String(buffer);
+                }
+            }
+            else {
+                return new String(buffer);
+            }
+        }
+
+        return buffer;
     }
 
-    public CompressionStrategy getStrategy()
-    {
-        return strategy;
-    }
-
-    public void setStrategy(CompressionStrategy strategy)
-    {
-        this.strategy = strategy;
-    }
 }
