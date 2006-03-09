@@ -182,12 +182,12 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             return resultMessage;
         } catch (Exception e) {
             throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
-                    + descriptor.getName()), event.getMessage(), e);
+                    + descriptor.getName()), RequestContext.getEventContext().getMessage(), e);
         }
     }
 
     /**
-     * @return
+     * @return true if the component has been started
      */
     public boolean isStarted()
     {
