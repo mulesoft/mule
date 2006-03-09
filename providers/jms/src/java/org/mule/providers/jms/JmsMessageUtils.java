@@ -14,6 +14,7 @@
  */
 package org.mule.providers.jms;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.compression.CompressionHelper;
@@ -31,7 +32,6 @@ import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -146,7 +146,7 @@ public class JmsMessageUtils
 
             } else if (source instanceof BytesMessage) {
                 byte[] bytes = getBytesFromMessage(source);
-                return CompressionHelper.uncompressByteArray(bytes);
+                return CompressionHelper.getDefaultCompressionStrategy().uncompressByteArray(bytes);
             } else if (source instanceof StreamMessage) {
 
                 StreamMessage sm = (javax.jms.StreamMessage) source;

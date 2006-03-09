@@ -26,6 +26,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
+import org.mule.util.compression.CompressionStrategy;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -193,11 +194,12 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 // occur, there is no guarantee that
                 // Custom properties will be propagated
                 byte[] bytes = JmsMessageUtils.getBytesFromMessage(source);
-                if (CompressionHelper.isCompressed(bytes)) {
+                CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
+                if (strategy.isCompressed(bytes)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Message recieved is compressed");
                     }
-                    result = CompressionHelper.uncompressByteArray(bytes);
+                    result = strategy.uncompressByteArray(bytes);
                 } else {
                     // If the message is not compressed, handle it the standard
                     // way

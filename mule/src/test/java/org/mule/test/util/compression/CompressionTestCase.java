@@ -15,10 +15,10 @@
 
 package org.mule.test.util.compression;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
+
+import java.util.Arrays;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -33,11 +33,6 @@ import junit.textui.TestRunner;
  */
 public class CompressionTestCase extends TestCase
 {
-
-    /**
-     * logger used by this class
-     */
-    private static transient Log logger = LogFactory.getLog(CompressionTestCase.class);
 
     public static void main(String[] args)
     {
@@ -59,11 +54,10 @@ public class CompressionTestCase extends TestCase
 
     public void testCompressDefaultGZip() throws Exception
     {
-        logger.debug("testCompressDefaultGZip");
-
         String temp = "This is a compressed string";
-        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         byte[] compressed = strategy.compressByteArray(temp.getBytes());
+
         // For small test data the compressed data will be bigger than the real
         // data
         assertTrue(compressed.length > temp.getBytes().length);
@@ -91,26 +85,47 @@ public class CompressionTestCase extends TestCase
 
     public void testNullIsCompressed() throws Exception
     {
-        logger.debug("testNullIsCompressed");
-
-        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertFalse(strategy.isCompressed(null));
+    }
+
+    public void testEmptyIsCompressed() throws Exception
+    {
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
+        assertFalse(strategy.isCompressed(new byte[0]));
     }
 
     public void testCompressNullBytes() throws Exception
     {
-        logger.debug("testCompressNull");
-
-        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertNull(strategy.compressByteArray(null));
+    }
+
+    public void testCompressEmptyBytes() throws Exception
+    {
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
+        byte[] bytes = new byte[0];
+        byte[] result = strategy.compressByteArray(bytes);
+
+        assertTrue(strategy.isCompressed(result));
     }
 
     public void testUncompressNullBytes() throws Exception
     {
-        logger.debug("testUncompressNull");
-
-        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertNull(strategy.uncompressByteArray(null));
+    }
+
+    public void testUncompressEmptyBytes() throws Exception
+    {
+        CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
+        byte[] bytes = new byte[0];
+
+        byte[] cmpbytes = strategy.compressByteArray(bytes);
+        assertTrue(strategy.isCompressed(cmpbytes));
+
+        byte[] result = strategy.uncompressByteArray(cmpbytes);
+        assertTrue(Arrays.equals(bytes, result));
     }
 
 }
