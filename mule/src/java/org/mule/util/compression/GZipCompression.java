@@ -75,7 +75,7 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] compressByteArray(byte[] bytes) throws IOException
     {
-        if (bytes == null || isCompressed(bytes)) {
+        if (bytes == null || bytes.length == 0 || isCompressed(bytes)) {
             // nothing to compress
             return bytes;
         }
