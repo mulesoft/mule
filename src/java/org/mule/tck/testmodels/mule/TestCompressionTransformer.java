@@ -11,11 +11,11 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.tck.testmodels.mule;
 
 import org.mule.transformers.compression.AbstractCompressionTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;
 
 /**
@@ -29,6 +29,12 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
     private String containerProperty;
 
     private int beanProperty2;
+
+    public TestCompressionTransformer()
+    {
+        super();
+        this.setStrategy(new GZipCompression());
+    }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
@@ -74,13 +80,10 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
     public Object clone() throws CloneNotSupportedException
     {
         if (containerProperty == null) {
-            throw new IllegalStateException("Transformer cannot be cloned until all properties have been set on it");
+            throw new IllegalStateException(
+                    "Transformer cannot be cloned until all properties have been set on it");
         }
         return super.clone();
     }
 
-    protected CompressionStrategy getStrategy()
-    {
-        return new GZipCompression();
-    }
 }
