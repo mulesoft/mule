@@ -12,17 +12,11 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.transformers.compression;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
-import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
-
-import java.io.IOException;
 
 /**
  * <code>AbstractCompressionTransformer</code> Is a base class for all
@@ -35,68 +29,24 @@ import java.io.IOException;
 
 public abstract class AbstractCompressionTransformer extends AbstractTransformer
 {
-    /**
-     * logger used by this class
-     */
-    private static transient Log logger = LogFactory.getLog(AbstractCompressionTransformer.class);
+    private CompressionStrategy strategy;
 
     /**
      * default constructor required for discovery
      */
     public AbstractCompressionTransformer()
     {
+        super();
     }
 
-    /**
-     * @param src the source data to compress
-     * @return a compressed Message as a byte[]
-     * @throws TransformerException
-     */
-    protected byte[] compressMessage(Object src) throws TransformerException
+    public CompressionStrategy getStrategy()
     {
-        try {
-
-            byte[] buffer;
-            if (src instanceof String) {
-                buffer = ((String) src).getBytes();
-            } else if (src instanceof byte[]) {
-                buffer = (byte[]) src;
-            } else {
-                buffer = Utility.objectToByteArray(src);
-            }
-            byte[] cmp = CompressionHelper.compressByteArray(buffer);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Compressed message in transformation");
-            }
-            return cmp;
-        } catch (IOException e) {
-            throw new TransformerException(this, e);
-        }
-
+        return strategy;
     }
 
-    /**
-     * Uncompresses an Object into a byte[].
-     * 
-     * @param src The Message to uncompress
-     * @return
-     * @throws TransformerException
-     */
-    protected byte[] uncompressMessage(Object src) throws TransformerException
+    public void setStrategy(CompressionStrategy strategy)
     {
-        byte[] buffer = null;
-        try {
-            if (src instanceof String) {
-                buffer = getStrategy().uncompressByteArray(((String) src).getBytes());
-            } else {
-                buffer = getStrategy().uncompressByteArray((byte[]) src);
-            }
-
-        } catch (IOException e) {
-            logger.error("Failed to uncompress message: " + e, e);
-        }
-        return buffer;
+        this.strategy = strategy;
     }
 
-    protected abstract CompressionStrategy getStrategy();
 }
