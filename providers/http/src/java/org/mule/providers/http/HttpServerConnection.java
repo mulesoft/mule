@@ -122,8 +122,8 @@ public class HttpServerConnection
                 setKeepAlive(false);
                 return null;
             }
-            HttpRequest request = new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(
-                    this.in, encoding), this.in);
+            HttpRequest request = new HttpRequest(RequestLine.parseLine(line), HttpParser
+                    .parseHeaders(this.in, encoding), this.in);
             return request;
         }
         catch (IOException e) {
@@ -173,7 +173,6 @@ public class HttpServerConnection
         OutputStream outstream = this.out;
         InputStream content = request.getBody();
         if (content != null) {
-
             Header transferenc = request.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
             if (transferenc != null) {
                 request.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);

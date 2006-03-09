@@ -25,9 +25,9 @@ import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -125,7 +125,7 @@ public class HttpResponse
 
     public String getStatusLine()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer(64);
         buffer.append(this.ver);
         buffer.append(' ');
         buffer.append(this.statuscode);

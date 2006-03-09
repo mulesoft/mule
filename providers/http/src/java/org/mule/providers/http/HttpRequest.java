@@ -22,9 +22,9 @@ import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HeaderGroup;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.MuleManager;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -203,7 +203,7 @@ public class HttpRequest
     {
         InputStream in = getBody();
         if (in != null) {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream(8192);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             IOUtils.copy(in, buffer);
             return buffer.toByteArray();
         }

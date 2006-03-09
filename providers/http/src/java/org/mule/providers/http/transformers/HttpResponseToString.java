@@ -16,13 +16,14 @@ package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.providers.http.ResponseWriter;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,11 +46,10 @@ public class HttpResponseToString extends AbstractTransformer
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-
         try {
             HttpResponse response = (HttpResponse)src;
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            OutputStream outstream = out;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
+            OutputStream outstream = bos;
             ResponseWriter writer = new ResponseWriter(outstream, encoding);
             writer.println(response.getStatusLine());
             Iterator item = response.getHeaderIterator();
@@ -67,34 +67,21 @@ public class HttpResponseToString extends AbstractTransformer
                     response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
                     if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
                         outstream = new ChunkedOutputStream(outstream);
-
-                        byte[] tmp = new byte[1024];
-                        int i = 0;
-                        while ((i = content.read(tmp)) >= 0) {
-                            outstream.write(tmp, 0, i);
-                        }
-                        if (outstream instanceof ChunkedOutputStream) {
-                            ((ChunkedOutputStream)outstream).finish();
-                        }
-                    }
-                }
-                else {
-                    /**
-                     * read the content when needed to embed content-length
-                     */
-                    byte[] tmp = new byte[1024];
-                    int i = 0;
-                    while ((i = content.read(tmp)) >= 0) {
-                        outstream.write(tmp, 0, i);
                     }
 
+                    IOUtils.copy(content, outstream);
+
+                    if (outstream instanceof ChunkedOutputStream) {
+                        ((ChunkedOutputStream)outstream).finish();
+                    }
                 }
             }
+
             outstream.flush();
-            out.flush();
-            byte[] result = out.toByteArray();
+            bos.flush();
+            byte[] result = bos.toByteArray();
             outstream.close();
-            out.close();
+            bos.close();
             if (getReturnClass().equals(String.class)) {
                 return new String(result, encoding);
             }

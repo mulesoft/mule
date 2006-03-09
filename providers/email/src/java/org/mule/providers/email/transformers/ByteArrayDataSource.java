@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.mule.providers.email.transformers;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
 import javax.activation.DataSource;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,18 +31,15 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * This class implements a typed DataSource from:<br>
- *
- * - an InputStream<br>
- * - a byte array<br>
- * - a String<br>
- *
+ *  - an InputStream<br> - a byte array<br> - a String<br>
+ * 
  * @author <a href="mailto:colin.chalmers@maxware.nl">Colin Chalmers</a>
  * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
  * @author <a href="mailto:bmclaugh@algx.net">Brett McLaughlin</a>
- * @version $Id$
+ * @version $Id: ByteArrayDataSource.java,v 1.1 2005/08/24 09:54:12 rossmason
+ *          Exp $
  */
-public class ByteArrayDataSource
-        implements DataSource
+public class ByteArrayDataSource implements DataSource
 {
     /** Stream containg the Data */
     private ByteArrayOutputStream baos = null;
@@ -48,162 +49,138 @@ public class ByteArrayDataSource
 
     /**
      * Create a datasource from a byte array.
-     *
-     * @param data A byte[].
-     * @param type A String.
+     * 
+     * @param data
+     *            A byte[].
+     * @param type
+     *            A String.
      * @exception IOException
      */
-    public ByteArrayDataSource(byte[] data, String type)
-            throws IOException
+    public ByteArrayDataSource(byte[] data, String type) throws IOException
     {
         ByteArrayInputStream Bis = null;
 
-        try
-        {
+        try {
             Bis = new ByteArrayInputStream(data);
             this.byteArrayDataSource(Bis, type);
         }
-        catch (IOException ioex)
-        {
+        catch (IOException ioex) {
             throw ioex;
         }
-        finally
-        {
-            try
-            {
-                if (Bis != null)
-                {
+        finally {
+            try {
+                if (Bis != null) {
                     Bis.close();
                 }
             }
-            catch (IOException ignored)
-            {
+            catch (IOException ignored) {
             }
         }
     }
 
     /**
      * Create a datasource from an input stream.
-     *
-     * @param aIs An InputStream.
-     * @param type A String.
+     * 
+     * @param aIs
+     *            An InputStream.
+     * @param type
+     *            A String.
      * @exception IOException
      */
-    public ByteArrayDataSource(InputStream aIs, String type)
-            throws IOException
+    public ByteArrayDataSource(InputStream aIs, String type) throws IOException
     {
         this.byteArrayDataSource(aIs, type);
     }
 
-   /**
+    /**
      * Create a datasource from an input stream.
-     *
-     * @param aIs An InputStream.
-     * @param type A String.
+     * 
+     * @param aIs
+     *            An InputStream.
+     * @param type
+     *            A String.
      * @exception IOException
      */
-    private void byteArrayDataSource(InputStream aIs, String type)
-            throws IOException
+    private void byteArrayDataSource(InputStream aIs, String type) throws IOException
     {
         this.type = type;
 
         BufferedInputStream Bis = null;
         BufferedOutputStream osWriter = null;
 
-        try
-        {
-            int length = 0;
-            byte[] buffer = new byte[512];
+        try {
+            Bis = new BufferedInputStream(aIs);
+            baos = new ByteArrayOutputStream();
+            osWriter = new BufferedOutputStream(baos);
 
-            Bis = new BufferedInputStream( aIs );
-               baos = new ByteArrayOutputStream();
-            osWriter = new BufferedOutputStream( baos );
-
-            //Write the InputData to OutputStream
-            while ((length = Bis.read(buffer)) != -1)
-            {
-                osWriter.write(buffer, 0 , length);
-            }
+            // Write the InputData to OutputStream
+            IOUtils.copy(Bis, osWriter);
             osWriter.flush();
             osWriter.close();
-
         }
-        catch (IOException ioex)
-        {
+        catch (IOException ioex) {
             throw ioex;
         }
-        finally
-        {
-            try
-            {
-                if (Bis != null)
-                {
+        finally {
+            try {
+                if (Bis != null) {
                     Bis.close();
                 }
-                if (baos != null)
-                {
+                if (baos != null) {
                     baos.close();
                 }
-                if (osWriter != null)
-                {
+                if (osWriter != null) {
                     osWriter.close();
                 }
             }
-            catch (IOException ignored)
-            {
+            catch (IOException ignored) {
             }
         }
     }
 
     /**
      * Create a datasource from a String.
-     *
-     * @param data A String.
-     * @param type A String.
+     * 
+     * @param data
+     *            A String.
+     * @param type
+     *            A String.
      * @exception IOException
      */
-    public ByteArrayDataSource(String data, String type)
-            throws IOException
+    public ByteArrayDataSource(String data, String type) throws IOException
     {
         this.type = type;
 
-        try
-        {
+        try {
             baos = new ByteArrayOutputStream();
 
             // Assumption that the string contains only ASCII
-            // characters!  Else just pass in a charset into this
+            // characters! Else just pass in a charset into this
             // constructor and use it in getBytes().
             baos.write(data.getBytes("iso-8859-1"));
             baos.flush();
             baos.close();
         }
-        catch (UnsupportedEncodingException uex)
-        {
+        catch (UnsupportedEncodingException uex) {
             // Do something!
         }
-           catch (IOException ignored)
-           {
+        catch (IOException ignored) {
             // Ignore
-           }
-        finally
-        {
-            try
-            {
-                if (baos != null)
-                {
+        }
+        finally {
+            try {
+                if (baos != null) {
                     baos.close();
                 }
             }
-            catch (IOException ignored)
-            {
+            catch (IOException ignored) {
             }
         }
     }
 
     /**
      * Get the content type.
-     *
+     * 
      * @return A String.
      */
     public String getContentType()
@@ -213,15 +190,13 @@ public class ByteArrayDataSource
 
     /**
      * Get the input stream.
-     *
+     * 
      * @return An InputStream.
      * @exception IOException
      */
-    public InputStream getInputStream()
-            throws IOException
+    public InputStream getInputStream() throws IOException
     {
-        if (baos == null)
-        {
+        if (baos == null) {
             throw new IOException("no data");
         }
         return new ByteArrayInputStream(baos.toByteArray());
@@ -229,7 +204,7 @@ public class ByteArrayDataSource
 
     /**
      * Get the name.
-     *
+     * 
      * @return A String.
      */
     public String getName()
@@ -239,12 +214,11 @@ public class ByteArrayDataSource
 
     /**
      * Get the OutputStream to write to
-     *
-     * @return  An OutputStream
-     * @exception   IOException
+     * 
+     * @return An OutputStream
+     * @exception IOException
      */
-    public OutputStream getOutputStream()
-            throws IOException
+    public OutputStream getOutputStream() throws IOException
     {
         baos = new ByteArrayOutputStream();
         return baos;

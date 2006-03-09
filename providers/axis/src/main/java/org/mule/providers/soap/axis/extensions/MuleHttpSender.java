@@ -35,6 +35,7 @@ import org.apache.axis.transport.http.SocketHolder;
 import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
@@ -45,7 +46,6 @@ import javax.xml.soap.SOAPException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

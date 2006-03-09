@@ -13,8 +13,9 @@
  */
 package org.mule.impl;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -32,6 +33,7 @@ import java.net.Socket;
 public class ResponseOutputStream extends BufferedOutputStream
 {
     private static ByteArrayOutputStream defaultStream = new ByteArrayOutputStream();
+
     private boolean used = false;
     private boolean isDefault = false;
     private Socket socket = null;

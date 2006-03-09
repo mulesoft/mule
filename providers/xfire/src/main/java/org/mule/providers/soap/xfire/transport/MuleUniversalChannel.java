@@ -14,6 +14,7 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.MessageContext;
@@ -44,7 +45,6 @@ import javax.mail.MessagingException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,12 +90,12 @@ public class MuleUniversalChannel extends AbstractChannel
                 Attachments atts = message.getAttachments();
                 if (atts != null && atts.size() > 0) {
                     writeAttachmentBody(context, message);
-                    // todo response.setContentType(atts.getContentType());
+                    // TODO response.setContentType(atts.getContentType());
 
                     atts.write(out);
                 }
                 else {
-                    // todo response.setContentType(getSoapMimeType(message));
+                    // TODO response.setContentType(getSoapMimeType(message));
 
                     writeWithoutAttachments(context, message, out);
                 }

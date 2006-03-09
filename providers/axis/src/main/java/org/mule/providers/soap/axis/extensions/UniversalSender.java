@@ -96,14 +96,14 @@ public class UniversalSender extends BasicHandler {
         	int contentLength = 0;
             if (msgContext.getRequestMessage().countAttachments() > 0) {
                 File temp = File.createTempFile("soap", ".tmp");
-                temp.deleteOnExit();
+                temp.deleteOnExit(); // TODO cleanup files earlier (IOUtils has a file tracker)
 	            FileOutputStream fos = new FileOutputStream(temp);
 	            msgContext.getRequestMessage().writeTo(fos);
 	            fos.close();
 	            contentLength = (int) temp.length();
 	            payload = new FileInputStream(temp);
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 msgContext.getRequestMessage().writeTo(baos);
                 baos.close();
                 payload = baos.toByteArray();
