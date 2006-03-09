@@ -15,18 +15,19 @@
     <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
 
     <build>
-        <!--
-             For some reason it does not pick up the standard m2 folder structure here
-             as described in http://tinyurl.com/amty9
-             Make it work by explicitly specifying them
-             TODO fix it
-        -->
-        <sourceDirectory>src/main</sourceDirectory>
+        <!-- m2 Standard directory layout 
+            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
+        <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
     </build>
 
     <dependencies>
@@ -35,11 +36,17 @@
             <artifactId>mule-soap-provider</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
-            <artifactId>xfire-all</artifactId>
+            <artifactId>xfire-core</artifactId>
             <version>1.0</version>
-            <!-- These transitive dependencies are not found on ibiblio and cause 
+            <!-- These transitive dependencies are not found on ibiblio and cause
             the build to fail. -->
             <exclusions>
                 <exclusion>
@@ -56,11 +63,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>1.0.2-rc4</version>
-        </dependency>
+        <!-- TODO if the javax.mail transitive dependency for XFire ever gets
+              corrected, this can be removed. -->
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>

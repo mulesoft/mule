@@ -12,15 +12,25 @@
     <artifactId>mule-glue-provider</artifactId>
 	<packaging>jar</packaging>
     <name>Glue Provider</name>
-    <description>A Mule provider for Soap Connectivity using Web Methods Glue. for more information see the
-        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.</description>
+    <description>A Mule provider for Soap Connectivity using Web Methods Glue.</description>
+    
+    <build>
+        <!-- m2 Standard directory layout 
+            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+
     <dependencies>
-        <!-- needed by the Axis Service component -->
-        <dependency>
-            <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
-            <version>${version}</version>
-        </dependency>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-soap-provider</artifactId>
@@ -30,7 +40,7 @@
             <groupId>glue</groupId>
             <artifactId>glue</artifactId>
             <version>5.0.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 	</dependencies>
 </project>

@@ -15,18 +15,19 @@
     <description>Allows Mule to send and receive events via the GigaSpaces Jini implementation.</description>
 
     <build>
-        <!--
-             For some reason it does not pick up the standard m2 folder structure here
-             as described in http://tinyurl.com/amty9
-             Make it work by explicitly specifying them
-             TODO fix it
-        -->
-        <sourceDirectory>src/main</sourceDirectory>
+        <!-- m2 Standard directory layout 
+            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
+        <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
     </build>
 
     <dependencies>
@@ -47,13 +48,11 @@
             <artifactId>jini-ext</artifactId>
             <version>2.1</version>
         </dependency>
-    <!--
         <dependency>
             <groupId>jini</groupId>
             <artifactId>JSpaces</artifactId>
             <version>0</version>
         </dependency>
-    -->
 
         <!-- Needed for unit tests only -->
         <dependency>
