@@ -26,6 +26,7 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Binildas Christudas
@@ -53,7 +54,7 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
                 }
             }
         } catch (TransformerException e) {
-            throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"), new MuleMessage(events, null), null, e);
+            throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"), new MuleMessage(events, (Map)null), null, e);
         }
         if (one && two) {
             creditProfileTO.setValid(true);
