@@ -58,8 +58,7 @@ public class GZipCompression implements CompressionStrategy
             return false;
         }
         else {
-            return ((bytes[0] == (byte)(GZIPInputStream.GZIP_MAGIC))
-                    && (bytes[1] == (byte)(GZIPInputStream.GZIP_MAGIC >> 8)));
+            return ((bytes[0] == (byte)(GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte)(GZIPInputStream.GZIP_MAGIC >> 8)));
         }
     }
 
@@ -75,7 +74,7 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] compressByteArray(byte[] bytes) throws IOException
     {
-        if (bytes == null || bytes.length == 0 || isCompressed(bytes)) {
+        if (bytes == null || isCompressed(bytes)) {
             // nothing to compress
             return bytes;
         }
@@ -125,7 +124,8 @@ public class GZipCompression implements CompressionStrategy
         if (!isCompressed(bytes)) {
             // throw a specific exception here to allow users of this method to
             // diffientiate between general IOExceptions and an invalid format
-            logger.warn("Data is not of type GZIP compressed. The data may not have been compressed in the first place.");
+            logger.warn("Data is not of type GZIP compressed."
+                    + " The data may not have been compressed in the first place.");
             throw new CompressionException("Not in GZIP format");
         }
 
