@@ -41,7 +41,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * todo document
+ * This component can used to proxy REST style services as local Mule Components. It can be configured with a
+ * service URL plus a number of properties that allow you to configure the parameters and error conditions
+ * on the service.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -173,8 +175,8 @@ public class RestServiceWrapper implements Callable, Initialisable
             requestBody = new NullPayload();
         }
 
-        setRESTParams(urlBuffer, eventContext.getMessage(), reqiredParams, false);
-        setRESTParams(urlBuffer, eventContext.getMessage(), optionalParams, true);
+        setRESTParams(urlBuffer, eventContext.getMessage(), request, reqiredParams, false);
+        setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true);
 
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
@@ -192,7 +194,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         return result;
     }
 
-    private void setRESTParams(StringBuffer url, UMOMessage msg, Map args, boolean optional) {
+    private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional) {
         char sep;
         if(url.indexOf("?") > -1) {
             sep = '&';
@@ -214,7 +216,7 @@ public class RestServiceWrapper implements Callable, Initialisable
             url.append(name).append("=").append(value);
         }
         if(!optional && payloadParameterName!=null) {
-            url.append(sep).append(payloadParameterName).append("=").append(msg.getPayload().toString());
+            url.append(sep).append(payloadParameterName).append("=").append(body.toString());
         }
     }
 
