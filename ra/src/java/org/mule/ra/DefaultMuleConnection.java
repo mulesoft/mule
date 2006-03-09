@@ -22,6 +22,7 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -127,7 +128,9 @@ public class DefaultMuleConnection implements MuleConnection
         }
 
         try {
-            UMOSession session = new MuleSession();
+
+            UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+
             if (credentials != null) {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
