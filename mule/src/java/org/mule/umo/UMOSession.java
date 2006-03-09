@@ -26,7 +26,7 @@ import java.util.Iterator;
  * 
  * This object is not usually referenced by client code directly. If needed
  * Components should manage events via the <code>UMOEventContext</code> which
- * is btainable via the <code>UMOManager</code> or by implementing
+ * is obtainable via the <code>UMOManager</code> or by implementing
  * <code>org.mule.umo.lifecycle.Callable</code>.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
