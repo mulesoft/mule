@@ -16,14 +16,12 @@
 package org.mule.util.compression;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -56,32 +54,13 @@ public class GZipCompression implements CompressionStrategy
      */
     public boolean isCompressed(byte[] bytes) throws IOException
     {
-        if (bytes == null) {
+        if ((bytes == null) || (bytes.length < 2)) {
             return false;
         }
-
-        // We only need the first 2 bytes
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes, 0, 2);
-        int b = readByte(is);
-        b = (readByte(is) << 8) | b;
-
-        return (b == GZIPInputStream.GZIP_MAGIC);
-    }
-
-    /**
-     * @param in
-     *            The InputStream to read the byte from
-     * @return The byte value
-     * @throws java.io.IOException
-     *             if a byte could not be read
-     */
-    private int readByte(InputStream in) throws IOException
-    {
-        int b = in.read();
-        if (b == -1) {
-            throw new EOFException();
+        else {
+            return ((bytes[0] == (byte)(GZIPInputStream.GZIP_MAGIC))
+                    && (bytes[1] == (byte)(GZIPInputStream.GZIP_MAGIC >> 8)));
         }
-        return b;
     }
 
     /**
@@ -96,9 +75,9 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] compressByteArray(byte[] bytes) throws IOException
     {
-        if (bytes == null) {
+        if (bytes == null || isCompressed(bytes)) {
             // nothing to compress
-            return null;
+            return bytes;
         }
 
         if (logger.isDebugEnabled()) {
@@ -134,9 +113,9 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] uncompressByteArray(byte[] bytes) throws IOException
     {
-        if (bytes == null) {
+        if (!isCompressed(bytes)) {
             // nothing to uncompress
-            return null;
+            return bytes;
         }
 
         if (logger.isDebugEnabled()) {
