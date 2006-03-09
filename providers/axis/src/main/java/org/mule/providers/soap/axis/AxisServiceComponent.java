@@ -30,6 +30,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.axis.transport.http.ServletEndpointContextImpl;
 import org.apache.axis.utils.Admin;
 import org.apache.axis.utils.XMLUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.mule.MuleManager;
@@ -55,7 +56,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -562,12 +562,10 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (tlog.isDebugEnabled()) {
             t3 = System.currentTimeMillis();
         }
-        if (responseMsg != null) {
-            sendResponse((String) context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY),
-                         contentType,
-                         response,
-                         responseMsg);
-        }
+
+        sendResponse((String)context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY), contentType,
+                response, responseMsg);
+
         if (logger.isDebugEnabled()) {
             logger.debug("Response sent.");
             logger.debug("Exit: doPost()");
@@ -636,7 +634,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             try {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 responseMsg.writeTo(baos);
                 response.write(baos.toString());
             } catch (SOAPException e) {
