@@ -14,11 +14,13 @@
     <name>Mule Providers</name>
 
 	<modules>
+		<module>axis</module>
 		<module>dq</module>
 		<module>ejb</module>
 		<module>email</module>
 		<module>file</module>
 		<module>ftp</module>
+		<module>glue</module>
 		<module>gs</module>
 		<module>http</module>
 		<module>jbi</module>
