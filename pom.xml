@@ -147,7 +147,6 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.1</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- For MuleXmlConfigurationBuilder -->
@@ -155,7 +154,6 @@
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.5</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- JXPath filtering of events -->
@@ -163,7 +161,6 @@
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
             <version>1.2</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- Used for script component support -->
@@ -171,7 +168,6 @@
             <groupId>script</groupId>
             <artifactId>jsr223</artifactId>
             <version>1.0</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- Logging -->
@@ -179,7 +175,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.13</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- Management deps -->
@@ -187,19 +182,16 @@
             <groupId>jmxri</groupId>
             <artifactId>jmxri</artifactId>
             <version>1.2</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>jmxri</groupId>
             <artifactId>jmxtools</artifactId>
             <version>1.2</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>jmxri</groupId>
             <artifactId>jmxremoting</artifactId>
             <version>1.2</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- mx4j Agent support  -->
@@ -207,19 +199,16 @@
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
             <version>2.1.1</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-tools</artifactId>
             <version>2.1.1</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-remote</artifactId>
             <version>2.1.1</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- Transactions logging system -->
@@ -227,7 +216,6 @@
             <groupId>activeio</groupId>
             <artifactId>activeio</artifactId>
             <version>2.1</version>
-            <optional>true</optional>
         </dependency>
 
         <!--
