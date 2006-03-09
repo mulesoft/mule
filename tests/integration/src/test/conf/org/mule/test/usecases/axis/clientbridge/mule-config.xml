@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Echo_Sample" version="1.0">
+	
+    <mule-environment-properties synchronous="true"/>
+
+    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
+	    <properties>
+	        <list name="beanTypes">
+	            <entry value="org.mule.test.usecases.axis.clientbridge.ComplexData"/>
+	        </list>
+	    </properties>
+	</connector>
+
+    <model name="james">
+		
+        <mule-descriptor name="doSomeWork" implementation="org.mule.test.usecases.axis.clientbridge.DoSomeWork">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8002/axisService" synchronous="true"/>
+            </inbound-router>
+            <!--<outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>-->
+        </mule-descriptor>
+		
+    </model>
+	
+</mule-configuration>

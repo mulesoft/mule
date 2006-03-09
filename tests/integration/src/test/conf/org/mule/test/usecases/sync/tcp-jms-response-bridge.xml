@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+	<!-- Mule properties -->
+	<mule-environment-properties/>
+	
+	<!-- Connectors -->
+	<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+		    <map name="jndiProviderProperties">
+                <property name="brokerUrl" value="tcp://localhost:61626"/>
+		    </map>
+        </properties>
+    </connector>
+
+	<model name="model">
+		<mule-descriptor name="TcpReceiver"
+			implementation="org.mule.components.simple.EchoComponent">
+			<inbound-router>
+                <endpoint address="tcp://localhost:4444" synchronous="true"/>
+            </inbound-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="jms://queue_in"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+
+		<mule-descriptor name="JMSReplyProvider" 
+			implementation="org.mule.test.usecases.service.TestReceiver"
+			inboundEndpoint="jms://queue_in" />
+	</model>
+	
+</mule-configuration>
