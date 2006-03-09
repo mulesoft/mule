@@ -19,9 +19,9 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.util.compression.CompressionStrategy;
 
 /**
- * <code>AbstractCompressionTransformer</code> Is a base class for all
- * transformers. Transformations transform one object into another. This base
- * class provides facilities for compressing and uncompressing messages.
+ * <code>AbstractCompressionTransformer</code> is a base class for all
+ * transformers that can compress or uncompress data when they performa message
+ * transformation. Compression is done via a pluggable strategy.
  * 
  * @author Ross Mason
  * @version $Revision$
