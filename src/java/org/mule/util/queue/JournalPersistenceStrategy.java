@@ -91,7 +91,7 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
     public Object store(String queue, Object obj) throws IOException
     {
         UUID id = getId(obj);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(256);
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeByte(STORE_BYTE);
         oos.writeUTF(queue);
@@ -137,7 +137,7 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
      */
     public void remove(String queue, Object id) throws IOException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(256);
         baos.write(DELETE_BYTE);
         baos.write(((UUID) id).asByteArray());
         Packet packet = new ByteArrayPacket(baos.toByteArray());
