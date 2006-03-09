@@ -15,6 +15,7 @@
 package org.mule.util;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -23,7 +24,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -211,6 +211,7 @@ public class Utility
             return (byte[])src;
         }
         else if (src instanceof String) {
+            // TODO what about encoding? is this implicit conversion still required?
             return ((String)src).getBytes();
         }
 
