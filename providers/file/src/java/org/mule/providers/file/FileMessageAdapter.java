@@ -143,6 +143,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         }
 
         this.file = message;
+        this.contents = null;
         properties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
         properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
