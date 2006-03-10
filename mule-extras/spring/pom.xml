@@ -18,11 +18,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
             <version>1.2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-hibernate</artifactId>
-            <version>1.2.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commongs-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Needed by SpringTransactionFactory
              TODO: verify whether this dependency is really required. -->
