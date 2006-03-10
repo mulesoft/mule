@@ -47,6 +47,21 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <!--
+            TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
+            makes JMS provider happy to compile when run from the project root folder,
+            otherwise it cannot find classes from commons-collections.
+
+            At the same time, running either from the providers or jms folder works fine
+            without this hack.
+
+            It seems m2 dependency visibility hierarchy is limited to 1 level deep.
+        -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
+        </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
