@@ -75,7 +75,8 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         synchronized (this) {
             if (contents == null) {
                 try {
-                    // TODO to cache or not to cache, that is the question?
+                    // TODO unfortunately reading the file here is required,
+                    // since otherwise the FileMessageReceiver might delete the file
                     this.contents = (byte[])transformer.transform(file);
                 }
                 catch (Exception noPayloadException) {
