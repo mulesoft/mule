@@ -50,16 +50,11 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
         }
 
         if (getReturnClass().equals(String.class)) {
-            if (encoding != null) {
-                try {
-                    return new String(buffer, encoding);
-                }
-                catch (UnsupportedEncodingException ex) {
-                    return new String(buffer);
-                }
+            try {
+                return new String(buffer, encoding);
             }
-            else {
-                return new String(buffer);
+            catch (UnsupportedEncodingException ex) {
+                throw new TransformerException(this, ex);
             }
         }
 
