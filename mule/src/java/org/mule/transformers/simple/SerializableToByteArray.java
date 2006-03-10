@@ -13,15 +13,16 @@
  */
 package org.mule.transformers.simple;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a
@@ -54,6 +55,12 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
             obj = src;
             if (obj instanceof byte[]) {
                 return obj;
+            } else if (obj instanceof String) {
+                try {
+					return ((String)obj).getBytes(encoding);
+				} catch (UnsupportedEncodingException e) {
+					throw new TransformerException(this, e);
+				}
             }
         }
 
