@@ -57,5 +57,17 @@
             <version>1.2</version>
             <scope>test</scope>
         </dependency>
+        <!--
+            TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
+            makes Spring happy to compile when run from the project root folder,
+            otherwise it cannot find classes from commons-logging.
+
+            It seems m2 dependency visibility hierarchy is limited to 1 level deep.
+        -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
     </dependencies>
 </project>
