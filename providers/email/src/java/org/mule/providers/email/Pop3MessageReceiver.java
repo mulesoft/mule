@@ -70,15 +70,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                                String backupFolder) throws InitialisationException
     {
         super(connector, component, endpoint, checkFrequency);
-
-        if (StringUtils.isEmpty(backupFolder)) {
-            this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
-        } else {
-            this.backupFolder = backupFolder;
-        }
-        if (backupFolder != null && !this.backupFolder.endsWith(File.separator)) {
-            this.backupFolder += File.separator;
-        }
+        this.backupFolder = backupFolder;
     }
     
     public void doConnect() throws Exception
@@ -108,6 +100,17 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         Store store = session.getStore(url);
         store.connect();
         folder = store.getFolder(inbox);
+
+        //If user explicitly sets backup folder to "" it will disable email back up
+        if (backupFolder==null) {
+            this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
+        } else if(StringUtils.EMPTY.equals(backupFolder)) {
+            backupFolder = null;
+        }
+        
+        if (backupFolder != null && !this.backupFolder.endsWith(File.separator)) {
+            this.backupFolder += File.separator;
+        }
     }
 
     public void doDisconnect() throws Exception
@@ -194,7 +197,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     }
 
     /**
-     * @return
+     * @return the current Mail folder
      */
     public Folder getFolder()
     {
