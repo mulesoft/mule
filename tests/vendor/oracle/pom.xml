@@ -21,7 +21,8 @@
             <groupId>oracle</groupId>
             <artifactId>aqapi13</artifactId>
             <version>9i</version>
-            <scope>test</scope>
+            <!-- Compilation fails with the 'test' scope-->
+            <!--<scope>test</scope>-->
         </dependency>
     </dependencies>
 </project>

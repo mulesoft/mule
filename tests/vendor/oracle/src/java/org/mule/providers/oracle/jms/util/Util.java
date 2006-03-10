@@ -40,7 +40,10 @@ public class Util {
         return (readToString(new InputStreamReader(input)));
     }
 
-	/** Reads the stream into a string. */
+	/**
+      Reads the stream into a string.
+      TODO consider using commons-io.
+    */
 	public static String readToString(Reader reader) throws IOException {
         String text = "";
 
@@ -51,7 +54,7 @@ public class Util {
         int numLines = lines.size();
         for (int i = 0; i < numLines; ++i) {
             if (text.equals("") == false) {
-            	text += Utility.CRLF;
+            	text += System.getProperty("line.separator");
             }
             text += lines.get(i);
         }
