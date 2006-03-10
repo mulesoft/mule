@@ -167,7 +167,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
             }
 
             // at this point msgAdapter either points to the old sourceFile
-            // or the new destinationFile. In any 
+            // or the new destinationFile.
             if (((FileConnector)connector).isAutoDelete()) {
                 // no moveTo directory
                 if (destinationFile == null) {
