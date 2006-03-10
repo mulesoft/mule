@@ -16,7 +16,6 @@ package org.mule.providers.tcp.protocols;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.providers.tcp.TcpProtocol;
 
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -62,10 +60,11 @@ import java.util.Map;
 public class XmlMessageProtocol implements TcpProtocol
 {
     private static String XML_PATTERN = "<?xml";
-    private static int PUSHBACK_BUFFER_SIZE = 10;
-    private static int READ_BUFFER_SIZE = 5;
 
-    private static Map pbMap = new ConcurrentHashMap();
+    private static int READ_BUFFER_SIZE = 4096;
+    private static int PUSHBACK_BUFFER_SIZE = READ_BUFFER_SIZE * 2;
+
+    private Map pbMap = new ConcurrentHashMap();
 
     /**
      * Adapted from DefaultProtocol
@@ -81,15 +80,15 @@ public class XmlMessageProtocol implements TcpProtocol
             pbis = new PushbackInputStream(is, PUSHBACK_BUFFER_SIZE);
             pbMap.put(is, pbis);
         }
+
         // read until xml pattern is seen (and then pushed back) or no more data
         // to read. return all data as message
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        int patternIndex;
         byte[] buffer = new byte[READ_BUFFER_SIZE];
-        int len;
+        int len = 0;
+
         try {
             while ((len = pbis.read(buffer)) == 0) {
+                // feed me!
             }
         }
         catch (SocketException e) {
@@ -98,42 +97,38 @@ public class XmlMessageProtocol implements TcpProtocol
         catch (SocketTimeoutException e) {
             return null;
         }
-        if (len == -1) {
-            return null;
-        }
-        else {
-            do {
-                baos.write(buffer, 0, len);
-                // start search at 2nd character in buffer (index=1) to
-                // allow us to process message at start of buffer (index=0)
-                patternIndex = baos.toString().indexOf(XML_PATTERN, 1);
-                if (patternIndex > 0) {
-                    break;
-                }
-                if (len < buffer.length) {
-                    break;
-                }
-                int av = pbis.available();
-                if (av == 0) {
-                    break;
-                }
+        finally {
+            if (len <= 0) {
+                // remove exhausted stream
+                pbMap.remove(is);
+                return null;
             }
-            while ((len = pbis.read(buffer)) > 0);
-
-            baos.flush();
-            baos.close();
-            byte[] result = baos.toByteArray();
-
-            if (patternIndex > 0) {
-                // push back the start of the next message and fill the
-                // pushed-back
-                // characters in the return buffer with whitespace
-                pbis.unread(result, patternIndex, result.length - patternIndex);
-                Arrays.fill(result, patternIndex, result.length, (byte)' ');
-            }
-
-            return result;
         }
+
+        StringBuffer out = new StringBuffer(READ_BUFFER_SIZE);
+        int patternIndex = -1;
+
+        do {
+            // TODO take encoding into account, ideally from the incoming XML
+            out.append(new String(buffer, 0, len));
+
+            // start search at 2nd character in buffer (index=1) to
+            // indicate whether we have reached a new document.
+            patternIndex = out.toString().indexOf(XML_PATTERN, 1);
+            if (patternIndex > 0 || len < buffer.length || pbis.available() == 0) {
+                break;
+            }
+        }
+        while ((len = pbis.read(buffer)) > 0);
+
+        if (patternIndex > 0) {
+            // push back the start of the next message and
+            // ignore the pushed-back characters in the return buffer
+            pbis.unread(out.substring(patternIndex, out.length()).getBytes());
+            out.setLength(patternIndex);
+        }
+
+        return out.toString().getBytes();
     }
 
     // simply write the data (which SHOULD begin with an XML declaration!)
