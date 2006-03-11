@@ -20,7 +20,7 @@
             <version>1.2.6</version>
             <exclusions>
                 <exclusion>
-                    <groupId>commongs-beanutils</groupId>
+                    <groupId>commons-beanutils</groupId>
                     <artifactId>commons-beanutils</artifactId>
                 </exclusion>
             </exclusions>
