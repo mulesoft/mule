@@ -12,8 +12,10 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.test.providers.file;
 
+import org.mule.MuleManager;
 import org.mule.providers.file.FileMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -35,8 +37,15 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
 
-        message = File.createTempFile("simple", ".mule");
+        // The working directory is deleted on tearDown
+        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        message = File.createTempFile("simple", ".mule", dir);
     }
 
     /*
