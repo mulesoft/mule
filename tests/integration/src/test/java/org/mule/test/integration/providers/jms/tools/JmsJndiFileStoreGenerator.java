@@ -186,7 +186,7 @@ public class JmsJndiFileStoreGenerator
 
     public void generateUberMQJndiFileStore() throws Exception
     {
-        // todo
+        // TODO
     }
 
     public RefFSContext getFileContext(String endpointName) throws Exception

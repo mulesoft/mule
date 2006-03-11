@@ -71,7 +71,7 @@ public class DQConnector extends AbstractServiceEnabledConnector
         }
         logger.debug("set polling frequency to: " + pollingFrequency);
 
-        // todo Can we include the Lib as part of the URI
+        // TODO Can we include the Lib as part of the URI
         String lib = (String) endpoint.getEndpointURI().getParams().get(LIB_PROPERTY);
         logger.debug("provider endpoint: " + endpoint.getName() + " - lib: " + lib);
         String name = "";

@@ -37,7 +37,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides() throws InterruptedException
     {
-        // todo initialised wait?
+        // TODO initialised wait?
         Thread.sleep(1000);
         FileConnector c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);

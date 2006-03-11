@@ -50,7 +50,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     protected void init() throws InitialisationException
     {
         try {
-            // todo MULE20 get namespace from service name
+            // TODO MULE20 get namespace from service name
             String namespace = XFireConnector.DEFAULT_MULE_NAMESPACE_URI;
 
             Map props = new HashMap(component.getDescriptor().getProperties());

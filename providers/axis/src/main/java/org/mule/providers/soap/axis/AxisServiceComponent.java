@@ -517,7 +517,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 msgContext.setUseSOAPAction(true);
                 msgContext.setSOAPActionURI(soapAction);
             }
-            // todo session support
+            // TODO session support
             // msgContext.setSession(new AxisHttpSession(req));
             if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();

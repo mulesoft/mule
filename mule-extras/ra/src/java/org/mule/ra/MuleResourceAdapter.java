@@ -146,7 +146,7 @@ public class MuleResourceAdapter implements ResourceAdapter
 
                                                                  }
                                                              });
-                // todo manage transactions
+                // TODO manage transactions
                 MessageEndpoint messageEndpoint = null;
                 messageEndpoint = endpointFactory.createEndpoint(null);
 

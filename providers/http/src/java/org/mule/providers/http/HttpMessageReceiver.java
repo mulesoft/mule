@@ -144,7 +144,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             .getHttpVersion().toString());
                     headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
 
-                    // todo Mule 2.0 generic way to set stream message adapter
+                    // TODO Mule 2.0 generic way to set stream message adapter
                     UMOMessageAdapter adapter;
                     Object body = null;
                     if (endpoint.isStreaming() && request.getBody() != null) {

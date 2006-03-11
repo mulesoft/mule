@@ -263,7 +263,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         } catch (UMOException e) {
             logger.error(e.getMessage(), e);
         }
-        // todo: how do you undeploy an Axis service?
+        // TODO: how do you undeploy an Axis service?
 
         // Unregister the mule part of the service
         connector.unregisterReceiverWithMuleService(this, endpoint.getEndpointURI());

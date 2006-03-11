@@ -156,7 +156,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
         assertTrue(callbackCalled);
         assertTrue(currentTx.isBegun());
-        // todo for some reason, it takes a while for committed flag on the tx
+        // TODO for some reason, it takes a while for committed flag on the tx
         // to update
         Thread.sleep(1000);
         assertTrue(currentTx.isCommitted());
@@ -220,7 +220,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         if (transactionAvailable) {
             assertNotNull(currentTx);
             assertTrue(currentTx.isBegun());
-            // todo for some reason, it takes a while for committed flag on the
+            // TODO for some reason, it takes a while for committed flag on the
             // tx to update
             Thread.sleep(300);
             assertTrue(currentTx.isCommitted());

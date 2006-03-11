@@ -184,7 +184,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
             } else {
                 msg.setSubject("(no subject)");
             }
-            // todo attachments
+            // TODO attachments
 
             // create the Multipart and its parts to it
             Multipart mp = new MimeMultipart();

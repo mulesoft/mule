@@ -57,7 +57,7 @@ public class DefaultMuleConnectionFactory implements MuleConnectionFactory
 
     public MuleConnection createConnection(MuleConnectionRequestInfo info) throws ResourceException
     {
-        // todo try {
+        // TODO try {
         return (MuleConnection) manager.allocateConnection(factory, info);
         // }
         // catch (ResourceException e) {

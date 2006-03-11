@@ -45,7 +45,7 @@ public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
         return MuleManager.getConfiguration().getProductVersion();
     }
 
-    // todo
+    // TODO
     public int getMaxConnections() throws ResourceException
     {
         return 0;

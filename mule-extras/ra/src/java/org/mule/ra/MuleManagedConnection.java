@@ -226,7 +226,7 @@ public class MuleManagedConnection implements ManagedConnection
      * @return the XAResource instance
      * @throws ResourceException if transactions are not supported
      */
-    // todo
+    // TODO
     public XAResource getXAResource() throws ResourceException
     {
         throw new NotSupportedException("getXAResource");
