@@ -202,7 +202,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public Properties getParams()
     {
-        // todo fix this so that the query string properties are not lost.
+        // TODO fix this so that the query string properties are not lost.
         // not sure whats causing this at the moment
         if (params.size() == 0 && getQuery() != null) {
             params = PropertiesHelper.getPropertiesFromQueryString(getQuery());

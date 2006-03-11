@@ -26,7 +26,7 @@ import org.mule.umo.manager.UMOServerNotification;
  */
 public class ManagementNotification extends UMOServerNotification
 {
-    // todo resource status notifications here i.e.
+    // TODO resource status notifications here i.e.
     public static final int MANAGEMENT_COMPONENT_QUEUE_EXHAUSTED = MANAGEMENT_EVENT_ACTION_START_RANGE + 1;
     public static final int MANAGEMENT_NODE_PING = MANAGEMENT_EVENT_ACTION_START_RANGE + 2;
 

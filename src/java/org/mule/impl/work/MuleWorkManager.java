@@ -126,7 +126,7 @@ public class MuleWorkManager implements UMOWorkManager
         }
     }
 
-    // todo
+    // TODO
     public XATerminator getXATerminator()
     {
         return null;
