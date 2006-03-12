@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -49,7 +50,6 @@ import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.Utility;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -290,7 +290,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             ExceptionPayload ep = null;
             if (httpMethod.getStatusCode() >= 400) {
-                logger.error(Utility.getInputStreamAsString(httpMethod.getResponseBodyAsStream()));
+                logger.error(IOUtils.toString(httpMethod.getResponseBodyAsStream()));
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
                                 + " " + httpMethod.getStatusText())));
