@@ -37,12 +37,23 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(null);
     }
 
+    protected  static String normalizeString(String rawString) {
+    	return rawString.replaceAll("\r\n", "\n");
+    }
+    
     public void testTransform() throws Exception
     {
         Object result = getTransformer().transform(getTestData());
         assertNotNull(result);
-        boolean b = compareResults(getResultData(), result);
-        assertTrue(b);
+        
+        Object expectedResult = getResultData();
+        // Special case for string results
+        if (result instanceof String && expectedResult instanceof String ) {
+			assertEquals(normalizeString((String)expectedResult), normalizeString((String)result));			
+		} else {
+			boolean b = compareResults(expectedResult, result);
+			assertTrue(b);
+		}
     }
 
     public void testRoundtripTransform() throws Exception

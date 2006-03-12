@@ -26,10 +26,12 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.Utility;
 
 import javax.xml.transform.ErrorListener;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,21 +72,20 @@ public class XsltTransformer extends AbstractTransformer {
     }
 
     /**
-     * Tranform, using XSLT, a XML String to another String.
+     * Transform, using XSLT, a XML String to another String.
      *
      * @param src The source String
      * @return The result String
      */
     public Object doTransform(Object src, String encoding) throws TransformerException {
         try {
-            DocumentSource sourceDoc = null;
+            Source sourceDoc = null;
             DocumentResult resultDoc = new DocumentResult();
             DefaultErrorListener errorListener = null;
-            if(src instanceof byte[]) {
-                src = new String((byte[])src);
-            }
 
-            if (src instanceof String) {
+            if (src instanceof byte[]) {
+                sourceDoc = new StreamSource(new ByteArrayInputStream((byte[])src));
+            } else if (src instanceof String) {
                 String xml = (String) src;
                 Document dom4jDoc = DocumentHelper.parseText(xml);
                 sourceDoc = new DocumentSource(dom4jDoc);
