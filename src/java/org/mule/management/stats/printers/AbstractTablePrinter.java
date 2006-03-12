@@ -167,6 +167,11 @@ public class AbstractTablePrinter extends PrintWriter
         return table;
     }
 
+
+    public void print(String string) {
+        this.print((Object) string);
+    }
+
     public void print(Object obj)
     {
         if (obj instanceof Collection) {
@@ -189,5 +194,11 @@ public class AbstractTablePrinter extends PrintWriter
     public void print(Collection c)
     {
         throw new UnsupportedOperationException();
+    }
+
+    // help IBM compiler, it complains helplessly about
+    // abmiguously overloaded method.
+    public void println(String string) {
+        this.println((Object) string);
     }
 }
