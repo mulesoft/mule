@@ -168,10 +168,6 @@ public class AbstractTablePrinter extends PrintWriter
     }
 
 
-    public void print(String string) {
-        this.print((Object) string);
-    }
-
     public void print(Object obj)
     {
         if (obj instanceof Collection) {
@@ -197,8 +193,15 @@ public class AbstractTablePrinter extends PrintWriter
     }
 
     // help IBM compiler, it complains helplessly about
-    // abmiguously overloaded method.
+    // an abmiguously overloaded/overridden method.
     public void println(String string) {
         this.println((Object) string);
     }
+
+    // help IBM compiler, it complains helplessly about
+    // an abmiguously overloaded/overridden method.
+    public void print(String string) {
+        this.print((Object) string);
+    }
+
 }
