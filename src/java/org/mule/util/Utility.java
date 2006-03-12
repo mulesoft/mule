@@ -132,6 +132,23 @@ public class Utility
     }
 
     /**
+     * Reads the incoming file and returns the content as a String object.
+     */
+    public static synchronized String fileToString(String fileName, String encoding) throws IOException
+    {
+        StringBuffer sb = new StringBuffer();
+        char[] buf = new char[1024 * 8];
+
+        Reader fr = new InputStreamReader(new FileInputStream(fileName), encoding);
+        int read = 0;
+        while ((read = fr.read(buf)) >= 0) {
+            sb.append(buf, 0, read);
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Reads the incoming String into a file at at the given destination.
      * 
      * @param filename
@@ -291,7 +308,7 @@ public class Utility
             resource = fileToString(resourceName);
         }
         else {
-            resource = fileToString(URLDecoder.decode(url.getFile(), encoding));
+            resource = fileToString(url.getFile(), encoding);
         }
         return resource;
     }
