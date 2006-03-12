@@ -32,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmlUMOMessageTransformersTestCase extends AbstractTransformerTestCase
+public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private UMOMessage testObject = null;
 
@@ -113,21 +113,6 @@ public class XmlUMOMessageTransformersTestCase extends AbstractTransformerTestCa
         } else {
             return false;
         }
-    }
-
-    /**
-     * Different JVMs serialize fields to XML in a different order.
-     * Make sure we DO NOT use direct (and too strict String comparison).
-     * Instead, compare xml contents, while the position of the node
-     * may differ in scope of the same node level (still, it does not violate xml spec).
-     * Overridden from the superclass.
-     * @throws Exception if any error
-     */
-    public void testTransform() throws Exception {
-        Object result = getTransformer().transform(getTestData());
-        assertNotNull(result);
-        XMLAssert.assertXMLEqual("Xml documents have different data.",
-                                (String) getResultData(), (String) result);
     }
 
 }

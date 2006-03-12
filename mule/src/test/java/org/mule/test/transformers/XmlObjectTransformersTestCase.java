@@ -18,12 +18,13 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.transformer.UMOTransformer;
+import org.custommonkey.xmlunit.XMLAssert;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmlObjectTransformersTestCase extends AbstractTransformerTestCase
+public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private Apple testObject = null;
 

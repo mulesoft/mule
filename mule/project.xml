@@ -441,6 +441,17 @@
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>${xmlunit_version}</version>
+            <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
+                <mule.core.jar>false</mule.core.jar>
+                <mule.mini>false</mule.mini>
+            </properties>
+        </dependency>
     </dependencies>
 
     <build>
