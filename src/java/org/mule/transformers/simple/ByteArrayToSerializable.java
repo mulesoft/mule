@@ -13,14 +13,11 @@
  */
 package org.mule.transformers.simple;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its
@@ -38,27 +35,13 @@ public class ByteArrayToSerializable extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
         try {
-            bais = new ByteArrayInputStream((byte[]) src);
-            ois = new ObjectInputStream(bais);
-            Object result = ois.readObject();
-            bais.close();
-
-            return result;
-        } catch (Exception e) {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "byte[]", "Object"),
-                                           this,
-                                           e);
-        } finally {
-            try {
-                if (ois != null) {
-                    ois.close();
-                }
-            } catch (IOException e) {
-                // ignore
-            }
+            return SerializationUtils.deserialize((byte[])src);
+        }
+        catch (Exception e) {
+            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
+                    "byte[]", "Object"), this, e);
         }
     }
+
 }
