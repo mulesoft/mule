@@ -15,9 +15,9 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.Utility;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -138,7 +138,7 @@ public class JmsWriter
             String data = args[0];
             if (data.endsWith(".xml")) {
                 try {
-                    data = Utility.fileToString(data);
+                    data = FileUtils.readFileToString(new File(data), null);
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.exit(0);

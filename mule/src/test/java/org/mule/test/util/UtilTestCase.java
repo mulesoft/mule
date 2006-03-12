@@ -12,6 +12,8 @@
 
 package org.mule.test.util;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.util.Utility;
 
@@ -43,7 +45,7 @@ public class UtilTestCase extends TestCase
         assertNotNull(src);
         assertTrue(src.length > 0);
 
-        Object result = Utility.byteArrayToObject(src);
+        Object result = SerializationUtils.deserialize(src);
         assertNotNull(result);
         assertTrue(result instanceof Orange);
 
@@ -64,7 +66,7 @@ public class UtilTestCase extends TestCase
 
             file = Utility.stringToFile(TEST_FILE, " and this is appended content", true);
 
-            String content = Utility.fileToString(TEST_FILE);
+            String content = FileUtils.readFileToString(new File(TEST_FILE), null);
 
             assertNotNull(content);
             assertTrue(content.indexOf("this is a test file") > -1);

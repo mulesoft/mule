@@ -14,27 +14,23 @@
 
 package org.mule.util;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.Reader;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -111,40 +107,6 @@ public class Utility
     }
 
     /**
-     * Reads the incoming file and returns the content as a String object.
-     */
-    public static synchronized String fileToString(String fileName) throws IOException
-    {
-        StringBuffer sb = new StringBuffer();
-        char[] buf = new char[1024 * 8];
-
-        FileReader fr = new FileReader(fileName);
-        int read = 0;
-        while ((read = fr.read(buf)) >= 0) {
-            sb.append(buf, 0, read);
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Reads the incoming file and returns the content as a String object.
-     */
-    public static synchronized String fileToString(String fileName, String encoding) throws IOException
-    {
-        StringBuffer sb = new StringBuffer();
-        char[] buf = new char[1024 * 8];
-
-        Reader fr = new InputStreamReader(new FileInputStream(fileName), encoding);
-        int read = 0;
-        while ((read = fr.read(buf)) >= 0) {
-            sb.append(buf, 0, read);
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * Reads the incoming String into a file at at the given destination.
      * 
      * @param filename
@@ -218,42 +180,19 @@ public class Utility
         }
     }
 
+    // TODO ideally this method should be removed;
+    // all callers should use an encoding-aware SerializableToByteArray
+    // transformer instead.
     public static byte[] objectToByteArray(Object src) throws IOException
     {
         if (src instanceof byte[]) {
             return (byte[])src;
         }
         else if (src instanceof String) {
-            // TODO what about encoding? is this implicit conversion still required?
             return ((String)src).getBytes();
         }
 
-        byte[] dest = null;
-        ByteArrayOutputStream bs = null;
-        ObjectOutputStream os = null;
-        try {
-            bs = new ByteArrayOutputStream();
-            os = new ObjectOutputStream(bs);
-            os.writeObject(src);
-            os.flush();
-            dest = bs.toByteArray();
-        }
-        catch (IOException e) {
-            IOUtils.closeQuietly(os);
-            IOUtils.closeQuietly(bs);
-            throw e;
-        }
-        return dest;
-    }
-
-    public static Object byteArrayToObject(byte[] src) throws IOException, ClassNotFoundException
-    {
-        Object dest = null;
-        ByteArrayInputStream bais = new ByteArrayInputStream(src);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        dest = ois.readObject();
-        ois.close();
-        return dest;
+        return SerializationUtils.serialize((Serializable)src);
     }
 
     /**
@@ -299,14 +238,11 @@ public class Utility
             throws IOException
     {
         URL url = getResource(resourceName, callingClass);
-        String resource = null;
-        if (url == null) {
-            resource = fileToString(resourceName);
+        if (url != null) {
+            resourceName = url.getFile();
         }
-        else {
-            resource = fileToString(url.getFile(), encoding);
-        }
-        return resource;
+
+        return FileUtils.readFileToString(new File(resourceName), encoding);
     }
 
     public static InputStream loadResource(String resourceName, Class callingClass) throws IOException
