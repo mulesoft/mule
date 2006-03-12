@@ -23,6 +23,7 @@ import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
+import org.custommonkey.xmlunit.XMLAssert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -113,4 +114,20 @@ public class XmlUMOMessageTransformersTestCase extends AbstractTransformerTestCa
             return false;
         }
     }
+
+    /**
+     * Different JVMs serialize fields to XML in a different order.
+     * Make sure we DO NOT use direct (and too strict String comparison).
+     * Instead, compare xml contents, while the position of the node
+     * may differ in scope of the same node level (still, it does not violate xml spec).
+     * Overridden from the superclass.
+     * @throws Exception if any error
+     */
+    public void testTransform() throws Exception {
+        Object result = getTransformer().transform(getTestData());
+        assertNotNull(result);
+        XMLAssert.assertXMLEqual("Xml documents have different data.",
+                                (String) getResultData(), (String) result);
+    }
+
 }
