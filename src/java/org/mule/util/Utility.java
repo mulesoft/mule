@@ -21,7 +21,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -43,11 +42,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -457,60 +453,6 @@ public class Utility
                 zip.close();
             }
         }
-    }
-
-    public static void copy(URL url, File output) throws IOException
-    {
-        InputStream is = null;
-        FileOutputStream os = null;
-        try {
-            // Copy url content stream to file
-            is = url.openStream();
-            os = new FileOutputStream(output);
-            IOUtils.copy(is, os);
-        }
-        finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
-        }
-    }
-
-    /** Reads the input stream into a string. */
-    public static String getInputStreamAsString(InputStream input) throws IOException
-    {
-        return (readToString(new InputStreamReader(input)));
-    }
-
-    /** Reads the stream into a string. */
-    public static String readToString(Reader reader) throws IOException
-    {
-        // Read the stream into an array of strings.
-        List lines = readToStringList(reader);
-
-        // Concatenate the array of strings into a single string.
-        StringBuffer sb = new StringBuffer(lines.size() * 5);
-        for (Iterator it = lines.iterator(); it.hasNext();) {
-            String line = (String)it.next();
-            if (sb.length() > 0) {
-                sb.append("\n");
-            }
-            sb.append(line);
-        }
-
-        return sb.toString();
-    }
-
-    /** Reads the stream into a list of strings. */
-    public static List readToStringList(Reader reader) throws IOException
-    {
-        List lines = new ArrayList();
-        String line;
-        BufferedReader buffer = new BufferedReader(reader);
-
-        while ((line = buffer.readLine()) != null) {
-            lines.add(line);
-        }
-        return (lines);
     }
 
 }
