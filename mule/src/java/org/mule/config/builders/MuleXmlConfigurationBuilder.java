@@ -543,6 +543,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 manager.registerInterceptorStack(digester.pop().toString(), stack);
             }
         });
+
+        addMulePropertiesRule(path + "/interceptor", digester);
     }
 
     protected void addModelRules(Digester digester, String path) throws ConfigurationException
