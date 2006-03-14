@@ -21,9 +21,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.mule.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -93,7 +91,7 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
         try {
             byte[] buf = encryptCipher.doFinal(data);
             if (base64Encoding) {
-                return new BASE64Encoder().encode(buf).getBytes();
+                return Base64.encodeBytes(buf).getBytes();
             } else {
                 return buf;
             }
@@ -107,7 +105,7 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
         try {
             byte[] dec = data;
             if (base64Encoding) {
-                dec = new BASE64Decoder().decodeBuffer(new String(data));
+                dec = Base64.decode(new String(data));
             }
             return decryptCipher.doFinal(dec);
         } catch (Exception e) {
