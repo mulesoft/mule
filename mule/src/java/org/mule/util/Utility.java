@@ -46,7 +46,7 @@ import java.util.zip.ZipFile;
 
 /**
  * <code>Utility</code> is a singleton grouping common functionality like
- * converting java.lang.String to different data types, reading files, etc
+ * reading files, converting dates, etc
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -178,21 +178,6 @@ public class Utility
         else {
             throw new IOException("File: " + filename + " can not be read");
         }
-    }
-
-    // TODO ideally this method should be removed;
-    // all callers should use an encoding-aware SerializableToByteArray
-    // transformer instead.
-    public static byte[] objectToByteArray(Object src) throws IOException
-    {
-        if (src instanceof byte[]) {
-            return (byte[])src;
-        }
-        else if (src instanceof String) {
-            return ((String)src).getBytes();
-        }
-
-        return SerializationUtils.serialize((Serializable)src);
     }
 
     /**

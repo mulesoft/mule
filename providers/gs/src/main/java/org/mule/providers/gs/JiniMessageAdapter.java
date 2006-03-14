@@ -16,6 +16,7 @@ package org.mule.providers.gs;
 import net.jini.core.entry.Entry;
 
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
@@ -63,11 +64,12 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
     public byte[] getPayloadAsBytes() throws Exception
     {
+    	Object payload = message;
         if(message instanceof JiniMessage) {
-            return Utility.objectToByteArray(((JiniMessage)message).getPayload());
-        } else {
-            return Utility.objectToByteArray(message);
+            payload = ((JiniMessage)message).getPayload();
         }
+        
+        return converToBytes(payload);
     }
 
     public Object getPayload()

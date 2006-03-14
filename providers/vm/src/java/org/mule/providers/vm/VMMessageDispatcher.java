@@ -22,6 +22,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.streaming.StreamMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -53,11 +54,14 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     private static transient Log logger = LogFactory.getLog(VMMessageDispatcher.class);
 
     private VMConnector connector;
+    
+    private SerializableToByteArray serializableToByteArray;
 
     public VMMessageDispatcher(VMConnector connector)
     {
         super(connector);
         this.connector = connector;
+        serializableToByteArray = new SerializableToByteArray();
     }
 
     /*
@@ -190,7 +194,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         if(event.isStreaming() && retMessage!=null) {
             StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
-            sma.setResponse(new ByteArrayInputStream(Utility.objectToByteArray(retMessage.getPayload())));
+            sma.setResponse(new ByteArrayInputStream((byte[])serializableToByteArray.transform(retMessage.getPayload())));
             retMessage = new MuleMessage(sma, retMessage.getProperties());
         }
         logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());

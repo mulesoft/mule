@@ -24,6 +24,7 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
@@ -51,6 +52,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
     public static final String CUSTOM_HEADER_PREFIX = "X-";
     private SimpleDateFormat format = null;
     private String server = null;
+    private SerializableToByteArray serializableToByteArray;
 
     public UMOMessageToHttpResponse()
     {
@@ -68,6 +70,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             server = MuleManager.getConfiguration().getProductName() + "/"
                     + MuleManager.getConfiguration().getProductVersion();
         }
+        serializableToByteArray = new SerializableToByteArray();
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context)
@@ -86,7 +89,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
                 response = (HttpResponse)src;
             }
             else {
-                response = createResponse(src, context);
+                response = createResponse(src, encoding, context);
             }
 
             // Ensure there's a content type header
@@ -160,7 +163,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
     }
 
-    protected HttpResponse createResponse(Object src, UMOEventContext context) throws IOException
+    protected HttpResponse createResponse(Object src, String encoding, UMOEventContext context) throws IOException, TransformerException
     {
         HttpResponse response = new HttpResponse();
 
@@ -230,7 +233,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             response.setBodyString(src.toString());
         }
         else {
-            response.setBody(new ByteArrayInputStream(Utility.objectToByteArray(src)));
+            response.setBody(new ByteArrayInputStream((byte[])serializableToByteArray.doTransform(src, encoding)));
         }
         return response;
     }

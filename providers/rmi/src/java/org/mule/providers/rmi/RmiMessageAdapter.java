@@ -14,6 +14,7 @@
 package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
 
@@ -36,8 +37,15 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
         this.message = message;
     }
 
+    
 
-    /**
+    public byte[] getPayloadAsBytes() throws Exception {
+		return converToBytes(getPayload());
+	}
+
+
+
+	/**
      * Converts the message implementation into a String representation
      *
      * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
@@ -47,11 +55,6 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception {
         return message.toString();
-    }
-
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return Utility.objectToByteArray(message);
     }
 
     public Object getPayload()

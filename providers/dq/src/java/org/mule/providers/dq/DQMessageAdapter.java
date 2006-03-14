@@ -14,6 +14,7 @@
 package org.mule.providers.dq;
 
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
 
@@ -27,6 +28,8 @@ public class DQMessageAdapter extends AbstractMessageAdapter
 {
 
     private DQMessage message;
+    
+    SerializableToByteArray serializableToByteArray;
 
     /**
      * Constructor
@@ -56,7 +59,10 @@ public class DQMessageAdapter extends AbstractMessageAdapter
 
     public final byte[] getPayloadAsBytes() throws Exception
     {
-        return Utility.objectToByteArray(message);
+    	if(serializableToByteArray==null) {
+    		serializableToByteArray = new SerializableToByteArray();
+    	}
+        return (byte[])serializableToByteArray.doTransform(message, getEncoding());
     }
 
     /**

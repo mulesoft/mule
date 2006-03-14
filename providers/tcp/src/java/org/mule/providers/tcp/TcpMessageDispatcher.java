@@ -17,11 +17,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
 import java.io.BufferedInputStream;
@@ -44,13 +46,10 @@ import java.net.URISyntaxException;
  */
 
 public class TcpMessageDispatcher extends AbstractMessageDispatcher {
-    /////////////////////////////////////////////////////////////////
-    // keepSocketOpen option variables
-    /////////////////////////////////////////////////////////////////
-
+   
     protected Socket connectedSocket = null;
 
-    /////////////////////////////////////////////////////////////////
+    protected SerializableToByteArray serializableToByteArray;
     /**
      * logger used by this class
      */
@@ -61,6 +60,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     public TcpMessageDispatcher(TcpConnector connector) {
         super(connector);
         this.connector = connector;
+        serializableToByteArray = new SerializableToByteArray();
     }
 
     protected Socket initSocket(String endpoint) throws IOException, URISyntaxException {
@@ -154,7 +154,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         return new Socket(inetAddress, port);
     }
 
-    protected void write(Socket socket, Object data) throws IOException {
+    protected void write(Socket socket, Object data) throws IOException, TransformerException {
         TcpProtocol protocol = connector.getTcpProtocol();
         byte[] binaryData;
         if (data instanceof String) {
@@ -162,7 +162,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         } else if (data instanceof byte[]) {
             binaryData = (byte[]) data;
         } else {
-            binaryData = Utility.objectToByteArray(data);
+            binaryData = (byte[])serializableToByteArray.transform(data);
         }
         BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
         protocol.write(bos, binaryData);

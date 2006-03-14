@@ -21,6 +21,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -85,6 +86,8 @@ public class MuleEvent extends EventObject implements UMOEvent
     private transient Object transformedMessage = null;
 
     private UMOCredentials credentials = null;
+    
+    private transient SerializableToByteArray serializableToByteArray;
 
     /**
      * Properties cache that only reads properties once from the inbound message
@@ -269,14 +272,10 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
     {
-        try {
-            return Utility.objectToByteArray(getTransformedMessage());
-        } catch (IOException e) {
-            throw new TransformerException(new Message(Messages.CANT_READ_PAYLOAD_AS_BYTES_TYPE_IS_X,
-                                                       getTransformedMessage().getClass().getName()),
-                                           endpoint.getTransformer(),
-                                           e);
-        }
+    	if(serializableToByteArray==null) {
+    		serializableToByteArray = new SerializableToByteArray();
+    	}
+        return (byte[])serializableToByteArray.doTransform(getTransformedMessage(), getEncoding());
     }
 
     /**

@@ -27,14 +27,14 @@ import java.io.UnsupportedEncodingException;
  * @version $Revision$
  */
 public class GZipUncompressTransformer extends GZipCompressTransformer
-{
-
+{	
     public GZipUncompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());
         this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
+        
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

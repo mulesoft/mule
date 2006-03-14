@@ -19,9 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.umo.transformer.TransformerException;
 
 import javax.activation.DataHandler;
 
@@ -29,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.io.UnsupportedEncodingException;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
@@ -49,6 +52,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
     protected Map attachments = new HashMap();
 
     protected UMOExceptionPayload exceptionPayload;
+    
+    private SerializableToByteArray serializableToByteArray;
 
     /**
      * Removes an associated property from the message
@@ -125,16 +130,14 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
         if (result != null) {
             if (result instanceof Long) {
                 return ((Long) result).longValue();
-            } else {
-                try {
-                    return Long.parseLong(result.toString());
-                } catch (NumberFormatException e) {
-                    return defaultValue;
-                }
             }
-        } else {
-            return defaultValue;
+			try {
+			    return Long.parseLong(result.toString());
+			} catch (NumberFormatException e) {
+			    return defaultValue;
+			}
         }
+		return defaultValue;
     }
 
     public double getDoubleProperty(String name, double defaultValue) {
@@ -142,16 +145,14 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
         if (result != null) {
             if (result instanceof Double) {
                 return ((Double) result).doubleValue();
-            } else {
-                try {
-                    return Double.parseDouble(result.toString());
-                } catch (NumberFormatException e) {
-                    return defaultValue;
-                }
             }
-        } else {
-            return defaultValue;
+			try {
+			    return Double.parseDouble(result.toString());
+			} catch (NumberFormatException e) {
+			    return defaultValue;
+			}
         }
+		return defaultValue;
     }
 
     public boolean getBooleanProperty(String name, boolean defaultValue) {
@@ -159,12 +160,10 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
         if (result != null) {
             if (result instanceof Boolean) {
                 return ((Boolean) result).booleanValue();
-            } else {
-                return Boolean.valueOf(result.toString()).booleanValue();
             }
-        } else {
-            return defaultValue;
+			return Boolean.valueOf(result.toString()).booleanValue();
         }
+		return defaultValue;
     }
 
     public void setBooleanProperty(String name, boolean value) {
@@ -277,5 +276,15 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
      */
     public final String getPayloadAsString() throws Exception {
         return getPayloadAsString(getEncoding());
+    }
+    
+    protected byte[] converToBytes(Object object) throws TransformerException, UnsupportedEncodingException {
+    	if(object instanceof String) {
+            return object.toString().getBytes(getEncoding());
+        }
+        if(serializableToByteArray==null) {
+    		serializableToByteArray = new SerializableToByteArray();
+    	}
+    	return (byte[])serializableToByteArray.doTransform(object, getEncoding());
     }
 }

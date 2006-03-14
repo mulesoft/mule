@@ -27,6 +27,7 @@ import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
@@ -46,10 +47,12 @@ import java.util.Map;
 
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
 {
+	private SerializableToByteArray serializableToByteArray;
 
     public ObjectToHttpClientMethodRequest()
     {
         setReturnClass(HttpMethod.class);
+        serializableToByteArray = new SerializableToByteArray();
     }
 
     private int addParameters(String queryString, PostMethod postMethod)
@@ -154,7 +157,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                             postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src));
                         }
                         else {
-                            byte[] buffer = Utility.objectToByteArray(src);
+                            byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
                             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer));
                         }
                     }

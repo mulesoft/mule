@@ -15,6 +15,7 @@ package org.mule.test.util;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.util.Utility;
 
 import java.io.File;
@@ -34,27 +35,6 @@ public class UtilTestCase extends TestCase
     private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
     private final String TEST_DATE_FORMAT_2 = "dd-MM-yy, hh:mm";
 
-    public void testByteTools() throws Exception
-    {
-        Orange orange = new Orange();
-        orange.setBrand("Juicy");
-        orange.setRadius(new Double(2.2));
-        orange.setSegments(new Integer(10));
-
-        byte[] src = Utility.objectToByteArray(orange);
-        assertNotNull(src);
-        assertTrue(src.length > 0);
-
-        Object result = SerializationUtils.deserialize(src);
-        assertNotNull(result);
-        assertTrue(result instanceof Orange);
-
-        Orange newOrange = (Orange) result;
-
-        assertEquals(new Double(2.2), newOrange.getRadius());
-        assertEquals(new Integer(10), newOrange.getSegments());
-        assertEquals("Juicy", newOrange.getBrand());
-    }
 
     public void testFileTools() throws Exception
     {

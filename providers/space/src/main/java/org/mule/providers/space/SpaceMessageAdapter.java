@@ -14,6 +14,7 @@
 package org.mule.providers.space;
 
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.UUID;
 import org.mule.util.Utility;
@@ -44,7 +45,13 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter {
         }
     }
 
-    /**
+    
+    public byte[] getPayloadAsBytes() throws Exception {
+		return converToBytes(getPayload());
+	}
+
+
+	/**
      * Converts the message implementation into a String representation
      *
      * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
@@ -55,16 +62,8 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter {
     public String getPayloadAsString(String encoding) throws Exception {
         return message.toString();
     }
-
-    /**
-     * Converts the message implementation into a String representation
-     *
-     * @return String representation of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public byte[] getPayloadAsBytes() throws Exception {
-        return Utility.objectToByteArray(message);
-    }
+    
+    
 
     /**
      * @return the current message
