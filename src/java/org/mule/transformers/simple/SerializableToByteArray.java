@@ -38,7 +38,6 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
     public SerializableToByteArray()
     {
         registerSourceType(Serializable.class);
-        registerSourceType(String.class);
         registerSourceType(byte[].class);
     }
 
@@ -56,14 +55,6 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         else {
             if (src instanceof byte[]) {
                 return src;
-            }
-            else if (src instanceof String) {
-                try {
-                    return ((String)src).getBytes(encoding);
-                }
-                catch (UnsupportedEncodingException e) {
-                    throw new TransformerException(this, e);
-                }
             }
         }
 

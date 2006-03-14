@@ -14,14 +14,14 @@
 
 package org.mule.transformers.compression;
 
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
-import org.mule.util.compression.GZipCompression;
-
 import java.io.IOException;
 
+import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.compression.GZipCompression;
+
 /**
- * <code>GZipCompressTransformer</code> TODO
+ * <code>GZipCompressTransformer</code> is a transformer compressing objects into byte arrays
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -29,18 +29,22 @@ import java.io.IOException;
 public class GZipCompressTransformer extends AbstractCompressionTransformer
 {
 
+	private SerializableToByteArray serializableToByteArray;
+	
     public GZipCompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());
         this.registerSourceType(Object.class);
         this.setReturnClass(byte[].class);
+        serializableToByteArray = new SerializableToByteArray();
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try {
-            return this.getStrategy().compressByteArray(Utility.objectToByteArray(src));
+        	byte[] data = (byte[])serializableToByteArray.doTransform(src, encoding);
+            return this.getStrategy().compressByteArray(data);
         }
         catch (IOException ioex) {
             throw new TransformerException(this, ioex);
