@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.space.UMOSpace;
+import org.mule.umo.space.UMOSpaceException;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.AbstractResourceManager;
@@ -37,45 +38,52 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
     protected abstract boolean isPersistent();
 
     public void testPutTake() throws Exception {
-        UMOSpace space = getSpaceFactory().create("test");
-        assertNull(space.takeNoWait());
-        space.put("String1");
-        Object o = space.take(1000);
-        assertNotNull(o);
-        assertEquals("String1", o);
-        assertNull(space.takeNoWait());
-        space.dispose();
+        final UMOSpace space = getSpaceFactory().create("test");
+        try {
+            assertNull(space.takeNoWait());
+            space.put("String1");
+            Object o = space.take(1000);
+            assertNotNull(o);
+            assertEquals("String1", o);
+            assertNull(space.takeNoWait());
+        } finally {
+            space.dispose();
+        }
     }
 
     public void testTakePut() throws Exception {
 
         final UMOSpace space = getSpaceFactory().create("test");
-        final Latch latch = new Latch();
+        try {
+            final Latch latch = new Latch();
 
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    latch.countDown();
-                    Thread.sleep(200);
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        latch.countDown();
+                        Thread.sleep(200);
 
-                    assertNull(space.takeNoWait());
-                    space.put("String1");
-                } catch (Exception e) {
+                        assertNull(space.takeNoWait());
+                        space.put("String1");
+                    } catch (Exception e) {
+                        logger.warn(e);
+                    }
                 }
-            }
-        };
-        t.start();
-        latch.await();
-        long t0 = System.currentTimeMillis();
-        assertNull(space.takeNoWait());
-        Object o = space.take();
-        long t1 = System.currentTimeMillis();
-        t.join();
-        assertNotNull(o);
-        assertEquals("String1", o);
-        assertNull(space.takeNoWait());
-        assertTrue(t1 - t0 > 100);
-        space.dispose();
+            };
+            t.start();
+            latch.await();
+            long t0 = System.currentTimeMillis();
+            assertNull(space.takeNoWait());
+            Object o = space.take();
+            long t1 = System.currentTimeMillis();
+            t.join();
+            assertNotNull(o);
+            assertEquals("String1", o);
+            assertNull(space.takeNoWait());
+            assertTrue(t1 - t0 > 100);
+        } finally {
+            space.dispose();
+        }
     }
 
     public void testTakePutRollbackPut() throws Exception {
@@ -83,34 +91,38 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
 
         final UMOSpace space = getSpaceFactory().create("test");
 
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    latch.countDown();
-                    Thread.sleep(200);
-                    assertNull(space.takeNoWait());
-                    space.beginTransaction();
-                    space.put("String1");
-                    space.rollbackTransaction();
-                    space.beginTransaction();
-                    space.put("String2");
-                    space.commitTransaction();
-                } catch (Exception e) {
+        try {
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        latch.countDown();
+                        Thread.sleep(200);
+                        assertNull(space.takeNoWait());
+                        space.beginTransaction();
+                        space.put("String1");
+                        space.rollbackTransaction();
+                        space.beginTransaction();
+                        space.put("String2");
+                        space.commitTransaction();
+                    } catch (Exception e) {
+                        logger.warn(e);
+                    }
                 }
-            }
-        };
-        t.start();
-        latch.await();
-        long t0 = System.currentTimeMillis();
-        assertNull(space.takeNoWait());
-        Object o = space.take();
-        long t1 = System.currentTimeMillis();
-        t.join();
-        assertNotNull(o);
-        assertEquals("String2", o);
-        assertNull(space.takeNoWait());
-        assertTrue(t1 - t0 > 100);
-        space.dispose();
+            };
+            t.start();
+            latch.await();
+            long t0 = System.currentTimeMillis();
+            assertNull(space.takeNoWait());
+            Object o = space.take();
+            long t1 = System.currentTimeMillis();
+            t.join();
+            assertNotNull(o);
+            assertEquals("String2", o);
+            assertNull(space.takeNoWait());
+            assertTrue(t1 - t0 > 100);
+        } finally {
+            space.dispose();
+        }
     }
 
     public void testTakePutOverCapacity() throws Exception {
@@ -118,34 +130,37 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
         factory.setCapacity(2);
         final UMOSpace space = factory.create("test");
 
-        final Latch latch = new Latch();
+        try {
+            final Latch latch = new Latch();
 
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    latch.await();
-                    Thread.sleep(200);
-                    Object o = space.take();
-                    assertEquals("String1", o);
-                } catch (Exception e) {
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        latch.await();
+                        Thread.sleep(200);
+                        Object o = space.take();
+                        assertEquals("String1", o);
+                    } catch (Exception e) {
+                        logger.warn(e);
+                    }
                 }
-            }
-        };
-        t.start();
-        assertNull(space.takeNoWait());
-        space.put("String1");
-        space.put("String2");
-        latch.countDown();
-        long t0 = System.currentTimeMillis();
-        space.put("String3");
-        long t1 = System.currentTimeMillis();
-        t.join();
-        assertNotNull(space.takeNoWait());
-        assertNotNull(space.takeNoWait());
-        assertNull(space.takeNoWait());
-        assertTrue(t1 - t0 > 100);
-
-        space.dispose();
+            };
+            t.start();
+            assertNull(space.takeNoWait());
+            space.put("String1");
+            space.put("String2");
+            latch.countDown();
+            long t0 = System.currentTimeMillis();
+            space.put("String3");
+            long t1 = System.currentTimeMillis();
+            t.join();
+            assertNotNull(space.takeNoWait());
+            assertNotNull(space.takeNoWait());
+            assertNull(space.takeNoWait());
+            assertTrue(t1 - t0 > 100);
+        } finally {
+            space.dispose();
+        }
     }
 
     public void testPutWithPersistence() throws Exception {
@@ -154,7 +169,8 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
 
             try {
                 space.put("String1x");
-
+            } catch (UMOSpaceException ex) {
+                logger.warn(ex);
             } finally {
                 space.dispose();
             }
@@ -162,6 +178,8 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
             space = getSpaceFactory().create("test");
             try {
                 assertEquals("String1x", space.take(1000));
+            } catch (UMOSpaceException ex) {
+                logger.warn(ex);
             } finally {
                 space.dispose();
             }
@@ -327,7 +345,7 @@ public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
                         Thread.sleep(500);
                         space.put("String1");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.warn(e);
                     }
                 }
             }).start();
