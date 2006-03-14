@@ -504,25 +504,6 @@
             <groupId>oro</groupId>
             <version>${oro_version}</version>
         </dependency>
-        <dependency>
-            <groupId>fscontext</groupId>
-            <artifactId>fscontext</artifactId>
-            <jar>fscontext.jar</jar>
-            <url></url>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>providerutil</groupId>
-            <artifactId>providerutil</artifactId>
-            <version></version>
-            <jar>providerutil.jar</jar>
-            <url></url>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
-        </dependency>
 		<!-- required my ActiveMQ 3.x -->
         <dependency>
             <groupId>concurrent</groupId>
