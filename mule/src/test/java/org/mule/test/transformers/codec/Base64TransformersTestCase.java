@@ -19,6 +19,7 @@ import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.codec.Base64Decoder;
 import org.mule.transformers.codec.Base64Encoder;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.Base64;
 
 /**
  * 
@@ -34,7 +35,12 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
      */
     public Object getResultData()
     {
-        return new sun.misc.BASE64Encoder().encode(getTestData().toString().getBytes());
+        try {
+            return Base64.encodeBytes(getTestData().toString().getBytes());
+        }
+        catch (Exception ex) {
+            return null;
+        }
     }
 
     /*
@@ -64,7 +70,10 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
      */
     public UMOTransformer getRoundTripTransformer()
     {
-        return new Base64Decoder();
+        UMOTransformer t = new Base64Decoder();
+        // our input is a String so we expect a String as output
+        t.setReturnClass(this.getTestData().getClass());
+        return t;
     }
 
 }
