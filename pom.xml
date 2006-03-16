@@ -64,7 +64,7 @@
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
-            <version>CVS20060313</version>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
