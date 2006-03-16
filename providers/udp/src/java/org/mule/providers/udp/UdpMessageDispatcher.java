@@ -14,7 +14,6 @@
 package org.mule.providers.udp;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -58,12 +57,18 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             URI uri = new URI(endpoint);
             port = uri.getPort();
             inetAddress = InetAddress.getByName(uri.getHost());
-            socket = new DatagramSocket();
-            socket.setReceiveBufferSize(connector.getBufferSize());
-            socket.setSendBufferSize(connector.getBufferSize());
-            socket.setSoTimeout(connector.getTimeout());
+            socket = createSocket(port, inetAddress);
             initialised.set(true);
         }
+    }
+
+    protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
+    {
+        DatagramSocket socket = new DatagramSocket();
+        socket.setReceiveBufferSize(connector.getBufferSize());
+        socket.setSendBufferSize(connector.getBufferSize());
+        socket.setSoTimeout(connector.getTimeout());
+        return socket;
     }
 
     public void doDispatch(UMOEvent event) throws Exception
