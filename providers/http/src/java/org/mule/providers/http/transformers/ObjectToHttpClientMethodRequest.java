@@ -19,7 +19,9 @@ import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -143,22 +145,29 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     // This way client calls
                     // can control if a POST body is posted explicitly
                     if (!(context.getMessage().getPayload() instanceof NullPayload)) {
+                    	// See if we have a MIME type set
+                    	String mimeType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+                    	
                         if (src instanceof String) {
-                            if (encoding != null) {
-                                postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString()
-                                        .getBytes(encoding)));
+                        	// Ensure that we strip the encoding information from the encoding type
+                        	int parameterIndex = mimeType != null ? mimeType.indexOf(";") : -1;
+                        	if (parameterIndex > 0) {
+                        		mimeType = mimeType.substring(0,parameterIndex);
                             }
-                            else {
-                                postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString()
-                                        .getBytes()));
-                            }
+                        	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                            if (encoding == null) encoding = MuleManager.getConfiguration().getEncoding();
+                            postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType, encoding));
                         }
                         else if (src instanceof InputStream) {
-                            postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src));
+                        	// Danger here! We don't know if the contents is really text or not 
+                        	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                            postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src, mimeType));
                         }
                         else {
+                        	// Danger here! We don't know if the contents is really text or not 
+                        	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                             byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
-                            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer));
+                            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
                         }
                     }
                 }
