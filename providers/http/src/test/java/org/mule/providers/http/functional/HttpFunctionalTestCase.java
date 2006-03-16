@@ -20,7 +20,10 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
@@ -33,10 +36,13 @@ import java.net.URI;
  */
 public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    protected static final String TEST_MESSAGE = "Test Http Request";
+    protected static final String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
+    protected static final String TEST_CONTENT_TYPE = "text/plain";
+    protected static final String TEST_CHARSET = "UTF-8";
 
     private HttpConnection cnn;
-
+    private PostMethod postMethod;
+    
     protected UMOEndpointURI getInDest()
     {
         try {
@@ -64,8 +70,8 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected void sendTestData(int iterations) throws Exception
     {
         URI uri = getInDest().getUri();
-        PostMethod postMethod = new PostMethod(uri.toString());
-        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
+        postMethod = new PostMethod(uri.toString());
+		postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE, TEST_CONTENT_TYPE, TEST_CHARSET));
         cnn = new HttpConnection(uri.getHost(), uri.getPort());
         cnn.open();
         postMethod.execute(new HttpState(), cnn);
@@ -73,13 +79,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected void receiveAndTestResults() throws Exception
     {
-        byte[] buf = new byte[1024 * 4];
-        int len = cnn.getResponseInputStream().read(buf);
-        if (len < 1) {
-            fail("Nothing was sent back in the response");
-        }
-        String msg = new String(buf, 0, len);
-
+        String msg = postMethod.getResponseBodyAsString();
         assertNotNull(msg);
         assertEquals(TEST_MESSAGE + " Received", msg);
     }
@@ -92,5 +92,20 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         catch (Exception e) {
 
         }
+    }
+    
+    public EventCallback createEventCallback() {
+    	final EventCallback superCallback = super.createEventCallback();
+
+    	return new EventCallback() {
+			public void eventReceived(UMOEventContext context, Object Component) throws Exception {
+				superCallback.eventReceived(context, Component);
+				context.setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
+			}
+    	};
+    }
+
+    protected String getExpectedContentType() {
+    	return "text/plain;charset=UTF-8";
     }
 }
