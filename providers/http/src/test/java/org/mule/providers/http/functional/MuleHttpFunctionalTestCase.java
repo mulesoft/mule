@@ -73,8 +73,7 @@ public class MuleHttpFunctionalTestCase extends HttpFunctionalTestCase
 	
     protected void sendTestData(int iterations) throws Exception {
     	try {
-    		// I put an HTTP monitor on this port
-    		reply = send("http://localhost:8051", TEST_MESSAGE);
+    		reply = send("http://localhost:60198", TEST_MESSAGE);
     	} catch (Exception e) {
             URI uri = getInDest().getUri();
             reply = send(uri.toString(), TEST_MESSAGE);
@@ -91,10 +90,11 @@ public class MuleHttpFunctionalTestCase extends HttpFunctionalTestCase
     	return "text/baz;charset=UTF-16BE";
     }
     
-    public UMOMessage send(String url, Object payload) throws Exception
-    {
+    public UMOMessage send(String url, Object payload) throws Exception {
         Map messageProperties = new HashMap();
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
+        messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE,
+                "text/plain;charset=UTF-7");
         UMOMessage message = new MuleMessage(payload, messageProperties);
 
         UMOEvent event = getEvent(message, url, true, false);

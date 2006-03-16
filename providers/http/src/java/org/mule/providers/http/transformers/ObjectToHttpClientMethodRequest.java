@@ -195,6 +195,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
             header = (Map.Entry)iterator.next();
             headerName = header.getKey().toString();
+            
+            // Filter this one, it is handled in transform()
+            if (HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) continue;
+            
             if ((HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
                     && header.getValue() instanceof String) {
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
