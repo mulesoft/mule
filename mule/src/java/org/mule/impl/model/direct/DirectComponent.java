@@ -61,7 +61,7 @@ public class DirectComponent extends AbstractComponent {
         if(obj instanceof UMOMessage) {
             return (UMOMessage)obj;
         } else {
-            return new MuleMessage(obj, RequestContext.getProperties());
+            return new MuleMessage(obj, event.getMessage());
         }
     }
 

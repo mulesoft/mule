@@ -195,7 +195,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if(event.isStreaming() && retMessage!=null) {
             StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
             sma.setResponse(new ByteArrayInputStream((byte[])serializableToByteArray.transform(retMessage.getPayload())));
-            retMessage = new MuleMessage(sma, retMessage.getProperties());
+            retMessage = new MuleMessage(sma, retMessage);
         }
         logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());
         return retMessage;

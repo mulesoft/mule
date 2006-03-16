@@ -57,6 +57,21 @@ public class TransformerException extends EndpointException
         addInfo("Transformer", transformer.toString());
     }
 
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public TransformerException(Message message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param message the exception message
+     */
+    public TransformerException(Message message) {
+        super(message);
+    }
+
     public UMOTransformer getTransformer()
     {
         return transformer;

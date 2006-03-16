@@ -34,8 +34,6 @@ public class RequestContext
 {
     private static ThreadLocal events = new ThreadLocal();
 
-    private static ThreadLocal props = new ThreadLocal();
-
     public static UMOEventContext getEventContext()
     {
         UMOEvent event = getEvent();
@@ -54,36 +52,6 @@ public class RequestContext
     public static synchronized void setEvent(UMOEvent event)
     {
         events.set(event);
-        if (event != null) {
-            props.set(event.getProperties());
-        }
-    }
-
-    public static void setProperty(String key, Object value)
-    {
-        Map properties = (Map) props.get();
-        if (properties == null) {
-            properties = new HashMap();
-            props.set(properties);
-        }
-        properties.put(key, value);
-    }
-
-    public static Map getProperties()
-    {
-        return (Map) props.get();
-    }
-
-    public static Object getProperty(String key)
-    {
-        Object property = null;
-        if (key != null) {
-            Map properties = (Map) props.get();
-            if (properties != null) {
-                property = properties.get(key);
-            }
-        }
-        return property;
     }
 
     public static void rewriteEvent(UMOMessage message)
@@ -97,17 +65,10 @@ public class RequestContext
         }
     }
 
-    public static Map clearProperties()
-    {
-        Map p = (Map) props.get();
-        props.set(null);
-        return p;
-    }
 
     public static void clear()
     {
         setEvent(null);
-        clearProperties();
     }
 
     public static void setExceptionPayload(UMOExceptionPayload exceptionPayload)

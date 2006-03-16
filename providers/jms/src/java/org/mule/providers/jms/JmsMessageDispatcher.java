@@ -88,7 +88,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             txSession = connector.getCurrentSession();
 
             //Should we be caching sessions
-            cacheJmsSession = PropertiesHelper.getBooleanProperty(event.getProperties(),
+            cacheJmsSession = event.getMessage().getBooleanProperty(
                     JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions());
             if(txSession!=null) {
                 cacheJmsSession = false;

@@ -97,6 +97,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
             }
             return catchAll(message, session, synchronous);
         } else if (!matchfound) {
+            System.err.println(message.toString());
             logger.warn("Message did not match any routers on: " + session.getComponent().getDescriptor().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message.");
         }

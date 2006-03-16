@@ -18,6 +18,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 
+import java.util.Map;
+
 /**
  * <code>MessagingException</code> is a general message exception thrown when
  * errors specific to Message processing occur.
@@ -53,7 +55,7 @@ public class MessagingException extends UMOException
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
-            this.umoMessage = new MuleMessage(payload);
+            this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
     }
@@ -64,7 +66,7 @@ public class MessagingException extends UMOException
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
-            this.umoMessage = new MuleMessage(payload);
+            this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
     }

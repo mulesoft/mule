@@ -57,9 +57,9 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
                 result[i] = ctx.getValue((String) beforeExpressionsList.get(i));
             }
             if (result.length == 1) {
-                return new MuleMessage(result[0], invocation.getMessage().getProperties());
+                return new MuleMessage(result[0], invocation.getMessage());
             } else {
-                return new MuleMessage(result, invocation.getMessage().getProperties());
+                return new MuleMessage(result, invocation.getMessage());
             }
         }
         return null;
@@ -75,7 +75,7 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
         if (afterExpression != null) {
             JXPathContext ctx = JXPathContext.newContext(getOriginalPayload());
             ctx.setValue(afterExpression, invocation.getMessage().getPayload());
-            return new MuleMessage(getOriginalPayload(), invocation.getMessage().getProperties());
+            return new MuleMessage(getOriginalPayload(), invocation.getMessage());
         }
         return null;
     }

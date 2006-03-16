@@ -33,6 +33,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Can schedule a Job with the Quartz scheduler.  The event must contain the Job
@@ -58,7 +59,10 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher {
         jobDetail.setName(event.getEndpoint().getEndpointURI().toString());
 
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.putAll(event.getProperties());
+        for (Iterator iterator = event.getMessage().getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            jobDataMap.put(o, event.getMessage().getProperty(o));
+        }
         jobDetail.setJobDataMap(jobDataMap);
 
         Job job;

@@ -22,6 +22,7 @@ import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
@@ -120,7 +121,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 return msg;
             }
 
-            setJmsProperties(ctx.getProperties(), msg);
+            setJmsProperties(ctx.getMessage(), msg);
 
             return msg;
             // }
@@ -129,25 +130,26 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
         }
     }
 
-    protected void setJmsProperties(Map props, Message msg) throws JMSException {
-        props = PropertiesHelper.getPropertiesWithoutPrefix(props, "JMS");
-        Map.Entry entry;
+    protected void setJmsProperties(UMOMessage umoMessage, Message msg) throws JMSException {
+        Object value;
         String key;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            key = entry.getKey().toString();
-            if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
-                msg.setJMSCorrelationID(entry.getValue().toString());
-            }
-            //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
-            if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && entry.getValue() instanceof Destination)) {
-                try {
-                    msg.setObjectProperty(encodeHeader(key), entry.getValue());
-                } catch (JMSException e) {
-                    //Various Jms servers have slightly different rules to what can be set as an object property on the message
-                    //As such we have to take a hit n' hope approach
-                    if(logger.isDebugEnabled()) {
-                        logger.debug("Unable to set property '" + encodeHeader(key) + "' of type " +  entry.getValue().getClass().getName() + "': " + e.getMessage());
+        for (Iterator iterator = umoMessage.getPropertyNames(); iterator.hasNext();) {
+            key = iterator.next().toString();
+            if(!key.startsWith("JMS")) {
+                value = umoMessage.getProperty(key);
+                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
+                    msg.setJMSCorrelationID(umoMessage.getCorrelationId());
+                }
+                //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
+                if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination)) {
+                    try {
+                        msg.setObjectProperty(encodeHeader(key), value);
+                    } catch (JMSException e) {
+                        //Various Jms servers have slightly different rules to what can be set as an object property on the message
+                        //As such we have to take a hit n' hope approach
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("Unable to set property '" + encodeHeader(key) + "' of type " +  value.getClass().getName() + "': " + e.getMessage());
+                        }
                     }
                 }
             }

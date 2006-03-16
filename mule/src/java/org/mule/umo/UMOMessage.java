@@ -39,12 +39,5 @@ public interface UMOMessage extends UMOMessageAdapter
      */
     void clearProperties();
 
-    /**
-     * Returns a map of all properties on this message
-     * 
-     * @return a map of all properties on this message
-     */
-    Map getProperties();
-
     UMOMessageAdapter getAdapter();
 }

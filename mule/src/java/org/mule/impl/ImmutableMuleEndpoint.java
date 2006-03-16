@@ -194,7 +194,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         this.type = type;
         if (properties != null) {
             this.properties = properties;
+        } else {
+            properties = new HashMap();
         }
+
         // Create a default transaction config
         transactionConfig = new MuleTransactionConfig();
         if (properties != null && endpointUri != null) {
@@ -241,7 +244,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         
         this.transactionConfig = source.getTransactionConfig();
-        if (properties != null && endpointUri != null) {
+        if (properties != null && endpointUri != null && endpointUri.getParams()!=null) {
             properties.putAll(endpointUri.getParams());
         }
 

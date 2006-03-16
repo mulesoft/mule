@@ -28,6 +28,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.io.UnsupportedEncodingException;
 
 /**
  * A default session handler used to store and retrieve session information on an event.
@@ -60,7 +61,12 @@ public class MuleSessionHandler implements UMOSessionHandler {
             throw new IllegalStateException("This session handler does not know how to look up session information for session id: " + sessionId);
         }
         if(sessionHeader!=null) {
-            String sessionString = (String)decoder.transform(sessionHeader);
+            String sessionString = null;
+            try {
+                sessionString = new String((byte[])decoder.transform(sessionHeader), message.getEncoding());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             if(logger.isDebugEnabled()) {
                 logger.debug("Parsing session header: " + sessionString);
             }

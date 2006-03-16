@@ -63,7 +63,7 @@ public class LenderService
             recipients.append(lenders[i].getEndpoint()).append(",");
         }
 
-        RequestContext.setProperty("recipients", recipients.substring(0, recipients.length()-1));
+        RequestContext.getEventContext().getMessage().setProperty("recipients", recipients.substring(0, recipients.length()-1));
         return lenders;
     }
 

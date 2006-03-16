@@ -76,7 +76,7 @@ public class BankQuotesAggregator extends CorrelationAggregator
                         }
                     }
                 }
-                return new MuleMessage(lowestQuote, event.getProperties());                
+                return new MuleMessage(lowestQuote, event.getMessage());                
             //}
         } catch (TransformerException e)
         {

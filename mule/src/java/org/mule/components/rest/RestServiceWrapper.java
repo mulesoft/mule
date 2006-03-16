@@ -184,7 +184,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         UMOEndpointURI endpointURI = new MuleEndpointURI(tempUrl);
         eventContext.getMessage().setProperty("http.method", httpMethod);
 
-        UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getProperties()), endpointURI);
+        UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()), endpointURI);
 
         if(isErrorPayload(result)) {
             handleException(new RestServiceException(

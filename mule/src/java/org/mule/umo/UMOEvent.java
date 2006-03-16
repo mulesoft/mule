@@ -20,6 +20,7 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>UMOEvent</code> represents any data event occuring in the Mule
@@ -279,12 +280,6 @@ public interface UMOEvent
      */
     void setStringProperty(String name, String value);
 
-    /**
-     * Returns a map of properties associated with the event
-     * 
-     * @return a map of properties on the event
-     */
-    Map getProperties();
 
     /**
      * Gets the endpoint associated with this event

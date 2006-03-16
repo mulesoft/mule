@@ -60,29 +60,12 @@ public class MuleMessage implements UMOMessage
     }
 
      public MuleMessage(Object message, UMOMessage previous) {
-         this(message, null, previous);
-     }
-
-    public MuleMessage(Object message, Map properties, UMOMessage previous) {
-        if (message instanceof UMOMessageAdapter) {
+         if (message instanceof UMOMessageAdapter) {
             adapter = (UMOMessageAdapter) message;
         } else {
-            adapter = new DefaultMessageAdapter(message);
+            adapter = new DefaultMessageAdapter(message, previous);
         }
-        if(properties!=null) {
-            addProperties(properties);
-        }
-        if(previous!=null) {
-            for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();) {
-                String name = (String) iterator.next();
-                try {
-                    addAttachment(name, previous.getAttachment(name));
-                } catch (Exception e) {
-                    throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD), e);
-                }
-            }
-        }
-    }
+     }
 
     public UMOMessageAdapter getAdapter()
     {
@@ -398,6 +381,8 @@ public class MuleMessage implements UMOMessage
         buf.append(", correlationId=").append(getCorrelationId());
         buf.append(", correlationGroup=").append(getCorrelationGroupSize());
         buf.append(", correlationSeq=").append(getCorrelationSequence());
+        buf.append(", encoding=").append(getEncoding());
+        buf.append(", adapter hash=").append(adapter.hashCode());
         buf.append(", exceptionPayload=").append(exceptionPayload);
         buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), true));
         buf.append("}");
@@ -429,5 +414,28 @@ public class MuleMessage implements UMOMessage
      */
     public String getEncoding() {
         return adapter.getEncoding();
+    }
+
+    /**
+     * Gets a String property from the event
+     *
+     * @param name         the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the
+     *                     event
+     * @return the property value or the defaultValue if the property does not
+     *         exist
+     */
+    public String getStringProperty(String name, String defaultValue) {
+        return adapter.getStringProperty(name, defaultValue);
+    }
+
+    /**
+     * Sets a String property on the event
+     *
+     * @param name  the property name or key
+     * @param value the property value
+     */
+    public void setStringProperty(String name, String value) {
+        adapter.setStringProperty(name, value);
     }
 }

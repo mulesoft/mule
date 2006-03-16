@@ -59,7 +59,7 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
         if (one && two) {
             creditProfileTO.setValid(true);
         }
-        return new MuleMessage(creditProfileTO, event.getProperties());
+        return new MuleMessage(creditProfileTO, event.getMessage());
     }
 
     protected boolean shouldAggregate(EventGroup events) {

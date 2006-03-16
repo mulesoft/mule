@@ -66,6 +66,12 @@ public class ObjectGetOrCreateRule extends ObjectCreateRule
         this.classAttrib = classAttrib;
     }
 
+    /**
+     * This method is deprecated in the Digester API however the API still uses it and we must overload it in order to
+     * customse the ObjectCreateRuleBehaviour
+     * @param attributes
+     * @throws Exception
+     */
     public void begin(Attributes attributes) throws Exception
     {
         String ref = attributes.getValue(refAttrib);

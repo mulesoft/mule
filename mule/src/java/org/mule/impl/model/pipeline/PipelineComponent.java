@@ -76,13 +76,13 @@ public class PipelineComponent extends DirectComponent {
             if (result instanceof UMOMessage) {
                 returnMessage = (UMOMessage) result;
             } else {
-                returnMessage = new MuleMessage(result, RequestContext.getProperties());
+                returnMessage = new MuleMessage(result, event.getMessage());
             }
             if (returnMessage != null && !event.isStopFurtherProcessing()) {
-                Map context = RequestContext.clearProperties();
-                if (context != null) {
-                    returnMessage.addProperties(context);
-                }
+//                Map context = RequestContext.clearProperties();
+//                if (context != null) {
+//                    returnMessage.addProperties(context);
+//                }
                 if (descriptor.getOutboundRouter().hasEndpoints()) {
                     UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
                     if (outboundReturnMessage != null) {

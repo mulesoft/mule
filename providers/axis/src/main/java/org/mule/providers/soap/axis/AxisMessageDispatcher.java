@@ -140,7 +140,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         if (result == null) {
             return null;
         } else {
-            UMOMessage resultMessage = new MuleMessage(result, event.getProperties());
+            UMOMessage resultMessage = new MuleMessage(result, event.getMessage());
             setMessageContextProperties(resultMessage, call.getMessageContext());
             return resultMessage;
         }
@@ -158,8 +158,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         Service service = getService(event);
         Call call = (Call) service.createCall();
 
-        String style = (String) event.getProperties().get("style");
-        String use = (String) event.getProperties().get("use");
+        String style = event.getMessage().getStringProperty("style", null);
+        String use = event.getMessage().getStringProperty("use", null);
 
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
@@ -370,7 +370,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     public String parseSoapAction(String soapAction, QName method, UMOEvent event) {
 
         UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
-        Map properties = new HashMap(event.getProperties());
+        Map properties = new HashMap();
+        for (Iterator iterator = event.getMessage().getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            properties.put(o, event.getMessage().getProperty(o));
+        }
         properties.put("method", method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());
         properties.put("address", endpointURI.getAddress());

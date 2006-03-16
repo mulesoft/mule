@@ -14,7 +14,10 @@
 package org.mule.samples.loanbroker;
 
 import org.mule.MuleManager;
+import org.mule.umo.UMOMessage;
 import org.mule.impl.RequestContext;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,11 @@ import java.util.List;
  */
 public class DefaultLenderService
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     public void setLenderList(BankQuoteRequest request)
     {
         Bank[] l = getLenderList(request.getLoanRequest().getCreditProfile(), new Double(request.getLoanRequest().getLoanAmount()));
@@ -60,7 +68,8 @@ public class DefaultLenderService
             recipients.add(lenders[i].getEndpoint());
         }
 
-        RequestContext.setProperty("recipients", recipients);
+        UMOMessage m = RequestContext.getEventContext().getMessage();
+        m.setProperty("recipients", recipients);
         return lenders;
     }
 

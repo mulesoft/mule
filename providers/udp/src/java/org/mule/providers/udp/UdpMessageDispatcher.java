@@ -28,6 +28,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 /**
  * <code>UdpMessageDispatcher</code> is responsible for dispatching MuleEvents as
@@ -97,7 +98,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             if (result == null) {
                 return null;
             }
-            UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
+            UMOMessage message = new MuleMessage(connector.getMessageAdapter(result), event.getMessage());
             return message;
         } else {
             return event.getMessage();
@@ -124,7 +125,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         if (result == null) {
             return null;
         }
-        UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
+        UMOMessage message = new MuleMessage(connector.getMessageAdapter(result), (Map)null);
         return message;
     }
 

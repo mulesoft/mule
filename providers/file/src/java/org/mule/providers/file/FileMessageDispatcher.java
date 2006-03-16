@@ -202,8 +202,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        //Wrap the transformed message in an Adapter before passing it to the filename parser
-        DefaultMessageAdapter message = new DefaultMessageAdapter(event.getTransformedMessage(), event.getProperties(), null);
+        //Wrap the transformed message before passing it to the filename parser
+        UMOMessage message = new MuleMessage(event.getTransformedMessage(), event.getMessage());
         return connector.getFilenameParser().getFilename(message, pattern);
     }
 

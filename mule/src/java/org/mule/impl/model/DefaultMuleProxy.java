@@ -246,10 +246,6 @@ public class DefaultMuleProxy implements MuleProxy
                     logger.debug("Event stop further processing has been set, no outbound routing will be performed.");
                 }
                 if (returnMessage != null && !event.isStopFurtherProcessing()) {
-                    Map context = RequestContext.clearProperties();
-                    if (context != null) {
-                        returnMessage.addProperties(context);
-                    }
                     if(descriptor.getOutboundRouter().hasEndpoints()) {
                         UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
                         if(outboundReturnMessage!=null) {
@@ -293,7 +289,7 @@ public class DefaultMuleProxy implements MuleProxy
                                                                    descriptor.getName()), event.getMessage(), e));
             }
             if(returnMessage==null) {
-                returnMessage = new MuleMessage(new NullPayload());
+                returnMessage = new MuleMessage(new NullPayload(), (Map)null);
             }
             returnMessage.setExceptionPayload(new ExceptionPayload(e));
         }

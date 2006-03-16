@@ -83,7 +83,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                                                     this.endpoint.getEndpointURI()), e);
             }
         } else {
-            UMOMessage msg = new MuleMessage(event.getTransformedMessage(), event.getProperties());
+            UMOMessage msg = new MuleMessage(event.getTransformedMessage(), event.getMessage());
             synchronized(lock) {
                 routeMessage(msg);
             }
@@ -97,7 +97,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     public Object onCall(UMOEvent event) throws UMOException
     {
-        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties(), event.getMessage()), event.isSynchronous());
+        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event.isSynchronous());
     }
 
     protected List getMessages() throws Exception
@@ -105,7 +105,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         UMOEvent event = (UMOEvent) queue.take();
-        routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
+        routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
         return null;
     }
 

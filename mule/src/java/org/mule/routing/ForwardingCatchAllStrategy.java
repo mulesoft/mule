@@ -53,7 +53,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
             if (sendTransformed && getEndpoint().getTransformer() != null) {
                 Object payload = message.getPayload();
                 payload = getEndpoint().getTransformer().transform(payload);
-                message = new MuleMessage(payload, message.getProperties());
+                message = new MuleMessage(payload, message);
             }
             UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
 

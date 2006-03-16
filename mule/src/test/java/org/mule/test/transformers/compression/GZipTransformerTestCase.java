@@ -21,8 +21,10 @@ import org.mule.transformers.compression.GZipUncompressTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.compression.GZipCompression;
+import org.apache.commons.lang.SerializationUtils;
 
 import java.util.Arrays;
+import java.io.Serializable;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -45,7 +47,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     public Object getResultData()
     {
         try {
-            return strat.compressByteArray(getTestData().toString().getBytes());
+            return strat.compressByteArray(SerializationUtils.serialize((Serializable)getTestData()));
         } catch (Exception e) {
             fail(e.getMessage());
             return null;
@@ -97,6 +99,21 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     }
 
     public boolean compareResults(Object src, Object result)
+    {
+        if (src instanceof byte[]) {
+            if (src == null && result == null) {
+                return true;
+            }
+            if (src == null || result == null) {
+                return false;
+            }
+            return Arrays.equals((byte[]) src, (byte[]) result);
+        } else {
+            return super.compareResults(src, result);
+        }
+    }
+
+    public boolean compareRoundtripResults(Object src, Object result)
     {
         if (src instanceof byte[]) {
             if (src == null && result == null) {

@@ -28,6 +28,7 @@ import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * The template endpoint router allows endpoints to be alered at runtime based on properties set on the current event
@@ -61,7 +62,10 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter {
             Map props = new HashMap();
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
-            props.putAll(message.getProperties());
+            for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
+                Object o =  iterator.next();
+                props.put(o, message.getProperty(o));
+            }
             uri = parser.parse(props, uri);
             if(logger.isDebugEnabled()) {
                 logger.debug("Uri after parsing is: " + uri);

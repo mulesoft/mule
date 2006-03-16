@@ -102,7 +102,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
                     throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
                 }
             }
-            return new MuleMessage(newPayload.toString(), event.getProperties());
+            return new MuleMessage(newPayload.toString(), event.getMessage());
         }
     }
 }

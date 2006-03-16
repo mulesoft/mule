@@ -189,18 +189,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
     protected void setHeaders(HttpMethod httpMethod, UMOEventContext context)
     {
         // Standard requestHeaders
-        Map.Entry header;
+        String headerValue;
         String headerName;
-        Map p = context.getProperties();
-        for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
-            header = (Map.Entry)iterator.next();
-            headerName = header.getKey().toString();
-            
-            // Filter this one, it is handled in transform()
-            if (HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) continue;
-            
-            if ((HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
-                    && header.getValue() instanceof String) {
+        for (Iterator iterator = context.getMessage().getPropertyNames(); iterator.hasNext();) {
+            headerName = (String)iterator.next();
+            headerValue = context.getMessage().getStringProperty(headerName, null);
+            if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null) {
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
                     headerName = "X-" + headerName;
                 }
@@ -208,10 +202,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 // corrupt the request
                 if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH)
                         && httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
-                    httpMethod.addRequestHeader(headerName, (String)header.getValue());
+                    httpMethod.addRequestHeader(headerName, headerValue);
                 }
                 else {
-                    httpMethod.addRequestHeader(headerName, (String)header.getValue());
+                    httpMethod.addRequestHeader(headerName, headerValue);
                 }
             }
         }

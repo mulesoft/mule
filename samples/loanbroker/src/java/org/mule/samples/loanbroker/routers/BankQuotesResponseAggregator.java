@@ -77,7 +77,7 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
                     }
                 }
                 logger.info("Lowest quote is: " + lowestQuote);
-                return new MuleMessage(lowestQuote, event.getProperties());
+                return new MuleMessage(lowestQuote, event.getMessage());
             //}
         } catch (TransformerException e)
         {

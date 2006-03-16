@@ -12,6 +12,6 @@ public class DummyComponent {
          List recipients = new ArrayList();
          recipients.add("ross.mason@symphonysoft.com");
          recipients.add("ross@rossmason.com");
-         RequestContext.setProperty("recipients", recipients);
+         RequestContext.getEventContext().getMessage().setProperty("recipients", recipients);
      }
 }

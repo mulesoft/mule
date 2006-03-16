@@ -59,7 +59,7 @@ public class SelectiveConsumer implements UMOInboundRouter
         if (transformFirst) {
             try {
                 Object payload = event.getTransformedMessage();
-                message = new MuleMessage(payload, event.getMessage().getProperties());
+                message = new MuleMessage(payload, event.getMessage());
             } catch (TransformerException e) {
                 throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
                                            event.getMessage(),

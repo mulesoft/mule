@@ -94,11 +94,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
 
         if (results != null && results.size() == 1) {
-            return new MuleMessage(results.get(0), result.getProperties());
+            return new MuleMessage(results.get(0), result);
         } else if (results.size() == 0) {
             return null;
         } else {
-            return new MuleMessage(results, (result == null ? null : result.getProperties()));
+            return new MuleMessage(results, (result == null ? null : result));
         }
     }
 

@@ -44,6 +44,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 
+import java.util.HashMap;
+
 /**
  * Utilities for creating test and Mock Mule objects
  *
@@ -91,7 +93,7 @@ public class MuleTestUtils {
     {
         UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
 		UMOSession session = getTestSession(component);
-		return new MuleEvent(new MuleMessage(data),
+		return new MuleEvent(new MuleMessage(data, new HashMap()),
 				getTestEndpoint("test1",
 				UMOEndpoint.ENDPOINT_TYPE_SENDER),
 				session, true);
@@ -110,20 +112,20 @@ public class MuleTestUtils {
 
         UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-        return new MuleEvent(new MuleMessage(data), endpoint, session, true);
+        return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
     public static UMOEvent getTestEvent(Object data, UMOEndpoint endpoint) throws Exception
     {
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class.getName())));
-        return new MuleEvent(new MuleMessage(data), endpoint, session, true);
+        return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOEndpoint endpoint)
             throws UMOException
     {
         UMOSession session = getTestSession(getTestComponent(descriptor));
-        UMOEvent event = new MuleEvent(new MuleMessage(data), endpoint, session, true);
+        UMOEvent event = new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
         return event;
     }
 

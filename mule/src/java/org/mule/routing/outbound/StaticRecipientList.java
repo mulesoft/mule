@@ -39,7 +39,7 @@ public class StaticRecipientList extends AbstractRecipientList
     {
         CopyOnWriteArrayList list = createList(message.removeProperty("recipients"));
         if(list == null) {
-            list = createList(RequestContext.getProperty("recipients"));
+            list = createList(message.getProperty("recipients"));
         }
         if(list==null) {
             list = recipients;

@@ -187,6 +187,26 @@ public interface UMOMessageAdapter extends Serializable {
     void setDoubleProperty(String name, double value);
 
     /**
+     * Gets a String property from the event
+     *
+     * @param name         the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the
+     *                     event
+     * @return the property value or the defaultValue if the property does not
+     *         exist
+     */
+    String getStringProperty(String name, String defaultValue);
+
+
+    /**
+     * Sets a String property on the event
+     *
+     * @param name  the property name or key
+     * @param value the property value
+     */
+    void setStringProperty(String name, String value);
+
+    /**
      * Sets a correlationId for this message. The correlation Id can be used by
      * components in the system to manage message relations
      * <p/>

@@ -122,14 +122,14 @@ public class MuleProxyListener implements InvocationHandler
         }
         UMOMessage message = eventTransformer.transform(args[0], method);
         if (!"void".equals(method.getReturnType().getName())) {
-            UMOMessage result = client.sendDirect(componentName, null, message.getPayload(), message.getProperties());
+            UMOMessage result = client.sendDirect(componentName, null, message);
             if (UMOMessage.class.equals(method.getReturnType())) {
                 return result;
             } else {
                 return (result == null ? null : result.getPayload());
             }
         } else {
-            client.dispatchDirect(componentName, message.getPayload(), message.getProperties());
+            client.dispatchDirect(componentName, message);
             return null;
         }
     }

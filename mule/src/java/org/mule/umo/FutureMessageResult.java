@@ -23,6 +23,8 @@ import org.mule.impl.MuleMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.HashMap;
+
 /**
  * <code>FutureMessageResult</code> is an UMOMessage result of a remote
  * invocation on a Mule Server. this object makes the result available to the
@@ -69,7 +71,7 @@ public class FutureMessageResult extends FutureTask
             if (transformer != null) {
                 obj = transformer.transform(obj);
             }
-            return new MuleMessage(obj);
+            return new MuleMessage(obj, new HashMap());
         } else {
             return null;
         }

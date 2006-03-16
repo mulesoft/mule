@@ -111,14 +111,14 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         Object[] response = client.invoke(method, getArgs(event));
         if (response != null && response.length <= 1) {
             if (response.length == 1) {
-                return new MuleMessage(response[0], event.getProperties());
+                return new MuleMessage(response[0], event.getMessage());
             }
             else {
                 return null;
             }
         }
         else {
-            return new MuleMessage(response, event.getProperties());
+            return new MuleMessage(response, event.getMessage());
         }
     }
 

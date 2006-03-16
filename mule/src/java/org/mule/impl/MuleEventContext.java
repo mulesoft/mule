@@ -44,6 +44,7 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
@@ -234,7 +235,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(Object message) throws UMOException
     {
-        return sendEvent(new MuleMessage(message, event.getProperties()));
+        return sendEvent(new MuleMessage(message, event.getMessage()));
     }
 
     /**
@@ -317,7 +318,7 @@ public class MuleEventContext implements UMOEventContext
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                UMOMessage umoMessage = new MuleMessage(message, event.getProperties());
+                UMOMessage umoMessage = new MuleMessage(message, event.getMessage());
                 umoMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 umoMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(umoMessage);
@@ -463,7 +464,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void dispatchEvent(Object message) throws UMOException
     {
-        session.dispatchEvent(new MuleMessage(message, event.getProperties()));
+        session.dispatchEvent(new MuleMessage(message, event.getMessage()));
     }
 
     /**
@@ -588,6 +589,7 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name
      * @return the property value or null if the property does not exist
+     * @deprecated use eventContext.getMessage().getProperty()
      */
     public Object getProperty(String name)
     {
@@ -604,6 +606,7 @@ public class MuleEventContext implements UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().getProperty()
      */
     public Object getProperty(String name, Object defaultValue)
     {
@@ -620,6 +623,7 @@ public class MuleEventContext implements UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().getIntProperty()
      */
     public int getIntProperty(String name, int defaultValue)
     {
@@ -636,6 +640,7 @@ public class MuleEventContext implements UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().getLongProperty()
      */
     public long getLongProperty(String name, long defaultValue)
     {
@@ -652,6 +657,7 @@ public class MuleEventContext implements UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().getDoubleProperty()
      */
     public double getDoubleProperty(String name, double defaultValue)
     {
@@ -668,6 +674,7 @@ public class MuleEventContext implements UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().getBooleanProperty()
      */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
@@ -681,6 +688,7 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     public void setProperty(String name, Object value)
     {
@@ -694,6 +702,7 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setBooleanProperty()
      */
     public void setBooleanProperty(String name, boolean value)
     {
@@ -707,6 +716,7 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setIntProperty()
      */
     public void setIntProperty(String name, int value)
     {
@@ -720,6 +730,7 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setLongProperty()
      */
     public void setLongProperty(String name, long value)
     {
@@ -733,20 +744,11 @@ public class MuleEventContext implements UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setDoubleProperty()
      */
     public void setDoubleProperty(String name, double value)
     {
         event.setDoubleProperty(name, value);
-    }
-
-    /**
-     * Returns a map of properties associated with the event
-     * 
-     * @return a map of properties on the event
-     */
-    public Map getProperties()
-    {
-        return event.getProperties();
     }
 
     /**
@@ -844,6 +846,12 @@ public class MuleEventContext implements UMOEventContext
         }
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     * @deprecated use eventContext.getMessage().getStringProperty()
+     */
     public String getStringProperty(String name) {
         Object result = getProperty(name);
         if(result==null)  {
@@ -853,6 +861,13 @@ public class MuleEventContext implements UMOEventContext
         }
     }
 
+    /**
+     *
+     * @param name
+     * @param defaultValue
+     * @return
+     * @deprecated use eventContext.getMessage().setStringProperty()
+     */
     public String getStringProperty(String name, String defaultValue) {
         String result = getStringProperty(name);
         if(result==null) {

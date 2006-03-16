@@ -251,8 +251,7 @@ public class RemoteDispatcher implements Disposable
     {
         String xml = xstream.toXML(action);
 
-        UMOMessage message = new MuleMessage(xml, (action.getMessage() == null ? null : action.getMessage()
-                                                                                              .getProperties()));
+        UMOMessage message = new MuleMessage(xml, (action.getMessage() == null ? null : action.getMessage()));
 
         message.addProperties(action.getProperties());
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);

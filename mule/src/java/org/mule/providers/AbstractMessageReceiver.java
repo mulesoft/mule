@@ -487,7 +487,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
         if (returnMessage == null) {
             if (transformer.isAcceptNull()) {
-                returnMessage = new MuleMessage(new NullPayload(), RequestContext.getProperties());
+                returnMessage = new MuleMessage(new NullPayload(), RequestContext.getEventContext().getMessage());
             }
             else {
                 return null;
@@ -501,7 +501,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                 returnMessage = (UMOMessage)result;
             }
             else {
-                returnMessage = new MuleMessage(result, returnMessage.getProperties());
+                returnMessage = new MuleMessage(result, returnMessage);
             }
         }
         else {
