@@ -57,6 +57,13 @@
             <artifactId>commons-jxpath</artifactId>
             <version>1.2</version>
             <scope>test</scope>
+            <!-- TODO get rid of duplication in the top-level providers pom.xml -->
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xerces</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--
             TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
