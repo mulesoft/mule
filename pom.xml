@@ -117,6 +117,19 @@
                     <target>1.4</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
+                        <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
+                        <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>changes-maven-plugin</artifactId>

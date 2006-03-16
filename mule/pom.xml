@@ -41,20 +41,7 @@
             </dependencies>
         </profile>
     </profiles>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
-                        <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
     <dependencies>
         <!--
         ****************************************************************
