@@ -34,6 +34,4 @@ public interface UMOLifecycleAdapter extends Lifecycle, Initialisable, UMOInterc
 
     UMODescriptor getDescriptor();
 
-    Object onCall(UMOEvent event) throws UMOException;
-
 }

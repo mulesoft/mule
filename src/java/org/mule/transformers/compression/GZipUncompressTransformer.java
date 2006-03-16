@@ -16,6 +16,7 @@ package org.mule.transformers.compression;
 
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.GZipCompression;
+import org.apache.commons.lang.SerializationUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -49,13 +50,8 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
             throw new TransformerException(this, e);
         }
 
-        if (getReturnClass().equals(String.class)) {
-            try {
-                return new String(buffer, encoding);
-            }
-            catch (UnsupportedEncodingException ex) {
-                throw new TransformerException(this, ex);
-            }
+        if (!getReturnClass().equals(byte[].class)) {
+            return SerializationUtils.deserialize(buffer);
         }
 
         return buffer;

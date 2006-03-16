@@ -19,6 +19,7 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>UMOEventContext</code> is the context object for the current request.
@@ -523,13 +524,6 @@ public interface UMOEventContext
      * @param value the property value
      */
     void setDoubleProperty(String name, double value);
-
-    /**
-     * Returns a map of properties associated with the event
-     * 
-     * @return a map of properties on the event
-     */
-    Map getProperties();
 
     /**
      * Determines whether the default processing for this event will be

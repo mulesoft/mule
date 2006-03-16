@@ -49,6 +49,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 
+import java.util.Map;
+
 /**
  * <code>MuleManagerComponent</code> is a MuleManager interal server component
  * responsible for receiving remote requests and dispatching them locally.  This allows
@@ -175,7 +177,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 UMOTransformer trans = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformer();
                 if (trans != null) {
                     Object payload = trans.transform(result.getPayload());
-                    result = new MuleMessage(payload, result.getProperties());
+                    result = new MuleMessage(payload, result);
                 }
                 return xstream.toXML(result);
             } else {
@@ -213,7 +215,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     protected String handleException(UMOMessage result, Throwable e) {
         logger.error("Failed to process admin request: " + e.getMessage(), e);
         if(result==null) {
-            result = new MuleMessage(new NullPayload());
+            result = new MuleMessage(new NullPayload(), (Map)null);
         }
         result.setExceptionPayload(new ExceptionPayload(e));
         return xstream.toXML(result);

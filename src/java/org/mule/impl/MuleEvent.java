@@ -16,7 +16,6 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -31,18 +30,19 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.UUID;
-import org.mule.util.Utility;
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.Serializable;
 import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -58,6 +58,10 @@ import java.util.Map;
 
 public class MuleEvent extends EventObject implements UMOEvent
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
     /**
      * The endpoint associated with the event
      */
@@ -94,7 +98,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * and merges them with any properties on the endpoint. The message
      * properties take precedence over the endpoint properties
      */
-    private Map properties = new HashMap();
+    //private Map properties = new HashMap();
 
     public MuleEvent(UMOMessage message, UMOEndpoint endpoint, UMOComponent component, UMOEvent previousEvent)
     {
@@ -183,19 +187,27 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected void fillProperties(UMOEvent previousEvent)
     {
-        if (previousEvent != null && previousEvent.getProperties() != null) {
-            properties = previousEvent.getProperties();
-        } else {
-            properties = new HashMap();
+        if (previousEvent != null) {
+            for (Iterator iterator = previousEvent.getMessage().getPropertyNames(); iterator.hasNext();) {
+                Object prop =  iterator.next();
+                //dont overwrite property on the message
+                if(message.getProperty(prop)==null) {
+                    message.setProperty(prop, previousEvent.getMessage().getProperty(prop));
+                }
+
+            }
         }
 
         if (endpoint != null && endpoint.getProperties() != null) {
-            properties.putAll(endpoint.getProperties());
-            if (endpoint.getEndpointURI().getParams() != null) {
-                properties.putAll(endpoint.getEndpointURI().getParams());
+            for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();) {
+                Object prop =  iterator.next();
+                //dont overwrite property on the message
+                if(message.getProperty(prop)==null) {
+                    Object value = endpoint.getProperties().get(prop);
+                    message.setProperty(prop, value);
+                }
             }
         }
-        properties.putAll(message.getProperties());
         setCredentials();
     }
 
@@ -265,17 +277,38 @@ public class MuleEvent extends EventObject implements UMOEvent
         return transformedMessage;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOEvent#getTransformedMessageAsBytes()
+    /**
+     * This method will attempt to convert the transformed message into an array of bytes
+     * It will first check if the result of the transformation is a byte array and return that. Otherwise if the the result
+     * is a string it will serialized the CONTENTS of the string not the String object. finally it will check if the result
+     * is a Serializable object and convert that to an array of bytes.
+     * @return a byte[] representation of the message
+     * @throws TransformerException if an unsupported encoding is being used or if the result message is not a String byte[] or
+     * Seializable object
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
     {
-    	if(serializableToByteArray==null) {
-    		serializableToByteArray = new SerializableToByteArray();
-    	}
-        return (byte[])serializableToByteArray.doTransform(getTransformedMessage(), getEncoding());
+        Object msg = getTransformedMessage();
+        if (msg instanceof byte[]) {
+            return (byte[])msg;
+        } else if (msg instanceof String) {
+            try {
+                return msg.toString().getBytes(getEncoding());
+            } catch (UnsupportedEncodingException e) {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, msg.getClass().getName(), e));
+            }
+        } else if( msg instanceof Serializable){
+            try {
+                return SerializationUtils.serialize((Serializable)msg);
+            }
+            catch (Exception e) {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
+                        msg.getClass().getName(), "byte[]"), e);
+            }
+        } else {
+            throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
+                    msg.getClass().getName(), "byte[] or " + Serializable.class.getName()));
+        }
     }
 
     /**
@@ -350,26 +383,27 @@ public class MuleEvent extends EventObject implements UMOEvent
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String)
-     */
+   /**
+    *
+    * @param name
+    * @return
+    * @deprecated use event.getMessage().getProperty()
+    */
     public Object getProperty(String name)
     {
-        return properties.get(name);
+        return message.getProperty(name);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String,
-     *      java.lang.Object)
+    /**
+     *
+     * @param name
+     * @param defaultValue
+     * @return
+     * @deprecated use event.getMessage().getProperty()
      */
     public Object getProperty(String name, Object defaultValue)
     {
-        Object prop = getProperty(name);
-        return (prop == null ? defaultValue : prop);
+        return message.getProperty(name, defaultValue);
     }
 
     /*
@@ -380,7 +414,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public void setProperty(String name, Object value)
     {
-        properties.put(name, value);
+        message.setProperty(name, value);
     }
 
     /*
@@ -388,24 +422,9 @@ public class MuleEvent extends EventObject implements UMOEvent
      * 
      * @see org.mule.umo.UMOEvent#getParams()
      */
-    public Map getProperties()
+    public Iterator getPropertyNames()
     {
-        // this is necessary as these properties
-        if (message.getCorrelationId() != null) {
-            properties.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message.getCorrelationId());
-        }
-        if (message.getCorrelationGroupSize() != -1) {
-            properties.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                           new Integer(message.getCorrelationGroupSize()));
-        }
-        if (message.getCorrelationSequence() != -1) {
-            properties.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                           new Integer(message.getCorrelationSequence()));
-        }
-        if (message.getReplyTo() != null) {
-            properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, message.getReplyTo());
-        }
-        return properties;
+        return message.getPropertyNames();
     }
 
     /*
@@ -535,44 +554,88 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.timeout = timeout;
     }
 
+    /**
+     * Gets an int property on the nessage
+     * @param name
+     * @deprecated use event.getMessage().getIntProperty() instead
+     */
     public int getIntProperty(String name, int defaultValue)
     {
-        return PropertiesHelper.getIntProperty(properties, name, defaultValue);
+        return message.getIntProperty(name, defaultValue);
     }
 
+    /**
+     * Gets a long property on the nessage
+     * @param name
+     * @deprecated use event.getMessage().getLongProperty() instead
+     */
     public long getLongProperty(String name, long defaultValue)
     {
-        return PropertiesHelper.getLongProperty(properties, name, defaultValue);
+        return message.getLongProperty(name, defaultValue);
     }
 
+    /**
+     * Gets a double property on the nessage
+     * @param name
+     * @deprecated use event.getMessage().getDoubleProperty() instead
+     */
     public double getDoubleProperty(String name, double defaultValue)
     {
-        return PropertiesHelper.getDoubleProperty(properties, name, defaultValue);
+        return message.getDoubleProperty(name, defaultValue);
     }
 
+    /**
+     * Gets a boolean property on the nessage
+     * @param name
+     * @deprecated use event.getMessage().getBooleanProperty() instead
+     */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
-        return PropertiesHelper.getBooleanProperty(properties, name, defaultValue);
+        return message.getBooleanProperty(name, defaultValue);
     }
 
+    /**
+     * Sets a boolean property on the nessage
+     * @param name
+     * @param value
+     * @deprecated use event.getMessage().setBooleanProperty() instead
+     */
     public void setBooleanProperty(String name, boolean value)
     {
-        properties.put(name, Boolean.valueOf(value));
+        message.setBooleanProperty(name, value);
     }
 
+    /**
+     * Sets an int property on the nessage
+     * @param name
+     * @param value
+     * @deprecated use event.getMessage().setIntProperty() instead
+     */
     public void setIntProperty(String name, int value)
     {
-        properties.put(name, new Integer(value));
+        message.setIntProperty(name, value);
     }
 
+    /**
+     * Sets a long property on the nessage
+     * @param name
+     * @param value
+     * @deprecated use event.getMessage().setLongProperty() instead
+     */
     public void setLongProperty(String name, long value)
     {
-        properties.put(name, new Long(value));
+        message.setLongProperty(name, value);
     }
 
+    /**
+     * Sets a double property on the nessage
+     * @param name
+     * @param value
+     * @deprecated use event.getMessage().setDoubleProperty() instead
+     */
     public void setDoubleProperty(String name, double value)
     {
-        properties.put(name, new Double(value));
+        message.setDoubleProperty(name, value);
     }
 
     /**
@@ -593,10 +656,11 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @param key the property key to remove
      * @return the removed property or null if the property was not found or if
      *         the underlying message does not return the removed property
+     * @deprecated use event.getMessage().removeProperty()
      */
     public Object removeProperty(Object key)
     {
-        return properties.remove(key);
+        return message.removeProperty(key);
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException
@@ -622,9 +686,10 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @param name the name of the proerty to get
      * @param defaultValue the default value to return if the proerty is not set
      * @return the property value or the defaultValue if the proerty is not set
+     * @deprecated use event.getMessage().getStringProperty()
      */
     public String getStringProperty(String name, String defaultValue) {
-        return PropertiesHelper.getStringProperty(properties, name, defaultValue);
+        return message.getStringProperty(name, defaultValue);
     }
 
     public void setStringProperty(String name, String value) {

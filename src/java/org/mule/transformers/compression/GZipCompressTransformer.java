@@ -15,10 +15,12 @@
 package org.mule.transformers.compression;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.GZipCompression;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> is a transformer compressing objects into byte arrays
@@ -35,15 +37,20 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(Object.class);
+        this.registerSourceType(Serializable.class);
+        this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
-        serializableToByteArray = new SerializableToByteArray();
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try {
-        	byte[] data = (byte[])serializableToByteArray.doTransform(src, encoding);
+        	byte[] data = null;
+            if(src instanceof byte[]) {
+                data = (byte[])src;
+            } else {
+                data = SerializationUtils.serialize((Serializable)src);
+            }
             return this.getStrategy().compressByteArray(data);
         }
         catch (IOException ioex) {

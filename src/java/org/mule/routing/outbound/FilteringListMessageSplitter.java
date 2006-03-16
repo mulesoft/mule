@@ -22,6 +22,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>FilteringListMessageSplitter</code> Accepts a List as a message
@@ -60,9 +61,12 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
             throw new IllegalArgumentException("The payload for this router must be of type java.util.List");
         }
         // Cache the properties here because for some message types getting the
-        // properties
-        // can be expensive
-        properties = message.getProperties();
+        // properties can be expensive
+        properties = new HashMap();
+        for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            properties.put(o, message.getProperty(o));
+        }
     }
 
     /**

@@ -52,7 +52,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
 
     public Object onCall(UMOEventContext eventContext) throws Exception {
 
-        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage());
+        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage(), eventContext.getMessage());
 
         UMOMessage responseMessage = requestMessage;
         Object builtMessage;
@@ -79,7 +79,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
                 } else {
                     responseMessage = eventContext.sendEvent(requestMessage, endpoint);
                     builtMessage = buildMessage(requestMessage, responseMessage);
-                    responseMessage = new MuleMessage(builtMessage, responseMessage.getProperties());
+                    responseMessage = new MuleMessage(builtMessage, responseMessage);
                     requestMessage = responseMessage;
                 }
             }

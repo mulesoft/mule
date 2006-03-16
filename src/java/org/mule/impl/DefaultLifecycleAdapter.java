@@ -36,6 +36,8 @@ import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.UMOEntryPointResolver;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * <code>DefaultLifecycleAdapter</code> provides lifecycle methods for all
  * Mule managed components. It's possible to plugin custom lifecycle adapters,
@@ -152,39 +154,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         disposed = true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Callable#onCall(org.mule.umo.UMOEvent)
-     */
-    public Object onCall(UMOEvent event) throws UMOException
-    {
-        Object result = null;
-        try {
 
-            // Invoke method
-            result = entryPoint.invoke(component, RequestContext.getEventContext());
-
-            UMOMessage resultMessage = null;
-            if (result == null && entryPoint.isVoid()) {
-                resultMessage = new MuleMessage(event.getTransformedMessage(), RequestContext.getProperties(), event.getMessage());
-            } else if (result != null) {
-                if (result instanceof UMOMessage) {
-                    resultMessage = (UMOMessage) result;
-                } else {
-                    resultMessage = new MuleMessage(result, RequestContext.getProperties(), event.getMessage());
-                }
-            }
-            //temporary fix until the new property handing in Mule 2.0
-            if(resultMessage!=null) {
-                resultMessage.removeProperty("method");
-            }
-            return resultMessage;
-        } catch (Exception e) {
-            throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
-                    + descriptor.getName()), RequestContext.getEventContext().getMessage(), e);
-        }
-    }
 
     /**
      * @return true if the component has been started
@@ -219,18 +189,30 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
      */
     public UMOMessage intercept(Invocation invocation) throws UMOException
     {
-        UMOEvent currentEvent = RequestContext.getEvent();
-        Object result = onCall(currentEvent);
-        // If the component returns an event we'll route it directly
-        if (result instanceof UMOMessage) {
-            return (UMOMessage) result;
-        } else if (result instanceof UMOEvent) {
-            return ((UMOEvent) result).getMessage();
-        } else if (result != null) {
-            return new MuleMessage(result, currentEvent.getProperties());
-        } else {
-            return null;
+        // Invoke method
+        Object result = null;
+
+        try {
+            result = entryPoint.invoke(component, RequestContext.getEventContext());
+        } catch (Exception e) {
+            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, component.getClass().getName()), e);
         }
+
+        UMOMessage resultMessage = null;
+        if (result == null && entryPoint.isVoid()) {
+            resultMessage = new MuleMessage(RequestContext.getEventContext().getTransformedMessage(),
+                    RequestContext.getEventContext().getMessage());
+        } else if (result != null) {
+            if (result instanceof UMOMessage) {
+                resultMessage = (UMOMessage) result;
+            } else {
+                resultMessage = new MuleMessage(result, RequestContext.getEventContext().getMessage());
+            }
+        }
+        if(resultMessage!=null) {
+            resultMessage.removeProperty("method");
+        }
+        return resultMessage;
     }
 
     /*

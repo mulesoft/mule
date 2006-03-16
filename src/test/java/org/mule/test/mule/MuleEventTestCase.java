@@ -55,14 +55,13 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("Event data should be a byte array 9 bytes in length", 9, event.getMessageAsBytes().length);
         assertEquals("Event data should equal " + data, data, event.getSource());
 
-        assertEquals("MuleBeanPropertiesRule", event.getProperty("MuleBeanPropertiesRule", "MuleBeanPropertiesRule"));
+        assertEquals("MuleBeanPropertiesRule", event.getMessage().getProperty("MuleBeanPropertiesRule", "MuleBeanPropertiesRule"));
         event.setProperty("Test", "Test1");
 
-        assertNotNull(event.getProperties());
-        assertTrue(event.getProperties().entrySet().iterator().hasNext());
-        assertEquals("bla2", event.getProperty("bla2", "bla2"));
-        assertEquals("Test1", event.getProperty("Test"));
-        assertEquals("Test1", event.getProperty("Test", "bla2"));
+        assertTrue(event.getMessage().getPropertyNames().hasNext());
+        assertEquals("bla2", event.getMessage().getProperty("bla2", "bla2"));
+        assertEquals("Test1", event.getMessage().getProperty("Test"));
+        assertEquals("Test1", event.getMessage().getProperty("Test", "bla2"));
         assertNotNull(event.getId());
     }
 
@@ -137,11 +136,12 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("value0", event.getProperty("prop"));
 
         // in previous event + endpoint => endpoint
-        props = new Properties();
-        props.put("prop", "value2");
-        endpoint.setProperties(props);
-        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-        assertEquals("value2", event.getProperty("prop"));
+        //This doesn't apply now as the previous event properties will be the same as the current event props
+//        props = new Properties();
+//        props.put("prop", "value2");
+//        endpoint.setProperties(props);
+//        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+//        assertEquals("value2", event.getProperty("prop"));
 
         // in previous event + message => message
         props = new Properties();
@@ -153,8 +153,12 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         // in previous event + endpoint + message => message
         props = new Properties();
-        props.put("prop", "value2");
-        endpoint.setProperties(props);
+        props.put("prop", "value1");
+        msg = new MuleMessage("payload", props);
+
+        Properties props2 = new Properties();
+        props2.put("prop", "value2");
+        endpoint.setProperties(props2);
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
         assertEquals("value1", event.getProperty("prop"));
 

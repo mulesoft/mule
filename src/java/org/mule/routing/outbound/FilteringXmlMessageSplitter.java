@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>FilteringXmlMessageSplitter</code> will split a DOM4J document
@@ -173,7 +174,11 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             throw new IllegalArgumentException("Failed to initialise the payload: " + ex.getMessage());
         }
 
-        Map theProperties = message.getProperties();
+        Map theProperties =new HashMap();
+        for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            theProperties.put(o, message.getProperty(o));
+        }
         properties.set(theProperties);
     }
 

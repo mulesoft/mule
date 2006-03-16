@@ -72,8 +72,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getConnector", connector.proxy());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
         dispatcher.expect("dispatch", C.isA(UMOEvent.class));
         strategy.catchMessage(event.getMessage(), null, false);
@@ -113,8 +111,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getConnector", connector.proxy());
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());

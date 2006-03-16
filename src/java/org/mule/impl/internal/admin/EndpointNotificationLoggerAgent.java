@@ -29,6 +29,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
+import java.util.Map;
+
 /**
  * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications to
  * a configurered endpoint uri.
@@ -53,7 +55,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "endpointAddress"), this);
             }
              // Create a session for sending notifications
-            session = new MuleSession(new MuleMessage(new NullPayload()), new NullSessionHandler());
+            session = new MuleSession(new MuleMessage(new NullPayload(), (Map)null), new NullSessionHandler());
         } catch (Exception e) {
             throw new InitialisationException(e, this);
         }
@@ -64,7 +66,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         if (logEndpoint != null) {
             try {
                 UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher("ANY");
-                UMOMessage msg = new MuleMessage(e.toString());
+                UMOMessage msg = new MuleMessage(e.toString(), (Map)null);
                 UMOEvent event = new MuleEvent(msg, logEndpoint, session, false);
                 dispatcher.dispatch(event);
             } catch (Exception e1) {

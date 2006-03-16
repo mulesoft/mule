@@ -17,6 +17,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,8 +30,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.PropertiesHelper;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -49,10 +52,11 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected Map responseEvents = new ConcurrentHashMap();
-    private Map locks = new ConcurrentHashMap();
+    private Map locks = new HashMap();
 
     protected Map eventGroups = new ConcurrentHashMap();
-    private Object lock = new Object();
+    private Lock aggregationLock = new ReentrantLock();
+    private Lock locksCollectionLock = new ReentrantLock();
 
     public void process(UMOEvent event) throws RoutingException
     {
@@ -61,21 +65,28 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         doAggregate.compareAndSet(false, shouldAggregate(eg));
 
         if (doAggregate.get()) {
-            synchronized (lock) {
-                UMOMessage returnMessage = aggregateEvents(eg);
-                Object id = eg.getGroupId();
-                removeGroup(id);
-                responseEvents.put(id, returnMessage);
-                Lock l = (Lock) locks.get(id);
-                if (l == null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Creating latch for " + id + " in " + this);
-                    }
-                    l = new Latch();
-                    locks.put(id, l);
+            //aggregationLock.lock();
+            UMOMessage returnMessage = aggregateEvents(eg);
+            Object id = eg.getGroupId();
+            removeGroup(id);
+
+            responseEvents.put(id, returnMessage);
+            Lock l = null;
+            locksCollectionLock.lock();
+            l = (Lock) locks.get(id);
+            if (l == null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Creating latch for " + id + " in " + this);
                 }
-                l.unlock();
+                l = new Latch();
+                if(locks.get(id)!=null) {
+                    throw new IllegalStateException("There is already a lock with ID: " + id);
+                }
+                locks.put(id, l);
             }
+            locksCollectionLock.unlock();
+            l.unlock();
+            //aggregationLock.unlock();
         }
     }
 
@@ -93,7 +104,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         Object cId = getAggregateIdentifier(event);
 
-        if (cId == null) {
+        if (cId == null || cId.equals("-1")) {
             throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }
 
@@ -147,15 +158,21 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Waiting for response for message id: " + messageId + " in " + this);
         }
 
-        Lock l = (Lock) locks.get(messageId);
-        if (l == null) {
-            logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-            		+ messageId + " in " + this);
-            l = new Latch();
-            locks.put(messageId, l);
-        } else {
-            logger.debug("Got latch for message: " + messageId);
-        }
+        Lock l = null;
+        locksCollectionLock.lock();
+            l = (Lock) locks.get(messageId);
+            if (l == null) {
+                logger.debug("Got response but no one is waiting for it yet. Creating latch for "
+                        + messageId + " in " + this);
+                l = new Latch();
+                 if(locks.get(messageId)!=null) {
+                    throw new IllegalStateException("There is already a lock with ID: " + messageId);
+                }
+                locks.put(messageId, l);
+            } else {
+                logger.debug("Got latch for message: " + messageId);
+            }
+        locksCollectionLock.unlock();
 
         boolean b = false;
         try {
@@ -170,6 +187,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.error(e.getMessage(), e);
         }
         if (!b) {
+            if(logger.isTraceEnabled()) {
+                synchronized(responseEvents) {
+                    logger.trace("Current responses are: \n" +
+                    PropertiesHelper.propertiesToString(responseEvents, true));
+                }
+            }
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
                                                            String.valueOf(getTimeout()),
                                                            messageId), message, null);

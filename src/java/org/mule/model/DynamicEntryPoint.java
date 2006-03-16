@@ -66,7 +66,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         Object payload = null;
 
         // Check for method override and remove it from the event
-        Object methodOverride = context.getProperties().remove(MuleProperties.MULE_METHOD_PROPERTY);
+        Object methodOverride = context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
         Method method = null;
         if (methodOverride instanceof Method) {
             method = (Method) methodOverride;
@@ -87,7 +87,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                     payload = context.getTransformedMessage();
                     method = getMethod(component, payload);
                     if (method != null) {
-                        RequestContext.rewriteEvent(new MuleMessage(payload));
+                        RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
                     }
                 } else {
                     payload = context;
@@ -98,7 +98,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             currentMethod = method;
             if (payload == null) {
                 payload = context.getTransformedMessage();
-                RequestContext.rewriteEvent(new MuleMessage(payload));
+                RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
             }
             return invokeCurrent(component, payload);
         }

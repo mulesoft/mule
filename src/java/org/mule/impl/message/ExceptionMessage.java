@@ -18,6 +18,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * <code>ExceptionMessage</code> is used by the
@@ -45,7 +46,10 @@ public class ExceptionMessage extends BaseMessage
         } else {
             endpointUri = ctx.getEndpointURI();
         }
-        addProperties(ctx.getProperties());
+        for (Iterator iterator = ctx.getMessage().getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            setProperty(o, ctx.getMessage().getProperty(o));
+        }
     }
 
     public ExceptionMessage(Object message, Throwable exception, UMOEventContext ctx)
@@ -55,7 +59,10 @@ public class ExceptionMessage extends BaseMessage
         timeStamp = new Date();
         componentName = ctx.getComponentDescriptor().getName();
         endpointUri = ctx.getEndpointURI();
-        addProperties(ctx.getProperties());
+        for (Iterator iterator = ctx.getMessage().getPropertyNames(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            setProperty(o, ctx.getMessage().getProperty(o));
+        }
     }
 
     public String getComponentName()

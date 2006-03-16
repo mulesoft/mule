@@ -17,8 +17,11 @@ package org.mule.providers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -32,6 +35,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.io.UnsupportedEncodingException;
+import java.io.Serializable;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
@@ -52,8 +56,6 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
     protected Map attachments = new HashMap();
 
     protected UMOExceptionPayload exceptionPayload;
-    
-    private SerializableToByteArray serializableToByteArray;
 
     /**
      * Removes an associated property from the message
@@ -166,6 +168,17 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
 		return defaultValue;
     }
 
+     public String getStringProperty(String name, String defaultValue) {
+        Object result = properties.get(name);
+        if (result != null) {
+            if (result instanceof String) {
+                return (String) result;
+            }
+			return result.toString();
+        }
+		return defaultValue;
+    }
+
     public void setBooleanProperty(String name, boolean value) {
         properties.put(name, Boolean.valueOf(value));
     }
@@ -180,6 +193,10 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
 
     public void setDoubleProperty(String name, double value) {
         properties.put(name, new Double(value));
+    }
+
+    public void setStringProperty(String name, String value) {
+        properties.put(name, value);
     }
 
     public Object getReplyTo() {
@@ -282,9 +299,20 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
     	if(object instanceof String) {
             return object.toString().getBytes(getEncoding());
         }
-        if(serializableToByteArray==null) {
-    		serializableToByteArray = new SerializableToByteArray();
-    	}
-    	return (byte[])serializableToByteArray.doTransform(object, getEncoding());
+
+        if (object instanceof byte[]) {
+            return (byte[])object;
+        } else if( object instanceof Serializable){
+            try {
+                return SerializationUtils.serialize((Serializable)object);
+            }
+            catch (Exception e) {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
+                        object.getClass().getName(), "byte[]"), e);
+            }
+        } else {
+            throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
+                    object.getClass().getName(), "byte[] or " + Serializable.class.getName()));
+        }
     }
 }

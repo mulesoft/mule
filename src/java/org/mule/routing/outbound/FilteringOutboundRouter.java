@@ -33,6 +33,7 @@ import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a
@@ -92,7 +93,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         if (transformer != null) {
             try {
                 Object payload = transformer.transform(message.getPayload());
-                message = new MuleMessage(payload, message.getProperties());
+                message = new MuleMessage(payload, message);
             } catch (TransformerException e) {
                 throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
                                            message,
@@ -139,7 +140,10 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             Map props = new HashMap();
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
-            props.putAll(message.getProperties());
+            for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
+                Object o =  iterator.next();
+                props.put(o, message.getProperty(o));
+            }
             String newUriString = parser.parse(props, uri);
             if(logger.isDebugEnabled()) {
                 logger.debug("Uri after parsing is: " + uri);
