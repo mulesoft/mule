@@ -41,13 +41,10 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     DatagramSocket s = null;
     URI serverUri = null;
 
-    private boolean breakCallStack;
-
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         serverUri = getInDest().getUri();
-        // reset the flag
-        this.breakCallStack = false;
     }
 
     protected void doTearDown() throws Exception
@@ -56,12 +53,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
             s.close();
         } catch (Exception e) {
         }
-        // avoid infinite recursion resulting in stack overflow
-        if (breakCallStack) {
-            return;
-        }
-        breakCallStack = true;
-        super.tearDown();
+        super.doTearDown();
     }
 
     protected void sendTestData(int iterations) throws Exception
