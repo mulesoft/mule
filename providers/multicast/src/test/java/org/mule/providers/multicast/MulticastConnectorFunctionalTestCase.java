@@ -37,11 +37,15 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     private InetAddress inet = null;
     private URI uri;
 
+    private boolean breakCallStack;
+
     protected void doSetUp() throws Exception
     {
         uri = getInDest().getUri();
         inet = InetAddress.getByName(uri.getHost());
 
+        // reset the flag
+        breakCallStack = false;
     }
 
     protected void doTearDown() throws Exception
@@ -54,6 +58,11 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
             s2.close();
         } catch (Exception e) {
         }
+        // avoid infinite recursion resulting in stack overflow
+        if (breakCallStack) {
+            return;
+        }
+        breakCallStack = true;
         super.tearDown();
     }
 
