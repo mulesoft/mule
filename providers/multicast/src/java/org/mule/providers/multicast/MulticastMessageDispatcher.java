@@ -21,7 +21,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 /**
- * <code>MulticastMessageDispatcher</code> TODO
+ * <code>MulticastMessageDispatcher</code> dispatches events to a multicast address
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -48,7 +48,9 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
     public void doDispose()
     {
         try {
-            ((MulticastSocket) socket).leaveGroup(inetAddress);
+            if(socket!=null) {
+                ((MulticastSocket) socket).leaveGroup(inetAddress);
+            }
         } catch (IOException e) {
             logger.error("Failed to leave group: " + inetAddress);
         }
