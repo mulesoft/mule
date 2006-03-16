@@ -28,7 +28,6 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -59,7 +59,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         registerSourceType(Object.class);
         setReturnClass(Object.class);
 
-        format = new SimpleDateFormat(HttpConstants.DATE_FORMAT);
+        format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
 
         // When running with the source code, Meta information is not set
         // so product name and version are not available, hence we hard code
@@ -181,6 +181,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         if (context.getProperty(HttpConstants.HEADER_EXPIRES) == null) {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
+        response.setFallbackCharset(encoding);
 
         String headerName;
         String value;
