@@ -37,15 +37,11 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     private InetAddress inet = null;
     private URI uri;
 
-    private boolean breakCallStack;
-
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         uri = getInDest().getUri();
         inet = InetAddress.getByName(uri.getHost());
-
-        // reset the flag
-        breakCallStack = false;
     }
 
     protected void doTearDown() throws Exception
@@ -58,32 +54,8 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
             s2.close();
         } catch (Exception e) {
         }
-        // avoid infinite recursion resulting in stack overflow
-        if (breakCallStack) {
-            return;
-        }
-        breakCallStack = true;
-        super.tearDown();
+        super.doTearDown();
     }
-
-    // public void testX() throws Exception
-    // {
-    // String msg = "Hello";
-    // InetAddress group = InetAddress.getByName("228.5.6.7");
-    // MulticastSocket s = new MulticastSocket(6789);
-    // s.joinGroup(group);
-    // DatagramPacket hi = new DatagramPacket(msg.getBytes(), msg.length(),
-    // group, 6789);
-    // s.send(hi);
-    // // get their responses!
-    // byte[] buf = new byte[1000];
-    // DatagramPacket recv = new DatagramPacket(buf, buf.length);
-    // s.setBroadcast(true);
-    // s.receive(recv);
-    // // OK, I'm done talking - leave the group...
-    // System.out.println(new String(recv.getData()));
-    // s.leaveGroup(group);
-    // }
 
     protected void sendTestData(int iterations) throws Exception
     {
