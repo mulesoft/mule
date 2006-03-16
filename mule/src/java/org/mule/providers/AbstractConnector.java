@@ -14,7 +14,6 @@ package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -321,12 +320,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             }
             doStart();
             started.set(true);
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Starting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+            if(receivers!=null) {
+                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                    AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Starting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                    }
+                    amr.start();
                 }
-                amr.start();
             }
 
             if (logger.isInfoEnabled()) {
@@ -364,12 +365,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             started.set(false);
 
             //Stop all the receivers on this connector (this will cause them to disconnect too)
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-            	UMOMessageReceiver mr = (UMOMessageReceiver) iterator.next();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+            if(receivers!=null) {
+                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                    UMOMessageReceiver mr = (UMOMessageReceiver) iterator.next();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                    }
+                    mr.stop();
                 }
-                mr.stop();
             }
         }
 
