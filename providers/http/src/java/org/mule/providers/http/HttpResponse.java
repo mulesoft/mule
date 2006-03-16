@@ -48,6 +48,7 @@ public class HttpResponse
     private InputStream entity = null;
     private boolean keepAlive = false;
     private boolean disableKeepAlive = false;
+    private String fallbackCharset = DEFAULT_CONTENT_CHARSET;
 
     public HttpResponse()
     {
@@ -194,7 +195,7 @@ public class HttpResponse
 
     public String getCharset()
     {
-        String charset = DEFAULT_CONTENT_CHARSET;
+        String charset = getFallbackCharset();
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
         if (contenttype != null) {
             HeaderElement values[] = contenttype.getElements();
@@ -229,7 +230,7 @@ public class HttpResponse
         if (string != null) {
             byte[] raw = null;
             try {
-                raw = string.getBytes(DEFAULT_CONTENT_CHARSET);
+                raw = string.getBytes(getCharset());
             }
             catch (UnsupportedEncodingException e) {
                 raw = string.getBytes();
@@ -294,5 +295,13 @@ public class HttpResponse
     {
         disableKeepAlive = keepalive;
     }
+
+	public String getFallbackCharset() {
+		return fallbackCharset;
+	}
+
+	public void setFallbackCharset(String overrideCharset) {
+		this.fallbackCharset = overrideCharset;
+	}
 
 }
