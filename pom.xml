@@ -2,183 +2,183 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<!-- Version -->
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.codehaus.mule</groupId>
-	<artifactId>mule-project</artifactId>
-	<packaging>pom</packaging>
-	<version>2.0-SNAPSHOT</version>
+    <!-- Version -->
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.codehaus.mule</groupId>
+    <artifactId>mule-project</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0-SNAPSHOT</version>
 
-	<!-- Organization -->
-	<organization>
-		<name>SymphonySoft Limited</name>
-		<url>http://www.symphonysoft.com</url>
-	</organization>
+    <!-- Organization -->
+    <organization>
+        <name>SymphonySoft Limited</name>
+        <url>http://www.symphonysoft.com</url>
+    </organization>
 
-	<!-- Project -->
-	<name>Mule</name>
-	<description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
-	<url>http://mule.codehaus.org</url>
-	<inceptionYear>2003</inceptionYear>
-	<mailingLists>
-		<mailingList>
-			<name>Mule User List</name>
-			<subscribe>user-subscribe@mule.codehaus.org</subscribe>
-			<unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
-			<archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-		</mailingList>
-		<mailingList>
-			<name>Mule Developer List</name>
-			<subscribe>dev-subscribe@mule.codehaus.org</subscribe>
-			<unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
-			<archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-		</mailingList>
-		<mailingList>
-			<name>Mule SCM List</name>
-			<subscribe>scm-subscribe@mule.codehaus.org</subscribe>
-			<unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
-			<archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-		</mailingList>
-	</mailingLists>
-	<developers>
-		<!-- Refer to http://mule.codehaus.org/Team -->
-	</developers>
-	<contributors>
-		<!-- Refer to http://mule.codehaus.org/Team -->
-	</contributors>
-	<issueManagement>
-		<url>http://jira.symphonysoft.com</url>
-	</issueManagement>
+    <!-- Project -->
+    <name>Mule</name>
+    <description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
+    <url>http://mule.codehaus.org</url>
+    <inceptionYear>2003</inceptionYear>
+    <mailingLists>
+        <mailingList>
+            <name>Mule User List</name>
+            <subscribe>user-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+            <name>Mule Developer List</name>
+            <subscribe>dev-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+            <name>Mule SCM List</name>
+            <subscribe>scm-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <!-- Refer to http://mule.codehaus.org/Team -->
+    </developers>
+    <contributors>
+        <!-- Refer to http://mule.codehaus.org/Team -->
+    </contributors>
+    <issueManagement>
+        <url>http://jira.symphonysoft.com</url>
+    </issueManagement>
 
-	<!-- Build -->
-	<scm>
-		<connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
-		<developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
-		<url>http://cvs.mule.codehaus.org/</url>
-	</scm>
-	<distributionManagement>
-		<downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
-		<repository>
-			<id>default</id>
-			<name>Default Repository</name>
-			<url>dist.codehaus.org/dist</url>
-		</repository>
-		<site>
-			<id>default</id>
-			<name>Default Site</name>
-			<url>scp://mule.codehaus.org//home/projects/mule/public_html</url>
-		</site>
-	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>mule</id>
-			<name>Mule Dependencies</name>
-			<url>http://dist.codehaus.org/mule/dependencies</url>
-		</repository>
-		<!--
-		<repository>
-			<id>codehaus</id>
-			<name>Codehaus</name>
-			<url>http://dist.codehaus.org</url>
-		</repository>
-		-->
-	</repositories>
-	<pluginRepositories>
-		<!--
-		<pluginRepository>
-			<id>Maven Snapshots</id>
-			<url>http://snapshots.maven.codehaus.org/maven2</url>
-		</pluginRepository>
-		-->
-	</pluginRepositories>
+    <!-- Build -->
+    <scm>
+        <connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
+        <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
+        <url>http://cvs.mule.codehaus.org/</url>
+    </scm>
+    <distributionManagement>
+        <downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
+        <repository>
+            <id>default</id>
+            <name>Default Repository</name>
+            <url>dist.codehaus.org/dist</url>
+        </repository>
+        <site>
+            <id>default</id>
+            <name>Default Site</name>
+            <url>scp://mule.codehaus.org//home/projects/mule/public_html</url>
+        </site>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>mule</id>
+            <name>Mule Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies</url>
+        </repository>
+        <!--
+        <repository>
+            <id>codehaus</id>
+            <name>Codehaus</name>
+            <url>http://dist.codehaus.org</url>
+        </repository>
+        -->
+    </repositories>
+    <pluginRepositories>
+        <!--
+        <pluginRepository>
+            <id>Maven Snapshots</id>
+            <url>http://snapshots.maven.codehaus.org/maven2</url>
+        </pluginRepository>
+        -->
+    </pluginRepositories>
 
-	<build>
-		<defaultGoal>install</defaultGoal>
-		
-		<!-- Directory layout -->
-		<sourceDirectory>src/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src/conf</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/conf</directory>
-			</testResource>
-		</testResources>
+    <build>
+        <defaultGoal>install</defaultGoal>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.4</source>
-					<target>1.4</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changes-maven-plugin</artifactId>
-				<configuration>
-					<toAddresses>
-						<toAddress implementation="java.lang.String">tcarlson@codehaus.org</toAddress>
-					</toAddresses>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        <!-- Directory layout -->
+        <sourceDirectory>src/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/conf</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/conf</directory>
+            </testResource>
+        </testResources>
 
-	<!-- Reports -->
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changes-maven-plugin</artifactId>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>jira-report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.4</source>
+                    <target>1.4</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>changes-maven-plugin</artifactId>
+                <configuration>
+                    <toAddresses>
+                        <toAddress implementation="java.lang.String">tcarlson@codehaus.org</toAddress>
+                    </toAddresses>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<!-- Subprojects -->
-	<modules>
-		<module>mule</module>
-		<module>providers</module>
-		<module>mule-extras</module>
-		<!--
-		<module>samples</module>
-		<module>tools</module>
-		-->
-		<module>distributions</module>
-		<module>tests</module>
-	</modules>
+    <!-- Reports -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>changes-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jira-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 
-	<dependencies>
-		<!-- Testing Dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mockobjects</groupId>
-			<artifactId>mockobjects-core</artifactId>
-			<version>0.09</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.0</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <!-- Subprojects -->
+    <modules>
+        <module>mule</module>
+        <module>providers</module>
+        <module>mule-extras</module>
+        <!--
+        <module>samples</module>
+        <module>tools</module>
+        -->
+        <module>distributions</module>
+        <module>tests</module>
+    </modules>
+
+    <dependencies>
+        <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <version>0.09</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
 
