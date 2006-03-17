@@ -47,6 +47,11 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 	logger.debug("Successfully connected to " + getDescription(connectable));
                 }
                 break;
+            } catch (InterruptedException ie) {
+                //If we were interrupted it's probably because the server is shutting down
+                throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                                                                getClass().getName(),
+                                                                getDescription(connectable)), ie, connectable);
             } catch (Exception e) {
                 if (count == retryCount) {
                     throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
