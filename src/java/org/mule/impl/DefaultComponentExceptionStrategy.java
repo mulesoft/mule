@@ -36,9 +36,9 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
     /**
      * The component to which the Exception handler belongs
      */
-    private UMOComponent component;
+    protected UMOComponent component;
 
-    private ComponentStatistics statistics;
+    protected ComponentStatistics statistics;
 
     public DefaultComponentExceptionStrategy()
     {
@@ -87,6 +87,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         if (component != null) {
             logger.error("Caught exception in Exception Strategy for: " + component.getDescriptor().getName() + ": "
                     + t, t);
+            //Users can overide this method if they do not want the transaction to roll back
             markTransactionForRollback();
         }
         if (RequestContext.getEvent() != null) {
