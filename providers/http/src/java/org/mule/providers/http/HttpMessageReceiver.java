@@ -27,12 +27,14 @@ import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
 
 import javax.resource.spi.work.Work;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -111,7 +113,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         public void run()
         {
-
             try {
                 do {
                     conn.setKeepAlive(false);
@@ -121,27 +122,41 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     }
 
                     Map headers = new HashMap();
-                    for (int i = 0; i < request.getHeaders().length; i++) {
-                        Header header = request.getHeaders()[i];
+                    for (Iterator rhi = request.getHeaderIterator(); rhi.hasNext();) {
+                        Header header = (Header)rhi.next();
                         String headerName = header.getName();
+                        Object headerValue = header.getValue();
+
+                        // fix Mule headers?
                         if (headerName.startsWith("X-MULE")) {
-                            headerName = headerName.replaceAll("X-MULE", "MULE");
+                            headerName = headerName.substring(2);
                         }
-                        // Parse cookies
-                        if (headerName.equals(HttpConstants.HEADER_COOKIE) && enableCookies) {
-                            Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
-                            if (cookies.length > 0) {
-                                headers.put(HttpConnector.HTTP_COOKIES_PROPERTY, cookies);
+                        // Parse cookies?
+                        else if (headerName.equals(HttpConnector.HTTP_COOKIES_PROPERTY)) {
+                            if (enableCookies) {
+                                Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
+                                if (cookies.length > 0) {
+                                    // yum!
+                                    headerValue = cookies;
+                                } else {
+                                    // bad cookies?!
+                                    continue;
+                                }
+                            }
+                            else {
+                                // no cookies for you!
+                                continue;
                             }
                         }
-                        headers.put(headerName, header.getValue());
+
+                        // accept header & value
+                        headers.put(headerName, headerValue);
                     }
-                    headers
-                            .put(HttpConnector.HTTP_METHOD_PROPERTY, request.getRequestLine()
-                                    .getMethod());
-                    headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestLine().getUri());
-                    headers.put(HttpConnector.HTTP_VERSION_PROPERTY, request.getRequestLine()
-                            .getHttpVersion().toString());
+
+                    RequestLine reqLine = request.getRequestLine();
+                    headers.put(HttpConnector.HTTP_METHOD_PROPERTY, reqLine.getMethod());
+                    headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, reqLine.getUri());
+                    headers.put(HttpConnector.HTTP_VERSION_PROPERTY, reqLine.getHttpVersion().toString());
                     headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
 
                     // TODO Mule 2.0 generic way to set stream message adapter
@@ -157,10 +172,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     else {
                         body = request.getBodyBytes();
                         if (body == null) {
-                            body = request.getRequestLine().getUri();
+                            body = reqLine.getUri();
                         }
-                        adapter = connector.getMessageAdapter(new Object[]{body,headers});
+                        adapter = connector.getMessageAdapter(new Object[]{body, headers});
                     }
+
                     UMOMessage message = new MuleMessage(adapter);
 
                     if (logger.isDebugEnabled()) {
@@ -175,10 +191,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     // the request was not served or a null result was returned
                     HttpResponse response = null;
                     if (receiver != null) {
-                        UMOMessage returnMessage = receiver.routeMessage(message, endpoint
-                                .isSynchronous(), /* todo */null);
+                        UMOMessage returnMessage = receiver.routeMessage(message,
+                                endpoint.isSynchronous(), /* TODO streaming */ null);
                         Object tempResponse = returnMessage.getPayload();
-                        // This remoes the need for users to explicitly adding
+                        // This removes the need for users to explicitly adding
                         // the response transformer ObjectToHttpResponse in
                         // their config
                         if (tempResponse instanceof HttpResponse) {
@@ -191,22 +207,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
                     }
                     else {
-                        String failedPath = endpoint.getEndpointURI().getScheme() + "://"
-                                + endpoint.getEndpointURI().getHost() + ":"
-                                + endpoint.getEndpointURI().getPort() + getRequestPath(message);
+                        UMOEndpointURI uri = endpoint.getEndpointURI();
+                        String failedPath = uri.getScheme() + "://" + uri.getHost() + ":"
+                                + uri.getPort() + getRequestPath(message);
 
                         if (logger.isDebugEnabled()) {
                             logger.debug("Failed to bind to " + failedPath);
                         }
 
                         response = new HttpResponse();
-                        response.setStatusLine(request.getRequestLine().getHttpVersion(),
-                                HttpConstants.SC_NOT_FOUND);
-                        response
-                                .setBodyString(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath)
-                                        .toString());
-                        // The DefaultResponse Transformer will set the
-                        // necessary Headers
+                        response.setStatusLine(reqLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
+                        response.setBodyString(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X,
+                                failedPath).toString());
+                        // The DefaultResponse Transformer will set the necessary Headers
                         response = (HttpResponse)connector.getDefaultResponseTransformer().transform(
                                 response);
                     }
@@ -244,7 +257,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint)
             throws ConnectException
     {
-
         String path = (String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         int i = path.indexOf("?");
         if (i > -1) {
@@ -255,14 +267,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(":").append(endpoint.getEndpointURI().getPort());
-        // first check there is a receive on the root address
+
+        // first check that there is a receiver on the root address
         if(logger.isTraceEnabled()) {
             logger.trace("Looking up receiver on connector: " + connector.getName() + " with URI key: " + requestUri.toString());
         }
+
         AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
+
         // If no receiver on the root and there is a request path, look up the
-        // received based on the
-        // root plus request path
+        // received based on the root plus request path
         if (receiver == null && !"/".equals(path)) {
             // remove anything after the last '/'
             int x = path.lastIndexOf("/");
@@ -272,15 +286,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             else {
                 requestUri.append(path);
             }
+
             if(logger.isTraceEnabled()) {
-                logger.trace("Secondary Look up of receiver on connector: " + connector.getName() + " with URI key: " + requestUri.toString());
+                logger.trace("Secondary lookup of receiver on connector: " + connector.getName() + " with URI key: " + requestUri.toString());
             }
+
+            // try again
             receiver = connector.getReceiver(requestUri.toString());
             if(receiver==null && logger.isWarnEnabled()) {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName() + " with URI key: " + requestUri.toString());
                 logger.warn("Receivers on connector are: " + PropertiesHelper.propertiesToString(connector.getReceivers(), true));
             }
         }
+
         return receiver;
     }
 }
