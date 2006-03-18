@@ -14,13 +14,15 @@
  */
 package org.mule.impl;
 
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -31,16 +33,13 @@ import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.UUID;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
 
@@ -91,8 +90,6 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     private UMOCredentials credentials = null;
     
-    private transient SerializableToByteArray serializableToByteArray;
-
     /**
      * Properties cache that only reads properties once from the inbound message
      * and merges them with any properties on the endpoint. The message
