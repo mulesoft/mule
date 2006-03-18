@@ -65,27 +65,31 @@ public class CookieHelper
 
     public static Cookie[] parseCookies(Header header, String spec) throws MalformedCookieException
     {
-        CookieSpec cookieSpec = getCookieSpec(spec);
         List cookies = new ArrayList();
-        Cookie cookie = null;
-        HeaderElement headerElement = null;
-        NameValuePair nameValuePair = null;
-        for (int j = 0; j < header.getElements().length; j++) {
-            cookie = new Cookie();
-            headerElement = header.getElements()[j];
-            for (int k = 0; k < headerElement.getParameters().length; k++) {
-                nameValuePair = headerElement.getParameters()[k];
+        CookieSpec cookieSpec = getCookieSpec(spec);
+        HeaderElement[] headerElements = header.getElements();
+
+        for (int j = 0; j < headerElements.length; j++) {
+            HeaderElement headerElement = headerElements[j];
+            NameValuePair[] headerElementParameters = headerElement.getParameters();
+            Cookie cookie = new Cookie();
+
+            for (int k = 0; k < headerElementParameters.length; k++) {
+                NameValuePair nameValuePair = headerElementParameters[k];
                 cookieSpec.parseAttribute(nameValuePair, cookie);
             }
+
             if (cookie.isExpired()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Cookie: " + cookie.toString() + " has expired removing it");
+                    logger.debug("Cookie: " + cookie.toString() + " has expired, not adding it.");
                 }
             }
             else {
                 cookies.add(cookie);
             }
         }
+
         return (Cookie[])cookies.toArray(new Cookie[cookies.size()]);
     }
+
 }

@@ -32,12 +32,10 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -159,12 +157,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                             postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType, encoding));
                         }
                         else if (src instanceof InputStream) {
-                        	// Danger here! We don't know if the contents is really text or not 
+                        	// TODO Danger here! We don't know if the content is really text or not 
                         	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                             postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src, mimeType));
                         }
                         else {
-                        	// Danger here! We don't know if the contents is really text or not 
+                        	// TODO Danger here! We don't know if the content is really text or not 
                         	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                             byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
                             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
