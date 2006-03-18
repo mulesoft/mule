@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
-            <artifactId>xfire-core</artifactId>
+            <artifactId>xfire-all</artifactId>
             <version>1.0</version>
             <!-- These transitive dependencies are not found on ibiblio and cause
             the build to fail. -->
@@ -69,6 +69,13 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
             <version>1.3.1-rc5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
