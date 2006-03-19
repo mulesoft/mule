@@ -1,0 +1,26 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Simple Sample</name>
+    <id>mule-samples-simple</id>
+    <groupId>mule</groupId>
+    <dependencies>
+    <dependency>
+            <groupId>groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy_version}</version>
+            <url>http://groovy.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <artifactId>asm</artifactId>
+            <groupId>asm</groupId>
+            <version>${asm_version}</version>
+            <url></url>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm_util_version}</version>
+            <url></url>
+        </dependency>
+    </dependencies>
+</project>
