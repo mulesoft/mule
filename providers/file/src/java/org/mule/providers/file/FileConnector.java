@@ -227,7 +227,7 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     /**
      * @param dir The moveToDirectoryName to set.
      */
-    public void setMoveToDirectory(String dir) throws IOException {
+    public void setMoveToDirectory(String dir) {
         this.moveToDirectoryName = dir;
     }
 
