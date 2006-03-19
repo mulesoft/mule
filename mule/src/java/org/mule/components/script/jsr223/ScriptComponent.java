@@ -20,6 +20,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.util.MuleLogger;
 
 import javax.script.Namespace;
 
@@ -62,7 +63,7 @@ public class ScriptComponent extends Scriptable implements Callable {
         namespace.put("message", context.getMessage());
         namespace.put("descriptor", context.getComponentDescriptor());
         namespace.put("componentNamespace", this.namespace);
-        namespace.put("log", logger);
+        namespace.put("log", new MuleLogger(logger));
         namespace.put("result", new Object());
     }
 
