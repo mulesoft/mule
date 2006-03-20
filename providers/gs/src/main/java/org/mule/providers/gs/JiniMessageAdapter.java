@@ -69,7 +69,7 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
             payload = ((JiniMessage)message).getPayload();
         }
         
-        return converToBytes(payload);
+        return convertToBytes(payload);
     }
 
     public Object getPayload()

@@ -40,7 +40,7 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
     
 
     public byte[] getPayloadAsBytes() throws Exception {
-		return converToBytes(getPayload());
+		return convertToBytes(getPayload());
 	}
 
 

@@ -47,7 +47,7 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter {
 
     
     public byte[] getPayloadAsBytes() throws Exception {
-		return converToBytes(getPayload());
+		return convertToBytes(getPayload());
 	}
 
 

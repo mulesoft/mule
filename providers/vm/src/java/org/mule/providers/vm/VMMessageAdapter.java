@@ -61,7 +61,7 @@ public class VMMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return converToBytes(message.getPayload());
+        return convertToBytes(message.getPayload());
     }
 
     /**
