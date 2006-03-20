@@ -281,7 +281,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         return getPayloadAsString(getEncoding());
     }
 
-    protected byte[] converToBytes(Object object) throws TransformerException,
+    protected byte[] convertToBytes(Object object) throws TransformerException,
             UnsupportedEncodingException
     {
         if (object instanceof String) {
