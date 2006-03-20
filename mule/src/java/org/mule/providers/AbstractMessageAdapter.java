@@ -15,59 +15,59 @@
 
 package org.mule.providers;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.PropertiesHelper;
 
 import javax.activation.DataHandler;
 
-import java.util.HashMap;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.io.UnsupportedEncodingException;
-import java.io.Serializable;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
  * simple message types that maybe don't normally allow for meta information,
  * such as File or tcp.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
+public abstract class AbstractMessageAdapter implements UMOMessageAdapter
+{
 
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected Map properties = new HashMap();
-    protected Map attachments = new HashMap();
+    protected Map properties = new ConcurrentHashMap();
+    protected Map attachments = new ConcurrentHashMap();
 
     protected UMOExceptionPayload exceptionPayload;
 
     /**
      * Removes an associated property from the message
-     *
-     * @param key the key of the property to remove
+     * 
+     * @param key
+     *            the key of the property to remove
      */
-    public Object removeProperty(Object key) {
-        Object prop = properties.get(key);
-        if (prop != null) {
-            properties.remove(key);
-        }
-        return prop;
+    public Object removeProperty(Object key)
+    {
+        return properties.remove(key);
     }
 
     /*
@@ -75,7 +75,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
      * 
      * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
      */
-    public Object getProperty(Object key) {
+    public Object getProperty(Object key)
+    {
         return properties.get(key);
     }
 
@@ -84,7 +85,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
      * 
      * @see org.mule.providers.UMOMessageAdapter#getPropertyNames()
      */
-    public Iterator getPropertyNames() {
+    public Iterator getPropertyNames()
+    {
         return properties.keySet().iterator();
     }
 
@@ -94,223 +96,211 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
      * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
      *      java.lang.Object)
      */
-    public void setProperty(Object key, Object value) {
-        properties.put(key, value);
+    public void setProperty(Object key, Object value)
+    {
+        if (key != null) {
+            if (value != null) {
+                properties.put(key, value);
+            }
+            else {
+                properties.remove(key);
+            }
+        }
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
         throw new UniqueIdNotSupportedException(this);
     }
 
-    public Object getProperty(String name, Object defaultValue) {
-        Object result = properties.get(name);
-        if (result == null) {
-            return defaultValue;
-        }
-        return result;
+    public Object getProperty(String name, Object defaultValue)
+    {
+        return PropertiesHelper.getProperty(properties, name, defaultValue);
     }
 
-    public int getIntProperty(String name, int defaultValue) {
-        Object result = properties.get(name);
-        if (result != null) {
-            if (result instanceof Integer) {
-                return ((Integer) result).intValue();
-            } else {
-                try {
-                    return Integer.parseInt(result.toString());
-                } catch (NumberFormatException e) {
-                    return defaultValue;
-                }
-            }
-        } else {
-            return defaultValue;
-        }
+    public int getIntProperty(String name, int defaultValue)
+    {
+        return PropertiesHelper.getIntProperty(properties, name, defaultValue);
     }
 
-    public long getLongProperty(String name, long defaultValue) {
-        Object result = properties.get(name);
-        if (result != null) {
-            if (result instanceof Long) {
-                return ((Long) result).longValue();
-            }
-			try {
-			    return Long.parseLong(result.toString());
-			} catch (NumberFormatException e) {
-			    return defaultValue;
-			}
-        }
-		return defaultValue;
+    public long getLongProperty(String name, long defaultValue)
+    {
+        return PropertiesHelper.getLongProperty(properties, name, defaultValue);
     }
 
-    public double getDoubleProperty(String name, double defaultValue) {
-        Object result = properties.get(name);
-        if (result != null) {
-            if (result instanceof Double) {
-                return ((Double) result).doubleValue();
-            }
-			try {
-			    return Double.parseDouble(result.toString());
-			} catch (NumberFormatException e) {
-			    return defaultValue;
-			}
-        }
-		return defaultValue;
+    public double getDoubleProperty(String name, double defaultValue)
+    {
+        return PropertiesHelper.getDoubleProperty(properties, name, defaultValue);
     }
 
-    public boolean getBooleanProperty(String name, boolean defaultValue) {
-        Object result = properties.get(name);
-        if (result != null) {
-            if (result instanceof Boolean) {
-                return ((Boolean) result).booleanValue();
-            }
-			return Boolean.valueOf(result.toString()).booleanValue();
-        }
-		return defaultValue;
+    public boolean getBooleanProperty(String name, boolean defaultValue)
+    {
+        return PropertiesHelper.getBooleanProperty(properties, name, defaultValue);
     }
 
-     public String getStringProperty(String name, String defaultValue) {
-        Object result = properties.get(name);
-        if (result != null) {
-            if (result instanceof String) {
-                return (String) result;
-            }
-			return result.toString();
-        }
-		return defaultValue;
+    public String getStringProperty(String name, String defaultValue)
+    {
+        return PropertiesHelper.getStringProperty(properties, name, defaultValue);
     }
 
-    public void setBooleanProperty(String name, boolean value) {
+    public void setBooleanProperty(String name, boolean value)
+    {
         properties.put(name, Boolean.valueOf(value));
     }
 
-    public void setIntProperty(String name, int value) {
+    public void setIntProperty(String name, int value)
+    {
         properties.put(name, new Integer(value));
     }
 
-    public void setLongProperty(String name, long value) {
+    public void setLongProperty(String name, long value)
+    {
         properties.put(name, new Long(value));
     }
 
-    public void setDoubleProperty(String name, double value) {
+    public void setDoubleProperty(String name, double value)
+    {
         properties.put(name, new Double(value));
     }
 
-    public void setStringProperty(String name, String value) {
+    public void setStringProperty(String name, String value)
+    {
         properties.put(name, value);
     }
 
-    public Object getReplyTo() {
+    public Object getReplyTo()
+    {
         return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
     }
 
-    public void setReplyTo(Object replyTo) {
+    public void setReplyTo(Object replyTo)
+    {
         setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
     }
 
-    public String getCorrelationId() {
-        return (String) getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+    public String getCorrelationId()
+    {
+        return (String)getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
     }
 
-    public void setCorrelationId(String correlationId) {
+    public void setCorrelationId(String correlationId)
+    {
         setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
     }
 
     /**
      * Gets the sequence or ordering number for this message in the the
      * correlation group (as defined by the correlationId)
-     *
+     * 
      * @return the sequence number or -1 if the sequence is not important
      */
-    public int getCorrelationSequence() {
+    public int getCorrelationSequence()
+    {
         return getIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, -1);
-
     }
 
     /**
      * Gets the sequence or ordering number for this message in the the
      * correlation group (as defined by the correlationId)
-     *
-     * @param sequence the sequence number or -1 if the sequence is not
-     *                 important
+     * 
+     * @param sequence
+     *            the sequence number or -1 if the sequence is not important
      */
-    public void setCorrelationSequence(int sequence) {
+    public void setCorrelationSequence(int sequence)
+    {
         setIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
     }
 
     /**
      * Determines how many messages are in the correlation group
-     *
+     * 
      * @return total messages in this group or -1 if the size is not known
      */
-    public int getCorrelationGroupSize() {
+    public int getCorrelationGroupSize()
+    {
         return getIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, -1);
     }
 
     /**
      * Determines how many messages are in the correlation group
-     *
-     * @param size the total messages in this group or -1 if the size is not
-     *             known
+     * 
+     * @param size
+     *            the total messages in this group or -1 if the size is not
+     *            known
      */
-    public void setCorrelationGroupSize(int size) {
+    public void setCorrelationGroupSize(int size)
+    {
         setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
 
-    public UMOExceptionPayload getExceptionPayload() {
+    public UMOExceptionPayload getExceptionPayload()
+    {
         return exceptionPayload;
     }
 
-    public void setExceptionPayload(UMOExceptionPayload payload) {
+    public void setExceptionPayload(UMOExceptionPayload payload)
+    {
         exceptionPayload = payload;
     }
 
-    public void addAttachment(String name, DataHandler dataHandler) throws Exception {
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception
+    {
         attachments.put(name, dataHandler);
     }
 
-    public void removeAttachment(String name) throws Exception {
+    public void removeAttachment(String name) throws Exception
+    {
         attachments.remove(name);
     }
 
-    public DataHandler getAttachment(String name) {
-        return (DataHandler) attachments.get(name);
+    public DataHandler getAttachment(String name)
+    {
+        return (DataHandler)attachments.get(name);
     }
 
-    public Set getAttachmentNames() {
+    public Set getAttachmentNames()
+    {
         return attachments.keySet();
     }
 
-    public String getEncoding() {
+    public String getEncoding()
+    {
         return MuleManager.getConfiguration().getEncoding();
     }
 
     /**
-     * Converts the message implementation into a String representation. If encoding is required it will
-     * use the encoding set on the message
-     *
+     * Converts the message implementation into a String representation. If
+     * encoding is required it will use the encoding set on the message
+     * 
      * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
+     * @throws Exception
+     *             Implementation may throw an endpoint specific exception
      */
-    public final String getPayloadAsString() throws Exception {
+    public final String getPayloadAsString() throws Exception
+    {
         return getPayloadAsString(getEncoding());
     }
-    
-    protected byte[] converToBytes(Object object) throws TransformerException, UnsupportedEncodingException {
-    	if(object instanceof String) {
+
+    protected byte[] converToBytes(Object object) throws TransformerException,
+            UnsupportedEncodingException
+    {
+        if (object instanceof String) {
             return object.toString().getBytes(getEncoding());
         }
 
         if (object instanceof byte[]) {
             return (byte[])object;
-        } else if( object instanceof Serializable){
+        }
+        else if (object instanceof Serializable) {
             try {
                 return SerializationUtils.serialize((Serializable)object);
             }
             catch (Exception e) {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
-                        object.getClass().getName(), "byte[]"), e);
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, object
+                        .getClass().getName(), "byte[]"), e);
             }
-        } else {
+        }
+        else {
             throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
                     object.getClass().getName(), "byte[] or " + Serializable.class.getName()));
         }
