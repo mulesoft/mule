@@ -781,9 +781,8 @@ public class MuleClient implements Disposable
                                         0,
                                         null, null);
         }
-        if (endpoint != null) {
-            manager.registerEndpoint(endpoint);
-        }
+
+        manager.registerEndpoint(endpoint);
         return endpoint;
     }
 
