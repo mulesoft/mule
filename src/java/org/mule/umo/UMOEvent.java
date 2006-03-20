@@ -19,8 +19,6 @@ import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * <code>UMOEvent</code> represents any data event occuring in the Mule
@@ -139,6 +137,7 @@ public interface UMOEvent
      * 
      * @param name the property name
      * @return the property value or null if the property does not exist
+     * @deprecated use event.getMessage().getProperty()
      */
     Object getProperty(String name);
 
@@ -152,6 +151,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getProperty()
      */
     Object getProperty(String name, Object defaultValue);
 
@@ -165,6 +165,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getProperty()
      */
     int getIntProperty(String name, int defaultValue);
 
@@ -178,6 +179,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getProperty()
      */
     long getLongProperty(String name, long defaultValue);
 
@@ -191,6 +193,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getProperty()
      */
     double getDoubleProperty(String name, double defaultValue);
 
@@ -204,6 +207,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getProperty()
      */
     boolean getBooleanProperty(String name, boolean defaultValue);
 
@@ -217,6 +221,7 @@ public interface UMOEvent
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use event.getMessage().getStringProperty()
      */
     String getStringProperty(String name, String defaultValue);
 
@@ -227,6 +232,7 @@ public interface UMOEvent
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setProperty()
      */
     void setProperty(String name, Object value);
 
@@ -237,6 +243,7 @@ public interface UMOEvent
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setBooleanProperty()
      */
     void setBooleanProperty(String name, boolean value);
 
@@ -247,6 +254,7 @@ public interface UMOEvent
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setIntProperty()
      */
     void setIntProperty(String name, int value);
 
@@ -257,6 +265,7 @@ public interface UMOEvent
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setLongProperty()
      */
     void setLongProperty(String name, long value);
 
@@ -267,6 +276,7 @@ public interface UMOEvent
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setDoubleProperty()
      */
     void setDoubleProperty(String name, double value);
 
@@ -277,6 +287,7 @@ public interface UMOEvent
      *
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use event.getMessage().setStringProperty()
      */
     void setStringProperty(String name, String value);
 
@@ -380,6 +391,7 @@ public interface UMOEvent
      * @param key the property key to remove
      * @return the removed property or null if the property was not found or if
      *         the underlying message does not return the removed property
+     * @deprecated use event.getMessage().removeProperty()
      */
     Object removeProperty(Object key);
 
