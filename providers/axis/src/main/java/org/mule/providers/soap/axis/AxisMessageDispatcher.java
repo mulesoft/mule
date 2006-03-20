@@ -96,7 +96,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
             //Allow the client config to be set on the endpoint
             String config = null;
             if(event!=null) {
-                config = event.getStringProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY, null);
+                config = event.getMessage().getStringProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY, null);
             }
             if(config!=null) {
                 clientConfig = new FileProvider(config);
@@ -115,7 +115,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected String getWsdlUrl(UMOEvent event) {
-        return event.getStringProperty(AxisConnector.WSDL_URL_PROPERTY, StringUtils.EMPTY);
+        return event.getMessage().getStringProperty(AxisConnector.WSDL_URL_PROPERTY, StringUtils.EMPTY);
     }
 
     public void doDispatch(UMOEvent event) throws Exception {
@@ -187,7 +187,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         call.setTargetEndpointAddress(endpointUri.getAddress());
 
         //Set a custome method namespace if one is set.  This will be used forthe parameters too
-        String methodNamespace = (String) event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
+        String methodNamespace = (String) event.getMessage().getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
         if (methodNamespace != null) {
             call.setOperationName(new QName(methodNamespace, method));
         } else {
@@ -206,7 +206,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
             call.setPassword(endpointUri.getPassword());
         }
 
-        Map methodCalls = (Map) event.getProperty("soapMethods");
+        Map methodCalls = (Map) event.getMessage().getProperty("soapMethods");
         if (methodCalls == null) {
             ArrayList params = new ArrayList();
             for (int i = 0; i < args.length; i++) {
@@ -237,13 +237,13 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
             HashMap map = new HashMap();
             map.put(method, params);
-            event.setProperty("soapMethods", map);
+            event.getMessage().setProperty("soapMethods", map);
         }
 
         setCallParams(call, event, call.getOperationName());
 
         //Set custom soap action if set on the event or endpoint
-        String soapAction = (String) event.getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
+        String soapAction = (String) event.getMessage().getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
         if (soapAction != null) {
             soapAction = parseSoapAction(soapAction, call.getOperationName(), event);
             call.setSOAPActionURI(soapAction);
@@ -403,7 +403,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         }
 
         SoapMethod soapMethod;
-        soapMethod = (SoapMethod) event.removeProperty(MuleProperties.MULE_SOAP_METHOD);
+        soapMethod = (SoapMethod) event.getMessage().removeProperty(MuleProperties.MULE_SOAP_METHOD);
         if (soapMethod == null) {
             soapMethod = (SoapMethod) callParameters.get(method.getLocalPart());
         }
@@ -423,17 +423,17 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {
-        callParameters = new HashMap();
-        Map methodCalls = (Map) event.getProperty("soapMethods");
+        Map methodCalls = (Map) event.getMessage().getProperty("soapMethods");
         if (methodCalls == null) {
             return;
         }
 
         Map.Entry entry;
         SoapMethod soapMethod;
+        callParameters = new HashMap();
+
         for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
-
             if (StringUtils.isEmpty(namespace)) {
                 if (entry.getValue() instanceof List) {
                     soapMethod = new SoapMethod(entry.getKey().toString(), (List) entry.getValue());

@@ -23,6 +23,7 @@ import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.TemplateParser;
@@ -69,20 +70,21 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector)endpoint.getConnector();
-        String to = context.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
-        String cc = context.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
-        String bcc = context.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
-        String from = context.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
-        String replyTo = context.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
-        String subject = context.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
+        UMOMessage eventMsg = context.getMessage();
+        String to = eventMsg.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
+        String cc = eventMsg.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
+        String bcc = eventMsg.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
+        String from = eventMsg.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
+        String replyTo = eventMsg.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
+        String subject = eventMsg.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
 
-        String contentType = context.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
+        String contentType = eventMsg.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
 
         Properties headers = new Properties();
         if(connector.getCustomHeaders()!=null) {
             headers.putAll(connector.getCustomHeaders());
         }
-        Properties otherHeaders = (Properties)context.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
+        Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if(otherHeaders!=null) {
             Map props = new HashMap(MuleManager.getInstance().getProperties());
             for (Iterator iterator = context.getMessage().getPropertyNames(); iterator.hasNext();) {
@@ -93,7 +95,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         }
 
         if(logger.isDebugEnabled()) {
-            StringBuffer buf = new StringBuffer();
+            StringBuffer buf = new StringBuffer(256);
             buf.append("Constucting email using:\n");
             buf.append("To: ").append(to);
             buf.append("From: ").append(from);
@@ -128,7 +130,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             }
 
             if (!StringUtils.isEmpty(replyTo)) {
-                msg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
+                eventMsg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 
             msg.setSubject(subject);
@@ -141,7 +143,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
             setContent(src, msg, contentType, context);
 
-            return msg;
+            return eventMsg;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
@@ -150,4 +152,5 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context) throws Exception {
         msg.setContent(payload, contentType);
     }
+
 }

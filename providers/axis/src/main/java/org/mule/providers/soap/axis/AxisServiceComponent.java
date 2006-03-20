@@ -43,6 +43,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
@@ -109,7 +110,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     /**
      * Passes the context to the listener
      * 
-     * @param context the context ot process
+     * @param context the context to process
      * @return Object this object can be anything. When the
      *         <code>UMOLifecycleAdapter</code> for the component receives
      *         this object it will first see if the Object is an
@@ -128,7 +129,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+        String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
         WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter());
         if ("GET".equals(method.toUpperCase())) {
             doGet(context, response);
@@ -147,7 +148,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     public void doGet(UMOEventContext context, WriterMessageAdapter response) throws UMOException, IOException
     {
         try {
-            //We parse a new uri based on the listeneing host and port with the request parameters appended
+            //We parse a new uri based on the listening host and port with the request parameters appended
             //Using the soap prefix ensures that we use a soap endpoint builder
             String uri = "soap:" + context.getEndpointURI().toString();
             uri += context.getMessageAsString();
@@ -155,8 +156,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
-            // String realpath =
-            // servletContext.getRealPath(request.getServletPath());
+            // String realpath = servletContext.getRealPath(request.getServletPath());
             boolean wsdlRequested = false;
             boolean listRequested = false;
 
@@ -503,8 +503,8 @@ public class AxisServiceComponent implements Initialisable, Callable
             Message requestMsg = new Message((request instanceof File) ? new FileInputStream((File) request) :
                                              request,
                                              false,
-                                             (String) context.getProperty(HTTPConstants.HEADER_CONTENT_TYPE),
-                                             (String) context.getProperty(HTTPConstants.HEADER_CONTENT_LOCATION));
+                                             context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_TYPE, null),
+                                             context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_LOCATION, null));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Request Message:" + requestMsg);
@@ -562,8 +562,8 @@ public class AxisServiceComponent implements Initialisable, Callable
             t3 = System.currentTimeMillis();
         }
 
-        sendResponse((String)context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY), contentType,
-                response, responseMsg);
+        sendResponse(context.getMessage().getStringProperty(HttpConnector.HTTP_STATUS_PROPERTY, null),
+                contentType, response, responseMsg);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Response sent.");
@@ -580,7 +580,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     private UMOEndpointURI getEndpoint(UMOEventContext context) throws MalformedEndpointException
     {
         String endpoint = context.getEndpointURI().getAddress();
-        String request = (String) context.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String request = context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
         if (request != null) {
             int i = endpoint.indexOf("/", endpoint.indexOf("://") + 3);
             if (i > -1) {
@@ -647,20 +647,23 @@ public class AxisServiceComponent implements Initialisable, Callable
     private void populateMessageContext(MessageContext msgContext, UMOEventContext context, UMOEndpointURI endpointUri)
             throws AxisFault, ConfigurationException
     {
+        UMOMessage msg = context.getMessage();
+
         if (logger.isDebugEnabled()) {
             logger.debug("MessageContext:" + msgContext);
-            logger.debug("HEADER_CONTENT_TYPE:" + context.getProperty(HttpConstants.HEADER_CONTENT_TYPE));
-            logger.debug("HEADER_CONTENT_LOCATION:" + context.getProperty(HttpConstants.HEADER_CONTENT_LOCATION));
+            logger.debug("HEADER_CONTENT_TYPE:" + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
+            logger.debug("HEADER_CONTENT_LOCATION:" + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETLOCATION:" +
             // String.valueOf(getWebInfPath()));
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETPATHINFO:" +
             // req.getPathInfo());
-            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + context.getProperty("Authorization"));
+            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
             logger.debug("Constants.MC_REMOTE_ADDR:" + endpointUri.getHost());
             // logger.debug("configPath:" + String.valueOf(getWebInfPath()));
         }
+
         msgContext.setTransportName(transportName);
         msgContext.setProperty("home.dir", getHomeDir());
         msgContext.setProperty("path", endpointUri.getPath());
@@ -686,7 +689,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         msgContext.setProperty(HTTPConstants.MC_HTTP_SERVLETPATHINFO, serviceName);
         msgContext.setProperty("serviceName", serviceName);
 
-        msgContext.setProperty("Authorization", context.getProperty("Authorization"));
+        msgContext.setProperty("Authorization", msg.getStringProperty("Authorization", null));
         msgContext.setProperty("remoteaddr", endpointUri.getHost());
         ServletEndpointContextImpl sec = new ServletEndpointContextImpl();
         msgContext.setProperty("servletEndpointContext", sec);
@@ -699,7 +702,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private String getSoapAction(UMOEventContext context) throws AxisFault
     {
-        String soapAction = (String) context.getProperty("SOAPAction");
+        String soapAction = context.getMessage().getStringProperty("SOAPAction", null);
         if (logger.isDebugEnabled()) {
             logger.debug("Header Soap Action:" + soapAction);
         }
@@ -732,11 +735,11 @@ public class AxisServiceComponent implements Initialisable, Callable
         // int i = serviceName.lastIndexOf("/");
         // if (i > -1) serviceName = serviceName.substring(0, i);
 
-        int i = serviceName.lastIndexOf("/");
+        int i = serviceName.lastIndexOf('/');
         if (i > -1) {
             serviceName = serviceName.substring(i);
         }
-        i = serviceName.lastIndexOf("?");
+        i = serviceName.lastIndexOf('?');
         if (i > -1) {
             serviceName = serviceName.substring(0, i);
         }

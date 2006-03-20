@@ -27,6 +27,7 @@ import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
@@ -105,7 +106,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,
             UnknownAuthenticationTypeException
     {
-        String header = (String) event.getProperty(HttpConstants.HEADER_AUTHORIZATION);
+        String header = event.getMessage().getStringProperty(HttpConstants.HEADER_AUTHORIZATION, null);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Authorization header: " + header);
@@ -126,7 +127,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,
                                                                                                       password);
-            authRequest.setDetails(event.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
+            authRequest.setDetails(event.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
 
             UMOAuthentication authResult;
 
@@ -168,8 +169,9 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         if (realm != null) {
             realmHeader += "\"" + realm + "\"";
         }
-        event.setProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, realmHeader);
-        event.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
+        UMOMessage msg = event.getMessage();
+        msg.setProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, realmHeader);
+        msg.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
     }
 
     /**
@@ -191,6 +193,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                 return;
             }
         }
+
         UMOAuthentication auth = event.getSession().getSecurityContext().getAuthentication();
         if (isAuthenticate()) {
             auth = getSecurityManager().authenticate(auth);
@@ -199,12 +202,12 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             }
         }
 
-        StringBuffer header = new StringBuffer();
-
+        StringBuffer header = new StringBuffer(128);
         header.append("Basic ");
         String token = auth.getCredentials().toString();
         header.append(Base64.encodeBase64(token.getBytes()));
 
-        event.setProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        event.getMessage().setStringProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
     }
+
 }
