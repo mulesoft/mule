@@ -125,8 +125,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     protected void sendMessage(UMOEvent event) throws Exception {
         initialize(event.getEndpoint().getEndpointURI());
         if(chat==null && groupChat==null) {
-            boolean group = event.getBooleanProperty(XmppConnector.XMPP_GROUP_CHAT, false);
-            String nickname = (String)event.getProperty(XmppConnector.XMPP_NICKNAME, "mule");
+            UMOMessage msg = event.getMessage();
+            boolean group = msg.getBooleanProperty(XmppConnector.XMPP_GROUP_CHAT, false);
+            String nickname = msg.getStringProperty(XmppConnector.XMPP_NICKNAME, "mule");
             String recipient = event.getEndpoint().getEndpointURI().getPath().substring(1);
 
             if(group) {

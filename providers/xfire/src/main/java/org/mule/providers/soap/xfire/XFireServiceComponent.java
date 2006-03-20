@@ -50,6 +50,7 @@ import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -107,15 +108,15 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             response = new OutStreamMessageAdapter(new ByteArrayOutputStream());
         }
 
-        String endpointHeader = eventContext.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-                null);
+        UMOMessage eventMsg = eventContext.getMessage();
+        String endpointHeader = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
 
         if (eventContext.getEndpointURI().getScheme().startsWith("http")) {
             // We parse a new uri based on the listeneing host and port with the
             // request parameters appended
             // Using the soap prefix ensures that we use a soap endpoint builder
             String uri = "soap:" + eventContext.getEndpointURI().toString();
-            uri += eventContext.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            uri += eventMsg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
             endpointURI = new MuleEndpointURI(uri);
             method = endpointURI.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
@@ -123,7 +124,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             // If we're not using Http for the transport the method must be set
             // as a property
             endpointURI = eventContext.getEndpointURI();
-            method = eventContext.getStringProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            method = eventMsg.getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
             if (method == null) {
                 if (endpointHeader != null) {
                     endpointURI = new MuleEndpointURI(endpointHeader);
@@ -133,7 +134,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         String serviceName = getService(eventContext);
-        String request = eventContext.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+        String request = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
 
         if (request != null && request.endsWith("?wsdl")) {
             generateWSDL(response, serviceName);
@@ -145,8 +146,8 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         ServiceRegistry reg = getServiceRegistry();
         if (serviceName == null || serviceName.length() == 0 || !reg.hasService(serviceName)) {
             if (!reg.hasService(serviceName)) {
-                eventContext.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, String
-                        .valueOf(HttpConstants.SC_NOT_FOUND));
+                eventMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
+                        String.valueOf(HttpConstants.SC_NOT_FOUND));
             }
 
             generateServices(response);
@@ -170,7 +171,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-
         if (xfire == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xfire"), this);
         }
@@ -254,11 +254,13 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         }
 
-        String contentType = eventContext.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        String encoding = eventContext.getStringProperty(HttpConstants.HEADER_CONTENT_ENCODING);
-        if (encoding == null) {
-            encoding = MuleManager.getConfiguration().getEncoding();
-        }
+        UMOMessage eventMsg = eventContext.getMessage();
+
+        String encoding = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_ENCODING,
+                MuleManager.getConfiguration().getEncoding());
+
+        String contentType = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+
         if (contentType == null) {
             contentType = DEFAULT_CONTENT_TYPE + "; charset=" + encoding;
             logger.warn("Content-Type not set on request, defaulting to: " + contentType);
@@ -274,7 +276,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
                 XMLStreamReader reader = STAXUtils.createXMLStreamReader(atts.getSoapMessage()
                         .getDataHandler().getInputStream(), encoding, context);
                 InMessage message = new InMessage(reader, uri);
-                message.setProperty(SoapConstants.SOAP_ACTION, eventContext.getStringProperty(
+                message.setProperty(SoapConstants.SOAP_ACTION, eventMsg.getStringProperty(
                         SoapConstants.SOAP_ACTION, StringUtils.EMPTY));
                 message.setAttachments(atts);
 
@@ -301,11 +303,14 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
         InputStream is;
-        if (context.getMessage().getPayload() instanceof InputStream) {
-            is = (InputStream)context.getMessage().getPayload();
+        UMOMessage eventMsg = context.getMessage();
+        Object eventMsgPayload = eventMsg.getPayload();
+
+        if (eventMsgPayload instanceof InputStream) {
+            is = (InputStream)eventMsgPayload;
         }
-        else if (context.getMessage().getAdapter() instanceof StreamMessageAdapter) {
-            StreamMessageAdapter sma = (StreamMessageAdapter)context.getMessage().getAdapter();
+        else if (eventMsg.getAdapter() instanceof StreamMessageAdapter) {
+            StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
             if (sma.getInput() != null) {
                 is = sma.getInput();
             }
@@ -314,9 +319,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             }
         }
         else {
-            String method = context.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            String method = eventMsg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
             // Automatically transform get requests. Normally soap requests
-            // should be POST with s soap message
+            // should be POST with a soap message
             if (method != null && method.equalsIgnoreCase(HttpConstants.METHOD_GET)) {
                 String data = (String)new GetRequestToSoapRequest().transform(context
                         .getTransformedMessageAsString());
