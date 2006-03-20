@@ -16,7 +16,6 @@ package org.mule.providers.dq;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.util.Utility;
 
 /**
  * <code>DQMessageAdapter</code> provides a wrapper for a DataQueue Message.
