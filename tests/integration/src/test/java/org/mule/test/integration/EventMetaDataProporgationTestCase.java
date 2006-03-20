@@ -82,12 +82,13 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
             UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
             return msg;
         } else {
-            assertEquals("param1", context.getProperty("stringParam"));
-            assertEquals(testObjectProperty, context.getProperty("objectParam"));
-            assertEquals(12345.6, 12345.6, context.getDoubleProperty("doubleParam", 0));
-            assertEquals(12345, context.getIntProperty("integerParam", 0));
-            assertEquals(123456789, context.getLongProperty("longParam", 0));
-            assertEquals(true, context.getBooleanProperty("booleanParam", false));
+            UMOMessage msg = context.getMessage();
+            assertEquals("param1", msg.getProperty("stringParam"));
+            assertEquals(testObjectProperty, msg.getProperty("objectParam"));
+            assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
+            assertEquals(12345, msg.getIntProperty("integerParam", 0));
+            assertEquals(123456789, msg.getLongProperty("longParam", 0));
+            assertEquals(true, msg.getBooleanProperty("booleanParam", false));
         }
         return null;
     }
@@ -96,12 +97,13 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
     {
         public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
         {
-            assertEquals("param1", context.getProperty("stringParam"));
-            assertEquals(testObjectProperty, context.getProperty("objectParam"));
-            assertEquals(12345.6, 12345.6, context.getDoubleProperty("doubleParam", 0));
-            assertEquals(12345, context.getIntProperty("integerParam", 0));
-            assertEquals(123456789, context.getLongProperty("longParam", 0));
-            assertEquals(true, context.getBooleanProperty("booleanParam", false));
+            UMOMessage msg = context.getMessage();
+            assertEquals("param1", msg.getProperty("stringParam"));
+            assertEquals(testObjectProperty, msg.getProperty("objectParam"));
+            assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
+            assertEquals(12345, msg.getIntProperty("integerParam", 0));
+            assertEquals(123456789, msg.getLongProperty("longParam", 0));
+            assertEquals(true, msg.getBooleanProperty("booleanParam", false));
             return src;
         }
     }

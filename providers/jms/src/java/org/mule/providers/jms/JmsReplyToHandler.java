@@ -80,9 +80,10 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination);
 
             // QoS support
-            String ttlString = (String) event.removeProperty("TimeToLive");
-            String priorityString = (String) event.removeProperty("Priority");
-            String persistentDeliveryString = (String) event.removeProperty("PersistentDelivery");
+            UMOMessage eventMsg = event.getMessage();
+            String ttlString = (String) eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String) eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String) eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null) {
                 connector.getJmsSupport().send(replyToProducer, replyToMessage);

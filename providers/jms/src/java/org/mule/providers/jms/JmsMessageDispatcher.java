@@ -140,11 +140,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 msg.setJMSCorrelationID(event.getMessage().getCorrelationId());
             }
 
+            UMOMessage eventMsg = event.getMessage();
             Destination replyTo = null;
+
             // Some JMS implementations might not support the ReplyTo property.
             if (connector.getJmsSupport().supportsProperty(JmsConstants.JMS_REPLY_TO)) {
-
-            	Object tempReplyTo = event.removeProperty(JmsConstants.JMS_REPLY_TO);
+            	Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
 	            if (tempReplyTo != null) {
 	                if (tempReplyTo instanceof Destination) {
 	                    replyTo = (Destination) tempReplyTo;
@@ -176,9 +177,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
 
             // QoS support
-            String ttlString = (String) event.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
-            String priorityString = (String) event.removeProperty(JmsConstants.PRIORITY_PROPERTY);
-            String persistentDeliveryString = (String) event.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
+            String ttlString = (String) eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String) eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String) eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             long ttl = Message.DEFAULT_TIME_TO_LIVE;
             int priority = Message.DEFAULT_PRIORITY;

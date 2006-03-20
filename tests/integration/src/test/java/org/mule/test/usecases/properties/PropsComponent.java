@@ -26,8 +26,8 @@ public class PropsComponent implements Callable {
              return msg;
          } else {
              System.out.println("Verifying..." + context.getComponentDescriptor().getName());
-             assertEquals("param1", context.getProperty("stringParam"));
-             assertEquals(testObjectProperty, context.getProperty("objectParam"));
+             assertEquals("param1", context.getMessage().getProperty("stringParam"));
+             assertEquals(testObjectProperty, context.getMessage().getProperty("objectParam"));
              System.out.println("Verifying done " + context.getComponentDescriptor().getName());
          }
          return context;
