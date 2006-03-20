@@ -12,6 +12,7 @@
 
 package org.mule.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.FileInputStream;
@@ -25,22 +26,24 @@ import java.util.Properties;
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and
  * filtering property Maps.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PropertiesHelper {
+public class PropertiesHelper
+{
 
     private static List maskedProperties = new ArrayList();
 
     static {
-        //When printing property lists mask password fields
-        //Users can register their own fields to mask
+        // When printing property lists mask password fields
+        // Users can register their own fields to mask
         registeredMaskedPropertyName("password");
     }
 
-    public static void registeredMaskedPropertyName(String name) {
-        if(name!=null) {
+    public static void registeredMaskedPropertyName(String name)
+    {
+        if (name != null) {
             maskedProperties.add(name);
         }
     }
@@ -49,40 +52,46 @@ public class PropertiesHelper {
      * This method reads the file in to a java.util.Properties object and
      * returns it.
      */
-    public static synchronized java.util.Properties loadProperties(String fileName) throws Exception {
+    public static synchronized java.util.Properties loadProperties(String fileName) throws Exception
+    {
         java.util.Properties p = null;
         try {
             FileInputStream is = new FileInputStream(fileName);
             p = new java.util.Properties();
             p.load(is);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw ex;
         }
         return p;
     }
 
-    public static String removeXmlNamespacePrefix(String eleName) {
+    public static String removeXmlNamespacePrefix(String eleName)
+    {
         int i = eleName.indexOf(":");
         return eleName.substring(i + 1, eleName.length());
     }
 
-    public static String removeNamespacePrefix(String eleName) {
+    public static String removeNamespacePrefix(String eleName)
+    {
         int i = eleName.lastIndexOf(".");
         return eleName.substring(i + 1, eleName.length());
     }
 
-    public static Map removeNamspaces(Map properties) {
+    public static Map removeNamspaces(Map properties)
+    {
         HashMap props = new HashMap(properties.size());
         Map.Entry entry;
         for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-            entry = (Map.Entry) iter.next();
-            props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
+            entry = (Map.Entry)iter.next();
+            props.put(removeNamespacePrefix((String)entry.getKey()), entry.getValue());
 
         }
         return props;
     }
 
-    public static Object getProperty(Map props, Object key, Object defaultValue) {
+    public static Object getProperty(Map props, Object key, Object defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -93,7 +102,8 @@ public class PropertiesHelper {
         return temp;
     }
 
-    public static String getStringProperty(Map props, Object key, String defaultValue) {
+    public static String getStringProperty(Map props, Object key, String defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -104,7 +114,8 @@ public class PropertiesHelper {
         return (temp == null ? null : temp.toString());
     }
 
-    public static int getIntProperty(Map props, Object key, int defaultValue) {
+    public static int getIntProperty(Map props, Object key, int defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -113,14 +124,16 @@ public class PropertiesHelper {
         if (temp != null) {
             try {
                 ret = Integer.parseInt(temp.toString());
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 ret = defaultValue;
             }
         }
         return ret;
     }
 
-    public static long getLongProperty(Map props, Object key, long defaultValue) {
+    public static long getLongProperty(Map props, Object key, long defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -129,14 +142,16 @@ public class PropertiesHelper {
         if (temp != null) {
             try {
                 ret = Long.parseLong(temp.toString());
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 ret = defaultValue;
             }
         }
         return ret;
     }
 
-    public static double getDoubleProperty(Map props, Object key, double defaultValue) {
+    public static double getDoubleProperty(Map props, Object key, double defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -145,14 +160,16 @@ public class PropertiesHelper {
         if (temp != null) {
             try {
                 ret = Double.parseDouble(temp.toString());
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 ret = defaultValue;
             }
         }
         return ret;
     }
 
-    public static boolean getBooleanProperty(Map props, Object key, boolean defaultValue) {
+    public static boolean getBooleanProperty(Map props, Object key, boolean defaultValue)
+    {
         if (props == null) {
             return defaultValue;
         }
@@ -161,58 +178,68 @@ public class PropertiesHelper {
         if (temp != null) {
             try {
                 ret = Boolean.valueOf(temp.toString()).booleanValue();
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 ret = defaultValue;
             }
         }
         return ret;
     }
 
-    public static Map reverseProperties(Map props) {
+    public static Map reverseProperties(Map props)
+    {
         Map newProps = new HashMap();
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+            entry = (Map.Entry)iterator.next();
             newProps.put(entry.getValue(), entry.getKey());
         }
         return newProps;
     }
 
-    public static int getIntValue(Object value) {
+    public static int getIntValue(Object value)
+    {
         if (value instanceof Integer) {
-            return ((Integer) value).intValue();
+            return ((Integer)value).intValue();
         }
         return Integer.parseInt(value.toString());
     }
 
-    public static long getLongValue(Object value) {
+    public static long getLongValue(Object value)
+    {
         if (value instanceof Long) {
-            return ((Long) value).longValue();
+            return ((Long)value).longValue();
         }
         return Long.parseLong(value.toString());
     }
 
-    public static boolean getBooleanValue(Object value) {
+    public static boolean getBooleanValue(Object value)
+    {
         if (value instanceof Boolean) {
-            return ((Boolean) value).booleanValue();
+            return ((Boolean)value).booleanValue();
         }
         return Boolean.valueOf(value.toString()).booleanValue();
     }
 
     /**
      * Will create a map of properties where the names have a prefix
-     * @param props the source set of properties
-     * @param prefix the prefix to filter on
-     * @return and new Map containing the filtered list of properties or an empty map if no
-     * properties matched the prefix
-     * @deprecated use void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
+     * 
+     * @param props
+     *            the source set of properties
+     * @param prefix
+     *            the prefix to filter on
+     * @return and new Map containing the filtered list of properties or an
+     *         empty map if no properties matched the prefix
+     * @deprecated use void getPropertiesWithPrefix(Map props, String prefix,
+     *             Map newProps)
      */
-    public static Map getPropertiesWithPrefix(Map props, String prefix) {
+    public static Map getPropertiesWithPrefix(Map props, String prefix)
+    {
         Map newProps = new HashMap();
 
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+            entry = (Map.Entry)iterator.next();
             if (entry.getKey().toString().startsWith(prefix)) {
                 newProps.put(entry.getKey(), entry.getValue());
             }
@@ -220,30 +247,35 @@ public class PropertiesHelper {
         return newProps;
     }
 
-
     /**
-     * Will create a map of properties where the names have a prefix
-     * Allows the callee to supply the target map so a comarator can be set
-     * @param props the source set of properties
-     * @param prefix the prefix to filter on
-     * @param newProps return map containing the filtered list of properties or an empty map if no
-     * properties matched the prefix
+     * Will create a map of properties where the names have a prefix Allows the
+     * callee to supply the target map so a comarator can be set
+     * 
+     * @param props
+     *            the source set of properties
+     * @param prefix
+     *            the prefix to filter on
+     * @param newProps
+     *            return map containing the filtered list of properties or an
+     *            empty map if no properties matched the prefix
      */
-     public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps) {
-
+    public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
+    {
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+            entry = (Map.Entry)iterator.next();
             if (entry.getKey().toString().startsWith(prefix)) {
                 newProps.put(entry.getKey(), entry.getValue());
             }
         }
     }
-    public static Map getPropertiesWithoutPrefix(Map props, String prefix) {
+
+    public static Map getPropertiesWithoutPrefix(Map props, String prefix)
+    {
         Map newProps = new HashMap();
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+            entry = (Map.Entry)iterator.next();
             if (!entry.getKey().toString().startsWith(prefix)) {
                 newProps.put(entry.getKey(), entry.getValue());
             }
@@ -251,7 +283,8 @@ public class PropertiesHelper {
         return newProps;
     }
 
-    public static Properties getPropertiesFromQueryString(String query) {
+    public static Properties getPropertiesFromQueryString(String query)
+    {
         Properties props = new Properties();
         if (query == null) {
             return props;
@@ -264,39 +297,43 @@ public class PropertiesHelper {
         return props;
     }
 
-    private static int addProperty(String query, int start, Properties properties) {
-        int i = query.indexOf("&", start);
-        int i2 = query.indexOf("&", i + 1);
+    private static int addProperty(String query, int start, Properties properties)
+    {
+        int i = query.indexOf('&', start);
+        int i2 = query.indexOf('&', i + 1);
         String pair;
         if (i > -1 && i2 > -1) {
             pair = query.substring(i + 1, i2);
-        } else if (i > -1) {
+        }
+        else if (i > -1) {
             pair = query.substring(i + 1);
-        } else {
+        }
+        else {
             return -1;
         }
-        int eq = pair.indexOf("=");
+        int eq = pair.indexOf('=');
 
         if (eq <= 0) {
             String key = pair;
-            String value = "";
+            String value = StringUtils.EMPTY;
             properties.setProperty(key, value);
-        } else {
+        }
+        else {
             String key = pair.substring(0, eq);
-            String value = (eq == pair.length() ? "" : pair.substring(eq + 1));
+            String value = (eq == pair.length() ? StringUtils.EMPTY : pair.substring(eq + 1));
             properties.setProperty(key, value);
         }
         return i2;
     }
 
-    public static String propertiesToString(Map props, boolean newline) {
-        StringBuffer buf = new StringBuffer(props.size() * 32);
-        buf.append("{");
-
+    public static String propertiesToString(Map props, boolean newline)
+    {
         if (props == null || props.isEmpty()) {
-            buf.append("}");
-            return buf.toString();
+            return "{}";
         }
+
+        StringBuffer buf = new StringBuffer(props.size() * 32);
+        buf.append('{');
 
         if (newline) {
             buf.append(SystemUtils.LINE_SEPARATOR);
@@ -305,33 +342,37 @@ public class PropertiesHelper {
         Object[] entries = props.entrySet().toArray();
         int i, numEntries = entries.length;
         for (i = 0; i < numEntries - 1; i++) {
-            appendMaskedProperty(buf, (Map.Entry) entries[i]);
+            appendMaskedProperty(buf, (Map.Entry)entries[i]);
             if (newline) {
                 buf.append(SystemUtils.LINE_SEPARATOR);
-            } else {
-                buf.append(", ");
+            }
+            else {
+                buf.append(',').append(' ');
             }
         }
 
         // don't forget the last one
-        appendMaskedProperty(buf, (Map.Entry) entries[i]);
+        appendMaskedProperty(buf, (Map.Entry)entries[i]);
 
         if (newline) {
             buf.append(SystemUtils.LINE_SEPARATOR);
         }
 
-        buf.append("}");
+        buf.append('}');
         return buf.toString();
     }
 
-    private static void appendMaskedProperty(StringBuffer buffer, Map.Entry property) {
+    private static void appendMaskedProperty(StringBuffer buffer, Map.Entry property)
+    {
         String key = property.getKey().toString();
-        buffer.append(key).append("=");
+        buffer.append(key).append('=');
 
         if (maskedProperties.contains(key)) {
             buffer.append("*****");
-        } else {
+        }
+        else {
             buffer.append(property.getValue());
         }
     }
+
 }
