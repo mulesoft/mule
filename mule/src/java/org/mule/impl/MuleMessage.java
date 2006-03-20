@@ -13,9 +13,6 @@
  */
 package org.mule.impl;
 
-import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
@@ -24,6 +21,7 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
 
 import javax.activation.DataHandler;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -374,7 +372,7 @@ public class MuleMessage implements UMOMessage
             id = "[uniqueId not supported]";
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuffer buf = new StringBuffer(80);
         buf.append("MuleMessage{");
         buf.append("id=").append(id);
         buf.append(", payload=").append(getPayload().getClass().getName());
