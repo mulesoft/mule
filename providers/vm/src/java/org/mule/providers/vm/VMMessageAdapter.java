@@ -18,7 +18,6 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.util.Utility;
 
 /**
  * <code>VMMessageAdapter</code> provides a common abstraction of Mule Event

@@ -25,7 +25,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
 
@@ -36,7 +35,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class the should be used

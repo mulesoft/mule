@@ -24,7 +24,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

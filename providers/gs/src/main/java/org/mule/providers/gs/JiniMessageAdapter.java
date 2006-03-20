@@ -16,10 +16,8 @@ package org.mule.providers.gs;
 import net.jini.core.entry.Entry;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.util.Utility;
 
 /**
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.

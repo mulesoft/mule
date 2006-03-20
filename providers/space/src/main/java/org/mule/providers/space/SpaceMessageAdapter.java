@@ -14,10 +14,8 @@
 package org.mule.providers.space;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.UUID;
-import org.mule.util.Utility;
 
 /**
  * Wraps a JavaSpaces Entry object

@@ -30,7 +30,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.Utility;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 

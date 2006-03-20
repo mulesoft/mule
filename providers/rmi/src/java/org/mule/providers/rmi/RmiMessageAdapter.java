@@ -14,9 +14,7 @@
 package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.util.Utility;
 
 /**
  * <code>RmiMessageAdapter</code> TODO
