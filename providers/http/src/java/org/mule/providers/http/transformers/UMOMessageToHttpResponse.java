@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
@@ -124,10 +125,11 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
                 }
             }
 
+            UMOMessage msg = context.getMessage();
+
             if (!response.containsHeader(HttpConstants.HEADER_CONNECTION)) {
-                // See if the the client explicitly handles connection
-                // persistence
-                String connHeader = context.getStringProperty(HttpConstants.HEADER_CONNECTION);
+                // See if the the client explicitly handles connection persistence
+                String connHeader = msg.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
                 if (connHeader != null) {
                     if (connHeader.equalsIgnoreCase("keep-alive")) {
                         Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
@@ -150,9 +152,8 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
                     }
                 }
             }
-            if ("HEAD".equalsIgnoreCase(context.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY))) {
-                // this is a head request, we don't want to send the actualy
-                // content
+            if ("HEAD".equalsIgnoreCase(msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null))) {
+                // this is a head request, we don't want to send the actual content
                 response.setBody(null);
             }
             return response;
@@ -166,35 +167,36 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
     protected HttpResponse createResponse(Object src, String encoding, UMOEventContext context) throws IOException, TransformerException
     {
         HttpResponse response = new HttpResponse();
+        UMOMessage msg = context.getMessage();
 
-        int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
-        String version = context.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
+        int status = msg.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
+        String version = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
                 HttpConstants.HTTP11);
         String date = format.format(new Date());
-        String contentType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE,
+        String contentType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE,
                 HttpConstants.DEFAULT_CONTENT_TYPE);
 
         response.setStatusLine(HttpVersion.parse(version), status);
         response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
-        if (context.getProperty(HttpConstants.HEADER_EXPIRES) == null) {
+        if (msg.getProperty(HttpConstants.HEADER_EXPIRES) == null) {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
         response.setFallbackCharset(encoding);
 
-        String headerName;
-        String value;
-        for (Iterator iterator = HttpConstants.RESPONSE_HEADER_NAMES.values().iterator(); iterator
-                .hasNext();) {
+        Collection headerNames = HttpConstants.RESPONSE_HEADER_NAMES.values();
+        String headerName, value;
+        for (Iterator iterator = headerNames.iterator(); iterator.hasNext();) {
             headerName = (String)iterator.next();
-            value = context.getStringProperty(headerName);
+            value = msg.getStringProperty(headerName, null);
             if (value != null) {
                 response.setHeader(new Header(headerName, value));
             }
         }
+
         // Custom responseHeaderNames
-        Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        Map customHeaders = (Map)msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null) {
             Map.Entry entry;
             for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();) {

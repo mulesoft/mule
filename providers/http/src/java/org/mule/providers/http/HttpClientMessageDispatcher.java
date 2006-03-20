@@ -146,7 +146,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         if (endpointUri.getUserInfo() != null) {
             // Add User Creds
             // TODO take encodings into account
-            StringBuffer header = new StringBuffer(64);
+            StringBuffer header = new StringBuffer(128);
             header.append("Basic ");
             header.append(new String(Base64.encodeBase64(endpointUri.getUserInfo().getBytes())));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
@@ -203,18 +203,19 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected void processCookies(UMOEvent event)
     {
-        Cookie[] cookies = (Cookie[])event.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        UMOMessage msg = event.getMessage();
+        Cookie[] cookies = (Cookie[])msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
         if (cookies != null && cookies.length > 0) {
-            client.getParams().setCookiePolicy(
-                    CookieHelper.getCookiePolicy((String)event
-                            .removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY)));
+            String policy = (String)msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
+            client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
             client.getState().addCookies(cookies);
         }
     }
 
     protected HttpMethod getMethod(UMOEvent event) throws TransformerException
     {
-        String method = (String)event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY,
+        UMOMessage msg = event.getMessage();
+        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
                 HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod = null;
@@ -252,10 +253,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
         httpMethod.setDoAuthentication(true);
         if (event.getCredentials() != null) {
-            String authScopeHost = event.getStringProperty("http.auth.scope.host", null);
-            int authScopePort = event.getIntProperty("http.auth.scope.port", -1);
-            String authScopeRealm = event.getStringProperty("http.auth.scope.realm", null);
-            String authScopeScheme = event.getStringProperty("http.auth.scope.scheme", null);
+            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
+            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
+            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
+            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
             client.getState().setCredentials(
                     new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                     new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
@@ -385,7 +386,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         public String getContentType()
         {
-            return event.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+            return event.getMessage().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
         }
     }
 

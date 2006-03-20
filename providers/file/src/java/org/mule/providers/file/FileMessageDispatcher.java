@@ -19,7 +19,6 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -58,13 +57,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
     public void doDispatch(UMOEvent event) throws Exception {
         String endpoint = event.getEndpoint().getEndpointURI().getAddress();
         Object data = event.getTransformedMessage();
-        String filename = (String) event.getProperty(FileConnector.PROPERTY_FILENAME);
+        UMOMessage msg = event.getMessage();
+        String filename = msg.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
 
         if (filename == null) {
-            String outPattern = (String) event.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
-            if (outPattern == null) {
-                outPattern = connector.getOutputPattern();
-            }
+            String outPattern = msg.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, connector.getOutputPattern());
             filename = generateFilename(event, outPattern);
         }
 

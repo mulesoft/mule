@@ -61,15 +61,14 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         final UMOEndpoint endpoint = event.getEndpoint();
         UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
-            String filename = (String) event.getProperty(FtpConnector.PROPERTY_FILENAME);
+            UMOMessage msg = event.getMessage();
+            String filename = msg.getStringProperty(FtpConnector.PROPERTY_FILENAME, null);
 
             if (filename == null) {
-                String outPattern = (String) event.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
-                if (outPattern == null) {
-                    outPattern = connector.getOutputPattern();
-                }
+                String outPattern = msg.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, connector.getOutputPattern());
                 filename = generateFilename(event, outPattern);
             }
+
             if (filename == null) {
                 throw new IOException("Filename is null");
             }

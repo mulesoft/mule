@@ -100,7 +100,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     	return new EventCallback() {
 			public void eventReceived(UMOEventContext context, Object Component) throws Exception {
 				superCallback.eventReceived(context, Component);
-				context.setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
+				context.getMessage().setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
 			}
     	};
     }

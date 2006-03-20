@@ -31,6 +31,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.InputStream;
@@ -101,13 +102,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
     public Object transform(Object src, String encoding, UMOEventContext context)
             throws TransformerException
     {
-        String endpoint = (String)context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        UMOMessage msg = context.getMessage();
+
+        String endpoint = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null) {
             throw new TransformerException(new Message(
                     Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,
                     MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
-        String method = (String)context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+
+        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
         try {
             URI uri = new URI(endpoint);
             HttpMethod httpMethod = null;
@@ -115,8 +119,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             if (HttpConstants.METHOD_GET.equals(method)) {
                 httpMethod = new GetMethod(uri.toString());
                 setHeaders(httpMethod, context);
-                String paramName = (String)context.getProperty(
-                        HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                String paramName = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                         HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 String query = uri.getQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src)) {
@@ -133,8 +136,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             else {
                 PostMethod postMethod = new PostMethod(uri.toString());
                 setHeaders(postMethod, context);
-                String paramName = (String)context
-                        .getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+                String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
                 // postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                 if (paramName == null) {
                     // Call method to manage the parameter array
@@ -144,13 +146,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     // can control if a POST body is posted explicitly
                     if (!(context.getMessage().getPayload() instanceof NullPayload)) {
                     	// See if we have a MIME type set
-                    	String mimeType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+                    	String mimeType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
                     	
                         if (src instanceof String) {
                         	// Ensure that we strip the encoding information from the encoding type
                         	int parameterIndex = mimeType != null ? mimeType.indexOf(";") : -1;
                         	if (parameterIndex > 0) {
-                        		mimeType = mimeType.substring(0,parameterIndex);
+                        		mimeType = mimeType.substring(0, parameterIndex);
                             }
                         	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                             if (encoding == null) encoding = MuleManager.getConfiguration().getEncoding();
