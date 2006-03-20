@@ -118,37 +118,41 @@ public class PropertiesHelperTestCase extends TestCase
         assertEquals("name1", newProps.get("value1"));
         assertEquals("name2", newProps.get("value2"));
     }
-    
+
+    public void testMapNull() throws Exception
+    {
+        Map props = null;
+        assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
+    }
+
     public void testMapEmpty() throws Exception
     {
-    	Map props = new HashMap();
-    	assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
-    	assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
+        Map props = new HashMap();
+        assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
     }
 
     public void testMapSingleElement() throws Exception
     {
-    	Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class,
-    			new Object[]{"foo"}, new Object[]{"bar"});
+        Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"},
+                new Object[]{"bar"});
 
-    	assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
-    	assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR + "}",
-					PropertiesHelper.propertiesToString(props, true));
+        assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR + "}",
+                PropertiesHelper.propertiesToString(props, true));
     }
 
     public void testMapTwoElements() throws Exception
     {
-    	Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class,
-    			new Object[]{"foo", "foozle"}, new Object[]{"bar", "doozle"});
+        Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class, new Object[]{"foo","foozle"},
+                new Object[]{"bar","doozle"});
 
-    	assertEquals("{foo=bar, foozle=doozle}",
-    			PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{foo=bar, foozle=doozle}", PropertiesHelper.propertiesToString(props, false));
 
-    	assertEquals("{"
-                + SystemUtils.LINE_SEPARATOR + "foo=bar"
-                + SystemUtils.LINE_SEPARATOR + "foozle=doozle"
-                + SystemUtils.LINE_SEPARATOR + "}",
-    			PropertiesHelper.propertiesToString(props, true));
+        assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR
+                + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}", PropertiesHelper
+                .propertiesToString(props, true));
     }
 
 }
