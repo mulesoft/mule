@@ -18,8 +18,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * <code>UMOEventContext</code> is the context object for the current request.
@@ -384,6 +382,7 @@ public interface UMOEventContext
      *
      * @param name the property name
      * @return the property value or null if the property does not exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     Object getProperty(String name);
 
@@ -397,6 +396,7 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     Object getProperty(String name, Object defaultValue);
 
@@ -407,6 +407,7 @@ public interface UMOEventContext
      *
      * @param name the property name
      * @return the property value or null if the property does not exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     String getStringProperty(String name);
 
@@ -421,8 +422,10 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     String getStringProperty(String name, String defaultValue);
+
     /**
      * Gets an Integer property associated with the current event. Calling this
      * method is equivilent to calling
@@ -433,6 +436,7 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     int getIntProperty(String name, int defaultValue);
 
@@ -446,6 +450,7 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     long getLongProperty(String name, long defaultValue);
 
@@ -459,6 +464,7 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     double getDoubleProperty(String name, double defaultValue);
 
@@ -472,6 +478,7 @@ public interface UMOEventContext
      *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     boolean getBooleanProperty(String name, boolean defaultValue);
 
@@ -482,6 +489,7 @@ public interface UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     void setProperty(String name, Object value);
 
@@ -492,6 +500,7 @@ public interface UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     void setBooleanProperty(String name, boolean value);
 
@@ -502,6 +511,7 @@ public interface UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     void setIntProperty(String name, int value);
 
@@ -512,6 +522,7 @@ public interface UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     void setLongProperty(String name, long value);
 
@@ -522,6 +533,7 @@ public interface UMOEventContext
      * 
      * @param name the property name or key
      * @param value the property value
+     * @deprecated use eventContext.getMessage().setProperty()
      */
     void setDoubleProperty(String name, double value);
 

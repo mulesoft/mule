@@ -43,8 +43,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
