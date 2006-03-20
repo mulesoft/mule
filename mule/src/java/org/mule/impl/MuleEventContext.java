@@ -641,7 +641,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public Object getProperty(String name)
     {
-        return event.getProperty(name);
+        return event.getMessage().getProperty(name);
     }
 
     /**
@@ -658,7 +658,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public Object getProperty(String name, Object defaultValue)
     {
-        return event.getProperty(name, defaultValue);
+        return event.getMessage().getProperty(name, defaultValue);
     }
 
     /**
@@ -675,7 +675,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public int getIntProperty(String name, int defaultValue)
     {
-        return event.getIntProperty(name, defaultValue);
+        return event.getMessage().getIntProperty(name, defaultValue);
     }
 
     /**
@@ -692,7 +692,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public long getLongProperty(String name, long defaultValue)
     {
-        return event.getLongProperty(name, defaultValue);
+        return event.getMessage().getLongProperty(name, defaultValue);
     }
 
     /**
@@ -709,7 +709,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public double getDoubleProperty(String name, double defaultValue)
     {
-        return event.getDoubleProperty(name, defaultValue);
+        return event.getMessage().getDoubleProperty(name, defaultValue);
     }
 
     /**
@@ -726,7 +726,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
-        return event.getBooleanProperty(name, defaultValue);
+        return event.getMessage().getBooleanProperty(name, defaultValue);
     }
 
     /**
@@ -741,7 +741,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setProperty(String name, Object value)
     {
-        event.setProperty(name, value);
+        event.getMessage().setProperty(name, value);
     }
 
     /**
@@ -756,7 +756,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setBooleanProperty(String name, boolean value)
     {
-        event.setBooleanProperty(name, value);
+        event.getMessage().setBooleanProperty(name, value);
     }
 
     /**
@@ -771,7 +771,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setIntProperty(String name, int value)
     {
-        event.setIntProperty(name, value);
+        event.getMessage().setIntProperty(name, value);
     }
 
     /**
@@ -786,7 +786,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setLongProperty(String name, long value)
     {
-        event.setLongProperty(name, value);
+        event.getMessage().setLongProperty(name, value);
     }
 
     /**
@@ -801,7 +801,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setDoubleProperty(String name, double value)
     {
-        event.setDoubleProperty(name, value);
+        event.getMessage().setDoubleProperty(name, value);
     }
 
     /**
