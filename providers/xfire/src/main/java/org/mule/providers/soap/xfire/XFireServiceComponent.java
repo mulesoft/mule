@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -69,7 +69,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * The Xfire service component recieves requests for Xfire services it manages
  * and marshalls requests and responses
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -109,14 +109,14 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         UMOMessage eventMsg = eventContext.getMessage();
-        String endpointHeader = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        String endpointHeader = eventContext.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
 
         if (eventContext.getEndpointURI().getScheme().startsWith("http")) {
             // We parse a new uri based on the listeneing host and port with the
             // request parameters appended
             // Using the soap prefix ensures that we use a soap endpoint builder
             String uri = "soap:" + eventContext.getEndpointURI().toString();
-            uri += eventMsg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
+            uri += eventContext.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
             endpointURI = new MuleEndpointURI(uri);
             method = endpointURI.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
@@ -124,7 +124,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             // If we're not using Http for the transport the method must be set
             // as a property
             endpointURI = eventContext.getEndpointURI();
-            method = eventMsg.getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
+            method = eventContext.getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
             if (method == null) {
                 if (endpointHeader != null) {
                     endpointURI = new MuleEndpointURI(endpointHeader);
@@ -134,7 +134,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         String serviceName = getService(eventContext);
-        String request = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        String request = eventContext.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
 
         if (request != null && request.endsWith("?wsdl")) {
             generateWSDL(response, serviceName);
@@ -219,7 +219,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
      * @param service
      * @throws IOException
      * @throws java.io.UnsupportedEncodingException
-     * 
+     *
      */
     protected void invoke(UMOEventContext eventContext,
             UMOEndpointURI endpointURI,
@@ -254,12 +254,10 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         }
 
-        UMOMessage eventMsg = eventContext.getMessage();
-
-        String encoding = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_ENCODING,
+        String encoding = eventContext.getStringProperty(HttpConstants.HEADER_CONTENT_ENCODING,
                 MuleManager.getConfiguration().getEncoding());
 
-        String contentType = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+        String contentType = eventContext.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
 
         if (contentType == null) {
             contentType = DEFAULT_CONTENT_TYPE + "; charset=" + encoding;
@@ -276,7 +274,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
                 XMLStreamReader reader = STAXUtils.createXMLStreamReader(atts.getSoapMessage()
                         .getDataHandler().getInputStream(), encoding, context);
                 InMessage message = new InMessage(reader, uri);
-                message.setProperty(SoapConstants.SOAP_ACTION, eventMsg.getStringProperty(
+                message.setProperty(SoapConstants.SOAP_ACTION, eventContext.getStringProperty(
                         SoapConstants.SOAP_ACTION, StringUtils.EMPTY));
                 message.setAttachments(atts);
 
@@ -319,7 +317,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             }
         }
         else {
-            String method = eventMsg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
+            String method = context.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
             // Automatically transform get requests. Normally soap requests
             // should be POST with a soap message
             if (method != null && method.equalsIgnoreCase(HttpConstants.METHOD_GET)) {
