@@ -128,13 +128,14 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         props = new Properties();
         endpoint.setProperties(props);
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-        assertNull(event.getProperty("prop"));
+        assertNull(event.getMessage().getProperty("prop"));
 
         // in previous event => previous event
-        prevEvent.setProperty("prop", "value0");
+        prevEvent.getMessage().setProperty("prop", "value0");
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-        assertEquals("value0", event.getProperty("prop"));
+        assertEquals("value0", event.getMessage().getProperty("prop"));
 
+        // TODO check if this fragment can be removed
         // in previous event + endpoint => endpoint
         //This doesn't apply now as the previous event properties will be the same as the current event props
 //        props = new Properties();
@@ -149,7 +150,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         msg = new MuleMessage("payload", props);
         endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-        assertEquals("value1", event.getProperty("prop"));
+        assertEquals("value1", event.getMessage().getProperty("prop"));
 
         // in previous event + endpoint + message => message
         props = new Properties();
@@ -160,7 +161,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         props2.put("prop", "value2");
         endpoint.setProperties(props2);
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-        assertEquals("value1", event.getProperty("prop"));
+        assertEquals("value1", event.getMessage().getProperty("prop"));
 
     }
 
