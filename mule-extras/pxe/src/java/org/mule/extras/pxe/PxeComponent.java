@@ -406,10 +406,11 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             String svcName = endpoint.getServiceName().getLocalPart();
             String port = endpoint.getPortName();
             QName operation = null;
-            String op = (String)eventContext.getProperty("bpel.operation");
-            if(op!=null) {
+            String op = eventContext.getMessage().getStringProperty("bpel.operation", null);
+            if (op != null) {
                 operation = parseQName(op);
-            } else {
+            }
+            else {
                 operation = this.operation;
             }
             if (operation == null) {
