@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.util.queue;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,11 @@ import java.util.TreeSet;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Runnable, JournalEventListener
+public class JournalPersistenceStrategy
+        implements
+            QueuePersistenceStrategy,
+            Runnable,
+            JournalEventListener
 {
 
     private static final Log logger = LogFactory.getLog(JournalPersistenceStrategy.class);
@@ -71,11 +76,9 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
 
     private static final int UUID_LENGTH = new UUID().asByteArray().length;
 
-    private static final Object ACTIVE_MARK = new Object();
-    private static final Object INACTIVE_MARK = new Object();
-
     public JournalPersistenceStrategy() throws IOException
     {
+        super();
     }
 
     protected UUID getId(Object obj)
@@ -115,18 +118,21 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
     public Object load(String queue, Object id) throws IOException
     {
         try {
-            RecordLocation loc = (RecordLocation) marks.get(id);
+            RecordLocation loc = (RecordLocation)marks.get(id);
             Packet packet = journal.read(loc);
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(packet.sliceAsBytes()));
+            ObjectInputStream ois = new ObjectInputStream(
+                    new ByteArrayInputStream(packet.sliceAsBytes()));
             ois.readByte();
             ois.readUTF();
             ois.skipBytes(UUID_LENGTH);
             Object obj = ois.readObject();
             return obj;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw e;
-        } catch (Exception e) {
-            throw (IOException) new IOException().initCause(e);
+        }
+        catch (Exception e) {
+            throw (IOException)new IOException().initCause(e);
         }
     }
 
@@ -139,12 +145,12 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(256);
         baos.write(DELETE_BYTE);
-        baos.write(((UUID) id).asByteArray());
+        baos.write(((UUID)id).asByteArray());
         Packet packet = new ByteArrayPacket(baos.toByteArray());
         RecordLocation loc = journal.write(packet, false);
         synchronized (markLock) {
             unusedMarks.add(loc);
-            loc = (RecordLocation) marks.remove(id);
+            loc = (RecordLocation)marks.remove(id);
             if (loc != null) {
                 pendingMarks.remove(loc);
                 unusedMarks.add(loc);
@@ -173,13 +179,14 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
                         UUID id = new UUID(buffer, 1);
                         results.remove(id);
                         unusedMarks.add(pos);
-                        RecordLocation loc = (RecordLocation) marks.remove(id);
+                        RecordLocation loc = (RecordLocation)marks.remove(id);
                         if (loc != null) {
                             pendingMarks.remove(loc);
                             unusedMarks.add(loc);
                         }
                         markLock.notify();
-                    } else {
+                    }
+                    else {
                         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(buffer));
                         ois.readByte();
                         String queue = ois.readUTF();
@@ -192,10 +199,12 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
                     }
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw e;
-        } catch (Exception e) {
-            throw (IOException) new IOException().initCause(e);
+        }
+        catch (Exception e) {
+            throw (IOException)new IOException().initCause(e);
         }
 
         logger.info("Journal Recovered: " + results.size() + " message(s) in transactions recovered.");
@@ -256,14 +265,13 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
                             m = pendingMarks.headSet(overflowLoc);
                             if (m != null && m.size() > 0) {
                                 logger.trace("Relocating " + m.size() + " records");
-                                // System.err.println("Relocating " + m.size() +
-                                // " records");
                                 int nbRecord = 0;
                                 while (m.size() > 0) {
-                                    RecordLocation loc = (RecordLocation) m.first();
+                                    RecordLocation loc = (RecordLocation)m.first();
                                     Packet packet = journal.read(loc);
                                     RecordLocation newLoc = journal.write(packet, false);
-                                    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(packet.sliceAsBytes()));
+                                    ObjectInputStream ois = new ObjectInputStream(
+                                            new ByteArrayInputStream(packet.sliceAsBytes()));
                                     ois.readByte();
                                     String queue = ois.readUTF();
                                     byte[] buf = new byte[UUID_LENGTH];
@@ -287,72 +295,35 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
                         if (pendingMarks.isEmpty()) {
                             m = unusedMarks;
                             // There are pending marks
-                        } else {
-                            RecordLocation pendingMark = (RecordLocation) pendingMarks.first();
+                        }
+                        else {
+                            RecordLocation pendingMark = (RecordLocation)pendingMarks.first();
                             m = unusedMarks.headSet(pendingMark);
                         }
                         // Is there anything to do ?
                         if (!m.isEmpty()) {
-                            RecordLocation last = (RecordLocation) m.last();
-                            RecordLocation n = journal.getNextRecordLocation((RecordLocation) m.last());
+                            RecordLocation last = (RecordLocation)m.last();
+                            RecordLocation n = journal.getNextRecordLocation((RecordLocation)m.last());
                             if (n == null) {
                                 n = last;
                             }
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Marking to " + n + " / "
                                         + (pendingMarks.isEmpty() ? "null" : pendingMarks.last()));
-                                // System.err.println("Marking to " + m.last());
                             }
                             if (journal.getMark() == null || n.compareTo(journal.getMark()) > 0) {
                                 journal.setMark(n, false);
                             }
                             m.clear();
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         logger.warn("Error when relocating records", e);
                     }
                 }
-                /*
-                 * synchronized (markLock) { //boolean over = overflow; boolean
-                 * over = true; boolean modified = true; while
-                 * (!unusedMarks.isEmpty() && modified) { modified = false; //
-                 * Check if we could move some records to save disk space if
-                 * (over) { RecordLocation firstUnused = (RecordLocation)
-                 * unusedMarks.first(); SortedSet blockingMarks =
-                 * pendingMarks.headSet(firstUnused); if (blockingMarks != null &&
-                 * blockingMarks.size() > 0 && blockingMarks.size() <
-                 * unusedMarks.size()) { try { logger.trace("Relocating " +
-                 * blockingMarks.size() + " records"); int nbRecord = 0; while
-                 * (!blockingMarks.isEmpty()) { RecordLocation loc =
-                 * (RecordLocation) blockingMarks.first(); Packet packet =
-                 * journal.read(loc); RecordLocation newLoc =
-                 * journal.write(packet, false); ObjectInputStream ois = new
-                 * ObjectInputStream(new
-                 * ByteArrayInputStream(packet.sliceAsBytes())); ois.readByte();
-                 * String queue = ois.readUTF(); byte[] buf = new
-                 * byte[UUID_LENGTH]; ois.read(buf); UUID id = new UUID(buf);
-                 * 
-                 * unusedMarks.add(loc); pendingMarks.add(newLoc); marks.put(id,
-                 * newLoc); blockingMarks.remove(loc); if (++nbRecord % 10 == 0) {
-                 * journal.setMark(loc, false);
-                 * unusedMarks.headSet(loc).clear(); } } modified = true;
-                 * overflow = false; } catch (Exception e) { logger.warn("Error
-                 * when relocating records", e); } } } SortedSet m; // No more
-                 * pending marks // so clear all unused marks and mark to last
-                 * if (pendingMarks.isEmpty()) { m = unusedMarks; // There are
-                 * pending marks } else { RecordLocation pendingMark =
-                 * (RecordLocation) pendingMarks.first(); m =
-                 * unusedMarks.headSet(pendingMark); } // Is there anything to
-                 * do ? if (!m.isEmpty()) { if (logger.isDebugEnabled()) {
-                 * logger.debug("Marking to " + m.last()); } try {
-                 * journal.setMark((RecordLocation) m.last(), false); m.clear();
-                 * modified = true; } catch (InterruptedIOException e) { throw
-                 * (InterruptedException) new
-                 * InterruptedException().initCause(e); } catch (Exception e) {
-                 * logger.warn("Could not mark", e); } } } overflow = false; }
-                 */
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             logger.debug("Marker thread interrupted");
         }
     }
@@ -395,7 +366,8 @@ public class JournalPersistenceStrategy implements QueuePersistenceStrategy, Run
         this.store = store;
     }
 
-    public boolean isTransient() {
+    public boolean isTransient()
+    {
         return false;
     }
 }
