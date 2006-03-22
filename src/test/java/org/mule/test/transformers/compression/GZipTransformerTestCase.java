@@ -15,16 +15,16 @@
 
 package org.mule.test.transformers.compression;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.compression.GZipCompressTransformer;
 import org.mule.transformers.compression.GZipUncompressTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.compression.GZipCompression;
-import org.apache.commons.lang.SerializationUtils;
 
-import java.util.Arrays;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -48,7 +48,8 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     {
         try {
             return strat.compressByteArray(SerializationUtils.serialize((Serializable)getTestData()));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             fail(e.getMessage());
             return null;
         }
@@ -92,7 +93,8 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         transformer.setReturnClass(String.class);
         try {
             transformer.initialise();
-        } catch (InitialisationException e) {
+        }
+        catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
@@ -100,31 +102,38 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src instanceof byte[]) {
-            if (src == null && result == null) {
-                return true;
-            }
-            if (src == null || result == null) {
-                return false;
-            }
-            return Arrays.equals((byte[]) src, (byte[]) result);
-        } else {
+        if (src == null && result == null) {
+            return true;
+        }
+
+        if (src == null || result == null) {
+            return false;
+        }
+
+        if (src instanceof byte[] && result instanceof byte[]) {
+            return Arrays.equals((byte[])src, (byte[])result);
+        }
+        else {
             return super.compareResults(src, result);
         }
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src instanceof byte[]) {
-            if (src == null && result == null) {
-                return true;
-            }
-            if (src == null || result == null) {
-                return false;
-            }
-            return Arrays.equals((byte[]) src, (byte[]) result);
-        } else {
+        if (src == null && result == null) {
+            return true;
+        }
+
+        if (src == null || result == null) {
+            return false;
+        }
+
+        if (src instanceof byte[] && result instanceof byte[]) {
+            return Arrays.equals((byte[])src, (byte[])result);
+        }
+        else {
             return super.compareResults(src, result);
         }
     }
+
 }

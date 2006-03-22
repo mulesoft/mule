@@ -21,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a

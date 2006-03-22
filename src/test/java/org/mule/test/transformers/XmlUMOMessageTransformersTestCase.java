@@ -16,14 +16,12 @@ package org.mule.test.transformers;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
-import org.custommonkey.xmlunit.XMLAssert;
 
 import java.util.HashMap;
 import java.util.Map;

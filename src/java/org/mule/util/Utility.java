@@ -16,7 +16,6 @@ package org.mule.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -340,6 +338,7 @@ public class Utility
     public static void unzip(File archive, File directory) throws IOException
     {
         ZipFile zip = null;
+
         if (directory.exists()) {
             if (!directory.isDirectory()) {
                 throw new IOException("Directory is not a directory: " + directory);
@@ -361,11 +360,13 @@ public class Utility
                     }
                 }
                 else {
-                    InputStream is = zip.getInputStream(entry);
-                    OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-                    IOUtils.copy(is, os);
-                    is.close();
-                    os.close();
+                    if (zip != null) {
+                        InputStream is = zip.getInputStream(entry);
+                        OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+                        IOUtils.copy(is, os);
+                        IOUtils.closeQuietly(is);
+                        IOUtils.closeQuietly(os);
+                    }
                 }
             }
         }

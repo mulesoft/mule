@@ -16,7 +16,6 @@ package org.mule.impl.model.seda.optimised;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleDescriptor;
@@ -36,13 +35,9 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.model.ModelException;
-import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
-
-import java.util.Map;
 
 /**
  * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that
@@ -98,10 +93,6 @@ public class OptimisedMuleProxy implements MuleProxy
         this.descriptor = new ImmutableMuleDescriptor(descriptor);
         this.proxyPool = proxyPool;
         umo = component;
-        UMOModel model = MuleManager.getInstance().getModel();
-
-        UMOEntryPointResolver resolver = model.getEntryPointResolver();
-
     }
 
     public void start() throws UMOException

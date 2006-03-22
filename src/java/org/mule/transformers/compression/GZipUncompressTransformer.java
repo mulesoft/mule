@@ -14,12 +14,11 @@
 
 package org.mule.transformers.compression;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.GZipCompression;
-import org.apache.commons.lang.SerializationUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 /**
  * <code>GZipCompressTransformer</code> TODO

@@ -96,7 +96,6 @@ public class MuleEvent extends EventObject implements UMOEvent
      * and merges them with any properties on the endpoint. The message
      * properties take precedence over the endpoint properties
      */
-    // private Map properties = new HashMap();
     public MuleEvent(UMOMessage message,
                      UMOEndpoint endpoint,
                      UMOComponent component,

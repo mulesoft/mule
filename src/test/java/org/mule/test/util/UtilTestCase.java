@@ -13,9 +13,6 @@
 package org.mule.test.util;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.SerializationUtils;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.util.Utility;
 
 import java.io.File;
