@@ -30,8 +30,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 
-import java.util.Map;
-
 /**
  * todo document
  *

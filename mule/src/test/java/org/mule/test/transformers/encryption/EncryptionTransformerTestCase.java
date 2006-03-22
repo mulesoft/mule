@@ -49,7 +49,8 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         try {
             return strat.encrypt(getTestData().toString().getBytes(), null);
-        } catch (CryptoFailureException e) {
+        }
+        catch (CryptoFailureException e) {
             fail(e.getMessage());
             return null;
         }
@@ -76,7 +77,8 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         transformer.setStrategy(strat);
         try {
             transformer.initialise();
-        } catch (InitialisationException e) {
+        }
+        catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
@@ -100,7 +102,8 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         transformer.setReturnClass(String.class);
         try {
             transformer.initialise();
-        } catch (InitialisationException e) {
+        }
+        catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
@@ -108,16 +111,20 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src instanceof byte[]) {
-            if (src == null && result == null) {
-                return true;
-            }
-            if (src == null || result == null) {
-                return false;
-            }
-            return Arrays.equals((byte[]) src, (byte[]) result);
-        } else {
+        if (src == null && result == null) {
+            return true;
+        }
+
+        if (src == null || result == null) {
+            return false;
+        }
+
+        if (src instanceof byte[] && result instanceof byte[]) {
+            return Arrays.equals((byte[])src, (byte[])result);
+        }
+        else {
             return super.compareResults(src, result);
         }
     }
+
 }

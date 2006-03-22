@@ -16,7 +16,6 @@ package org.mule.impl.model.direct;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;

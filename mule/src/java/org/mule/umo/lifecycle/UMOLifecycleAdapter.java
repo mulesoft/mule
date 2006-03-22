@@ -16,8 +16,6 @@
 package org.mule.umo.lifecycle;
 
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 
 /**

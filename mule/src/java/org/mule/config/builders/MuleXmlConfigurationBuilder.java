@@ -912,17 +912,6 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         digester.addSetNext(path, "setExceptionListener");
     }
 
-
-
-    private void addContainerReference(String propName,
-                                       String containerRef,
-                                       Object object,
-                                       boolean required,
-                                       String container)
-    {
-        containerReferences.add(new ContainerReference(propName, containerRef, object, required, container));
-    }
-
     protected void addSetPropertiesRule(String path, Digester digester, String[] s1, String[] s2)
     {
         digester.addRule(path, new ExtendedMuleSetPropertiesRule(s1, s2));

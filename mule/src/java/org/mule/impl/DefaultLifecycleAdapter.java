@@ -23,9 +23,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.umo.Invocation;
-import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Disposable;
@@ -35,8 +33,6 @@ import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.UMOEntryPointResolver;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>DefaultLifecycleAdapter</code> provides lifecycle methods for all
