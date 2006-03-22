@@ -73,6 +73,7 @@ public interface UMOMessageAdapter extends Serializable {
 
     /**
      * @return all properties on this message
+     * @deprecated
      */
     Iterator getPropertyNames();
 
