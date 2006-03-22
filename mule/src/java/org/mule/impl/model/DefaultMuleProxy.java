@@ -365,11 +365,12 @@ public class DefaultMuleProxy implements MuleProxy
             // get the endpointUri for this uri
             UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-            // Create the replyTo event asynchronous
-            UMOEvent replyToEvent = new MuleEvent(returnMessage, endpoint, event.getSession(), false);
             // make sure remove the replyTo property as not cause a a forever
             // replyto loop
-            replyToEvent.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+
+            // Create the replyTo event asynchronous
+            UMOEvent replyToEvent = new MuleEvent(returnMessage, endpoint, event.getSession(), false);
 
             // queue the event
             onEvent(queueSession, replyToEvent);

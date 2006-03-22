@@ -94,7 +94,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     {
         try {
             event.setSynchronous(false);
-            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+            event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
             // Apply Security filter if one is set
             UMOEndpoint endpoint = event.getEndpoint();
@@ -147,7 +147,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     {
         try {
             event.setSynchronous(true);
-            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+            event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
             // Apply Security filter if one is set
             UMOEndpoint endpoint = event.getEndpoint();
@@ -298,9 +298,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     protected boolean useRemoteSync(UMOEvent event) {
         boolean remoteSync = false;
+        UMOMessage msg = event.getMessage();
         if(event.getEndpoint().getConnector().isRemoteSyncEnabled()) {
             remoteSync = event.getEndpoint().isRemoteSync() ||
-                    event.getMessage().getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
+                    msg.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if(remoteSync) {
                 //component will be null for client calls
                 if(event.getComponent()!=null) {
@@ -309,8 +310,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
         }
         if(!remoteSync) {
-            event.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            msg.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
     }

@@ -160,7 +160,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         Object request = eventContext.getTransformedMessage();
         Object requestBody = request;
         if(urlFromMessage) {
-            tempUrl = (String)eventContext.getProperty(REST_SERVICE_URL);
+            tempUrl = eventContext.getMessage().getStringProperty(REST_SERVICE_URL, null);
             if(tempUrl==null) {
                 throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, REST_SERVICE_URL).toString());
             }

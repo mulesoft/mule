@@ -65,7 +65,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
             }
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
                 UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
-                boolean rsync = eventContext.getBooleanProperty(
+                boolean rsync = eventContext.getMessage().getBooleanProperty(
                         MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
                 if(!rsync) {
                     logger.info("Endpoint: " + endpoint + " is not remoteSync enabled. Message builder finishing");
