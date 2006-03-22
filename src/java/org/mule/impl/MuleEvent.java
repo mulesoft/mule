@@ -446,16 +446,6 @@ public class MuleEvent extends EventObject implements UMOEvent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOEvent#getParams()
-     */
-    public Iterator getPropertyNames()
-    {
-        return message.getPropertyNames();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.mule.umo.UMOEvent#getEndpoint()
      */
     public UMOEndpoint getEndpoint()
