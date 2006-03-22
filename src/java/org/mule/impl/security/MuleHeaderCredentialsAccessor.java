@@ -28,11 +28,11 @@ public class MuleHeaderCredentialsAccessor implements UMOCredentialsAccessor
 {
     public Object getCredentials(UMOEvent event)
     {
-        return event.getProperty(MuleProperties.MULE_USER_PROPERTY);
+        return event.getMessage().getProperty(MuleProperties.MULE_USER_PROPERTY);
     }
 
     public void setCredentials(UMOEvent event, Object credentials)
     {
-        event.setProperty(MuleProperties.MULE_USER_PROPERTY, credentials);
+        event.getMessage().setProperty(MuleProperties.MULE_USER_PROPERTY, credentials);
     }
 }

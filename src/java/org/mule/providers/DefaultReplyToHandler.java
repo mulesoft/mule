@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +58,8 @@ public class DefaultReplyToHandler implements ReplyToHandler
         this.transformer = transformer;
     }
 
-    public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException
+    public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo)
+            throws UMOException
     {
         if (logger.isDebugEnabled()) {
             logger.debug("sending reply to: " + returnMessage.getReplyTo());
@@ -66,19 +68,19 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
         // get the endpoint for this url
         UMOEndpoint endpoint = getEndpoint(event, replyToEndpoint);
-        if(transformer==null) {
+        if (transformer == null) {
             transformer = event.getEndpoint().getResponseTransformer();
         }
         if (transformer != null) {
             endpoint.setTransformer(transformer);
         }
 
-        // Create the replyTo event asynchronous
-        UMOEvent replyToEvent = new MuleEvent(returnMessage, endpoint, event.getSession(), false);
-
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
-        replyToEvent.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+
+        // Create the replyTo event asynchronous
+        UMOEvent replyToEvent = new MuleEvent(returnMessage, endpoint, event.getSession(), false);
 
         // dispatch the event
         try {
@@ -86,19 +88,18 @@ public class DefaultReplyToHandler implements ReplyToHandler
             if (logger.isInfoEnabled()) {
                 logger.info("reply to sent: " + endpoint);
             }
-            ((AbstractComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
-        } catch (Exception e) {
+            ((AbstractComponent)event.getComponent()).getStatistics().incSentReplyToEvent();
+        }
+        catch (Exception e) {
             throw new DispatchException(new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint),
-                                        replyToEvent.getMessage(),
-                                        replyToEvent.getEndpoint(),
-                                        e);
+                    replyToEvent.getMessage(), replyToEvent.getEndpoint(), e);
         }
 
     }
 
     protected UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = (UMOEndpoint) endpointCache.get(endpointUri);
+        UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null) {
             UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
