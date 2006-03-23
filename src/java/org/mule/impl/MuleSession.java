@@ -201,7 +201,10 @@ public final class MuleSession implements UMOSession
     {
         if (event.getEndpoint().canSend()) {
             try {
-                logger.debug("dispatching event: " + event);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("dispatching event: " + event);
+                }
+
                 UMOConnector connector = event.getEndpoint().getConnector();
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
 
