@@ -128,12 +128,13 @@ public final class MuleSession implements UMOSession
 
     public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
-        logger.debug("Session has received asynchronous event on: " + endpoint);
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         } else if (endpoint == null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
+
+        logger.debug("Session has received asynchronous event on: " + endpoint);
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
         dispatchEvent(event);
     }
@@ -155,18 +156,19 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
-        logger.debug("Session has received synchronous event on: " + endpoint);
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         } else if (endpoint == null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
 
+        logger.debug("Session has received synchronous event on endpoint: " + endpoint);
+
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
         UMOMessage result = sendEvent(event);
 
         //Handles the situation where a response has been received via a remote ReplyTo channel.
-        //RM* Todo not sure we need this bit of code??
+        //TODO RM: not sure we need this bit of code??
 //        if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null && result!=null) {
 //            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
 //            result = new MuleMessage(response, result.getProperties(), result);
@@ -224,7 +226,7 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
-        int timeout = event.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+        int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
         if (timeout >= 0) {
             event.setTimeout(timeout);
         }
@@ -314,12 +316,13 @@ public final class MuleSession implements UMOSession
     public UMOEvent createOutboundEvent(UMOMessage message, UMOEndpoint endpoint, UMOEvent previousEvent)
             throws UMOException
     {
-        logger.debug("Creating event with data: " + message.getPayload().getClass().getName() + ", for endpoint: "
-                + endpoint.toString());
-
         if (endpoint == null) {
             throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"), message, endpoint);
         }
+
+        logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
+                + ", for endpoint: " + endpoint);
+
         // Use default transformer if none is set
         if (endpoint.getTransformer() == null) {
             if (endpoint.getConnector() instanceof AbstractConnector) {
