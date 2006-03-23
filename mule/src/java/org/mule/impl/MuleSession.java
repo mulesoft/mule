@@ -217,8 +217,10 @@ public final class MuleSession implements UMOSession
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         } else if (component != null) {
-            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: "
-                    + event);
+            if (logger.isDebugEnabled()) {
+                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
+                        + ", event is: " + event);
+            }
             component.dispatchEvent(event);
         } else {
             throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
