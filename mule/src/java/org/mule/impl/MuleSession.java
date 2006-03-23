@@ -87,26 +87,32 @@ public final class MuleSession implements UMOSession
         this.component = component;
     }
 
-    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler) throws UMOException {
+    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler) throws UMOException
+    {
 
         if (requestSessionHandler == null) {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "requestSessionHandler").toString());
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                    "requestSessionHandler").toString());
         }
 
         if (message == null) {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "message").toString());
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "message")
+                    .toString());
         }
 
         properties = new HashMap();
         requestSessionHandler.populateSession(message, this);
         id = (String)getProperty(requestSessionHandler.getSessionIDKey());
-        if(id==null) {
+        if (id == null) {
             id = UUID.getUUID();
-            if(logger.isDebugEnabled()) {
-                logger.debug("There is no session id on the request using key: " +requestSessionHandler.getSessionIDKey() +
-                        ". Generating new session id: " + id);
+            if (logger.isDebugEnabled()) {
+                logger
+                        .debug("There is no session id on the request using key: "
+                                + requestSessionHandler.getSessionIDKey()
+                                + ". Generating new session id: " + id);
             }
-        } else if(logger.isDebugEnabled()) {
+        }
+        else if (logger.isDebugEnabled()) {
             logger.debug("Got session with id: " + id);
         }
     }
@@ -134,7 +140,10 @@ public final class MuleSession implements UMOSession
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
 
-        logger.debug("Session has received asynchronous event on: " + endpoint);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Session has received asynchronous event on: " + endpoint);
+        }
+
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
         dispatchEvent(event);
     }
@@ -162,7 +171,9 @@ public final class MuleSession implements UMOSession
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
 
-        logger.debug("Session has received synchronous event on endpoint: " + endpoint);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Session has received synchronous event on endpoint: " + endpoint);
+        }
 
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
         UMOMessage result = sendEvent(event);
@@ -173,9 +184,11 @@ public final class MuleSession implements UMOSession
 //            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
 //            result = new MuleMessage(response, result.getProperties(), result);
 //        }
+
         if(result!=null) {
             RequestContext.rewriteEvent(result);
         }
+
         return result;
     }
 
@@ -233,7 +246,9 @@ public final class MuleSession implements UMOSession
 
         if (event.getEndpoint().canSend()) {
             try {
-                logger.debug("sending event: " + event);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("sending event: " + event);
+                }
 
                 UMOConnector connector = event.getEndpoint().getConnector();
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
@@ -242,7 +257,7 @@ public final class MuleSession implements UMOSession
                     ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
                 } else {
                     //Todo in Mule20 we'll flatten the Connector hierachy
-                    logger.warn("A session handler could not be obtained, using  default");
+                    logger.warn("A session handler could not be obtained, using default.");
                     new MuleSessionHandler().writeSession(event.getMessage(), this);
                 }
                 return dispatcher.send(event);
@@ -253,8 +268,10 @@ public final class MuleSession implements UMOSession
             }
 
         } else if (component != null) {
-            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: "
-                    + event);
+            if (logger.isDebugEnabled()) {
+                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
+                        + " event is: " + event);
+            }
             return component.sendEvent(event);
 
         } else {
@@ -320,8 +337,10 @@ public final class MuleSession implements UMOSession
             throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"), message, endpoint);
         }
 
-        logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
-                + ", for endpoint: " + endpoint);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
+                    + ", for endpoint: " + endpoint);
+        }
 
         // Use default transformer if none is set
         if (endpoint.getTransformer() == null) {
@@ -419,4 +438,5 @@ public final class MuleSession implements UMOSession
     public Iterator getPropertyNames() {
         return properties.keySet().iterator();
     }
+
 }
