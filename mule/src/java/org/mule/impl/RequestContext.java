@@ -11,16 +11,13 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.impl;
 
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get
@@ -39,14 +36,15 @@ public class RequestContext
         UMOEvent event = getEvent();
         if (event != null) {
             return new MuleEventContext(event);
-        } else {
+        }
+        else {
             return null;
         }
     }
 
     public static UMOEvent getEvent()
     {
-        return (UMOEvent) events.get();
+        return (UMOEvent)events.get();
     }
 
     public static synchronized void setEvent(UMOEvent event)
@@ -54,7 +52,7 @@ public class RequestContext
         events.set(event);
     }
 
-    public static void rewriteEvent(UMOMessage message)
+    public static synchronized void rewriteEvent(UMOMessage message)
     {
         if (message != null) {
             UMOEvent event = getEvent();
@@ -64,7 +62,6 @@ public class RequestContext
             }
         }
     }
-
 
     public static void clear()
     {
@@ -81,15 +78,4 @@ public class RequestContext
         return getEvent().getMessage().getExceptionPayload();
     }
 
-    public static Map getAttachments() {
-        Map attachments = new HashMap();
-        if(getEvent()!=null) {
-            UMOMessage message = getEvent().getMessage();
-            for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();) {
-                String name = (String) iterator.next();
-                attachments.put(name, message.getAttachment(name));
-            }
-        }
-        return attachments;
-    }
 }
