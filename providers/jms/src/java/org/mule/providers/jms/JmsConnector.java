@@ -41,6 +41,7 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
+import org.apache.commons.lang.UnhandledException;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -130,6 +131,15 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
      */
     public void doInitialise() throws InitialisationException
     {
+        // when a connection to jms server is lost, we are recycling the connector
+        // need to safely reinitialise these here for proper connection recovery
+        if (dispatchers == null) {
+            dispatchers = new ConcurrentHashMap();
+        }
+        if (receivers == null) {
+            receivers = new ConcurrentHashMap();
+        }
+
         super.doInitialise();
         try {
             MuleManager.getInstance().registerListener(this, getName());
@@ -209,16 +219,22 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException jmsException) {
                     logger.debug("About to recycle myself due to remote JMS connection shutdown.");
+                    final JmsConnector jmsConnector = JmsConnector.this;
                     try {
-                        JmsConnector.this.stopConnector();
+                        jmsConnector.stopConnector();
+                        jmsConnector.initialised.set(false);
                     } catch (UMOException e) {
                         logger.warn(e.getMessage(), e);
                     }
 
                     try {
-                        connectionStrategy.connect(JmsConnector.this);
-                    } catch (FatalConnectException e) {
+                        connectionStrategy.connect(jmsConnector);
+                        jmsConnector.initialise();
+                        jmsConnector.startConnector();
+                    } catch (FatalConnectException fcex) {
                         logger.fatal("Failed to reconnect to JMS server. I'm giving up.");
+                    } catch (UMOException umoex) {
+                        throw new UnhandledException("Failed to recover a connector.", umoex);
                     }
                 }
             });
