@@ -150,9 +150,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     	
                         if (src instanceof String) {
                         	// Ensure that we strip the encoding information from the encoding type
-                        	int parameterIndex = mimeType != null ? mimeType.indexOf(";") : -1;
-                        	if (parameterIndex > 0) {
-                        		mimeType = mimeType.substring(0, parameterIndex);
+                            if (mimeType != null) {
+                                int parameterIndex = mimeType.indexOf(";");
+                                if (parameterIndex > 0) {
+                                    mimeType = mimeType.substring(0, parameterIndex);
+                                }
                             }
                         	if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                             if (encoding == null) encoding = MuleManager.getConfiguration().getEncoding();
