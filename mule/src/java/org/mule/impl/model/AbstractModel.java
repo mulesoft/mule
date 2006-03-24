@@ -42,7 +42,6 @@ import org.mule.umo.model.UMOModel;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -285,27 +284,22 @@ public abstract class AbstractModel implements UMOModel
     public void dispose()
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSING));
-        UMOComponent temp = null;
-        Object key = null;
-        for (Iterator i = components.keySet().iterator(); i.hasNext();) {
+
+        for (Iterator i = components.values().iterator(); i.hasNext();) {
+            UMOComponent component = (UMOComponent)i.next();
             try {
-                key = i.next();
-                temp = (UMOComponent) components.get(key);
-                try {
-                    temp.dispose();
-                } catch (Exception e1) {
-                    logger.warn("Failed to dispose component: " + e1.getMessage());
-                }
-                logger.info(temp + " has been destroyed successfully");
-            } catch (ConcurrentModificationException e) {
-                logger.warn("cannot dispose calling component");
-                //return;
+                component.dispose();
+                logger.info(component + " has been destroyed successfully");
+            } catch (Exception e1) {
+                logger.warn("Failed to dispose component: " + e1.getMessage());
             }
         }
+
         components.clear();
         descriptors.clear();
         components = null;
         descriptors = null;
+
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
     }
 
