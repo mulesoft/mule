@@ -13,6 +13,18 @@
     <packaging>pom</packaging>
     <name>Mule Providers</name>
 
+    <profiles>
+        <profile>
+            <id>java5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <modules>
+                <module>gs</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <modules>
         <module>axis</module>
         <module>dq</module>
@@ -21,7 +33,6 @@
         <module>file</module>
         <module>ftp</module>
         <module>glue</module>
-        <module>gs</module>
         <module>http</module>
         <module>jbi</module>
         <module>jdbc</module>
