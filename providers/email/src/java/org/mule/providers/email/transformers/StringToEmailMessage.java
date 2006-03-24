@@ -143,7 +143,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
             setContent(src, msg, contentType, context);
 
-            return eventMsg;
+            return msg;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
