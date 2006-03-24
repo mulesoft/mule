@@ -18,6 +18,7 @@ package org.mule.test.mule.model;
 import org.mule.impl.RequestContext;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.model.TooManySatisfiableMethodsException;
+import org.mule.model.NoSatisfiableMethodsException;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -102,7 +103,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             fail("Should have failed to find entrypoint.");
         } catch (InvocationTargetException itex) {
             final Throwable cause = itex.getCause();
-            if (cause != null && cause.getClass().isAssignableFrom(TooManySatisfiableMethodsException.class)) {
+            if (cause instanceof TooManySatisfiableMethodsException) {
                 // expected
             } else {
                 throw itex;
@@ -134,7 +135,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
         } catch (InvocationTargetException itex) {
             final Throwable cause = itex.getCause();
-            if (cause != null && cause.getClass().isAssignableFrom(TooManySatisfiableMethodsException.class)) {
+            if (cause instanceof TooManySatisfiableMethodsException) {
                 // expected
             } else {
                 throw itex;
@@ -145,4 +146,40 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
     }
 
+    /**
+     * If there was a method parameter specified to override the discovery
+     * mechanism and no such method exists, an exception should be thrown,
+     * and no fallback to the default discovery should take place.
+     */
+    public void testMethodOverrideDoesNotFallback() throws Exception
+    {
+        UMOEntryPointResolver epd = getEntryPointResolver();
+        UMODescriptor descriptor = getDescriptorToResolve(FruitBowl.class.getName());
+
+        UMOEntryPoint ep = null;
+        ep = epd.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+
+        try {
+
+            RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+
+            // those are usually set on the endpoint and copied over to the message
+            final String methodName = "nosuchmethod";
+            final String propertyName = "method";
+            RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+
+            ep.invoke(new FruitBowl(), RequestContext.getEventContext());
+            fail("Should have failed to find an entrypoint.");
+        } catch (InvocationTargetException itex) {
+            Throwable cause = itex.getCause();
+            if (cause instanceof NoSatisfiableMethodsException) {
+                // expected
+            } else {
+                throw itex;
+            }
+        } finally {
+            RequestContext.setEvent(null);
+        }
+    }
 }

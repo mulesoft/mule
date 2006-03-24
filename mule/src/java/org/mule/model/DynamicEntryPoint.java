@@ -72,8 +72,20 @@ public class DynamicEntryPoint implements UMOEntryPoint
             method = (Method) methodOverride;
         } else if (methodOverride != null) {
             payload = context.getTransformedMessage();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Manual method resolution requested, methodOverride=" + methodOverride);
+            }
             //Get the method that matches the method name with the current argument types
             method = ClassHelper.getMethod(methodOverride.toString(), ClassHelper.getClassTypes(payload), component.getClass());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Method override resolved to " + method);
+            }
+            if (method == null) {
+                NoSatisfiableMethodsException nsmex = new NoSatisfiableMethodsException(component.getClass());
+                throw new InvocationTargetException(nsmex,
+                        "Manually overridden method '" + methodOverride +
+                        "' not found in " + component.getClass().getName());
+            }
         }
 
         if (method == null) {
