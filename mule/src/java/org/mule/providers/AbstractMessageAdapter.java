@@ -15,8 +15,6 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +32,7 @@ import javax.activation.DataHandler;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -54,8 +53,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected Map properties = new ConcurrentHashMap();
-    protected Map attachments = new ConcurrentHashMap();
+    protected Map properties = new HashMap();
+    protected Map attachments = new HashMap();
 
     protected UMOExceptionPayload exceptionPayload;
 
