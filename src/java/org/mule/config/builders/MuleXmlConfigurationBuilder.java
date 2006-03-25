@@ -302,7 +302,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         // set threading profile
         digester.addObjectCreate(path + "/threading-profile", THREADING_PROFILE);
         SetPropertiesRule threadingRule = new SetPropertiesRule();
-        threadingRule.addAlias("setPoolExhaustedAction", "setPoolExhaustedActionString");
+        threadingRule.addAlias("poolExhaustedAction", "poolExhaustedActionString");
         digester.addRule(path + "/threading-profile", threadingRule);
         digester.addRule(path + "/threading-profile", new Rule() {
             private String id;
@@ -961,8 +961,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         {
             attributes = processor.processAttributes(attributes, s2);
             // Add transformer references that will be bound to their objects
-            // once
-            // all configuration has bean read
+            // once all configuration has bean read
             String transformerNames = attributes.getValue("transformer");
             if (transformerNames != null) {
                 addTransformerReference("transformer", transformerNames, digester.peek());
