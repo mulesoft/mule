@@ -176,7 +176,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         // Create the AxisServer
         axisServer = new AxisServer(serverProvider);
-        axisServer.setOption("axis.doAutoTypes", new Boolean(doAutoTypes));
+        axisServer.setOption("axis.doAutoTypes", Boolean.valueOf(doAutoTypes));
 
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULE_PROVIDER, new WSDDJavaMuleProvider(this));
