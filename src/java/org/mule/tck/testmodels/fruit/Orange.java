@@ -54,13 +54,6 @@ public class Orange implements Fruit, Callable
         setSegments((Integer) props.get("segments"));
     }
 
-    // public Orange(String brand, Double radius, Integer segments)
-    // {
-    // this.brand = brand;
-    // this.radius = radius;
-    // this.segments = segments;
-    // }
-
     public void bite()
     {
         bitten = true;
