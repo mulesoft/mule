@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -25,6 +25,8 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.FruitLover;
 import org.mule.tck.testmodels.fruit.ObjectToFruitLover;
 import org.mule.tck.testmodels.fruit.WaterMelon;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -38,14 +40,14 @@ import java.util.EventObject;
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
- * 
+ *
  * @version $Revision$
  */
 public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDiscoveryTestCase
 {
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
      */
     public ComponentMethodMapping[] getComponentMappings()
@@ -59,7 +61,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getDescriptorToResolve(java.lang.String)
      */
     public UMODescriptor getDescriptorToResolve(String className) throws Exception
@@ -76,7 +78,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getEntryPointResolver()
      */
     public UMOEntryPointResolver getEntryPointResolver()
@@ -178,6 +180,62 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             } else {
                 throw itex;
             }
+        } finally {
+            RequestContext.setEvent(null);
+        }
+    }
+
+    /**
+     * If there was a method parameter specified to override the discovery
+     * mechanism and a Callable instance is serving the request, call
+     * the Callable, ignore the method override parameter.
+     */
+    public void testMethodOverrideIgnoredWithCallable() throws Exception
+    {
+        UMOEntryPointResolver epd = getEntryPointResolver();
+        UMODescriptor descriptor = getDescriptorToResolve(Apple.class.getName());
+
+        UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+
+        try {
+
+            RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+
+            // those are usually set on the endpoint and copied over to the message
+            final String methodName = "nosuchmethod";
+            final String propertyName = "method";
+            RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+
+            ep.invoke(new Apple(), RequestContext.getEventContext());
+        } finally {
+            RequestContext.setEvent(null);
+        }
+    }
+
+    /**
+     * If there was a method parameter specified to override the discovery
+     * mechanism and a target instance has a method accepting UMOEventContext,
+     * proceed to call this method, ignore the method override parameter.
+     */
+    public void testMethodOverrideIgnoredWithEventContext() throws Exception
+    {
+        UMOEntryPointResolver epd = getEntryPointResolver();
+        UMODescriptor descriptor = getDescriptorToResolve(Kiwi.class.getName());
+
+        UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+
+        try {
+
+            RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
+
+            // those are usually set on the endpoint and copied over to the message
+            final String methodName = "nosuchmethod";
+            final String propertyName = "method";
+            RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+
+            ep.invoke(new Kiwi(), RequestContext.getEventContext());
         } finally {
             RequestContext.setEvent(null);
         }
