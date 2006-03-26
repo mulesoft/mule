@@ -45,8 +45,8 @@ public class AsyncLoanBroker implements LoanBroker
   }
 
     public Object receiveQuote(LoanQuote quote) {
-        logger.info("\nLoan Broker Quote recieved: " + quote);
-        System.out.println("Quote " + incQuotes() + " recieved: " + quote);
+        logger.info("\nLoan Broker Quote received: " + quote);
+        System.out.println("Quote " + incQuotes() + " received: " + quote);
 
         //System.out.println("OQuote: " + incQuotes());
         return null;

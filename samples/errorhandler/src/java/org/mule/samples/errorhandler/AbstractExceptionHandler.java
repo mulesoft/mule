@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -73,12 +73,12 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler {
         try {
             t = message.getException().toException();
         } catch (Exception e) {
-            throw new HandlerException("Failed to retreive exception from exception message: " + e, e);
+            throw new HandlerException("Failed to retrieve exception from exception message: " + e, e);
         }
 
         if(!isRegisteredFor(t.getClass())) {
             throw new HandlerException("Exception: " + t.getClass().getName() +
-            " was recieved by Exception behaviour: " + getClass().getName() +
+            " was received by Exception behaviour: " + getClass().getName() +
             ", but the exception is not registered to be handled by this behaviour");
         }
         processException(message, t);
