@@ -17,6 +17,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.ClassHelper;
+import org.apache.commons.lang.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,10 +39,13 @@ public class ServiceProxy
 {
     public static Class[] getInterfacesForComponent(UMOComponent component) throws UMOException, ClassNotFoundException
     {
-        Class[] interfaces = new Class[0];
+        Class[] interfaces;
         List ifaces = (List) component.getDescriptor().getProperties().get("serviceInterfaces");
         if (ifaces == null || ifaces.size() == 0) {
-            interfaces = component.getDescriptor().getImplementationClass().getInterfaces();
+            final Class implementationClass = component.getDescriptor().getImplementationClass();
+            // get all implemented interfaces from superclasses as well
+            final List intfList = ClassUtils.getAllInterfaces(implementationClass);
+            interfaces = (Class[]) intfList.toArray(new Class[intfList.size()]);
 
         } else {
             interfaces = new Class[ifaces.size()];
