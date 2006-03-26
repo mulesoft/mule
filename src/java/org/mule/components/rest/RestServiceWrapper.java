@@ -196,27 +196,31 @@ public class RestServiceWrapper implements Callable, Initialisable
 
     private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional) {
         char sep;
+
         if(url.indexOf("?") > -1) {
             sep = '&';
         } else {
             sep = '?';
         }
-        String name;
-        String exp;
-        Object value;
-        for (Iterator iterator = args.keySet().iterator(); iterator.hasNext();) {
-            name = (String) iterator.next();
-            exp = (String)args.get(name);
-            value = propertyExtractor.getProperty(exp, msg);
-            if(value==null && !optional) {
-                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
+
+        for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry entry = (Map.Entry)iterator.next();
+            String name = (String)entry.getKey();
+            String exp = (String)entry.getValue();
+            Object value = propertyExtractor.getProperty(exp, msg);
+
+            if (value == null && !optional) {
+                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT,
+                        exp).toString());
             }
+
             url.append(sep);
             sep = '&';
-            url.append(name).append("=").append(value);
+            url.append(name).append('=').append(value);
         }
-        if(!optional && payloadParameterName!=null) {
-            url.append(sep).append(payloadParameterName).append("=").append(body.toString());
+
+        if (!optional && payloadParameterName != null) {
+            url.append(sep).append(payloadParameterName).append('=').append(body.toString());
         }
     }
 
