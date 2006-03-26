@@ -117,19 +117,19 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
 
-            if (!StringUtils.isEmpty(from)) {
+            if (StringUtils.isNotBlank(from)) {
                 msg.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
             }
 
-            if (!StringUtils.isEmpty(cc)) {
+            if (StringUtils.isNotBlank(cc)) {
                 msg.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
             }
 
-            if (!StringUtils.isEmpty(bcc)) {
+            if (StringUtils.isNotBlank(bcc)) {
                 msg.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
             }
 
-            if (!StringUtils.isEmpty(replyTo)) {
+            if (StringUtils.isNotBlank(replyTo)) {
                 eventMsg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 

@@ -277,19 +277,19 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
     private void setMessageContextProperties(UMOMessage message, MessageContext ctx) {
         String temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (!StringUtils.isEmpty(temp)) {
+        if (StringUtils.isNotBlank(temp)) {
             message.setCorrelationId(temp);
         }
         temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (!StringUtils.isEmpty(temp)) {
+        if (StringUtils.isNotBlank(temp)) {
             message.setCorrelationGroupSize(Integer.parseInt(temp));
         }
         temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (!StringUtils.isEmpty(temp)) {
+        if (StringUtils.isNotBlank(temp)) {
             message.setCorrelationSequence(Integer.parseInt(temp));
         }
         temp = ctx.getStrProp(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (!StringUtils.isEmpty(temp)) {
+        if (StringUtils.isNotBlank(temp)) {
             message.setReplyTo(temp);
         }
     }

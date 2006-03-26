@@ -154,7 +154,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         try {
             // to
             InternetAddress[] toAddrs = null;
-            if (!StringUtils.isEmpty(to)) {
+            if (StringUtils.isNotBlank(to)) {
                 toAddrs = InternetAddress.parse(to, false);
                 msg.setRecipients(Message.RecipientType.TO, toAddrs);
             } else {
@@ -169,17 +169,17 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
             msg.setFrom(new InternetAddress(from));
             // cc
             InternetAddress[] ccAddrs = null;
-            if (!StringUtils.isEmpty(cc)) {
+            if (StringUtils.isNotBlank(cc)) {
                 ccAddrs = InternetAddress.parse(cc, false);
                 msg.setRecipients(Message.RecipientType.CC, ccAddrs);
             }
             InternetAddress[] bccAddrs = null;
-            if (!StringUtils.isEmpty(bcc)) {
+            if (StringUtils.isNotBlank(bcc)) {
                 bccAddrs = InternetAddress.parse(bcc, false);
                 msg.setRecipients(Message.RecipientType.BCC, bccAddrs);
             }
             // subject
-            if (!StringUtils.isEmpty(subject)) {
+            if (StringUtils.isNotBlank(subject)) {
                 msg.setSubject(subject);
             } else {
                 msg.setSubject("(no subject)");

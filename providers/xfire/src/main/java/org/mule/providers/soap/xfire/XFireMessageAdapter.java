@@ -113,18 +113,18 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
             MuleSoapHeaders header = new MuleSoapHeaders(messageContext.getInMessage().getHeader()
                     .getChildren().iterator());
 
-            if (!StringUtils.isEmpty(header.getReplyTo())) {
+            if (StringUtils.isNotBlank(header.getReplyTo())) {
                 setReplyTo(header.getReplyTo());
             }
 
-            if (!StringUtils.isEmpty(header.getCorrelationGroup())
+            if (StringUtils.isNotBlank(header.getCorrelationGroup())
                     && !"-1".equals(header.getCorrelationGroup())) {
                 setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
             }
-            if (!StringUtils.isEmpty(header.getCorrelationSequence())) {
+            if (StringUtils.isNotBlank(header.getCorrelationSequence())) {
                 setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
             }
-            if (!StringUtils.isEmpty(header.getCorrelationId())) {
+            if (StringUtils.isNotBlank(header.getCorrelationId())) {
                 setCorrelationId(header.getCorrelationId());
             }
         }

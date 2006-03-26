@@ -77,7 +77,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             queryString = StringUtils.EMPTY;
         }
         int parameterIndex = -1;
-        while (!StringUtils.isEmpty(currentParam)) {
+        while (StringUtils.isNotBlank(currentParam)) {
             String paramName, paramValue;
             equals = currentParam.indexOf("=");
             if (equals > -1) {

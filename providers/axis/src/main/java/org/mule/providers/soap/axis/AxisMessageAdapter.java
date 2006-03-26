@@ -51,17 +51,17 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
             if (ctx != null) {
                 MuleSoapHeaders header = new MuleSoapHeaders(ctx.getMessage().getSOAPPart().getEnvelope().getHeader());
 
-                if (!StringUtils.isEmpty(header.getReplyTo())) {
+                if (StringUtils.isNotBlank(header.getReplyTo())) {
                     setReplyTo(header.getReplyTo());
                 }
 
-                if (!StringUtils.isEmpty(header.getCorrelationGroup())) {
+                if (StringUtils.isNotBlank(header.getCorrelationGroup())) {
                     setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
                 }
-                if (!StringUtils.isEmpty(header.getCorrelationSequence())) {
+                if (StringUtils.isNotBlank(header.getCorrelationSequence())) {
                     setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
                 }
-                if (!StringUtils.isEmpty(header.getCorrelationId())) {
+                if (StringUtils.isNotBlank(header.getCorrelationId())) {
                     setCorrelationId(header.getCorrelationId());
                 }
 

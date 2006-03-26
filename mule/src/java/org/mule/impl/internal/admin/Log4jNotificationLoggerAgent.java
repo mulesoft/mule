@@ -61,7 +61,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     public String getDescription()
     {
         StringBuffer buf = new StringBuffer(64);
-        if (!StringUtils.isEmpty(logFile)) {
+        if (StringUtils.isNotBlank(logFile)) {
             buf.append("Logging notifications to: ").append(logFile);
         }
         if (enableChainsaw) {
