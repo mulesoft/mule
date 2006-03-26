@@ -385,7 +385,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getUsername()
     {
-        if (!StringUtils.isEmpty(userInfo)) {
+        if (StringUtils.isNotBlank(userInfo)) {
             int i = userInfo.indexOf(":");
             if (i == -1) {
                 return userInfo;
@@ -402,7 +402,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPassword()
     {
-        if (!StringUtils.isEmpty(userInfo)) {
+        if (StringUtils.isNotBlank(userInfo)) {
             int i = userInfo.indexOf(":");
             if (i > -1) {
                 return userInfo.substring(i + 1);

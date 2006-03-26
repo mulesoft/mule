@@ -63,7 +63,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
      */
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        if (!StringUtils.isEmpty(configResources)) {
+        if (StringUtils.isNotBlank(configResources)) {
             if (configResources.indexOf(",") > -1) {
                 throw new ConfigurationException(new Message(Messages.ONLY_SINGLE_RESOURCE_CAN_BE_SPECIFIED));
             }
