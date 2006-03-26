@@ -81,6 +81,7 @@ public class HttpResponseToString extends AbstractTransformer
             bos.flush();
             byte[] result = bos.toByteArray();
             outstream.close();
+            writer.close();
             bos.close();
             if (getReturnClass().equals(String.class)) {
                 return new String(result, encoding);
