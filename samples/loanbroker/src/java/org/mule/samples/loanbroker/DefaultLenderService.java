@@ -13,11 +13,11 @@
  */
 package org.mule.samples.loanbroker;
 
-import org.mule.MuleManager;
-import org.mule.umo.UMOMessage;
-import org.mule.impl.RequestContext;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.impl.RequestContext;
+import org.mule.umo.UMOMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +45,13 @@ public class DefaultLenderService
     public Bank[] getLenderList(CreditProfile creditProfile, Double loanAmount)
     {
         Bank[] lenders;
-        if ((loanAmount.doubleValue() >= (double) 20000)) //&& (creditProfile.getCreditScore() >= 600) && (creditProfile.getCreditHistoryLength() >= 8))
+        if ((loanAmount.doubleValue() >= 20000)) //&& (creditProfile.getCreditScore() >= 600) && (creditProfile.getCreditHistoryLength() >= 8))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank1", getEndpoint("Bank1"));
-            lenders[1] =new Bank("Bank2", getEndpoint("Bank2"));
+            lenders[1] = new Bank("Bank2", getEndpoint("Bank2"));
 
-        } else if (((loanAmount.doubleValue() >= (double) 10000) && (loanAmount.doubleValue() <= (double) 19999))) // && (creditProfile.getCreditScore() >= 400) && (creditProfile.getCreditHistoryLength() >= 3))
+        } else if (((loanAmount.doubleValue() >= 10000) && (loanAmount.doubleValue() <= 19999))) // && (creditProfile.getCreditScore() >= 400) && (creditProfile.getCreditHistoryLength() >= 3))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank3", getEndpoint("Bank3"));
@@ -83,16 +83,24 @@ public class DefaultLenderService
     private String getEndpoint(String name)
     {
         String endpoint = MuleManager.getInstance().lookupEndpointIdentifier(name, null);
-        if (endpoint.startsWith("glue") || endpoint.startsWith("axis") ||
-                endpoint.startsWith("soap"))
+
+        if (endpoint.startsWith("axis")
+            || endpoint.startsWith("xfire")
+            || endpoint.startsWith("glue")
+            || endpoint.startsWith("soap"))
         {
             int i = endpoint.indexOf('?');
-            if(i > -1) {
+            if (i > -1)
+            {
                 endpoint = endpoint.replaceFirst("\\?", "/" + name + "?method=getLoanQuote\\&");
-            } else {
+            }
+            else
+            {
                 endpoint += "/" + name + "?method=getLoanQuote";
             }
         }
+
         return endpoint;
     }
+
 }
