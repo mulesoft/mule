@@ -41,7 +41,7 @@ public class CookieHelper
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(CookieHelper.class);
+    protected static transient final Log logger = LogFactory.getLog(CookieHelper.class);
 
     public static CookieSpec getCookieSpec(String spec)
     {
