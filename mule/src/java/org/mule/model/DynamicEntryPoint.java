@@ -27,7 +27,6 @@ import org.mule.util.ClassHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +34,20 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>DynamicEntryPoint</code> is used to detemine the entry point on a
- * bean after an event has been received for it. The entrypoint is then
- * discovered using the event payload type as the argument. An entry point will
- * try and be matched for different argument types so it's possible to have
- * multiple entry points on a single component.
+ * bean after an event has been received for it. It is possible to force method
+ * resolution to a specific name by setting the <code>method</code> property on
+ * the endpoint. The default discovery steps are:
+ * <ul>
+ *  <li>If a {@link Callable} implementation encountered, ignore method
+ * override and invoke.</li>
+ *  <li>If the target has a method accepting a single {@link UMOEventContext},
+ * ignore method override and invoke. A component does not necessarily have to
+ * implement the {@link Callable}</li>
+ *  <li>If a method override has been specified, attempt discovery by that name.
+ * If none found, an exception is thrown.</li>
+ *  <li>If none of the above, attempt to match by the payload type. If more than
+ * one or zero matching methods are found, throw an exception.</li>
+ * </ul>
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
