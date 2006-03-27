@@ -30,7 +30,7 @@ import java.util.Iterator;
 /**
  * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
  * attahcments and Mule headers
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -133,7 +133,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     protected void initAttachments()
     {
         try {
-            Attachment att = null;
+            Attachment att;
             if (this.messageContext.getInMessage().getAttachments() != null) {
                 for (Iterator i = this.messageContext.getInMessage().getAttachments().getParts(); i
                         .hasNext();) {
