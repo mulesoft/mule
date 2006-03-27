@@ -1,6 +1,8 @@
 #! /bin/sh
 # There is no need to call this if you set the MULE_HOME in your environment
-export MULE_HOME=../../..
+if [ -z "$MULE_HOME" ] ; then
+  export MULE_HOME=../../..
+fi
 
 #Set the main class to run
 export MULE_MAIN=org.mule.samples.voipservice.client.VoipConsumer
