@@ -129,9 +129,10 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-        WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter());
-        if ("GET".equals(method.toUpperCase())) {
+        WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter(4096));
+        String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
+                HttpConstants.METHOD_POST);
+        if (HttpConstants.METHOD_GET.equalsIgnoreCase(method)) {
             doGet(context, response);
         } else {
             doPost(context, response);
