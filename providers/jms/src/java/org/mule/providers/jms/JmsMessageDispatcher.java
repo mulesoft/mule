@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.jms;
@@ -62,7 +62,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#dispatchEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
@@ -123,7 +123,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
-            producer = connector.getJmsSupport().createProducer(session, dest);
+            producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
             Object message = event.getTransformedMessage();
             if (!(message instanceof Message)) {
@@ -146,34 +146,34 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             // Some JMS implementations might not support the ReplyTo property.
             if (connector.getJmsSupport().supportsProperty(JmsConstants.JMS_REPLY_TO)) {
             	Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
-	            if (tempReplyTo != null) {
-	                if (tempReplyTo instanceof Destination) {
-	                    replyTo = (Destination) tempReplyTo;
-	                } else {
-	                    boolean replyToTopic = false;
-	                    String reply = tempReplyTo.toString();
-	                    int i = reply.indexOf(":");
-	                    if (i > -1) {
-	                        String qtype = reply.substring(0, i);
-	                        replyToTopic = "topic".equalsIgnoreCase(qtype);
-	                        reply = reply.substring(i + 1);
-	                    }
-	                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
-	                }
-	            }
-	            // Are we going to wait for a return event ?
-	            if (remoteSync && replyTo == null) {
-	                replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
-	            }
-	            // Set the replyTo property
-	            if (replyTo != null) {
-	                msg.setJMSReplyTo(replyTo);
-	            }
-	            
-	            // Are we going to wait for a return event ?
-	            if (remoteSync) {
-	                consumer = connector.getJmsSupport().createConsumer(session, replyTo);
-	            }
+                if (tempReplyTo != null) {
+                    if (tempReplyTo instanceof Destination) {
+                        replyTo = (Destination) tempReplyTo;
+                    } else {
+                        boolean replyToTopic = false;
+                        String reply = tempReplyTo.toString();
+                        int i = reply.indexOf(":");
+                        if (i > -1) {
+                            String qtype = reply.substring(0, i);
+                            replyToTopic = "topic".equalsIgnoreCase(qtype);
+                            reply = reply.substring(i + 1);
+                        }
+                        replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
+                    }
+                }
+                // Are we going to wait for a return event ?
+                if (remoteSync && replyTo == null) {
+                    replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+                }
+                // Set the replyTo property
+                if (replyTo != null) {
+                    msg.setJMSReplyTo(replyTo);
+                }
+
+                // Are we going to wait for a return event ?
+                if (remoteSync) {
+                    consumer = connector.getJmsSupport().createConsumer(session, replyTo, topic);
+                }
             }
 
             // QoS support
@@ -201,7 +201,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 ReplyToListener listener = new ReplyToListener(l);
                 consumer.setMessageListener(listener);
 
-                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
+                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
                 int timeout = event.getTimeout();
                 logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
@@ -217,7 +217,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                     return new MuleMessage(resultObject);
                 }
             } else {
-                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
+                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
                 if (consumer != null) {
                     int timeout = event.getTimeout();
                     logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
@@ -243,7 +243,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
@@ -254,7 +254,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
@@ -269,7 +269,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
             session = connector.getSession(false, topic);
             dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
-            consumer = connector.getJmsSupport().createConsumer(session, dest);
+            consumer = connector.getJmsSupport().createConsumer(session, dest, topic);
 
             try {
                 Message message = null;
@@ -296,7 +296,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
     public synchronized Object getDelegateSession() throws UMOException {
@@ -320,7 +320,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageDispatcher#getConnector()
      */
     public UMOConnector getConnector() {

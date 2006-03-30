@@ -51,7 +51,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createDurableSubscriber", matcher);
 
-        jmsSupport.createConsumer((Session) mockSession.proxy(), topic, null, noLocal, durableName);
+        jmsSupport.createConsumer((Session) mockSession.proxy(), topic, null, noLocal, durableName, true);
 
         mockTopic.verify();
         mockSession.verify();
@@ -73,7 +73,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createConsumer", matcher);
 
-        jmsSupport.createConsumer((Session) mockSession.proxy(), topic, null, noLocal, null);
+        jmsSupport.createConsumer((Session) mockSession.proxy(), topic, null, noLocal, null, true);
 
         mockTopic.verify();
         mockSession.verify();
@@ -95,7 +95,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createConsumer", matcher);
 
-        jmsSupport.createConsumer((Session) mockSession.proxy(), queue, null, noLocal, null);
+        jmsSupport.createConsumer((Session) mockSession.proxy(), queue, null, noLocal, null, false);
 
         mockQueue.verify();
         mockSession.verify();
@@ -114,7 +114,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
 
         try {
-            jmsSupport.createConsumer((Session) mockSession.proxy(), queue, null, noLocal, durableName);
+            jmsSupport.createConsumer((Session) mockSession.proxy(), queue, null, noLocal, durableName, false);
         } catch (JMSException jmsex) {
             // expected
             assertEquals("Wrong exception text.",

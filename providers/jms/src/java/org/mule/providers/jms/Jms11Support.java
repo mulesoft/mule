@@ -28,10 +28,13 @@ import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>Jms11Support</code> is a template class to provide an absstraction to
  * to the Jms 1.1 api specification.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -74,32 +77,35 @@ public class Jms11Support implements JmsSupport
         return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
     }
 
-    public MessageProducer createProducer(Session session, Destination destination) throws JMSException
+    public MessageProducer createProducer(Session session, Destination destination, boolean topic) throws JMSException
     {
         return session.createProducer(destination);
     }
 
-    public MessageConsumer createConsumer(Session session, Destination destination) throws JMSException
+    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic) throws JMSException
     {
-        return createConsumer(session, destination, null, false, null);
+        return createConsumer(session, destination, null, false, null, topic);
     }
 
     public MessageConsumer createConsumer(Session session,
                                           Destination destination,
                                           String messageSelector,
                                           boolean noLocal,
-                                          String durableName) throws JMSException
+                                          String durableName,
+                                          boolean topic) throws JMSException
     {
         if (durableName == null) {
-            if (destination instanceof Topic) {
+            if (topic) {
                 return session.createConsumer(destination, messageSelector, noLocal);
             } else {
                 return session.createConsumer(destination, messageSelector);
             }
-        } else if (destination instanceof Topic) {
-            return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
         } else {
-            throw new JMSException("A durable subscriber name was set but the destination was not a Topic");
+            if (topic) {
+                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
+            } else {
+                throw new JMSException("A durable subscriber name was set but the destination was not a Topic");
+            }
         }
     }
 
@@ -124,18 +130,12 @@ public class Jms11Support implements JmsSupport
             }
         }
 
-        if (!topic) {
-            if (session instanceof QueueSession) {
-                return ((QueueSession) session).createQueue(name);
-            } else {
-                return session.createQueue(name);
-            }
+        if (topic && session instanceof TopicSession) {
+            return ((TopicSession) session).createTopic(name);
+        } else if (session instanceof QueueSession) {
+            return ((QueueSession) session).createQueue(name);
         } else {
-            if (session instanceof TopicSession) {
-                return ((TopicSession) session).createTopic(name);
-            } else {
-                return session.createTopic(name);
-            }
+            throw new IllegalArgumentException("Session and domain type do not match");
         }
     }
 
@@ -163,41 +163,37 @@ public class Jms11Support implements JmsSupport
             throw new IllegalArgumentException("Session cannot be null when creating a destination");
         }
 
-        if (!topic) {
-            if (session instanceof QueueSession) {
-                return ((QueueSession) session).createTemporaryQueue();
-            } else {
-                return session.createTemporaryQueue();
-            }
+        if (topic && session instanceof TopicSession) {
+            return ((TopicSession) session).createTemporaryTopic();
+        } else if (session instanceof QueueSession) {
+            return ((QueueSession) session).createTemporaryQueue();
         } else {
-            if (session instanceof TopicSession) {
-                return ((TopicSession) session).createTemporaryTopic();
-            } else {
-                return session.createTemporaryTopic();
-            }
+            throw new IllegalArgumentException("Session and domain type do not match");
         }
     }
 
-    public void send(MessageProducer producer, Message message) throws JMSException
+    public void send(MessageProducer producer, Message message, boolean topic) throws JMSException
     {
         send(producer,
              message,
              connector.isPersistentDelivery(),
              Message.DEFAULT_PRIORITY,
-             Message.DEFAULT_TIME_TO_LIVE);
+             Message.DEFAULT_TIME_TO_LIVE,
+             topic);
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest) throws JMSException
+    public void send(MessageProducer producer, Message message, Destination dest, boolean topic) throws JMSException
     {
         send(producer,
              message,
              dest,
              connector.isPersistentDelivery(),
              Message.DEFAULT_PRIORITY,
-             Message.DEFAULT_TIME_TO_LIVE);
+             Message.DEFAULT_TIME_TO_LIVE,
+             topic);
     }
 
-    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl)
+    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic)
             throws JMSException
     {
         producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
@@ -208,7 +204,8 @@ public class Jms11Support implements JmsSupport
                      Destination dest,
                      boolean persistent,
                      int priority,
-                     long ttl) throws JMSException
+                     long ttl,
+                     boolean topic) throws JMSException
     {
         producer.send(dest,
                       message,
@@ -216,11 +213,12 @@ public class Jms11Support implements JmsSupport
                       priority,
                       ttl);
     }
-    
-    /** 
+
+    /**
      * This method may be overridden in case a certain JMS implementation does not support all the standard JMS properties.
      */
     public boolean supportsProperty(String property) {
-    	return true;
+        return true;
     }
 }
+

@@ -37,7 +37,7 @@ import javax.jms.Topic;
 
 /**
  * Registers a single Jms MessageListener for an endpoint
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  *
@@ -68,7 +68,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     public void doConnect() throws Exception
     {
-		createConsumer();
+        createConsumer();
         if(startOnConnect) {
             doStart();
         }
@@ -76,7 +76,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     public void doDisconnect() throws Exception
     {
-    	closeConsumer();
+        closeConsumer();
     }
 
     public void onMessage(Message message)
@@ -151,52 +151,51 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
      */
     protected void createConsumer() throws Exception
     {
-    	try {
-	        JmsSupport jmsSupport = this.connector.getJmsSupport();
-	        // Create session if none exists
-	        if (session == null) {
-	    		session = this.connector.getSession(endpoint);
-	        }
+        try {
+            JmsSupport jmsSupport = this.connector.getJmsSupport();
+            // Create session if none exists
+            if (session == null) {
+                session = this.connector.getSession(endpoint);
+            }
 
-	        // Create destination
-	        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-	        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
+            // Create destination
+            String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+            boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
             //todo MULE20 remove resource Info support
             if(!topic) {
                 topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);
             }
 
-	        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
+            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
 
-	        // Extract jms selector
-	        String selector = null;
-	        if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-	            selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-	        } else if (endpoint.getProperties() != null) {
-	            // still allow the selector to be set as a property on the endpoint
-	            // to be backward compatable
-	            selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
-	        }
-	        String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
-	        boolean durable = connector.isDurable();
+            // Extract jms selector
+            String selector = null;
+            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
+                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+            } else if (endpoint.getProperties() != null) {
+                // still allow the selector to be set as a property on the endpoint
+                // to be backward compatable
+                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+            }
+            String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            boolean durable = connector.isDurable();
 	        if (tempDurable != null) {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 
-	        // Get the durable subscriber name if there is one
-	        String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
-	        if (durableName == null && durable && dest instanceof Topic) {
-	            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
-	            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-	                    + durableName);
-	        }
+            // Get the durable subscriber name if there is one
+            String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
+            if (durableName == null && durable && dest instanceof Topic) {
+                durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
+                logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
+                        + durableName);
+            }
 
-	        // Create consumer
-	        consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
-    	} catch (JMSException e) {
-    		throw new ConnectException(e, this);
-    	}
+            // Create consumer
+            consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName, topic);
+        } catch (JMSException e) {
+            throw new ConnectException(e, this);
+        }
     }
-
 }

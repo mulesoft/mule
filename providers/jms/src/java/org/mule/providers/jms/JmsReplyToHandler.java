@@ -31,7 +31,7 @@ import javax.jms.Topic;
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
  * the defualt replyTo handler if the replyTo is a url
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -65,11 +65,12 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 if(getTransformer().isSourceTypeSupported(payload.getClass())) {
                     payload = getTransformer().transform(payload);
                 } else if(logger.isDebugEnabled()) {
-                    logger.debug("transformer for replyTo Handler: " + getTransformer().toString() + 
+                    logger.debug("transformer for replyTo Handler: " + getTransformer().toString() +
                             " does not support source type: "  + payload.getClass() + ". Not doing a transform");
                 }
             }
-            session = connector.getSession(false, replyToDestination instanceof Topic);
+            boolean topic = replyToDestination instanceof Topic;
+            session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
             replyToMessage.setJMSReplyTo(null);
@@ -77,7 +78,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 logger.debug("Sending jms reply to: " + replyToDestination + "("
                         + replyToDestination.getClass().getName() + ")");
             }
-            replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination);
+            replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination, topic);
 
             // QoS support
             UMOMessage eventMsg = event.getMessage();
@@ -86,7 +87,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             String persistentDeliveryString = (String) eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null) {
-                connector.getJmsSupport().send(replyToProducer, replyToMessage);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
             } else {
                 long ttl = Message.DEFAULT_TIME_TO_LIVE;
                 int priority = Message.DEFAULT_PRIORITY;
@@ -102,7 +103,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                     persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
                 }
 
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl, topic);
             }
 
             // connector.getJmsSupport().send(replyToProducer, replyToMessage,
