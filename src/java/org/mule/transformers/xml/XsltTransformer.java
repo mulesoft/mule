@@ -39,7 +39,7 @@ import java.io.InputStream;
 /**
  * <code>XsltTransformer</code> performs a xslt transform on a Dom object
  *
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
+ * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe St?phane</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -97,7 +97,15 @@ public class XsltTransformer extends AbstractTransformer {
             errorListener = new DefaultErrorListener(this);
             transformer.setErrorListener(errorListener);
 
+            if (logger.isDebugEnabled()) {
+                logger.debug("Before transform: " + sourceDoc.toString());
+            }
+
             transformer.transform(sourceDoc, resultDoc);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("After transform: " + resultDoc.toString());
+            }
 
             if(errorListener.isError()) {
                 throw errorListener.getException();

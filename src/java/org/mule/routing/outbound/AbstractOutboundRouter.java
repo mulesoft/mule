@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
  * statics about message processing through the router.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -67,12 +67,12 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         setMessageProperties(session, message, endpoint);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Message Being sent from: " + endpoint.getEndpointURI());
+            logger.debug("Message being sent to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
         if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Send Message Payload: \n" + message.getPayloadAsString());
+                logger.trace("Message payload: \n" + message.getPayloadAsString());
             } catch (Exception e) {
                 // ignore
             }
@@ -97,12 +97,12 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         setMessageProperties(session, message, endpoint);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Message Being sent from: " + endpoint.getEndpointURI());
+            logger.debug("Message being sent to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
         if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Send Message Payload: \n" + message.getPayloadAsString());
+                logger.trace("Message payload: \n" + message.getPayloadAsString());
             } catch (Exception e) {
                 // ignore
             }
@@ -115,12 +115,12 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Response Message from sending on: " + endpoint.getEndpointURI());
+            logger.debug("Response message from sending to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
          if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Response Message Payload: \n" + message.getPayloadAsString());
+                logger.trace("Message payload: \n" + message.getPayloadAsString());
             } catch (Exception e) {
                 // ignore
             }
