@@ -3,13 +3,13 @@
  * 2004/01/18 12:06:05 rossmason Exp $ $Revision$ $Date: 2004/01/18
  * 12:06:05 $
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- *  
+ *
  */
 package org.mule.impl.model;
 
@@ -50,7 +50,7 @@ import java.util.List;
  * model encapsulates and manages the runtime behaviour of a Mule Server
  * instance. It is responsible for maintaining the UMOs instances and their
  * configuration.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -353,13 +353,13 @@ public abstract class AbstractModel implements UMOModel
             for (Iterator i = components.values().iterator(); i.hasNext();) {
                 UMOComponent temp = (UMOComponent) i.next();
                 if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_STARTED)) {
-                    registerListeners(temp);
                     temp.start();
+                    registerListeners(temp);
                     logger.info("Component " + temp + " has been started successfully");
                 } else if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_PAUSED)) {
-                    registerListeners(temp);
                     temp.start();
                     temp.pause();
+                    registerListeners(temp);
                     logger.info("Component " + temp + " has an initial state of 'paused'");
 
                 } else {
