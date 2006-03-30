@@ -221,6 +221,16 @@ public class Jms11Support implements JmsSupport
         return true;
     }
 
+    /** This method may be overridden in order to apply pre-processing to the message
+     * as soon as it arrives.
+     * @param message - the incoming message
+     * @param session - the JMS session
+     * @return the preprocessed message
+     */
+    public Message preProcessMessage(Message message, Session session) throws Exception {
+        return message;
+    }
+
     public void close(MessageProducer producer) throws JMSException
     {
         if (producer != null) {

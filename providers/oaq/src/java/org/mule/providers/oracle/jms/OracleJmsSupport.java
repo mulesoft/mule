@@ -225,6 +225,34 @@ public class OracleJmsSupport extends Jms102bSupport {
     }
 
     /**
+     * If the incoming message is an XMLType, return it as a standard {@code javax.jms.TextMessage}.
+     * If the incoming message is any other AdtMessage, return it as a standard {@code javax.jms.ObjectMessage}.
+     */
+    public Message preProcessMessage(Message message, Session session) throws Exception {
+        Object payload;
+        Message newMessage;
+
+        if (message instanceof AdtMessage) {
+            payload = ((AdtMessage) message).getAdtPayload();
+
+            if (payload instanceof XMLType) {
+                newMessage = session.createTextMessage(((XMLType) payload).getStringVal());
+            }
+            else if (payload instanceof Serializable) {
+                newMessage = session.createObjectMessage((Serializable) payload);
+            }
+            else {
+                throw new JMSException("The payload of the incoming AdtMessage must be serializable.");
+            }
+            // TODO Is there a better way to do this?
+            JmsMessageUtils.copyJMSProperties(message, newMessage, this);
+            return newMessage;
+        } else {
+            return message;
+        }
+    }
+
+    /**
      * Close the underlying JDBC connection before closing the JMS session.
      */
     public void close(Session session) throws JMSException {

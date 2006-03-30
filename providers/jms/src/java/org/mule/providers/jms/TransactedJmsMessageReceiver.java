@@ -176,6 +176,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             }
             return null;
         }
+        message = connector.getJmsSupport().preProcessMessage(message, ctx.session);
 
         // Process message
         if (logger.isDebugEnabled()) {

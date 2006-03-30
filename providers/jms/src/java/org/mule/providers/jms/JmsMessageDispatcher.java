@@ -283,6 +283,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 if (message == null) {
                     return null;
                 }
+
+                message = connector.getJmsSupport().preProcessMessage(message, session);
+
                 return new MuleMessage(connector.getMessageAdapter(message));
             } catch (Exception e) {
                 connector.handleException(e);

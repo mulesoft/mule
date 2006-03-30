@@ -29,7 +29,7 @@ import javax.jms.Session;
 /**
  * Transformer for use with the Oracle Jms Connector.
  * Expects a string containing properly-formed XML.
- * Creates a JMS message whose payload is Oracle's native XML data type. 
+ * Creates a JMS message whose payload is Oracle's native XML data type.
  *
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @see XMLMessageToString
@@ -47,7 +47,7 @@ public class StringToXMLMessage extends AbstractTransformer {
 
     /**
      * @param xml - String containing properly-formed XML.
-     * @return JMS message whose payload is Oracle's native XML data type 
+     * @return JMS message whose payload is Oracle's native XML data type
      */
     public Object doTransform(Object xml, String encoding) throws TransformerException {
         Session session = null;
@@ -58,20 +58,22 @@ public class StringToXMLMessage extends AbstractTransformer {
         try { session = (Session) getEndpoint().getConnector().getDispatcher("transformerSession").getDelegateSession();
         } catch (UMOException e) { throw new TransformerException(this, e); }
         if (!(session instanceof AQjmsSession)) {
-        	throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);
+            throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);
         }
 
         try {
-        	// Make sure the object to transform is one of the supported types for this
-        	// transformer.
+            // Make sure the object to transform is one of the supported types for this
+            // transformer.
             if (xml instanceof String) {
+                logger.debug("Converting string to XMLType: " + xml);
                 xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
-                            		  		(String) xml);
+                                              (String) xml);
             } else if (xml instanceof byte[]) {
-                    xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
-                                		  		new String((byte[]) xml, encoding));
+                logger.debug("Converting bytes to XMLType: " + xml);
+                xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
+                                              new String((byte[]) xml, encoding));
             } else {
-            	throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
+                throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
             }
 
             // Create the JMS message.

@@ -78,4 +78,6 @@ public interface JmsSupport
     void close(Session session) throws JMSException;
 
     void closeQuietly(Session session);
+
+    Message preProcessMessage(Message message, Session session) throws Exception;
 }
