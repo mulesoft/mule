@@ -66,4 +66,16 @@ public interface JmsSupport
             throws JMSException;
 
     boolean supportsProperty(String property);
+
+    void close(MessageProducer producer) throws JMSException;
+
+    void closeQuietly(MessageProducer producer);
+
+    void close(MessageConsumer consumer) throws JMSException;
+
+    void closeQuietly(MessageConsumer consumer);
+
+    void close(Session session) throws JMSException;
+
+    void closeQuietly(Session session);
 }

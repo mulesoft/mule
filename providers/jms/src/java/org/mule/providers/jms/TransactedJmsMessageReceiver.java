@@ -226,13 +226,13 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
         // Close consumer
         if (force || !reuseSession || !reuseConsumer) {
-            JmsUtils.closeQuietly(ctx.consumer);
+            connector.getJmsSupport().closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
         // Do not close session if a transaction is in progress
         // the session will be close by the transaction
         if (force || !reuseSession) {
-            JmsUtils.closeQuietly(ctx.session);
+            connector.getJmsSupport().closeQuietly(ctx.session);
             ctx.session = null;
         }
     }

@@ -115,8 +115,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                         returnMessage,
                                         null, e);
         } finally {
-            JmsUtils.closeQuietly(replyToProducer);
-            JmsUtils.closeQuietly(session);
+            connector.getJmsSupport().closeQuietly(replyToProducer);
+            connector.getJmsSupport().closeQuietly(session);
         }
     }
 }

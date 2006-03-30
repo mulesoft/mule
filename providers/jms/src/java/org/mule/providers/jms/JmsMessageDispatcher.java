@@ -233,10 +233,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
             return null;
         } finally {
-            JmsUtils.closeQuietly(consumer);
-            JmsUtils.closeQuietly(producer);
+            connector.getJmsSupport().closeQuietly(consumer);
+            connector.getJmsSupport().closeQuietly(producer);
             if (session != null && !cacheJmsSession && !session.equals(txSession)) {
-                JmsUtils.closeQuietly(session);
+                connector.getJmsSupport().closeQuietly(session);
             }
         }
     }
@@ -289,8 +289,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 return null;
             }
         } finally {
-            JmsUtils.closeQuietly(consumer);
-            JmsUtils.closeQuietly(session);
+            connector.getJmsSupport().closeQuietly(consumer);
+            connector.getJmsSupport().closeQuietly(session);
         }
     }
 
@@ -329,8 +329,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     public void doDispose() {
         logger.debug("Disposing");
-        JmsUtils.closeQuietly(delegateSession);
-        JmsUtils.closeQuietly(cachedSession);
+        connector.getJmsSupport().closeQuietly(delegateSession);
+        connector.getJmsSupport().closeQuietly(cachedSession);
     }
 
     private class ReplyToListener implements MessageListener {

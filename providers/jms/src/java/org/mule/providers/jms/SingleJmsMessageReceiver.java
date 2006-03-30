@@ -138,9 +138,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     protected void closeConsumer()
     {
-        JmsUtils.closeQuietly(consumer);
+        connector.getJmsSupport().closeQuietly(consumer);
         consumer = null;
-        JmsUtils.closeQuietly(session);
+        connector.getJmsSupport().closeQuietly(session);
         session = null;
     }
 

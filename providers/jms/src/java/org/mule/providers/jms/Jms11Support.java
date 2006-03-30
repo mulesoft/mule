@@ -220,5 +220,60 @@ public class Jms11Support implements JmsSupport
     public boolean supportsProperty(String property) {
         return true;
     }
-}
 
+    public void close(MessageProducer producer) throws JMSException
+    {
+        if (producer != null) {
+            producer.close();
+        }
+    }
+
+    public void closeQuietly(MessageProducer producer)
+    {
+        if (producer != null) {
+            try {
+                producer.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms message producer", e);
+            }
+        }
+    }
+
+    public void close(MessageConsumer consumer) throws JMSException
+    {
+        if (consumer != null) {
+            consumer.close();
+        }
+    }
+
+    public void closeQuietly(MessageConsumer consumer)
+    {
+        if (consumer != null) {
+            try {
+                consumer.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms message consumer", e);
+            }
+        }
+    }
+
+    public void close(Session session) throws JMSException
+    {
+        if (session != null) {
+            session.close();
+        }
+    }
+
+    public void closeQuietly(Session session)
+    {
+        if (session != null) {
+            try {
+                session.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms session consumer", e);
+            }
+        }
+    }
+
+    private static final transient Log logger = LogFactory.getLog(Jms11Support.class);
+}

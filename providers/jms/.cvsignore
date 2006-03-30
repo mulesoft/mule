@@ -6,3 +6,4 @@ bin
 mule-jms-provider.iml
 .fbprefs
 .fbwarnings
+.wtpmodules
