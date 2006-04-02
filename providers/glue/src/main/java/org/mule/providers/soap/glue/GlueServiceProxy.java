@@ -41,7 +41,8 @@ public class GlueServiceProxy extends ServiceProxy
 {
     public static Object createProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
-        return Proxy.newProxyInstance(GlueServiceProxy.class.getClassLoader(),
+        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return Proxy.newProxyInstance(cl,
                                       classes,
                                       createServiceHandler(receiver, synchronous));
     }
