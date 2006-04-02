@@ -132,6 +132,8 @@ public class OracleJmsConnector extends JmsConnector {
             jdbcConnectionPool.setUser(username);
             jdbcConnectionPool.setPassword(password);
             jdbcConnectionPool.setURL(url);
+
+            setJmsSupport(new OracleJmsSupport(this, null, false, false));
         } catch (SQLException e) {
             throw new InitialisationException(e, this);
         }
@@ -145,7 +147,6 @@ public class OracleJmsConnector extends JmsConnector {
             setJndiDestinations(false);
             setForceJndiDestinations(false);
 
-            setJmsSupport(new OracleJmsSupport(this, null, false, false));
         } catch (Exception e) {
             throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Oracle Jms Connector"), e, this);
         }
