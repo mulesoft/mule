@@ -20,7 +20,7 @@ import org.mule.umo.lifecycle.Callable;
 
 /**
  * Creates an optimised Mule proxy for pooling which does away with the
- * replection and inteception on objects
+ * reflection and inteception on objects
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
