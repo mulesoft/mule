@@ -4,14 +4,15 @@
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="TestConfiguration" version="1.0">
-		
-	<connector name="oracleJmsConnector" className="org.mule.providers.oracle.jms.OracleJmsConnector">
-	    <properties>
-			<property name="url" value="jdbc:oracle:oci:@eaid" /> 
-	        <property name="username" value="eai" />
-	        <property name="password" value="eai" />
-	    </properties>
-	</connector>
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="oracleJmsConnector" className="org.mule.providers.oracle.jms.OracleJmsConnector">
+        <properties>
+            <property name="url" value="jdbc:oracle:oci:@eaid" />
+            <property name="username" value="jms" />
+            <property name="password" value="jms" />
+        </properties>
+    </connector>
 
     <transformers>
         <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"

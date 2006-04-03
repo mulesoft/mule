@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.codehaus.mule.tests</groupId>
-        <artifactId>mule-tests-external-deps</artifactId>
+        <artifactId>mule-tests-vendor</artifactId>
         <relativePath>../pom.xml</relativePath>
         <version>2.0-SNAPSHOT</version>
     </parent>
@@ -15,14 +15,41 @@
     <description>Functional and integration tests for the Mule Oracle JMS provider.</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-oracle-jms-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>9i</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>jmscommon</artifactId>
+            <version>9i</version>
+        </dependency>
+
+        <!-- For XMLType only -->
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>xdb</artifactId>
+            <version>9i</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>xmlparserv2-distilled</artifactId>
+            <version>9i</version>
+        </dependency>
+
         <!-- The native AQ (i.e., non-JMS) API is only needed for administrative functions
         (creating/deleting queues, etc.) -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>aqapi13</artifactId>
             <version>9i</version>
-            <!-- Compilation fails with the 'test' scope-->
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
