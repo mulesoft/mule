@@ -14,8 +14,6 @@
  */
 package org.mule.providers.oracle.jms;
 
-import java.io.Serializable;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -23,7 +21,6 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
@@ -37,16 +34,11 @@ import javax.naming.Context;
 import oracle.jms.AQjmsQueueConnectionFactory;
 import oracle.jms.AQjmsSession;
 import oracle.jms.AQjmsTopicConnectionFactory;
-import oracle.jms.AdtMessage;
-import oracle.xdb.XMLType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.JmsMessageUtils;
-import org.mule.umo.provider.UMOConnector;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's
@@ -71,15 +63,6 @@ public class OracleJmsSupport extends Jms102bSupport {
     public OracleJmsSupport(JmsConnector connector, Context context,
                             boolean jndiDestinations, boolean forceJndiDestinations) {
         super(connector, context, jndiDestinations, forceJndiDestinations);
-    }
-
-    /**
-     * Oracle throws a "JMS-102: Feature not supported" error if any of these
-     * "standard" properties are used.
-     */
-    public boolean supportsProperty(String property) {
-        return (property.equalsIgnoreCase(JmsConstants.JMS_REPLY_TO) == false
-                && property.equalsIgnoreCase(JmsConstants.JMS_TYPE) == false);
     }
 
     /** The Oracle JMS implementation requires a JDBC Connection to be created prior to
@@ -222,65 +205,6 @@ public class OracleJmsSupport extends Jms102bSupport {
             } if (ex != null) throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass);
         }
         return payloadFactory;
-    }
-
-    /**
-     * If the incoming message is an XMLType, return it as a standard {@code javax.jms.TextMessage}.
-     * If the incoming message is any other AdtMessage, return it as a standard {@code javax.jms.ObjectMessage}.
-     */
-    public Message preProcessMessage(Message message, Session session) throws Exception {
-        Object payload;
-        Message newMessage;
-
-        if (message instanceof AdtMessage) {
-            payload = ((AdtMessage) message).getAdtPayload();
-
-            if (payload instanceof XMLType) {
-                newMessage = session.createTextMessage(((XMLType) payload).getStringVal());
-            }
-            else if (payload instanceof Serializable) {
-                newMessage = session.createObjectMessage((Serializable) payload);
-            }
-            else {
-                throw new JMSException("The payload of the incoming AdtMessage must be serializable.");
-            }
-            // TODO Is there a better way to do this?
-            JmsMessageUtils.copyJMSProperties(message, newMessage, this);
-            return newMessage;
-        } else {
-            return message;
-        }
-    }
-
-    /**
-     * Close the underlying JDBC connection before closing the JMS session.
-     */
-    public void close(Session session) throws JMSException {
-        if (session != null) {
-            try {
-                ((AQjmsSession) session).getDBConnection().close();
-            } catch (SQLException e) {
-                throw new JMSException("Failed to close the Oracle JMS session's underlying JDBC connection: " + e.getMessage());
-            }
-        }
-        super.close(session);
-    }
-
-    /**
-     * Close the underlying JDBC connection before closing the JMS session.
-     */
-    public void closeQuietly(Session session) {
-        if (session != null) {
-            try {
-                ((AQjmsSession) session).getDBConnection().close();
-                session.close();
-            } catch (SQLException e) {
-                log.error("Failed to close the Oracle JMS session's underlying JDBC connection", e);
-            } catch (JMSException e) {
-                log.error("Failed to close the Oracle JMS session's underlying JDBC connection", e);
-            }
-        }
-        super.closeQuietly(session);
     }
 
     public Map getEndpointProperties() {

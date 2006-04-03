@@ -138,9 +138,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     protected void closeConsumer()
     {
-        connector.getJmsSupport().closeQuietly(consumer);
+        connector.closeQuietly(consumer);
         consumer = null;
-        connector.getJmsSupport().closeQuietly(session);
+        connector.closeQuietly(session);
         session = null;
     }
 
@@ -180,7 +180,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
             }
             String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
-	        if (tempDurable != null) {
+            if (tempDurable != null) {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 

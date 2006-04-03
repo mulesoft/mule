@@ -255,35 +255,35 @@ public class JmsMessageUtils
         }
     }
 
-    public static Message copyJMSProperties(Message from, Message to, JmsSupport jmsSupport) throws JMSException {
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_CORRELATION_ID)) {
+    public static Message copyJMSProperties(Message from, Message to, JmsConnector connector) throws JMSException {
+        if (connector.supportsProperty(JmsConstants.JMS_CORRELATION_ID)) {
             to.setJMSCorrelationID(from.getJMSCorrelationID());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_DELIVERY_MODE)) {
+        if (connector.supportsProperty(JmsConstants.JMS_DELIVERY_MODE)) {
             to.setJMSDeliveryMode(from.getJMSDeliveryMode());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_DESTINATION)) {
+        if (connector.supportsProperty(JmsConstants.JMS_DESTINATION)) {
             to.setJMSDestination(from.getJMSDestination());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_EXPIRATION)) {
+        if (connector.supportsProperty(JmsConstants.JMS_EXPIRATION)) {
             to.setJMSExpiration(from.getJMSExpiration());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_MESSAGE_ID)) {
+        if (connector.supportsProperty(JmsConstants.JMS_MESSAGE_ID)) {
             to.setJMSMessageID(from.getJMSMessageID());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_PRIORITY)) {
+        if (connector.supportsProperty(JmsConstants.JMS_PRIORITY)) {
             to.setJMSPriority(from.getJMSPriority());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_REDELIVERED)) {
+        if (connector.supportsProperty(JmsConstants.JMS_REDELIVERED)) {
             to.setJMSRedelivered(from.getJMSRedelivered());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_REPLY_TO)) {
+        if (connector.supportsProperty(JmsConstants.JMS_REPLY_TO)) {
             to.setJMSReplyTo(from.getJMSReplyTo());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_TIMESTAMP)) {
+        if (connector.supportsProperty(JmsConstants.JMS_TIMESTAMP)) {
             to.setJMSTimestamp(from.getJMSTimestamp());
         }
-        if (jmsSupport.supportsProperty(JmsConstants.JMS_TYPE)) {
+        if (connector.supportsProperty(JmsConstants.JMS_TYPE)) {
             to.setJMSType(from.getJMSType());
         }
         return to;

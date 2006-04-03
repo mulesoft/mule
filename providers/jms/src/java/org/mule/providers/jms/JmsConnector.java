@@ -47,6 +47,8 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
 import javax.naming.Context;
@@ -126,7 +128,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
     public void doInitialise() throws InitialisationException
@@ -244,7 +246,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     }
 
 
-    public void doConnect() throws ConnectException 
+    public void doConnect() throws ConnectException
     {
         try {
             // If we have a connection factory, there is no need to initialise
@@ -266,7 +268,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
                 }
             }
             if (connectionFactory == null) {
-            	connectionFactory = createConnectionFactory();
+                connectionFactory = createConnectionFactory();
             }
             if (connectionFactoryProperties != null && !connectionFactoryProperties.isEmpty()) {
                 // apply connection factory properties
@@ -276,30 +278,30 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
 
-    	try {
+        try {
             connection = createConnection();
             if (started.get()) {
-            	connection.start();
+                connection.start();
             }
-    	} catch (Exception e) {
-    		throw new ConnectException(e, this);
-    	}
+        } catch (Exception e) {
+            throw new ConnectException(e, this);
+        }
     }
-    
+
     public void doDisconnect() throws ConnectException
     {
-    	try {
-    		if (connection != null) {
-    			connection.close();
-    		}
-    	} catch (Exception e) {
-    		throw new ConnectException(e, this);
-    	} finally {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (Exception e) {
+            throw new ConnectException(e, this);
+        } finally {
             connectionFactory = null;
             connection = null;
-    	}
+        }
     }
-    
+
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
@@ -307,7 +309,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
      */
     public Object getSessionFactory(UMOEndpoint endpoint)
@@ -363,17 +365,17 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void doStart() throws UMOException
     {
         if (connection != null) {
-	        try {
-        		connection.start();
-	        } catch (JMSException e) {
-	            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
-	        }
-    	}
+            try {
+                connection.start();
+            } catch (JMSException e) {
+                throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
+            }
+        }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -383,7 +385,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
@@ -701,5 +703,76 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     public void setCacheJmsSessions(boolean cacheJmsSessions) {
         this.cacheJmsSessions = cacheJmsSessions;
+    }
+
+    /**
+     * This method may be overridden in case a certain JMS implementation does not support all the standard JMS properties.
+     */
+    public boolean supportsProperty(String property) {
+        return true;
+    }
+
+    /** This method may be overridden in order to apply pre-processing to the message
+     * as soon as it arrives.
+     * @param message - the incoming message
+     * @param session - the JMS session
+     * @return the preprocessed message
+     */
+    public javax.jms.Message preProcessMessage(javax.jms.Message message, Session session) throws Exception {
+        return message;
+    }
+
+    public void close(MessageProducer producer) throws JMSException
+    {
+        if (producer != null) {
+            producer.close();
+        }
+    }
+
+    public void closeQuietly(MessageProducer producer)
+    {
+        if (producer != null) {
+            try {
+                producer.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms message producer", e);
+            }
+        }
+    }
+
+    public void close(MessageConsumer consumer) throws JMSException
+    {
+        if (consumer != null) {
+            consumer.close();
+        }
+    }
+
+    public void closeQuietly(MessageConsumer consumer)
+    {
+        if (consumer != null) {
+            try {
+                consumer.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms message consumer", e);
+            }
+        }
+    }
+
+    public void close(Session session) throws JMSException
+    {
+        if (session != null) {
+            session.close();
+        }
+    }
+
+    public void closeQuietly(Session session)
+    {
+        if (session != null) {
+            try {
+                session.close();
+            } catch (JMSException e) {
+                logger.error("Failed to close jms session consumer", e);
+            }
+        }
     }
 }

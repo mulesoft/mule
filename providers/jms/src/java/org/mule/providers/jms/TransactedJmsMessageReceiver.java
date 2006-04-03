@@ -176,7 +176,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             }
             return null;
         }
-        message = connector.getJmsSupport().preProcessMessage(message, ctx.session);
+        message = connector.preProcessMessage(message, ctx.session);
 
         // Process message
         if (logger.isDebugEnabled()) {
@@ -227,13 +227,13 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
         // Close consumer
         if (force || !reuseSession || !reuseConsumer) {
-            connector.getJmsSupport().closeQuietly(ctx.consumer);
+            connector.closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
         // Do not close session if a transaction is in progress
         // the session will be close by the transaction
         if (force || !reuseSession) {
-            connector.getJmsSupport().closeQuietly(ctx.session);
+            connector.closeQuietly(ctx.session);
             ctx.session = null;
         }
     }
@@ -269,7 +269,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             }
             String tempDurable = (String) endpoint.getProperties().get("durable");
             boolean durable = connector.isDurable();
-	        if (tempDurable != null) {
+            if (tempDurable != null) {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 

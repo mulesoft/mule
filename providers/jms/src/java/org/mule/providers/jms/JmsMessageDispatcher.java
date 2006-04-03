@@ -144,8 +144,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             Destination replyTo = null;
 
             // Some JMS implementations might not support the ReplyTo property.
-            if (connector.getJmsSupport().supportsProperty(JmsConstants.JMS_REPLY_TO)) {
-            	Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
+            if (connector.supportsProperty(JmsConstants.JMS_REPLY_TO)) {
+                Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
                 if (tempReplyTo != null) {
                     if (tempReplyTo instanceof Destination) {
                         replyTo = (Destination) tempReplyTo;
@@ -233,10 +233,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
             return null;
         } finally {
-            connector.getJmsSupport().closeQuietly(consumer);
-            connector.getJmsSupport().closeQuietly(producer);
+            connector.closeQuietly(consumer);
+            connector.closeQuietly(producer);
             if (session != null && !cacheJmsSession && !session.equals(txSession)) {
-                connector.getJmsSupport().closeQuietly(session);
+                connector.closeQuietly(session);
             }
         }
     }
@@ -284,7 +284,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                     return null;
                 }
 
-                message = connector.getJmsSupport().preProcessMessage(message, session);
+                message = connector.preProcessMessage(message, session);
 
                 return new MuleMessage(connector.getMessageAdapter(message));
             } catch (Exception e) {
@@ -292,8 +292,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 return null;
             }
         } finally {
-            connector.getJmsSupport().closeQuietly(consumer);
-            connector.getJmsSupport().closeQuietly(session);
+            connector.closeQuietly(consumer);
+            connector.closeQuietly(session);
         }
     }
 
@@ -332,8 +332,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     public void doDispose() {
         logger.debug("Disposing");
-        connector.getJmsSupport().closeQuietly(delegateSession);
-        connector.getJmsSupport().closeQuietly(cachedSession);
+        connector.closeQuietly(delegateSession);
+        connector.closeQuietly(cachedSession);
     }
 
     private class ReplyToListener implements MessageListener {
