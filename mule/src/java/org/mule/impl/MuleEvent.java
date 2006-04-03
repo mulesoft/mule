@@ -30,6 +30,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -65,7 +66,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * The endpoint associated with the event
      */
-    private transient UMOEndpoint endpoint = null;
+    private transient UMOImmutableEndpoint endpoint = null;
 
     /**
      * the Universally Unique ID for the event
@@ -97,7 +98,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * properties take precedence over the endpoint properties
      */
     public MuleEvent(UMOMessage message,
-                     UMOEndpoint endpoint,
+                     UMOImmutableEndpoint endpoint,
                      UMOComponent component,
                      UMOEvent previousEvent)
     {
@@ -113,7 +114,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         fillProperties(previousEvent);
     }
 
-    public MuleEvent(UMOMessage message, UMOEndpoint endpoint, UMOSession session, boolean synchronous)
+    public MuleEvent(UMOMessage message, UMOImmutableEndpoint endpoint, UMOSession session, boolean synchronous)
     {
         this(message, endpoint, session, synchronous, null);
     }
@@ -130,7 +131,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message,
-                     UMOEndpoint endpoint,
+                     UMOImmutableEndpoint endpoint,
                      UMOSession session,
                      boolean synchronous,
                      ResponseOutputStream outputStream)
@@ -157,7 +158,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message,
-                     UMOEndpoint endpoint,
+                     UMOImmutableEndpoint endpoint,
                      UMOSession session,
                      String eventId,
                      boolean synchronous)
@@ -197,6 +198,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     protected void fillProperties(UMOEvent previousEvent)
     {
         if (previousEvent != null) {
+            synchronized(previousEvent.getMessage()) {
             for (Iterator iterator = previousEvent.getMessage().getPropertyNames(); iterator.hasNext();) {
                 Object prop = iterator.next();
                 // dont overwrite property on the message
@@ -205,6 +207,8 @@ public class MuleEvent extends EventObject implements UMOEvent
                 }
 
             }
+            }
+
         }
 
         if (endpoint != null && endpoint.getProperties() != null) {
@@ -448,7 +452,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * 
      * @see org.mule.umo.UMOEvent#getEndpoint()
      */
-    public UMOEndpoint getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }

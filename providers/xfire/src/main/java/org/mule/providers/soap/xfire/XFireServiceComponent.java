@@ -44,7 +44,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.soap.transformers.GetRequestToSoapRequest;
+import org.mule.providers.soap.transformers.HttpRequestToSoapRequest;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
@@ -52,6 +52,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -92,7 +93,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         OutStreamMessageAdapter response;
-        UMOEndpointURI endpointURI;
+        UMOEndpointURI endpointURI = eventContext.getEndpointURI();
         String method;
 
         if (eventContext.isStreaming()) {
@@ -110,38 +111,36 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         UMOMessage eventMsg = eventContext.getMessage();
         String endpointHeader = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
-
-        if (eventContext.getEndpointURI().getScheme().startsWith("http")) {
-            // We parse a new uri based on the listeneing host and port with the
-            // request parameters appended
-            // Using the soap prefix ensures that we use a soap endpoint builder
-            String uri = "soap:" + eventContext.getEndpointURI().toString();
-            uri += eventMsg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
-            endpointURI = new MuleEndpointURI(uri);
-            method = endpointURI.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        String request = eventMsg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
+        //If a http request is set we can get the method from the request
+        if(request!=null) {
+            endpointURI = new MuleEndpointURI("soap:" + endpointURI.toString() + request);
         }
-        else {
-            // If we're not using Http for the transport the method must be set
-            // as a property
-            endpointURI = eventContext.getEndpointURI();
-            method = eventMsg.getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
-            if (method == null) {
-                if (endpointHeader != null) {
-                    endpointURI = new MuleEndpointURI(endpointHeader);
-                    method = endpointURI.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
-                }
+
+        method = endpointURI.getParams().getProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY);
+
+        if (method == null) {
+            method = eventMsg.getStringProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY, null);
+        }
+        if (method == null) {
+            if (endpointHeader != null) {
+                endpointURI = new MuleEndpointURI(endpointHeader);
+                method = endpointURI.getParams().getProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY);
             }
-        }
-
-        String serviceName = getService(eventContext);
-        String request = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
-
-        if (request != null && request.endsWith("?wsdl")) {
-            generateWSDL(response, serviceName);
         }
         if (method == null) {
             throw new MuleException(new Message(Messages.PROPERTIES_X_NOT_SET, "method"));
         }
+
+        String serviceName = getService(eventContext);
+        if(request==null) {
+            request = endpointHeader;
+        }
+
+        if (request != null && request.endsWith("?wsdl")) {
+            generateWSDL(response, serviceName);
+        }
+
 
         ServiceRegistry reg = getServiceRegistry();
         if (serviceName == null || serviceName.length() == 0 || !reg.hasService(serviceName)) {
@@ -319,17 +318,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             }
         }
         else {
-            String method = eventMsg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
-            // Automatically transform get requests. Normally soap requests
-            // should be POST with a soap message
-            if (method != null && method.equalsIgnoreCase(HttpConstants.METHOD_GET)) {
-                String data = (String)new GetRequestToSoapRequest().transform(context
-                        .getTransformedMessageAsString());
-                is = new ByteArrayInputStream(data.getBytes());
-            }
-            else {
-                is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
-            }
+            is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
         }
         return is;
     }

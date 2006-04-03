@@ -37,6 +37,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -155,36 +156,34 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                 disconnect();
             } catch (Exception e) {
                 connector.getExceptionListener().exceptionThrown(e);
-                setExceptionCode(exception);
             }
         }
         connector.getExceptionListener().exceptionThrown(exception);
-        setExceptionCode(exception);
         if (exception instanceof ConnectException) {
             try {
                 connectionStrategy.connect(this);
             } catch (UMOException e) {
                 connector.getExceptionListener().exceptionThrown(e);
-                setExceptionCode(exception);
             }
         }
     }
 
-    public void setExceptionCode(Exception exception) {
+    /**
+     * This method is used to set any additional aand possibly transport specific information on the return message where
+     * it has an exception payload.
+     * @param message
+     * @param exception
+     */
+    protected void setExceptionDetails(UMOMessage message, Throwable exception) {
         String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol());
         // If we dont find a error code property we can assume there are not
         // error code mappings for this connector
         if (propName != null) {
-            UMOEvent event = RequestContext.getEvent();
-            if (event != null) {
-                UMOMessage message = event.getMessage();
-                String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
-                }
-                message.setProperty(propName, code);
-                RequestContext.rewriteEvent(message);
+            String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
             }
+            message.setProperty(propName, code);
         }
     }
 
@@ -442,6 +441,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     connector.fireNotification(new SecurityNotification(e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
                     resultMessage = message;
+                    //setExceptionDetails(resultMessage, e);
                 }
             } else {
                 authorised=true;
@@ -462,6 +462,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
             if (resultMessage != null) {
                 RequestContext.rewriteEvent(resultMessage);
+                if(resultMessage.getExceptionPayload()!=null) {
+                    setExceptionDetails(resultMessage, resultMessage.getExceptionPayload().getException());
+                }
             }
             return applyResponseTransformer(resultMessage);
         }

@@ -95,7 +95,6 @@ public class MuleClient implements Disposable
      */
     private UMOManager manager;
 
-    // private Set connectors = new HashSet();
     private List dispatchers = new ArrayList();
 
     // configuration helper for the client
@@ -645,6 +644,9 @@ public class MuleClient implements Disposable
         } catch (Exception e) {
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
+        if(event.getEndpoint().getResponseTransformer()!=null) {
+            
+        }
         return result;
     }
 
@@ -664,11 +666,10 @@ public class MuleClient implements Disposable
         UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         try {
             UMOMessage message = endpoint.getConnector()
-                                         .getDispatcher(endpoint.getEndpointURI().getAddress())
-                                         .receive(endpoint.getEndpointURI(), timeout);
+                                         .getDispatcher(endpoint).receive(endpoint, timeout);
             return message;
         } catch (Exception e) {
-            throw new ReceiveException(endpoint.getEndpointURI(), timeout, e);
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 
@@ -905,7 +906,7 @@ public class MuleClient implements Disposable
         builder.unregisterComponent(name);
     }
 
-    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MalformedEndpointException
+    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws UMOException
     {
         RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint);
         dispatchers.add(rd);
@@ -913,7 +914,7 @@ public class MuleClient implements Disposable
     }
 
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
-            throws MalformedEndpointException
+            throws UMOException
     {
         RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint, new MuleCredentials(user, password.toCharArray()));
         dispatchers.add(rd);

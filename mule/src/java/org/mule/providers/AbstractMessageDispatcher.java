@@ -15,27 +15,37 @@ package org.mule.providers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
+import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
+import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
+import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.ReceiveException;
 
 import javax.resource.spi.work.Work;
 
 import java.beans.ExceptionListener;
+import java.io.OutputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p/> <code>AbstractMessageDispatcher</code> provides a default dispatch (client) support for handling threads
@@ -56,34 +66,44 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     protected UMOWorkManager workManager = null;
 
+    protected UMOImmutableEndpoint endpoint;
     protected AbstractConnector connector;
 
     protected boolean disposed = false;
 
     protected boolean doThreading = true;
 
-    public AbstractMessageDispatcher(AbstractConnector connector)
-    {
-        init(connector);
-    }
+    protected ConnectionStrategy connectionStrategy;
 
-    private void init(AbstractConnector connector)
+    protected WaitableBoolean connected = new WaitableBoolean(false);
+
+    private AtomicBoolean connecting = new AtomicBoolean(false);
+
+    public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        this.connector = connector;
-        if (connector != null) {
-            ThreadingProfile profile = connector.getDispatcherThreadingProfile();
-            doThreading = profile.isDoThreading();
-            if (doThreading) {
-                workManager = connector.createDispatcherWorkManager("");
-                try {
-                    workManager.start();
-                } catch (UMOException e) {
-                    dispose();
-                    throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "WorkManager"), e);
-                }
+        this.endpoint = endpoint;
+        this.connector = (AbstractConnector)endpoint.getConnector();
+        connectionStrategy = connector.getConnectionStrategy();
+        if(connectionStrategy instanceof AbstractConnectionStrategy) {
+            //We don't want to do threading in the dispatcher because we're either
+            //already running in a worker thread (asynchronous) or we need to complete the operation
+            // in a single thread
+            ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(false);
+        }
+
+        ThreadingProfile profile = connector.getDispatcherThreadingProfile();
+        doThreading = profile.isDoThreading();
+        if (doThreading) {
+            workManager = connector.createDispatcherWorkManager(connector.getName() + ".dispatchers");
+            try {
+                workManager.start();
+            } catch (UMOException e) {
+                dispose();
+                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "WorkManager"), e);
             }
         }
     }
+
 
     /*
      * (non-Javadoc)
@@ -97,7 +117,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
             // Apply Security filter if one is set
-            UMOEndpoint endpoint = event.getEndpoint();
+            UMOImmutableEndpoint endpoint = event.getEndpoint();
             if (endpoint.getSecurityFilter() != null) {
                 try {
                     endpoint.getSecurityFilter().authenticate(event);
@@ -120,6 +140,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 if (doThreading && !event.isSynchronous() && tx == null) {
                     workManager.scheduleWork(new Worker(event));
                 } else {
+                    //Make sure we are connected
+                    connectionStrategy.connect(this);
                     doDispatch(event);
                     if(connector.isEnableMessageEvents()) {
                         String component = null;
@@ -150,7 +172,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
             // Apply Security filter if one is set
-            UMOEndpoint endpoint = event.getEndpoint();
+            UMOImmutableEndpoint endpoint = event.getEndpoint();
             if (endpoint.getSecurityFilter() != null) {
                 try {
                     endpoint.getSecurityFilter().authenticate(event);
@@ -168,6 +190,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             // latest event again
             event = RequestContext.getEvent();
             try {
+                //Make sure we are connected
+                connectionStrategy.connect(this);
+
                 UMOMessage result = doSend(event);
                 if(connector.isEnableMessageEvents()) {
                     String component = null;
@@ -194,6 +219,61 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 dispose();
             }
         }
+    }
+
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpointUri the endpoint URI to use when connecting to the resource
+     * @param timeout     the maximum time the operation should block before returning. The call should
+     *                    return immediately if there is data available. If no data becomes available before the timeout
+     *                    elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     *                   //@deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
+     */
+    public final UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
+        return receive(new ImmutableMuleEndpoint(endpointUri.toString(), true), timeout);
+    }
+
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    public final UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
+        try {
+
+            try {
+                //Make sure we are connected
+                connectionStrategy.connect(this);
+                UMOMessage result = doReceive(endpoint, timeout);
+                if(result !=null && connector.isEnableMessageEvents()) {
+                    String component = null;
+                    connector.fireNotification(new MessageNotification(result, endpoint, component, MessageNotification.MESSAGE_RECEIVED));
+                }
+                return result;
+            } catch (DispatchException e) {
+                dispose();
+                throw e;
+            } catch (Exception e) {
+                dispose();
+                throw new ReceiveException(endpoint, timeout, e);
+            }
+        } finally {
+            if(connector.isCreateDispatcherPerRequest()) {
+                dispose();
+            }
+        }
+
     }
 
     /*
@@ -223,6 +303,11 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     {
         if (!disposed) {
             try {
+                try {
+                    disconnect();
+                } catch (Exception e) {
+                    logger.warn(e.getMessage(), e);
+                }
                 doDispose();
                 if (workManager != null) {
                     workManager.dispose();
@@ -236,48 +321,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     public UMOConnector getConnector()
     {
         return connector;
-    }
-
-    public abstract void doDispose();
-
-    public abstract void doDispatch(UMOEvent event) throws Exception;
-
-    public abstract UMOMessage doSend(UMOEvent event) throws Exception;
-
-    private class Worker implements Work
-    {
-        private UMOEvent event;
-
-        public Worker(UMOEvent event)
-        {
-            this.event = event;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
-        public void run()
-        {
-            try {
-                RequestContext.setEvent(event);
-                doDispatch(event);
-                if(connector.isEnableMessageEvents()) {
-                    String component = null;
-                    if(event.getComponent()!=null) {
-                        component = event.getComponent().getDescriptor().getName();
-                    }
-                    connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
-                }
-            } catch (Exception e) {
-                getConnector().handleException(e);
-            }
-        }
-
-        public void release()
-        {
-        }
     }
 
     /**
@@ -298,10 +341,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     protected boolean useRemoteSync(UMOEvent event) {
         boolean remoteSync = false;
-        UMOMessage msg = event.getMessage();
         if(event.getEndpoint().getConnector().isRemoteSyncEnabled()) {
             remoteSync = event.getEndpoint().isRemoteSync() ||
-                    msg.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
+                    event.getMessage().getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if(remoteSync) {
                 //component will be null for client calls
                 if(event.getComponent()!=null) {
@@ -310,8 +352,153 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
         }
         if(!remoteSync) {
-            msg.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
+    }
+
+    /**
+     * Well get the output stream (if any) for this type of transport.  Typically this will be called only when Streaming
+     * is being used on an outbound endpoint
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message  the current message being processed
+     * @return the output stream to use for this request or null if the transport does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException {
+        return null;
+    }
+
+    public void connect() throws Exception {
+        if (connected.get()) {
+            return;
+        }
+        if(disposed) {
+            if(logger.isWarnEnabled()) {
+                logger.warn("Dispatcher has been disposed. Cannot connector resource");
+            }
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
+        }
+        if (connecting.compareAndSet(false, true)) {
+            connectionStrategy.connect(this);
+            logger.info("Successfully connected to: " + endpoint.getEndpointURI());
+            return;
+        }
+
+        try {
+            doConnect(endpoint);
+            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                    ConnectionNotification.CONNECTION_CONNECTED));
+        } catch (Exception e) {
+            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                    ConnectionNotification.CONNECTION_FAILED));
+            if (e instanceof ConnectException) {
+                throw (ConnectException) e;
+            } else {
+                throw new ConnectException(e, this);
+            }
+        }
+        connected.set(true);
+        connecting.set(false);
+    }
+
+     public void disconnect() throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
+        }
+        connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                ConnectionNotification.CONNECTION_DISCONNECTED));
+        connected.set(false);
+        doDisconnect();
+        logger.info("Disconnected from: " + endpoint.getEndpointURI());
+    }
+
+    protected String getConnectEventId(UMOImmutableEndpoint endpoint)
+    {
+        return connector.getName() + ".dispatcher (" + endpoint.getEndpointURI() + ")";
+    }
+
+    public final boolean isConnected() {
+       return connected.get();
+   }
+
+    /**
+     * Returns a string identifying the underlying resource
+     *
+     * @return
+     */
+    public String getConnectionDescription() {
+        return endpoint.getEndpointURI().toString();
+    }
+
+    public void reconnect() throws Exception {
+        disconnect();
+        connect();
+    }
+
+    protected abstract void doDispose();
+
+    protected abstract void doDispatch(UMOEvent event) throws Exception;
+
+    protected abstract UMOMessage doSend(UMOEvent event) throws Exception;
+
+    protected abstract void doConnect(UMOImmutableEndpoint endpoint) throws Exception;
+
+    protected abstract void doDisconnect() throws Exception;
+
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected abstract UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception;
+
+    private class Worker implements Work
+    {
+        private UMOEvent event;
+
+        public Worker(UMOEvent event)
+        {
+            this.event = event;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Runnable#run()
+         */
+        public void run()
+        {
+            try {
+                RequestContext.setEvent(event);
+                //Make sure we are connected
+                connectionStrategy.connect(AbstractMessageDispatcher.this);
+                doDispatch(event);
+                if(connector.isEnableMessageEvents()) {
+                    String component = null;
+                    if(event.getComponent()!=null) {
+                        component = event.getComponent().getDescriptor().getName();
+                    }
+                    connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
+                }
+            } catch (Exception e) {
+                getConnector().handleException(e);
+            }
+        }
+
+        public void release()
+        {
+        }
     }
 }

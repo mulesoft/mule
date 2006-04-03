@@ -22,6 +22,7 @@
                     <entry value="org.mule.test.usecases.axis.TradeStatus"/>
                     <entry value="org.mule.test.usecases.axis.SubmitTrade"/>
                 </list>
+                <property name="doAutoTypes" value="false"/>
             </properties>
         </mule-descriptor>
 

@@ -15,14 +15,18 @@
 package org.mule.providers.vm;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author Ross Mason //TODO document
+ * <code>VMMessageDispatcherFactory</code> creates an in-memory event dispatcher
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
-
 public class VMMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     /*
@@ -30,8 +34,8 @@ public class VMMessageDispatcherFactory implements UMOMessageDispatcherFactory
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
      */
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new VMMessageDispatcher((VMConnector) connector);
+        return new VMMessageDispatcher(endpoint);
     }
 }

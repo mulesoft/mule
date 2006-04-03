@@ -17,6 +17,7 @@ package org.mule.providers.http.functional;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -43,45 +44,17 @@ import org.mule.umo.provider.UMOConnector;
  * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
  * @version $Revision$
  */
-public class MuleHttpFunctionalTestCase extends HttpFunctionalTestCase
+public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     UMOMessage reply;
 
-    protected UMOEndpointURI getInDest()
-    {
-        try {
-            return new MuleEndpointURI("http://localhost:60198");
-        }
-        catch (MalformedEndpointException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    protected UMOEndpointURI getOutDest()
-    {
-        return null;
-    }
-
-    protected UMOConnector createConnector() throws Exception
-    {
-        HttpConnector connector = new HttpConnector();
-        connector.setName("testHttp");
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-        return connector;
-    }
-	
     protected void sendTestData(int iterations) throws Exception {
-    	try {
-    		reply = send("http://localhost:60198", TEST_MESSAGE);
-    	} catch (Exception e) {
-            URI uri = getInDest().getUri();
-            reply = send(uri.toString(), TEST_MESSAGE);
-    	}
+        reply = send(getInDest().getAddress(), TEST_MESSAGE, "text/plain;charset=UTF-8");
     }
     protected void receiveAndTestResults() throws Exception
     {
         assertNotNull(reply);
+        assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
         assertTrue(reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString().startsWith("text/baz"));
     }
@@ -90,11 +63,10 @@ public class MuleHttpFunctionalTestCase extends HttpFunctionalTestCase
     	return "text/baz;charset=UTF-16BE";
     }
     
-    public UMOMessage send(String url, Object payload) throws Exception {
+    public UMOMessage send(String url, Object payload, String contentType) throws Exception {
         Map messageProperties = new HashMap();
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
-        messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE,
-                "text/plain;charset=UTF-7");
+        messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
         UMOMessage message = new MuleMessage(payload, messageProperties);
 
         UMOEvent event = getEvent(message, url, true, false);

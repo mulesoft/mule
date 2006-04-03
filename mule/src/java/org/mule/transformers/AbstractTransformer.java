@@ -177,7 +177,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         Object result;
         String encoding = null;
-        if (src instanceof UMOMessage) {
+        if (src instanceof UMOMessage && !isSourceTypeSupported(UMOMessage.class)) {
             encoding = ((UMOMessage) src).getEncoding();
             src = ((UMOMessage) src).getPayload();
         }

@@ -616,8 +616,9 @@
                 <exclude>**/Abstract*.*</exclude>
             </excludes>
             <resources>
+                
                 <resource>
-                    <directory>${basedir}/src/test</directory>
+                    <directory>${basedir}/src/test/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>

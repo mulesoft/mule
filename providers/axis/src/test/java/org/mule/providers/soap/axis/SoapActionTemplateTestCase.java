@@ -15,8 +15,10 @@
 package org.mule.providers.soap.axis;
 
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;
 
@@ -27,16 +29,19 @@ import javax.xml.namespace.QName;
 public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception {
-        AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(new AxisConnector());
-        UMOEvent event = getTestEvent("test,", new MuleEndpoint("http://mycompany.com:8080/services/myService?method=foo", false));
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://mycompany.com:8080/services/myService?method=foo", false);
+        AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
+        UMOEvent event = getTestEvent("test,", ep);
         String result = dispatcher.parseSoapAction("${hostInfo}/${method}", new QName("foo"), event);
 
         assertEquals("http://mycompany.com:8080/foo", result);
     }
 
     public void testHostReplace() throws Exception {
-        AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(new AxisConnector());
-        UMOEvent event = getTestEvent("test,", new MuleEndpoint("http://mycompany.com:8080/services/myService?method=foo", false));
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://mycompany.com:8080/services/myService?method=foo", false);
+
+        AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
+        UMOEvent event = getTestEvent("test,", ep);
         event.getComponent().getDescriptor().setName("myService");
         String result = dispatcher.parseSoapAction("${scheme}://${host}:${port}/${serviceName}/${method}", new QName("foo"), event);
 

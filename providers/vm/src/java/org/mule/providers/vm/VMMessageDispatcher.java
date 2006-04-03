@@ -27,6 +27,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
@@ -56,10 +58,10 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     
     private SerializableToByteArray serializableToByteArray;
 
-    public VMMessageDispatcher(VMConnector connector)
+    public VMMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (VMConnector)endpoint.getConnector();
         serializableToByteArray = new SerializableToByteArray();
     }
 
@@ -73,35 +75,40 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#receive(java.lang.String,
-     *      org.mule.umo.UMOEvent)
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
         if (!connector.isQueueEvents()) {
             throw new UnsupportedOperationException("Receive only supported on the VM Queue Connector");
         }
         QueueSession queueSession = null;
         try {
             queueSession = connector.getQueueSession();
-            Queue queue = queueSession.getQueue(endpointUri.getAddress());
+            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
             if (queue == null) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("No queue with name " + endpointUri.getAddress());
+                    logger.debug("No queue with name " + endpoint.getEndpointURI().getAddress());
                 }
                 return null;
             } else {
                 UMOEvent event = null;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting for a message on " + endpointUri.getAddress());
+                    logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
                 }
                 try {
                     event = (UMOEvent) queue.poll(timeout);
                 } catch (InterruptedException e) {
-                    logger.error("Failed to receive event from queue: " + endpointUri);
+                    logger.error("Failed to receive event from queue: " + endpoint.getEndpointURI());
                 }
                 if (event != null) {
                     if (logger.isDebugEnabled()) {
@@ -125,7 +132,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
@@ -163,7 +170,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         UMOMessage retMessage = null;
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
@@ -210,7 +217,15 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+
+    }
+
+    protected void doDisconnect() throws Exception {
+
     }
 }

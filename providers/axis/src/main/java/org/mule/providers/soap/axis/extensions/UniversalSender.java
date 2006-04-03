@@ -40,6 +40,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
@@ -79,8 +80,8 @@ public class UniversalSender extends BasicHandler {
         //UMOEvent event = (UMOEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
         //Get the dispatch endpoint
         String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
-        UMOEndpoint requestEndpoint = (UMOEndpoint)call.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        UMOEndpoint endpoint = null;
+        UMOImmutableEndpoint requestEndpoint = (UMOImmutableEndpoint)call.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+        UMOImmutableEndpoint endpoint = null;
         try {
             endpoint = lookupEndpoint(uri);
         } catch (UMOException e) {
@@ -137,7 +138,11 @@ public class UniversalSender extends BasicHandler {
                 logger.debug("Soap request is:\n" + payload.toString());
             }
             if(sync) {
-                dispatchEvent.getEndpoint().setRemoteSync(true);
+                //We need to rewrite the endpoint on the event to set the reomoteSync property
+                MuleEndpoint syncEndpoint = new MuleEndpoint(dispatchEvent.getEndpoint());
+                syncEndpoint.setRemoteSync(true);
+                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint, dispatchEvent.getSession(),
+                        dispatchEvent.isSynchronous());
                 UMOMessage result = session.sendEvent(dispatchEvent);
                 if(result!=null) {
                     byte[] response = result.getPayloadAsBytes();

@@ -22,7 +22,10 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
@@ -42,9 +45,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ *
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
  * RMI-JRMP.
  *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
@@ -54,43 +59,45 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
 
     private RmiConnector connector;
 
-    private AtomicBoolean initialised = new AtomicBoolean(false);
+    protected InetAddress inetAddress;
 
-    private InetAddress inetAddress;
+    protected int port;
 
-    private int port;
-
-    private String serviceName;
+    protected String serviceName;
 
     protected Remote remoteObject;
 
     protected Method invokedMethod;
 
-    public RmiMessageDispatcher(RmiConnector connector) {
-        super(connector);
-        this.connector = connector;
+    public RmiMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (RmiConnector)endpoint.getConnector();
     }
 
-    protected void initialise(UMOEvent event) throws IOException, DispatchException, NotBoundException,
-            NoSuchMethodException, ClassNotFoundException {
-        if (!initialised.get()) {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        if (remoteObject==null) {
 
-            remoteObject = getRemoteObject(event);
-            invokedMethod = getMethodObject(event, remoteObject);
-
-            initialised.set(true);
+            remoteObject = getRemoteObject();
+            invokedMethod = getMethodObject(remoteObject);
         }
     }
 
-    private Remote getRemoteObject(UMOEvent event) throws RemoteException, MalformedURLException,
+    protected void doDisconnect() throws Exception {
+        remoteObject = null;
+        invokedMethod = null;
+    }
+
+    protected Remote getRemoteObject() throws RemoteException, MalformedURLException,
             NotBoundException, UnknownHostException {
         Remote remoteObj;
 
-        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
 
-        // TODO - add more error handling on uri
         port = endpointUri.getPort();
         if (port < 1) {
+            if(logger.isWarnEnabled()) {
+                logger.warn("RMI port not set on URI: " + endpointUri + ". Using default port: " + RmiConnector.DEFAULT_RMI_REGISTRY_PORT);
+            }
             port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
         }
 
@@ -104,28 +111,24 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         return remoteObj;
     }
 
-    private Method getMethodObject(UMOEvent event, Remote remoteObject) throws DispatchException,
+    protected  Method getMethodObject(Remote remoteObject) throws InitialisationException,
             NoSuchMethodException, ClassNotFoundException {
         Method method;
-        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
 
         String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
                 RmiConnector.PARAM_SERVICE_METHOD, null);
 
         if (methodName == null) {
-            methodName = (String) event.getEndpoint().getProperties().get(RmiConnector.PARAM_SERVICE_METHOD);
+            methodName = (String) endpoint.getProperties().get(RmiConnector.PARAM_SERVICE_METHOD);
             if (methodName == null) {
-                throw new DispatchException(new org.mule.config.i18n.Message("rmi",
-                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET),
-                        event.getMessage(),
-                        event.getEndpoint());
+                throw new InitialisationException(new org.mule.config.i18n.Message("rmi",
+                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), this);
             }
         }
 
 
-        List methodArgumentTypes = (List) event.getEndpoint()
-                .getProperties()
-                .get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+        List methodArgumentTypes = (List) endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
         if (methodArgumentTypes != null) {
             connector.setMethodArgumentTypes(methodArgumentTypes);
         }
@@ -152,8 +155,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception {
-        initialise(event);
+    protected void doDispatch(UMOEvent event) throws Exception {
 
         Object[] arguments = getArgs(event);
         invokedMethod.invoke(remoteObject, arguments);
@@ -168,8 +170,6 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
 
         UMOMessage resultMessage;
 
-        initialise(event);
-
         Object[] arguments = getArgs(event);
         Object result = invokedMethod.invoke(remoteObject, arguments);
 
@@ -182,8 +182,19 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         return resultMessage;
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        throw new UnsupportedOperationException("receive on RMIMessageDispatcher");
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
     /**
@@ -205,7 +216,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         return connector;
     }
 
-    public void doDispose() {
+    protected void doDispose() {
     }
 
 }

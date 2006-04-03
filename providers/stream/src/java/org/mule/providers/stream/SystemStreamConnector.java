@@ -20,13 +20,18 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.Utility;
+import org.mule.MuleManager;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.IOException;
 
 /**
- * <code>SystemStreamConnector</code> TODO
+ * <code>SystemStreamConnector</code> Connects to the System streams in and out by default and add some basic fuctionality for
+ * Writing out prompt messages
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,20 +42,13 @@ public class SystemStreamConnector extends StreamConnector
 
     private String promptMessage;
 
-    InputStream inputStream;
+    private long messageDelayTime = 3000;
 
-    PrintStream outputStream;
-
-    private long messageDelayTime = 0;
+    private boolean firstTime=true;
 
     public SystemStreamConnector()
     {
         super();
-    }
-
-    public void doInitialise() throws InitialisationException
-    {
-        super.doInitialise();
         inputStream = System.in;
         outputStream = System.out;
     }
@@ -70,11 +68,9 @@ public class SystemStreamConnector extends StreamConnector
      * 
      * @see org.mule.providers.AbstractConnector#doStart()
      */
-    public synchronized void doStart()
+    public void doStart()
     {
-        if (receivers.size() > 0) {
-            reinitialise();
-        }
+        firstTime = false;
     }
 
     /*
@@ -85,17 +81,6 @@ public class SystemStreamConnector extends StreamConnector
     public OutputStream getOutputStream()
     {
         return outputStream;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.stream.StreamConnector#reinitialise()
-     */
-    public void reinitialise()
-    {
-        DelayedMessageWriter writer = new DelayedMessageWriter(getMessageDelayTime());
-        writer.start();
     }
 
     /**
@@ -140,47 +125,19 @@ public class SystemStreamConnector extends StreamConnector
             throw new UnsupportedOperationException("You can only register one listener per system stream connector");
         }
         UMOMessageReceiver receiver = super.registerListener(component, endpoint);
-        reinitialise();
         return receiver;
     }
 
-    private class DelayedMessageWriter extends Thread
-    {
-        private long delay = 0;
 
-        public DelayedMessageWriter(long delay)
-        {
-            this.delay = delay;
-        }
-
-        public void run()
-        {
-            if (delay > 0) {
-                try {
-                    // Allow all other console message to be printed out first
-                    sleep(delay);
-                } catch (InterruptedException e1) {
-                }
-            }
-
-            outputStream.println();
-            outputStream.print(promptMessage);
+    public long getMessageDelayTime() {
+        if(firstTime) {
+            return messageDelayTime + 4000;
+        } else {
+            return messageDelayTime;
         }
     }
 
-    /**
-     * @return Returns the messageDelayTime.
-     */
-    public long getMessageDelayTime()
-    {
-        return messageDelayTime;
-    }
-
-    /**
-     * @param messageDelayTime The messageDelayTime to set.
-     */
-    public void setMessageDelayTime(long messageDelayTime)
-    {
+    public void setMessageDelayTime(long messageDelayTime) {
         this.messageDelayTime = messageDelayTime;
     }
 }

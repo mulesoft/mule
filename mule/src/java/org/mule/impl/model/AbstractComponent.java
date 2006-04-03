@@ -233,9 +233,7 @@ public abstract class AbstractComponent implements UMOComponent {
         // Dispatching event to an inbound endpoint
         // in the MuleSession#dispatchEvent
         if (!event.getEndpoint().canReceive()) {
-            UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint()
-                    .getEndpointURI()
-                    .getAddress());
+            UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint());
             try {
                 dispatcher.dispatch(event);
             } catch (Exception e) {

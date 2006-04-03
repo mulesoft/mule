@@ -23,6 +23,7 @@ import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.CompressionHelper;
@@ -99,9 +100,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
             // The session can be closed by the dispatcher closing so its more
             // reliable to get it from the dispatcher each time
             if (requireNewSession || getEndpoint() != null) {
-                session = (Session) getEndpoint().getConnector()
-                                                 .getDispatcher("transformerSession")
-                                                 .getDelegateSession();
+                UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
+                session = (Session) dispatcher.getDelegateSession();
                 requireNewSession = session==null;
             }
 

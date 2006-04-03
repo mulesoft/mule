@@ -15,12 +15,17 @@
 package org.mule.providers.file;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author Ross Mason <p/> //TODO document
+ * <code>FileMessageDispatcherFactory</code> creaes a dispatcher responsible for writing files to disk
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class FileMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
@@ -29,9 +34,9 @@ public class FileMessageDispatcherFactory implements UMOMessageDispatcherFactory
      * 
      * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
      */
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new FileMessageDispatcher((FileConnector) connector);
+        return new FileMessageDispatcher( endpoint);
     }
 
 }

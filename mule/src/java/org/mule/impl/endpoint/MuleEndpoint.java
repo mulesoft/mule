@@ -28,6 +28,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.util.Map;
 
@@ -40,6 +42,9 @@ import java.util.Map;
  */
 public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 {
+
+    public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";
+    public static final String NEVER_CREATE_STRING = "NEVER_CREATE";
     /**
      * Default constructor This is required right now for the Mule digester to
      * set the properties through the classes mutators
@@ -68,10 +73,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
     public MuleEndpoint(String endpointName, boolean receiver) throws UMOException
     {
-        this();
-        String type = (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEndpoint p = getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
-        this.initFromDescriptor(p);
+        super(endpointName, receiver);
     }
 
     public Object clone()
@@ -120,11 +122,13 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     {
         if (connector != null && endpointUri != null
                 && !connector.supportsProtocol(endpointUri.getFullScheme())) {
-            throw new IllegalArgumentException(
-                    "Endpoint scheme must be compatible with the connector scheme. Connector is: "
-                            + connector.getProtocol() + ", endpoint is: " + endpointUri);
+            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
+                    connector.getProtocol(), endpointUri).getMessage());
         }
         this.endpointUri = endpointUri;
+        if(this.endpointUri!=null) {
+            properties.putAll(endpointUri.getParams());
+        }
     }
 
     public void setEncoding(String endpointEncoding)
@@ -151,9 +155,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     {
         if (connector != null && endpointUri != null
                 && !connector.supportsProtocol(endpointUri.getFullScheme())) {
-            throw new IllegalArgumentException(
-                    "Endpoint scheme must be compatible with the connector scheme. Connector is: "
-                            + connector.getProtocol() + ", endpoint is: " + endpointUri);
+            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
+                    connector.getProtocol(), endpointUri).getMessage());
         }
         this.connector = connector;
     }
@@ -269,10 +272,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
     public void setCreateConnectorAsString(String action)
     {
-        if ("ALWAYS_CREATE".equals(action)) {
+        if (ALWAYS_CREATE_STRING.equals(action)) {
             createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
         }
-        else if ("NEVER_CREATE".equals(action)) {
+        else if (NEVER_CREATE_STRING.equals(action)) {
             createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
         }
         else {
@@ -335,4 +338,13 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         this.streaming = stream;
     }
 
+    /**
+     * Sets a property on the endpoint
+     *
+     * @param key   the property key
+     * @param value the value of the property
+     */
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
 }

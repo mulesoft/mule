@@ -40,14 +40,12 @@ public class XmppConnector extends AbstractServiceEnabledConnector
     public static final String XMPP_GROUP_CHAT = XMPP_PROPERTY_PREFIX + "groupChat";
     public static final String XMPP_NICKNAME = XMPP_PROPERTY_PREFIX + "nickname";
 
-    private Map connCache = new HashMap();
-
     public String getProtocol()
     {
         return "xmpp";
     }
 
-    public XMPPConnection findOrCreateXmppConnection(UMOEndpointURI endpointURI) throws XMPPException
+    public XMPPConnection createXmppConnection(UMOEndpointURI endpointURI) throws XMPPException
     {
         logger.info("Trying to find XMPP connection for uri: " + endpointURI);
         XMPPConnection xmppConnection = null;
@@ -57,11 +55,11 @@ public class XmppConnector extends AbstractServiceEnabledConnector
         String password = endpointURI.getPassword();
         String resource = (String)endpointURI.getParams().get("resource");
 
-        xmppConnection = findOrCreateConnection(endpointURI);
-
-        logger.info("*************************************");
-        logger.info("*            JABBER LOGIN           *");
-        logger.info("*************************************");
+        if(endpointURI.getPort() != -1) {
+                xmppConnection = new XMPPConnection(endpointURI.getHost(), endpointURI.getPort());
+            } else {
+                xmppConnection = new XMPPConnection(endpointURI.getHost());
+            }
 
         if (!xmppConnection.isAuthenticated()) {
             // Make sure we have an account. If we don't, make one.
@@ -73,48 +71,31 @@ public class XmppConnector extends AbstractServiceEnabledConnector
                 logger.info("*** account (" + username + ") already exists ***");
             }
 
-            logger.info("Logging in as: " + username);
-            logger.info("pw is        : " + password);
-            logger.info("server       : " + hostname);
-            logger.info("resource     : " + resource);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Logging in as: " + username);
+                logger.debug("pw is        : " + password);
+                logger.debug("server       : " + hostname);
+                logger.debug("resource     : " + resource);
+            }
+
             if(resource == null) {
                 xmppConnection.login(username, password);
             } else {
                 xmppConnection.login(username, password, resource);
             }
         } else {
-            logger.info("Already authenticated on this connection, no need to log in again.");
+            if(logger.isDebugEnabled()) logger.debug("Already authenticated on this connection, no need to log in again.");
         }
-
-        logger.info("XMPP LOGIN COMPLETE!");
-
         return xmppConnection;
     }
 
-    private XMPPConnection findOrCreateConnection(UMOEndpointURI uri) throws XMPPException
-    {
-        XMPPConnection conn = (XMPPConnection) connCache.get(uri);
-        if (null == conn) {
-            if(uri.getPort() != -1) {
-                conn = new XMPPConnection(uri.getHost(), uri.getPort());
-            } else {
-                conn = new XMPPConnection(uri.getHost());
-            }
-            connCache.put(uri, conn);
-        }
-        return conn;
-    }
 
     /**
      * Template method to perform any work when destroying the connectoe
      */
     protected void doDispose()
     {
-        for (Iterator iterator = connCache.keySet().iterator(); iterator.hasNext();) {
-            UMOEndpointURI uri = (UMOEndpointURI) iterator.next();
-            XMPPConnection conn = (XMPPConnection) connCache.remove(uri);
-            conn.close();
-        }
+
     }
 
     public boolean isRemoteSyncEnabled() {

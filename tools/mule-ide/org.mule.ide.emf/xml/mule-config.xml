@@ -88,7 +88,7 @@
 			Please refer to the Configuration Guide for a full description of all the parameters.
 		-->
 		<mule-descriptor name="GreeterUMO"
-			inboundEndpoint="stream://localhost?transformers=StringToNameString"
+			inboundEndpoint="stream://System.in?transformers=StringToNameString"
 			outboundEndpoint="vm://localhost/chitchatter"
 			implementation="org.mule.samples.hello.Greeter">
 			<!--
@@ -99,7 +99,7 @@
 
 		<mule-descriptor name="ChitChatUMO"
 			inboundEndpoint="vm://localhost/chitchatter?transformers=NameStringToChatString"
-			outboundEndpoint="stream://system.out?transformers=ChatStringToString"
+			outboundEndpoint="stream://System.out?transformers=ChatStringToString"
 			implementation="org.mule.samples.hello.ChitChatter">
 
 			<interceptor name="default" />

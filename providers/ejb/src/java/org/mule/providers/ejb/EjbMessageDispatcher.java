@@ -13,7 +13,6 @@
  */
 package org.mule.providers.ejb;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.rmi.RmiConnector;
@@ -21,6 +20,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
@@ -41,8 +42,9 @@ import java.util.List;
 
 
 /**
- * Code by (c) 2005 P.Oikari.
+ * Todo
  *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
  * @version $Revision$
  */
@@ -51,51 +53,38 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
 {
     private EjbConnector connector;
 
-    private AtomicBoolean initialised = new AtomicBoolean(false);
-
     protected EJBObject remoteObject;
 
-    protected Method invokedMethod;
-
-    public EjbMessageDispatcher(EjbConnector connector)
-    {
-        super(connector);
-
-        this.connector = connector;
+    public EjbMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (EjbConnector)endpoint.getConnector();
     }
 
-    protected void initialise(UMOEvent event) throws IOException, InitialisationException, NotBoundException,
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws IOException, InitialisationException, NotBoundException,
             NoSuchMethodException, ClassNotFoundException
     {
-        if (!initialised.get()) {
+        if (remoteObject==null) {
             String rmiPolicyPath = connector.getSecurityPolicy();
-            //String serverCodebasePath = connector.getServerCodebase();
 
             System.setProperty("java.security.policy", rmiPolicyPath);
-            // System.setProperty("java.rmi.server.codebase",
-            // serverCodebasePath);
 
             // Set security manager
             if (System.getSecurityManager() == null) {
                 System.setSecurityManager(new RMISecurityManager());
             }
 
-            remoteObject = getRemoteObject(event);
-
-            try {
-                invokedMethod = getMethodObject(event, remoteObject);
-            } catch (UMOException e) {
-                throw new InitialisationException(e, this);
-            }
-
-            initialised.set(true);
+            remoteObject = getRemoteObject();
         }
     }
 
-    private EJBObject getRemoteObject(UMOEvent event) throws RemoteException, UnknownHostException {
+    protected void doDisconnect() throws Exception {
+        remoteObject=null;
+    }
+
+    protected EJBObject getRemoteObject() throws RemoteException, UnknownHostException {
         EJBObject remoteObj;
 
-        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
 
         int port = endpointUri.getPort();
 
@@ -120,7 +109,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
         return (remoteObj);
     }
 
-    private Method getMethodObject(UMOEvent event, EJBObject remoteObject) throws UMOException, NoSuchMethodException, ClassNotFoundException {
+    protected Method getMethodObject(UMOEvent event, EJBObject remoteObject) throws UMOException, NoSuchMethodException, ClassNotFoundException {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
         String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
@@ -128,21 +117,16 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
                 null);
 
         if (null == methodName) {
-            methodName = (String) event.getEndpoint()
-                    .getProperties()
-                    .get(RmiConnector.PARAM_SERVICE_METHOD);
+            methodName = (String) event.getMessage().getProperty(RmiConnector.PARAM_SERVICE_METHOD);
 
             if (null == methodName) {
                 throw new DispatchException(new org.mule.config.i18n.Message("ejb",
-                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET),
-                        event.getMessage(),
-                        event.getEndpoint());
+                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(), event.getEndpoint());
             }
         }
 
         // Parse method args
-        String arguments = (String) event.getEndpoint()
-                .getProperties().get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+        String arguments = (String) event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
 
         List methodArgumentTypes = new ArrayList();
         if (null != arguments) {
@@ -168,34 +152,33 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
         return (remoteObject.getClass().getMethod(methodName, types));
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        logger.debug("receive");
-
-        return null;
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
-        logger.debug("doDispatch");
-
-        initialise(event);
-
         Object[] arguments = getArgs(event);
-
+        Method invokedMethod = getMethodObject(event, remoteObject);
         invokedMethod.invoke(remoteObject, arguments);
     }
 
     public UMOMessage doSend(UMOEvent event) throws IllegalAccessException, InvocationTargetException, Exception
     {
-        logger.debug("doSend");
-
-        initialise(event);
-
         Object[] arguments = getArgs(event);
-
+        Method invokedMethod = getMethodObject(event, remoteObject);
         Object result = invokedMethod.invoke(remoteObject, arguments);
-
         return (null == result
                     ? null
                     : new MuleMessage(connector.getMessageAdapter(result).getPayload()));
@@ -203,17 +186,16 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
 
     public Object getDelegateSession() throws UMOException
     {
-        return (null);
+        return null;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
     }
 
     private Object[] getArgs(UMOEvent event) throws TransformerException
     {
         Object payload = event.getTransformedMessage();
-
         return (payload instanceof Object[] ? (Object[]) payload : new Object[]{payload});
     }
 }

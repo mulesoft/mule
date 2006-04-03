@@ -27,7 +27,7 @@ public class ClientBridgeTestCase extends FunctionalTestCase {
         return "org/mule/test/usecases/axis/clientbridge/client-mule-config.xml";
     }
 
-    public void testX () throws Exception {
+    public void testBridgeVMToAxis () throws Exception {
         MuleClient client = new MuleClient();
         UMOMessage message =
           client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);

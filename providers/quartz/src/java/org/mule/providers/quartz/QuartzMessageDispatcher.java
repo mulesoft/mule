@@ -22,6 +22,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.util.ClassHelper;
 import org.quartz.CronTrigger;
@@ -44,16 +45,17 @@ import java.util.Iterator;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class QuartzMessageDispatcher extends AbstractMessageDispatcher {
-    public QuartzMessageDispatcher(AbstractConnector connector) {
-        super(connector);
+public class QuartzMessageDispatcher extends AbstractMessageDispatcher
+ {
+    public QuartzMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
     }
 
-    public void doDispose() {
+    protected void doDispose() {
 
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception {
 
         JobDetail jobDetail = new JobDetail();
         jobDetail.setName(event.getEndpoint().getEndpointURI().toString());
@@ -143,13 +145,32 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         doDispatch(event);
         return null;
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        throw new UnsupportedOperationException("receive is not implemented on the Quartz provider");
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+
+    }
+
+    protected void doDisconnect() throws Exception {
+
+    }
+
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
     public Object getDelegateSession() throws UMOException {

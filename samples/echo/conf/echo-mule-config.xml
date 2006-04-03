@@ -31,6 +31,10 @@
         </properties>
     </connector>
 
+     <transformers>
+        <transformer name="HttpRequestToSoapRequest" className="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
+    </transformers>
+
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -44,7 +48,7 @@
             <!-- any number of endpoints can be added to an inbound router -->
             <inbound-router>
                 <endpoint address="stream://System.in"/>
-                <endpoint address="axis:http://localhost:8081/services"/>
+                <endpoint address="xfire:http://localhost:8081/services" transformers="HttpRequestToSoapRequest" />                
             </inbound-router>
             <!-- An outbound router can have one or more router configurations
             that can be invoked depending on business rules, message contents, headers

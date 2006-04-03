@@ -34,6 +34,10 @@ import org.mule.umo.routing.UMOOutboundRouter;
  */
 public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
+    public MuleEndpointConfigurationTestCase() {
+        super.setDisposeManagerPerSuite(true);
+    }
+
     protected String getConfigResources()
     {
         return "org/mule/test/integration/test-endpoints-config.xml";
@@ -57,7 +61,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         assertEquals("stream", endpoint.getConnector().getProtocol().toLowerCase());
         assertNotNull(endpoint.getName());
-        assertEquals("localhost", endpoint.getEndpointURI().getAddress());
+        assertEquals("System.out", endpoint.getEndpointURI().getAddress());
         assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 

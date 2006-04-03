@@ -31,6 +31,7 @@ import org.mule.providers.gs.JiniTransactionFactory;
 import org.mule.providers.gs.filters.JavaSpaceTemplateFilter;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
@@ -76,7 +77,7 @@ public class GSSpaceFactory implements UMOSpaceFactory {
      * @throws org.mule.umo.space.UMOSpaceException
      *
      */
-    public UMOSpace create(UMOEndpoint endpoint) throws UMOSpaceException {
+    public UMOSpace create(UMOImmutableEndpoint endpoint) throws UMOSpaceException {
         try {
             GSSpace space = new GSSpace(endpoint.getEndpointURI().toString(), enableMonitorEvents);
 

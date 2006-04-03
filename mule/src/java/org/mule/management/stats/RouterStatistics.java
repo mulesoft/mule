@@ -15,6 +15,7 @@ package org.mule.management.stats;
 
 import org.mule.management.stats.printers.SimplePrinter;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class RouterStatistics implements Statistics
      * 
      * @param endpoint The endpoint
      */
-    public synchronized void incrementRoutedMessage(UMOEndpoint endpoint)
+    public synchronized void incrementRoutedMessage(UMOImmutableEndpoint endpoint)
     {
         if (endpoint == null) {
             return;

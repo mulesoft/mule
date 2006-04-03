@@ -55,7 +55,7 @@ public class StringToXMLMessage extends AbstractTransformer {
         XMLType xmltype = null;
 
         // Get the (already open) OracleAQ session.
-        try { session = (Session) getEndpoint().getConnector().getDispatcher("transformerSession").getDelegateSession();
+        try { session = (Session) getEndpoint().getConnector().getDispatcher(getEndpoint()).getDelegateSession();
         } catch (UMOException e) { throw new TransformerException(this, e); }
         if (!(session instanceof AQjmsSession)) {
             throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);

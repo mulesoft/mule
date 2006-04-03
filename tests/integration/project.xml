@@ -10,6 +10,11 @@
     <shortDescription>integration-tests</shortDescription>
     <url>http://www.muleumo.org/</url>
     <dependencies>
+        <dependency>
+          <groupId>xfire</groupId>
+          <artifactId>XmlSchema</artifactId>
+          <version>20060128-patched</version>
+        </dependency>
     </dependencies>
     <build>
         <unitTest>
@@ -20,25 +25,20 @@
                 <exclude>**/Abstract*.*</exclude>
                 <!-- requires a server -->
                 <exclude>**/EmailFunctionalTestCase.*</exclude>
-                <!-- Causes NPE in ActiveMQ. TODO retry with 4.0  -->
-                <exclude>**/JmsReconnectionTestCase.*</exclude>
                 <!-- TODO Does not find the server -->
                 <exclude>**/XmppFunctionalTestCase.*</exclude>
                 <!-- TODO Fix -->
                 <exclude>**/JmsPipelineTestCase.*</exclude>
-                <!-- Seems to be a problem with the endpoint: TODO investigate -->
-                <exclude>**/JdbcTransactionalJdbcFunctionalTestCase.*</exclude>
-                <!-- Seems to be a problem with the endpoint: TODO investigate -->
-                <exclude>**/JdbcTransactionalXAFunctionalTestCase.*</exclude>
-
-                <!-- requires a Jms server running -->
-                <exclude>**/ActiveMQJmsTransactionalFunctionalTestCase.*</exclude>
-                <exclude>**/ActiveMQJmsXATransactionFunctionalTestCase.*</exclude>
-                <exclude>**/JmsClientAcknowledgeTransactionFunctionalTestCase.*</exclude>
             </excludes>
             <resources>
                 <resource>
                     <directory>${basedir}/src/test/java</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>

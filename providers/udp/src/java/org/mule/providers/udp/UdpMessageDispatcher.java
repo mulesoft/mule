@@ -20,9 +20,12 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -44,24 +47,33 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     protected InetAddress inetAddress;
     protected DatagramSocket socket;
     protected int port;
-    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-    public UdpMessageDispatcher(UdpConnector connector)
+    public UdpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (UdpConnector)endpoint.getConnector();
     }
 
-    protected void initialise(String endpoint) throws IOException, URISyntaxException
-    {
-        if (!initialised.get()) {
-            URI uri = new URI(endpoint);
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        if(!connected.get()) {
+            URI uri = endpoint.getEndpointURI().getUri();
             port = uri.getPort();
             inetAddress = InetAddress.getByName(uri.getHost());
             socket = createSocket(port, inetAddress);
-            initialised.set(true);
         }
     }
+
+    protected void doDisconnect() throws Exception {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } finally {
+            socket=null;
+        }
+    }
+
+
 
     protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
     {
@@ -72,9 +84,8 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         return socket;
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
-        initialise(event.getEndpoint().getEndpointURI().getAddress());
         byte[] payload = event.getTransformedMessageAsBytes();
         write(socket, payload);
     }
@@ -89,7 +100,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         socket.send(packet);
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
@@ -118,9 +129,18 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        initialise(endpointUri.getAddress());
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
         DatagramPacket result = receive(socket, Integer.parseInt(String.valueOf(timeout)));
         if (result == null) {
             return null;
@@ -139,11 +159,8 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
-        initialised.set(false);
-        if (socket != null) {
-            socket.close();
-        }
+
     }
 }

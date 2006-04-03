@@ -17,6 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
@@ -79,7 +80,7 @@ public class SpaceConnector extends AbstractServiceEnabledConnector {
      * @return
      * @throws UMOSpaceException
      */
-    public UMOSpace getSpace(UMOEndpoint endpoint) throws UMOSpaceException {
+    public UMOSpace getSpace(UMOImmutableEndpoint endpoint) throws UMOSpaceException {
         String spaceUrl = endpoint.getEndpointURI().toString();
         logger.info("looking for space: " + spaceUrl);
         UMOSpace space = (UMOSpace)spaces.get(spaceUrl);

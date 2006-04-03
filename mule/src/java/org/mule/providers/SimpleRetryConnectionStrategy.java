@@ -41,8 +41,6 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
             try {
                 count++;
                 connectable.connect();
-                // reset counter
-                count = 0;
                 if (logger.isDebugEnabled()) {
                 	logger.debug("Successfully connected to " + getDescription(connectable));
                 }
@@ -78,7 +76,14 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
             }
         }
     }
-    
+
+    /**
+     * Resets any state stored in the retry strategy
+     */
+    public synchronized void resetState() {
+        count=0;
+    }
+
     public int getRetryCount()
     {
         return retryCount;

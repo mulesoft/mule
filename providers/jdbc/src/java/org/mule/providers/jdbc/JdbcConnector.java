@@ -23,6 +23,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -68,7 +69,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        String[] params = getReadAndAckStatements(endpoint.getEndpointURI(), endpoint);
+        String[] params = getReadAndAckStatements(endpoint);
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, params);
     }
 
@@ -120,19 +121,19 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         }
     }
 
-    public String[] getReadAndAckStatements(UMOEndpointURI endpointUri, UMOEndpoint endpoint)
+    public String[] getReadAndAckStatements(UMOImmutableEndpoint endpoint)
     {
         String str;
         // Find read statement
         String readStmt = null;
-        if ((str = endpointUri.getParams().getProperty("sql")) != null) {
+        if ((str = (String)endpoint.getProperty("sql")) != null) {
             readStmt = str;
         } else {
-            readStmt = endpointUri.getAddress();
+            readStmt = endpoint.getEndpointURI().getAddress();
         }
         // Find ack statement
         String ackStmt = null;
-        if ((str = endpointUri.getParams().getProperty("ack")) != null) {
+        if ((str = (String)endpoint.getProperty("ack")) != null) {
             ackStmt = str;
             if ((str = getQuery(endpoint, ackStmt)) != null) {
                 ackStmt = str;
@@ -165,7 +166,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         return new String[] { readStmt, ackStmt };
     }
 
-    public String getQuery(UMOEndpoint endpoint, String stmt)
+    public String getQuery(UMOImmutableEndpoint endpoint, String stmt)
     {
         Object query = null;
         if (endpoint != null && endpoint.getProperties() != null) {

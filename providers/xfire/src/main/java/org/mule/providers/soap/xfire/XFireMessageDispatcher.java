@@ -25,11 +25,13 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 
@@ -41,7 +43,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 /**
- * todo document
+ * The XfireMessageDispatcher is used for making Soap client requests to remote services using the Xfire soap stack
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -52,16 +54,32 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     protected XFireConnector connector;
     protected Client client;
 
-    public XFireMessageDispatcher(XFireConnector connector)
+    public XFireMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (XFireConnector)endpoint.getConnector();
 
     }
 
-    public void doDispose()
-    {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        if(client==null)
+        {
+            String serviceName = getService(endpoint);
+            XFire xfire = connector.getXfire();
+            Service service = xfire.getServiceRegistry().getService(serviceName);
+            client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
+            client.setXFire(xfire);
+            client.setEndpointUri(endpoint.getEndpointURI().toString());
+        }
+    }
+
+    protected void doDisconnect() throws Exception {
         client = null;
+    }
+
+    protected void doDispose()
+    {
+
     }
 
     protected String getMethod(UMOEvent event) throws DispatchException
@@ -103,10 +121,11 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         return args;
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
-        Client client = getClient(event);
-
+        if (client.getTimeout() != event.getTimeout()) {
+            client.setTimeout(event.getTimeout());
+        }
         String method = getMethod(event);
         Object[] response = client.invoke(method, getArgs(event));
         if (response != null && response.length <= 1) {
@@ -122,38 +141,46 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
-        Client client = getClient(event);
+        if (client.getTimeout() != event.getTimeout()) {
+            client.setTimeout(event.getTimeout());
+        }
         String method = getMethod(event);
         client.invoke(method, getArgs(event));
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
 
-        String serviceName = getService(endpointUri);
+        String serviceName = getService(endpoint);
 
         XFire xfire = connector.getXfire();
         Service service = xfire.getServiceRegistry().getService(serviceName);
-        Client client = new Client(new MuleUniversalTransport(), service, endpointUri.toString());
+        Client client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
         client.setXFire(xfire);
         client.setTimeout((int)timeout);
-        client.setEndpointUri(endpointUri.toString());
+        client.setEndpointUri(endpoint.getEndpointURI().toString());
 
-        String method = (String)endpointUri.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
+        String method = (String)endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
         OperationInfo op = service.getServiceInfo().getOperation(method);
 
-        Properties params = endpointUri.getUserParams();
+        Properties params = endpoint.getEndpointURI().getUserParams();
         String args[] = new String[params.size()];
         int i = 0;
         for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++) {
             args[i] = iterator.next().toString();
         }
-
-        UMOEndpoint ep = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        ep.initialise();
 
         Object[] response = client.invoke(op, args);
 
@@ -165,25 +192,6 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected Client getClient(UMOEvent event) throws Exception
-    {
-        if (client == null) {
-            String serviceName = getService(event.getEndpoint().getEndpointURI());
-
-            XFire xfire = connector.getXfire();
-            Service service = xfire.getServiceRegistry().getService(serviceName);
-            client = new Client(new MuleUniversalTransport(), service, event.getEndpoint()
-                    .getEndpointURI().toString());
-
-            client.setXFire(xfire);
-        }
-        if (client.getTimeout() != event.getTimeout()) {
-            client.setTimeout(event.getTimeout());
-        }
-        client.setEndpointUri(event.getEndpoint().getEndpointURI().toString());
-        return client;
-    }
-
     public Object getDelegateSession() throws UMOException
     {
         return null;
@@ -192,12 +200,12 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Get the service that is mapped to the specified request.
      */
-    protected String getService(UMOEndpointURI uri)
+    protected String getService(UMOImmutableEndpoint endpoint)
     {
-        String pathInfo = uri.getPath();
+        String pathInfo = endpoint.getEndpointURI().getPath();
 
         if (StringUtils.isEmpty(pathInfo)) {
-            return uri.getHost();
+            return endpoint.getEndpointURI().getHost();
         }
 
         String serviceName;

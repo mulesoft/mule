@@ -16,6 +16,7 @@ package org.mule.impl.message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ public class ExceptionMessage extends BaseMessage
     private UMOEndpointURI endpointUri;
     private Date timeStamp;
 
-    public ExceptionMessage(Object message, UMOEndpoint endpoint, Throwable exception, UMOEventContext ctx)
+    public ExceptionMessage(Object message, UMOImmutableEndpoint endpoint, Throwable exception, UMOEventContext ctx)
     {
         super(message);
         this.exception = exception;

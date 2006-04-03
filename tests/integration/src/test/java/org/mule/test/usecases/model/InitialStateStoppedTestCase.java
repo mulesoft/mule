@@ -24,7 +24,7 @@ public class InitialStateStoppedTestCase extends AbstractMuleTestCase {
         }
 
         // "TestComponent" is initially stopped (initialState="stopped").
-		manager = new MuleXmlConfigurationBuilder().configure("initial-state-stopped-config.xml");
+		manager = new MuleXmlConfigurationBuilder().configure("org/mule/test/usecases/model/initial-state-stopped-config.xml");
 		manager.start();
 		
 		// The connector should be started, but with no listeners registered.

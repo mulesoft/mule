@@ -168,7 +168,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         dispose();
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
         if (socket != null && !socket.isClosed()) {
             logger.debug("Closing Udp connection: " + uri);

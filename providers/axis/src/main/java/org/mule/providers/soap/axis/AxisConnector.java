@@ -250,7 +250,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
      *         name.
      */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
-        return component.getDescriptor().getName();
+        if(endpoint.getEndpointURI().getPort()==-1) {
+            return component.getDescriptor().getName();
+        } else {
+            return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+        }
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception {
@@ -352,6 +356,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             //Remove the Axis Receiver Security filter now
             receiver.getEndpoint().setSecurityFilter(null);
 
+//        if(receiver.getEndpoint().getTransformer()!=null) {
+//            serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+//            receiver.getEndpoint().setTransformer(null);
+//        }
             //propagate properties to the service endpoint
             serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
 

@@ -14,6 +14,7 @@
 package org.mule.umo;
 
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * <code>UMOExceptionPayload</code> is a message payload that contains
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOExceptionPayload
+public interface UMOExceptionPayload extends Serializable
 {
 
     int getCode();
@@ -32,4 +33,7 @@ public interface UMOExceptionPayload
     Map getInfo();
 
     Throwable getException();
+
+    Throwable getRootException();
+
 }

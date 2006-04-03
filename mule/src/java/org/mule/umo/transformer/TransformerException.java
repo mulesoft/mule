@@ -54,7 +54,7 @@ public class TransformerException extends EndpointException
     {
         super(cause);
         this.transformer = transformer;
-        addInfo("Transformer", transformer.toString());
+        addInfo("Transformer", (transformer==null ? "null" : transformer.toString()));
     }
 
     /**

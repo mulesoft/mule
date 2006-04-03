@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
@@ -42,9 +43,9 @@ public class MessageNotification extends UMOServerNotification
 
     private static final transient String[] ACTIONS = new String[] { "received", "dispatched", "sent", "requested" };
 
-    private UMOEndpoint endpoint;
+    private UMOImmutableEndpoint endpoint;
 
-    public MessageNotification(UMOMessage resource, UMOEndpoint endpoint, String identifier, int action)
+    public MessageNotification(UMOMessage resource, UMOImmutableEndpoint endpoint, String identifier, int action)
     {
         super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
@@ -80,6 +81,10 @@ public class MessageNotification extends UMOServerNotification
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint.getEndpointURI()
                 + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp +  ", serverId=" + serverId + ", message: " + source + "}";
+    }
+
+    public UMOImmutableEndpoint getEndpoint() {
+        return endpoint;
     }
 
 }

@@ -55,7 +55,7 @@ public class EMailFunctionalTestCase extends AbstractMuleTestCase
         Map props = new HashMap();
         
         mc.sendNoReceive(sendUrl, messageString, props);
-        msg = mc.receive(receiveUrl, 20000);
+        msg = mc.receive(receiveUrl, 30000);
         assertNotNull(msg);
         assertTrue(msg.getPayloadAsString().indexOf(messageString) > -1);
     }

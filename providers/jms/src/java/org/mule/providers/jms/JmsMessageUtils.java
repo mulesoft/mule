@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * <code>JmsMessageUtils</code> TODO -document class
+ * <code>JmsMessageUtils</code> contains helper method for dealing with Jms messages in Mule
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

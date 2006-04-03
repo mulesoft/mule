@@ -15,6 +15,7 @@ package org.mule.providers.jdbc;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -26,6 +27,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -34,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The Jdbc Message dispatcher is responsible for executing SQL queries against a database
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
@@ -42,10 +46,10 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 
     private JdbcConnector connector;
 
-    public JdbcMessageDispatcher(JdbcConnector connector)
+    public JdbcMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (JdbcConnector)endpoint.getConnector();
     }
 
     /*
@@ -53,7 +57,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.providers.AbstractMessageDispatcher#doDispose()
      */
-    public void doDispose()
+    protected void doDispose()
     {
     }
 
@@ -62,20 +66,19 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.providers.AbstractMessageDispatcher#doDispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         if (logger.isDebugEnabled()) {
             logger.debug("Dispatch event: " + event);
         }
 
-        UMOEndpoint endpoint = event.getEndpoint();
-        UMOEndpointURI endpointURI = endpoint.getEndpointURI();
-        String writeStmt = endpointURI.getAddress();
+        UMOImmutableEndpoint endpoint = event.getEndpoint();
+        String writeStmt = endpoint.getEndpointURI().getAddress();
         String str;
         if ((str = this.connector.getQuery(endpoint, writeStmt)) != null) {
             writeStmt = str;
         }
-        if (writeStmt == null) {
+        if (StringUtils.isEmpty(writeStmt)) {
             throw new IllegalArgumentException("Write statement should not be null");
         }
         if (!"insert".equalsIgnoreCase(writeStmt.substring(0, 6))
@@ -85,7 +88,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
         List paramNames = new ArrayList();
         writeStmt = JdbcUtils.parseStatement(writeStmt, paramNames);
-        Object[] paramValues = JdbcUtils.getParams(endpointURI, paramNames, event.getTransformedMessage());
+        Object[] paramValues = JdbcUtils.getParams(endpoint, paramNames, event.getTransformedMessage());
 
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
@@ -114,25 +117,30 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.providers.AbstractMessageDispatcher#doSend(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         return event.getMessage();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#receive(org.mule.umo.endpoint.UMOEndpointURI,
-     *      long)
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
         if (logger.isDebugEnabled()) {
             logger.debug("Trying to receive a message with a timeout of " + timeout);
         }
 
-        String[] stmts = this.connector.getReadAndAckStatements(endpointUri, null);
+        String[] stmts = this.connector.getReadAndAckStatements(endpoint);
         String readStmt = stmts[0];
         String ackStmt = stmts[1];
         List readParams = new ArrayList();
@@ -151,7 +159,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             do {
                 result = new QueryRunner().query(con,
                                                  readStmt,
-                                                 JdbcUtils.getParams(endpointUri, readParams, null),
+                                                 JdbcUtils.getParams(endpoint, readParams, null),
                                                  new MapHandler());
                 if (result != null) {
                     if (logger.isDebugEnabled()) {
@@ -171,7 +179,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                 }
             } while (true);
             if (result != null && ackStmt != null) {
-                int nbRows = new QueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpointUri, ackParams, result));
+                int nbRows = new QueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpoint, ackParams, result));
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
                 }
@@ -184,6 +192,13 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             JdbcUtils.rollbackAndClose(con);
             throw e;
         }
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+
+    }
+
+    protected void doDisconnect() throws Exception {
     }
 
     /*

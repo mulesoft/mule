@@ -14,6 +14,8 @@
 package org.mule.providers.space;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -28,8 +30,8 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 public class SpaceMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new SpaceMessageDispatcher((SpaceConnector) connector);
+        return new SpaceMessageDispatcher(endpoint);
     }
 }

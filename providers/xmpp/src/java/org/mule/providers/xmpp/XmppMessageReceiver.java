@@ -58,7 +58,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     {
         try {
             XmppConnector cnn = (XmppConnector) connector;
-            xmppConnection = cnn.findOrCreateXmppConnection(endpoint.getEndpointURI());
+            xmppConnection = cnn.createXmppConnection(endpoint.getEndpointURI());
             if (endpoint.getFilter() instanceof PacketFilter) {
                 xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
             } else {
@@ -80,7 +80,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         }
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
         logger.info("Closed Xmpp Listener");
     }

@@ -39,12 +39,6 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
         return "stream://System.out";
     }
 
-    public void testGetStreams() throws Exception
-    {
-        SystemStreamConnector connector = (SystemStreamConnector) createConnector();
-        assertNotNull(connector.getInputStream());
-        assertNotNull(connector.getOutputStream());
-    }
 
     public UMOConnector getConnector() throws Exception
     {

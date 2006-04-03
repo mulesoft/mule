@@ -87,7 +87,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
 
     public void afterInitialise() throws Exception
     {
-        Thread.sleep(2000);
+        Thread.sleep(20000);
     }
 
     public void testSendNotTransacted() throws Exception

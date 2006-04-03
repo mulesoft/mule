@@ -77,6 +77,11 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
     public Object transform(Object src, String encoding, UMOEventContext context)
             throws TransformerException
     {
+        //Send back the exception payload if one has been set
+        if(context.getMessage().getExceptionPayload()!=null) {
+       //     src = context.getMessage().getExceptionPayload();
+        }
+
         // Note this transformer excepts Null as we must always return a result
         // from the Http
         // connector if a response transformer is present
@@ -209,25 +214,24 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         }
 
         // Mule properties
-        UMOMessage m = context.getMessage();
-        String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
+        String user = (String)msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, null);
         if (user != null) {
             response
                     .setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));
         }
-        if (m.getCorrelationId() != null) {
+        if (msg.getCorrelationId() != null) {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX
-                    + MuleProperties.MULE_CORRELATION_ID_PROPERTY, m.getCorrelationId()));
+                    + MuleProperties.MULE_CORRELATION_ID_PROPERTY, msg.getCorrelationId()));
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX
-                    + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(m
+                    + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(msg
                     .getCorrelationGroupSize())));
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX
-                    + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(m
+                    + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(msg
                     .getCorrelationSequence())));
         }
-        if (m.getReplyTo() != null) {
+        if (msg.getReplyTo() != null) {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
-                    m.getReplyTo().toString()));
+                    msg.getReplyTo().toString()));
         }
         if (src instanceof InputStream) {
             response.setBody((InputStream)src);

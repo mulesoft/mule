@@ -20,6 +20,9 @@ import org.apache.commons.httpclient.Header;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleSession;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -219,6 +222,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         response.setStatusLine(reqLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
                         response.setBodyString(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X,
                                 failedPath).toString());
+                        RequestContext.setEvent(new MuleEvent(new MuleMessage(response), endpoint, new MuleSession(component), true));
                         // The DefaultResponse Transformer will set the necessary Headers
                         response = (HttpResponse)connector.getDefaultResponseTransformer().transform(
                                 response);

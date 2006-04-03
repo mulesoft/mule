@@ -47,6 +47,9 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
             if (src instanceof byte[]) {
                 data = (byte[])src;
             }
+//            else  if (src instanceof String) {
+//                data = src.toString().getBytes(encoding);
+//            }
             else {
                 data = SerializationUtils.serialize((Serializable)src);
             }

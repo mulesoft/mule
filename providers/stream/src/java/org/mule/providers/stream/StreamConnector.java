@@ -18,6 +18,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,20 +34,23 @@ import java.io.OutputStream;
 public abstract class StreamConnector extends AbstractServiceEnabledConnector
 {
 
-    protected StreamConnector()
-    {
-    }
+    public static final String STREAM_SYSTEM_IN = "system.in";
+    public static final String STREAM_SYSTEM_OUT = "system.out";
+    public static final String STREAM_SYSTEM_ERR = "system.err";
+
+
+    protected OutputStream outputStream;
+    protected InputStream inputStream;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession,
      *      org.mule.umo.endpoint.UMOEndpoint)
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { getInputStream(),
-                new Long(1000) });
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { new Long(1000) });
     }
 
     /*
@@ -54,12 +58,14 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      * 
      * @see org.mule.providers.AbstractConnector#doStop()
      */
-    public synchronized void doStop()
+    public void doStop()
     {
     }
 
     protected void doDispose()
     {
+        IOUtils.closeQuietly(inputStream);
+        IOUtils.closeQuietly(outputStream);
     }
 
     /*
@@ -67,7 +73,7 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      * 
      * @see org.mule.providers.AbstractConnector#doStart()
      */
-    public synchronized void doStart()
+    public void doStart()
     {
     }
 
@@ -82,22 +88,21 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
         return "stream";
     }
 
-    public abstract InputStream getInputStream();
 
-    public abstract OutputStream getOutputStream();
-
-    /**
-     * Sub classes might want to reinitialise between stream reads here
-     */
-    public abstract void reinitialise();
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
-    public void run()
-    {
-        // noop
+    public InputStream getInputStream() {
+        return inputStream;
     }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public OutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    public void setOutputStream(OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
+
 }

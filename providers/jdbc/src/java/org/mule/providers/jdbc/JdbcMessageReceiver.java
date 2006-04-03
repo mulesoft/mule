@@ -88,7 +88,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             con = this.connector.getConnection();
 
             if (this.ackStmt != null) {
-                Object[] ackParams = JdbcUtils.getParams(getEndpointURI(), this.ackParams, message);
+                Object[] ackParams = JdbcUtils.getParams(endpoint, this.ackParams, message);
                 int nbRows = new QueryRunner().update(con, this.ackStmt, ackParams);
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
@@ -129,7 +129,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 throw new ConnectException(e, this);
             }
 
-            Object[] readParams = JdbcUtils.getParams(getEndpointURI(), this.readParams, null);
+            Object[] readParams = JdbcUtils.getParams(endpoint, this.readParams, null);
             Object results = new QueryRunner().query(con, this.readStmt, readParams, new MapListHandler());
             return (List) results;
         } finally {

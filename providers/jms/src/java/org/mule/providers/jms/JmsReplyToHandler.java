@@ -69,6 +69,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                             " does not support source type: "  + payload.getClass() + ". Not doing a transform");
                 }
             }
+
             boolean topic = replyToDestination instanceof Topic;
             session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);

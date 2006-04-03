@@ -40,7 +40,7 @@ public class MuleDispatcher extends AbstractEndpointComponent implements Message
             logger.debug("In Mule Dispatcher");
         }
         try {
-            UMOMessageDispatcher dispatcher = muleEndpoint.getConnector().getDispatcher(muleEndpoint.getEndpointURI().getAddress());
+            UMOMessageDispatcher dispatcher = muleEndpoint.getConnector().getDispatcher(muleEndpoint);
             NormalizedMessage out = messageExchange.getMessage(IN);
             UMOMessage message = JbiUtils.createMessage(out);
             if(logger.isDebugEnabled()) {

@@ -16,6 +16,7 @@ package org.mule.umo.provider;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.RoutingException;
 
 /**
@@ -28,22 +29,22 @@ import org.mule.umo.routing.RoutingException;
 
 public class DispatchException extends RoutingException
 {
-    public DispatchException(UMOMessage message, UMOEndpoint endpoint)
+    public DispatchException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         super(message, endpoint);
     }
 
-    public DispatchException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public DispatchException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(umoMessage, endpoint, cause);
     }
 
-    public DispatchException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public DispatchException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }
 
-    public DispatchException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public DispatchException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);
     }

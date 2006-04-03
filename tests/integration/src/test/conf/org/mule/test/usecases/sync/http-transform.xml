@@ -28,8 +28,8 @@
 				  address="http://localhost:18080/RemoteService"
 				  synchronous="true">
 			<properties>
-				<property name="Content-Type" value="text/plain" />
-			</properties>
+                <property name="Content-Type" value="text/plain"/>
+            </properties>
 		</endpoint>
 		<endpoint name="httpEndpoint2"
 				  address="http://localhost:18081/RemoteService?method=post"
@@ -43,10 +43,11 @@
 	
 	<model name="model">
 		<mule-descriptor name="HttpService" 
-			implementation="org.mule.components.simple.EchoComponent"
-			inboundEndpoint="httpEndpoint"
-			inboundTransformer="ByteArrayToString"
-			responseTransformer="ObjectToXml Compress ToHttpResponse">
+			implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="httpEndpoint" transformers="ByteArrayToString"
+                    responseTransformers="ObjectToXml Compress ToHttpResponse"/>
+            </inbound-router>
 		</mule-descriptor>
 
 		<mule-descriptor name="HttpService2" 

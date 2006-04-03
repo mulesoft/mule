@@ -3,7 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Mule_Echo_Sample" version="1.0">
+<mule-configuration id="Mule_Axis_VM_Bridge" version="1.0">
 	
     <mule-environment-properties synchronous="true" serverUrl=""/>
 
@@ -16,7 +16,7 @@
 	    </properties>
 	</connector>
 	
-    <model name="james">
+    <model name="main">
 	
 		<mule-descriptor name="test" implementation="org.mule.components.simple.BridgeComponent">
 		    <inbound-router>
@@ -28,7 +28,12 @@
 		        </router>
 		    </outbound-router>
 		</mule-descriptor>
-		
+
+        <mule-descriptor name="doSomeWork" implementation="org.mule.test.usecases.axis.clientbridge.DoSomeWork">
+		    <inbound-router>
+		        <endpoint address="axis:http://localhost:8002/axisService"/>
+		    </inbound-router>
+		</mule-descriptor>
     </model>
 	
 </mule-configuration>

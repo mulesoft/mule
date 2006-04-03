@@ -56,7 +56,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate tt = new TransactionTemplate(tc, null);
         tt.execute(new TransactionCallback() {
-            public Object doInTransaction() throws Exception 
+            public Object doInTransaction() throws Exception
             {
                 for (int i = 0; i < 100; i++) {
                     client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
@@ -90,7 +90,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         TransactionTemplate tt = new TransactionTemplate(tc, null);
         try {
             tt.execute(new TransactionCallback() {
-                public Object doInTransaction() throws Exception 
+                public Object doInTransaction() throws Exception
                 {
                     for (int i = 0; i < 100; i++) {
                         client.send("jms://test.queue", "Test Client Dispatch message " + i, props);

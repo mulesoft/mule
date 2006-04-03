@@ -14,21 +14,23 @@
 package org.mule.providers.ejb;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
-/*
- * Code by (c) 2005 P.Oikari.
+
+/**
+ * <code>EjbMessageDispatcherFactory</code> creates a dispatcher for marshalling requests to an EJB Session bean
  *
- * @author <a href="mailto:pnirvin@hotmail.com">P.Oikari</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
 public class EjbMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new EjbMessageDispatcher((EjbConnector) connector);
+        return new EjbMessageDispatcher(endpoint);
     }
 }
 

@@ -99,7 +99,7 @@ public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
             if (results.size() >= 10) {
                 break;
             }
-            assertTrue(System.currentTimeMillis() - t0 < 10000);
+            assertTrue(System.currentTimeMillis() - t0 < 20000);
             Thread.sleep(500);
         }
     }

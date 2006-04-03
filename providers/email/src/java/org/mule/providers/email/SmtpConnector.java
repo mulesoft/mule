@@ -237,8 +237,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
      */
     public void doStart() throws UMOException
     {
-        // force connection to server
-        dispatcherFactory.create(this);
+
     }
 
     /*

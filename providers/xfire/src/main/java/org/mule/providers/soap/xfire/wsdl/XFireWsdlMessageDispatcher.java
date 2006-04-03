@@ -20,6 +20,7 @@ import org.codehaus.xfire.service.Service;
 import org.mule.providers.soap.xfire.XFireMessageDispatcher;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;
 
@@ -34,15 +35,15 @@ import java.net.URL;
 public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 {
 
-    public XFireWsdlMessageDispatcher(XFireWsdlConnector connector)
+    public XFireWsdlMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
+        super(endpoint);
     }
 
-    protected Client getClient(UMOEvent event) throws Exception
-    {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+
         if (client == null) {
-            String wsdlUrl = event.getEndpoint().getEndpointURI().getAddress();
+            String wsdlUrl = endpoint.getEndpointURI().getAddress();
             String serviceName = wsdlUrl.substring(0, wsdlUrl.lastIndexOf("?"));
 
             XFire xfire = connector.getXfire();
@@ -58,11 +59,8 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 
             client.setXFire(xfire);
         }
-        if (client.getTimeout() != event.getTimeout()) {
-            client.setTimeout(event.getTimeout());
-        }
-        client.setEndpointUri(event.getEndpoint().getEndpointURI().toString());
-        return client;
+
+        client.setEndpointUri(endpoint.getEndpointURI().toString());
     }
 
 }

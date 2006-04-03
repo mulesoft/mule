@@ -21,8 +21,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.MuleManager;
 
 import java.io.InputStream;
+import java.io.PrintStream;
 
 /**
  * <code>StreamMessageReceiver</code> is a listener of events from a mule
@@ -37,14 +39,21 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private InputStream inputStream;
+    private StreamConnector connector;
 
     public StreamMessageReceiver(UMOConnector connector,
                                  UMOComponent component,
                                  UMOEndpoint endpoint,
-                                 InputStream stream,
                                  Long checkFrequency) throws InitialisationException {
         super(connector, component, endpoint, checkFrequency);
-        inputStream = stream;
+
+        this.connector = (StreamConnector)connector;
+        String streamName = endpoint.getEndpointURI().getAddress();
+        if(StreamConnector.STREAM_SYSTEM_IN.equalsIgnoreCase(streamName)) {
+            inputStream = System.in;
+        } else {
+            inputStream = this.connector.getInputStream();
+        }
 
         // apply connector-specific properties
         if (connector instanceof SystemStreamConnector) {
@@ -54,16 +63,15 @@ public class StreamMessageReceiver extends PollingMessageReceiver
             if (promptMessage != null) {
                 ssc.setPromptMessage(promptMessage);
             }
-
-            String messageDelayTime = (String)endpoint.getProperties().get("messageDelayTime");
-            if (messageDelayTime != null) {
-                ssc.setMessageDelayTime(Long.parseLong(messageDelayTime));
-            }
         }
     }
 
     public void doConnect() throws Exception {
-        // noop
+        if (connector instanceof SystemStreamConnector) {
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
+            DelayedMessageWriter writer = new DelayedMessageWriter(ssc);
+            writer.start();
+        }
     }
 
     public void doDisconnect() throws Exception {
@@ -81,7 +89,6 @@ public class StreamMessageReceiver extends PollingMessageReceiver
             int len = inputStream.read(inputBuffer);
 
             if (len == -1) {
-                // System.in is unlikely to be closed but..
                 return;
             }
 
@@ -107,7 +114,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
             UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(finalMessageString));
             routeMessage(umoMessage, endpoint.isSynchronous());
 
-            ((StreamConnector)endpoint.getConnector()).reinitialise();
+            doConnect();
         }
         catch (Exception e) {
             handleException(e);
@@ -128,5 +135,30 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
+    }
+
+    private class DelayedMessageWriter extends Thread
+    {
+        private long delay = 0;
+        private SystemStreamConnector ssc;
+
+        public DelayedMessageWriter(SystemStreamConnector ssc)
+        {
+            this.delay = ssc.getMessageDelayTime();
+            this.ssc = ssc;
+        }
+
+        public void run()
+        {
+            if (delay > 0) {
+                try {
+                    // Allow all other console message to be printed out first
+                    sleep(delay);
+                } catch (InterruptedException e1) {
+                }
+            }
+            ((PrintStream)ssc.getOutputStream()).println();
+            ((PrintStream)ssc.getOutputStream()).print(ssc.getPromptMessage());
+        }
     }
 }

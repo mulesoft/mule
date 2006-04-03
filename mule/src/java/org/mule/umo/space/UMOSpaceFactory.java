@@ -14,6 +14,7 @@
 package org.mule.umo.space;
 
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * A factory for creating Mule Space facade objects
@@ -30,7 +31,7 @@ public interface UMOSpaceFactory {
      * @return an new Space object
      * @throws UMOSpaceException
      */
-    public UMOSpace create(UMOEndpoint endpoint) throws UMOSpaceException;
+    public UMOSpace create(UMOImmutableEndpoint endpoint) throws UMOSpaceException;
 
     /**
      * Creates a space based on a URI identifier for the space

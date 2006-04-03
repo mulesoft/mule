@@ -18,6 +18,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 
@@ -109,13 +110,13 @@ public interface UMOConnector extends Disposable, Initialisable
      * ingnore the endpointUri altogether and use a ThreadLocal or always create
      * new.
      * 
-     * @param endpoint the endpointUri that can be used to key cached
+     * @param endpoint the endpoint that can be used to key cached
      *            dispatchers
      * @return the component associated with the endpointUri If there is no
      *         component for the current thread one will be created
      * @throws UMOException if creation of a component fails
      */
-    UMOMessageDispatcher getDispatcher(String endpoint) throws UMOException;
+    UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException;
 
     /**
      * @param listener the exception strategy to use with this endpoint

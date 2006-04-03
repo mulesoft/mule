@@ -69,7 +69,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
 
         assertEquals(noOfMessages, results.size());
         for (int i = 0; i < noOfMessages; i++) {
-            assertEquals(response, results.get(i).toString());
+            assertEquals(response, new String((byte[])results.get(i)));
         }
     }
 }

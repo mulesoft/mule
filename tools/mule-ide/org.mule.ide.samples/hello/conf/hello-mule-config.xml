@@ -83,7 +83,7 @@
         <mule-descriptor name="GreeterUMO"
             implementation="org.mule.samples.hello.Greeter">
             <inbound-router>
-                <endpoint address="stream://localhost" transformers="StringToNameString"/>
+                <endpoint address="stream://System.in" transformers="StringToNameString"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

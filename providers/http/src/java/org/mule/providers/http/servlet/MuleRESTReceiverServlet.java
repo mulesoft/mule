@@ -69,8 +69,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                             + " timeout is: " + to);
                 }
 
-                UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(
-                        endpoint.getEndpointURI(), to);
+                UMOMessage returnMessage = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, to);
 
                 writeResponse(httpServletResponse, returnMessage);
             }
@@ -141,8 +140,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                         + to);
             }
 
-            UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(
-                    endpoint.getEndpointURI(), to);
+            UMOMessage returnMessage = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, to);
             if (returnMessage != null) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_OK);
             }

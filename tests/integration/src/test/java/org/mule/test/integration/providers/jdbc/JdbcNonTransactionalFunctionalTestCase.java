@@ -43,16 +43,15 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         // Start the server
         MuleManager.getInstance().start();
 
-        MuleEndpointURI muleEndpoint = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TEST");
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        MuleEndpoint muleEndpoint = new MuleEndpoint("jdbc://?sql=SELECT * FROM TEST", true);
         UMOMessage message;
 
-        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNull(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
                 + "', NULL, NULL)");
-        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNotNull(message);
     }
 
@@ -79,16 +78,15 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         // Start the server
         MuleManager.getInstance().start();
 
-        MuleEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_IN_URI);
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        MuleEndpoint muleEndpoint = new MuleEndpoint(DEFAULT_IN_URI, true);
         UMOMessage message;
 
-        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNull(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
                 + "', NULL, NULL)");
-        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNotNull(message);
 
     }

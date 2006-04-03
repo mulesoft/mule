@@ -67,6 +67,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.beans.ExceptionListener;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -131,19 +132,19 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * The set of listeners for this Multicaster
      */
-    private Set listeners = new HashSet();
+    protected Set listeners = new HashSet();
 
     /**
      * Determines whether events will be processed asynchronously
      */
-    private boolean asynchronous = false;
+    protected boolean asynchronous = false;
 
     /**
      * Any logical endpointUri mappings to register with mule. These allow for
      * friendly names to be used in place of urls i.e. email-orders ->
      * smtp://orders:password@restaurant.com
      */
-    private Map endpointMappings = null;
+    protected Map endpointMappings = null;
 
     /**
      * A list of endpoints the eventMulticaster will receive events on Note that
@@ -152,31 +153,33 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * are here for convenience, the event multicaster will use these to create
      * a default MuleDescriptor for itself at runtime
      */
-    private String[] subscriptions = null;
+    protected String[] subscriptions = null;
     /**
      * The Spring acpplication context
      */
-    private ApplicationContext applicationContext;
+    protected ApplicationContext applicationContext;
 
     /**
      * The Mule descriptor that belongs to this component instnace in Mule
      */
-    private UMODescriptor descriptor;
+    protected UMODescriptor descriptor;
 
     /**
      * The mule instance compoennt for the Multicaster
      */
-    private UMOComponent component;
+    protected UMOComponent component;
 
     /**
      * The filter used to match subscriptions
      */
-    private Class subscriptionFilter = WildcardFilter.class;
+    protected Class subscriptionFilter = WildcardFilter.class;
 
     /**
      * Used to store parsed endpoints
      */
-    private Map endpointsCache = new HashMap();
+    protected Map endpointsCache = new HashMap();
+
+    protected ExceptionListener exceptionListener = new LoggingExceptionListener();
 
     /**
      * Adds a listener to the the Multicaster. If asynchronous is sset to true,
@@ -273,7 +276,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 try {
                     dispatchEvent(muleEvent);
                 } catch (ApplicationEventException e1) {
-                    logger.error("failed to dispatch event: " + e.toString(), e1);
+                    exceptionListener.exceptionThrown(e1);
                 }
                 return;
             }
@@ -426,7 +429,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                         message = new MuleMessage(endpoint.getTransformer().transform(applicationEvent.getSource()),
                                                   applicationEvent.getProperties());
                     }
-                    UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI().getAddress());
+                    UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
                     dispatcher.dispatch(new MuleEvent(message, endpoint, session, false));
                 }
             } catch (Exception e1) {
@@ -686,7 +689,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                                                                               new Object[] { pattern });
             return filter;
         } catch (Exception e) {
-            logger.error("Failed to load filter: " + getSubscriptionFilter() + " : " + e.getMessage());
+            exceptionListener.exceptionThrown(e);
             return new WildcardFilter(pattern);
         }
     }
@@ -762,5 +765,19 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     public void setSubscriptions(String[] subscriptions)
     {
         this.subscriptions = subscriptions;
+    }
+
+    protected void setExceptionListener(ExceptionListener listener) {
+        if(listener!=null) {
+            this.exceptionListener = listener;
+        } else {
+            throw new NullPointerException("exceptionListener");
+        }
+    }
+
+    private class LoggingExceptionListener implements ExceptionListener {
+        public void exceptionThrown(Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }

@@ -82,7 +82,7 @@ public class AttachmentsPropagationTestCase extends TestCase implements EventCal
 
          // expect CHAINED attachment from CHAINED component
          // and SINGLE attachment from SINGLE component
-        assertEquals("[CHAINED, SINGLE]", result.getPayloadAsString());
+        assertEquals("[SINGLE, CHAINED]", result.getPayloadAsString());
     }
 
     public void testClientReceivesAttachments() throws Exception {
@@ -101,7 +101,7 @@ public class AttachmentsPropagationTestCase extends TestCase implements EventCal
         assertNotNull(result);
 
          // expect SINGLE and CHAINED attachments
-        assertEquals("[CHAINED, SINGLE]", result.getPayloadAsString());
+        assertEquals("[SINGLE, CHAINED]", result.getPayloadAsString());
         assertNotNull(result.getAttachment("SINGLE"));
         assertEquals("<content>", result.getAttachment("SINGLE").getContent().toString());
         assertNotNull(result.getAttachment("CHAINED"));

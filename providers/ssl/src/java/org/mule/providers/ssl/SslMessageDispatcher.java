@@ -16,6 +16,7 @@ package org.mule.providers.ssl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.tcp.TcpMessageDispatcher;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -35,14 +36,9 @@ import java.net.Socket;
 
 public class SslMessageDispatcher extends TcpMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(SslMessageDispatcher.class);
-
-    public SslMessageDispatcher(SslConnector connector)
+    public SslMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
+        super(endpoint);
     }
 
     protected Socket createSocket(int port, InetAddress inetAddress) throws IOException

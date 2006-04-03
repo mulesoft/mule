@@ -21,6 +21,7 @@ import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;
 
@@ -38,8 +39,8 @@ import java.util.Vector;
  */
 public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher {
 
-    public AxisWsdlMessageDispatcher(AxisWsdlConnector connector) {
-        super(connector);
+    public AxisWsdlMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
     }
 
     protected Service createService(UMOEvent event) throws Exception {

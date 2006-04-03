@@ -21,12 +21,16 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.IllegalTransactionStateException;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.concurrent.Latch;
 
@@ -55,9 +59,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     private Session cachedSession;
     private boolean cacheJmsSession = false;
 
-    public JmsMessageDispatcher(JmsConnector connector) {
-        super(connector);
-        this.connector = connector;
+    public JmsMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (JmsConnector)endpoint.getConnector();
     }
 
     /*
@@ -66,8 +70,16 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
      * @see org.mule.providers.UMOConnector#dispatchEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
-    public void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception {
         dispatchMessage(event);
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+
+    }
+
+    protected void doDisconnect() throws Exception {
+        
     }
 
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception {
@@ -81,11 +93,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         MessageConsumer consumer = null;
 
         try {
-
             // Retrieve the session for the current transaction
             // If there is one, this is up to the transaction to close the
             // session
-            txSession = connector.getCurrentSession();
+         //   UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+//            if (tx != null && tx instanceof JmsTransaction) {
+                txSession = connector.getCurrentSession();
+//                if(txSession==null) {
+                    //txSession = connector.getSession(event.getEndpoint());
+//                }
+//                tx.bindResource(connector.getConnection(), txSession);
+//            }
 
             //Should we be caching sessions
             cacheJmsSession = event.getMessage().getBooleanProperty(
@@ -98,6 +116,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                     cachedSession = connector.getSession(event.getEndpoint());
                 }
                 session = cachedSession;
+            } else if(txSession!=null) {
+                session = txSession;
             } else {
                 // Retrieve a session from the connector
                 session = connector.getSession(event.getEndpoint());
@@ -213,8 +233,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                     logger.debug("No message was returned via replyTo destination");
                     return null;
                 } else {
-                    Object resultObject = JmsMessageUtils.getObjectForMessage(result);
-                    return new MuleMessage(resultObject);
+                    UMOMessageAdapter adapter = connector.getMessageAdapter(result);
+                    return new MuleMessage(JmsMessageUtils.getObjectForMessage(result), adapter);
                 }
             } else {
                 connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
@@ -226,8 +246,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                         logger.debug("No message was returned via replyTo destination");
                         return null;
                     } else {
-                        Object resultObject = JmsMessageUtils.getObjectForMessage(result);
-                        return new MuleMessage(resultObject);
+                        UMOMessageAdapter adapter = connector.getMessageAdapter(result);
+                        return new MuleMessage(JmsMessageUtils.getObjectForMessage(result), adapter);
                     }
                 }
             }
@@ -235,7 +255,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         } finally {
             connector.closeQuietly(consumer);
             connector.closeQuietly(producer);
-            if (session != null && !cacheJmsSession && !session.equals(txSession)) {
+            if (session != null && !cacheJmsSession && txSession==null) {
                 connector.closeQuietly(session);
             }
         }
@@ -247,28 +267,34 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
      * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         UMOMessage message = dispatchMessage(event);
         return message;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Make a specific request to the underlying transport
      *
-     * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
-     *      org.mule.providers.MuleEndpoint)
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
         Session session = null;
         Destination dest = null;
         MessageConsumer consumer = null;
         try {
             boolean topic = false;
-            String resourceInfo = endpointUri.getResourceInfo();
+            String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
             topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
             session = connector.getSession(false, topic);
-            dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
+            dest = connector.getJmsSupport().createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
             consumer = connector.getJmsSupport().createConsumer(session, dest, topic);
 
             try {
@@ -330,10 +356,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         return connector;
     }
 
-    public void doDispose() {
-        logger.debug("Disposing");
-        connector.closeQuietly(delegateSession);
-        connector.closeQuietly(cachedSession);
+    protected void doDispose() {
+
     }
 
     private class ReplyToListener implements MessageListener {

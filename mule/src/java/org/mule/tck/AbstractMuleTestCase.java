@@ -25,6 +25,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.StringMessageHelper;
@@ -243,11 +244,11 @@ public abstract class AbstractMuleTestCase extends TestCase {
         return MuleTestUtils.getTestEvent(data, descriptor);
     }
 
-    public static UMOEvent getTestEvent(Object data, UMOEndpoint endpoint) throws Exception {
+    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception {
         return MuleTestUtils.getTestEvent(data, endpoint);
     }
 
-    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOEndpoint endpoint)
+    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
             throws UMOException {
         return MuleTestUtils.getTestEvent(data, descriptor, endpoint);
     }

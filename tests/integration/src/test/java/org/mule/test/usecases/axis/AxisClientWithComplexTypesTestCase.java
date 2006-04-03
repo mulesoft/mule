@@ -64,9 +64,9 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 		submittrade.setArg0(trade);
 
         //We need to name the parameters weh using Doc/Lit
-        SoapMethod method = new SoapMethod(new QName("submitTrade"), SubmitTradeResponse.class);
-        method.addNamedParameter(new NamedParameter(new QName("submitTrade"), NamedParameter.createQName("Object"), ParameterMode.IN));
-        props.put(MuleProperties.MULE_SOAP_METHOD, method);
+//        SoapMethod method = new SoapMethod(new QName("submitTrade"), SubmitTradeResponse.class);
+//        method.addNamedParameter(new NamedParameter(new QName("submitTrade"), NamedParameter.createQName("Object"), ParameterMode.IN));
+//        props.put(MuleProperties.MULE_SOAP_METHOD, method);
         UMOMessage result = client.send(uri, submittrade, props);
         assertNotNull(result);
         SubmitTradeResponse response = (SubmitTradeResponse)result.getPayload();

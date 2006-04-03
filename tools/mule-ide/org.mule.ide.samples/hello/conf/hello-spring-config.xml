@@ -71,7 +71,7 @@
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
-                            <value>stream://localhost?transformers=StringToNameString</value>
+                            <value>stream://System.in?transformers=StringToNameString</value>
                         </constructor-arg>
                     </bean>
                </property>
@@ -120,7 +120,7 @@
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
-                            <value>stream://localhost?transformers=ChatStringToString</value>
+                            <value>stream://System.out?transformers=ChatStringToString</value>
                         </constructor-arg>
                     </bean>
                </property>

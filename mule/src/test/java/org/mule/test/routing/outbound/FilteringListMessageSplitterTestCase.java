@@ -26,6 +26,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -41,7 +42,6 @@ import java.util.List;
  */
 public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 {
-
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
@@ -61,9 +61,6 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 
         UMOMessage message = new MuleMessage(payload);
 
-        // need this dirty trick, otherwise "testConnector not started" error
-        // is popping up
-        endpoint.getConnector().setDispatcherFactory(new TestDispatcherFactory());
 
         UMOMessage result = router.route(message, session, true);
         assertNotNull(result);
@@ -71,51 +68,5 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
         assertEquals("Correlation group size has not been set.",
                       4,
                       result.getCorrelationGroupSize());
-    }
-
-    private static final class TestDispatcherFactory implements UMOMessageDispatcherFactory
-    {
-        public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
-        {
-            return new TestMessageDispatcher(connector);
-        }
-
-        private static class TestMessageDispatcher extends AbstractMessageDispatcher
-        {
-            public TestMessageDispatcher(final UMOConnector connector)
-            {
-                super((AbstractConnector) connector);
-            }
-
-            public void doDispose()
-            {
-
-            }
-
-            public void doDispatch(UMOEvent event) throws Exception
-            {
-                if(event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail")) {
-                    throw new RoutingException(event.getMessage(), event.getEndpoint());
-                }
-            }
-
-            public UMOMessage doSend(UMOEvent event) throws Exception
-            {
-                if(event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail")) {
-                    throw new RoutingException(event.getMessage(), event.getEndpoint());
-                }
-                return event.getMessage();
-            }
-
-            public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-            {
-                return null;
-            }
-
-            public Object getDelegateSession() throws UMOException
-            {
-                return null;
-            }
-        }
     }
 }

@@ -100,7 +100,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
     public void release() {
     }
 
-    public void doDispose() {
+    protected void doDispose() {
     }
 
     protected Work createWork(UMOSpace space, Object message) throws Exception {

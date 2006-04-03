@@ -15,6 +15,7 @@
 package org.mule.umo;
 
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 
@@ -297,7 +298,7 @@ public interface UMOEvent
      * 
      * @return the endpoint associated with this event
      */
-    UMOEndpoint getEndpoint();
+    UMOImmutableEndpoint getEndpoint();
 
     /**
      * Retrieves the component session for the current event

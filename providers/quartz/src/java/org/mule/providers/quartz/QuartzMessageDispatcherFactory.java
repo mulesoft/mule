@@ -15,19 +15,21 @@ package org.mule.providers.quartz;
 
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * TCreates a QuartzMessageDispatcher instance
+ * Creates a QuartzMessageDispatcher instance
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class QuartzMessageDispatcherFactory implements UMOMessageDispatcherFactory
  {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException {
-        return new QuartzMessageDispatcher((AbstractConnector)connector);
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+        return new QuartzMessageDispatcher(endpoint);
     }
 }

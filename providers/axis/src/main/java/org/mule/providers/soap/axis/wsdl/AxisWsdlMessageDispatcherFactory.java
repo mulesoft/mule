@@ -14,6 +14,8 @@
 package org.mule.providers.soap.axis.wsdl;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -25,7 +27,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @version $Revision$
  */
 public class AxisWsdlMessageDispatcherFactory implements UMOMessageDispatcherFactory {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException {
-        return new AxisWsdlMessageDispatcher((AxisWsdlConnector)connector);
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+        return new AxisWsdlMessageDispatcher(endpoint);
     }
 }

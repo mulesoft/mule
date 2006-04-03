@@ -88,8 +88,8 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
         UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
             client = connector.getFtp(uri);
-            connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
-            connector.setupFileType(client, endpoint.getProperties());
+            connector.enterActiveOrPassiveMode(client, endpoint);
+            connector.setupFileType(client, endpoint);
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " +
                         client.getReplyCode());
@@ -123,8 +123,8 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
         UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
             client = connector.getFtp(uri);
-            connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
-            connector.setupFileType(client, endpoint.getProperties());
+            connector.enterActiveOrPassiveMode(client, endpoint);
+            connector.setupFileType(client, endpoint);
             if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

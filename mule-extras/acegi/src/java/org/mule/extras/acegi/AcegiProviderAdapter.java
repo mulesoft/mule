@@ -15,6 +15,7 @@ package org.mule.extras.acegi;
 
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
+import net.sf.acegisecurity.AcegiSecurityException;
 import net.sf.acegisecurity.providers.AuthenticationProvider;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
@@ -25,6 +26,9 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityContextFactory;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security
@@ -83,13 +87,7 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
                                                            authentication.getCredentials());
         }
 
-        // try {
         auth = delegate.authenticate(auth);
-        // } catch (AcegiSecurityException e) {
-        // throw new UnauthorisedException(new
-        // Message(Messages.AUTH_FAILED_FOR_USER_X,
-        // authentication.getPrincipal()), e);
-        // }
         return new AcegiAuthenticationAdapter(auth);
     }
 

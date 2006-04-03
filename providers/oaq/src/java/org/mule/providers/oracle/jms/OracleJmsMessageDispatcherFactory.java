@@ -17,6 +17,8 @@ package org.mule.providers.oracle.jms;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsMessageDispatcherFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
@@ -25,7 +27,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  */
 public class OracleJmsMessageDispatcherFactory extends JmsMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException {
-        return new OracleJmsMessageDispatcher((JmsConnector) connector);
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+        return new OracleJmsMessageDispatcher(endpoint);
     }
 }

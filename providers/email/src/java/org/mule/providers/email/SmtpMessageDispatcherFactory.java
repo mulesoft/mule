@@ -15,12 +15,18 @@
 package org.mule.providers.email;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author Ross Mason <p/> //TODO document
+ * <code>SmtpMessageDispatcherFactory</code> creates an instance of an SmtpMessage dispatcher used for sending email events
+ * via an smtp gateway
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class SmtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
@@ -29,8 +35,8 @@ public class SmtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
      * 
      * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
      */
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new SmtpMessageDispatcher((SmtpConnector) connector);
+        return new SmtpMessageDispatcher(endpoint);
     }
 }

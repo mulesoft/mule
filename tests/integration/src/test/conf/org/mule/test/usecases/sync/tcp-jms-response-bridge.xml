@@ -26,7 +26,7 @@
             </inbound-router>
 			<outbound-router>
 				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="jms://queue_in"/>
+					<endpoint address="jms://queue_in" remoteSync="true" />
 				</router>
 			</outbound-router>
 		</mule-descriptor>

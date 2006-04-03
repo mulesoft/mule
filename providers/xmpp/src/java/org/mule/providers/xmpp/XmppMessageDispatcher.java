@@ -30,6 +30,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -50,60 +52,49 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
     private XmppConnector connector;
 
-    private AtomicBoolean initialized = new AtomicBoolean(false);
-
     private XMPPConnection xmppConnection = null;
 
     private Chat chat;
 
     private GroupChat groupChat;
 
-    public XmppMessageDispatcher(AbstractConnector connector)
+    public XmppMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = (XmppConnector) connector;
+        super(endpoint);
+        this.connector = (XmppConnector) endpoint.getConnector();
     }
 
-    protected synchronized void initialize(UMOEndpointURI uri) throws InitialisationException
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        logger.debug("initialise()");
-
-        if (!initialized.get()) {
-            try {
-                xmppConnection = connector.findOrCreateXmppConnection(uri);
-
-                if (!xmppConnection.isConnected()) {
-                    throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                                                                                       "XMPP Connection",
-                                                                                       uri),
-                                                      this);
-
-                }
-                initialized.set(true);
-            } catch (XMPPException e) {
-                throw new InitialisationException(e, this);
-            }
-
+        if(xmppConnection==null) {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+            xmppConnection = connector.createXmppConnection(uri);
         }
     }
 
-    public void doDispose()
-    {
-        if(groupChat!=null) {
+    protected void doDisconnect() throws Exception {
+        try {
+            if(groupChat!=null) {
             groupChat.leave();
         }
-        if (null != xmppConnection) {
-            xmppConnection.close();
+            if(xmppConnection!=null) {
+                xmppConnection.close();
+            }
+        } finally {
+            xmppConnection=null;
         }
-        initialized.set(false);
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispose()
+    {
+    }
+
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         sendMessage(event);
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         sendMessage(event);
         if(useRemoteSync(event)) {
@@ -123,7 +114,6 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     }
 
     protected void sendMessage(UMOEvent event) throws Exception {
-        initialize(event.getEndpoint().getEndpointURI());
         if(chat==null && groupChat==null) {
             UMOMessage msg = event.getMessage();
             boolean group = msg.getBooleanProperty(XmppConnector.XMPP_GROUP_CHAT, false);
@@ -152,11 +142,6 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
             logger.trace("Transformed packet: " + message.toXML());
         }
 
-        while (!xmppConnection.isConnected() && !initialized.get()) {
-            initialize(null);
-            Thread.sleep(150);
-        }
-
         if(chat!=null) {
             chat.sendMessage(message);
         } else {
@@ -167,17 +152,23 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
 
-        while (!xmppConnection.isConnected() && !initialized.get()) {
-            initialize(null);
-            Thread.sleep(150);
-        }
         //Should be in the form of xmpp://user:pass@host:[port]/folder
-        String to = (String)endpointUri.getParams().get("folder");
+        String to = (String)endpoint.getProperty("folder");
         if(to==null) {
-            throw new MalformedEndpointException(endpointUri.toString());
+            throw new MalformedEndpointException(endpoint.getEndpointURI().toString());
         }
         Chat chat = xmppConnection.createChat(to);
         Message message = null;

@@ -16,6 +16,13 @@
 		class="org.activemq.ActiveMQConnectionFactory">
 		<property name="brokerURL"><value>vm://localhost</value></property>
 		<property name="useEmbeddedBroker"><value>true</value></property>
+        <property name="brokerContainerFactory">
+            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
+                <constructor-arg index="0">
+                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
+                </constructor-arg>
+            </bean>
+        </property>
 	</bean>
                 </beans>
                 ]]>
@@ -43,12 +50,20 @@
     <transformers>
         <transformer name="StringToJmsMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage" returnClass="javax.jms.TextMessage"/>
     </transformers>
+    
+    <global-endpoints>
+        <endpoint address="jms://test.queue" name="transactedJmsEndpoint" type="sender">
+            <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory">
+<!--                <constraint className="org.mule.transaction.constraints.BatchConstraint" batchSize="10"/> -->
+            </transaction>
+        </endpoint>
+    </global-endpoints>
 
     <model name="model">
         <mule-descriptor name="TestReceiverUMO"
             inboundEndpoint="jms://test.queue"
             inboundTransformer="StringToJmsMessage"
-            outboundEndpoint="stream://localhost/system"
+            outboundEndpoint="stream://System.out"
             implementation="org.mule.test.integration.service.TestReceiver">
         </mule-descriptor>
     </model>

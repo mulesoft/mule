@@ -18,10 +18,18 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.DispatchException;
+import org.mule.config.i18n.Message;
+
+import java.io.OutputStream;
 
 /**
- * <code>StreamMessageDispatcher</code> TODO
+ * <code>StreamMessageDispatcher</code> A simple stream dispatcher that obtains a stream from the Stream Connector
+ * to write to.  This only really useful for testing purposes right now when writing to System.in and System.out.
+ * However, it is feesable to set any outputstream on the Stream connector and have that written to.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -32,10 +40,10 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
     private StreamConnector connector;
 
-    public StreamMessageDispatcher(StreamConnector connector)
+    public StreamMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (StreamConnector)endpoint.getConnector();
     }
 
     /*
@@ -53,15 +61,28 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
+        OutputStream out = null;
+        String streamName = event.getEndpoint().getEndpointURI().getAddress();
+        if(StreamConnector.STREAM_SYSTEM_OUT.equalsIgnoreCase(streamName)) {
+            out = System.out;
+        } else if(StreamConnector.STREAM_SYSTEM_ERR.equalsIgnoreCase(streamName)) {
+            out = System.err;
+        } else {
+            out = connector.getOutputStream();
+        }
+
+        if(out==null) {
+            throw new DispatchException(new Message("stream", 1, streamName), event.getMessage(), event.getEndpoint());
+        }
         Object data = event.getTransformedMessage();
         if(data instanceof byte[]) {
-            connector.getOutputStream().write((byte[])data);
+            out.write((byte[])data);
         } else {
-            connector.getOutputStream().write(data.toString().getBytes());
+            out.write(data.toString().getBytes());
         }
-        connector.getOutputStream().flush();
+        out.flush();
     }
 
     /*
@@ -69,15 +90,25 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         return event.getMessage();
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        throw new UnsupportedOperationException("Receive not implemented on the Stream connector");
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
     public UMOConnector getConnector()
@@ -85,7 +116,13 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+    }
+
+    protected void doDisconnect() throws Exception {
     }
 }

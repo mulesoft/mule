@@ -26,9 +26,14 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * @author m999svm <p/> DQMessageDispatcher
+ * <code>DQMessageDispatcher</code> //todo document
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class DQMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -37,16 +42,15 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Constructor
      * 
-     * @param connector
-     *            The connector
+     * @param endpoint The endpoint for this adapter
      */
-    public DQMessageDispatcher(DQConnector connector)
+    public DQMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (DQConnector)endpoint.getConnector();
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         try {
             DQMessage msg = (DQMessage)event.getMessage().getPayload();
@@ -89,7 +93,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         return DQMessageUtils.getRecordFormat(recordDescriptor, connector.getSystem());
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         return null;
@@ -100,12 +104,23 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        DataQueue dq = new DataQueue(connector.getSystem(), endpointUri.getAddress());
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
+        DataQueue dq = new DataQueue(connector.getSystem(), endpoint.getEndpointURI().getAddress());
         DataQueueEntry entry = dq.read((int)timeout);
         if (entry != null) {
-            RecordFormat format = getRecordFormat(endpointUri);
+            RecordFormat format = getRecordFormat(endpoint.getEndpointURI());
             DQMessage message = DQMessageUtils.getDQMessage(entry.getData(), format);
             message.setSenderInformation(entry.getSenderInformation());
             return new MuleMessage(connector.getMessageAdapter(message));
@@ -113,7 +128,13 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+    }
+
+    protected void doDisconnect() throws Exception {
     }
 }

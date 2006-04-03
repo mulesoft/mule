@@ -37,10 +37,9 @@ public class HttpTransformTestCase extends FunctionalTestCase {
         UMOMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
 		GZipUncompressTransformer gu = new GZipUncompressTransformer();
+        gu.setReturnClass(String.class);
         assertNotNull(message.getPayload());
-		assertTrue(message.getPayload() instanceof byte[]);
-		byte[] r = (byte[]) gu.transform(message.getPayload());
-		String result = new String(r);
+		String result = (String) gu.transform(message.getPayloadAsBytes());
         assertEquals("<string>payload</string>", result);
     }
 	

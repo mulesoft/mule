@@ -160,7 +160,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
     public void release() {
     }
 
-    public void doDispose() {
+    protected void doDispose() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();

@@ -29,6 +29,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -123,8 +124,6 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     {
         if(isCreateDispatcherPerRequest()) {
             destroyFtp(uri, client);
-            // TODO what's up here?
-            UMOMessageDispatcher dispatcher = getDispatcher(uri.toString());
         } else {
             if (client != null && client.isConnected()) {
                 ObjectPool pool = getFtpPool(uri);
@@ -291,10 +290,10 @@ public class FtpConnector extends AbstractServiceEnabledConnector
      *
      * @see #setPassive(boolean) 
      */
-    public void enterActiveOrPassiveMode(FTPClient client, Map endpointProperties)
+    public void enterActiveOrPassiveMode(FTPClient client, UMOImmutableEndpoint endpoint)
     {
         // well, no endpoint URI here, as we have to use the most common denominator in API :(
-        final String passiveString = (String) endpointProperties.get(FtpConnector.PROPERTY_PASSIVE_MODE);
+        final String passiveString = (String) endpoint.getProperty(FtpConnector.PROPERTY_PASSIVE_MODE);
         if (passiveString == null) {
             // try the connector properties then
             if (isPassive()) {
@@ -377,12 +376,12 @@ public class FtpConnector extends AbstractServiceEnabledConnector
      *
      * @see #setBinary(boolean)
      */
-    public void setupFileType(FTPClient client, Map endpointProperties) throws Exception
+    public void setupFileType(FTPClient client, UMOImmutableEndpoint endpoint) throws Exception
     {
         int type;
 
         // well, no endpoint URI here, as we have to use the most common denominator in API :(
-        final String binaryTransferString = (String) endpointProperties.get(FtpConnector.PROPERTY_BINARY_TRANSFER);
+        final String binaryTransferString = (String) endpoint.getProperty(FtpConnector.PROPERTY_BINARY_TRANSFER);
         if (binaryTransferString == null) {
             // try the connector properties then
             if (isBinary()) {

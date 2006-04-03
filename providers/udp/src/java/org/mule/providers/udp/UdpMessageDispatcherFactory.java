@@ -14,12 +14,14 @@
 package org.mule.providers.udp;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>UdpMessageDispatcherFactory</code> TODO
+ * <code>UdpMessageDispatcherFactory</code> creates a dispatcher for writing udp packets
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -27,8 +29,8 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 public class UdpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new UdpMessageDispatcher((UdpConnector) connector);
+        return new UdpMessageDispatcher(endpoint);
     }
 }

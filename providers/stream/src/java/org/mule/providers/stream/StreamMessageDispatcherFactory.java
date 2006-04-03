@@ -15,12 +15,15 @@
 package org.mule.providers.stream;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>StreamMessageDispatcherFactory</code> TODO
+ * <code>StreamMessageDispatcherFactory</code> creates a Stream dispatcher suitable for writing to fixed streams such
+ * as System.in or System.out
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -32,8 +35,8 @@ public class StreamMessageDispatcherFactory implements UMOMessageDispatcherFacto
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
      */
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new StreamMessageDispatcher((StreamConnector) connector);
+        return new StreamMessageDispatcher(endpoint);
     }
 }

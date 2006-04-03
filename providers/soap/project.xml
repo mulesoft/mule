@@ -19,6 +19,6 @@
             <version>${geronimo_spec_saaj_version}</version>
             <url>http://java.sun.com/products/saaj/</url>
         </dependency>
-        
+
    </dependencies>
 </project>

@@ -34,11 +34,13 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
@@ -72,32 +74,34 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
     protected Service service;
 
-    public AxisMessageDispatcher(AxisConnector connector) {
-        super(connector);
-        this.connector = connector;
+    public AxisMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (AxisConnector)endpoint.getConnector();
         AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
     }
 
-    public void doDispose() {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+         if (service == null) {
+            service = createService(endpoint);
+        }
+    }
+
+    protected void doDisconnect() throws Exception {
         if(service!=null) {
             service = null;
         }
     }
 
-    protected Service getService(UMOEvent event) throws Exception {
-        if (service == null) {
-            service = createService(event);
-        }
-        return service;
+    protected void doDispose() {
+
     }
 
-    protected EngineConfiguration getClientConfig(UMOEvent event) {
+    protected EngineConfiguration getClientConfig(UMOImmutableEndpoint endpoint) {
         if(clientConfig==null) {
             //Allow the client config to be set on the endpoint
             String config = null;
-            if(event!=null) {
-                config = event.getMessage().getStringProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY, null);
-            }
+            config = (String)endpoint.getProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY);
+
             if(config!=null) {
                 clientConfig = new FileProvider(config);
             } else {
@@ -107,9 +111,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         return clientConfig;
     }
 
-    protected Service createService(UMOEvent event) throws Exception {
+    protected Service createService(UMOImmutableEndpoint endpoint) throws Exception {
         // Create a simple axis service without wsdl
-        EngineConfiguration config = getClientConfig(event);
+        EngineConfiguration config = getClientConfig(endpoint);
         Service service = new Service(config);
         return service;
     }
@@ -118,7 +122,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         return event.getMessage().getStringProperty(AxisConnector.WSDL_URL_PROPERTY, StringUtils.EMPTY);
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception {
         Object[] args = getArgs(event);
         Call call = getCall(event, args);
         // dont use invokeOneWay here as we are already in a thread pool.
@@ -131,7 +135,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         Call call;
         Object result;
         Object[] args = getArgs(event);
@@ -155,7 +159,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
                     event.getEndpoint());
         }
 
-        Service service = getService(event);
         Call call = (Call) service.createCall();
 
         String style = event.getMessage().getStringProperty("style", null);
@@ -294,15 +297,27 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        Service service = getService(null);
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
         Call call = new Call(service);
-        call.setSOAPActionURI(endpointUri.toString());
-        call.setTargetEndpointAddress(endpointUri.toString());
+        String uri = endpoint.getEndpointURI().toString();
+        call.setSOAPActionURI(uri);
+        call.setTargetEndpointAddress(uri);
 
-        String method = (String) endpointUri.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
+        Properties params = endpoint.getEndpointURI().getUserParams();
+        String method = (String) params.remove(SoapConstants.SOAP_METHOD_PROPERTY);
         call.setOperationName(method);
-        Properties params = endpointUri.getUserParams();
+        
         String args[] = new String[params.size()];
         int i = 0;
         for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++) {
@@ -310,15 +325,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
         }
 
         call.setOperationName(method);
-        UMOEndpoint ep = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        ep.initialise();
-        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, ep);
+        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
         Object result = call.invoke(method, args);
         return createMessage(result, call);
     }
 
     public UMOMessage receive(String endpoint, Object[] args) throws Exception {
-        Service service = getService(null);
         Call call = new Call(service);
 
         call.setSOAPActionURI(endpoint);
@@ -337,7 +349,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     public UMOMessage receive(String endpoint, SOAPEnvelope envelope) throws Exception {
-        Service service = getService(null);
         Call call = new Call(service);
 
         call.setSOAPActionURI(endpoint);

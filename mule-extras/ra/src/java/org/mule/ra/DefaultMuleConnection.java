@@ -103,11 +103,10 @@ public class DefaultMuleConnection implements MuleConnection
 
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         try {
-            UMOMessage message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint,
-                                                                                                          timeout);
+            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
             return message;
         } catch (Exception e) {
-            throw new ReceiveException(muleEndpoint, timeout, e);
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 

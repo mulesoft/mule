@@ -41,6 +41,7 @@ import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -151,7 +152,8 @@ public class AxisServiceComponent implements Initialisable, Callable
         try {
             //We parse a new uri based on the listening host and port with the request parameters appended
             //Using the soap prefix ensures that we use a soap endpoint builder
-            String uri = "soap:" + context.getEndpointURI().toString();
+            //String uri = "soap:" + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
+            String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().toString();
             uri += context.getMessageAsString();
             UMOEndpointURI endpointUri = new MuleEndpointURI(uri);
 
@@ -167,10 +169,10 @@ public class AxisServiceComponent implements Initialisable, Callable
 
             String queryString = endpointUri.getQuery();
             if (queryString != null) {
-                if (queryString.equalsIgnoreCase("wsdl")) {
+                if (queryString.equalsIgnoreCase(SoapConstants.WSDL_PROPERTY)) {
                     wsdlRequested = true;
                 } else {
-                    if (queryString.equalsIgnoreCase("list")) {
+                    if (queryString.equalsIgnoreCase(SoapConstants.LIST_PROPERTY)) {
                         listRequested = true;
                     }
                 }

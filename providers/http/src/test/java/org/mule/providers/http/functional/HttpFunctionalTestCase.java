@@ -36,9 +36,9 @@ import java.net.URI;
  */
 public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    protected static final String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
-    protected static final String TEST_CONTENT_TYPE = "text/plain";
-    protected static final String TEST_CHARSET = "UTF-8";
+    protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
+    protected static String TEST_CONTENT_TYPE = "text/plain";
+    protected static String TEST_CHARSET = "UTF-8";
 
     private HttpConnection cnn;
     private PostMethod postMethod;

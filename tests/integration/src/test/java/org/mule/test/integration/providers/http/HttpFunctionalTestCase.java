@@ -76,9 +76,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         int i=0;
         for (Iterator iterator = results.iterator(); iterator.hasNext();i++) {
-            String result = (String) iterator.next();
+            byte[] result = (byte[]) iterator.next();
             assertNotNull(result);
-            assertEquals(TEST_MESSAGE + i + " Received", result);
+            assertEquals(TEST_MESSAGE + i + " Received", new String(result));
         }
     }
 

@@ -172,18 +172,10 @@
                 <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
                 <exclude>**/MailMessageReceiverTestCase.*</exclude>
 
-                <!-- tests fails on Linux jdk -->
-                <exclude>**/CompressionTransformerTestCase.*</exclude>
-
-                <!-- Disable Multicast tests unless configured -->
-                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
-
                 <!-- this fail unless as security patch is applied to JAVA_HOME/lib -->
                 <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
                 <exclude>**/PGPSecurityFilterTestCase.*</exclude>
 
-                <!-- sometimes fails failing to bind -->
-                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
                 <exclude>**/Plexus*.*</exclude>
 
                 <exclude>**/PxeHelloWorldTestCase.*</exclude>

@@ -14,6 +14,8 @@
 package org.mule.providers.dq;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -26,9 +28,9 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 public class DQMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
 
-    public final UMOMessageDispatcher create(final UMOConnector connector) throws UMOException
+    public final UMOMessageDispatcher create(final UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new DQMessageDispatcher((DQConnector) connector);
+        return new DQMessageDispatcher(endpoint);
     }
 
 }

@@ -22,6 +22,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 
@@ -48,33 +49,48 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher {
     private UMOSpace space;
     private SpaceConnector connector;
 
-    public SpaceMessageDispatcher(SpaceConnector connector) {
-        super(connector);
-        this.connector = connector;
+    public SpaceMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (SpaceConnector)endpoint.getConnector();
     }
 
-    protected UMOSpace getSpace(UMOEndpoint endpoint) throws  UMOSpaceException {
-
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
         if (space == null) {
             space = connector.getSpace(endpoint);
         }
-        return space;
-
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
-        UMOSpace space = getSpace(event.getEndpoint());
+    protected void doDisconnect() throws Exception {
+        try {
+            space.dispose();
+        } finally {
+            space=null;
+        }
+    }
+
+    protected void doDispatch(UMOEvent event) throws Exception {
         space.put(event.getTransformedMessage(), event.getTimeout());
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         doDispatch(event);
         return null;
     }
 
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        String destination = endpointUri.toString();
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        String destination = endpoint.getEndpointURI().toString();
 
         if(logger.isInfoEnabled()) {
             logger.info("Connecting to space '" + destination + "'");
@@ -93,10 +109,8 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher {
         return null;
     }
 
-    public void doDispose() {
-        if(space!=null) {
-            space.dispose();
-        }
+    protected void doDispose() {
+      
     }
 
 

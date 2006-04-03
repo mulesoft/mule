@@ -14,12 +14,14 @@
 package org.mule.providers.xmpp;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>XmppMessageDispatcherFactory</code> TODO
+ * <code>XmppMessageDispatcherFactory</code> creates a dispatcher responsible for writing Xmpp packets to a an Jabber chat
  * 
  * @author Peter Braswell
  * @version $Revision$
@@ -27,8 +29,8 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 public class XmppMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new XmppMessageDispatcher((XmppConnector) connector);
+        return new XmppMessageDispatcher( endpoint);
     }
 }

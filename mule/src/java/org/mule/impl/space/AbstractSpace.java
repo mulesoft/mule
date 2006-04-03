@@ -184,15 +184,15 @@ public abstract class AbstractSpace implements UMOSpace {
         this.transactionFactory = transactionFactory;
     }
 
-    public abstract void doPut(Object value) throws UMOSpaceException;
+    protected abstract void doPut(Object value) throws UMOSpaceException;
 
-    public abstract void doPut(Object value, long lease) throws UMOSpaceException;
+    protected abstract void doPut(Object value, long lease) throws UMOSpaceException;
 
-    public abstract Object doTake() throws UMOSpaceException;
+    protected abstract Object doTake() throws UMOSpaceException;
 
-    public abstract Object doTake(long timeout) throws UMOSpaceException;
+    protected abstract Object doTake(long timeout) throws UMOSpaceException;
 
-    public abstract Object doTakeNoWait() throws UMOSpaceException ;
+    protected abstract Object doTakeNoWait() throws UMOSpaceException ;
 
-    public abstract void doDispose();
+    protected abstract void doDispose();
 }

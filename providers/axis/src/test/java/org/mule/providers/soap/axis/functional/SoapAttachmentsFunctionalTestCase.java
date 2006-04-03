@@ -18,6 +18,7 @@ import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
@@ -27,6 +28,7 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.activation.DataHandler;
@@ -95,13 +97,15 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected void sendTestData(int iterations) throws Exception
     {
-    	AxisMessageDispatcher client = new AxisMessageDispatcher((AxisConnector) connector);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments", false);
+
+    	AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
     	for(int i = 0; i < iterations; i++) {
     		UMOMessage msg = new MuleMessage("testPayload");
     		File tempFile = File.createTempFile("test", ".att");
     		tempFile.deleteOnExit();
 	    	msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
-	    	MuleEvent event = new MuleEvent(msg, new MuleEndpoint("axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments", false), null, true);
+	    	MuleEvent event = new MuleEvent(msg, ep, null, true);
 	    	UMOMessage result = client.send(event);
 	    	assertNotNull(result);
 	    	assertNotNull(result.getPayload());

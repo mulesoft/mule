@@ -36,6 +36,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
@@ -546,7 +547,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         this.jndiProviderUrl = jndiProviderUrl;
     }
 
-    public Session getSession(UMOEndpoint endpoint) throws Exception
+    public Session getSession(UMOImmutableEndpoint endpoint) throws Exception
     {
         String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
         boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));

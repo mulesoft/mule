@@ -70,7 +70,7 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
         }
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
         if (socket != null && !socket.isClosed()) {
             try {

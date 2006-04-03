@@ -17,7 +17,7 @@
     </endpoint-identifiers>
 
     <transformers>
-        <transformer name="ObjectToFileMessage" className="org.mule.providers.file.transformers.ObjectToFileMessage"/>
+        <transformer name="ObjectToFileMessage" className="org.mule.providers.file.transformers.FileToString"/>
         <transformer name="ObjectToXml" className="org.mule.transformers.xml.ObjectToXml" returnClass="java.lang.String"/>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject" returnClass="java.lang.Object"/>
     </transformers>
@@ -33,7 +33,7 @@
         -->
         <mule-descriptor name="TestComponent1"
             inboundEndpoint="test://localhost/test.queue"
-            outboundEndpoint="stream://localhost"
+            outboundEndpoint="stream://System.out"
             implementation="org.mule.test.integration.service.TestComponent">
         </mule-descriptor>
 

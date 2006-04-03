@@ -21,6 +21,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -33,7 +34,10 @@ import javax.mail.URLName;
 import java.util.Calendar;
 
 /**
- * @author Ross Mason
+ * <code>SmtpMessageDispatcher</code> will dispatch Mule events as Mime email messages over an Smtp gateway
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -41,23 +45,28 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     private SmtpConnector connector;
 
-    /**
-     * @param connector
-     */
-    public SmtpMessageDispatcher(SmtpConnector connector)
+    public SmtpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (SmtpConnector)endpoint.getConnector();
+    }
 
-        URLName url = new URLName(connector.getProtocol(),
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        if(session==null) {
+            URLName url = new URLName(connector.getProtocol(),
                                   connector.getHostname(),
                                   connector.getPort(),
                                   null,
                                   connector.getUsername(),
                                   connector.getPassword());
 
-        session = MailUtils.createMailSession(url, connector);
-        session.setDebug(logger.isDebugEnabled());
+            session = MailUtils.createMailSession(url, connector);
+            session.setDebug(logger.isDebugEnabled());
+        }
+    }
+
+    protected void doDisconnect() throws Exception {
+        session = null;
     }
 
     /*
@@ -68,7 +77,6 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
      */
     public void doDispatch(UMOEvent event)
     {
-
 
         Message msg = null;
 
@@ -99,18 +107,22 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return session;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String,
-     *      org.mule.umo.UMOEvent)
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        throw new UnsupportedOperationException("Cannot do a receive on an SmtpConnector");
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         return event.getMessage();
@@ -131,11 +143,11 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         if (logger.isDebugEnabled()) {
             StringBuffer msg = new StringBuffer();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");
-            msg.append("From: ").append(MailUtils.mailAddressesToString(message.getFrom())).append(" ");
-            msg.append("To: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO))).append(" ");
-            msg.append("Cc: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC))).append(" ");
-            msg.append("Bcc: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC))).append(" ");
-            msg.append("ReplyTo: ").append(MailUtils.mailAddressesToString(message.getReplyTo()));
+            msg.append(", From: ").append(MailUtils.mailAddressesToString(message.getFrom())).append(" ");
+            msg.append(", To: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO))).append(" ");
+            msg.append(", Cc: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC))).append(" ");
+            msg.append(", Bcc: ").append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC))).append(" ");
+            msg.append(", ReplyTo: ").append(MailUtils.mailAddressesToString(message.getReplyTo()));
 
             logger.debug(msg.toString());
         }
@@ -152,7 +164,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
         session = null;
     }

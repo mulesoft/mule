@@ -23,43 +23,40 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
- * Glue inoking mechanism.
+ * Glue invoking mechanism.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class GlueMessageDispatcher extends AbstractMessageDispatcher {
-    public GlueMessageDispatcher(AbstractConnector connector) {
-        super(connector);
+public class GlueMessageDispatcher extends AbstractMessageDispatcher
+ {
+    protected IProxy proxy = null;
+
+    public GlueMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
-        doSend(event);
-    }
-
-    public UMOMessage doSend(UMOEvent event) throws Exception {
-        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        // if(!endpoint.startsWith("glue:")) {
-        // endpoint = "glue:" + endpoint;
-        // }
-        String method = (String) endpointUri.getParams().remove("method");
-        setContext(event);
-        IProxy proxy = null;
-        String bindAddress = endpointUri.getAddress();
-        if (bindAddress.indexOf(".wsdl") == -1) {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        if(proxy==null) {
+        String bindAddress = endpoint.getEndpointURI().getAddress();
+        String method = (String) endpoint.getProperty("method");
+        if (bindAddress.indexOf(".wsdl") == -1 && method!=null) {
             bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
         }
         int i = bindAddress.indexOf("?");
@@ -68,14 +65,34 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher {
         }
 
         //add credentials to the request
-        if (event.getCredentials() != null) {
+        if (endpoint.getEndpointURI().getUsername() != null) {
             ProxyContext context = new ProxyContext();
-            context.setAuthUser(event.getCredentials().getUsername());
-            context.setAuthPassword(new String(event.getCredentials().getPassword()));
+            context.setAuthUser(endpoint.getEndpointURI().getUsername());
+            context.setAuthPassword(new String(endpoint.getEndpointURI().getPassword()));
             proxy = Registry.bind(bindAddress, context);
         } else {
             proxy = Registry.bind(bindAddress);
         }
+        }
+    }
+
+    protected void doDisconnect() throws Exception {
+        proxy=null;
+    }
+
+    protected void doDispatch(UMOEvent event) throws Exception {
+        doSend(event);
+    }
+
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
+
+        //Todo this was removing the method property. It may break now...
+        String method = (String) event.getMessage().getStringProperty("method", null);
+        if(method==null) {
+            System.out.println("");
+        }
+        setContext(event);
+
 
         Object payload = event.getTransformedMessage();
         Object[] args;
@@ -103,22 +120,26 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher {
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
-        Map params = ep.getParams();
-        String method = (String) params.remove("method");
-
-        String bindAddress = ep.getAddress();
-        int i = bindAddress.indexOf("?");
-        if (i > -1) {
-            bindAddress = bindAddress.substring(0, i);
-        }
-        IProxy proxy = Registry.bind(bindAddress);
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        Map props = new HashMap();
+        props.putAll(endpoint.getProperties());
+        String method = (String) props.remove(SoapConstants.SOAP_METHOD_PROPERTY);
         try {
-            Object result = proxy.invoke(method, params.values().toArray());
+            Object result = proxy.invoke(method, props.values().toArray());
             return new MuleMessage(result);
         } catch (Throwable t) {
-            throw new ReceiveException(endpointUri, timeout, t);
+            throw new ReceiveException(endpoint, timeout, t);
         }
     }
 
@@ -126,7 +147,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher {
         return null;
     }
 
-    public void doDispose() {
+    protected void doDispose() {
     }
 
     protected String getMethod(String endpoint) throws MalformedEndpointException {

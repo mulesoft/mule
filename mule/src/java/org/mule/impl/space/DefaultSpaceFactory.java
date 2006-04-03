@@ -14,6 +14,7 @@
 package org.mule.impl.space;
 
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
@@ -135,7 +136,7 @@ public abstract class DefaultSpaceFactory implements UMOSpaceFactory {
      * @throws org.mule.umo.space.UMOSpaceException
      *
      */
-    public UMOSpace create(UMOEndpoint endpoint) throws UMOSpaceException {
+    public UMOSpace create(UMOImmutableEndpoint endpoint) throws UMOSpaceException {
         return create(endpoint.getEndpointURI().getAddress());
     }
 }

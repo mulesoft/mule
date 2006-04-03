@@ -25,12 +25,16 @@
 		    <outbound-router>
 		        <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
 		            <endpoint 
-						address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"
-						/>
+						address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"/>
 		        </router>
 		    </outbound-router>
 		</mule-descriptor>
-		
+
+		<mule-descriptor name="doSomeWork" implementation="org.mule.test.usecases.axis.clientbridge.DoSomeWork">
+		    <inbound-router>
+		        <endpoint address="axis:http://localhost:8002/axisService"/>
+		    </inbound-router>
+		</mule-descriptor>
     </model>
 	
 </mule-configuration>

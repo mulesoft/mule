@@ -43,11 +43,15 @@ public abstract class AbstractEventAwareTransformer extends AbstractTransformer
     public final Object doTransform(Object src, String encoding) throws TransformerException
     {
         UMOEventContext event = RequestContext.getEventContext();
-        if (event == null) {
+        if (event == null && requiresCurrentEvent()) {
             throw new TransformerException(new Message(Messages.NO_CURRENT_EVENT_FOR_TRANSFORMER), this);
-        }
+        } 
         return transform(src, encoding, event);
     }
     
     public abstract Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException;
+
+    protected boolean requiresCurrentEvent() {
+        return true;
+    }
 }

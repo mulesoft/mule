@@ -62,7 +62,7 @@ public interface MuleProperties
      ***************************************************/
     public final String MULE_EVENT_PROPERTY = PROPERTY_PREFIX + "EVENT";
     public final String MULE_EVENT_TIMEOUT_PROPERTY = PROPERTY_PREFIX + "EVENT_TIMEOUT";
-    public final String MULE_METHOD_PROPERTY = "method";
+    public final String MULE_METHOD_PROPERTY = PROPERTY_PREFIX + "SERVICE_METHOD";
     public final String MULE_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ENDPOINT";
     public final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
     public final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";

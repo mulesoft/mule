@@ -19,6 +19,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
@@ -39,16 +41,17 @@ import javax.jbi.messaging.NormalizedMessage;
 public class JbiMessageDispatcher extends AbstractMessageDispatcher {
     private JbiConnector connector;
 
-    public JbiMessageDispatcher(JbiConnector connector) {
-        super(connector);
-        this.connector = connector;
+
+    public JbiMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (JbiConnector)endpoint.getConnector();
     }
 
-    public void doDispose() {
+    protected void doDispose() {
 
     }
 
-    public void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception {
         InOnly exchange = connector.getExchangeFactory().createInOnlyExchange();
         NormalizedMessage message = exchange.createMessage();
         exchange.setInMessage(message);
@@ -56,7 +59,7 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher {
         done(exchange);
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         InOut exchange = connector.getExchangeFactory().createInOutExchange();
         NormalizedMessage message = exchange.createMessage();
         exchange.setInMessage(message);
@@ -70,8 +73,19 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher {
         return response;
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        throw new UnsupportedOperationException("JbiMessageDispatcher:receiver");
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+        throw new UnsupportedOperationException("doReceive");
     }
 
     public Object getDelegateSession() throws UMOException {
@@ -87,6 +101,14 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher {
     protected void done(MessageExchange me) throws MessagingException {
         me.setStatus(ExchangeStatus.DONE);
         connector.getDeliveryChannel().send(me);
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        //no op
+    }
+
+    protected void doDisconnect() throws Exception {
+        //no op
     }
 
 }

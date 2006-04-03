@@ -18,12 +18,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.NullPayload;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
@@ -45,17 +47,11 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     public void testClient() throws Exception
     {
-        UMOEndpointURI uri = new MuleEndpointURI(getOutDest());
+        UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
         FtpConnector c = (FtpConnector) createConnector();
         c.initialise();
-        UMOMessageDispatcher d = c.getDispatcher(uri.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test",
-                                                                      uri,
-                                                                      c,
-                                                                      null,
-                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                                      0,
-                                                                      null, null));
+        UMOMessageDispatcher d = c.getDispatcher(endpoint);
+        UMOEvent e = getTestEvent(new NullPayload(), endpoint);
         d.dispatch(e);
     }
 

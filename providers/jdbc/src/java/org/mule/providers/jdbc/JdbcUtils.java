@@ -17,6 +17,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.dom4j.Node;
 import org.dom4j.io.DOMReader;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -85,7 +86,7 @@ public abstract class JdbcUtils
         return sb.toString();
     }
 
-    public static Object[] getParams(UMOEndpointURI uri, List paramNames, Object root) throws Exception
+    public static Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object root) throws Exception
     {
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++) {
@@ -136,7 +137,7 @@ public abstract class JdbcUtils
             }
             if (!valueResolved){ 
 	            if (value == null) {
-	                value = uri.getParams().getProperty(name);
+	                value = endpoint.getProperty(name);
 	            }
 	            if (name.equals("payload")) {
 	                value = root;

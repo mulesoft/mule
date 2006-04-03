@@ -36,10 +36,10 @@ public class VFSMessageDispatcher extends AbstractMessageDispatcher {
   }
 
 
-  public void doDispose() {
+  protected void doDispose() {
   }
 
-  public void doDispatch(UMOEvent event) throws Exception {
+  protected void doDispatch(UMOEvent event) throws Exception {
     try {
       Object data = event.getTransformedMessage();
       String filename = (String) event.getProperty(FileConnector.PROPERTY_FILENAME);
@@ -89,7 +89,7 @@ public class VFSMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  public UMOMessage doSend(UMOEvent event) throws Exception {
+  protected UMOMessage doSend(UMOEvent event) throws Exception {
     doDispatch(event);
     return event.getMessage();
   }

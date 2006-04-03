@@ -117,6 +117,22 @@ public class HttpConnector extends TcpConnector
     }
 
     /**
+     * The method determines the key used to store the receiver against.
+     *
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint  the endpoint being registered for the component
+     * @return the key to store the newly created receiver against
+     */
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+        String key = endpoint.getEndpointURI().toString();
+        int i = key.indexOf("?");
+        if(i > -1) {
+            key = key.substring(0, i);
+        }
+        return key;
+    }
+
+    /**
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()

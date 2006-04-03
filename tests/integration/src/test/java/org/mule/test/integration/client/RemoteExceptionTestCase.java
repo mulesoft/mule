@@ -55,41 +55,41 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
         props.put("throwException", "true");
         builder.registerComponent(FunctionalTestComponent.class.getName(), "testComponent2", ep2, null, props);
 
-        builder.createStartedManager(true, "tcp://localhost:5555");
+        builder.createStartedManager(true, "http://localhost:5555");
         return builder;
     }
 
     public void testClientTransformerException() throws Exception {
 
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
+        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException() instanceof TransformerException);
+        assertTrue(exceptionPayload.getRootException() instanceof TransformerException);
     }
 
     public void testClientMalformedEndpointException() throws Exception {
 
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
+        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException() instanceof MalformedEndpointException);
+        assertTrue(exceptionPayload.getRootException() instanceof MalformedEndpointException);
     }
 
     public void testClientComponentException() throws Exception {
 
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
+        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException() instanceof MuleException);
-        assertEquals("Functional Test Component Exception", exceptionPayload.getException().getMessage());
+        assertTrue(exceptionPayload.getRootException() instanceof MuleException);
+        assertEquals("Functional Test Component Exception", exceptionPayload.getRootException().getMessage());
     }
 }

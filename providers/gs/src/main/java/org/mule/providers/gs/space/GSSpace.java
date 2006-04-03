@@ -96,7 +96,7 @@ public class GSSpace extends AbstractSpace {
         }
     }
 
-    public void doDispose() {
+    protected void doDispose() {
         //How do you release a space?
     }
 

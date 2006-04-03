@@ -222,6 +222,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         this.initFromDescriptor(source);
     }
 
+    public ImmutableMuleEndpoint(String endpointName, boolean receiver) throws UMOException
+    {
+        this();
+        String type = (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint p = getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
+        this.initFromDescriptor(p);
+    }
+
     protected void initFromDescriptor(UMOImmutableEndpoint source)
     {
         if (this.name == null) {
@@ -785,5 +793,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isStreaming()
     {
         return streaming;
+    }
+
+    public Object getProperty(Object key) {
+        Object value =  properties.get(key);
+        if(value==null) {
+            value = endpointUri.getParams().get(key);
+        }
+        return value;
     }
 }

@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,9 +46,12 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -70,21 +74,36 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     private HttpClient client = null;
     private UMOTransformer receiveTransformer;
 
-    public HttpClientMessageDispatcher(HttpConnector connector)
+    public HttpClientMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (HttpConnector)endpoint.getConnector();
         receiveTransformer = new HttpClientMethodResponseToObject();
-        client = new HttpClient();
+    }
 
-        HttpState state = new HttpState();
-        if (connector.getProxyUsername() != null) {
-            state.setProxyCredentials(new AuthScope(null, -1, null, null),
-                    new UsernamePasswordCredentials(connector.getProxyUsername(), connector
-                            .getProxyPassword()));
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        if(client==null) {
+            client = new HttpClient();
+
+            HttpState state = new HttpState();
+            if (connector.getProxyUsername() != null) {
+                state.setProxyCredentials(new AuthScope(null, -1, null, null),
+                        new UsernamePasswordCredentials(connector.getProxyUsername(), connector
+                                .getProxyPassword()));
+            }
+            client.setState(state);
+            client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
+
+            //test the connection
+//            HeadMethod method = new HeadMethod(endpoint.getEndpointURI().getAddress());
+//            client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()), method);
         }
-        client.setState(state);
-        client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
+
+    }
+
+    protected void doDisconnect() throws Exception {
+        client = null;
     }
 
     /*
@@ -92,7 +111,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
         execute(event, httpMethod, true);
@@ -102,11 +121,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                     "Http call returned a status of: " + httpMethod.getStatusCode() + " "
                             + httpMethod.getStatusText()));
         }
-    }
-
-    public void doStreaming(UMOEvent event, StreamMessageAdapter messageAdapter) throws Exception
-    {
-        doDispatch(event);
     }
 
     /*
@@ -129,26 +143,26 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String,
-     *      org.mule.umo.UMOEvent)
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        if (endpointUri == null) {
-            return null;
-        }
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
 
-        HttpMethod httpMethod = new GetMethod(endpointUri.getAddress());
+        HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
         httpMethod.setDoAuthentication(true);
-        if (endpointUri.getUserInfo() != null) {
+        if (endpoint.getEndpointURI().getUserInfo() != null && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION)==null) {
             // Add User Creds
-            // TODO take encodings into account
             StringBuffer header = new StringBuffer(128);
             header.append("Basic ");
-            header.append(new String(Base64.encodeBase64(endpointUri.getUserInfo().getBytes())));
+            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
         try {
@@ -160,15 +174,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             else {
                 throw new ReceiveException(
-                        new Message("http", 3, httpMethod.getStatusLine().toString()), endpointUri,
-                        timeout);
+                        new Message("http", 3, httpMethod.getStatusLine().toString()), endpoint, timeout);
             }
         }
         catch (ReceiveException e) {
             throw e;
         }
         catch (Exception e) {
-            throw new ReceiveException(endpointUri, timeout, e);
+            throw new ReceiveException(endpoint, timeout, e);
         }
         finally {
             httpMethod.releaseConnection();
@@ -245,8 +258,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
-                // TODO MULE20 add Encoding
-                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer /* event.getEncoding() */));
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
                 httpMethod = postMethod;
             }
 
@@ -265,12 +277,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
+
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
 
@@ -291,7 +305,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             ExceptionPayload ep = null;
             if (httpMethod.getStatusCode() >= 400) {
-                logger.error(IOUtils.toString(httpMethod.getResponseBodyAsStream()));
+//                String result = IOUtils.toString(httpMethod.getResponseBodyAsStream());
+//                logger.error(result);
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
                                 + " " + httpMethod.getStatusText())));
@@ -304,11 +319,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 sp.setResponse(httpMethod.getResponseBodyAsStream());
                 m = new MuleMessage(sp, h);
             }
-            else if ((header != null) && header.getValue().startsWith("text/")) {
-                m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
-            }
+//            else if ((header != null) && header.getValue().startsWith("text/")) {
+//                m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+//            }
             else {
-                m = new MuleMessage(httpMethod.getResponseBody(), h);
+                Object body = httpMethod.getResponseBody();
+                if(body==null) {
+                    body = StringUtils.EMPTY;
+                }
+                UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{body, h});
+                m = new MuleMessage(adapter);
             }
             m.setExceptionPayload(ep);
             return m;
@@ -323,20 +343,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected HttpConnection getConnection(URI uri) throws URISyntaxException
-    {
-        HttpConnection connection = null;
 
-        Protocol protocol = Protocol.getProtocol(connector.getProtocol().toLowerCase());
-
-        String host = uri.getHost();
-        int port = uri.getPort();
-
-        connection = new HttpConnection(host, port, protocol);
-        connection.setProxyHost(connector.getProxyHostname());
-        connection.setProxyPort(connector.getProxyPort());
-        return connection;
-    }
 
     protected HostConfiguration getHostConfig(URI uri) throws URISyntaxException
     {
@@ -353,9 +360,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return config;
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
-        client = null;
     }
 
     private class StreamPayloadRequestEntity implements RequestEntity

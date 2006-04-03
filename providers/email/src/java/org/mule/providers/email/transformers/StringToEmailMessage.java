@@ -30,6 +30,7 @@ import org.mule.util.TemplateParser;
 
 import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 
 import java.util.Calendar;
@@ -110,7 +111,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         }
 
         try {
-            Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpointAddress).getDelegateSession());
+            Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpoint).getDelegateSession());
 
             msg.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 

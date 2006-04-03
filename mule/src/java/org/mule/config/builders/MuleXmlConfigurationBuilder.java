@@ -976,10 +976,10 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 addTransformerReference("responseTransformer", transformerNames, digester.peek());
             }
 
-            transformerNames = attributes.getValue("responseTransformer");
-            if (transformerNames != null) {
-                addTransformerReference("responseTransformer", transformerNames, digester.peek());
-            }
+//            transformerNames = attributes.getValue("responseTransformer");
+//            if (transformerNames != null) {
+//                addTransformerReference("responseTransformer", transformerNames, digester.peek());
+//            }
 
             transformerNames = attributes.getValue("inboundTransformer");
             if (transformerNames != null) {

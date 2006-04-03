@@ -36,6 +36,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
@@ -53,8 +58,9 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected Map properties = new HashMap();
-    protected Map attachments = new HashMap();
+    protected Map properties = new ConcurrentHashMap();
+    protected Map attachments = new ConcurrentHashMap();
+    protected String encoding = MuleManager.getConfiguration().getEncoding();
 
     protected UMOExceptionPayload exceptionPayload;
 
@@ -264,7 +270,16 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public String getEncoding()
     {
-        return MuleManager.getConfiguration().getEncoding();
+        return encoding;
+    }
+
+    /**
+     * Sets the encoding for this message
+     *
+     * @param encoding the encoding to use
+     */
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     /**

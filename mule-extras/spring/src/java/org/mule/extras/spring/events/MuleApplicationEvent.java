@@ -18,6 +18,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.PropertiesHelper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -45,8 +46,17 @@ public class MuleApplicationEvent extends ApplicationEvent
         super(message);
         String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
                                                          endpoint,
-                                                         endpoint);
-        setEndpoint(new MuleEndpointURI(temp));
+                                                         null);
+        if(temp==null) {
+            UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpoint);
+            if(ep!=null) {
+                setEndpoint(ep.getEndpointURI());
+            } else {
+                setEndpoint(new MuleEndpointURI(endpoint));
+            }
+        } else {
+            setEndpoint(new MuleEndpointURI(temp));
+        }
     }
 
     MuleApplicationEvent(Object message, UMOEventContext context, ApplicationContext appContext)

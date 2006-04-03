@@ -15,22 +15,28 @@
 package org.mule.providers.ftp;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.io.ByteArrayInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,33 +51,21 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected FtpConnector connector;
 
-    public FtpMessageDispatcher(FtpConnector connector)
+    public FtpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
-        super(connector);
-        this.connector = connector;
+        super(endpoint);
+        this.connector = (FtpConnector)endpoint.getConnector();
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(UMOEvent event) throws Exception
     {
         FTPClient client = null;
-        final UMOEndpoint endpoint = event.getEndpoint();
-        UMOEndpointURI uri = endpoint.getEndpointURI();
+        UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
         try {
-            UMOMessage msg = event.getMessage();
-            String filename = msg.getStringProperty(FtpConnector.PROPERTY_FILENAME, null);
-
-            if (filename == null) {
-                String outPattern = msg.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, connector.getOutputPattern());
-                filename = generateFilename(event, outPattern);
-            }
-
-            if (filename == null) {
-                throw new IOException("Filename is null");
-            }
 
             byte[] buf;
             Object data = event.getTransformedMessage();
@@ -81,46 +75,107 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 buf = data.toString().getBytes();
             }
 
-            client = connector.getFtp(uri);
-            connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
-            connector.setupFileType(client, endpoint.getProperties());
-            if (!client.changeWorkingDirectory(uri.getPath())) {
-                throw new IOException("Ftp error: " + client.getReplyCode());
-            }
-            if (!client.storeFile(filename, new ByteArrayInputStream(buf))) {
-                throw new IOException("Ftp error: " + client.getReplyCode());
-            }
+            FtpOutputStreamWrapper out = (FtpOutputStreamWrapper)getOutputStream(event.getEndpoint(), event.getMessage());
+            client = out.getFtpClient();
+            //we shouldn't need to do this as the call to getOutputStream will set the client up
+//            connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
+//            connector.setupFileType(client, endpoint.getProperties());
+//            if (!client.changeWorkingDirectory(uri.getPath())) {
+//                throw new IOException("Ftp error: " + client.getReplyCode());
+//            }
+            IOUtils.copy(new ByteArrayInputStream(buf), out);
+            //This will ensure that the completePendingRequest is called
+            out.close();
 
         } finally {
             connector.releaseFtp(uri, client);
         }
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    /**
+     * Well get the output stream (if any) for this type of transport.  Typically this will be called only when Streaming
+     * is being used on an outbound endpoint
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message  the current message being processed
+     * @return the output stream to use for this request or null if the transport does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException {
+        FTPClient client = null;
+
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+       String filename = (String) message.getProperty(FtpConnector.PROPERTY_FILENAME);
+
+        try {
+            if (filename == null) {
+                String outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, connector.getOutputPattern());
+                filename = generateFilename(message, outPattern);
+            }
+
+            if (filename == null) {
+                throw new IOException("Filename is null");
+            }
+
+            client = connector.getFtp(uri);
+            connector.enterActiveOrPassiveMode(client, endpoint);
+            connector.setupFileType(client, endpoint);
+            if (!client.changeWorkingDirectory(uri.getPath())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            OutputStream out = client.storeFileStream(filename);
+            //We wrap the ftp outputstream to ensure that the completePendingRequest() method is called when the stream is closed
+            return new FtpOutputStreamWrapper(client, out);
+        } catch (Exception e) {
+            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint, e);
+        }
+    }
+
+    protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         return event.getMessage();
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
+        connector.releaseFtp(endpoint.getEndpointURI(), client);
+    }
+
+    protected void doDisconnect() throws Exception {
+        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
+        connector.destroyFtp(endpoint.getEndpointURI(), client);
+    }
+
+    /**
+     * Make a specific request to the underlying transport
+     *
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout  the maximum time the operation should block before returning. The call should
+     *                 return immediately if there is data available. If no data becomes available before the timeout
+     *                 elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
+     *         avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
         FTPClient client = null;
         try {
 
-            client = connector.getFtp(endpointUri);
+            client = connector.getFtp(endpoint.getEndpointURI());
             // not sure this getParams() will always work, there's a todo in the code
-            connector.enterActiveOrPassiveMode(client, endpointUri.getParams());
-            connector.setupFileType(client, endpointUri.getParams());
-            if (!client.changeWorkingDirectory(endpointUri.getPath())) {
+            connector.enterActiveOrPassiveMode(client, endpoint);
+            connector.setupFileType(client, endpoint);
+            if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
 
             FilenameFilter filenameFilter = null;
-            String filter = (String)endpointUri.getParams().get("filter");
-            if(filter!=null) {
-                filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
-                filenameFilter = new FilenameWildcardFilter(filter);
+            if(endpoint.getFilter() instanceof FilenameFilter) {
+                 filenameFilter = (FilenameFilter)endpoint.getFilter();
             }
+
             FTPFile[] files = client.listFiles();
             if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
                 throw new IOException("Ftp error: " +
@@ -152,7 +207,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
             return new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
 
         } finally {
-            connector.releaseFtp(endpointUri, client);
+            connector.releaseFtp(endpoint.getEndpointURI(), client);
         }
     }
 
@@ -161,12 +216,60 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    private String generateFilename(UMOEvent event, String pattern)
+    private String generateFilename(UMOMessage message, String pattern)
     {
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        return connector.getFilenameParser().getFilename(event.getMessage(), pattern);
+        return connector.getFilenameParser().getFilename(message, pattern);
+    }
+    
+    class FtpOutputStreamWrapper extends OutputStream {
+        
+        private FTPClient client;
+        private OutputStream out;
+
+        public FtpOutputStreamWrapper(FTPClient client, OutputStream out)
+        {
+            this.client = client;
+            this.out = out;
+        }
+
+        public void write(int b) throws IOException {
+            out.write(b);
+        }
+
+        public void write(byte b[]) throws IOException {
+            out.write(b);
+        }
+
+
+        public void write(byte b[], int off, int len) throws IOException {
+            out.write(b, off, len);
+        }
+
+        public void flush() throws IOException {
+            out.flush();
+        }
+
+
+        public void close() throws IOException {
+            try {
+                if(!client.completePendingCommand()) {
+                    client.logout();
+                    client.disconnect();
+                    client=null;
+                    throw new IOException("FTP Stream failed to complete pending request");
+                }
+                super.close();
+            } finally {
+                out.close();
+            }
+        }
+
+        FTPClient getFtpClient() {
+            return client;
+        }
     }
 
 }

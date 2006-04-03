@@ -32,7 +32,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected void sendTestData(int iterations) throws Exception
     {
-        cnn = connector.findOrCreateXmppConnection(getInDest());
+        cnn = connector.createXmppConnection(getInDest());
         for (int i = 0; i < 100; i++) {
             cnn.createChat("mule1").sendMessage("Test Message:" + i);
         }

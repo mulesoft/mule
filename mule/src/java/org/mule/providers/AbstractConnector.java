@@ -33,6 +33,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -512,13 +513,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         this.dispatcherFactory = dispatcerFactory;
     }
 
-    public synchronized UMOMessageDispatcher getDispatcher(String endpoint) throws UMOException
+    public synchronized UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
     {
         checkDisposed();
         UMOMessageDispatcher dispatcher = null;
 
-        endpoint = StringUtils.defaultIfEmpty(endpoint, "ANY");
-        if ("ANY".equals(endpoint) && dispatchers.size() > 0) {
+        if (endpoint==null && dispatchers.size() > 0) {
             Map.Entry entry;
             for (Iterator iterator = dispatchers.entrySet().iterator(); iterator.hasNext();) {
                 entry = (Map.Entry) iterator.next();
@@ -533,17 +533,24 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             if (dispatchers == null) {
                 throw new NullPointerException("Dispatchers are null for connector: " + name);
             }
-            dispatcher = (UMOMessageDispatcher) dispatchers.get(endpoint);
+            dispatcher = (UMOMessageDispatcher) dispatchers.get(endpoint.getEndpointURI().toString());
             if (dispatcher != null && dispatcher.isDisposed()) {
                 dispatchers.values().remove(dispatcher);
                 dispatcher = null;
             }
         }
 
-        if (dispatcher == null) {
-            dispatcher = createDispatcher();
-            dispatchers.put(endpoint, dispatcher);
+        if(!supportsProtocol(endpoint.getConnector().getProtocol())) {
+            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
+                    getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
         }
+        if (dispatcher == null) {
+            dispatcher = createDispatcher(endpoint);
+            dispatchers.put(endpoint.getEndpointURI().toString(), dispatcher);
+        }
+//        if(!dispatcher.isConnected()) {
+//            connectionStrategy.connect(dispatcher);
+//        }
         return dispatcher;
     }
 
@@ -554,12 +561,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
     }
 
-    protected UMOMessageDispatcher createDispatcher() throws UMOException
+    protected UMOMessageDispatcher createDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
     {
         if (dispatcherFactory == null) {
             throw new ConnectorException(new Message(Messages.CONNECTOR_NOT_STARTED, name), this);
         }
-        UMOMessageDispatcher dispatcher = dispatcherFactory.create(this);
+        UMOMessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
         return dispatcher;
     }
 

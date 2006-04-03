@@ -18,6 +18,7 @@ package org.mule.test.providers.file;
 import com.mockobjects.dynamic.Mock;
 
 import org.mule.MuleManager;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.MuleTestUtils;
@@ -89,7 +90,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         connector.registerListener(component, endpoint);
         connector.startConnector();
-        connector.getDispatcher("dummy").dispatch(event);
+        connector.getDispatcher(new ImmutableMuleEndpoint("file:/foo", false)).dispatch(event);
 
         session.verify();
     }
@@ -109,7 +110,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         connector.registerListener(component, endpoint);
         connector.startConnector();
-        connector.getDispatcher("dummy").send(event);
+        connector.getDispatcher(new ImmutableMuleEndpoint("file:/foo", false)).send(event);
+
     }
 
     public Object getValidMessage() throws Exception

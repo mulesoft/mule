@@ -17,7 +17,7 @@ import file.TextFileExample;
 public class BinaryHttpExample extends SimpleRunner
  {
     public BinaryHttpExample() {
-        super("http/SimpleHTTP.xml");
+        super("http/BinaryHTTPExample.xml");
     }
 
     public static void main(String[] args) {

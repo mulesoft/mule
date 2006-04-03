@@ -55,7 +55,15 @@ public class MuleMsgProvider extends MsgProvider
 
     protected Object makeNewServiceObject(MessageContext messageContext, String s) throws Exception
     {
-        AxisMessageReceiver receiver = (AxisMessageReceiver)connector.getReceiver(messageContext.getTargetService());
+        String transUrl = (String)messageContext.getProperty("transport.url");
+        int i = transUrl.indexOf("?");
+        if(i > -1) {
+            transUrl = transUrl.substring(0,i);
+        }
+        AxisMessageReceiver receiver = (AxisMessageReceiver)connector.getReceiver(transUrl);
+        if (receiver == null) {
+            receiver = (AxisMessageReceiver)connector.getReceiver(messageContext.getTargetService());
+        }
         if (receiver == null) {
             throw new AxisFault("Could not find Mule registered service: " + s);
         }

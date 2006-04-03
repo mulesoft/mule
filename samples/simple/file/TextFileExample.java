@@ -30,7 +30,7 @@ import junit.framework.TestResult;
 public class TextFileExample extends SimpleRunner
  {
     public TextFileExample() {
-        super("file/SimpleFile.xml");
+        super("file/TextFileExample.xml");
     }
 
     public static void main(String[] args) {

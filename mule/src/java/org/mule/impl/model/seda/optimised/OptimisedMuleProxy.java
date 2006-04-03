@@ -382,7 +382,7 @@ public class OptimisedMuleProxy implements MuleProxy
             } else {
                 UMOMessageDispatcher dispatcher = event.getEndpoint()
                                                        .getConnector()
-                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                                                       .getDispatcher(event.getEndpoint());
                 dispatcher.dispatch(event);
             }
 

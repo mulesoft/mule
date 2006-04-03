@@ -26,6 +26,7 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
@@ -46,7 +47,11 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         if (message instanceof Object[]) {
             this.message = ((Object[])message)[0];
             if (((Object[])message).length > 1) {
-                properties = (Map)((Object[])message)[1];
+                Map props = (Map)((Object[])message)[1];
+                for (Iterator iterator = props.keySet().iterator(); iterator.hasNext();) {
+                    Object o = iterator.next();
+                    setProperty(o, props.get(o));
+                }
             }
         }
         else if (message instanceof byte[]) {
@@ -58,6 +63,25 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         String temp = (String)properties.get(HttpConnector.HTTP_VERSION_PROPERTY);
         if (HttpConstants.HTTP10.equalsIgnoreCase(temp)) {
             http11 = false;
+        }
+
+        //set the encoding
+        String charset = null;
+        Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
+        if (contenttype != null) {
+            HeaderElement values[] = contenttype.getElements();
+            if (values.length == 1) {
+                NameValuePair param = values[0].getParameterByName("charset");
+                if (param != null) {
+                    charset = param.getValue();
+                }
+            }
+        }
+        if (charset != null) {
+            encoding = charset;
+        }
+        else {
+            encoding =  MuleManager.getConfiguration().getEncoding();
         }
     }
 
@@ -136,26 +160,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    public String getEncoding()
-    {
-        String charset = null;
-        Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null) {
-            HeaderElement values[] = contenttype.getElements();
-            if (values.length == 1) {
-                NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null) {
-                    charset = param.getValue();
-                }
-            }
-        }
-        if (charset != null) {
-            return charset;
-        }
-        else {
-            return MuleManager.getConfiguration().getEncoding();
-        }
-    }
 
     public Header getHeader(String name)
     {

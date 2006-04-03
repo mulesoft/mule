@@ -17,6 +17,7 @@ package org.mule.providers.file;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
@@ -24,7 +25,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
@@ -32,6 +36,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLDecoder;
 
 /**
@@ -44,9 +49,9 @@ import java.net.URLDecoder;
 public class FileMessageDispatcher extends AbstractMessageDispatcher {
     private FileConnector connector;
 
-    public FileMessageDispatcher(FileConnector connector) {
-        super(connector);
-        this.connector = connector;
+    public FileMessageDispatcher(UMOImmutableEndpoint endpoint) {
+        super(endpoint);
+        this.connector = (FileConnector)endpoint.getConnector();
     }
 
     /*
@@ -54,35 +59,58 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception {
-        String endpoint = event.getEndpoint().getEndpointURI().getAddress();
+    protected void doDispatch(UMOEvent event) throws Exception {
         Object data = event.getTransformedMessage();
-        UMOMessage msg = event.getMessage();
-        String filename = msg.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+        //Wrap the transformed message before passing it to the filename parser
+        UMOMessage message = new MuleMessage(data, event.getMessage());
 
-        if (filename == null) {
-            String outPattern = msg.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, connector.getOutputPattern());
-            filename = generateFilename(event, outPattern);
-        }
-
-        if (filename == null) {
-            throw new IOException("Filename is null");
-        }
-
-        File file = Utility.createFile(endpoint + "/" + filename);
         byte[] buf;
         if (data instanceof byte[]) {
             buf = (byte[]) data;
         } else {
-            buf = data.toString().getBytes();
+            buf = data.toString().getBytes(event.getEncoding());
         }
-
-        logger.info("Writing file to: " + file.getAbsolutePath());
-        FileOutputStream fos = new FileOutputStream(file, connector.isOutputAppend());
+        FileOutputStream fos = (FileOutputStream)getOutputStream(event.getEndpoint(), message);
         try {
             fos.write(buf);
         } finally {
             fos.close();
+        }
+    }
+
+    /**
+     * Well get the output stream (if any) for this type of transport.  Typically this will be called only when Streaming
+     * is being used on an outbound endpoint
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message  the current message being processed
+     * @return the output stream to use for this request or null if the transport does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException {
+        String address = endpoint.getEndpointURI().getAddress();
+        String filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+
+        try {
+            if (filename == null) {
+                String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+                if (outPattern == null) {
+                    outPattern = connector.getOutputPattern();
+                }
+                filename = generateFilename(message, outPattern);
+            }
+
+            if (filename == null) {
+                throw new IOException("Filename is null");
+            }
+
+            File file = Utility.createFile(address + "/" + filename);
+            if(logger.isInfoEnabled()) {
+                logger.info("Writing file to: " + file.getAbsolutePath());
+            }
+            return new FileOutputStream(file, connector.isOutputAppend());
+        } catch (IOException e) {
+            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint, e);
         }
     }
 
@@ -102,17 +130,19 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
      * file in the directory according to the filename filter configured on the
      * connector.
      *
-     * @param endpointUri a path to a file or directory
+     * @param endpoint an endpoint a path to a file or directory
      * @param timeout     this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing
      *         to receive
      * @throws Exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-        File file = new File(endpointUri.getAddress());
+
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+
+        File file = new File(endpoint.getEndpointURI().getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
-        String filter = (String) endpointUri.getParams().get("filter");
+        String filter = (String) endpoint.getProperty("filter");
         if (filter != null) {
             filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
             filenameFilter = new FilenameWildcardFilter(filter);
@@ -121,7 +151,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
             if (file.isFile()) {
                 result = file;
             } else if (file.isDirectory()) {
-                result = getNextFile(endpointUri.getAddress(), filenameFilter);
+                result = getNextFile(endpoint.getEndpointURI().getAddress(), filenameFilter);
             }
             if (result != null) {
                 boolean checkFileAge = connector.getCheckFileAge();
@@ -181,7 +211,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception {
         doDispatch(event);
         return event.getMessage();
     }
@@ -195,16 +225,22 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
         return connector;
     }
 
-    private String generateFilename(UMOEvent event, String pattern) throws TransformerException {
+    private String generateFilename(UMOMessage message, String pattern)  {
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        //Wrap the transformed message before passing it to the filename parser
-        UMOMessage message = new MuleMessage(event.getTransformedMessage(), event.getMessage());
         return connector.getFilenameParser().getFilename(message, pattern);
     }
 
-    public void doDispose() {
+    protected void doDispose() {
+    }
+
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+        //no op
+    }
+
+    protected void doDisconnect() throws Exception {
+        //no op
     }
 
 }

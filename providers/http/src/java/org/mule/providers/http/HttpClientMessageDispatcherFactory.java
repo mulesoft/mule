@@ -16,6 +16,8 @@
 package org.mule.providers.http;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -32,8 +34,8 @@ public class HttpClientMessageDispatcherFactory implements UMOMessageDispatcherF
      * 
      * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
      */
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new HttpClientMessageDispatcher((HttpConnector)connector);
+        return new HttpClientMessageDispatcher(endpoint);
     }
 }

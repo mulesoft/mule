@@ -43,7 +43,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
         //whole message is to be serialised to Xml, nit just the payload.  This can be useful
         //for protocols such as tcp where the protocol does not support headers, thus the whole messgae
         //needs to be serialized
-        if(isSourceTypeSupported(UMOMessage.class, true)) {
+        if(isSourceTypeSupported(UMOMessage.class, true) && context!=null) {
             return getXStream().toXML(context.getMessage());
         } else {
             return getXStream().toXML(src);
