@@ -34,6 +34,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
 import javax.resource.ResourceException;
+
 import java.util.Map;
 
 /**
@@ -102,11 +103,10 @@ public class DefaultMuleConnection implements MuleConnection
 
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         try {
-            UMOMessage message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint,
-                                                                                                          timeout);
+            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
             return message;
         } catch (Exception e) {
-            throw new ReceiveException(muleEndpoint, timeout, e);
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 
@@ -159,8 +159,9 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public void close() throws ResourceException
     {
-        if (managedConnection == null)
+        if (managedConnection == null) {
             return; // connection is already closed
+        }
         managedConnection.removeConnection(this);
 
         // Send a close event to the App Server
