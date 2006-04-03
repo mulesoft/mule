@@ -26,6 +26,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
+import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
@@ -33,6 +34,7 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.transformers.xml.XmlToObject;
+import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -47,6 +49,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 
 import java.util.Map;
@@ -71,11 +74,11 @@ public class MuleManagerComponent implements Callable, Initialisable
     public static final String MANAGER_ENDPOINT_NAME = "_muleManagerEndpoint";
 
     private XmlToObject remoteTransformer;
-    private XStream xstream;
+    private ObjectToXml objectToXml;
 
     public void initialise() throws InitialisationException
     {
-        xstream = new XStream(new XppDriver());
+        objectToXml = new ObjectToXml();
         remoteTransformer = new XmlToObject();
         remoteTransformer.setReturnClass(AdminNotification.class);
     }
@@ -114,16 +117,18 @@ public class MuleManagerComponent implements Callable, Initialisable
 
         if (destComponent != null) {
             UMOSession session = MuleManager.getInstance().getModel().getComponentSession(destComponent);
-            RequestContext.rewriteEvent(action.getMessage());
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but the
             // message will not be of expected type
-            UMOEvent event = RequestContext.getEvent();
-            event.getEndpoint().setTransformer(null);
+            UMOEndpoint ep = new MuleEndpoint(RequestContext.getEvent().getEndpoint());
+            ep.setTransformer(null);
+            UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
+            RequestContext.setEvent(event);
+            
             if (context.isSynchronous()) {
 
                 result = session.getComponent().sendEvent(event);
-                return xstream.toXML(result);
+                return objectToXml.transform(result);
             } else {
                 session.getComponent().dispatchEvent(event);
                 return null;
@@ -149,7 +154,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 if (result == null) {
                     return null;
                 } else {
-                    return xstream.toXML(result);
+                    return objectToXml.transform(result);
                 }
             }
         } catch (Exception e) {
@@ -164,7 +169,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
             UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(action.getResourceIdentifier());
+            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
             long timeout = PropertiesHelper.getLongProperty(action.getProperties(),
                                                             MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY,
                                                             MuleManager.getConfiguration().getSynchronousEventTimeout());
@@ -179,7 +184,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                     Object payload = trans.transform(result.getPayload());
                     result = new MuleMessage(payload, result);
                 }
-                return xstream.toXML(result);
+                return objectToXml.transform(result);
             } else {
                 return null;
             }
@@ -218,7 +223,12 @@ public class MuleManagerComponent implements Callable, Initialisable
             result = new MuleMessage(new NullPayload(), (Map)null);
         }
         result.setExceptionPayload(new ExceptionPayload(e));
-        return xstream.toXML(result);
+        try {
+            return (String)objectToXml.transform(result);
+        } catch (TransformerException e1) {
+            logger.error(e.toString(), e);
+            return e.getMessage();
+        }
     }
 
 }

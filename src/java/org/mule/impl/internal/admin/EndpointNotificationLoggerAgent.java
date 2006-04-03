@@ -65,7 +65,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     {
         if (logEndpoint != null) {
             try {
-                UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher("ANY");
+                UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher(logEndpoint);
                 UMOMessage msg = new MuleMessage(e.toString(), (Map)null);
                 UMOEvent event = new MuleEvent(msg, logEndpoint, session, false);
                 dispatcher.dispatch(event);

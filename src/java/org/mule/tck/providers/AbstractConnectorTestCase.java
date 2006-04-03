@@ -23,6 +23,7 @@ import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -225,7 +226,9 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOConnector connector = getConnector();
         assertNotNull(connector);
         assertNotNull(connector.getDispatcherFactory());
-        UMOMessageDispatcher dispatcher = connector.getDispatcher("dummy");
+        UMOMessageDispatcher dispatcher = connector.getDispatcher(new ImmutableMuleEndpoint(
+                "test", new MuleEndpointURI(getTestEndpointURI()), connector, null,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null));
         assertNotNull(dispatcher);
         assertEquals(connector, dispatcher.getConnector());
     }

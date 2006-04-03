@@ -590,6 +590,12 @@ Jndi
 <!ATTLIST endpoint synchronous	(true|false)			#IMPLIED>
 
 <!--
+    streaming
+    Whether this endpoint will stream data in/out of mule
+-->
+<!ATTLIST endpoint streaming	(true|false)			#IMPLIED>
+
+<!--
     encoding
     explicitly specify the encoding used by this endpoint
 -->

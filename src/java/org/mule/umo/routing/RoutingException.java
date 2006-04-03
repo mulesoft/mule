@@ -19,6 +19,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>RoutingException</code> is a base class for al routing exceptions.
@@ -31,38 +32,38 @@ import org.mule.umo.endpoint.UMOEndpoint;
  */
 public class RoutingException extends MessagingException
 {
-    protected transient UMOEndpoint endpoint;
+    protected transient UMOImmutableEndpoint endpoint;
 
-    public RoutingException(UMOMessage message, UMOEndpoint endpoint)
+    public RoutingException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         super(generateMessage(null, endpoint), message);
         this.endpoint = endpoint;
     }
 
-    public RoutingException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public RoutingException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(generateMessage(null, endpoint), umoMessage, cause);
         this.endpoint = endpoint;
     }
 
-    public RoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public RoutingException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint)
     {
         super(generateMessage(message, endpoint), umoMessage);
         this.endpoint = endpoint;
     }
 
-    public RoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public RoutingException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(generateMessage(message, endpoint), umoMessage, cause);
         this.endpoint = endpoint;
     }
 
-    public UMOEndpoint getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }
 
-    private static Message generateMessage(Message message, UMOEndpoint endpoint)
+    private static Message generateMessage(Message message, UMOImmutableEndpoint endpoint)
     {
         Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
         if (message != null) {

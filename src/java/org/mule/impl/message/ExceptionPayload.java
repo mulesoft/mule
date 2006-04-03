@@ -35,7 +35,7 @@ public class ExceptionPayload implements UMOExceptionPayload
 
     public ExceptionPayload(Throwable exception)
     {
-        this.exception = ExceptionHelper.getRootException(exception);
+        this.exception = exception;
         UMOException muleRoot = ExceptionHelper.getRootMuleException(exception);
         if (muleRoot != null) {
             message = muleRoot.getMessage();
@@ -44,6 +44,10 @@ public class ExceptionPayload implements UMOExceptionPayload
         } else {
             message = exception.getMessage();
         }
+    }
+
+    public Throwable getRootException() {
+        return ExceptionHelper.getRootException(exception);
     }
 
     public int getCode()

@@ -20,6 +20,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>DefaultComponentExceptionStrategy</code> is the default exception
@@ -103,7 +104,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         }
     }
 
-    protected void routeException(UMOMessage message, UMOEndpoint failedEndpoint, Throwable t)
+    protected void routeException(UMOMessage message, UMOImmutableEndpoint failedEndpoint, Throwable t)
     {
         UMOEndpoint ep = getEndpoint(t);
         if (ep != null) {

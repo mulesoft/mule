@@ -166,6 +166,20 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      */
     void setSynchronous(boolean synchronous);
 
+    /**
+     * Sets a property on the endpoint
+     * @param key the property key
+     * @param value the value of the property
+     */
+    void setProperty(String key, Object value);
+
+    /**
+     * This attribute determines how a connector is obtained for the endpoint. The options are -
+     * GET_OR_CREATE_CONNECTOR = 0: create a connector for the endpoint if one isn't already register (default)
+     * ALWAYS_CREATE_CONNECTOR = 1: Always create a new connector of each endpoint
+     * NEVER_CREATE_CONNECTOR = 2: Throw an exception if there is not connector with a matching protocol for this endpoint
+     * @param action
+     */
     void setCreateConnector(int action);
 
     /**

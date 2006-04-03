@@ -22,9 +22,12 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <p>
@@ -35,6 +38,20 @@ import org.mule.umo.provider.UMOMessageReceiver;
  */
 public class TestConnector extends AbstractConnector
 {
+    /**
+     * The connector can pool dispatchers based on their endpointUri or can
+     * ingnore the endpointUri altogether and use a ThreadLocal or always create
+     * new.
+     *
+     * @param endpoint the endpoint that can be used to key cached
+     *                 dispatchers
+     * @return the component associated with the endpointUri If there is no
+     *         component for the current thread one will be created
+     * @throws org.mule.umo.UMOException if creation of a component fails
+     */
+    public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException {
+        return new TestMessageDispatcher(endpoint);
+    }
 
     /**
      * 
@@ -42,6 +59,12 @@ public class TestConnector extends AbstractConnector
     public TestConnector()
     {
         super();
+        setDispatcherFactory(new UMOMessageDispatcherFactory() {
+
+            public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+                return new TestMessageDispatcher(endpoint);
+            }
+        });
     }
 
     /*

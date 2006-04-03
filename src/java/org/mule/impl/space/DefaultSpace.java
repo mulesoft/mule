@@ -124,7 +124,7 @@ public class DefaultSpace extends AbstractSpace {
         }
     }
 
-    public void doDispose() {
+    protected void doDispose() {
         for (Iterator iterator = children.iterator(); iterator.hasNext();) {
             DefaultSpace childSpace = (DefaultSpace) iterator.next();
             childSpace.dispose();

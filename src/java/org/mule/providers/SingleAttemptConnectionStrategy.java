@@ -37,4 +37,11 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
 
         }
     }
+
+    /**
+     * Resets any state stored in the retry strategy
+     */
+    public void resetState() {
+        //no op
+    }
 }

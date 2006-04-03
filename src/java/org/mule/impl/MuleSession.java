@@ -206,7 +206,7 @@ public final class MuleSession implements UMOSession
                 }
 
                 UMOConnector connector = event.getEndpoint().getConnector();
-                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
                 if(connector instanceof AbstractConnector) {
                     ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
@@ -256,7 +256,7 @@ public final class MuleSession implements UMOSession
                 }
 
                 UMOConnector connector = event.getEndpoint().getConnector();
-                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
                 if(connector instanceof AbstractConnector) {
                     ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
@@ -327,11 +327,10 @@ public final class MuleSession implements UMOSession
     public UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException
     {
         try {
-            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI()
-                                                                                            .getAddress());
-            return dispatcher.receive(endpoint.getEndpointURI(), timeout);
+            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
+            return dispatcher.receive(endpoint, timeout);
         } catch (Exception e) {
-            throw new ReceiveException(endpoint.getEndpointURI(), timeout, e);
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 

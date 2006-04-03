@@ -14,7 +14,10 @@
 package org.mule.transformers.xml;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.DefaultMapper;
 import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
@@ -27,6 +30,7 @@ import org.mule.util.ClassHelper;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream
@@ -53,6 +57,11 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
                 xstream = new XStream(new XppDriver());
             }
         }
+
+        //We must always register this converter as the Mule Message uses ConcurrentHashMaps,
+        // but XStream does not support them out of the box right now
+         xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
+
         addAliases();
         addConverters();
         return xstream;
@@ -128,4 +137,32 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
         this.converters = converters;
     }
 
+    protected boolean requiresCurrentEvent() {
+        return false;
+    }
+
+    private class ConcurrentHashMapConverter extends MapConverter
+    {
+        private Class jdk5ConurrentHashMap = null;
+        private Class backportConurrentHashMap = null;
+
+        public ConcurrentHashMapConverter(Mapper mapper) {
+            super(mapper);
+            try {
+                jdk5ConurrentHashMap = ClassHelper.loadClass("java.util.concurrent.ConcurrentHashMap", getClass());
+            } catch (ClassNotFoundException e) {
+
+            }
+
+            try {
+                backportConurrentHashMap = ClassHelper.loadClass("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", getClass());
+            } catch (ClassNotFoundException e) {
+
+            }
+        }
+
+        public boolean canConvert(Class aClass) {
+            return aClass.equals(backportConurrentHashMap) || aClass.equals(jdk5ConurrentHashMap);
+        }
+    }
 }

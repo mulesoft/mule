@@ -35,6 +35,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -891,7 +892,7 @@ public class MuleEventContext implements UMOEventContext
         return event.getTimeout();
     }
 
-    private void setRemoteSync(UMOMessage message, UMOEndpoint endpoint)
+    private void setRemoteSync(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         if (endpoint.isRemoteSync()) {
             if (getTransaction() == null) {

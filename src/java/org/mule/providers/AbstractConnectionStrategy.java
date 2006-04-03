@@ -53,6 +53,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                         try {
                             doConnect(connectable);
                         } catch (FatalConnectException e) {
+                            resetState();
                         	// TODO: this cast is evil
                         	if (connectable instanceof AbstractMessageReceiver) {
                         		((AbstractMessageReceiver) connectable).handleException(e);
@@ -61,10 +62,15 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                     }
                 });
             } catch (WorkException e) {
+                resetState();
                 throw new FatalConnectException(e, connectable);
             }
         } else {
-            doConnect(connectable);
+            try {
+                doConnect(connectable);
+            } finally {
+                resetState();
+            }
         }
     }
 
@@ -79,6 +85,11 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
     }
 
     public abstract void doConnect(UMOConnectable connectable) throws FatalConnectException;
+
+    /**
+     * Resets any state stored in the retry strategy
+     */
+    public abstract void resetState();
 
     protected String getDescription(UMOConnectable connectable) {
     	if (connectable instanceof UMOMessageReceiver) {

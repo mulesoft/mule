@@ -27,6 +27,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
@@ -159,10 +160,10 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      *            method for logging purposes
      * @param t the exception thrown. This will be sent with the
      *            ExceptionMessage
-     * 
+     *
      * @see ExceptionMessage
      */
-    protected void routeException(UMOMessage message, UMOEndpoint failedEndpoint, Throwable t)
+    protected void routeException(UMOMessage message, UMOImmutableEndpoint failedEndpoint, Throwable t)
     {
         UMOEndpoint endpoint = getEndpoint(t);
         if (endpoint != null) {
@@ -275,7 +276,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      *            exception or some wrapper exception
      * @see RoutingException
      */
-    public abstract void handleRoutingException(UMOMessage message, UMOEndpoint endpoint, Throwable e);
+    public abstract void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable e);
 
     /**
      * Lifecycle exceptions are thrown when an error occurs during an object's

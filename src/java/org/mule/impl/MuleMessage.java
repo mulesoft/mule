@@ -16,9 +16,14 @@ package org.mule.impl;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
+import org.mule.MuleException;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.activation.DataHandler;
 
@@ -57,12 +62,29 @@ public class MuleMessage implements UMOMessage
         addProperties(properties);
     }
 
-     public MuleMessage(Object message, UMOMessage previous) {
+     public MuleMessage(Object message, UMOMessageAdapter previous) {
          if (message instanceof UMOMessageAdapter) {
             adapter = (UMOMessageAdapter) message;
         } else {
             adapter = new DefaultMessageAdapter(message, previous);
         }
+         if(previous.getExceptionPayload()!=null) {
+             setExceptionPayload(previous.getExceptionPayload());
+         }
+         setEncoding(previous.getEncoding());
+         if(previous.getAttachmentNames().size() > 0) {
+             Set attNames = adapter.getAttachmentNames();
+             synchronized(attNames) {
+                 for (Iterator iterator = attNames.iterator(); iterator.hasNext();) {
+                     String s = (String)iterator.next();
+                     try {
+                         addAttachment(s, adapter.getAttachment(s));
+                     } catch (Exception e) {
+                         throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_ATTACHMENT_X, s), e);
+                     }
+                 }
+             }
+         }
      }
 
     public UMOMessageAdapter getAdapter()
@@ -380,7 +402,6 @@ public class MuleMessage implements UMOMessage
         buf.append(", correlationGroup=").append(getCorrelationGroupSize());
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
-        buf.append(", adapter hash=").append(adapter.hashCode());
         buf.append(", exceptionPayload=").append(exceptionPayload);
         buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), true));
         buf.append("}");
@@ -412,6 +433,15 @@ public class MuleMessage implements UMOMessage
      */
     public String getEncoding() {
         return adapter.getEncoding();
+    }
+
+    /**
+     * Sets the encoding for this message
+     *
+     * @param encoding the encoding to use
+     */
+    public void setEncoding(String encoding) {
+        adapter.setEncoding(encoding);
     }
 
     /**

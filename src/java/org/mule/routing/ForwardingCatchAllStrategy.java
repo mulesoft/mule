@@ -47,8 +47,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
                                                 session.getComponent());
         }
         try {
-            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint().getEndpointURI()
-                                                                                                      .getAddress());
+            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
             
             if (sendTransformed && getEndpoint().getTransformer() != null) {
                 Object payload = message.getPayload();

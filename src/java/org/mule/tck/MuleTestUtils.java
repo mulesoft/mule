@@ -38,6 +38,7 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -115,13 +116,13 @@ public class MuleTestUtils {
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
-    public static UMOEvent getTestEvent(Object data, UMOEndpoint endpoint) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
     {
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class.getName())));
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
-    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOEndpoint endpoint)
+    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
             throws UMOException
     {
         UMOSession session = getTestSession(getTestComponent(descriptor));

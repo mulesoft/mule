@@ -192,7 +192,7 @@ public class SedaComponent extends AbstractComponent implements Work {
     }
 
 
-    public void doDispose() {
+    protected void doDispose() {
 
         try {
             // threadPool.awaitTerminationAfterShutdown();

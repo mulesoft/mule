@@ -136,6 +136,13 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
     Map getProperties();
 
     /**
+     * Retrieves a property set on the endpoint
+     * @param key the name of the property
+     * @return the property value or null if it does not exist
+     */
+    Object getProperty(Object key);
+
+    /**
      * The transport protocol name that the message endpoint communicates over.
      * i.e. jms, sms, smtp etc. The protocol must match that of the associated
      * endpoint

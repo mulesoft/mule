@@ -47,12 +47,12 @@ public class RequestContext
         return (UMOEvent)events.get();
     }
 
-    public static synchronized void setEvent(UMOEvent event)
+    public static void setEvent(UMOEvent event)
     {
         events.set(event);
     }
 
-    public static synchronized void rewriteEvent(UMOMessage message)
+    public static void rewriteEvent(UMOMessage message)
     {
         if (message != null) {
             UMOEvent event = getEvent();

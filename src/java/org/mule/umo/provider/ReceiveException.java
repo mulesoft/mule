@@ -17,6 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>ReceiveException</code> is specifically thrown by the Provider
@@ -28,13 +29,15 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 public class ReceiveException extends UMOException
 {
 
+    private UMOImmutableEndpoint endpoint;
     /**
      * @param message the exception message
      */
-    public ReceiveException(Message message, UMOEndpointURI endpointUri, long timeout)
+    public ReceiveException(Message message, UMOImmutableEndpoint endpoint, long timeout)
     {
         super(message);
-        addInfo("Endpoint", endpointUri.toString());
+        this.endpoint = endpoint;
+        addInfo("Endpoint", endpoint.toString());
         addInfo("Timeout", new Long(timeout).toString());
     }
 
@@ -42,15 +45,16 @@ public class ReceiveException extends UMOException
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public ReceiveException(Message message, UMOEndpointURI endpointUri, long timeout, Throwable cause)
+    public ReceiveException(Message message, UMOImmutableEndpoint endpoint, long timeout, Throwable cause)
     {
         super(message, cause);
-        addInfo("Endpoint", endpointUri.toString());
+        this.endpoint = endpoint;
+        addInfo("Endpoint", endpoint.toString());
         addInfo("Timeout", new Long(timeout).toString());
     }
 
-    public ReceiveException(UMOEndpointURI endpointUri, long timeout, Throwable cause)
+    public ReceiveException(UMOImmutableEndpoint endpoint, long timeout, Throwable cause)
     {
-        super(new Message(Messages.FAILED_TO_RECEIVE_OVER_X_TIMEOUT_X, endpointUri, String.valueOf(timeout)), cause);
+        this(new Message(Messages.FAILED_TO_RECEIVE_OVER_X_TIMEOUT_X, endpoint, String.valueOf(timeout)), endpoint, timeout, cause);
     }
 }

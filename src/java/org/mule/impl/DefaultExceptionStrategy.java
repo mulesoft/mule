@@ -17,6 +17,7 @@ package org.mule.impl;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>DefaultExceptionStrategy</code> Provides a default exception handling
@@ -35,7 +36,7 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
         routeException(message, null, t);
     }
 
-    public void handleRoutingException(UMOMessage message, UMOEndpoint endpoint, Throwable t)
+    public void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable t)
     {
         defaultHandler(t);
         routeException(message, endpoint, t);

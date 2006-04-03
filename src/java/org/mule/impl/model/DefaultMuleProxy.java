@@ -39,6 +39,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
@@ -282,16 +283,17 @@ public class DefaultMuleProxy implements MuleProxy
             }
         } catch (Exception e) {
             event.getSession().setValid(false);
-            if (e instanceof UMOException) {
-                handleException(e);
-            } else {
-                handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
+            handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                                                                    descriptor.getName()), event.getMessage(), e));
-            }
+
             if(returnMessage==null) {
                 returnMessage = new MuleMessage(new NullPayload(), (Map)null);
             }
-            returnMessage.setExceptionPayload(new ExceptionPayload(e));
+            UMOExceptionPayload exceptionPayload = RequestContext.getExceptionPayload();
+            if(exceptionPayload==null) {
+                exceptionPayload = new ExceptionPayload(e);
+            }
+            returnMessage.setExceptionPayload(exceptionPayload);
         }
         return returnMessage;
     }
@@ -423,7 +425,7 @@ public class DefaultMuleProxy implements MuleProxy
             } else {
                 UMOMessageDispatcher dispatcher = event.getEndpoint()
                                                        .getConnector()
-                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                                                       .getDispatcher(event.getEndpoint());
                 dispatcher.dispatch(event);
             }
 

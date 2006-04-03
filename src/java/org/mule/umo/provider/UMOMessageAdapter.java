@@ -73,7 +73,6 @@ public interface UMOMessageAdapter extends Serializable {
 
     /**
      * @return all properties on this message
-     * @deprecated
      */
     Iterator getPropertyNames();
 
@@ -321,4 +320,10 @@ public interface UMOMessageAdapter extends Serializable {
      * @return the encoding for this message.  This method must never return null
      */
     public String getEncoding();
+
+    /**
+     * Sets the encoding for this message
+     * @param encoding the encoding to use
+     */
+    public void setEncoding(String encoding);
 }

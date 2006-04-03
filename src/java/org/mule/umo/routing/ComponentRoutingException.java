@@ -18,6 +18,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>ComponentRoutingException</code> is thrown due to a routing exception
@@ -33,7 +34,7 @@ public class ComponentRoutingException extends RoutingException
 
     public ComponentRoutingException(Message message,
                                      UMOMessage umoMessage,
-                                     UMOEndpoint endpoint,
+                                     UMOImmutableEndpoint endpoint,
                                      UMOComponent component)
     {
         super(generateMessage(message, endpoint, component), umoMessage, endpoint);
@@ -42,7 +43,7 @@ public class ComponentRoutingException extends RoutingException
 
     public ComponentRoutingException(Message message,
                                      UMOMessage umoMessage,
-                                     UMOEndpoint endpoint,
+                                     UMOImmutableEndpoint endpoint,
                                      UMOComponent component,
                                      Throwable cause)
     {
@@ -50,14 +51,14 @@ public class ComponentRoutingException extends RoutingException
         this.component = component;
     }
 
-    public ComponentRoutingException(UMOMessage umoMessage, UMOEndpoint endpoint, UMOComponent component)
+    public ComponentRoutingException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, UMOComponent component)
     {
         super(generateMessage(null, endpoint, component), umoMessage, endpoint);
         this.component = component;
     }
 
     public ComponentRoutingException(UMOMessage umoMessage,
-                                     UMOEndpoint endpoint,
+                                     UMOImmutableEndpoint endpoint,
                                      UMOComponent component,
                                      Throwable cause)
     {
@@ -66,7 +67,7 @@ public class ComponentRoutingException extends RoutingException
 
     }
 
-    private static Message generateMessage(Message message, UMOEndpoint endpoint, UMOComponent component)
+    private static Message generateMessage(Message message, UMOImmutableEndpoint endpoint, UMOComponent component)
     {
 
         Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X,
