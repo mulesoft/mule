@@ -131,12 +131,11 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-
         if (getStatistics().isEnabled()) {
             getStatistics().incrementCaughtMessage();
         }
 
-        return getCatchAllStrategy().catchMessage(message, null, false);
+        return getCatchAllStrategy().catchMessage(message, session, synchronous);
     }
 
     public boolean hasEndpoints() {

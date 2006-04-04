@@ -37,12 +37,12 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 
     public void setEndpoint(UMOEndpoint endpoint)
     {
-        throw new UnsupportedOperationException("A endpoint cannot be set on this Catch All strategy");
+        throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
 
     public void setEndpoint(String endpoint)
     {
-        throw new UnsupportedOperationException("A endpoint cannot be set on this Catch All strategy");
+        throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
 
     public UMOEndpoint getEndpoint()
