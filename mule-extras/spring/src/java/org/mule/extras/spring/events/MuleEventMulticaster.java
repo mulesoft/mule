@@ -177,7 +177,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * Used to store parsed endpoints
      */
-    protected Map endpointsCache = new HashMap();
+   // protected Map endpointsCache = new HashMap();
 
     protected ExceptionListener exceptionListener = new LoggingExceptionListener();
 
@@ -291,7 +291,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 if(listener instanceof AsynchronousEventListener) {
                     AsynchronousEventListener asyncListener = (AsynchronousEventListener)listener;
                     if (asyncListener.getListener() instanceof MuleSubscriptionEventListener) {
-                        if (isSubscriptionMatch(muleEvent.getEndpoint().getAddress(),
+                        if (isSubscriptionMatch(muleEvent.getEndpoint(),
                                                 ((MuleSubscriptionEventListener) asyncListener.getListener()).getSubscriptions())) {
                             asyncListener.onApplicationEvent(muleEvent);
                         }
@@ -302,7 +302,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     }
                     //Synchronous Event listener Checks
                 } else if (listener instanceof MuleSubscriptionEventListener) {
-                    if (isSubscriptionMatch(muleEvent.getEndpoint().getAddress(),
+                    if (isSubscriptionMatch(muleEvent.getEndpoint(),
                                             ((MuleSubscriptionEventListener) listener).getSubscriptions())) {
                         listener.onApplicationEvent(muleEvent);
                     }
@@ -314,6 +314,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 listener.onApplicationEvent(e);
             } else if (!(listener instanceof MuleEventListener)) {
                 listener.onApplicationEvent(e);
+            } else {
+                //Finally only propogate the Application event if the ApplicationEvent interface is explicitly implemented
+                for (int i = 0; i <  listener.getClass().getInterfaces().length; i++) {
+                    if(listener.getClass().getInterfaces()[i].equals(ApplicationListener.class)) {
+                        listener.onApplicationEvent(e);
+                        break;
+                    }
+                }
 
             }
         }
@@ -337,18 +345,18 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // my.queue
             // if it is a MuleEndpointURI we need to extract the Resource
             // specific part
-            if (MuleEndpointURI.isMuleUri(subscription)) {
-                UMOEndpointURI ep = (UMOEndpointURI) endpointsCache.get(subscription);
-                if (ep == null) {
-                    try {
-                        ep = new MuleEndpointURI(subscription);
-                    } catch (MalformedEndpointException e) {
-                        throw new IllegalArgumentException(e.getMessage());
-                    }
-                    endpointsCache.put(subscription, ep);
-                }
-                subscription = ep.getAddress();
-            }
+//            if (MuleEndpointURI.isMuleUri(subscription)) {
+//                UMOEndpointURI ep = (UMOEndpointURI) endpointsCache.get(subscription);
+//                if (ep == null) {
+//                    try {
+//                        ep = new MuleEndpointURI(subscription);
+//                    } catch (MalformedEndpointException e) {
+//                        throw new IllegalArgumentException(e.getMessage());
+//                    }
+//                    endpointsCache.put(subscription, ep);
+//                }
+//                subscription = ep.getAddress();
+//            }
 
             ObjectFilter filter = createFilter(subscription);
             if (filter.accept(endpoint)) {
@@ -410,9 +418,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         if (endpoint != null) {
             try {
-                if (applicationEvent.getEndpoint() != null) {
-                    endpoint.setEndpointURI(applicationEvent.getEndpoint());
-                }
+//                if (applicationEvent.getEndpoint() != null) {
+//                    endpoint.setEndpointURI(applicationEvent.getEndpoint());
+//                }
 
                 MuleMessage message = new MuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
                 // has dispatch been triggered using beanFactory.publish()
@@ -454,7 +462,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     protected void initMule()
     {
         try {
-            endpointsCache.clear();
+           // endpointsCache.clear();
             // See if there has been a discriptor explicitly configured
             if (applicationContext.containsBean(EVENT_MULTICASTER_DESCRIPTOR_NAME)) {
                 descriptor = (UMODescriptor) applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);

@@ -37,26 +37,27 @@ import java.util.Map;
 public class MuleApplicationEvent extends ApplicationEvent
 {
     private UMOEventContext context;
-    private UMOEndpointURI endpointUri;
+    private String endpoint;
     private ApplicationContext applicationContext;
     private Map properties = new HashMap();
 
-    public MuleApplicationEvent(Object message, String endpoint) throws MalformedEndpointException
+    public MuleApplicationEvent(Object message, String endpoint) //throws MalformedEndpointException
     {
         super(message);
-        String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
-                                                         endpoint,
-                                                         null);
-        if(temp==null) {
-            UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpoint);
-            if(ep!=null) {
-                setEndpoint(ep.getEndpointURI());
-            } else {
-                setEndpoint(new MuleEndpointURI(endpoint));
-            }
-        } else {
-            setEndpoint(new MuleEndpointURI(temp));
-        }
+//        String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
+//                                                         endpoint,
+//                                                         null);
+//        if(temp==null) {
+//            UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpoint);
+//            if(ep!=null) {
+//                setEndpoint(ep.getEndpointURI());
+//            } else {
+//                setEndpoint(new MuleEndpointURI(endpoint));
+//            }
+//        } else {
+//            setEndpoint(new MuleEndpointURI(temp));
+//        }
+        this.endpoint = endpoint;
     }
 
     MuleApplicationEvent(Object message, UMOEventContext context, ApplicationContext appContext)
@@ -64,13 +65,13 @@ public class MuleApplicationEvent extends ApplicationEvent
     {
         super(message);
         this.context = context;
-        setEndpoint(context.getEndpointURI());
+        setEndpoint(context.getEndpointURI().toString());
         applicationContext = appContext;
     }
 
-    protected void setEndpoint(UMOEndpointURI endpointUri) throws MalformedEndpointException
+    protected void setEndpoint(String endpoint) throws MalformedEndpointException
     {
-        this.endpointUri = endpointUri;
+        this.endpoint = endpoint;
     }
 
     public UMOEventContext getMuleEventContext()
@@ -78,9 +79,9 @@ public class MuleApplicationEvent extends ApplicationEvent
         return context;
     }
 
-    public UMOEndpointURI getEndpoint()
+    public String getEndpoint()
     {
-        return endpointUri;
+        return endpoint;
     }
 
     public ApplicationContext getApplicationContext()

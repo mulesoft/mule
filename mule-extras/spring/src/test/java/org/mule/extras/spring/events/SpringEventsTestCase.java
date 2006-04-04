@@ -128,8 +128,29 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         };
         bean.setEventCallback(callback);
         context.publishEvent(new ContextRefreshedEvent(context));
+
         afterPublishEvent();
         assertEquals(1, eventCount);
+    }
+
+    public void testReceivingAllEvents() throws Exception
+    {
+        TestAllEventBean bean = (TestAllEventBean) context.getBean("testAllEventBean");
+        assertNotNull(bean);
+        // when an event is received by 'testEventBean1' this callback will be
+        // invoked
+        EventCallback callback = new EventCallback() {
+            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            {
+                eventCount++;
+            }
+        };
+        bean.setEventCallback(callback);
+        MuleClient client = new MuleClient();
+        client.send("vm://event.multicaster", "Test Spring Event", null);
+        context.publishEvent(new ContextRefreshedEvent(context));
+        afterPublishEvent();
+        assertEquals(2, eventCount);
     }
 
     public void testReceivingASubscriptionEvent() throws Exception

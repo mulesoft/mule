@@ -50,11 +50,7 @@ public class AsyncOrderManagerBean extends OrderManagerBean implements AsyncOrde
         // Do some processing...
         String message = "Order '" + order.getOrder() + "' Processed Async";
         MuleApplicationEvent returnEvent = null;
-        try {
-            returnEvent = new MuleApplicationEvent(message, "jms://processed.queue");
-        } catch (MalformedEndpointException e) {
-            // ignore
-        }
+        returnEvent = new MuleApplicationEvent(message, "jms://processed.queue");
 
         // Call publish on the application context, Mule will do the rest
         applicationContext.publishEvent(returnEvent);

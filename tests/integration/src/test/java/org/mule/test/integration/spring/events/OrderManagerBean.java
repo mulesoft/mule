@@ -29,24 +29,21 @@ public class OrderManagerBean extends TestMuleEventBean implements OrderManager,
 {
     private String[] subscriptions;
 
-    public void onApplicationEvent(ApplicationEvent orderEvent)
+    public void onApplicationEvent(ApplicationEvent event)
     {
-        super.onApplicationEvent(orderEvent);
+        super.onApplicationEvent(event);
         // Get the order
-        Order order = (Order) orderEvent.getSource();
+        Order order = (Order) event.getSource();
         String result = processOrder(order);
 
         // Cast the event to a Mule event, we'll use this to get the AppContext
-        MuleApplicationEvent muleEvent = (MuleApplicationEvent) orderEvent;
+        MuleApplicationEvent muleEvent = (MuleApplicationEvent) event;
 
         // Create a new MuleEvent. This will be sent to the replyTo
         // address
         MuleApplicationEvent returnEvent = null;
-        try {
-            returnEvent = new MuleApplicationEvent(result, "jms://processed.queue");
-        } catch (MalformedEndpointException e) {
-            // ignore
-        }
+
+        returnEvent = new MuleApplicationEvent(result, "jms://processed.queue");
 
         // Call publish on the application context, Mule will do the rest
         muleEvent.getApplicationContext().publishEvent(returnEvent);
