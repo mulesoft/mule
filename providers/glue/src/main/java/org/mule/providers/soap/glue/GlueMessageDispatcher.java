@@ -17,24 +17,20 @@ import electric.glue.context.ProxyContext;
 import electric.glue.context.ThreadContext;
 import electric.proxy.IProxy;
 import electric.registry.Registry;
-
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
@@ -53,26 +49,27 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     }
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        if(proxy==null) {
-        String bindAddress = endpoint.getEndpointURI().getAddress();
-        String method = (String) endpoint.getProperty("method");
-        if (bindAddress.indexOf(".wsdl") == -1 && method!=null) {
-            bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
-        }
-        int i = bindAddress.indexOf("?");
-        if (i > -1) {
-            bindAddress = bindAddress.substring(0, i);
-        }
+        if(proxy==null)
+        {
+            String bindAddress = endpoint.getEndpointURI().getAddress();
+            String method = (String) endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+            if (bindAddress.indexOf(".wsdl") == -1 && method!=null) {
+                bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
+            }
+            int i = bindAddress.indexOf("?");
+            if (i > -1) {
+                bindAddress = bindAddress.substring(0, i);
+            }
 
-        //add credentials to the request
-        if (endpoint.getEndpointURI().getUsername() != null) {
-            ProxyContext context = new ProxyContext();
-            context.setAuthUser(endpoint.getEndpointURI().getUsername());
-            context.setAuthPassword(new String(endpoint.getEndpointURI().getPassword()));
-            proxy = Registry.bind(bindAddress, context);
-        } else {
-            proxy = Registry.bind(bindAddress);
-        }
+            //add credentials to the request
+            if (endpoint.getEndpointURI().getUsername() != null) {
+                ProxyContext context = new ProxyContext();
+                context.setAuthUser(endpoint.getEndpointURI().getUsername());
+                context.setAuthPassword(new String(endpoint.getEndpointURI().getPassword()));
+                proxy = Registry.bind(bindAddress, context);
+            } else {
+                proxy = Registry.bind(bindAddress);
+            }
         }
     }
 
