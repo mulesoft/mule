@@ -31,6 +31,11 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,6 +85,23 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
             props.put("longParam", new Long(123456789));
             props.put("booleanParam", Boolean.TRUE);
             UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
+            msg.addAttachment("test1", new DataHandler(new DataSource() {
+                public InputStream getInputStream() throws IOException {
+                    return null;
+                }
+
+                public OutputStream getOutputStream() throws IOException {
+                    return null;
+                }
+
+                public String getContentType() {
+                    return "text/plain";
+                }
+
+                public String getName() {
+                    return "test1";
+                }
+            }));
             return msg;
         } else {
             UMOMessage msg = context.getMessage();
@@ -89,6 +111,7 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
             assertEquals(12345, msg.getIntProperty("integerParam", 0));
             assertEquals(123456789, msg.getLongProperty("longParam", 0));
             assertEquals(true, msg.getBooleanProperty("booleanParam", false));
+            assertNotNull(msg.getAttachment("test1"));
         }
         return null;
     }
