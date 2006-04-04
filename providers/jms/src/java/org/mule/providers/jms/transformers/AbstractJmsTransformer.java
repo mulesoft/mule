@@ -131,7 +131,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
     protected void setJmsProperties(UMOMessage umoMessage, Message msg) throws JMSException {
         Object value;
         String key;
-        for (Iterator iterator = umoMessage.getPropertyNames(); iterator.hasNext();) {
+        for (Iterator iterator = umoMessage.getPropertyNames().iterator(); iterator.hasNext();) {
             key = iterator.next().toString();
             if(!key.startsWith("JMS")) {
                 value = umoMessage.getProperty(key);

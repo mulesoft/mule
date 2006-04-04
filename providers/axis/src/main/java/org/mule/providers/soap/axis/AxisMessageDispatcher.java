@@ -382,9 +382,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
         UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap();
-        for (Iterator iterator = event.getMessage().getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            properties.put(o, event.getMessage().getProperty(o));
+        UMOMessage msg = event.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKeys =  iterator.next();
+            properties.put(propertyKeys, msg.getProperty(propertyKeys));
         }
         properties.put("method", method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());

@@ -54,7 +54,7 @@ public class MuleDispatcher extends AbstractEndpointComponent implements Message
                 logger.debug("Payload is: " + event.getMessageAsString());
 
                 UMOMessage result = dispatcher.send(event);
-                //todo send result back
+                //TODO send result back
             } else {
                 dispatcher.dispatch(event);
             }

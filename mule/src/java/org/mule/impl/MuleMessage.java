@@ -149,7 +149,7 @@ public class MuleMessage implements UMOMessage
     /**
      * @return all properties on this payload
      */
-    public Iterator getPropertyNames()
+    public Set getPropertyNames()
     {
         return adapter.getPropertyNames();
     }
@@ -175,35 +175,12 @@ public class MuleMessage implements UMOMessage
 
     public void addProperties(Map properties)
     {
-        if (properties != null) {
-            synchronized(properties) {
-                for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-                    Map.Entry entry = (Map.Entry) iter.next();
-                    adapter.setProperty(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    public Map getProperties()
-    {
-        Map props = new HashMap();
-        Object key;
-        for (Iterator iter = getPropertyNames(); iter.hasNext();) {
-            key = iter.next();
-            if(key!=null) {
-                props.put(key, getProperty(key));
-            }
-        }
-        return Collections.unmodifiableMap(props);
+        adapter.addProperties(properties);
     }
 
     public void clearProperties()
     {
-        for (Iterator iter = adapter.getPropertyNames(); iter.hasNext();) {
-            Object key = iter.next();
-            adapter.removeProperty(key);
-        }
+        adapter.clearProperties();
     }
 
     /**
@@ -386,26 +363,7 @@ public class MuleMessage implements UMOMessage
 
     public String toString()
     {
-        String id;
-
-        try {
-            id = getUniqueId();
-        } catch (UniqueIdNotSupportedException e) {
-            id = "[uniqueId not supported]";
-        }
-
-        StringBuffer buf = new StringBuffer(80);
-        buf.append("MuleMessage{");
-        buf.append("id=").append(id);
-        buf.append(", payload=").append(getPayload().getClass().getName());
-        buf.append(", correlationId=").append(getCorrelationId());
-        buf.append(", correlationGroup=").append(getCorrelationGroupSize());
-        buf.append(", correlationSeq=").append(getCorrelationSequence());
-        buf.append(", encoding=").append(getEncoding());
-        buf.append(", exceptionPayload=").append(exceptionPayload);
-        buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), true));
-        buf.append("}");
-        return buf.toString();
+        return adapter.toString();
     }
 
     public void addAttachment(String name, DataHandler dataHandler) throws Exception {

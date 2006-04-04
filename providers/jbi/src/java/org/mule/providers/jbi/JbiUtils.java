@@ -50,7 +50,7 @@ public class JbiUtils {
             properties.put(MuleProperties.MULE_USER_PROPERTY, message.getSecuritySubject());
         }
         try {
-            //todo source transformer
+            // TODO source transformer
             Source source = message.getContent();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             StreamResult result = new StreamResult(baos);
@@ -70,10 +70,11 @@ public class JbiUtils {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        for (Iterator iterator = muleMessage.getPropertyNames(); iterator.hasNext();) {
+        for (Iterator iterator = muleMessage.getPropertyNames().iterator(); iterator.hasNext();) {
             String s = (String)iterator.next();
             message.setProperty(s, muleMessage.getProperty(s));
         }
+
         for (Iterator iterator = muleMessage.getAttachmentNames().iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
             message.addAttachment(s, muleMessage.getAttachment(s));

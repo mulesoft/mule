@@ -14,6 +14,10 @@
 
 package org.mule.providers.http.transformers;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Iterator;
+
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -33,10 +37,6 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Iterator;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -193,9 +193,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         // Standard requestHeaders
         String headerValue;
         String headerName;
-        for (Iterator iterator = context.getMessage().getPropertyNames(); iterator.hasNext();) {
+        UMOMessage msg = context.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
             headerName = (String)iterator.next();
-            headerValue = context.getMessage().getStringProperty(headerName, null);
+            headerValue = msg.getStringProperty(headerName, null);
             if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null) {
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
                     headerName = "X-" + headerName;

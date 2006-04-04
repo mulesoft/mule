@@ -214,7 +214,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         }
 
         // Mule properties
-        String user = (String)msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, null);
+        String user = msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, null);
         if (user != null) {
             response
                     .setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));

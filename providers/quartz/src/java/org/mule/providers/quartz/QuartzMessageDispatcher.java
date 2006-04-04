@@ -47,6 +47,7 @@ import java.util.Iterator;
  */
 public class QuartzMessageDispatcher extends AbstractMessageDispatcher
  {
+
     public QuartzMessageDispatcher(UMOImmutableEndpoint endpoint) {
         super(endpoint);
     }
@@ -61,9 +62,10 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         jobDetail.setName(event.getEndpoint().getEndpointURI().toString());
 
         JobDataMap jobDataMap = new JobDataMap();
-        for (Iterator iterator = event.getMessage().getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            jobDataMap.put(o, event.getMessage().getProperty(o));
+        UMOMessage msg = event.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKeys = iterator.next();
+            jobDataMap.put(propertyKeys, msg.getProperty(propertyKeys));
         }
         jobDetail.setJobDataMap(jobDataMap);
 

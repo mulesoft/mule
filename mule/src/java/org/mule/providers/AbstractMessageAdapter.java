@@ -64,6 +64,48 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     protected UMOExceptionPayload exceptionPayload;
 
+    public String toString()
+    {
+        String id;
+
+        try {
+            id = getUniqueId();
+        } catch (UniqueIdNotSupportedException e) {
+            id = "[uniqueId not supported]";
+        }
+
+        StringBuffer buf = new StringBuffer(120);
+        buf.append(getClass().getName());
+        buf.append('{');
+        buf.append("id=").append(id);
+        buf.append(", payload=").append(getPayload().getClass().getName());
+        buf.append(", correlationId=").append(getCorrelationId());
+        buf.append(", correlationGroup=").append(getCorrelationGroupSize());
+        buf.append(", correlationSeq=").append(getCorrelationSequence());
+        buf.append(", encoding=").append(getEncoding());
+        buf.append(", exceptionPayload=").append(exceptionPayload);
+        buf.append(", properties=").append(PropertiesHelper.propertiesToString(properties, true));
+        buf.append('}');
+        return buf.toString();
+    }
+
+    public void addProperties(Map props)
+    {
+        if (props != null) {
+            synchronized(props) {
+                for (Iterator iter = props.entrySet().iterator(); iter.hasNext();) {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    setProperty(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+
+    public void clearProperties()
+    {
+        properties.clear();
+    }
+
     /**
      * Removes an associated property from the message
      * 
@@ -90,9 +132,9 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      * 
      * @see org.mule.providers.UMOMessageAdapter#getPropertyNames()
      */
-    public Iterator getPropertyNames()
+    public Set getPropertyNames()
     {
-        return properties.keySet().iterator();
+        return properties.keySet();
     }
 
     /*

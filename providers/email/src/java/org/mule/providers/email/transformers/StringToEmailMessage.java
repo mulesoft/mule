@@ -14,6 +14,16 @@
  */
 package org.mule.providers.email.transformers;
 
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,17 +37,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.TemplateParser;
-
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeMessage;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * <code>StringToEmailMessage</code> will convert a string to a java mail
@@ -86,11 +85,12 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             headers.putAll(connector.getCustomHeaders());
         }
         Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
-        if(otherHeaders!=null) {
+        if(otherHeaders != null) {
             Map props = new HashMap(MuleManager.getInstance().getProperties());
-            for (Iterator iterator = context.getMessage().getPropertyNames(); iterator.hasNext();) {
-                Object o =  iterator.next();
-                props.put(o, context.getMessage().getProperty(o));
+            UMOMessage msg = context.getMessage();
+            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+                Object propertyKeys = iterator.next();
+                props.put(propertyKeys, context.getMessage().getProperty(propertyKeys));
             }
             headers.putAll(templateParser.parse(props, otherHeaders));
         }

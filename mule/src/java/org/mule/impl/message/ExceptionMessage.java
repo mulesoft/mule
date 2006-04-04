@@ -13,13 +13,13 @@
  */
 package org.mule.impl.message;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
 import java.util.Date;
 import java.util.Iterator;
+
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>ExceptionMessage</code> is used by the
@@ -42,14 +42,17 @@ public class ExceptionMessage extends BaseMessage
         this.exception = exception;
         timeStamp = new Date();
         componentName = ctx.getComponentDescriptor().getName();
+
         if (endpoint != null) {
             endpointUri = endpoint.getEndpointURI();
         } else {
             endpointUri = ctx.getEndpointURI();
         }
-        for (Iterator iterator = ctx.getMessage().getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            setProperty(o, ctx.getMessage().getProperty(o));
+
+        UMOMessage msg = ctx.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKey =  iterator.next();
+            setProperty(propertyKey, msg.getProperty(propertyKey));
         }
     }
 
@@ -60,9 +63,11 @@ public class ExceptionMessage extends BaseMessage
         timeStamp = new Date();
         componentName = ctx.getComponentDescriptor().getName();
         endpointUri = ctx.getEndpointURI();
-        for (Iterator iterator = ctx.getMessage().getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            setProperty(o, ctx.getMessage().getProperty(o));
+
+        UMOMessage msg = ctx.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKey =  iterator.next();
+            setProperty(propertyKey, msg.getProperty(propertyKey));
         }
     }
 

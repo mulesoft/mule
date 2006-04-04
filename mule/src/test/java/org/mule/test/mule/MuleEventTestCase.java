@@ -49,8 +49,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
         assertEquals("Event data should be a byte array 9 bytes in length",
-                     9,
-                     event.getTransformedMessageAsBytes().length);
+                     9, event.getTransformedMessageAsBytes().length);
 
         assertEquals("Event data should be a byte array 9 bytes in length", 9, event.getMessageAsBytes().length);
         assertEquals("Event data should equal " + data, data, event.getSource());
@@ -58,7 +57,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("MuleBeanPropertiesRule", event.getMessage().getProperty("MuleBeanPropertiesRule", "MuleBeanPropertiesRule"));
         event.setProperty("Test", "Test1");
 
-        assertTrue(event.getMessage().getPropertyNames().hasNext());
+        assertFalse(event.getMessage().getPropertyNames().isEmpty());
         assertEquals("bla2", event.getMessage().getProperty("bla2", "bla2"));
         assertEquals("Test1", event.getMessage().getProperty("Test"));
         assertEquals("Test1", event.getMessage().getProperty("Test", "bla2"));
