@@ -16,7 +16,7 @@
 package org.mule.providers.file;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.mule.MuleRuntimeException;
+import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
@@ -80,7 +80,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
                     this.contents = (byte[])transformer.transform(file);
                 }
                 catch (Exception noPayloadException) {
-                    throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
+                    throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
                             noPayloadException);
                 }
             }

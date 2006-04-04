@@ -172,7 +172,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                 // no moveTo directory
                 if (destinationFile == null) {
                     // make sure the adapter has lazy-loaded the file
-                    assert (msgAdapter.getPayloadAsBytes() != null);
+                    msgAdapter.getPayloadAsBytes();
 
                     // delete source
                     if (!sourceFile.delete()) {
