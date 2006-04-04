@@ -174,7 +174,7 @@ public class MuleEndpointURI implements UMOEndpointURI
     private void initialise(UMOEndpointURI endpointUri)
     {
         this.address = endpointUri.getAddress();
-        this.endpointName = endpointUri.getEndpointName();
+        if(this.endpointName==null) this.endpointName = endpointUri.getEndpointName();
         this.connectorName = endpointUri.getConnectorName();
         this.transformers = endpointUri.getTransformers();
         this.responseTransformers = endpointUri.getResponseTransformers();
