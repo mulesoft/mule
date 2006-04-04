@@ -152,8 +152,8 @@ public class AxisServiceComponent implements Initialisable, Callable
         try {
             //We parse a new uri based on the listening host and port with the request parameters appended
             //Using the soap prefix ensures that we use a soap endpoint builder
-            //String uri = "soap:" + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
-            String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().toString();
+            String uri = "soap:" + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
+            //String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().toString();
             uri += context.getMessageAsString();
             UMOEndpointURI endpointUri = new MuleEndpointURI(uri);
 

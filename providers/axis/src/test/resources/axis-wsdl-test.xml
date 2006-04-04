@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+    <model name="test">
+        <mule-descriptor name="EchoService1" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8081/services"/>
+            </inbound-router>
+            <properties>
+                    <property name="serviceNamespace" value="http://foo"/>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="EchoService2" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8082/services"/>
+            </inbound-router>
+            <properties>
+                    <map name="axisOptions">
+                        <property name="wsdlPortType" value="mulePortType"/>
+                        <property name="wsdlServiceElement" value="muleService"/>
+                        <property name="wsdlServicePort" value="muleServicePort"/>
+                    </map>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="EchoService3" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8083/services"/>
+            </inbound-router>
+            <properties>
+                    <property name="wsdlFile" value="test-service.wsdl"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

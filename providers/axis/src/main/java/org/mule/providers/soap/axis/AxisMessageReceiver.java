@@ -76,6 +76,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String style = (String) descriptor.getProperties().get("style");
         String use = (String) descriptor.getProperties().get("use");
         String doc = (String) descriptor.getProperties().get("documentation");
+
         UMOEndpointURI uri = endpoint.getEndpointURI();
         String serviceName = component.getDescriptor().getName();
 
@@ -159,10 +160,18 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             methodNames = methodNames.substring(0, methodNames.length() - 1);
         }
 
-        // The namespace of the service.
         String className = interfaces[0].getName();
-        String namespace = Namespaces.makeNamespace(className);
-
+        // The namespace of the service.
+        //Todo use the service qname in Mule 2.0
+        String namespace = (String) descriptor.getProperties().get("serviceNamespace");
+        if(namespace==null) {
+            namespace = Namespaces.makeNamespace(className);
+        }
+        //WSDL override
+        String wsdlFile = (String) descriptor.getProperties().get("wsdlFile");
+        if(wsdlFile!=null) {
+            service.getServiceDescription().setWSDLFile(wsdlFile);
+        }
         /*
          * Now we set up the various options for the SOAPService. We set:
          *
@@ -219,6 +228,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 service.setUse(u);
             }
         }
+
         service.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
@@ -246,6 +256,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         } else {
             service.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
         }
+        service.getServiceDescription().setDefaultNamespace(namespace);
         service.stop();
     }
 
