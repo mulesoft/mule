@@ -19,7 +19,7 @@ import org.mule.umo.UMOExceptionPayload;
 import javax.activation.DataHandler;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +30,19 @@ import java.util.Set;
  * @version $Revision$
  */
 public interface UMOMessageAdapter extends Serializable {
+
+    /**
+     * Adds a map of properties to be associated with this message
+     * 
+     * @param properties the properties add to this message
+     */
+    void addProperties(Map properties);
+
+    /**
+     * Removes all properties on this message
+     */
+    void clearProperties();
+
     /**
      * Gets a property of the message implementation
      *
@@ -61,7 +74,7 @@ public interface UMOMessageAdapter extends Serializable {
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception;
+    String getPayloadAsString(String encoding) throws Exception;
 
     /**
      * Converts the message implementation into a String representation. If encoding is required it will
@@ -69,12 +82,12 @@ public interface UMOMessageAdapter extends Serializable {
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception;
+    String getPayloadAsString() throws Exception;
 
     /**
-     * @return all properties on this message
+     * @return all property keys on this message
      */
-    Iterator getPropertyNames();
+    Set getPropertyNames();
 
     /**
      * Converts the message implementation into a byte array representation
@@ -305,13 +318,13 @@ public interface UMOMessageAdapter extends Serializable {
      */
     void setExceptionPayload(UMOExceptionPayload payload);
 
-    public void addAttachment(String name, DataHandler dataHandler) throws Exception;
+    void addAttachment(String name, DataHandler dataHandler) throws Exception;
 
-    public void removeAttachment(String name) throws Exception;
+    void removeAttachment(String name) throws Exception;
 
-    public DataHandler getAttachment(String name);
+    DataHandler getAttachment(String name);
 
-    public Set getAttachmentNames();
+    Set getAttachmentNames();
 
     /**
      * Gets the encoding for the current message. For potocols that send encoding
@@ -319,11 +332,12 @@ public interface UMOMessageAdapter extends Serializable {
      * transport encoding, otherwise the default encoding in the Mule configuration will be used
      * @return the encoding for this message.  This method must never return null
      */
-    public String getEncoding();
+    String getEncoding();
 
     /**
      * Sets the encoding for this message
      * @param encoding the encoding to use
      */
-    public void setEncoding(String encoding);
+    void setEncoding(String encoding);
+
 }

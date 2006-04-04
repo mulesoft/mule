@@ -174,10 +174,10 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             throw new IllegalArgumentException("Failed to initialise the payload: " + ex.getMessage());
         }
 
-        Map theProperties =new HashMap();
-        for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            theProperties.put(o, message.getProperty(o));
+        Map theProperties = new HashMap();
+        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKey =  iterator.next();
+            theProperties.put(propertyKey, message.getProperty(propertyKey));
         }
         properties.set(theProperties);
     }

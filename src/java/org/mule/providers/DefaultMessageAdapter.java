@@ -78,7 +78,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
                     throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD), e);
                 }
             }
-            for (Iterator iterator = previous.getPropertyNames(); iterator.hasNext();) {
+            for (Iterator iterator = previous.getPropertyNames().iterator(); iterator.hasNext();) {
                 String name = (String) iterator.next();
                 try {
                     setProperty(name, previous.getProperty(name));

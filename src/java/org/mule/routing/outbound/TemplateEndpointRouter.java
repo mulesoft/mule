@@ -62,9 +62,9 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter {
             Map props = new HashMap();
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
-            for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
-                Object o =  iterator.next();
-                props.put(o, message.getProperty(o));
+            for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
+                Object propertyKeys =  iterator.next();
+                props.put(propertyKeys, message.getProperty(propertyKeys));
             }
             uri = parser.parse(props, uri);
             if(logger.isDebugEnabled()) {

@@ -27,17 +27,7 @@ import java.util.Map;
 
 public interface UMOMessage extends UMOMessageAdapter
 {
-    /**
-     * Adds a map of properties to be associated with this message
-     * 
-     * @param properties the properties add to this message
-     */
-    void addProperties(Map properties);
-
-    /**
-     * Removes all properties on this message
-     */
-    void clearProperties();
 
     UMOMessageAdapter getAdapter();
+
 }

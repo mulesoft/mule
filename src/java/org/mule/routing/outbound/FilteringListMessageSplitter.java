@@ -63,9 +63,9 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         // Cache the properties here because for some message types getting the
         // properties can be expensive
         properties = new HashMap();
-        for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            properties.put(o, message.getProperty(o));
+        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
+            Object propertyKey =  iterator.next();
+            properties.put(propertyKey, message.getProperty(propertyKey));
         }
     }
 

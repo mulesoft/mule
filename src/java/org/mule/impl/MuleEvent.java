@@ -198,15 +198,15 @@ public class MuleEvent extends EventObject implements UMOEvent
     protected void fillProperties(UMOEvent previousEvent)
     {
         if (previousEvent != null) {
-            synchronized(previousEvent.getMessage()) {
-            for (Iterator iterator = previousEvent.getMessage().getPropertyNames(); iterator.hasNext();) {
-                Object prop = iterator.next();
-                // dont overwrite property on the message
-                if (message.getProperty(prop) == null) {
-                    message.setProperty(prop, previousEvent.getMessage().getProperty(prop));
+            UMOMessage msg = previousEvent.getMessage();
+            synchronized (msg) {
+                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+                    Object prop = iterator.next();
+                    // don't overwrite property on the message
+                    if (message.getProperty(prop) == null) {
+                        message.setProperty(prop, msg.getProperty(prop));
+                    }
                 }
-
-            }
             }
 
         }
@@ -214,7 +214,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         if (endpoint != null && endpoint.getProperties() != null) {
             for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();) {
                 Object prop = iterator.next();
-                // dont overwrite property on the message
+                // don't overwrite property on the message
                 if (message.getProperty(prop) == null) {
                     Object value = endpoint.getProperties().get(prop);
                     message.setProperty(prop, value);
