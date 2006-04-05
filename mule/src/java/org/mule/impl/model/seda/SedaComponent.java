@@ -113,7 +113,6 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         try {
             // Setup event Queue (used for VM execution)
             descriptor.getQueueProfile().configureQueue(descriptor.getName());
-
         } catch (InitialisationException e) {
             throw e;
         } catch (Throwable e) {
@@ -177,8 +176,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
         try {
             // Need to initialise the pool only after all listerner have
-            // been
-            // registed and initialised so we need to delay until now
+            // been registered and initialised so we need to delay until now
             if (!poolInitialised.get() && enablePooling) {
                 initialisePool();
                 proxyPool.start();
@@ -272,15 +270,20 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             throw new ComponentException(event.getMessage(), this, e);
         } finally {
             try {
-                if (proxy != null && proxyPool!=null) {
-                    proxyPool.returnObject(proxy);
-                } else if (componentPerRequest) {
-                    proxy.dispose();
+                if (proxy != null) {
+                    if (proxyPool != null) {
+                        proxyPool.returnObject(proxy);
+                    }
+                    else if (componentPerRequest) {
+                        proxy.dispose();
+                    }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new ComponentException(event.getMessage(), this, e);
             }
-            if(proxyPool!=null) {
+
+            if (proxyPool != null) {
                 getStatistics().setComponentPoolSize(proxyPool.getSize());
             }
         }
@@ -347,7 +350,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                     workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
                 }
             } catch (Exception e) {
-                if (proxy != null && proxyPool!=null) {
+                if (proxy != null && proxyPool != null) {
                     try {
                         proxyPool.returnObject(proxy);
                     } catch (Exception e2) {
@@ -379,7 +382,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 }
             } finally {
             	stopping.set(false);
-                if(componentPerRequest) {
+                if (proxy != null && componentPerRequest) {
                     proxy.dispose();
                 }
             }
