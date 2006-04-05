@@ -25,6 +25,8 @@ import org.mule.umo.provider.UMOConnector;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
 
 /**
  * <p>
@@ -56,7 +58,7 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     public void doStart() throws UMOException
     {
         try {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
         } catch (WorkException e) {
             stopped.set(true);
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);

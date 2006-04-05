@@ -41,6 +41,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.ReceiveException;
 
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkManager;
+import javax.resource.spi.work.WorkEvent;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
@@ -138,7 +140,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             try {
                 UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
                 if (doThreading && !event.isSynchronous() && tx == null) {
-                    workManager.scheduleWork(new Worker(event));
+                    workManager.scheduleWork(new Worker(event), WorkManager.IMMEDIATE, null, connector);
                 } else {
                     //Make sure we are connected
                     connectionStrategy.connect(this);

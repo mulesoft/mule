@@ -49,6 +49,8 @@ import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkEvent;
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +88,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractConnector implements UMOConnector, ExceptionListener, UMOConnectable
+public abstract class AbstractConnector implements UMOConnector, ExceptionListener, UMOConnectable, WorkListener
 {    /**
      * logger used by this class
      */
@@ -1173,5 +1175,35 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public void setSessionHandler(UMOSessionHandler sessionHandler) {
         this.sessionHandler = sessionHandler;
+    }
+
+    public void workAccepted(WorkEvent event) {
+        handleWorkException(event, "workCompleted");
+    }
+
+    public void workRejected(WorkEvent event) {
+        handleWorkException(event, "workRejected");
+    }
+
+    public void workStarted(WorkEvent event) {
+        handleWorkException(event, "workStarted");
+    }
+
+    public void workCompleted(WorkEvent event) {
+        handleWorkException(event, "workCompleted");
+    }
+
+    protected void handleWorkException(WorkEvent event, String type) {
+        Exception e = null;
+        if(event!=null && event.getException()!=null) {
+            e = event.getException();
+        } else {
+            return;
+        }
+        if(event.getException().getCause()!=null) {
+            e = (Exception)event.getException().getCause();
+        }
+        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+        handleException(e);
     }
 }
