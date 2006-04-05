@@ -1178,7 +1178,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     public void workAccepted(WorkEvent event) {
-        handleWorkException(event, "workCompleted");
+        handleWorkException(event, "workAccepted");
     }
 
     public void workRejected(WorkEvent event) {
