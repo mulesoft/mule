@@ -13,6 +13,9 @@
  */
 package org.mule.routing.response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -29,11 +32,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
-import org.mule.util.concurrent.Latch;
 import org.mule.util.PropertiesHelper;
-
-import java.util.Map;
-import java.util.HashMap;
+import org.mule.util.concurrent.Latch;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -55,7 +55,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     private Map locks = new HashMap();
 
     protected Map eventGroups = new ConcurrentHashMap();
-    private Lock aggregationLock = new ReentrantLock();
     private Lock locksCollectionLock = new ReentrantLock();
 
     public void process(UMOEvent event) throws RoutingException
@@ -65,7 +64,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         doAggregate.compareAndSet(false, shouldAggregate(eg));
 
         if (doAggregate.get()) {
-            //aggregationLock.lock();
             UMOMessage returnMessage = aggregateEvents(eg);
             Object id = eg.getGroupId();
             removeGroup(id);
@@ -86,7 +84,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             }
             locksCollectionLock.unlock();
             l.unlock();
-            //aggregationLock.unlock();
         }
     }
 
