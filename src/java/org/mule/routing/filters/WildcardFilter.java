@@ -68,25 +68,27 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         if (object == null) {
             return false;
         }
-        String pattern = null;
+
         boolean match = false;
         for (int x = 0; x < patterns.length; x++) {
-            pattern = patterns[x];
+            String pattern = patterns[x];
             
             String string = object.toString();
             if ("*".equals(pattern) || "**".equals(pattern)) {
                 return true;
             }
-            int i = pattern.indexOf("*");
+
+            int i = pattern.indexOf('*');
 
             if(!isCaseSensitive()) {
                 pattern = pattern.toLowerCase();
                 string = string.toLowerCase();
             }
+
             if (i == -1) {
                 match = pattern.equals(string);
             } else {
-                int i2 = pattern.indexOf("*", i + 1);
+                int i2 = pattern.indexOf('*', i + 1);
                 if (i2 > 1) {
                     match = string.indexOf(pattern.substring(1, i2)) > -1;
                 } else if (i == 0) {
