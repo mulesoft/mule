@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.transformers;
@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.NullPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -34,7 +35,7 @@ import java.util.List;
 /**
  * <code>AbstractTransformer</code> Is a base class for all transformers.
  * Transformations transform one object into another.
- * 
+ *
  * @author Ross Mason
  * @version $Revision$
  */
@@ -126,7 +127,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.transformers.Transformer#getReturnClass()
      */
     public Class getReturnClass()
@@ -136,7 +137,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.transformers.Transformer#setReturnClass(java.lang.String)
      */
     public void setReturnClass(Class newClass)
@@ -169,7 +170,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /**
      * Transforms the object.
-     * 
+     *
      * @param src The source object to transform.
      * @return The transformed object
      */
@@ -200,6 +201,9 @@ public abstract class AbstractTransformer implements UMOTransformer
                 encoding = MuleManager.getConfiguration().getEncoding();
             }
             result = doTransform(src, encoding);
+            if (result == null) {
+                result = new NullPayload();
+            }
 
             result = checkReturnClass(result);
             if (transformer != null) {
@@ -216,7 +220,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.transformer.UMOTransformer#setConnector(org.mule.umo.provider.UMOConnector)
      */
     public void setEndpoint(UMOImmutableEndpoint endpoint)
@@ -234,7 +238,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.transformer.UMOTransformer#getTransformer()
      */
     public UMOTransformer getTransformer()
@@ -244,7 +248,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.transformer.UMOTransformer#setTransformer(org.mule.umo.transformer.UMOTransformer)
      */
     public void setTransformer(UMOTransformer transformer)
@@ -254,7 +258,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     public Object clone() throws CloneNotSupportedException
@@ -269,7 +273,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /**
      * Will return the return type for the last transformer in the chain
-     * 
+     *
      * @return the last transformers return type
      */
     public Class getFinalReturnClass()
@@ -286,7 +290,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     /**
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
-     * 
+     *
      * @throws InitialisationException
      */
     public void initialise() throws InitialisationException
@@ -306,7 +310,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /**
      * Convenience method to register source types using a bean property setter
-     * 
+     *
      * @param type the fully qualified class name
      * @throws ClassNotFoundException is thrown if the class is not on
      *             theclasspath
@@ -332,6 +336,6 @@ public abstract class AbstractTransformer implements UMOTransformer
     }
 
     public boolean isAcceptNull() {
-        return false; 
+        return false;
     }
 }
