@@ -38,6 +38,8 @@ import org.mule.util.queue.QueueSession;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkEvent;
 
 import java.util.NoSuchElementException;
 
@@ -49,7 +51,7 @@ import java.util.NoSuchElementException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SedaComponent extends AbstractComponent implements Work {
+public class SedaComponent extends AbstractComponent implements Work, WorkListener {
 
     /**
      * A pool of available Mule Proxies. Component pooling has been disabled on the
@@ -184,7 +186,7 @@ public class SedaComponent extends AbstractComponent implements Work {
                 componentProxy = createComponentProxy();
             }
             workManager.start();
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
         } catch (Exception e) {
             throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Component: "
                     + descriptor.getName()), e, this);
@@ -397,5 +399,35 @@ public class SedaComponent extends AbstractComponent implements Work {
         // Wait until an event is available
         QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
         return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
+    }
+
+    public void workAccepted(WorkEvent event) {
+        handleWorkException(event, "workCompleted");
+    }
+
+    public void workRejected(WorkEvent event) {
+        handleWorkException(event, "workRejected");
+    }
+
+    public void workStarted(WorkEvent event) {
+        handleWorkException(event, "workStarted");
+    }
+
+    public void workCompleted(WorkEvent event) {
+        handleWorkException(event, "workCompleted");
+    }
+
+     protected void handleWorkException(WorkEvent event, String type) {
+        Exception e = null;
+        if(event!=null && event.getException()!=null) {
+            e = event.getException();
+        } else {
+            return;
+        }
+        if(event.getException().getCause()!=null) {
+            e = (Exception)event.getException().getCause();
+        }
+        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+        handleException(e);
     }
 }
