@@ -17,11 +17,14 @@ import java.io.Serializable;
 
 /**
  * <code>NullPayload</code> represents a null event payload
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class NullPayload implements Serializable
-{
-} 
+public class NullPayload implements Serializable {
+
+    public boolean equals(Object obj) {
+        return obj instanceof NullPayload;
+    }
+}
