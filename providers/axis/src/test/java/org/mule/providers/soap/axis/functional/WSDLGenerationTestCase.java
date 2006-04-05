@@ -54,15 +54,14 @@ public class WSDLGenerationTestCase extends FunctionalTestCase {
         assertEquals("http://foo", doc.valueOf("/wsdl:definitions/@targetNamespace"));
 
         // standalone m2 test run can produce $Proxy0, $Proxy1, $Proxy3, etc.
-        assertTrue(doc.valueOf("/wsdl:definitions/wsdl:portType/@name").startsWith("$Proxy"));
+        assertTrue(doc.valueOf("/wsdl:definitions/wsdl:portType/@name").matches("^\\$Proxy(\\d)$"));
 
         assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
         assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
 
         // standalone m2 test run can produce $Proxy0Service, $Proxy1Service, $Proxy3Service, etc.
         final String proxyServiceName = doc.valueOf("/wsdl:definitions/wsdl:service/@name");
-        assertTrue(proxyServiceName.startsWith("$Proxy"));
-        assertTrue(proxyServiceName.endsWith("Service"));
+        assertTrue(proxyServiceName.matches("^\\$Proxy(\\d)Service$"));
 
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
         assertEquals("http://localhost:8081/services/EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
