@@ -94,6 +94,9 @@ public class XsltTransformer extends AbstractTransformer {
             } else if (src instanceof Document) {
                 sourceDoc = new DocumentSource((Document) src);
             }
+
+            assert(sourceDoc != null);
+
             errorListener = new DefaultErrorListener(this);
             transformer.setErrorListener(errorListener);
 

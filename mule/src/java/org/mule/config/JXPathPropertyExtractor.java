@@ -59,23 +59,24 @@ public class JXPathPropertyExtractor extends SimplePropertyExtractor {
             try {
                 result = context.getValue(name);
             } catch (Exception e) {
-                result=null;
+                // ignore
             }
         }
+
         if(result==null) {
             result = super.getProperty(name, message);
         }
+
         return result;
     }
 
     public Map getProperties(List names, UMOMessage message) {
-        Map props = new HashMap();
         Object result = null;
-        Object obj = message.getPayload();
         Document doc = null;
         JXPathContext context = null;
-        if (obj instanceof String) {
 
+        Object obj = message.getPayload();
+        if (obj instanceof String) {
             try {
                 doc = DocumentHelper.parseText((String) obj);
             } catch (DocumentException e) {
@@ -85,22 +86,28 @@ public class JXPathPropertyExtractor extends SimplePropertyExtractor {
         } else {
             context = JXPathContext.newContext(obj);
         }
+
+        Map props = new HashMap();
+
         for (Iterator iterator = names.iterator(); iterator.hasNext();) {
-            String name = (String) iterator.next();
-            if(doc!=null) {
-             result = doc.valueOf(name);
-            } else {
+            String name = (String)iterator.next();
+            if (doc != null) {
+                result = doc.valueOf(name);
+            }
+            else if (context != null) {
                 try {
                     result = context.getValue(name);
-                } catch (Exception e) {
-                    result=null;
+                }
+                catch (Exception e) {
+                    result = null;
                 }
             }
-            if(result==null) {
+            if (result == null) {
                 result = super.getProperty(name, message);
             }
             props.put(name, result);
         }
+
         return props;
     }
 }

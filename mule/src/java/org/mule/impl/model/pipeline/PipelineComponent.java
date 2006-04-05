@@ -76,7 +76,8 @@ public class PipelineComponent extends DirectComponent {
             } else {
                 returnMessage = new MuleMessage(result, event.getMessage());
             }
-            if (returnMessage != null && !event.isStopFurtherProcessing()) {
+            if (!event.isStopFurtherProcessing()) {
+//                // TODO what about this code?
 //                Map context = RequestContext.clearProperties();
 //                if (context != null) {
 //                    returnMessage.addProperties(context);
