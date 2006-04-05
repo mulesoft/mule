@@ -402,7 +402,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     }
 
     public void workAccepted(WorkEvent event) {
-        handleWorkException(event, "workCompleted");
+        handleWorkException(event, "workAccepted");
     }
 
     public void workRejected(WorkEvent event) {
