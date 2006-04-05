@@ -122,11 +122,12 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     {
         if (connector != null && endpointUri != null
                 && !connector.supportsProtocol(endpointUri.getFullScheme())) {
-            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
-                    connector.getProtocol(), endpointUri).getMessage());
+            throw new IllegalArgumentException(new Message(
+                    Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector
+                            .getProtocol(), endpointUri).getMessage());
         }
         this.endpointUri = endpointUri;
-        if(this.endpointUri!=null) {
+        if (endpointUri != null) {
             properties.putAll(endpointUri.getParams());
         }
     }
