@@ -23,6 +23,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
@@ -36,6 +37,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -98,6 +100,17 @@ public class MuleTestUtils {
 				getTestEndpoint("test1",
 				UMOEndpoint.ENDPOINT_TYPE_SENDER),
 				session, true);
+    }
+
+    public static UMOEventContext getTestEventContext(Object data) throws Exception
+    {
+        try {
+            UMOEvent event = getTestEvent(data);
+            RequestContext.setEvent(event);
+            return RequestContext.getEventContext();
+        } finally {
+            RequestContext.setEvent(null);
+        }
     }
 
     public static UMOTransformer getTestTransformer()
