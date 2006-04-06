@@ -17,14 +17,13 @@ package org.mule.providers.oracle.jms;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsMessageDispatcher;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class OracleJmsMessageDispatcher extends JmsMessageDispatcher {
-	
+
     public OracleJmsMessageDispatcher(UMOImmutableEndpoint endpoint) {
         super(endpoint);
     }
@@ -32,7 +31,7 @@ public class OracleJmsMessageDispatcher extends JmsMessageDispatcher {
     /**
      * Make a specific request to the underlying transport
      * Save a copy of the endpoint's properties within the OracleJmsSupport object.
-	 * @see OracleJmsSupport#endpointProperties
+     * @see OracleJmsSupport#endpointProperties
      *
      * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout  the maximum time the operation should block before returning. The call should
@@ -43,7 +42,7 @@ public class OracleJmsMessageDispatcher extends JmsMessageDispatcher {
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
-    	((OracleJmsSupport) ((JmsConnector) getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getProperties());
-    	return super.receive(endpoint, timeout);
-	}
+        ((OracleJmsSupport) ((JmsConnector) getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getEndpointURI().getParams());
+        return super.doReceive(endpoint, timeout);
+    }
 }
