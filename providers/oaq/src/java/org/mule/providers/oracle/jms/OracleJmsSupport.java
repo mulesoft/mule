@@ -84,7 +84,8 @@ public class OracleJmsSupport extends Jms102bSupport {
     public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal) throws JMSException {
         java.sql.Connection jdbcConnection = null;
         try {
-            log.debug("Creating queue/topic connection, URL = " + ((OracleJmsConnector) connector).getJdbcConnectionPool().getURL());
+            log.debug("Creating queue/topic connection, URL = " + ((OracleJmsConnector) connector).getJdbcConnectionPool().getURL()
+                        + ", user = " + ((OracleJmsConnector) connector).getJdbcConnectionPool().getUser());
             jdbcConnection = ((OracleJmsConnector) connector).getJdbcConnectionPool().getConnection();
         } catch (SQLException e) {
             throw new JMSException("Unable to open JDBC connection", e.getMessage());
