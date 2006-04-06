@@ -106,7 +106,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             // rethrow
             throw ex;
         } finally {
-            if (MuleManager.getInstance().getTransactionManager() != null) {
+            if (MuleManager.getInstance().getTransactionManager() != null || tx==null) {
                 // We are running in an XA transaction.
                 // This call is required here for compatibility with strict XA DataSources
                 // implementations, as is the case for WebSphere AS and Weblogic.
