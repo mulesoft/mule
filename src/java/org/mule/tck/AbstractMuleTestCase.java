@@ -24,6 +24,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
@@ -234,6 +235,10 @@ public abstract class AbstractMuleTestCase extends TestCase {
 
     public static UMOEvent getTestEvent(Object data) throws Exception {
         return MuleTestUtils.getTestEvent(data);
+    }
+
+    public static UMOEventContext getTestEventContext(Object data) throws Exception {
+        return MuleTestUtils.getTestEventContext(data);
     }
 
     public static UMOTransformer getTestTransformer() {

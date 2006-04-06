@@ -142,13 +142,8 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             ep.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
 
-        } catch (InvocationTargetException itex) {
-            final Throwable cause = itex.getCause();
-            if (cause instanceof TooManySatisfiableMethodsException) {
-                // expected
-            } else {
-                throw itex;
-            }
+        } catch (TooManySatisfiableMethodsException itex) {
+            // expected
         } finally {
             RequestContext.setEvent(null);
         }
@@ -180,13 +175,8 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
             ep.invoke(new FruitBowl(), RequestContext.getEventContext());
             fail("Should have failed to find an entrypoint.");
-        } catch (InvocationTargetException itex) {
-            Throwable cause = itex.getCause();
-            if (cause instanceof NoSatisfiableMethodsException) {
-                // expected
-            } else {
-                throw itex;
-            }
+        } catch (NoSuchMethodException itex) {
+            //expected
         } finally {
             RequestContext.setEvent(null);
         }
@@ -240,7 +230,12 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
             RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
 
-            ep.invoke(new Kiwi(), RequestContext.getEventContext());
+            try {
+                ep.invoke(new Kiwi(), RequestContext.getEventContext());
+                fail("no such method on component");
+            } catch (NoSuchMethodException e) {
+               //expected
+            }
         } finally {
             RequestContext.setEvent(null);
         }

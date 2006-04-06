@@ -26,10 +26,9 @@ import java.lang.reflect.InvocationTargetException;
  */
 public interface UMOEntryPoint
 {
-    Class getParameterType();
+    Class[] getParameterTypes();
 
-    Object invoke(Object component, UMOEventContext context) throws InvocationTargetException,
-            IllegalAccessException, TransformerException;
+    Object invoke(Object component, UMOEventContext context) throws Exception;
 
     boolean isVoid();
 

@@ -16,12 +16,14 @@
 package org.mule.tck.model;
 
 import org.mule.impl.RequestContext;
+import org.mule.impl.MuleEventContext;
 import org.mule.model.NoSatisfiableMethodsException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.util.ClassHelper;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -96,7 +98,8 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
 
         try {
-            epr.resolveEntryPoint(descriptor);
+            UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
+            ep.invoke(ClassHelper.instanciateClass(mapping.getComponentClass(), ClassHelper.NO_ARGS), getTestEventContext("blah"));
             fail("Resolving should have failed for: " + mapping.toString());
         } catch (Exception e) {
             // expected
