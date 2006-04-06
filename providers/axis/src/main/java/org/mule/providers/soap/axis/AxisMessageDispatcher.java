@@ -28,7 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
@@ -38,7 +37,6 @@ import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -66,6 +64,7 @@ import java.util.Properties;
  * <at> version $Revision$
  */
 public class AxisMessageDispatcher extends AbstractMessageDispatcher {
+
     private Map callParameters;
 
     protected EngineConfiguration clientConfig;
@@ -99,7 +98,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     protected EngineConfiguration getClientConfig(UMOImmutableEndpoint endpoint) {
         if(clientConfig==null) {
             //Allow the client config to be set on the endpoint
-            String config = null;
+            String config;
             config = (String)endpoint.getProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY);
 
             if(config!=null) {
@@ -211,9 +210,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
         Map methodCalls = (Map) event.getMessage().getProperty("soapMethods");
         if (methodCalls == null) {
-            ArrayList params = new ArrayList();
+            List params = new ArrayList();
             for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof DataHandler[]) {
+                if (args[i] == null) {
+                    QName qname = call.getTypeMapping().getTypeQName(Object.class);
+                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":" + qname.getNamespaceURI() + "};in");
+                } else if (args[i] instanceof DataHandler[]) {
                     params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
                     //Convert key/value pairs into the parameters
                 } else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams()) {
@@ -259,7 +261,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
 
     private Object[] getArgs(UMOEvent event) throws TransformerException {
         Object payload = event.getTransformedMessage();
-        Object[] args = new Object[0];
+        Object[] args;
         if (payload instanceof Object[]) {
             args = (Object[]) payload;
         } else {
