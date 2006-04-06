@@ -38,6 +38,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -45,6 +46,7 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -504,7 +506,18 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                 returnMessage = (UMOMessage)result;
             }
             else {
-                returnMessage = new MuleMessage(result, returnMessage);
+                //Try and wrap the response in the correct messageAdapter, if this doesn't work for some reason
+                //just use a standard adater
+                try {
+                    UMOMessageAdapter adapter = endpoint.getConnector().getMessageAdapter(result);
+                    returnMessage = new MuleMessage(adapter, returnMessage);
+                } catch (MessagingException e) {
+                    if(logger.isWarnEnabled()) {
+                        logger.warn("Failed to wrap response in " + endpoint.getConnector().getProtocol() + ". Error is: " + e.getMessage());
+                    }
+                    returnMessage = new MuleMessage(result, returnMessage);
+                }
+
             }
         }
         else {
