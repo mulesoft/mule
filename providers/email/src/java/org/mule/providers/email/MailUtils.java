@@ -82,6 +82,8 @@ public class MailUtils
                 System.setProperty("mail." + protocol + ".socketFactory.port", String.valueOf(port));
 
             }
+            props.setProperty("mail." + protocol + ".rsetbeforequit","true");
+            
             if (url.getPassword() != null) {
                 props.put("mail." + protocol + ".auth", "true");
                 Authenticator auth = connector.getAuthenticator();

@@ -76,7 +76,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     public void doConnect() throws Exception
     {
         String inbox = null;
-        if (connector.getProtocol().equalsIgnoreCase("imap")) {
+        if (connector.getProtocol().toLowerCase().startsWith("imap")) {
             inbox = endpoint.getEndpointURI().getPath();
             if(inbox.length()==0) {
                 inbox = Pop3Connector.MAILBOX;

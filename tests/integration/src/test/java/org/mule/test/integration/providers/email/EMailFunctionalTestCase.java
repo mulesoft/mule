@@ -24,15 +24,15 @@ public class EMailFunctionalTestCase extends AbstractMuleTestCase
 {
     public void testPopRoundtrip() throws Exception
     {
-        doRoundtrip("pop3://muletestbox:testbox1@pop.mail.yahoo.co.uk",
-                "smtp://muletestbox:testbox1@smtp.mail.yahoo.co.uk?address=muletestbox@yahoo.co.uk");
+        doRoundtrip("pop3://mule%40inmail24.com:testbox@pop3.inmail24.com?checkFrequency=5000",
+                "smtp://mule%40inmail24.com:testbox@smtp.inmail24.com?address=mule@inmail24.com");
     }
 
-    public void testSecurePopRoundtrip() throws Exception
-    {
-        doRoundtrip("pop3s://muletestbox:testbox@pop.gmail.com",
-                "smtps://muletestbox:testbox@smtp.gmail.com?address=muletestbox@gmail.com");
-    }
+//    public void testSecurePopRoundtrip() throws Exception
+//    {
+//        doRoundtrip("pop3s://muletestbox:testbox@pop.gmail.com",
+//                "smtps://muletestbox:testbox@smtp.gmail.com?address=muletestbox@gmail.com&fromAddress=muletestbox@gmail.com&ccAddresses=ross.mason@symphonysoft.com");
+//    }
 
     public void testSecureImapRoundtrip() throws Exception
     {
@@ -47,8 +47,8 @@ public class EMailFunctionalTestCase extends AbstractMuleTestCase
         MuleClient mc = new MuleClient();
         UMOMessage msg = mc.receive(receiveUrl, 5000);
         while(msg!=null) {
-            msg = mc.receive(receiveUrl, 5000);
             System.out.println("Received:" + msg.getPayloadAsString());
+            msg = mc.receive(receiveUrl, 5000);
         }
 
         String messageString = "testtesttesttesttesttest";

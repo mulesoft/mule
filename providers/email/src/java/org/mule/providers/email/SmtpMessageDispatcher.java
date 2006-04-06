@@ -41,7 +41,8 @@ import java.util.Calendar;
  */
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
-    private Session session;
+    protected Transport transport;
+    protected Session session;
 
     private SmtpConnector connector;
 
@@ -52,21 +53,30 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     }
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        if(session==null) {
+        if(transport==null) {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
             URLName url = new URLName(connector.getProtocol(),
-                                  connector.getHostname(),
-                                  connector.getPort(),
+                                  uri.getHost(),
+                                  uri.getPort(),
                                   null,
-                                  connector.getUsername(),
-                                  connector.getPassword());
+                                  uri.getUsername(),
+                                  uri.getPassword());
 
             session = MailUtils.createMailSession(url, connector);
             session.setDebug(logger.isDebugEnabled());
+
+            transport = session.getTransport(connector.getProtocol());
+            transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
         }
     }
 
     protected void doDisconnect() throws Exception {
-        session = null;
+        try {
+            transport.close();
+        } finally {
+            transport=null;
+            session = null;
+        }
     }
 
     /*
@@ -139,7 +149,9 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     {
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
-        Transport.send(message);
+
+        transport.sendMessage(message, message.getAllRecipients());
+        //Transport.send(message);
         if (logger.isDebugEnabled()) {
             StringBuffer msg = new StringBuffer();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");

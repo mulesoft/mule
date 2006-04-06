@@ -124,9 +124,9 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-javamail</artifactId>
-            <version>${geronimo_spec_javamail_version}</version>
+            <groupId>javamail</groupId>
+            <artifactId>javamail</artifactId>
+            <version>${javamail_version}</version>
             <url>http://java.sun.com/products/javamail/</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
