@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
@@ -89,7 +90,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
             if (this.ackStmt != null) {
                 Object[] ackParams = JdbcUtils.getParams(endpoint, this.ackParams, message);
-                int nbRows = new QueryRunner().update(con, this.ackStmt, ackParams);
+                int nbRows = connector.createQueryRunner().update(con, this.ackStmt, ackParams);
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
                 }
@@ -130,7 +131,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             }
 
             Object[] readParams = JdbcUtils.getParams(endpoint, this.readParams, null);
-            Object results = new QueryRunner().query(con, this.readStmt, readParams, new MapListHandler());
+            Object results = connector.createQueryRunner().query(con, this.readStmt, readParams, connector.createResultSetHandler());
             return (List) results;
         } finally {
             JdbcUtils.close(con);

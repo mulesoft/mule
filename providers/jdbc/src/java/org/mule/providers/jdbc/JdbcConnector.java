@@ -13,6 +13,8 @@
  */
 package org.mule.providers.jdbc;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -37,25 +39,31 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {
 
+    private static final String DEFAULT_QUERY_RUNNER = "org.apache.commons.dbutils.QueryRunner";
+    private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
+
     /* Register the SQL Exception reader if this class gets loaded*/
     static {
         ExceptionHelper.registerExceptionReader(new SQLExceptionReader());
     }
 
-    private long pollingFrequency = 0;
-    private DataSource dataSource;
-    private String dataSourceJndiName;
-    private Context jndiContext;
-    private String jndiInitialFactory;
-    private String jndiProviderUrl;
-    private Map providerProperties;
-    private Map queries;
+    protected long pollingFrequency = 0;
+    protected DataSource dataSource;
+    protected String dataSourceJndiName;
+    protected Context jndiContext;
+    protected String jndiInitialFactory;
+    protected String jndiProviderUrl;
+    protected Map providerProperties;
+    protected Map queries;
+    protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
+    protected String queryRunner = DEFAULT_QUERY_RUNNER;
 
     /*
      * (non-Javadoc)
@@ -342,6 +350,56 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             }
         }
         return con;
+    }
+
+    /**
+     * @return Returns the resultSetHandler.
+     */
+    public String getResultSetHandler() {
+        return this.resultSetHandler;
+    }
+    
+    /**
+     * @param resultSetHandler The resultSetHandler class name to set. 
+     */
+    public void setResultSetHandler(String resultSetHandler) {
+        this.resultSetHandler = resultSetHandler;
+    }
+
+    /**
+     * @return a new instance of the ResultSetHandler class as defined in the JdbcConnector
+     */
+    protected ResultSetHandler createResultSetHandler() {
+        try {
+            return (ResultSetHandler) Class.forName(getResultSetHandler()).newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :" + getResultSetHandler(), e);
+        }
+    }
+    
+    /**
+     * @return Returns the queryRunner.
+     */
+    public String getQueryRunner() {
+        return this.queryRunner;
+    }
+
+    /**
+     * @param queryRunner The QueryRunner class name to set.
+     */
+    public void setQueryRunner(String queryRunner) {
+        this.queryRunner = queryRunner;
+    }
+
+    /**
+     * @return a new instance of the QueryRunner class as defined in the JdbcConnector
+     */
+    protected QueryRunner createQueryRunner() {
+        try {
+            return (QueryRunner) Class.forName(getQueryRunner()).newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error creating instance of the queryRunner class :" + getQueryRunner(), e);
+        }
     }
 
 }

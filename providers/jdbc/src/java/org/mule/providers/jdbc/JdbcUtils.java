@@ -14,6 +14,7 @@
 package org.mule.providers.jdbc;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.dom4j.Node;
 import org.dom4j.io.DOMReader;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -28,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
@@ -94,15 +96,19 @@ public abstract class JdbcUtils
             String param = (String) paramNames.get(i);
             String name = param.substring(2, param.length() - 1);
             Object value = null;
+            // If we find a value and it happens to be null, thats acceptable
+            boolean foundValue = false;
             if ("NOW".equalsIgnoreCase(name)) {
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
+                foundValue = true;
             } else if (root instanceof org.w3c.dom.Document) {
 				org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) root;
 				org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
 				try {
 				    Node node = dom4jDoc.selectSingleNode(name);
 				    if (node != null) {
-					value = node.getText();
+					    value = node.getText();
+                        foundValue = true;
 				    }
                 } catch (Exception ignored) {
 				    value = null;
@@ -112,7 +118,8 @@ public abstract class JdbcUtils
 				try {
 				    Node node = dom4jDoc.selectSingleNode(name);
 				    if (node != null) {
-					value = node.getText();
+					    value = node.getText();
+                        foundValue = true;
 				    }
 		                } catch (Exception ignored) {
 				    value = null;
@@ -122,32 +129,33 @@ public abstract class JdbcUtils
 				try {
 				    Node node = dom4jNode.selectSingleNode(name);
 				    if (node != null) {
-					value = node.getText();
+					    value = node.getText();
+                        foundValue = true;
 				    }
 		                } catch (Exception ignored) {
 				    value = null;
 				} 
             } else {
                 try {
-                    value = BeanUtils.getProperty(root, name);
-                    valueResolved = true;
+                    value = PropertyUtils.getProperty(root, name);
+                    foundValue = (value!=null);
                 } catch (Exception ignored) {
 				    value = null;
                 }
             }
-            if (!valueResolved){ 
-	            if (value == null) {
-	                value = endpoint.getProperty(name);
-	            }
-	            if (name.equals("payload")) {
-	                value = root;
-	            }
-	
-	            if (value == null) {
-	                throw new IllegalArgumentException("Cannot retrieve argument " + name);
-	            }
-	        }
-            params[i] = value;
+            if (value == null) {
+                  value = endpoint.getProperty(name);
+                  foundValue = foundValue || endpoint.getProperties().containsKey(name);
+              }
+              if (name.equals("payload")) {
+                  value = root;
+                 foundValue = true;
+              }
+             // Allow null values which may be acceptable to the user
+             if (value == null && ! foundValue) {
+                  throw new IllegalArgumentException("Can not retrieve argument " + name);
+              }
+              params[i] = value;
         }
         return params;
     }

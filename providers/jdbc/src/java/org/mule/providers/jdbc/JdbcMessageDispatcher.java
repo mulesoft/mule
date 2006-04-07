@@ -95,7 +95,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         try {
             con = this.connector.getConnection();
 
-            int nbRows = new QueryRunner().update(con, writeStmt, paramValues);
+            int nbRows = connector.createQueryRunner().update(con, writeStmt, paramValues);
             if (nbRows != 1) {
                 logger.warn("Row count for write should be 1 and not " + nbRows);
             }
@@ -157,7 +157,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             }
             Object result = null;
             do {
-                result = new QueryRunner().query(con,
+                result = connector.createQueryRunner().query(con,
                                                  readStmt,
                                                  JdbcUtils.getParams(endpoint, readParams, null),
                                                  new MapHandler());
@@ -179,7 +179,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                 }
             } while (true);
             if (result != null && ackStmt != null) {
-                int nbRows = new QueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpoint, ackParams, result));
+                int nbRows = connector.createQueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpoint, ackParams, result));
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
                 }
