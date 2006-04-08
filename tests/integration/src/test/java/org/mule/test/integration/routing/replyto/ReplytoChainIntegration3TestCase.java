@@ -26,14 +26,14 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
+public class ReplytoChainIntegration3TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration2TestCase() {
+    public ReplytoChainIntegration3TestCase() {
         setDisposeManagerPerSuite(true);
     }
 
     protected String getConfigResources() {
-        return "org/mule/test/integration/routing/replyto/injection2-test.xml";
+        return "org/mule/test/integration/routing/replyto/routing-chain-3-test.xml";
     }
 
     public void testReplyToChain() throws Exception
@@ -41,11 +41,9 @@ public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
         String message = "test";
 
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        UMOMessage result = client.send("vm://pojo1", message, props);
+        client.dispatch("vm://pojo1", message, null);
+        UMOMessage result = client.receive("jms://response", 10000);
         assertNotNull(result);
-        // Te
         assertEquals("Received: " + message, result.getPayload());
     }
 }

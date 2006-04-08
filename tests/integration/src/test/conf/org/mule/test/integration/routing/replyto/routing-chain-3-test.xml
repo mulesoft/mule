@@ -44,12 +44,12 @@
         <mule-descriptor name="pojo1"
             implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="vm://pojo1" synchronous="true" />
+                <endpoint address="vm://pojo1" />
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter" enableCorrelation="NEVER" >
-                    <endpoint address="jms://pojo2" remoteSync="true"  />
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter" >
+                    <endpoint address="jms://pojo2" />
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -57,7 +57,7 @@
         <mule-descriptor name="pojo2"
             implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="jms://pojo2" remoteSync="false" />
+                <endpoint address="jms://pojo2"/>
             </inbound-router>
 
             <outbound-router>
@@ -65,11 +65,6 @@
                     <endpoint address="jms://pojo3"/>
                 </router>
             </outbound-router>
-
-            <response-router timeout="70000">
-                <endpoint address="jms://response"/>
-                <router className="org.mule.routing.response.SingleResponseRouter"/>
-            </response-router>
         </mule-descriptor>
 
         <mule-descriptor name="pojo3"
