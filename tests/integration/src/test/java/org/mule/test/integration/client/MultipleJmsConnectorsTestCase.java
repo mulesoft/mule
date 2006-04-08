@@ -30,6 +30,7 @@ public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         client.setProperty("jms.connectionFactory", factory);
         client.setProperty("jms.specification", "1.1");
+        client.getManager().start();
         client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "testing", null);
         client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "testing", null);
 
