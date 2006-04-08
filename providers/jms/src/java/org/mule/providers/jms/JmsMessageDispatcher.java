@@ -96,16 +96,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             // Retrieve the session for the current transaction
             // If there is one, this is up to the transaction to close the
             // session
-         //   UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-//            if (tx != null && tx instanceof JmsTransaction) {
-                txSession = connector.getCurrentSession();
-//                if(txSession==null) {
-                    //txSession = connector.getSession(event.getEndpoint());
-//                }
-//                tx.bindResource(connector.getConnection(), txSession);
-//            }
+            txSession = connector.getCurrentSession();
 
-            //Should we be caching sessions
+            //Should we be caching sessions. Note this is not part of the Jms spec and is turned off by default
             cacheJmsSession = event.getMessage().getBooleanProperty(
                     JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions());
             if(txSession!=null) {

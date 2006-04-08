@@ -83,13 +83,8 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
 
     protected UMOMessage doSend(UMOEvent event) throws Exception {
 
-        //Todo this was removing the method property. It may break now...
         String method = (String) event.getMessage().getStringProperty("method", null);
-        if(method==null) {
-            System.out.println("");
-        }
         setContext(event);
-
 
         Object payload = event.getTransformedMessage();
         Object[] args;
