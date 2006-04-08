@@ -308,9 +308,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public final void startConnector() throws UMOException
     {
-        if (isDisposed()) {
-            throw new ConnectorException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
-        }
+        checkDisposed();
         if (!started.get()) {
             if(!isConnected()) {
                 startOnConnect.set(true);
@@ -559,7 +557,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected void checkDisposed() throws DisposeException
     {
         if (isDisposed()) {
-            throw new DisposeException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
+            throw new DisposeException(new Message(Messages.CANT_USE_DISPOSED_CONNECTOR), this);
         }
     }
 
