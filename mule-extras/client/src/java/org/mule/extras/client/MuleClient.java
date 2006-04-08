@@ -14,7 +14,6 @@
 package org.mule.extras.client;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -42,7 +41,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
@@ -663,10 +661,14 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         try {
-            UMOMessage message = endpoint.getConnector()
-                                         .getDispatcher(endpoint).receive(endpoint, timeout);
+            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
+            if(message!=null && endpoint.getTransformer()!=null) {
+                if(endpoint.getTransformer().isSourceTypeSupported(message.getPayload().getClass())) {
+                    message = new MuleMessage(endpoint.getTransformer().transform(message.getPayload()), message);
+                }
+            }
             return message;
         } catch (Exception e) {
             throw new ReceiveException(endpoint, timeout, e);
