@@ -15,6 +15,7 @@ package org.mule.providers.jdbc;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -24,7 +25,6 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -133,14 +133,14 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     {
         String str;
         // Find read statement
-        String readStmt = null;
+        String readStmt;
         if ((str = (String)endpoint.getProperty("sql")) != null) {
             readStmt = str;
         } else {
             readStmt = endpoint.getEndpointURI().getAddress();
         }
         // Find ack statement
-        String ackStmt = null;
+        String ackStmt;
         if ((str = (String)endpoint.getProperty("ack")) != null) {
             ackStmt = str;
             if ((str = getQuery(endpoint, ackStmt)) != null) {
@@ -373,7 +373,9 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         try {
             return (ResultSetHandler) Class.forName(getResultSetHandler()).newInstance();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :" + getResultSetHandler(), e);
+            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :" +
+                    getResultSetHandler() + System.getProperty("line.separator") +
+                    ExceptionUtils.getFullStackTrace(e));
         }
     }
     
@@ -398,7 +400,9 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         try {
             return (QueryRunner) Class.forName(getQueryRunner()).newInstance();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error creating instance of the queryRunner class :" + getQueryRunner(), e);
+            throw new IllegalArgumentException("Error creating instance of the queryRunner class :" +
+                    getQueryRunner() + System.getProperty("line.separator") +
+                    ExceptionUtils.getFullStackTrace(e));
         }
     }
 
