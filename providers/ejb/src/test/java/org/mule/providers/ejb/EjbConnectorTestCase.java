@@ -72,11 +72,4 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
         }
     }
 
-    /*
-     * temporary overwrite the inherited method due to current Rmi Provider did
-     * not support receiver function
-     */
-    public void testConnectorListenerSupport() throws Exception
-    {
-    }
 }

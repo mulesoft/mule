@@ -13,7 +13,6 @@
  */
 package org.mule.impl.space;
 
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;

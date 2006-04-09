@@ -13,16 +13,12 @@
  */
 package org.mule.providers.email;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.mail.Flags;
@@ -100,7 +96,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
                 try {
                     folder.expunge();
                 } catch (MessagingException e) {
-
+                    // maybe next time.
                 }
                  if(folder.isOpen()) {
                      folder.close(true);
@@ -223,6 +219,6 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
-
+        // template method
     }
 }

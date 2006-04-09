@@ -13,22 +13,17 @@
  */
 package org.mule.impl;
 
-import org.mule.providers.DefaultMessageAdapter;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.util.PropertiesHelper;
-import org.mule.MuleException;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.DefaultMessageAdapter;
+import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.activation.DataHandler;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;

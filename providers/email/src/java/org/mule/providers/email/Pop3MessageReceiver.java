@@ -191,6 +191,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                 try {
                     logger.debug("Message removed: " + messages[i].getSubject());
                 } catch (MessagingException ignore) {
+                    // ignore
                 }
             }
         }

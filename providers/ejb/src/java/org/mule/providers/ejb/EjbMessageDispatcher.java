@@ -21,7 +21,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
@@ -29,6 +28,7 @@ import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 
 import javax.ejb.EJBObject;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -191,6 +191,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
+        // template method
     }
 
     private Object[] getArgs(UMOEvent event) throws TransformerException

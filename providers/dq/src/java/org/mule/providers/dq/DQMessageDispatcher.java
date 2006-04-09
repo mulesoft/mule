@@ -27,11 +27,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>DQMessageDispatcher</code> //todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +41,8 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Constructor
      * 
-     * @param endpoint The endpoint for this adapter
+     * @param endpoint
+     *            The endpoint for this adapter
      */
     public DQMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -106,16 +106,21 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     *
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout  the maximum time the operation should block before returning. The call should
-     *                 return immediately if there is data available. If no data becomes available before the timeout
-     *                 elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     *         avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     * 
+     * @param endpoint
+     *            the endpoint to use when connecting to the resource
+     * @param timeout
+     *            the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available.
+     *            If no data becomes available before the timeout elapses, null
+     *            will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null
+     *         will be returned if no data was avaialable
+     * @throws Exception
+     *             if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
 
         DataQueue dq = new DataQueue(connector.getSystem(), endpoint.getEndpointURI().getAddress());
         DataQueueEntry entry = dq.read((int)timeout);
@@ -130,11 +135,17 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
+        // template method
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        // template method
     }
 
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() throws Exception
+    {
+        // template method
     }
+
 }

@@ -103,9 +103,12 @@ public class DQMessageReceiver extends PollingMessageReceiver
 
     public void doConnect() throws Exception
     {
+        // template method
     }
 
     public void doDisconnect() throws Exception
     {
+        // template method
     }
+
 }

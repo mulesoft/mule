@@ -13,9 +13,6 @@
  */
 package org.mule.impl.internal.admin;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.XppDriver;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -24,17 +21,17 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
-import org.mule.transformers.xml.XmlToObject;
 import org.mule.transformers.xml.ObjectToXml;
+import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -48,8 +45,8 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 
 import java.util.Map;

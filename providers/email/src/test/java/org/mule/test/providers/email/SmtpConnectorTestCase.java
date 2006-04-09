@@ -38,6 +38,7 @@ public class SmtpConnectorTestCase extends Pop3ConnectorTestCase
 
     public void testReceiver() throws Exception
     {
+        // override to disable parent implementation
     }
 
 }

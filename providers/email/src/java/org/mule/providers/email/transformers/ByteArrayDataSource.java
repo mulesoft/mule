@@ -74,6 +74,7 @@ public class ByteArrayDataSource implements DataSource
                 }
             }
             catch (IOException ignored) {
+                // ignore
             }
         }
     }
@@ -134,6 +135,7 @@ public class ByteArrayDataSource implements DataSource
                 }
             }
             catch (IOException ignored) {
+                // ignore
             }
         }
     }
@@ -174,6 +176,7 @@ public class ByteArrayDataSource implements DataSource
                 }
             }
             catch (IOException ignored) {
+                // ignore
             }
         }
     }

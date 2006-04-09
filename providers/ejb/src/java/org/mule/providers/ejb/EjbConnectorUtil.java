@@ -41,6 +41,7 @@ public class EjbConnectorUtil
 
     private EjbConnectorUtil()
     {
+        // prevent instantiation.
     }
 
     /**
