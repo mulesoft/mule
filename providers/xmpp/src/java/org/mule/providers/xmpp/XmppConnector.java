@@ -19,10 +19,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * <code>XmppConnector</code> TODO
  * 
@@ -95,7 +91,7 @@ public class XmppConnector extends AbstractServiceEnabledConnector
      */
     protected void doDispose()
     {
-
+        // template method
     }
 
     public boolean isRemoteSyncEnabled() {

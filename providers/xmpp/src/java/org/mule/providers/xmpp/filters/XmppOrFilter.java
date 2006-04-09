@@ -26,6 +26,7 @@ public class XmppOrFilter extends XmppAndFilter
 {
     public XmppOrFilter()
     {
+        super();
     }
 
     public XmppOrFilter(PacketFilter left, PacketFilter right)

@@ -136,6 +136,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
         public void release()
         {
+            // template method
         }
     }
 }

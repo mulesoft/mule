@@ -44,7 +44,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.soap.transformers.HttpRequestToSoapRequest;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
@@ -52,7 +51,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -160,12 +158,12 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public void start() throws UMOException
     {
-
+        // template method
     }
 
     public void stop() throws UMOException
     {
-
+        // template method
     }
 
     public void initialise() throws InitialisationException, RecoverableException
@@ -177,7 +175,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public void dispose()
     {
-
+        // template method
     }
 
     protected void registerTransport()

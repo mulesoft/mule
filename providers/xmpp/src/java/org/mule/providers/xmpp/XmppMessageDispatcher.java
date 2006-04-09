@@ -13,26 +13,19 @@
  */
 package org.mule.providers.xmpp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.GroupChat;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>XmppMessageDispatcher</code> allows Mule events to be sent and
@@ -87,6 +80,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
+        // template method
     }
 
     protected void doDispatch(UMOEvent event) throws Exception

@@ -25,6 +25,7 @@ public class XmppPacketIDFilter extends XmppFromContainsFilter
 {
     public XmppPacketIDFilter()
     {
+        super();
     }
 
     public XmppPacketIDFilter(String expression)

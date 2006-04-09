@@ -19,7 +19,6 @@ import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.Service;
 import org.mule.providers.soap.xfire.XFireMessageDispatcher;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;

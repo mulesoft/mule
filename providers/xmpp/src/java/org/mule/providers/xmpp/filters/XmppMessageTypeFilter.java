@@ -26,6 +26,7 @@ public class XmppMessageTypeFilter extends XmppFromContainsFilter
 {
     public XmppMessageTypeFilter()
     {
+        super();
     }
 
     public XmppMessageTypeFilter(String expression)

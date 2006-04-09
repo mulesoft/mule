@@ -25,6 +25,7 @@ public class XmppThreadFilter extends XmppFromContainsFilter
 {
     public XmppThreadFilter()
     {
+        super();
     }
 
     public XmppThreadFilter(String expression)

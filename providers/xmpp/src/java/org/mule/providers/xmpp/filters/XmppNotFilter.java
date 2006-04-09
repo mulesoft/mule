@@ -28,6 +28,7 @@ public class XmppNotFilter extends AbstractXmppFilter
 
     public XmppNotFilter()
     {
+        super();
     }
 
     public XmppNotFilter(PacketFilter filter)

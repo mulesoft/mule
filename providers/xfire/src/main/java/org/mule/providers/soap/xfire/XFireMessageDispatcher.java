@@ -20,16 +20,13 @@ import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
-import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -79,7 +76,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
-
+        // template method
     }
 
     protected String getMethod(UMOEvent event) throws DispatchException

@@ -25,6 +25,7 @@ public class XmppToContainsFilter extends XmppFromContainsFilter
 {
     public XmppToContainsFilter()
     {
+        super();
     }
 
     public XmppToContainsFilter(String expression)

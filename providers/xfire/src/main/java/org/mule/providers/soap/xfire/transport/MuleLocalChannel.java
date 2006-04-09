@@ -72,6 +72,7 @@ public class MuleLocalChannel extends AbstractChannel
 
     public void open()
     {
+        // template method
     }
 
     public void send(final MessageContext context, final OutMessage message) throws XFireException
@@ -166,6 +167,7 @@ public class MuleLocalChannel extends AbstractChannel
 
     public void close()
     {
+        // template method
     }
 
     public boolean isAsync()
@@ -231,6 +233,7 @@ public class MuleLocalChannel extends AbstractChannel
 
         public void release()
         {
+            // template method
         }
     }
 
@@ -274,6 +277,7 @@ public class MuleLocalChannel extends AbstractChannel
 
         public void release()
         {
+            // template method
         }
     }
 }

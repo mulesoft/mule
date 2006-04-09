@@ -27,6 +27,7 @@ public class XmppPacketTypeFilter extends AbstractXmppFilter
 
     public XmppPacketTypeFilter()
     {
+        super();
     }
 
     public XmppPacketTypeFilter(Class expectedType)
