@@ -114,7 +114,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
      * 
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
-    private void setMessage(Object message) throws MessagingException {
+    protected void setMessage(Object message) throws MessagingException {
         Message msg;
         if (message instanceof Message) {
             msg = (Message) message;
