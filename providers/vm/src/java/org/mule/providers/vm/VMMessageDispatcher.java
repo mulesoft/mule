@@ -28,7 +28,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
@@ -219,13 +218,17 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
+        // template method
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        // template method
     }
 
-    protected void doDisconnect() throws Exception {
-
+    protected void doDisconnect() throws Exception
+    {
+        // template method
     }
+
 }

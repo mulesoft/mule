@@ -64,6 +64,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     public void doDisconnect() throws Exception
     {
+        // template method
     }
 
     /*
@@ -112,8 +113,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     protected void processMessage(Object msg) throws Exception
     {
-        // This method is never called as the
-        // message is processed when received
+        // This method is never called as the message is processed when received
     }
 
 }

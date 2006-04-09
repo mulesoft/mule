@@ -53,7 +53,6 @@ import java.util.Iterator;
 public class VMConnector extends AbstractServiceEnabledConnector
 {
     private boolean queueEvents = false;
-    private int maxQueues = 16;
     private QueueProfile queueProfile;
     private Class adapterClass = null;
 
@@ -102,7 +101,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
     {
         if (message == null) {
             throw new MessageTypeNotSupportedException(null, adapterClass);
-
         } else if (message instanceof MuleMessage) {
             return ((MuleMessage) message).getAdapter();
         } else if (message instanceof UMOMessageAdapter) {
@@ -129,6 +127,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
      */
     protected void doDispose()
     {
+        // template method
     }
 
     public boolean isQueueEvents()
@@ -149,11 +148,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
     public void setQueueProfile(QueueProfile queueProfile)
     {
         this.queueProfile = queueProfile;
-    }
-
-    public void setMaxQueues(int maxQueues)
-    {
-        this.maxQueues = maxQueues;
     }
 
     VMMessageReceiver getReceiver(UMOEndpointURI endpointUri) throws EndpointException
@@ -227,7 +221,9 @@ public class VMConnector extends AbstractServiceEnabledConnector
         return null;
     }
 
-    public boolean isRemoteSyncEnabled() {
+    public boolean isRemoteSyncEnabled()
+    {
         return true;
-}
+    }
+
 }
