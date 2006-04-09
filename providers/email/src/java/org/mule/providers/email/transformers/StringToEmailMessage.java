@@ -97,7 +97,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
         if(logger.isDebugEnabled()) {
             StringBuffer buf = new StringBuffer(256);
-            buf.append("Constucting email using:\n");
+            buf.append("Constructing email using:\n");
             buf.append("To: ").append(to);
             buf.append("From: ").append(from);
             buf.append("CC: ").append(cc);
