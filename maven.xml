@@ -1,4 +1,4 @@
-<project default="multiproject:install"
+<project default="build"
     xmlns:j="jelly:core"
     xmlns:u="jelly:util"
     xmlns:ant="jelly:ant"
@@ -245,11 +245,11 @@
     <!--=================================================-->
 
     <goal name="setvars">
-        <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
-        <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
-        <j:set var="mule.release.lib.opt.dir" value="${mule.release.lib.dir}\opt"/>
-        <j:set var="mule.release.lib.patch.dir" value="${mule.release.lib.dir}\patch"/>
-        <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
+        <j:set var="mule.release.dir" value="${maven.build.dir}/release"/>
+        <j:set var="mule.release.lib.dir" value="${mule.release.dir}/lib"/>
+        <j:set var="mule.release.lib.opt.dir" value="${mule.release.lib.dir}/opt"/>
+        <j:set var="mule.release.lib.patch.dir" value="${mule.release.lib.dir}/patch"/>
+        <j:set var="mule.release.dist.dir" value="${mule.release.dir}/dist"/>
         <echo>Release dir is ${mule.release.dir}</echo>
         <j:set var="mule.base.context.path" value="../../.."/>
         <j:set var="mule.samples.dist" value="${mule.release.dir}/samples"/>
@@ -301,7 +301,7 @@
     </goal>
 
     <goal name="mule:tools" prereqs="setvars">
-        <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
+        <j:set var="mule.release.tools.dir" value="${mule.release.dir}/tools"/>
         <mkdir dir="${mule.release.tools.dir}"/>
 
         <mkdir dir="${mule.release.tools.dir}/config-graph"/>
@@ -440,7 +440,7 @@
     </goal>
 
     <goal name="mule:src">
-        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
+        <j:set var="mule.release.src.dir" value="${mule.release.dir}/src"/>
         <mkdir dir="${mule.release.src.dir}"/>
         <u:available file="${basedir}/etc/src/README.txt">
              <copy file="${basedir}/etc/src/README.txt" todir="${mule.release.src.dir}"/>
