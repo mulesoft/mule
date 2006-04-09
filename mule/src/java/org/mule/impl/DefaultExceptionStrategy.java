@@ -14,9 +14,9 @@
  */
 package org.mule.impl;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
@@ -45,7 +45,7 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
     public void handleLifecycleException(Object component, Throwable t)
     {
         defaultHandler(t);
-        logger.error("The object that failed was: \n" + component.toString());
+        logger.error("The object that failed was: \n" + ObjectUtils.toString(component, "null"));
         markTransactionForRollback();
     }
 

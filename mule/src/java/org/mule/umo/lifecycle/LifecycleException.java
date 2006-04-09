@@ -11,8 +11,10 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.umo.lifecycle;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -29,8 +31,10 @@ public class LifecycleException extends UMOException
     private transient Object component;
 
     /**
-     * @param message the exception message
-     * @param component the object that failed during a lifecycle method call
+     * @param message
+     *            the exception message
+     * @param component
+     *            the object that failed during a lifecycle method call
      */
     public LifecycleException(Message message, Object component)
     {
@@ -39,9 +43,12 @@ public class LifecycleException extends UMOException
     }
 
     /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
+     * @param message
+     *            the exception message
+     * @param cause
+     *            the exception that cause this exception to be thrown
+     * @param component
+     *            the object that failed during a lifecycle method call
      */
     public LifecycleException(Message message, Throwable cause, Object component)
     {
@@ -50,25 +57,21 @@ public class LifecycleException extends UMOException
     }
 
     /**
-     * @param cause the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
+     * @param cause
+     *            the exception that cause this exception to be thrown
+     * @param component
+     *            the object that failed during a lifecycle method call
      */
     public LifecycleException(Throwable cause, Object component)
     {
         super(new Message(Messages.INITIALISATION_FAILURE_X, cause.getMessage()), cause);
         this.component = component;
-        addDetails();
-    }
-
-    private void addDetails()
-    {
-    	// TODO dead code?
-        // Message m = new Message(Messages.OBJECT_CAUSED_ERROR_IS_X, component);
-        addInfo("Object", component.toString());
+        addInfo("Object", ObjectUtils.toString(component, "null"));
     }
 
     public Object getComponent()
     {
         return component;
     }
+
 }
