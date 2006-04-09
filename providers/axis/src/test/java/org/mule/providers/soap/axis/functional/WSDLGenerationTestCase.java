@@ -13,16 +13,12 @@
  */
 package org.mule.providers.soap.axis.functional;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.components.simple.EchoService;
-import org.mule.components.simple.EchoComponent;
-import org.mule.umo.UMOMessage;
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.http.HttpConnector;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;

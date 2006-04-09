@@ -16,10 +16,9 @@ package org.mule.providers.soap.axis.functional;
 
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.soap.axis.AxisConnector;

@@ -16,7 +16,6 @@ package org.mule.providers.soap.axis.extensions;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
-import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ParameterDesc;

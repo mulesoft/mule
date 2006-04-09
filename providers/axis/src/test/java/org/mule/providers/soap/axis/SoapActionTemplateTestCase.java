@@ -14,7 +14,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;

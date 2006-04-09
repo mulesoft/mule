@@ -76,7 +76,7 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
                     logger.fatal("Failed to read attachments", e);
                 }
             } else {
-
+                // TODO handle null Axis MessageContext
             }
         } catch (SOAPException e) {
             throw new MessagingException(new Message("soap", 5), message, e);

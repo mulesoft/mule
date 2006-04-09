@@ -40,8 +40,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -144,7 +144,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     public void initialise() throws InitialisationException
     {
-
+        // template method
     }
 
     public void doGet(UMOEventContext context, WriterMessageAdapter response) throws UMOException, IOException
