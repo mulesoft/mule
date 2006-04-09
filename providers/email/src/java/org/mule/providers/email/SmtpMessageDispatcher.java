@@ -150,8 +150,13 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
 
-        transport.sendMessage(message, message.getAllRecipients());
-        //Transport.send(message);
+        // These getAllRecipients() and similar methods always return null???
+        // Seems like JavaMail 1.3.3 is setting headers only
+        //transport.sendMessage(message, message.getAllRecipients());
+
+        // this call at least preserves the TO field
+        // TODO handle CC and BCC
+        Transport.send(message);
         if (logger.isDebugEnabled()) {
             StringBuffer msg = new StringBuffer();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");
