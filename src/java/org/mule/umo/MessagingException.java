@@ -11,12 +11,14 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.umo;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
+import org.mule.providers.NullPayload;
 
 import java.util.Map;
 
@@ -54,7 +56,8 @@ public class MessagingException extends UMOException
         super();
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
-        } else {
+        }
+        else {
             this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
@@ -65,7 +68,8 @@ public class MessagingException extends UMOException
         super(cause);
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
-        } else {
+        }
+        else {
             this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
@@ -73,17 +77,26 @@ public class MessagingException extends UMOException
 
     private String generateMessage(Message message)
     {
+        StringBuffer buf = new StringBuffer(80);
 
-        StringBuffer buf = new StringBuffer();
         if (message != null) {
             buf.append(message.getMessage()).append(". ");
         }
 
-        // TODO MULE-731
-        String type = umoMessage.getPayload().getClass().getName();
+        if (umoMessage != null) {
+            Object payload = umoMessage.getPayload();
+            if (payload == null) {
+                payload = new NullPayload();
+            }
 
-        buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, type));
-        addInfo("Payload", umoMessage.getPayload().toString());
+            buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, payload.getClass().getName()));
+            addInfo("Payload", payload.toString());
+        }
+        else {
+            buf.append("The current UMOMessage is null! Please report this to dev@mule.codehaus.org.");
+            addInfo("Payload", new NullPayload().toString());
+        }
+
         return buf.toString();
     }
 
@@ -91,4 +104,5 @@ public class MessagingException extends UMOException
     {
         return umoMessage;
     }
+
 }
