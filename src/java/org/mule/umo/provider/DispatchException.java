@@ -15,7 +15,6 @@ package org.mule.umo.provider;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.RoutingException;
 
