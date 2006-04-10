@@ -79,6 +79,7 @@ public class MessagingException extends UMOException
             buf.append(message.getMessage()).append(". ");
         }
 
+        // TODO MULE-731
         String type = umoMessage.getPayload().getClass().getName();
 
         buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, type));
