@@ -910,7 +910,7 @@ public class MuleClient implements Disposable
 
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws UMOException
     {
-        RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint);
+        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint);
         dispatchers.add(rd);
         return rd;
     }
@@ -918,7 +918,7 @@ public class MuleClient implements Disposable
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
             throws UMOException
     {
-        RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint, new MuleCredentials(user, password.toCharArray()));
+        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, new MuleCredentials(user, password.toCharArray()));
         dispatchers.add(rd);
         return rd;
     }

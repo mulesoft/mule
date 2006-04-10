@@ -14,7 +14,6 @@
 package org.mule.extras.client;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -60,9 +59,6 @@ public class RemoteDispatcher implements Disposable {
 
     private UMOEndpoint serverEndpoint;
 
-    // TODO remove this? (only used from constructor)
-    private MuleClient client;
-
     private UMOCredentials credentials = null;
 
     /**
@@ -71,17 +67,16 @@ public class RemoteDispatcher implements Disposable {
     private ObjectToXml objectToXml;
     private XmlToObject xmlToObject;
 
-    RemoteDispatcher(MuleClient client, String endpoint, UMOCredentials credentials)
+    RemoteDispatcher(String endpoint, UMOCredentials credentials)
             throws UMOException {
-        this(client, endpoint);
+        this(endpoint);
         this.credentials = credentials;
     }
 
-    RemoteDispatcher(MuleClient client, String endpoint) throws UMOException {
+    RemoteDispatcher(String endpoint) throws UMOException {
         serverEndpoint = new MuleEndpoint(endpoint, true);
         objectToXml = new ObjectToXml();
         xmlToObject = new XmlToObject();
-        this.client = client;
     }
 
     /**
