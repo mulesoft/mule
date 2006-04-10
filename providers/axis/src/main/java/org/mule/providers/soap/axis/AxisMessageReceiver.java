@@ -22,6 +22,7 @@ import org.apache.axis.encoding.TypeMappingRegistryImpl;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -198,7 +199,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         setOptionIfNotset(service, JavaProvider.OPTION_WSDL_SERVICEPORT, serviceName);
         setOptionIfNotset(service, JavaProvider.OPTION_CLASSNAME, className);
         setOptionIfNotset(service, JavaProvider.OPTION_SCOPE, "Request");
-        setOptionIfNotset(service, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
+        if(StringUtils.isNotBlank(namespace)) {
+            setOptionIfNotset(service, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
+        }
 
         // Set the allowed methods, allow all if there are none specified.
         if (methodNames == null) {
@@ -256,7 +259,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         } else {
             service.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
         }
-        service.getServiceDescription().setDefaultNamespace(namespace);
+        if(StringUtils.isNotBlank(namespace)) {
+            service.getServiceDescription().setDefaultNamespace(namespace);
+        }
         service.stop();
     }
 

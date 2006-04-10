@@ -356,10 +356,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             //Remove the Axis Receiver Security filter now
             receiver.getEndpoint().setSecurityFilter(null);
 
-//        if(receiver.getEndpoint().getTransformer()!=null) {
-//            serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-//            receiver.getEndpoint().setTransformer(null);
-//        }
+            if(receiver.getEndpoint().getTransformer()!=null) {
+                serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+                receiver.getEndpoint().setTransformer(null);
+            }
             //propagate properties to the service endpoint
             serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
 

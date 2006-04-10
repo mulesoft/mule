@@ -30,15 +30,15 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
 */
 
-public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
+public class AxisMessageStyleServiceWithoutNamespaceTestCase extends FunctionalTestCase {
     private static String expectedResult = "TEST RESPONSE";
 
-    public AxisMessageStyleServiceTestCase() {
+    public AxisMessageStyleServiceWithoutNamespaceTestCase() {
         setDisposeManagerPerSuite(true);
     }
 
     public String getConfigResources() {
-        return "org/mule/test/integration/providers/soap/axis/style/axis-mule-message-config.xml";
+        return "org/mule/test/integration/providers/soap/axis/style/axis-mule-message-config-without-namespace.xml";
     }
 
     protected static String getServiceEndpoint() {
@@ -46,15 +46,15 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
     }
 
     public void testDocumentWithNamesapce() throws Exception {
-        doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false, false, false);
+        doSoapRequest(new QName("document"), "axis:" + getServiceEndpoint(), false, false, false);
     }
 
     public void testDocumentWithQName() throws Exception {
-        doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false, false, true);
+        doSoapRequest(new QName("document"), "axis:" + getServiceEndpoint(), false, false, true);
     }
 
     public void testDocumentWithAxisApi() throws Exception {
-        doSoapRequest(new QName("http://muleumo.org", "document"), getServiceEndpoint(), true, false, false);
+        doSoapRequest(new QName("document"), getServiceEndpoint(), true, false, false);
     }
 
     public void testDocumentWithSoapMethod() throws Exception {

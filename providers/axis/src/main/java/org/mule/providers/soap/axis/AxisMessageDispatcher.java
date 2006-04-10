@@ -163,10 +163,15 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected Call getCall(UMOEvent event, Object[] args) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        String method = (String)endpointUri.getParams().remove("method");
+        Object method = event.getMessage().getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
         if (method == null) {
             throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
                     event.getEndpoint());
+        } else if(method instanceof SoapMethod) {
+            if(callParameters==null) {
+                callParameters = new HashMap();
+            }
+            callParameters.put(((SoapMethod)method).getName().getLocalPart(), (SoapMethod)method);
         }
 
         Call call = (Call)service.createCall();
@@ -203,16 +208,23 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
         call.setTargetEndpointAddress(endpointUri.getAddress());
 
-        // Set a custome method namespace if one is set. This will be used
-        // forthe parameters too
-        String methodNamespace = (String)event.getMessage().getProperty(
-                AxisConnector.METHOD_NAMESPACE_PROPERTY);
-        if (methodNamespace != null) {
-            call.setOperationName(new QName(methodNamespace, method));
+        String methodNamespace = null;
+        if(method instanceof String) {
+            //Set a custome method namespace if one is set.  This will be used forthe parameters too
+            methodNamespace = (String) event.getMessage().getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
+            if (methodNamespace != null) {
+                call.setOperationName(new QName(methodNamespace, method.toString()));
+            } else {
+                call.setOperationName(new QName(method.toString()));
+            }
+        } else if(method instanceof QName){
+            call.setOperationName((QName)method);
+            method = ((QName)method).getLocalPart();
+        } else {
+            call.setOperationName(((SoapMethod)method).getName());
         }
-        else {
-            call.setOperationName(new QName(method));
-        }
+
+        methodNamespace = call.getOperationName().getNamespaceURI();
 
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
@@ -226,8 +238,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setPassword(endpointUri.getPassword());
         }
 
-        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
-        if (methodCalls == null) {
+        Map methodCalls = (Map) event.getMessage().getProperty("soapMethods");
+        if (methodCalls == null && !(method instanceof SoapMethod)) {
             List params = new ArrayList();
             for (int i = 0; i < args.length; i++) {
                 if (args[i] == null) {

@@ -34,6 +34,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -152,10 +153,12 @@ public class AxisServiceComponent implements Initialisable, Callable
         try {
             //We parse a new uri based on the listening host and port with the request parameters appended
             //Using the soap prefix ensures that we use a soap endpoint builder
-            String uri = "soap:" + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
-            //String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().toString();
-            uri += context.getMessageAsString();
-            UMOEndpointURI endpointUri = new MuleEndpointURI(uri);
+            UMOEndpointURI endpointUri = context.getEndpointURI();
+            if(!"servlet".equalsIgnoreCase(context.getEndpointURI().getSchemeMetaInfo())) {
+                String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
+                uri += context.getMessageAsString();
+                endpointUri = new MuleEndpointURI(uri);
+            }
 
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
@@ -547,7 +550,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 throw new Exception(Messages.getMessage("noResponse01"));
             }
         } catch (AxisFault fault) {
-            logger.error(fault, fault);
+            logger.error(fault.toString() + ". Event is: " + context.toString(), fault);
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = msgContext.getResponseMessage();
