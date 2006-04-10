@@ -21,11 +21,9 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -33,6 +31,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.concurrent.WaitableBoolean;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -75,11 +74,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-
+        // template method
     }
 
     protected void doDisconnect() throws Exception {
-        
+        // template method
     }
 
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception {
@@ -350,13 +349,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
-
+        // template method
     }
 
     private class ReplyToListener implements MessageListener {
         private Latch latch;
         private Message message;
-        private boolean released = false;
+        private WaitableBoolean released = new WaitableBoolean(false);
 
         public ReplyToListener(Latch latch) {
             this.latch = latch;
@@ -367,21 +366,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         }
 
         public void release() {
-            released = true;
+            released.set(true);
         }
 
         public void onMessage(Message message) {
             this.message = message;
             latch.unlock();
-            while (!released) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-
-                }
+            try {
+                released.whenTrue(null);
+            }
+            catch (InterruptedException e) {
+                // ignored
             }
         }
 
-
     }
+
 }
