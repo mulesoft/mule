@@ -142,4 +142,35 @@
             </properties>
         </dependency>
   </dependencies>
+    <build>
+        <nagEmailAddress>scm@mule.codehaus.org</nagEmailAddress>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/test/java</unitTestSourceDirectory>
+        <unitTest>
+            <resources>
+                <resource>
+                    <directory>${basedir}/test/resources</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/conf</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.cer</exclude>
+                    <exclude>**/*Keystore</exclude>
+                    <exclude>**/*.groovy</exclude>
+                    <exclude>**/log4j.properties</exclude>
+                    <exclude>**/.keep</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
 </project>

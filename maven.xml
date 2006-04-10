@@ -163,7 +163,16 @@
 
         <delete file="${mule.release.dist.dir}/mule-providers-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-extras-${pom.currentVersion}.jar"/>
-        <delete file="${mule.release.dist.dir}/mule-tests-${pom.currentVersion}.jar"/>
+        <delete>
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="mule-tests-*"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="mule-samples-*"/>
+            </fileset>
+        </delete>
         <delete file="${mule.release.dist.dir}/mule-samples-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-tools-${pom.currentVersion}.jar"/>
 
