@@ -70,7 +70,7 @@ public class SpringEventsJmsExampleTestCase extends AbstractMuleTestCase
         UMOMessage result = client.receive("jms://processed.queue", 10000);
         assertEquals(1, eventCount);
         assertNotNull(result);
-        assertEquals("Order 'Sausage and Mash' Processed", ((TextMessage) result.getPayload()).getText());
+        assertEquals("Order 'Sausage and Mash' Processed", result.getPayload());
     }
 
     public void testReceiveAsWebService() throws Exception
