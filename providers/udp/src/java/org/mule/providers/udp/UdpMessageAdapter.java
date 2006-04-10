@@ -17,12 +17,10 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.DatagramPacket;
 
 /**
- * <code>UdpMessageAdapter</code> TODO
+ * <code>UdpMessageAdapter</code>
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -38,20 +36,13 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
     public UdpMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof DatagramPacket) {
-            DatagramPacket dp = (DatagramPacket) message;
+            DatagramPacket dp = (DatagramPacket)message;
             this.message = new byte[dp.getLength()];
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(dp.getData());
-            bais.read(this.message, 0, dp.getLength());
-            try {
-                bais.close();
-            } catch (IOException e) {
-            }
-
+            System.arraycopy(dp.getData(), 0, this.message, 0, dp.getLength());
             setProperty(ADDRESS_PROPERTY, dp.getAddress());
             setProperty(PORT_PROPERTY, new Integer(dp.getPort()));
-
-        } else {
+        }
+        else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }

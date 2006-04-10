@@ -14,11 +14,11 @@
 
 package org.mule.providers.tcp.protocols;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.tcp.TcpProtocol;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,12 +42,13 @@ public class DefaultProtocol implements TcpProtocol
 
     public byte[] read(InputStream is) throws IOException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE);
 
         byte[] buffer = new byte[BUFFER_SIZE];
         int len = 0;
         try {
             while ((len = is.read(buffer)) == 0) {
+                // wait
             }
         } catch (SocketException e) {
             // do not pollute the log with a stacktrace, log only the message

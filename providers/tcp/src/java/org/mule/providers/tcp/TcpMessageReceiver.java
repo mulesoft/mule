@@ -116,7 +116,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                 Socket socket = null;
                 try {
                     socket = serverSocket.accept();
+                    assert (socket != null);
+
                     TcpConnector connector = (TcpConnector) this.connector;
+
                     if (connector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getReceiveBufferSize() != connector.getBufferSize()) {
                         socket.setReceiveBufferSize(connector.getBufferSize());
                     }
@@ -126,7 +129,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                     if (connector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET && socket.getSoTimeout() != connector.getReceiveTimeout()) {
                         socket.setSoTimeout(connector.getReceiveTimeout());
                     }
+
                     socket.setTcpNoDelay(true);
+
                     if (logger.isTraceEnabled()) {
                         logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
                     }
@@ -140,6 +145,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                         handleException(new ConnectException(e, this));
                     }
                 }
+
                 if (socket != null) {
                     try {
                         Work work = createWork(socket);
@@ -151,13 +157,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                     } catch (IOException e) {
                         handleException(e);
                     }
-
                 }
             }
         }
     }
 
     public void release() {
+        // template method
     }
 
     protected void doDispose() {
@@ -253,4 +259,5 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
         }
 
     }
+
 }

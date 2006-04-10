@@ -21,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.MuleManager;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -155,6 +154,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
                     // Allow all other console message to be printed out first
                     sleep(delay);
                 } catch (InterruptedException e1) {
+                    // ignore
                 }
             }
             ((PrintStream)ssc.getOutputStream()).println();

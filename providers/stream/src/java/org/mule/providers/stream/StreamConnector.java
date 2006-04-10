@@ -60,6 +60,7 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      */
     public void doStop()
     {
+        // template method
     }
 
     protected void doDispose()
@@ -75,6 +76,7 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      */
     public void doStart()
     {
+        // template method
     }
 
     /*

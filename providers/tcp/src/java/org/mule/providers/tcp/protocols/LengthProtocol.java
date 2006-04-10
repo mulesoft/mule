@@ -47,6 +47,7 @@ public class LengthProtocol implements TcpProtocol
         int length;
         dis.mark(32);
         while ((length = dis.read(buffer)) == 0) {
+            // wait
         }
         if (length == -1) {
             return null;

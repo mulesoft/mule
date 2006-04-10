@@ -13,19 +13,15 @@
  */
 package org.mule.providers.tcp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.BufferedInputStream;
@@ -234,7 +230,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
-
+        // template method
     }
 
     /////////////////////////////////////////////////////////////////

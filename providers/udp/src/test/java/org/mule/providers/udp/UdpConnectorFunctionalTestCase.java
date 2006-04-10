@@ -52,6 +52,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         try {
             s.close();
         } catch (Exception e) {
+            // ignore
         }
         super.doTearDown();
     }

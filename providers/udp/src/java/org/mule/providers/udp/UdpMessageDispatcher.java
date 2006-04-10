@@ -13,24 +13,19 @@
  */
 package org.mule.providers.udp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 /**
@@ -141,7 +136,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
-        DatagramPacket result = receive(socket, Integer.parseInt(String.valueOf(timeout)));
+        DatagramPacket result = receive(socket, (int)timeout);
         if (result == null) {
             return null;
         }
@@ -161,6 +156,6 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
-
+        // template method
     }
 }
