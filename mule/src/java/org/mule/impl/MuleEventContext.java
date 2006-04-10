@@ -963,4 +963,7 @@ public class MuleEventContext implements UMOEventContext
         return event.getSession();
     }
 
+    public String toString() {
+        return event.toString();
+    }
 }
