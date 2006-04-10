@@ -27,6 +27,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.UUID;
@@ -141,25 +142,38 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     public void messagesAdded(MessageCountEvent event)
     {
         Message messages[] = event.getMessages();
-        UMOMessage message = null;
-        for (int i = 0; i < messages.length; i++) {
-            try {
-                if (!messages[i].getFlags().contains(Flags.Flag.DELETED)) {
-                    MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
-                    storeMessage(mimeMessage);
-                    message = new MuleMessage(connector.getMessageAdapter(mimeMessage));
+        if (messages != null) {
+            UMOMessage message = null;
+            for (int i = 0; i < messages.length; i++) {
+                try {
+                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED)) {
+                        MimeMessage mimeMessage = new MimeMessage((MimeMessage)messages[i]);
+                        storeMessage(mimeMessage);
+                        message = new MuleMessage(connector.getMessageAdapter(mimeMessage));
 
-                    // Mark as deleted
-                    messages[i].setFlag(Flags.Flag.DELETED, true);
-                    routeMessage(message, endpoint.isSynchronous());
+                        // Mark as deleted
+                        messages[i].setFlag(Flags.Flag.DELETED, true);
+                        routeMessage(message, endpoint.isSynchronous());
+                    }
                 }
-            } catch (UMOException e) {
-                handleException(e);
-            } catch (Exception e) {
-                handleException(new RoutingException(new org.mule.config.i18n.Message(Messages.ROUTING_ERROR),
-                                                     message,
-                                                     endpoint,
-                                                     e));
+                catch (UMOException e) {
+                    handleException(e);
+                }
+                catch (Exception e) {
+                    Exception forwarded;
+
+                    if (message != null)
+                    {
+                        forwarded = new RoutingException(new org.mule.config.i18n.Message(Messages.ROUTING_ERROR),
+                                message, endpoint, e);
+                    }
+                    else
+                    {
+                        forwarded = new ReceiveException(endpoint, -1, e);
+                    }
+
+                    handleException(forwarded);
+                }
             }
         }
     }

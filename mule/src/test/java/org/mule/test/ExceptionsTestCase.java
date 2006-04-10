@@ -1,8 +1,27 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * -----------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ *
+ */
+
 package org.mule.test;
 
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
+import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ManagerException;
+import org.mule.umo.routing.RoutingException;
 
 import junit.framework.TestCase;
 
@@ -11,112 +30,44 @@ import junit.framework.TestCase;
  */
 public class ExceptionsTestCase extends TestCase
 {
-    public void testExceptionPrinting()
+
+    protected void setUp() throws Exception
     {
-        Exception e = new ManagerException(Message.createStaticMessage("Test Exception Message"),
-                                           new MuleException(Message.createStaticMessage("Root Test Exception Message")));
-        System.out.println(e.toString());
+        super.setUp();
     }
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    // public void testExceptions() throws Exception
-    // {
-    // //Note for exceptions that added customer behaviour,
-    // //additional tests for the special behaviour should be tested here
-    // umoExceptionTest(MuleException.class);
-    // umoExceptionTest(MuleRuntimeException.class);
-    // umoExceptionTest(InitialisationException.class);
-    // umoExceptionTest(DisposeException.class);
-    // umoExceptionTest(ObjectNotFoundException.class);
-    // umoExceptionTest(ContainerException.class);
-    // umoExceptionTest(NoReceiverForEndpointException.class);
-    // // umoExceptionTest(CouldNotRouteInboundEventException.class);
-    // // umoExceptionTest(CouldNotRouteOutboundMessageException.class);
-    // umoExceptionTest(EndpointNotFoundException.class);
-    // umoExceptionTest(ModelException.class);
-    // umoExceptionTest(MessagingException.class);
-    // umoExceptionTest(FailedToQueueEventException.class);
-    //
-    // umoExceptionTest(CompressionException.class);
-    // umoExceptionTest(TransformerException.class);
-    // umoExceptionTest(RoutePathNotFoundException.class);
-    // umoExceptionTest(RoutingException.class);
-    //
-    // umoExceptionTest(org.mule.transaction.IllegalTransactionStateException.class);
-    // umoExceptionTest(org.mule.transaction.TransactionInProgressException.class);
-    // umoExceptionTest(org.mule.transaction.TransactionNotInProgressException.class);
-    // umoExceptionTest(org.mule.transaction.TransactionRollbackException.class);
-    // umoExceptionTest(org.mule.transaction.TransactionStatusException.class);
-    //
-    // }
-    // public void testNoSatisfiableMethods()
-    // {
-    // Orange object = new Orange();
-    // NoSatisfiableMethodsException exception =
-    // new NoSatisfiableMethodsException(object, new IOException("something bad
-    // happened"));
-    //
-    // assertNotNull(exception.getCause());
-    // assertTrue(exception.getCause() instanceof IOException);
-    // assertNotNull(exception.getMessage());
-    //
-    // exception = new NoSatisfiableMethodsException(object);
-    //
-    // assertNull(exception.getCause());
-    // assertNotNull(exception.getMessage());
-    // }
-    // public void testUniqueIdNotSupported()
-    // {
-    // UMOMessageAdapter adapter = (UMOMessageAdapter) new
-    // Mock(UMOMessageAdapter.class).proxy();
-    // UniqueIdNotSupportedException exception = new
-    // UniqueIdNotSupportedException(adapter);
-    // exception = new UniqueIdNotSupportedException(adapter, "blah");
-    // assertTrue(exception.getMessage().endsWith("blah"));
-    // exception = new UniqueIdNotSupportedException(adapter, new
-    // Exception("foo"));
-    // assertTrue(exception.getMessage().endsWith("foo"));
-    //
-    // }
-    //
-    // public void testTooManySatisfiableMethods()
-    // {
-    // Orange object = new Orange();
-    // TooManySatisfiableMethodsException exception =
-    // new TooManySatisfiableMethodsException(object, new IOException("something
-    // bad happened"));
-    //
-    // assertNotNull(exception.getCause());
-    // assertTrue(exception.getCause() instanceof IOException);
-    // assertNotNull(exception.getMessage());
-    //
-    // exception = new TooManySatisfiableMethodsException(object);
-    //
-    // assertNull(exception.getCause());
-    // assertNotNull(exception.getMessage());
-    // }
-    // protected void umoExceptionTest(Class exceptionClass) throws Exception
-    // {
-    // //assertTrue(UMOException.class.isAssignableFrom(exceptionClass));
-    //
-    // Constructor ctor = exceptionClass.getConstructor(new
-    // Class[]{String.class, Throwable.class});
-    // Throwable exception =
-    // (Throwable) ctor.newInstance(new Object[]{"Something Failed", new
-    // IOException("Nested, something failed")});
-    //
-    // assertNotNull(exception.getCause());
-    // assertTrue(exception.getCause() instanceof IOException);
-    // assertNotNull(exception.getMessage());
-    //
-    // ctor = exceptionClass.getConstructor(new Class[]{String.class});
-    // exception = (Throwable) ctor.newInstance(new Object[]{"Something
-    // Failed"});
-    //
-    // assertNull(exception.getCause());
-    // assertNotNull(exception.getMessage());
-    // }
+
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
+
+    public void testExceptionChaining()
+    {
+        String rootMsg = "Root Test Exception Message";
+        String msg = "Test Exception Message";
+
+        Exception e = new ManagerException(Message.createStaticMessage(msg),
+                new MuleException(Message.createStaticMessage(rootMsg)));
+
+        assertEquals(rootMsg, e.getCause().getMessage());
+        assertEquals(msg, e.getMessage());
+        assertEquals(e.getClass().getName() + ": " + msg, e.toString());
+    }
+
+    public final void testRoutingExceptionNullUMOMessageNullUMOImmutableEndpoint() throws UMOException
+    {
+        RoutingException rex = new RoutingException(null, null);
+        assertNotNull(rex);
+    }
+
+    public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws UMOException
+    {
+        UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint("test://outbound", false);
+        assertNotNull(endpoint);
+
+        RoutingException rex = new RoutingException(null, endpoint);
+        assertNotNull(rex);
+        assertSame(endpoint, rex.getEndpoint());
+    }
+
 }
