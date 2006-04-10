@@ -13,8 +13,6 @@
  */
 package org.mule.providers.rmi;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -22,16 +20,13 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.DispatchException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -217,6 +212,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
+        // template method
     }
 
 }

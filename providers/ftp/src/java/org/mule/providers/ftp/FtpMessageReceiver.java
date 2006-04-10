@@ -77,6 +77,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
                     }
 
                     public void release() {
+                        // no op
                     }
                 });
             }
@@ -149,7 +150,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
     }
 
     public void doDisconnect() throws Exception {
-
+        // no op
     }
 
 }

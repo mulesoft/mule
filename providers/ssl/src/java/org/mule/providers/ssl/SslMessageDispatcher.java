@@ -13,8 +13,6 @@
  */
 package org.mule.providers.ssl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.tcp.TcpMessageDispatcher;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 

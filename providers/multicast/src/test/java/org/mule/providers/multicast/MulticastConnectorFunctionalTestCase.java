@@ -49,11 +49,14 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         try {
             s1.close();
         } catch (Exception e) {
+            // ignore
         }
         try {
             s2.close();
         } catch (Exception e) {
+            // ignore
         }
+
         super.doTearDown();
     }
 

@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.space;
 
 import org.mule.config.i18n.Message;
@@ -29,10 +30,9 @@ import org.mule.util.PropertiesHelper;
 import java.util.List;
 import java.util.Properties;
 
-
 /**
  * Registers a transacted message listener on a Space.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,15 +41,20 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
     private UMOSpace space;
     private SpaceConnector connector;
 
-    public TransactedSpaceMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint) throws InitialisationException {
+    public TransactedSpaceMessageReceiver(UMOConnector connector,
+                                          UMOComponent component,
+                                          final UMOEndpoint endpoint) throws InitialisationException
+    {
         super(connector, component, endpoint, new Long(0));
         this.connector = (SpaceConnector)connector;
 
-        this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 100000L);
+        this.frequency = PropertiesHelper
+                .getLongProperty(endpoint.getProperties(), "frequency", 100000L);
     }
 
-    protected List getMessages() throws Exception {
-            Object message = space.take(frequency);
+    protected List getMessages() throws Exception
+    {
+        Object message = space.take(frequency);
         if (message == null) {
             return null;
         }
@@ -64,28 +69,33 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
         return null;
     }
 
-    protected void processMessage(Object message) throws Exception {
-        // This method is never called as the
-        // message is processed when received
+    protected void processMessage(Object message) throws Exception
+    {
+        // This method is never called as the message is processed when received
     }
 
-    public void doConnect() throws Exception {
+    public void doConnect() throws Exception
+    {
         String destination = endpoint.getEndpointURI().getAddress();
 
         Properties props = new Properties();
         props.putAll(endpoint.getProperties());
         try {
-			logger.info("Connecting to space: " + destination);
-			space = connector.getSpace(endpoint);
-		} catch (UMOSpaceException e) {
-			throw new ConnectException(new Message("space", 1, destination), e, this);
-		}
+            logger.info("Connecting to space: " + destination);
+            space = connector.getSpace(endpoint);
+        }
+        catch (UMOSpaceException e) {
+            throw new ConnectException(new Message("space", 1, destination), e, this);
+        }
     }
 
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
+        // template method
     }
 
-    public UMOSpace getSpace() {
+    public UMOSpace getSpace()
+    {
         return space;
     }
 }

@@ -24,12 +24,9 @@ import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.util.Utility;
 
 import java.io.File;
@@ -233,14 +230,15 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
+        // no op
     }
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        //no op
+        // no op
     }
 
     protected void doDisconnect() throws Exception {
-        //no op
+        // no op
     }
 
 }

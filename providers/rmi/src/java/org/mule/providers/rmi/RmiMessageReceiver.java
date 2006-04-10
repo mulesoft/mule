@@ -95,7 +95,7 @@ public class RmiMessageReceiver extends AbstractMessageReceiver
     {
         try {
             // Do not reinit if RMI is already bound to JNDI!!!
-            // Todo! Test how things work under heavy load!!!
+            // TODO Test how things work under heavy load!!!
             // Do we need threadlocals or so!?!?
 
             // TODO [aperepel] consider AtomicBooleans here

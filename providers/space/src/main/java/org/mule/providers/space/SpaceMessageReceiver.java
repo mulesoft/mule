@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.space;
 
 import org.mule.config.i18n.Message;
@@ -34,112 +35,132 @@ import javax.resource.spi.work.WorkManager;
 import java.util.Properties;
 
 /**
- * <code>SpaceMessageReceiver</code> registers a listener on a Space, which can be a JavaSpace, Rio space,
- * JCache implementation of an internal Mule space.
- *
+ * <code>SpaceMessageReceiver</code> registers a listener on a Space, which
+ * can be a JavaSpace, Rio space, JCache implementation of an internal Mule
+ * space.
+ * 
  * @version $Revision$
  */
-public class SpaceMessageReceiver extends AbstractMessageReceiver implements Work {
+public class SpaceMessageReceiver extends AbstractMessageReceiver implements Work
+{
 
     private UMOSpace space;
     private SpaceConnector connector;
 
     public SpaceMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException {
+            throws InitialisationException
+    {
         super(connector, component, endpoint);
         this.connector = (SpaceConnector)connector;
     }
 
-    public void doConnect() throws ConnectException {
+    public void doConnect() throws ConnectException
+    {
         String destination = endpoint.getEndpointURI().getAddress();
 
         Properties props = new Properties();
         props.putAll(endpoint.getProperties());
         try {
-			logger.info("Connecting to space: " + destination);
-			space = connector.getSpace(endpoint);
-		} catch (UMOSpaceException e) {
-			throw new ConnectException(new Message("space", 1, destination), e, this);
-		}
+            logger.info("Connecting to space: " + destination);
+            space = connector.getSpace(endpoint);
+        }
+        catch (UMOSpaceException e) {
+            throw new ConnectException(new Message("space", 1, destination), e, this);
+        }
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
-        } catch (WorkException e) {
+        }
+        catch (WorkException e) {
             throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
     }
 
-    public void doDisconnect() throws ConnectException {
-        //Todo How should we disconnect from a Space, maby remove the ref to it for the connector??
+    public void doDisconnect() throws ConnectException
+    {
+        // Todo How should we disconnect from a Space, maby remove the ref to it
+        // for the connector??
     }
 
-
-    public void run() {
+    public void run()
+    {
         while (!disposing.get()) {
             if (connector.isStarted() && !disposing.get()) {
-                if(logger.isTraceEnabled()) {
+                if (logger.isTraceEnabled()) {
                     logger.trace("Receiver starting on space: " + space);
                 }
 
+                try {
+                    Object message = space.take(Long.MAX_VALUE);
+                    Work work = createWork(space, message);
                     try {
-                        Object message = space.take(Long.MAX_VALUE);
-                        Work work = createWork(space, message);
-                        try {
-                            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
-                        } catch (WorkException e) {
-                            logger.error("GS Server receiver Work was not processed: " + e.getMessage(), e);
-                        }
-                    } catch (Exception e) {
-                        handleException(e);
+                        getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
                     }
-
+                    catch (WorkException e) {
+                        logger.error("GS Server receiver Work was not processed: " + e.getMessage(), e);
+                    }
                 }
+                catch (Exception e) {
+                    handleException(e);
+                }
+
             }
         }
-
-
-    public void release() {
     }
 
-    protected void doDispose() {
+    public void release()
+    {
+        // template method
     }
 
-    protected Work createWork(UMOSpace space, Object message) throws Exception {
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected Work createWork(UMOSpace space, Object message) throws Exception
+    {
         return new SpaceWorker(space, message);
     }
 
-    protected class SpaceWorker implements Work {
+    protected class SpaceWorker implements Work
+    {
         private UMOSpace space;
         private Object message;
 
-        public SpaceWorker(UMOSpace space, Object message) {
+        public SpaceWorker(UMOSpace space, Object message)
+        {
             this.space = space;
             this.message = message;
         }
 
-        public void release() {
+        public void release()
+        {
+            // template method
         }
-
 
         /**
          * Accept requests on a given template
          */
-        public void run() {
+        public void run()
+        {
             try {
-                if(logger.isTraceEnabled()) {
-                    logger.trace("worker listening on space " + space );
+                if (logger.isTraceEnabled()) {
+                    logger.trace("worker listening on space " + space);
                 }
 
-                    //todo transactions
+                // TODO transactions
 
-                    UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-                    UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
-//                    if (returnMessage != null) {
-//                        space.put(returnMessage.getPayload(), Long.MAX_VALUE);
-//                    }
+                UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
+                // if (returnMessage != null) {
+                // space.put(returnMessage.getPayload(), Long.MAX_VALUE);
+                // }
 
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 handleException(e);
-            } finally {
+            }
+            finally {
                 release();
             }
         }

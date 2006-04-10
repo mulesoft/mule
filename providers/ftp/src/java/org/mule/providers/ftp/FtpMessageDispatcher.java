@@ -14,30 +14,25 @@
  */
 package org.mule.providers.ftp;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
 
-import java.io.ByteArrayInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +54,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
+        // no op
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
@@ -83,7 +79,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 //            if (!client.changeWorkingDirectory(uri.getPath())) {
 //                throw new IOException("Ftp error: " + client.getReplyCode());
 //            }
-            IOUtils.copy(new ByteArrayInputStream(buf), out);
+            IOUtils.write(buf, out);
             //This will ensure that the completePendingRequest is called
             out.close();
 

@@ -57,6 +57,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
     protected void doDispose()
     {
+        // template method
     }
 
     public void doStart() throws UMOException
@@ -124,10 +125,12 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
     public void doConnect() throws Exception
     {
+        // template method
     }
 
     public void doDisconnect() throws Exception
     {
-
+        // template method
     }
+
 }

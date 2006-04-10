@@ -16,14 +16,12 @@ package org.mule.providers.ftp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -66,7 +64,6 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void receiveAndTestResults() throws Exception
     {
-        // TODO Auto-generated method stub
         Thread.sleep(5000);
     }
 

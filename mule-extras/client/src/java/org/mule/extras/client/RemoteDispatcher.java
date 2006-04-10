@@ -18,27 +18,22 @@ import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToObject;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.transformers.xml.ObjectToXml;
+import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -300,7 +295,7 @@ public class RemoteDispatcher implements Disposable {
     }
 
     public void dispose() {
-
+        // template method
     }
 
     protected void setCredentials(UMOMessage message) {

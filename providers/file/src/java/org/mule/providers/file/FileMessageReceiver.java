@@ -99,6 +99,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     public void doDisconnect() throws Exception
     {
+        // template method
     }
 
     public void poll()

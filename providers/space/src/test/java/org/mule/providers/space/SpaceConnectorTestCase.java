@@ -48,5 +48,7 @@ public class SpaceConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
+        // TODO
     }
+
 }

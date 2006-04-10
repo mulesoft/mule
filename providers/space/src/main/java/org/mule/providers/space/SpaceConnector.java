@@ -11,12 +11,12 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.space;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.space.UMOSpace;
@@ -29,42 +29,48 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Provides generic connectivity to 'Spaces' that implment the Mule Space Api, i.e.
- * Gigaspaces, JCache implementations, Rio can be accessed as well as a mule file, Journal or VM space.
- *
+ * Provides generic connectivity to 'Spaces' that implment the Mule Space Api,
+ * i.e. Gigaspaces, JCache implementations, Rio can be accessed as well as a
+ * mule file, Journal or VM space.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SpaceConnector extends AbstractServiceEnabledConnector {
+public class SpaceConnector extends AbstractServiceEnabledConnector
+{
 
     private UMOSpaceFactory spaceFactory;
     private Map spaceProperties;
-    //Todo Mule 2.0 these are stored on the UMOManagementContext
+    // TODO Mule 2.0: these are stored on the UMOManagementContext
     private Map spaces = new HashMap();
 
-    public SpaceConnector() {
-
+    public SpaceConnector()
+    {
+        super();
     }
 
-    public String getProtocol() {
+    public String getProtocol()
+    {
         return "space";
     }
 
-    public void doInitialise() throws InitialisationException {
+    public void doInitialise() throws InitialisationException
+    {
         super.doInitialise();
-        if(spaceFactory==null) {
+        if (spaceFactory == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "spaceFactory"), this);
         }
-        if(spaceProperties!=null) {
+        if (spaceProperties != null) {
             BeanUtils.populateWithoutFail(spaceFactory, spaceProperties, true);
         }
 
     }
 
-    public UMOSpace getSpace(String spaceUrl) throws UMOSpaceException {
+    public UMOSpace getSpace(String spaceUrl) throws UMOSpaceException
+    {
         logger.info("looking for space: " + spaceUrl);
         UMOSpace space = (UMOSpace)spaces.get(spaceUrl);
-        if(space==null) {
+        if (space == null) {
             logger.info("Space not found, creating space: " + spaceUrl);
             space = spaceFactory.create(spaceUrl);
             spaces.put(spaceUrl, space);
@@ -73,52 +79,60 @@ public class SpaceConnector extends AbstractServiceEnabledConnector {
     }
 
     /**
-     * Will look up a space based on the URI.
-     * If the Space is created this method will honour the transaction information on the endpoint and
-     * set the space up accordingly
+     * Will look up a space based on the URI. If the Space is created this
+     * method will honour the transaction information on the endpoint and set
+     * the space up accordingly
+     * 
      * @param endpoint
      * @return
      * @throws UMOSpaceException
      */
-    public UMOSpace getSpace(UMOImmutableEndpoint endpoint) throws UMOSpaceException {
+    public UMOSpace getSpace(UMOImmutableEndpoint endpoint) throws UMOSpaceException
+    {
         String spaceUrl = endpoint.getEndpointURI().toString();
         logger.info("looking for space: " + spaceUrl);
         UMOSpace space = (UMOSpace)spaces.get(spaceUrl);
-        if(space==null) {
+        if (space == null) {
             logger.info("Space not found, creating space: " + spaceUrl);
             space = spaceFactory.create(endpoint);
             spaces.put(spaceUrl, space);
-            if(endpoint.getTransactionConfig().getFactory()!=null) {
+            if (endpoint.getTransactionConfig().getFactory() != null) {
                 space.setTransactionFactory(endpoint.getTransactionConfig().getFactory());
             }
         }
         return space;
     }
 
-    public UMOSpaceFactory getSpaceFactory() {
+    public UMOSpaceFactory getSpaceFactory()
+    {
         return spaceFactory;
     }
 
-    public void setSpaceFactory(UMOSpaceFactory spaceFactory) {
+    public void setSpaceFactory(UMOSpaceFactory spaceFactory)
+    {
         this.spaceFactory = spaceFactory;
     }
 
-    public Map getSpaceProperties() {
+    public Map getSpaceProperties()
+    {
         return spaceProperties;
     }
 
-    public void setSpaceProperties(Map spaceProperties) {
+    public void setSpaceProperties(Map spaceProperties)
+    {
         this.spaceProperties = spaceProperties;
     }
 
     /**
      * Template method to perform any work when destroying the connectoe
      */
-    protected void doDispose() {
+    protected void doDispose()
+    {
         for (Iterator iterator = spaces.values().iterator(); iterator.hasNext();) {
-            UMOSpace space = (UMOSpace) iterator.next();
+            UMOSpace space = (UMOSpace)iterator.next();
             space.dispose();
         }
         spaces.clear();
     }
+
 }

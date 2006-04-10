@@ -57,6 +57,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
     public HttpBasicAuthenticationFilter()
     {
+        super();
     }
 
     public HttpBasicAuthenticationFilter(String realm)
