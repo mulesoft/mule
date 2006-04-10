@@ -32,6 +32,7 @@ public class DataSourceWrapper implements DataSource
 
     public DataSourceWrapper()
     {
+        super();
     }
 
     public DataSourceWrapper(XADataSource xads, TransactionManager tm)

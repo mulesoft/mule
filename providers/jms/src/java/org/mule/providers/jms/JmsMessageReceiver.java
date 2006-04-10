@@ -87,6 +87,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
         }
 
         public void release() {
+            // no op
         }
     }
 }

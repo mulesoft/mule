@@ -13,11 +13,9 @@
  */
 package org.mule.providers.jdbc;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.dom4j.Node;
 import org.dom4j.io.DOMReader;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.sql.Connection;

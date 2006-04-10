@@ -13,7 +13,6 @@
  */
 package org.mule.providers.jdbc;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
@@ -25,8 +24,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -59,6 +56,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      */
     protected void doDispose()
     {
+        // template method
     }
 
     /*
@@ -134,8 +132,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      *         avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
-
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
         if (logger.isDebugEnabled()) {
             logger.debug("Trying to receive a message with a timeout of " + timeout);
         }
@@ -194,11 +192,14 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        // template method
     }
 
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() throws Exception
+    {
+        // template method
     }
 
     /*

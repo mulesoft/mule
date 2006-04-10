@@ -14,31 +14,8 @@
 
 package org.mule.providers.http.functional;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.UnsupportedEncodingException;
-
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.HttpConstants;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 
 /**
  * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>

@@ -13,8 +13,6 @@
  */
 package org.mule.providers.jdbc;
 
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;

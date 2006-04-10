@@ -44,7 +44,4 @@ public class GSConnectorTestCase extends AbstractConnectorTestCase
         return "Hello";
     }
 
-    public void testProperties() throws Exception
-    {
-    }
 }

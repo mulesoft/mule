@@ -92,56 +92,75 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try {
             setProperty(JmsConstants.JMS_CORRELATION_ID, this.message.getJMSCorrelationID());
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_DELIVERY_MODE, new Integer(this.message.getJMSDeliveryMode()));
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_DESTINATION, this.message.getJMSDestination());
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_EXPIRATION, new Long(this.message.getJMSExpiration()));
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_MESSAGE_ID, this.message.getJMSMessageID());
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_PRIORITY, new Integer(this.message.getJMSPriority()));
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(this.message.getJMSRedelivered()));
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_REPLY_TO, this.message.getJMSReplyTo());
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_TIMESTAMP, new Long(this.message.getJMSTimestamp()));
         } catch (JMSException e) {
+            // ignored
         }
+
         try {
             setProperty(JmsConstants.JMS_TYPE, this.message.getJMSType());
         } catch (JMSException e) {
+            // ignored
         }
 
         try {
             Enumeration e = this.message.getPropertyNames();
-
-            String key;
             while (e.hasMoreElements()) {
-                key = (String) e.nextElement();
+                String key = (String) e.nextElement();
                 try {
                     setProperty(key, this.message.getObjectProperty(key));
                 } catch (JMSException e1) {
+                    // ignored
                 }
             }
         } catch (JMSException e1) {
+            // ignored
         }
     }
 

@@ -170,6 +170,7 @@ public class JmsMessageUtils
                     }
                 }
                 catch (MessageEOFException eof) {
+                    // ignored
                 }
                 catch (Exception e) {
                     throw new JMSException("Failed to extract information from JMS Stream Message: " + e);

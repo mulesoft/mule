@@ -34,6 +34,7 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
 
     public JdbcTransaction()
     {
+        super();
     }
 
     /*

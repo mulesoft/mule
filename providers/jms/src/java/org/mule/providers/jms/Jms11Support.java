@@ -28,9 +28,6 @@ import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>Jms11Support</code> is a template class to provide an absstraction to
  * to the Jms 1.1 api specification.
@@ -214,5 +211,4 @@ public class Jms11Support implements JmsSupport
                       ttl);
     }
 
-    private static final transient Log logger = LogFactory.getLog(Jms11Support.class);
 }

@@ -11,12 +11,14 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.soap.glue;
 
 import electric.glue.context.ProxyContext;
 import electric.glue.context.ThreadContext;
 import electric.proxy.IProxy;
 import electric.registry.Registry;
+
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -35,25 +37,26 @@ import java.util.Map;
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
  * Glue invoking mechanism.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public class GlueMessageDispatcher extends AbstractMessageDispatcher
- {
+{
     protected IProxy proxy = null;
 
-    public GlueMessageDispatcher(UMOImmutableEndpoint endpoint) {
+    public GlueMessageDispatcher(UMOImmutableEndpoint endpoint)
+    {
         super(endpoint);
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        if(proxy==null)
-        {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        if (proxy == null) {
             String bindAddress = endpoint.getEndpointURI().getAddress();
-            String method = (String) endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
-            if (bindAddress.indexOf(".wsdl") == -1 && method!=null) {
+            String method = (String)endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+            if (bindAddress.indexOf(".wsdl") == -1 && method != null) {
                 bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
             }
             int i = bindAddress.indexOf("?");
@@ -61,40 +64,46 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
                 bindAddress = bindAddress.substring(0, i);
             }
 
-            //add credentials to the request
+            // add credentials to the request
             if (endpoint.getEndpointURI().getUsername() != null) {
                 ProxyContext context = new ProxyContext();
                 context.setAuthUser(endpoint.getEndpointURI().getUsername());
                 context.setAuthPassword(new String(endpoint.getEndpointURI().getPassword()));
                 proxy = Registry.bind(bindAddress, context);
-            } else {
+            }
+            else {
                 proxy = Registry.bind(bindAddress);
             }
         }
     }
 
-    protected void doDisconnect() throws Exception {
-        proxy=null;
+    protected void doDisconnect() throws Exception
+    {
+        proxy = null;
     }
 
-    protected void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception
+    {
         doSend(event);
     }
 
-    protected UMOMessage doSend(UMOEvent event) throws Exception {
+    protected UMOMessage doSend(UMOEvent event) throws Exception
+    {
 
-        String method = (String) event.getMessage().getStringProperty("method", null);
+        String method = event.getMessage().getStringProperty("method", null);
         setContext(event);
 
         Object payload = event.getTransformedMessage();
         Object[] args;
         if (payload instanceof Object[]) {
-            args = (Object[]) payload;
-        } else {
+            args = (Object[])payload;
+        }
+        else {
             args = new Object[]{payload};
         }
         if (event.getMessage().getReplyTo() != null) {
-            ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, event.getMessage().getReplyTo());
+            ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, event.getMessage()
+                    .getReplyTo());
         }
         if (event.getMessage().getCorrelationId() != null) {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage()
@@ -104,57 +113,72 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
             Object result = proxy.invoke(method, args);
             if (result == null) {
                 return null;
-            } else {
+            }
+            else {
                 return new MuleMessage(result);
             }
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), t);
         }
     }
 
     /**
      * Make a specific request to the underlying transport
-     *
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout  the maximum time the operation should block before returning. The call should
-     *                 return immediately if there is data available. If no data becomes available before the timeout
-     *                 elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     *         avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     * 
+     * @param endpoint
+     *            the endpoint to use when connecting to the resource
+     * @param timeout
+     *            the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available.
+     *            If no data becomes available before the timeout elapses, null
+     *            will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null
+     *         will be returned if no data was avaialable
+     * @throws Exception
+     *             if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
         Map props = new HashMap();
         props.putAll(endpoint.getProperties());
-        String method = (String) props.remove(SoapConstants.SOAP_METHOD_PROPERTY);
+        String method = (String)props.remove(SoapConstants.SOAP_METHOD_PROPERTY);
         try {
             Object result = proxy.invoke(method, props.values().toArray());
             return new MuleMessage(result);
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             throw new ReceiveException(endpoint, timeout, t);
         }
     }
 
-    public Object getDelegateSession() throws UMOException {
+    public Object getDelegateSession() throws UMOException
+    {
         return null;
     }
 
-    protected void doDispose() {
+    protected void doDispose()
+    {
+        // template method
     }
 
-    protected String getMethod(String endpoint) throws MalformedEndpointException {
+    protected String getMethod(String endpoint) throws MalformedEndpointException
+    {
         int i = endpoint.lastIndexOf("/");
         String method = endpoint.substring(i + 1);
         if (method.indexOf(".wsdl") != -1) {
-            throw new MalformedEndpointException("Soap url must contain method to invoke as a param [method=X] or as the last path element");
-        } else {
+            throw new MalformedEndpointException(
+                    "Soap url must contain method to invoke as a param [method=X] or as the last path element");
+        }
+        else {
             return method;
             // endpointUri = endpointUri.substring(0, endpointUri.length() -
             // (method.length() + 1));
         }
     }
 
-    protected void setContext(UMOEvent event) {
+    protected void setContext(UMOEvent event)
+    {
         Object replyTo = event.getMessage().getReplyTo();
         if (replyTo != null) {
             ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
@@ -167,12 +191,14 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
 
         int value = event.getMessage().getCorrelationSequence();
         if (value > 0) {
-            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(value));
+            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String
+                    .valueOf(value));
         }
 
         value = event.getMessage().getCorrelationGroupSize();
         if (value > 0) {
-            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(value));
+            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String
+                    .valueOf(value));
         }
     }
 }
