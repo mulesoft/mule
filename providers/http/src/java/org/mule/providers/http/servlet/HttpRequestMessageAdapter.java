@@ -16,11 +16,13 @@ package org.mule.providers.http.servlet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpConnector;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
@@ -33,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * <code>HttpRequestMessageAdapter</code> is a MUle message adapter for
@@ -54,16 +57,30 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             setPayload((HttpServletRequest)message);
             final Map parameterMap = request.getParameterMap();
             if (parameterMap != null && parameterMap.size() > 0) {
-                properties.putAll(parameterMap);
+                for (Iterator iterator = parameterMap.entrySet().iterator(); iterator.hasNext();) {
+                    Map.Entry entry = (Map.Entry) iterator.next();
+                    if(entry.getValue() !=null) {
+                        if(entry.getValue().getClass().isArray() && ((Object[])entry.getValue()).length==1) {
+                            properties.put(entry.getKey(), ((Object[])entry.getValue())[0]);
+                        } else {
+                            properties.put(entry.getKey(), entry.getValue());
+                        }
+                    }
+                }
             }
             String key;
             for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
                 key = (String)e.nextElement();
                 properties.put(key, request.getAttribute(key));
             }
+            String realKey;
             for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
                 key = (String)e.nextElement();
-                properties.put(key, request.getHeader(key));
+                realKey = key;
+                if(key.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+                    realKey = key.substring(2);
+                }
+                properties.put(realKey, request.getHeader(key));
             }
         }
         else {
@@ -130,7 +147,17 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     private void setPayload(HttpServletRequest message) throws MessagingException
     {
         try {
+
             request = message;
+//            String httpRequest = null;
+//            httpRequest = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getServletPath();
+//            httpRequest += request.getPathInfo();
+//            if(StringUtils.isNotBlank(request.getQueryString())) {
+//                httpRequest += "?" + request.getQueryString();
+//            }
+//            setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, httpRequest);
+//            this.message = httpRequest;
+            
             // Check if a payload parameter has been set, if so use it
             // otherwise we'll use the request payload
             String payloadParam = (String)request
@@ -143,7 +170,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             if (payload == null) {
                 if (isText(request.getContentType())) {
                     BufferedReader reader = request.getReader();
-                    StringBuffer buffer = new StringBuffer(32768);
+                    StringBuffer buffer = new StringBuffer(8192);
                     String line;
                     while ((line = reader.readLine()) != null) {
                         buffer.append(line);
@@ -152,7 +179,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                     this.message = buffer.toString();
                 }
                 else {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream(32768);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                     IOUtils.copy(request.getInputStream(), baos);
                     this.message = baos.toByteArray();
                 }
@@ -160,7 +187,9 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             else {
                 this.message = payload;
             }
-
+//            if(message==null || StringUtils.isBlank(this.message.toString())) {
+//                this.message = httpRequest;
+//            }
         }
         catch (IOException e) {
             throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()),
