@@ -85,7 +85,7 @@ public class FutureMessageResult extends FutureTask
      */
     public void execute()
     {
-    	// TODO rather use ExecutorService.submit()
+    	// TODO MULE-732 - rather use ExecutorService.submit()
     	new Thread(this).start();
     }
 
