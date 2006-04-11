@@ -28,5 +28,5 @@ public interface CreditAgencyService
 {
     CreditProfile getCreditProfile(Customer customer);
 
-    void getCreditProfile(BankQuoteRequest request);
+    //void getCreditProfile(BankQuoteRequest request);
 }

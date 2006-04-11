@@ -27,7 +27,7 @@ import org.mule.samples.loanbroker.LoanRequest;
  */
 public interface BankService
 {
-    LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile);
+    //LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile);
 
     LoanQuote getLoanQuote(BankQuoteRequest request);
 }

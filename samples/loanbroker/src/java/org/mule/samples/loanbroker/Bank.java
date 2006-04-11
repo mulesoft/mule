@@ -58,14 +58,14 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
         this.bankName = descriptor.getName();
     }
 
-    public LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile)
-    {
-        LoanQuote quote = new LoanQuote();
-        quote.setBankName(getBankName());
-        quote.setInterestRate(primeRate);
-        logger.info("Returning Rate is:" + quote);
-        return quote;
-    }
+//    public LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile)
+//    {
+//        LoanQuote quote = new LoanQuote();
+//        quote.setBankName(getBankName());
+//        quote.setInterestRate(primeRate);
+//        logger.info("Returning Rate is:" + quote);
+//        return quote;
+//    }
 
     public LoanQuote getLoanQuote(BankQuoteRequest request)
     {

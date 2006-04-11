@@ -51,12 +51,12 @@ public class DefaultCreditAgencyService implements CreditAgencyService
         return cp;
     }
 
-    public void getCreditProfile(BankQuoteRequest request)
-    {
-        CreditProfile cp = new CreditProfile();
-        Customer customer = request.getLoanRequest().getCustomer();
-        cp.setCreditHistoryLength(getCreditHistoryLength(customer.getSsn()));
-        cp.setCreditScore(getCreditScore(customer.getSsn()));
-        request.getLoanRequest().setCreditProfile(cp);
-    }
+//    public void getCreditProfile(BankQuoteRequest request)
+//    {
+//        CreditProfile cp = new CreditProfile();
+//        Customer customer = request.getLoanRequest().getCustomer();
+//        cp.setCreditHistoryLength(getCreditHistoryLength(customer.getSsn()));
+//        cp.setCreditScore(getCreditScore(customer.getSsn()));
+//        request.getLoanRequest().setCreditProfile(cp);
+//    }
 }
