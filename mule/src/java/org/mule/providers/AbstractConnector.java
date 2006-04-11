@@ -15,7 +15,6 @@ package org.mule.providers;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -49,8 +48,8 @@ import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -291,11 +290,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (logger.isInfoEnabled()) {
             logger.info("Initialising " + getClass().getName());
         }
+
+        doInitialise();
         if (exceptionListener instanceof Initialisable) {
             ((Initialisable) exceptionListener).initialise();
         }
-
-        doInitialise();
         initialised.set(true);
     }
 
@@ -850,7 +849,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (connected.get()) {
             return;
         }
-
+        checkDisposed();
         if (connecting.commit(false, true)) {
             connectionStrategy.connect(this);
             logger.info("Connected: " + getConnectionDescription());
