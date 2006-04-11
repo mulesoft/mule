@@ -31,11 +31,13 @@ import java.util.List;
 
 public class StaticRecipientList extends AbstractRecipientList
 {
+    public static final String RECIPIENTS_PROPERTY = "recipients";
+
     private CopyOnWriteArrayList recipients = new CopyOnWriteArrayList();
 
     protected CopyOnWriteArrayList getRecipients(UMOMessage message)
     {
-        CopyOnWriteArrayList list = createList(message.removeProperty("recipients"));
+        CopyOnWriteArrayList list = createList(message.removeProperty(RECIPIENTS_PROPERTY));
         if(list==null) {
             list = recipients;
         }
