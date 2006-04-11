@@ -14,7 +14,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -22,11 +21,13 @@ import org.mule.impl.message.ExceptionMessage;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
 import org.mule.umo.TransactionException;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -170,14 +171,28 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
             try {
                 logger.error("Message being processed is: " + (message == null ? "null" : message.toString()));
                 UMOEventContext ctx = RequestContext.getEventContext();
-                ExceptionMessage msg = null;
-                if (failedEndpoint != null) {
-                    msg = new ExceptionMessage(getErrorMessagePayload(message), failedEndpoint, t, ctx);
-                } else {
-                    msg = new ExceptionMessage(getErrorMessagePayload(message), t, ctx);
+                String component = "Unknown";
+                UMOEndpointURI endpointUri = null;
+                if(ctx!=null) {
+                    component = ctx.getComponentDescriptor().getName();
+                    endpointUri = ctx.getEndpointURI();
+                } else if(failedEndpoint!=null) {
+                    endpointUri = failedEndpoint.getEndpointURI();
                 }
+                ExceptionMessage msg = null;
+                msg = new ExceptionMessage(getErrorMessagePayload(message), t, component, endpointUri);
 
-                ctx.sendEvent(new MuleMessage(msg, ctx.getMessage()), endpoint);
+                UMOMessage exceptionMessage = null;
+                if(ctx==null) {
+                    exceptionMessage = new MuleMessage(msg);
+                } else {
+                    exceptionMessage = new MuleMessage(msg, ctx.getMessage());
+                }
+                UMOEvent exceptionEvent = new MuleEvent(exceptionMessage, endpoint,
+                        new MuleSession(exceptionMessage, new MuleSessionHandler()), true);
+                RequestContext.setEvent(exceptionEvent);
+                endpoint.getConnector().getDispatcher(endpoint).send(exceptionEvent);
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("routed Exception message via " + endpoint);
                 }
