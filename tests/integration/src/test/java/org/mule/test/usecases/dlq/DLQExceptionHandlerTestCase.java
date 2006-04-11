@@ -17,6 +17,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 
 import javax.jms.ObjectMessage;
 
@@ -33,16 +34,20 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
     public void testDLQ() throws Exception
     {
         MuleClient client = new MuleClient();
+        client.getManager().start();
         client.dispatch("jms://request.queue", "testing 1 2 3", null);
 
         UMOMessage message = client.receive("jms://out.queue", 3000);
         assertNull(message);
 
-        message = client.receive("jms://DLQ", 500000000);
+        try {
+            message = client.receive("jms://DLQ", 6000000);
+        } catch (UMOException e) {
+            e.printStackTrace(System.err);
+        }
         assertNotNull(message);
 
-        ObjectMessage m = (ObjectMessage) message.getPayload();
-        ExceptionMessage em = (ExceptionMessage) m.getObject();
+        ExceptionMessage em = (ExceptionMessage) message.getPayload();
         assertEquals("testing 1 2 3", em.getPayload());
     }
 }
