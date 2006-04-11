@@ -31,6 +31,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.MuleProperties;
 
 import javax.activation.DataHandler;
 
@@ -67,6 +68,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
             client.setXFire(xfire);
             client.setEndpointUri(endpoint.getEndpointURI().toString());
+            client.addInHandler(new MuleHeadersInHandler());
+            client.addOutHandler(new MuleHeadersOutHandler());
         }
     }
 
@@ -123,19 +126,19 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         if (client.getTimeout() != event.getTimeout()) {
             client.setTimeout(event.getTimeout());
         }
+        client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         String method = getMethod(event);
         Object[] response = client.invoke(method, getArgs(event));
+        UMOMessage result = null;
         if (response != null && response.length <= 1) {
             if (response.length == 1) {
-                return new MuleMessage(response[0], event.getMessage());
-            }
-            else {
-                return null;
+                result = new MuleMessage(response[0], event.getMessage());
             }
         }
         else {
-            return new MuleMessage(response, event.getMessage());
+            result = new MuleMessage(response, event.getMessage());
         }
+        return result;
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
@@ -143,6 +146,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         if (client.getTimeout() != event.getTimeout()) {
             client.setTimeout(event.getTimeout());
         }
+        client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         String method = getMethod(event);
         client.invoke(method, getArgs(event));
     }

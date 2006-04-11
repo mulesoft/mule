@@ -13,9 +13,13 @@
  */
 package org.mule.providers.soap;
 
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.dom4j.dom.DOMElement;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -23,7 +27,6 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
-
 import java.util.Iterator;
 
 /**
@@ -82,7 +85,7 @@ public class MuleSoapHeaders
     protected void readElements(Iterator elements) {
         Element element;
         while (elements.hasNext()) {
-                element = (SOAPElement) elements.next();
+                element = (Element)elements.next();
                 if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getLocalName())) {
                     correlationId = getStringValue(element);
                 } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getLocalName())) {
@@ -147,6 +150,36 @@ public class MuleSoapHeaders
             e.addTextNode(replyTo);
         }
     }
+
+    public Element createHeaders() throws Exception
+    {
+        Element muleHeader = null;
+
+        if (correlationId != null || replyTo != null) {
+            muleHeader = new DOMElement(new QName(MULE_HEADER, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR)));
+        } else {
+            return null;
+        }
+
+        if (correlationId != null) {
+            Node e = muleHeader.appendChild(new DOMElement(new QName(MuleProperties.MULE_CORRELATION_ID_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+            e.setNodeValue(correlationId);
+
+            e = muleHeader.appendChild(new DOMElement(new QName(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+            e.setNodeValue(correlationGroup);
+
+            e = muleHeader.appendChild(new DOMElement(new QName(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+            e.setNodeValue(correlationSequence);
+        }
+        if (replyTo != null) {
+
+            Node e = muleHeader.appendChild(new DOMElement(new QName(MuleProperties.MULE_REPLY_TO_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+            e.setNodeValue(replyTo);
+        }
+        return muleHeader;
+    }
+
+
 
     public String getReplyTo()
     {

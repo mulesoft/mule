@@ -22,6 +22,9 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.config.MuleProperties;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 import javax.activation.DataHandler;
 
@@ -109,25 +112,32 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     protected void initHeaders()
     {
-        if (messageContext.getInMessage().hasHeader()) {
-            MuleSoapHeaders header = new MuleSoapHeaders(messageContext.getInMessage().getHeader()
-                    .getChildren().iterator());
-
-            if (StringUtils.isNotBlank(header.getReplyTo())) {
-                setReplyTo(header.getReplyTo());
-            }
-
-            if (StringUtils.isNotBlank(header.getCorrelationGroup())
-                    && !"-1".equals(header.getCorrelationGroup())) {
-                setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
-            }
-            if (StringUtils.isNotBlank(header.getCorrelationSequence())) {
-                setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
-            }
-            if (StringUtils.isNotBlank(header.getCorrelationId())) {
-                setCorrelationId(header.getCorrelationId());
+        if(messageContext.getInMessage()!=null) {
+            Element header = messageContext.getInMessage().getHeader();
+            if(header==null) return;
+            
+            Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE, MuleSoapHeaders.MULE_10_ACTOR);
+            Element muleHeaders = header.getChild(MuleSoapHeaders.MULE_HEADER, ns);
+            if(muleHeaders!=null) {
+                Element child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_ID_PROPERTY, ns);
+                if(child!=null) {
+                    setCorrelationId(child.getText());
+                }
+                child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, ns);
+                if(child!=null) {
+                    setCorrelationGroupSize(Integer.valueOf(child.getText()).intValue());
+                }
+                child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, ns);
+                if(child!=null) {
+                    setCorrelationSequence(Integer.valueOf(child.getText()).intValue());
+                }
+                child = muleHeaders.getChild(MuleProperties.MULE_REPLY_TO_PROPERTY, ns);
+                if(child!=null) {
+                    setReplyTo(child.getText());
+                }
             }
         }
+
     }
 
     protected void initAttachments()

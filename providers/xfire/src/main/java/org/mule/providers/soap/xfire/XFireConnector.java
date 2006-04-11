@@ -28,6 +28,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -153,11 +154,11 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
 
         // Set the transformers on the endpoint too
-        // serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-        // receiver.getEndpoint().setTransformer(null);
-        //
-        // serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
-        // receiver.getEndpoint().setResponseTransformer(null);
+         serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+         receiver.getEndpoint().setTransformer(null);
+
+         serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
+         receiver.getEndpoint().setResponseTransformer(null);
 
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
@@ -191,6 +192,23 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     public void setServiceFactory(ObjectServiceFactory serviceFactory)
     {
         this.serviceFactory = serviceFactory;
+    }
+
+    /**
+     * The method determines the key used to store the receiver against.
+     *
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint  the endpoint being registered for the component
+     * @return the key to store the newly created receiver against. In this case
+     *         it is the component name, which is equivilent to the Axis service
+     *         name.
+     */
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+        if(endpoint.getEndpointURI().getPort()==-1) {
+            return component.getDescriptor().getName();
+        } else {
+            return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+        }
     }
 
     public void onNotification(UMOServerNotification event)
