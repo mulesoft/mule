@@ -9,10 +9,6 @@
         <mule-descriptor name="mycomponent"
             implementation="org.mule.test.integration.service.TestServiceComponent"
             inboundEndpoint="glue:http://localhost:38003/mule/services">
-<!--            <outbound-router>-->
-<!--                <router endpoints="glue:http://localhost:38004/mule/mycomponent2/echo stream://System.out" className="org.mule.routing.outbound.ChainingRouter">-->
-<!--                </router>-->
-<!--            </outbound-router>-->
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
