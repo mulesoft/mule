@@ -44,7 +44,7 @@
                 <exclude>**/AxisClientWithComplexTypesTestCase.*</exclude>
                 <exclude>**/ReplytoChainIntegration2TestCase.*</exclude>
                 <exclude>**/ReplytoChainIntegration4TestCase.*</exclude>
-                <exclude>**/FileStreamingTestCase.*</exclude>
+                <exclude>**/FileStreamingFunctionalTestCase.*</exclude>
 
             </excludes>
             <resources>
