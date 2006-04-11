@@ -50,7 +50,7 @@ import java.util.Map;
 public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 {
 
-    public static final String CUSTOM_HEADER_PREFIX = "X-";
+    public static final String CUSTOM_HEADER_PREFIX = "";
     private SimpleDateFormat format = null;
     private String server = null;
     private SerializableToByteArray serializableToByteArray;
