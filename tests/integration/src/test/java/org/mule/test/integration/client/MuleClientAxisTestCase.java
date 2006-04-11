@@ -25,7 +25,7 @@ import org.mule.umo.UMOMessage;
 public class MuleClientAxisTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
-        return "org/mule/test/integration/client/axis-test-mule-config.xml";
+        return "org/mule/test/integration/client/axis-client-test-mule-config.xml";
     }
 
     public void testRequestResponse() throws Throwable
