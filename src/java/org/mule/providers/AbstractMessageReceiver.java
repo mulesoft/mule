@@ -16,7 +16,6 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -31,22 +30,21 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -163,6 +161,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         connector.getExceptionListener().exceptionThrown(exception);
         if (exception instanceof ConnectException) {
             try {
+                logger.warn("Reconnecting after exception: " + exception.getMessage(), exception);
                 connectionStrategy.connect(this);
             } catch (UMOException e) {
                 connector.getExceptionListener().exceptionThrown(e);
