@@ -15,7 +15,6 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.mule.umo.UMOMessage;
 import org.mule.util.Utility;
 
@@ -37,9 +36,6 @@ public class StaticRecipientList extends AbstractRecipientList
     protected CopyOnWriteArrayList getRecipients(UMOMessage message)
     {
         CopyOnWriteArrayList list = createList(message.removeProperty("recipients"));
-        if(list == null) {
-            list = createList(message.getProperty("recipients"));
-        }
         if(list==null) {
             list = recipients;
         }
