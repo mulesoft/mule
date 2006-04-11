@@ -20,6 +20,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.impl.RequestContext;
 
 /**
  * <code>ExceptionMessage</code> is used by the
@@ -36,38 +37,23 @@ public class ExceptionMessage extends BaseMessage
     private UMOEndpointURI endpointUri;
     private Date timeStamp;
 
-    public ExceptionMessage(Object message, UMOImmutableEndpoint endpoint, Throwable exception, UMOEventContext ctx)
+
+
+    public ExceptionMessage(Object message, Throwable exception, String componentName, UMOEndpointURI endpointUri)
     {
         super(message);
         this.exception = exception;
         timeStamp = new Date();
-        componentName = ctx.getComponentDescriptor().getName();
+        this.componentName = componentName;
+        this.endpointUri = endpointUri;
 
-        if (endpoint != null) {
-            endpointUri = endpoint.getEndpointURI();
-        } else {
-            endpointUri = ctx.getEndpointURI();
-        }
-
-        UMOMessage msg = ctx.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKey =  iterator.next();
-            setProperty(propertyKey, msg.getProperty(propertyKey));
-        }
-    }
-
-    public ExceptionMessage(Object message, Throwable exception, UMOEventContext ctx)
-    {
-        super(message);
-        this.exception = exception;
-        timeStamp = new Date();
-        componentName = ctx.getComponentDescriptor().getName();
-        endpointUri = ctx.getEndpointURI();
-
-        UMOMessage msg = ctx.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKey =  iterator.next();
-            setProperty(propertyKey, msg.getProperty(propertyKey));
+        UMOEventContext ctx = RequestContext.getEventContext();
+        if(ctx!=null) {
+            UMOMessage msg = ctx.getMessage();
+            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+                Object propertyKey =  iterator.next();
+                setProperty(propertyKey, msg.getProperty(propertyKey));
+            }
         }
     }
 
