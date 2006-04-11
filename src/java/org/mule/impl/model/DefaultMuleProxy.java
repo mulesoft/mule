@@ -42,6 +42,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
@@ -227,7 +228,7 @@ public class DefaultMuleProxy implements MuleProxy
             if (event.getEndpoint().canReceive()) {
                 RequestContext.setEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
-                ReplyToHandler replyToHandler = getReplyToHandler(event);
+                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 // stats
@@ -345,14 +346,14 @@ public class DefaultMuleProxy implements MuleProxy
         suspended = false;
     }
 
-    protected ReplyToHandler getReplyToHandler(UMOEvent event) {
-        Object replyTo = event.getMessage().getReplyTo();
+    protected ReplyToHandler getReplyToHandler(UMOMessage message, UMOImmutableEndpoint endpoint) {
+        Object replyTo = message.getReplyTo();
         ReplyToHandler replyToHandler = null;
         if (replyTo != null) {
-            replyToHandler = ((AbstractConnector) event.getEndpoint().getConnector()).getReplyToHandler();
+            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
             //Use the response transformer for the event if one is set
-            if(event.getEndpoint().getResponseTransformer()!=null) {
-                replyToHandler.setTransformer(event.getEndpoint().getResponseTransformer());
+            if(endpoint.getResponseTransformer()!=null) {
+                replyToHandler.setTransformer(endpoint.getResponseTransformer());
             }
         }
         return replyToHandler;
@@ -397,7 +398,7 @@ public class DefaultMuleProxy implements MuleProxy
                 // dispatch the next receiver
                 RequestContext.setEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();                
-                ReplyToHandler replyToHandler = getReplyToHandler(event);
+                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 // do stats
