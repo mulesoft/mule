@@ -24,25 +24,23 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
+public class MuleClientHttpsFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    protected static final String TEST_MESSAGE = "Test Http Request";
+    protected static final String TEST_MESSAGE = "Test Https Request";
 
     private List results = new ArrayList();
 
     protected UMOEndpointURI getInDest()
     {
         try {
-            return new MuleEndpointURI("http://localhost:60198");
+            return new MuleEndpointURI("https://localhost:50198");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
@@ -85,43 +83,5 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
             assertNotNull(result);
             assertEquals(TEST_MESSAGE + i + " Received", new String(result));
         }
-    }
-
-    protected String getClientUrl()
-    {
-        return "http://www.google.com.au";
-    }
-
-    public void testClient() throws Exception
-    {
-        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClient()")) {
-            return;
-        }
-
-        MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        props.put("http.method", "GET");
-        UMOMessage m = client.send(getClientUrl(), null, props);
-        assertNotNull(m);
-        assertNotNull(m.getPayload());
-        System.out.println(m.getPayloadAsString());
-        assertTrue(m.getPayloadAsString().indexOf("google") > -1);
-    }
-
-    public void testClientWithPath() throws Exception
-    {
-        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClientWithPath()")) {
-            return;
-        }
-
-        String requestAddress = "http://mule.codehaus.org/docs/apidocs/";
-        MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        props.put("http.method", "GET");
-
-        UMOMessage m = client.send(requestAddress, null, props);
-        assertNotNull(m);
-        assertNotNull(m.getPayload());
-        assertTrue(m.getPayloadAsString().indexOf("javadoc") > -1);
     }
 }

@@ -18,6 +18,7 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -72,7 +73,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         URI uri = getInDest().getUri();
         postMethod = new PostMethod(uri.toString());
 		postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE, TEST_CONTENT_TYPE, TEST_CHARSET));
-        cnn = new HttpConnection(uri.getHost(), uri.getPort());
+        cnn = new HttpConnection(uri.getHost(), uri.getPort(), Protocol.getProtocol(uri.getScheme()));
         cnn.open();
         postMethod.execute(new HttpState(), cnn);
     }

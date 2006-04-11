@@ -20,7 +20,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.Utility;
 
 import javax.net.ssl.KeyManagerFactory;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,7 +56,7 @@ public class HttpsConnector extends HttpConnector
     private boolean explicitTrustStoreOnly = false;
 
     private KeyManagerFactory keyManagerFactory = null;
-    private boolean requireClientAuthentication = true;
+    private boolean requireClientAuthentication = false;
 
     public void doInitialise() throws InitialisationException
     {
@@ -97,7 +96,7 @@ public class HttpsConnector extends HttpConnector
             // Get key manager
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
             // Initialize the KeyManagerFactory to work with our keyStore
-            keyManagerFactory.init(keystore, getStorePassword().toCharArray());
+            keyManagerFactory.init(keystore, getKeyPassword().toCharArray());
         }
         catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e,
@@ -138,16 +137,18 @@ public class HttpsConnector extends HttpConnector
             logger.info("Defaulting trust store to client Key Store");
             trustStore = getClientKeyStore();
             trustStorePassword = getClientKeyStorePassword();
-            System.setProperty("javax.net.ssl.trustStore", getTrustStore());
-            System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
-            logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
+            if(trustStore!=null) {
+                System.setProperty("javax.net.ssl.trustStore", getTrustStore());
+                System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
+                logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
+            }
         }
 
     }
 
     public String getProtocol()
     {
-        return "HTTPS";
+        return "https";
     }
 
     public String getKeyStore()
