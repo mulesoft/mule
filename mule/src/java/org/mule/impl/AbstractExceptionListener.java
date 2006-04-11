@@ -174,7 +174,9 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 String component = "Unknown";
                 UMOEndpointURI endpointUri = null;
                 if(ctx!=null) {
-                    component = ctx.getComponentDescriptor().getName();
+                    if(ctx.getComponentDescriptor()!=null) {
+                        component = ctx.getComponentDescriptor().getName();
+                    }
                     endpointUri = ctx.getEndpointURI();
                 } else if(failedEndpoint!=null) {
                     endpointUri = failedEndpoint.getEndpointURI();

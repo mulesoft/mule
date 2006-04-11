@@ -15,7 +15,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -629,7 +628,11 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMODescriptor getComponentDescriptor()
     {
-        return event.getComponent().getDescriptor();
+        if(event.getComponent()!=null) {
+            return event.getComponent().getDescriptor();
+        } else {
+            return null;
+        }
     }
 
     /**
