@@ -16,7 +16,7 @@ package org.mule.test.integration.providers.http;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.HttpsConnector;
+import org.mule.providers.http.HttpConnector;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
@@ -56,14 +56,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOConnector createConnector() throws Exception
     {
-        HttpsConnector connector = new HttpsConnector();
-        connector.setName("testHttps");
+        HttpConnector connector = new HttpConnector();
+        connector.setName("testHttp");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        connector.setKeyStore("muletest.keystore");
-        connector.setStorePassword("password");
-        connector.setKeyPassword("keypassword");
-        connector.setTrustStorePassword("password");
-        connector.setTrustStore("muletest.truststore");
         return connector;
     }
 
