@@ -14,7 +14,6 @@
 package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,6 +47,8 @@ import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
+import org.mule.impl.space.SpaceMonitorNotification;
+import org.mule.impl.space.SpaceMonitorNotificationListener;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
@@ -75,7 +76,6 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -250,6 +250,7 @@ public class MuleManager implements UMOManager
         notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
         notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
         notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
+        notificationManager.registerEventType(SpaceMonitorNotification.class, SpaceMonitorNotificationListener.class);
 
     }
 
