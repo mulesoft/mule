@@ -41,49 +41,45 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
 
-//     public void testClientSendDirect() throws Exception
-//     {
-//     MuleClient client = new MuleClient();
-//     MuleManager.getConfiguration().setSynchronous(true);
+    public void testClientSendDirect() throws Exception {
+        MuleClient client = new MuleClient();
+        MuleManager.getConfiguration().setSynchronous(true);
+
+        UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
+        assertNotNull(message);
+        assertEquals("Received: Test Client Send message", message.getPayload());
+    }
+
+//    public void testClientDispatchDirect() throws Exception {
+//        MuleClient client = new MuleClient();
+//        MuleManager.getConfiguration().setSynchronous(true);
 //
-//     UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
-//     assertNotNull(message);
-//     assertEquals("Received: Test Client Send message", message.getPayload());
-//     }
-//
-//     public void testClientDispatchDirect() throws Exception
-//     {
-//     MuleClient client = new MuleClient();
-//     MuleManager.getConfiguration().setSynchronous(true);
-//
-//     client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message",
-//     null);
-//     }
-//
-//     public void testClientSend() throws Exception
-//     {
-//     MuleClient client = new MuleClient();
-//     MuleManager.getConfiguration().setSynchronous(true);
-//     MuleManager.getConfiguration().setRemoteSync(true);
-//
-//     UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
-//     assertNotNull(message);
-//     assertEquals("Received: Test Client Send message", message.getPayload());
-//     }
-//
-//     public void testClientMultiSend() throws Exception
-//     {
-//     MuleClient client = new MuleClient();
-//     MuleManager.getConfiguration().setSynchronous(true);
-//     MuleManager.getConfiguration().setRemoteSync(true);
-//
-//     for(int i = 0;i < INTERATIONS;i++) {
-//     UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
-//     assertNotNull(message);
-//     assertEquals("Received: Test Client Send message " + i,
-//     message.getPayload());
-//     }
-//     }
+//        client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message",
+//                null);
+//    }
+
+    public void testClientSend() throws Exception {
+        MuleClient client = new MuleClient();
+        MuleManager.getConfiguration().setSynchronous(true);
+        MuleManager.getConfiguration().setRemoteSync(true);
+
+        UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+        assertNotNull(message);
+        assertEquals("Received: Test Client Send message", message.getPayload());
+    }
+
+    public void testClientMultiSend() throws Exception {
+        MuleClient client = new MuleClient();
+        MuleManager.getConfiguration().setSynchronous(true);
+        MuleManager.getConfiguration().setRemoteSync(true);
+
+        for (int i = 0; i < INTERATIONS; i++) {
+            UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+            assertNotNull(message);
+            assertEquals("Received: Test Client Send message " + i,
+                    message.getPayload());
+        }
+    }
 //
 //     public void testClientMultiDispatch() throws Exception
 //     {
@@ -120,14 +116,14 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
 
         start = System.currentTimeMillis();
         for (i = 0; i < INTERATIONS; i++) {
-            UMOMessage message = client.receive("jms://replyTo.queue", 10000);
+            UMOMessage message = client.receive("jms://replyTo.queue", 20000);
             assertNotNull("message should not be null from Reply queue", message);
             System.out.println("Count is " + i);
-            System.out.println(((TextMessage) message.getPayload()).getText());
+            System.out.println(message.getPayloadAsString());
+            assertTrue(message.getPayloadAsString().startsWith("Received"));
         }
         time = System.currentTimeMillis() - start;
         System.out.println("It took " + time + "ms to receive " + i + " messages");
-
     }
 
     public String getDispatchUrl() {
