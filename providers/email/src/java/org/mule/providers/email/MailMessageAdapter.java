@@ -1,36 +1,38 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
 package org.mule.providers.email;
 
-import org.apache.commons.io.IOUtils;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
 
 import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.SystemUtils;
+import org.mule.config.i18n.Messages;
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
  * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message.
@@ -49,7 +51,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOMessageAdapter#getPayload()
      */
     public Object getPayload() {
@@ -58,7 +60,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
     public byte[] getPayloadAsBytes() throws Exception {
@@ -69,6 +71,12 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 getPayloadAsString();
             } else {
                 InputStream is = messagePart.getInputStream();
+                // If the stream is not already buffered, wrap a BufferedInputStream
+                // around it.
+                if ((is instanceof BufferedInputStream) == false) {
+                    is = new BufferedInputStream(is);
+                }
+
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(32768);
                 IOUtils.copy(is, baos);
                 contentBuffer = baos.toByteArray();
@@ -91,16 +99,22 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
 
             if (contentType.startsWith("text/")) {
                 InputStream is = messagePart.getInputStream();
+                // If the stream is not already buffered, wrap a BufferedInputStream
+                // around it.
+                if ((is instanceof BufferedInputStream) == false) {
+                    is = new BufferedInputStream(is);
+                }
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 StringBuffer buffer = new StringBuffer(32768);
-                String line = reader.readLine();
-                buffer.append(line);
 
+                String line = reader.readLine();
+                buffer.append(line).append(SystemUtils.LINE_SEPARATOR);
                 while (line != null) {
                     line = reader.readLine();
-                    buffer.append(line);
+                    buffer.append(line).append(SystemUtils.LINE_SEPARATOR);
                 }
+
                 contentBuffer = buffer.toString().getBytes();
             } else {
                 contentBuffer = getPayloadAsBytes();
@@ -111,7 +125,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
     protected void setMessage(Object message) throws MessagingException {
