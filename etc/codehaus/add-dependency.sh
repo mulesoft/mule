@@ -17,21 +17,24 @@ MD5="/home/projects/mule/bin/md5 -l"
 
 if [ $# = 1 ]
 then
-	echo "Enter groupId:"
+	echo "Enter groupId (can be multi-part, such as javax.mail):"
 	read groupId
 	echo "Enter artifactId:"
 	read artifactId
 	echo "Enter version:"
 	read version
 
-	path=$DEPENDENCIES/$groupId/$artifactId/$version
+	# Convert the group's package to a path (e.g. javax.mail --> javax/mail)
+	groupPath=`echo $groupId | sed s*[.]*/*g`
+
+	path=$DEPENDENCIES/$groupPath/$artifactId/$version
 	file=$artifactId-$version
 
 	echo "Creating directory $path"
 	mkdir -p $path	
 	echo "Setting directory privileges"
-	chmod -R 775 $DEPENDENCIES/$groupId
-	chown -R :mule $DEPENDENCIES/$groupId
+	chmod -fR 775 $DEPENDENCIES
+	chown -fR :mule $DEPENDENCIES
 
 	echo "Installing library as $artifactId-$version.jar"
 	cp $1 $path/$file.jar
