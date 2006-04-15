@@ -14,7 +14,6 @@
 package org.mule.test.integration.client;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -23,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a> 
  * @version $Revision$
  */
 public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
@@ -36,16 +35,11 @@ public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
 
         String input =  "IBM";
         Map properties = new HashMap();
-        properties.put(AxisConnector.WSDL_URL_PROPERTY, "http://services.xmethods.net/soap/urn:xmethods-delayed-quotes.wsdl");
-        properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}#${method}");
-        properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "urn:xmethods-delayed-quotes");
-        String url = "axis:http://services.xmethods.net:9090/soap?method=getQuote";
+//        properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
+//        properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
+        String url = "wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&method=GetQuote";
         MuleClient client = null;
-        try {
-            client = new MuleClient();
-        } catch (UMOException e) {
-            e.printStackTrace();
-        }
+        client = new MuleClient();
         UMOMessage result = null;
         try {
             result = client.send(url, input,  properties);
