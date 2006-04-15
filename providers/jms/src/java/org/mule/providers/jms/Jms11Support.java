@@ -128,10 +128,8 @@ public class Jms11Support implements JmsSupport
 
         if (topic) {
             return session.createTopic(name);
-        } else if (session instanceof QueueSession) {
-            return session.createQueue(name);
         } else {
-            throw new IllegalArgumentException("Session and domain type do not match");
+            return session.createQueue(name);
         }
     }
 
@@ -161,10 +159,8 @@ public class Jms11Support implements JmsSupport
 
         if (topic) {
             return session.createTemporaryTopic();
-        } else if (session instanceof QueueSession) {
-            return session.createTemporaryQueue();
         } else {
-            throw new IllegalArgumentException("Session and domain type do not match");
+            return session.createTemporaryQueue();
         }
     }
 
