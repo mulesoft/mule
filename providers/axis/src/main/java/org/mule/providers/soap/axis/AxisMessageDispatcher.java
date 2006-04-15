@@ -48,7 +48,6 @@ import org.mule.util.TemplateParser;
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,11 +121,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         EngineConfiguration config = getClientConfig(endpoint);
         Service service = new Service(config);
         return service;
-    }
-
-    protected String getWsdlUrl(UMOEvent event)
-    {
-        return event.getMessage().getStringProperty(AxisConnector.WSDL_URL_PROPERTY, StringUtils.EMPTY);
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
