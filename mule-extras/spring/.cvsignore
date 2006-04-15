@@ -1,9 +1,0 @@
-target
-spring.iml
-xdoc
-.classpath
-.project
-bin
-mule-extras-spring.iml
-.fbprefs
-.fbwarnings

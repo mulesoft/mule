@@ -1,8 +1,0 @@
-bin
-target
-.classpath
-.project
-mule-dq-provider.iml
-.mule
-.fbprefs
-.fbwarnings

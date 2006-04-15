@@ -1,9 +1,0 @@
-target
-.classpath
-.project
-bin
-.mule
-mule-axis-provider.iml
-.fbprefs
-.fbwarnings
-mule.log

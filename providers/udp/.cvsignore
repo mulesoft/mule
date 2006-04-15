@@ -1,8 +1,0 @@
-target
-.classpath
-.project
-bin
-mule-udp-provider.iml
-.mule
-.fbprefs
-.fbwarnings

@@ -1,8 +1,0 @@
-.classpath
-.project
-target
-bin
-.mule
-mule-stream-provider.iml
-.fbprefs
-.fbwarnings
