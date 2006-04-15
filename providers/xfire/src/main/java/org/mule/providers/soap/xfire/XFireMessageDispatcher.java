@@ -20,8 +20,11 @@ import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.FatalConnectException;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
@@ -31,10 +34,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.config.MuleProperties;
 
 import javax.activation.DataHandler;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -65,6 +66,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             String serviceName = getService(endpoint);
             XFire xfire = connector.getXfire();
             Service service = xfire.getServiceRegistry().getService(serviceName);
+            if(service==null) {
+                throw new FatalConnectException(new Message("xfire", 8, serviceName), this);
+            }
             client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
             client.setXFire(xfire);
             client.setEndpointUri(endpoint.getEndpointURI().toString());

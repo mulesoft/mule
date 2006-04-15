@@ -27,8 +27,8 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -230,6 +230,9 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
                     // been register for the xfire connector
                     if (xfireDescriptor == null) {
                         xfireDescriptor = createxfireDescriptor();
+                    }
+                    if (xfireDescriptor.getProperties().get("xfire") == null) {
+                        xfireDescriptor.getProperties().put("xfire", xfire);
                     }
                     MuleManager.getInstance().getModel().registerComponent(xfireDescriptor);
                 }
