@@ -24,7 +24,6 @@ import javax.jms.MessageProducer;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -127,10 +126,10 @@ public class Jms11Support implements JmsSupport
             }
         }
 
-        if (topic && session instanceof TopicSession) {
-            return ((TopicSession) session).createTopic(name);
+        if (topic) {
+            return session.createTopic(name);
         } else if (session instanceof QueueSession) {
-            return ((QueueSession) session).createQueue(name);
+            return session.createQueue(name);
         } else {
             throw new IllegalArgumentException("Session and domain type do not match");
         }
@@ -138,7 +137,7 @@ public class Jms11Support implements JmsSupport
 
     protected Destination getJndiDestination(String name) throws JMSException
     {
-        Object temp = null;
+        Object temp;
         try {
             temp = context.lookup(name);
         } catch (NamingException e) {
@@ -160,10 +159,10 @@ public class Jms11Support implements JmsSupport
             throw new IllegalArgumentException("Session cannot be null when creating a destination");
         }
 
-        if (topic && session instanceof TopicSession) {
-            return ((TopicSession) session).createTemporaryTopic();
+        if (topic) {
+            return session.createTemporaryTopic();
         } else if (session instanceof QueueSession) {
-            return ((QueueSession) session).createTemporaryQueue();
+            return session.createTemporaryQueue();
         } else {
             throw new IllegalArgumentException("Session and domain type do not match");
         }
