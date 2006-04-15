@@ -31,7 +31,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
- * the defualt replyTo handler if the replyTo is a url
+ * the default replyTo handler if the replyTo is a url
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
