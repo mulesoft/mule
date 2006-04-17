@@ -32,13 +32,11 @@ import javax.transaction.TransactionManager;
  */
 public class JotmTransactionManagerFactory implements UMOTransactionManagerFactory
 {
-
-    private Current jotmCurrent;
-
-    private Jotm jotm;
+    private TransactionManager jotmCurrent;
 
     public JotmTransactionManagerFactory()
     {
+        super();
     }
 
     /**
@@ -54,8 +52,7 @@ public class JotmTransactionManagerFactory implements UMOTransactionManagerFacto
             jotmCurrent = Current.getCurrent();
             // if none found, create new local JOTM instance
             if (jotmCurrent == null) {
-                jotm = new Jotm(true, false);
-                jotmCurrent = Current.getCurrent();
+                jotmCurrent = new Jotm(true, false).getTransactionManager();
             }
         }
         return jotmCurrent;
