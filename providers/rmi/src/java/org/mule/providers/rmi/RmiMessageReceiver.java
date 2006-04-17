@@ -52,8 +52,6 @@ public class RmiMessageReceiver extends AbstractMessageReceiver
         logger.debug("Initializing with endpoint " + endpoint);
 
         String rmiPolicyPath = connector.getSecurityPolicy();
-        // TODO what's up here?
-        String serverCodebasePath = connector.getServerCodebase();
 
         System.setProperty("java.security.policy", rmiPolicyPath);
 
