@@ -78,11 +78,10 @@ public class JcaComponent implements UMOComponent
 
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
-        Object result = null;
         try {
             // Invoke method
-            result = entryPoint.invoke(component, RequestContext.getEventContext());
-
+            // TODO is there anything we can/should do with the return result from invoke()?
+            entryPoint.invoke(component, RequestContext.getEventContext());
         } catch (Exception e) {
             throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()),
                                     e);
@@ -104,10 +103,12 @@ public class JcaComponent implements UMOComponent
 
     public void pause() throws UMOException
     {
+        // nothing to do
     }
 
     public void resume() throws UMOException
     {
+        // nothing to do
     }
 
     public void start() throws UMOException

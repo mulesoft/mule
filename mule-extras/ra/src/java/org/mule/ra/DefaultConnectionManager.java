@@ -71,6 +71,7 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
      */
     public void localTransactionStarted(ConnectionEvent event)
     {
+        // TODO maybe later?
     }
 
     /**
@@ -78,6 +79,7 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
      */
     public void localTransactionCommitted(ConnectionEvent event)
     {
+        // TODO maybe later?
     }
 
     /**
@@ -85,6 +87,7 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
      */
     public void localTransactionRolledback(ConnectionEvent event)
     {
+        // TODO maybe later?
     }
 
     /**

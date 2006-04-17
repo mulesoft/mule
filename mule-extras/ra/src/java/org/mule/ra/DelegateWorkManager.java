@@ -72,13 +72,17 @@ public class DelegateWorkManager implements UMOWorkManager
 
     public void start() throws UMOException
     {
+        // nothing to do
     }
 
     public void stop() throws UMOException
     {
+        // nothing to do
     }
 
     public void dispose()
     {
+        // nothing to do
     }
+
 }
