@@ -92,12 +92,12 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-
+        // nothing to do
     }
 
     protected void doInit() throws ServletException
     {
-
+        // nothing to do
     }
 
     protected void writeResponse(HttpServletResponse servletResponse, UMOMessage message)

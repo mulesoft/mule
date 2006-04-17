@@ -41,11 +41,11 @@ public class ServletMessageReceiver extends AbstractMessageReceiver
 
     public void doConnect() throws Exception
     {
-
+        // nothing to do
     }
 
     public void doDisconnect() throws Exception
     {
-
+        // nothing to do
     }
 }

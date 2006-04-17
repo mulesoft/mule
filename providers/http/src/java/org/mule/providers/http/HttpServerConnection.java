@@ -68,6 +68,7 @@ public class HttpServerConnection
             }
         }
         catch (IOException e) {
+            // ignore
         }
         finally {
             socket = null;

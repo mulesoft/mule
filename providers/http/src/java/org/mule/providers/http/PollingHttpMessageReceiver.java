@@ -146,6 +146,6 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
 
     public void doDisconnect() throws Exception
     {
-
+        // nothing to do
     }
 }

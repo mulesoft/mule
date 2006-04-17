@@ -31,6 +31,7 @@ public class HttpRequestWildcardFilter extends WildcardFilter
 {
     public HttpRequestWildcardFilter()
     {
+        super();
     }
 
     public HttpRequestWildcardFilter(String pattern)
