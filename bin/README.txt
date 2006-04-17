@@ -1,15 +1,15 @@
-You can use these scripts to run a Mule instance.  To run use -
+You can use these scripts to run a Mule instance.  To run use:
 
 mule -config <comma-separated list of config files>
 
-To run with a different configuration builder such  as Spring or Groovy jst
-specify the -builder parameter -
+To run with a different configuration builder such  as Spring or Groovy just
+specify the -builder parameter:
 
 mule -config <config files> -builder org.mule.extras.spring.SpringConfigurationBuilder
 
 The mule script loads all jars in the lib and lib/opt directories.  If you want to add your own
 classpath you can either drop your jar into the lib directory of you can set the CLASSPATH
-environment variable before running the script i.e.
+environment variable before running the script i.e.:
 
 For Linux and unix
 export CLASSPATH=/myproject/classes:/myproject/conf
@@ -19,7 +19,7 @@ For Windows
 set CLASSPATH=/myproject/classes;/myproject/conf
 mule -config mule-config.xml
 
-If you want to include a whole directory of jars, rether than listing them all in
+If you want to include a whole directory of jars, rather than listing them all in
 the CLASSPATH variable you can specify the CUSTOM_LIB variable and point it to the
 directory containing your jars.
 
