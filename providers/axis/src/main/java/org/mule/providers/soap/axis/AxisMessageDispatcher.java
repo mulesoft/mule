@@ -165,7 +165,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             if(callParameters==null) {
                 callParameters = new HashMap();
             }
-            callParameters.put(((SoapMethod)method).getName().getLocalPart(), (SoapMethod)method);
+            callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
         }
 
         Call call = (Call)service.createCall();
