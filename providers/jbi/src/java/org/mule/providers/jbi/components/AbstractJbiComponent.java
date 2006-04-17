@@ -286,19 +286,19 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
     }
 
     protected void doInit() throws JBIException {
-
+        // template method
     }
 
     protected void doStart() throws JBIException {
-
+        // template method
     }
 
     protected void doStop() throws JBIException {
-
+        // template method
     }
 
     protected void doShutdown() throws JBIException {
-
+        // template method
     }
 
     public ObjectName getExtensionMBeanName() {
@@ -309,12 +309,11 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
         this.mbeanName = mbeanName;
     }
 
-    //--------- Work impl ---------//
-    //- This receive code should be separated out to pluggable invocation
-    //- strategies
     public void release() {
-
+        // nothing to do
     }
+
+    // TODO This receive code should be separated out to pluggable invocation strategies
 
     public void run() {
         while (started.get()) {
@@ -339,6 +338,7 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
         }
 
         public void release() {
+            // nothing to do
         }
 
         public void run() {
@@ -382,19 +382,19 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
         }
 
         public void init(String string, String string1) throws DeploymentException {
-
+            // nothing to do (yet?)
         }
 
         public void start(String string) throws DeploymentException {
-
+            // nothing to do (yet?)
         }
 
         public void stop(String string) throws DeploymentException {
-
+            // nothing to do (yet?)
         }
 
         public void shutDown(String string) throws DeploymentException {
-
+            // nothing to do (yet?)
         }
 
         public String undeploy(String string, String string1) throws DeploymentException {

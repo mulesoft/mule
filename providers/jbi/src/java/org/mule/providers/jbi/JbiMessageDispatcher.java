@@ -18,9 +18,7 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
@@ -48,7 +46,7 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
-
+        // nothing to do
     }
 
     protected void doDispatch(UMOEvent event) throws Exception {

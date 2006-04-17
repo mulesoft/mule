@@ -63,11 +63,11 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work 
     }
 
     public void doConnect() throws Exception {
-
+        // nothing to do
     }
 
     public void doDisconnect() throws Exception {
-
+        // nothing to do
     }
 
     public void doStart() throws UMOException {
@@ -78,12 +78,12 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work 
         }
     }
 
-
-    //- This receive code should be separated out to pluggable invocation
-    //- strategies
     public void release() {
-
+        // nothing to do
     }
+
+
+    // TODO This receive code should be separated out to pluggable invocation strategies
 
     public void run() {
         while (connector.isStarted()) {
@@ -106,6 +106,7 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work 
         }
 
         public void release() {
+            // nothing to do
         }
 
         public void run() {

@@ -209,27 +209,27 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         }
 
         public void pause() throws UMOException {
-
+            // nothing to do
         }
 
         public void resume() throws UMOException {
-
+            // nothing to do
         }
 
         public void start() throws UMOException {
-
+            // nothing to do
         }
 
         public void stop() throws UMOException {
-
+            // nothing to do
         }
 
         public void dispose() {
-
+            // nothing to do
         }
 
         public void initialise() throws InitialisationException, RecoverableException {
-
+            // nothing to do
         }
 
         public boolean isStarted() {

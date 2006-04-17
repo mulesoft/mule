@@ -61,6 +61,9 @@ public class JbiConnector extends AbstractServiceEnabledConnector implements Com
         return exchangeFactory;
     }
 
+    // TODO the start/stop/shutdown JBI lifecycle methods are rather picky,
+    // we should probably review the spec here again
+
     public void init(ComponentContext componentContext) throws JBIException {
         this.context = componentContext;
         this.deliveryChannel = context.getDeliveryChannel();
@@ -84,6 +87,6 @@ public class JbiConnector extends AbstractServiceEnabledConnector implements Com
     }
 
     public void shutDown() throws JBIException {
-
+        // nothing to do (for now?)
     }
 }
