@@ -93,8 +93,8 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     public void removeAttachment(String name) throws Exception
     {
-        throw new UnsupportedOperationException("XFIRE: removeAttahcment");
-        // TODO unable to remove an attahcment from XFire Attachements
+        throw new UnsupportedOperationException("XFIRE: removeAttachment");
+        // TODO unable to remove an attachment from XFire Attachments
     }
 
     public MessageContext getMessageContext()
