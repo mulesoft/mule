@@ -72,7 +72,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         URI uri = getInDest().getUri();
         postMethod = new PostMethod(uri.toString());
-		postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE, TEST_CONTENT_TYPE, TEST_CHARSET));
+        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE, TEST_CONTENT_TYPE, TEST_CHARSET));
         cnn = new HttpConnection(uri.getHost(), uri.getPort(), Protocol.getProtocol(uri.getScheme()));
         cnn.open();
         postMethod.execute(new HttpState(), cnn);
@@ -87,26 +87,23 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected void doTearDown() throws Exception
     {
-        try {
+        if (cnn != null) {
             cnn.close();
         }
-        catch (Exception e) {
-            throw e;
-        }
-    }
+    }    
     
     public EventCallback createEventCallback() {
-    	final EventCallback superCallback = super.createEventCallback();
+        final EventCallback superCallback = super.createEventCallback();
 
-    	return new EventCallback() {
-			public void eventReceived(UMOEventContext context, Object Component) throws Exception {
-				superCallback.eventReceived(context, Component);
-				context.getMessage().setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
-			}
-    	};
+        return new EventCallback() {
+            public void eventReceived(UMOEventContext context, Object Component) throws Exception {
+                superCallback.eventReceived(context, Component);
+                context.getMessage().setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
+            }
+        };
     }
 
     protected String getExpectedContentType() {
-    	return "text/plain;charset=UTF-8";
+        return "text/plain;charset=UTF-8";
     }
 }
