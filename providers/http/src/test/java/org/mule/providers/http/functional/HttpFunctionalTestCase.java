@@ -91,7 +91,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
             cnn.close();
         }
         catch (Exception e) {
-
+            throw e;
         }
     }
     
