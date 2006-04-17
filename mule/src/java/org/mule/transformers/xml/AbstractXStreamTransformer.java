@@ -14,12 +14,11 @@
 package org.mule.transformers.xml;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.mapper.DefaultMapper;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
+import com.thoughtworks.xstream.mapper.Mapper;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,7 +29,6 @@ import org.mule.util.ClassHelper;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream

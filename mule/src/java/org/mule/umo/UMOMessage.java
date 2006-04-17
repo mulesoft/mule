@@ -15,8 +15,6 @@ package org.mule.umo;
 
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.util.Map;
-
 /**
  * <code>UMOMessage</code> represents a message payload. The Message comprises
  * of the payload itself and properties associated with the payload.

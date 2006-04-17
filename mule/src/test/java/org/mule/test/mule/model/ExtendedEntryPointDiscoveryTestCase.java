@@ -15,25 +15,24 @@
 
 package org.mule.test.mule.model;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.model.TooManySatisfiableMethodsException;
-import org.mule.model.NoSatisfiableMethodsException;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.FruitLover;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.ObjectToFruitLover;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.config.MuleProperties;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;

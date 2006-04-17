@@ -108,6 +108,7 @@ public class PoolingProfile
 
     public PoolingProfile()
     {
+        super();
     }
 
     public PoolingProfile(PoolingProfile pp)

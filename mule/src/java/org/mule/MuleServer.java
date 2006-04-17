@@ -68,6 +68,7 @@ public class MuleServer implements Runnable
      */
     public MuleServer()
     {
+        super();
     }
 
     public MuleServer(String configResources)

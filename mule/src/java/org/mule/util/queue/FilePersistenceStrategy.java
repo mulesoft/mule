@@ -48,6 +48,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
 
     public FilePersistenceStrategy()
     {
+        super();
     }
 
     protected String getId(Object obj)
