@@ -235,7 +235,7 @@ public class MuleConfiguration
 
     public MuleConfiguration()
     {
-
+        super();
     }
 
     /**

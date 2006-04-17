@@ -1027,7 +1027,9 @@ public class MuleManager implements UMOManager
         try {
             InetAddress host = InetAddress.getLocalHost();
             message.add("Host: " + host.getCanonicalHostName() + " (" + host.getHostAddress() + ")");
-        } catch (UnknownHostException e) {}
+        } catch (UnknownHostException e) {
+            // ignore
+        }
 
         message.add("ID: " + id);
 

@@ -14,23 +14,13 @@
 package org.mule.test.routing.outbound;
 
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.routing.outbound.FilteringListMessageSplitter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.List;

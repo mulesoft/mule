@@ -15,8 +15,6 @@ package org.mule.model;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.beanutils.MethodUtils;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -24,7 +22,6 @@ import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.UMOEntryPoint;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
 
 import java.lang.reflect.InvocationTargetException;

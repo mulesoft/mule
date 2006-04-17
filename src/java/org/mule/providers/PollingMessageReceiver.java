@@ -25,8 +25,6 @@ import org.mule.umo.provider.UMOConnector;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
 
 /**
  * <p>
@@ -106,6 +104,7 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     protected void doDispose()
     {
+        // nothing to do
     }
 
     public abstract void poll() throws Exception;

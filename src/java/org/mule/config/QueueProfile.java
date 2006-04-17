@@ -33,6 +33,7 @@ public class QueueProfile
 
     public QueueProfile()
     {
+        super();
     }
 
     public QueueProfile(int maxOutstandingMessages, boolean persistent)

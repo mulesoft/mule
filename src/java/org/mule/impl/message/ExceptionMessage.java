@@ -13,14 +13,13 @@
  */
 package org.mule.impl.message;
 
-import java.util.Date;
-import java.util.Iterator;
-
+import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.impl.RequestContext;
+
+import java.util.Date;
+import java.util.Iterator;
 
 /**
  * <code>ExceptionMessage</code> is used by the

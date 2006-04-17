@@ -1,5 +1,7 @@
 /*
- * $Header$ $Revision$ $Date$
+ * $Header:$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
@@ -12,42 +14,39 @@
 
 package org.mule.providers;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
-import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.RequestContext;
 import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.RequestContext;
+import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.ReceiveException;
+import org.mule.util.concurrent.WaitableBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkManager;
-import javax.resource.spi.work.WorkEvent;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p/> <code>AbstractMessageDispatcher</code> provides a default dispatch (client) support for handling threads

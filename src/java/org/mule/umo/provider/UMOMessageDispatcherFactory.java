@@ -15,7 +15,6 @@
 package org.mule.umo.provider;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**

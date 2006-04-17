@@ -943,6 +943,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     public class ExtendedMuleSetPropertiesRule extends MuleSetPropertiesRule
     {
         public ExtendedMuleSetPropertiesRule() {
+            super();
         }
 
         public ExtendedMuleSetPropertiesRule(PlaceholderProcessor processor) {

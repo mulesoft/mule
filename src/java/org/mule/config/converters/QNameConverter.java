@@ -35,6 +35,7 @@ public class QNameConverter implements Converter {
     boolean explicit = false;
 
     public QNameConverter() {
+        super();
     }
 
     public QNameConverter(boolean explicit) {

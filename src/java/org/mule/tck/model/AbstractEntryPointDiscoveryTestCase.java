@@ -16,7 +16,6 @@
 package org.mule.tck.model;
 
 import org.mule.impl.RequestContext;
-import org.mule.impl.MuleEventContext;
 import org.mule.model.NoSatisfiableMethodsException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;

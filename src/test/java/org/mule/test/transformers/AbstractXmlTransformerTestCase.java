@@ -14,7 +14,6 @@
 package org.mule.test.transformers;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.custommonkey.xmlunit.XMLAssert;
 
 /**
  * Use this superclass if you intend to compare Xml contents.

@@ -88,6 +88,7 @@ public class ThreadingProfile
 
     public ThreadingProfile()
     {
+        super();
     }
 
     public ThreadingProfile(int maxThreadsActive,

@@ -19,7 +19,6 @@ import com.mockobjects.dynamic.Mock;
 
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
