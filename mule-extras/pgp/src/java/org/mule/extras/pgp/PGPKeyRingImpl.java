@@ -50,6 +50,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
 
     public PGPKeyRingImpl()
     {
+        super();
     }
 
     public String getSecretKeyRingFileName()

@@ -41,6 +41,7 @@ public class FakeCredentialAccessor implements UMOCredentialsAccessor
      */
     public void setCredentials(UMOEvent event, Object credentials)
     {
+        // dummy
     }
 
 }
