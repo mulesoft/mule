@@ -642,8 +642,8 @@ public class MuleClient implements Disposable
         } catch (Exception e) {
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
-        if(event.getEndpoint().getResponseTransformer()!=null) {
-            
+        if (event.getEndpoint().getResponseTransformer() != null) {
+            // TODO MULE-757
         }
         return result;
     }
