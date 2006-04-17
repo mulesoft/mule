@@ -298,15 +298,13 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             latch.countDown();
             return src;
         }
-
-
     }
 
     protected void afterPublishEvent() {
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
-
+            // ignore
         }
     }
 }

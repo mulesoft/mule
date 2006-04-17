@@ -25,5 +25,5 @@ import org.springframework.context.ApplicationListener;
 
 public interface MuleEventListener extends ApplicationListener
 {
-
+    // just a marker
 }

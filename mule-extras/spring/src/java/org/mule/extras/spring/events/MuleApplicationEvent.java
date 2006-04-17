@@ -13,13 +13,8 @@
  */
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.util.PropertiesHelper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 

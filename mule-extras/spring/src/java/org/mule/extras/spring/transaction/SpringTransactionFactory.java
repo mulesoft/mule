@@ -53,6 +53,7 @@ public class SpringTransactionFactory implements UMOTransactionFactory
 
         protected void doBegin() throws TransactionException
         {
+            // nothing to do
         }
 
         protected void doCommit() throws TransactionException
@@ -101,6 +102,7 @@ public class SpringTransactionFactory implements UMOTransactionFactory
 
     public SpringTransactionFactory()
     {
+        super();
     }
 
     public UMOTransaction beginTransaction() throws TransactionException
