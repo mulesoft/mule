@@ -19,9 +19,6 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mule.config.MuleProperties;
 import org.mule.providers.soap.MuleSoapHeaders;
-import org.mule.umo.UMOEvent;
-
-import java.util.Iterator;
 
 /**
  * Reads the Mule Soap Header and sets the various header properties on the context

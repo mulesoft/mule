@@ -14,17 +14,17 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.attachments.Attachment;
+import org.codehaus.xfire.attachments.Attachments;
 import org.codehaus.xfire.attachments.SimpleAttachment;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.config.MuleProperties;
-import org.jdom.Element;
-import org.jdom.Namespace;
 
 import javax.activation.DataHandler;
 
@@ -33,7 +33,7 @@ import java.util.Iterator;
 /**
  * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
  * attahcments and Mule headers
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -94,7 +94,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     public void removeAttachment(String name) throws Exception
     {
         throw new UnsupportedOperationException("XFIRE: removeAttahcment");
-        // Todo unable to remove an attahcment from XFire Attachements
+        // TODO unable to remove an attahcment from XFire Attachements
     }
 
     public MessageContext getMessageContext()
@@ -106,33 +106,34 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     {
         this.messageContext = messageContext;
         initHeaders();
-        // Todo what is the expense of reading attachments??
+        // TODO what is the expense of reading attachments??
         // initAttachments();
     }
 
     protected void initHeaders()
     {
-        if(messageContext.getInMessage()!=null) {
+        if (messageContext.getInMessage() != null) {
             Element header = messageContext.getInMessage().getHeader();
-            if(header==null) return;
-            
-            Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE, MuleSoapHeaders.MULE_10_ACTOR);
+            if (header == null) return;
+
+            Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
+                    MuleSoapHeaders.MULE_10_ACTOR);
             Element muleHeaders = header.getChild(MuleSoapHeaders.MULE_HEADER, ns);
-            if(muleHeaders!=null) {
+            if (muleHeaders != null) {
                 Element child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_ID_PROPERTY, ns);
-                if(child!=null) {
+                if (child != null) {
                     setCorrelationId(child.getText());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, ns);
-                if(child!=null) {
+                if (child != null) {
                     setCorrelationGroupSize(Integer.valueOf(child.getText()).intValue());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, ns);
-                if(child!=null) {
+                if (child != null) {
                     setCorrelationSequence(Integer.valueOf(child.getText()).intValue());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_REPLY_TO_PROPERTY, ns);
-                if(child!=null) {
+                if (child != null) {
                     setReplyTo(child.getText());
                 }
             }
@@ -143,11 +144,10 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     protected void initAttachments()
     {
         try {
-            Attachment att;
-            if (this.messageContext.getInMessage().getAttachments() != null) {
-                for (Iterator i = this.messageContext.getInMessage().getAttachments().getParts(); i
-                        .hasNext();) {
-                    att = ((Attachment)i.next());
+            Attachments atts = this.messageContext.getInMessage().getAttachments();
+            if (atts != null) {
+                for (Iterator i = atts.getParts(); i.hasNext();) {
+                    Attachment att = ((Attachment)i.next());
                     super.addAttachment(att.getId(), att.getDataHandler());
                 }
             }
@@ -157,4 +157,5 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
             logger.fatal("Failed to read attachments", e);
         }
     }
+
 }
