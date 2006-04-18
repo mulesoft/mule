@@ -60,11 +60,11 @@ public class RmiRegistryAgent  implements UMOAgent
     }
 
     public void registered() {
-
+        // nothing to do
     }
 
     public void unregistered() {
-
+        // nothing to do
     }
 
     public void start() throws UMOException {
@@ -73,7 +73,7 @@ public class RmiRegistryAgent  implements UMOAgent
         try {
             uri = new URI(serverUri);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            throw new InitialisationException(e, this);
         }
 
         if (rmiRegistry == null) {
@@ -82,7 +82,7 @@ public class RmiRegistryAgent  implements UMOAgent
                     try {
                         rmiRegistry = LocateRegistry.createRegistry(uri.getPort());
                     } catch (ExportException e) {
-                        logger.info("Registery on " + serverUri + " already bound. Attempting to use that instead");
+                        logger.info("Registry on " + serverUri + " already bound. Attempting to use that instead");
                         rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
                     }
                 } else {
@@ -100,12 +100,11 @@ public class RmiRegistryAgent  implements UMOAgent
     }
 
     public void dispose() {
-
+        // nothing to do
     }
 
     public void initialise() throws InitialisationException, RecoverableException {
-
-
+        // nothing to do
     }
 
     public Registry getRmiRegistry() {
