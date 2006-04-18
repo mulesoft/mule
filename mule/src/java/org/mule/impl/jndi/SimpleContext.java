@@ -46,23 +46,27 @@ import java.util.jar.Attributes;
  	private Hashtable environment;
      
   	public SimpleContext() {
+        super();
   	}
 
     public Object lookupLink(Name name) throws NamingException {
+        // unsupported
         return null;
     }
 
 
     public void rename(Name oldName, Name newName) throws NamingException {
-
+        // unsupported
     }
 
 
     public NameParser getNameParser(Name name) throws NamingException {
+        // unsupported
         return null;
     }
 
     public NamingEnumeration list(Name name) throws NamingException {
+        // unsupported
         return null;
     }
 
@@ -128,7 +132,9 @@ import java.util.jar.Attributes;
   			public boolean hasMore() {
  				return i.hasNext();
  			}
- 			public void close() {}
+ 			public void close() {
+                // noop
+            }
  			public boolean hasMoreElements() {
  				return hasMore();
  			}
@@ -153,7 +159,9 @@ import java.util.jar.Attributes;
  			public boolean hasMore() {
  				return i.hasNext();
  			}
- 			public void close() {}
+ 			public void close() {
+                // noop        
+            }
  			public boolean hasMoreElements() {
  				return hasMore();
  			}
@@ -213,7 +221,9 @@ import java.util.jar.Attributes;
         }
  		return environment;
  	}
- 	public void close() {}
+ 	public void close() {
+      // noop  
+    }
  	public String getNameInNamespace() {
  		return "";
  	}

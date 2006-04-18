@@ -31,6 +31,7 @@ public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactor
 {
     public DefaultLifecycleAdapterFactory()
     {
+        super();
     }
 
     /*

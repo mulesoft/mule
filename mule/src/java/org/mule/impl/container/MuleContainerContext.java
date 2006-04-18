@@ -68,5 +68,7 @@ public class MuleContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException
     {
+        // nothing to do
     }
+
 }

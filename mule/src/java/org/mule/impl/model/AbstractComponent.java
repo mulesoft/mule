@@ -373,30 +373,31 @@ public abstract class AbstractComponent implements UMOComponent {
     }
 
     protected void doForceStop() throws UMOException {
-
+        // template method
     }
 
     protected void doStop() throws UMOException {
-
+        // template method
     }
-    protected void doStart()  throws UMOException {
 
+    protected void doStart()  throws UMOException {
+        // template method
     }
 
     protected void doPause() {
-
+        // template method
     }
 
     protected void doResume() {
-
+        // template method
     }
 
     protected void doDispose() {
-
+        // template method
     }
 
     protected void doInitialise() throws InitialisationException {
-
+        // template method
     }
 
     public boolean isStarted() {
@@ -406,4 +407,5 @@ public abstract class AbstractComponent implements UMOComponent {
     protected abstract UMOMessage doSend(UMOEvent event) throws UMOException;
 
     protected abstract void doDispatch(UMOEvent event) throws UMOException;
+
 }

@@ -133,5 +133,7 @@ public class MultiContainerContext implements UMOContainerContext
 
     public void initialise() throws InitialisationException
     {
+        // nothing to do
     }
+
 }

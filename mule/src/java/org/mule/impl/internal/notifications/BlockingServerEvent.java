@@ -25,4 +25,5 @@ package org.mule.impl.internal.notifications;
 
 public interface BlockingServerEvent
 {
+    // no methods
 }

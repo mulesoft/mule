@@ -26,4 +26,5 @@ import org.mule.umo.manager.UMOServerNotificationListener;
  */
 public interface CustomNotificationListener extends UMOServerNotificationListener
 {
+    // no methods
 }
