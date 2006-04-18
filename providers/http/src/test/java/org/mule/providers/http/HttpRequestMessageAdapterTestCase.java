@@ -99,6 +99,6 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
 
     public void testMessageRetrieval() throws Exception
     {
-
+        // TODO MULE-776
     }
 }
