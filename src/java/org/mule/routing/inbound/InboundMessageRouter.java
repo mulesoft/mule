@@ -111,7 +111,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
                                 logger.warn("Message fragment is: "
                                         + StringMessageHelper.truncate(event.getMessageAsString(), 100, true));
                             } catch (UMOException e) {
-
+                                // ignore
                             }
                         }
                     }
@@ -119,15 +119,17 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
             } else {
                 try {
                     UMOMessage messageResult = null;
-                    for (int i = 0; i < eventsToRoute.length; i++) {
-                        if (event.isSynchronous()) {
-                            messageResult = send(eventsToRoute[i]);
-                        } else {
-                            dispatch(eventsToRoute[i]);
-                        }
-                        // Update stats
-                        if (getStatistics().isEnabled()) {
-                            getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
+                    if (eventsToRoute != null) {
+                        for (int i = 0; i < eventsToRoute.length; i++) {
+                            if (event.isSynchronous()) {
+                                messageResult = send(eventsToRoute[i]);
+                            } else {
+                                dispatch(eventsToRoute[i]);
+                            }
+                            // Update stats
+                            if (getStatistics().isEnabled()) {
+                                getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
+                            }
                         }
                     }
                     return messageResult;
