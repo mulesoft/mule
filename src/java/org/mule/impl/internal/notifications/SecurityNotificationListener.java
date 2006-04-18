@@ -25,4 +25,5 @@ import org.mule.umo.manager.UMOServerNotificationListener;
  */
 public interface SecurityNotificationListener extends UMOServerNotificationListener
 {
+    // no methods
 }

@@ -88,18 +88,22 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
 
     public void start() throws UMOException
     {
+        // nothing to do
     }
 
     public void stop() throws UMOException
     {
+        // nothing to do
     }
 
     public void dispose()
     {
+        // nothing to do
     }
 
     public void registered()
     {
+        // nothing to do
     }
 
     public void unregistered()

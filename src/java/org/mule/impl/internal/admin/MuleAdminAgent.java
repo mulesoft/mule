@@ -65,6 +65,7 @@ public class MuleAdminAgent implements UMOAgent
      */
     public void setName(String name)
     {
+        // not allowed
     }
 
     /**
@@ -79,22 +80,27 @@ public class MuleAdminAgent implements UMOAgent
 
     public void start() throws UMOException
     {
+        // nothing to do (yet?)
     }
 
     public void stop() throws UMOException
     {
+        // nothing to do (yet?)
     }
 
     public void dispose()
     {
+        // nothing to do (yet?)
     }
 
     public void registered()
     {
+        // nothing to do (yet?)
     }
 
     public void unregistered()
     {
+        // nothing to do (yet?)
     }
 
     public void initialise() throws InitialisationException

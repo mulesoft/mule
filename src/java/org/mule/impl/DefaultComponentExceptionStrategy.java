@@ -43,6 +43,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
     public DefaultComponentExceptionStrategy()
     {
+        super();
     }
 
     /**
