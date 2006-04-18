@@ -35,7 +35,7 @@ public class TestDefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFa
      */
     public TestDefaultLifecycleAdapterFactory()
     {
-
+        super();
     }
 
     /*

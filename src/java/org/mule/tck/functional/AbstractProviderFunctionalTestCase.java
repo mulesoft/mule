@@ -139,7 +139,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     public void afterInitialise() throws Exception
     {
-
+        // nothing to do
     }
 
     public EventCallback createEventCallback()

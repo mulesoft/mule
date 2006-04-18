@@ -33,7 +33,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
-
+        // template method
     }
 
     protected void doDispatch(UMOEvent event) throws Exception {

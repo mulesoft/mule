@@ -24,5 +24,5 @@ import org.mule.impl.DefaultExceptionStrategy;
 
 public class TestExceptionStrategy extends DefaultExceptionStrategy
 {
-
+    // no methods yet
 }
