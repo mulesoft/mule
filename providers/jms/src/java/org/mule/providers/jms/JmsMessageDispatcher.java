@@ -249,6 +249,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
             return null;
         } finally {
+            connector.closeQuietly(consumer);
+            connector.closeQuietly(producer);
+
             // TODO I wonder if those temporary destinations also implement BOTH interfaces...
             // keep it 'simple' for now
             if (replyTo != null &&
@@ -260,8 +263,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                     connector.closeQuietly((TemporaryTopic) replyTo);
                 }
             }
-            connector.closeQuietly(consumer);
-            connector.closeQuietly(producer);
+
             if (session != null && !cacheJmsSession && txSession==null) {
                 connector.closeQuietly(session);
             }
