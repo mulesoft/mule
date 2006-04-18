@@ -454,7 +454,7 @@ public class DefaultMuleProxy implements MuleProxy
 
     public void release()
     {
-
+        // nothing to do
     }
 
     /*

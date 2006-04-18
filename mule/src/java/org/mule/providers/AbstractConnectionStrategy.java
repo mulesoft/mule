@@ -46,6 +46,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                 MuleManager.getInstance().getWorkManager().scheduleWork(new Work() {
                     public void release()
                     {
+                        // nothing to do
                     }
 
                     public void run()

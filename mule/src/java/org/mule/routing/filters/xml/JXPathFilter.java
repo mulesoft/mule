@@ -50,7 +50,7 @@ public class JXPathFilter implements UMOFilter
     private boolean lenient = true;
 
     public JXPathFilter() {
-
+        super();
     }
 
     public JXPathFilter(String expression) {

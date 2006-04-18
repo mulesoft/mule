@@ -38,7 +38,9 @@ public abstract class DefaultSpaceFactory implements UMOSpaceFactory {
     private int capacity = 0;
     private boolean enableCaching = false;
 
-    public DefaultSpaceFactory() {}
+    public DefaultSpaceFactory() {
+        super();
+    }
 
     public DefaultSpaceFactory(boolean enableMonitorEvents) {
         this.enableMonitorEvents = enableMonitorEvents;

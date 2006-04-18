@@ -46,6 +46,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
 
     public WildcardFilter()
     {
+        super();
     }
 
     public WildcardFilter(String pattern)

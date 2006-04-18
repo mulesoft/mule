@@ -231,6 +231,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration {
      * @see javax.management.MBeanRegistration#preDeregister()
      */
     public void preDeregister() throws Exception {
+        // nothing to do
     }
 
     /*
