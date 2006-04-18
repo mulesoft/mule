@@ -1,5 +1,7 @@
 /*
- * $Header$ $Revision$ $Date$
+ * $Header: $
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
@@ -12,6 +14,7 @@
 
 package org.mule.tck.model;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -72,7 +75,8 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
     public void testFailOnExhaust() throws Exception
     {
 
-        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()), FAIL_WHEN_EXHAUSTED);
+        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()),
+                FAIL_WHEN_EXHAUSTED);
         Object borrowed = null;
 
         for (int i = 0; i < pool.getMaxSize(); i++) {
@@ -84,17 +88,19 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
         try {
             borrowed = pool.borrowObject();
             fail("Should throw an Exception");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // expected
         }
     }
 
     public void testBlockExpiryOnExhaust() throws Exception
     {
-        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()), BLOCK_WHEN_EXHAUSTED);
-		Object borrowed = null;
+        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()),
+                BLOCK_WHEN_EXHAUSTED);
+        Object borrowed = null;
 
-		assertEquals(0, pool.getSize());
+        assertEquals(0, pool.getSize());
         borrowed = pool.borrowObject();
         assertNotNull(borrowed);
         borrowed = pool.borrowObject();
@@ -108,7 +114,8 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
         try {
             borrowed = pool.borrowObject();
             fail("Should throw an Exception");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // TODO
             // long totalTime = System.currentTimeMillis() - starttime;
             // Need to allow for alittle variance in system time
@@ -120,8 +127,9 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
     public void testBlockOnExhaust() throws Exception
     {
-        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()), BLOCK_WHEN_EXHAUSTED);
-		Object borrowed = null;
+        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()),
+                BLOCK_WHEN_EXHAUSTED);
+        Object borrowed = null;
 
         assertEquals(0, pool.getSize());
 
@@ -137,7 +145,9 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
         // Make sure the borrower borrows first
         try {
             Thread.sleep(200);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
+            // ignore
         }
 
         borrowed = pool.borrowObject();
@@ -153,7 +163,8 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
     public void testGrowOnExhaust() throws Exception
     {
-        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()), GROW_WHEN_EXHAUSTED);
+        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()),
+                GROW_WHEN_EXHAUSTED);
 
         Object borrowed = pool.borrowObject();
         borrowed = pool.borrowObject();
@@ -171,7 +182,8 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
     public void testClearPool() throws Exception
     {
 
-        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()), FAIL_WHEN_EXHAUSTED);
+        ObjectPool pool = createPool(getTestDescriptor("orange", Orange.class.getName()),
+                FAIL_WHEN_EXHAUSTED);
 
         Object borrowed = pool.borrowObject();
         assertEquals(1, pool.getSize());
@@ -231,19 +243,21 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
                 Object object = pool.borrowObject();
                 try {
                     sleep(time);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     // ignore
                 }
                 pool.returnObject(object);
-            } catch (Exception e) {
-                e.printStackTrace();
-                fail("Borrower thread failed");
+            }
+            catch (Exception e) {
+                fail("Borrower thread failed:\n" + ExceptionUtils.getStackTrace(e));
             }
         }
 
     }
 
-    public abstract ObjectPool createPool(MuleDescriptor descriptor, byte action) throws InitialisationException;
+    public abstract ObjectPool createPool(MuleDescriptor descriptor, byte action)
+            throws InitialisationException;
 
     public abstract UMOPoolFactory getPoolFactory();
 }
