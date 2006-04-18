@@ -11,78 +11,136 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.util;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Properties;
 
 /**
- * A class for getting the OS environmet properies.  Not this goes out of process and should not be relied upon
- * to obtain critical information
- *
+ * A class for getting the OS environmet properies. Note that this goes out of
+ * process and should not be relied upon to obtain critical information
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EnvironmentHelper {
+public class EnvironmentHelper
+{
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(EnvironmentHelper.class);
+
+    private EnvironmentHelper()
+    {
+        // forbidden
+    }
 
     /**
-     * Get the operating system environment properties, should work for Windows and Linux
+     * Get the operating system environment properties, should work for Windows
+     * and Linux
+     * 
      * @return Properties map or an empty properties map if there was an error
      */
-    public Properties getEnvProperties(){
+    public static synchronized Properties getEnvironment()
+    {
+        Properties envProps = new Properties();
+
+        try {
+            if (SystemUtils.IS_JAVA_1_5) {
+                // the following runaround is necessary since we still want to
+                // compile on JDK 1.4
+                Method envMethod = System.class.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
+                envProps.putAll((Map)envMethod.invoke(System.class, (Class[])null));
+            }
+            else {
+                // fallback
+                envProps = getEnvironmentJDK14();
+            }
+        }
+        catch (Exception ex) {
+            logger.error("Could not access OS environment.", ex);
+        }
+
+        return envProps;
+    }
+
+    private static Properties getEnvironmentJDK14() throws Exception
+    {
         Properties envProps = new Properties();
         FileInputStream in = null;
         File f = null;
-        try {
-            boolean unix = true;
-            Process process = null;
-            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                process = Runtime.getRuntime().exec("cmd /c set>temp.env");
-                unix=false;
-            } else {
-                process = Runtime.getRuntime().exec("export -p >temp.env");
-            }
-            process.waitFor();
-            f = new File("temp.env");
 
+        try {
+            boolean isUnix = true;
+            Process process = null;
+            StringBuffer cmdBuffer = new StringBuffer(80);
+            String tempEnvFileName = "mule-environment.tmp";
+
+            if (SystemUtils.IS_OS_WINDOWS) {
+                cmdBuffer.append("cmd /c set");
+                isUnix = false;
+            }
+            else {
+                cmdBuffer.append("export -p");
+            }
+
+            cmdBuffer.append(" > ");
+            cmdBuffer.append(SystemUtils.getJavaIoTmpDir()).append(SystemUtils.FILE_SEPARATOR);
+            cmdBuffer.append(tempEnvFileName);
+
+            process = Runtime.getRuntime().exec(cmdBuffer.toString());
+            process.waitFor();
+
+            f = new File(SystemUtils.getJavaIoTmpDir(), tempEnvFileName);
             in = new FileInputStream(f);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String line = null;
+
+            String line;
             while ((line = br.readLine()) != null) {
-                int index = -1;
-                if(line.startsWith("declare -")) {
+                // bash prepends: declare -x
+                // zsh prepends: typeset -x
+                if (line.startsWith("declare -") || line.startsWith("typeset -")) {
                     line = line.substring(11);
                 }
 
-                if ((index = line.indexOf("=")) > -1) {
+                int index = -1;
+                if ((index = line.indexOf('=')) > -1) {
                     String key = line.substring(0, index).trim();
                     String value = line.substring(index + 1).trim();
-                    //remove quotes
-                    if(unix && value.length() > 1) {
-                        value = value.substring(1, value.length()-1);
+                    // remove quotes, if any
+                    if (isUnix && value.length() > 1 && (value.startsWith("\"") || value.startsWith("'"))) {
+                        value = value.substring(1, value.length() - 1);
                     }
                     envProps.setProperty(key, value);
-                } else {
+                }
+                else {
                     envProps.setProperty(line, StringUtils.EMPTY);
                 }
             }
-
-        } catch (Exception e) {
-            //ignore
-        } finally{
-            try {
-                if(in!=null) {
-                    in.close();
-                }
-            } catch (IOException e) {}
-            f.delete();
         }
+        catch (Exception e) {
+            throw e; // bubble up
+        }
+        finally {
+            IOUtils.closeQuietly(in);
+            if (f != null) {
+                f.delete();
+            }
+        }
+
         return envProps;
     }
 
