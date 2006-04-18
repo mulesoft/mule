@@ -146,6 +146,7 @@ public class Mx4jAgent implements UMOAgent
      */
     public void registered()
     {
+        // nothing to do
     }
 
     /*
@@ -155,6 +156,7 @@ public class Mx4jAgent implements UMOAgent
      */
     public void unregistered()
     {
+        // nothing to do
     }
 
     /*

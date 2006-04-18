@@ -244,6 +244,7 @@ public class JmxAgent implements UMOAgent
      */
     public void registered()
     {
+        // nothing to do
     }
 
     /*
@@ -253,6 +254,7 @@ public class JmxAgent implements UMOAgent
      */
     public void unregistered()
     {
+        // nothing to do
     }
 
     protected String getDomainName()

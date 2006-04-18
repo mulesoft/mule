@@ -118,6 +118,7 @@ public class Log4jAgent implements UMOAgent
      */
     public void start() throws UMOException
     {
+        // nothing to do
     }
 
     /*
@@ -127,6 +128,7 @@ public class Log4jAgent implements UMOAgent
      */
     public void stop() throws UMOException
     {
+        // nothing to do
     }
 
     /*
@@ -136,6 +138,7 @@ public class Log4jAgent implements UMOAgent
      */
     public void dispose()
     {
+        // nothing to do
     }
 
     /*
@@ -145,6 +148,7 @@ public class Log4jAgent implements UMOAgent
      */
     public void registered()
     {
+        // nothing to do
     }
 
     /*
@@ -154,6 +158,7 @@ public class Log4jAgent implements UMOAgent
      */
     public void unregistered()
     {
+        // nothing to do
     }
 
 }

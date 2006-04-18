@@ -116,11 +116,11 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
     }
 
     public static interface BroadcastNotificationServiceMBean extends NotificationEmitter {
-
+        // no methods
     }
 
     public static class BroadcastNotificationService extends NotificationBroadcasterSupport implements BroadcastNotificationServiceMBean {
-
+        // no methods
     }
 
     public static interface NotificationListenerMBean {

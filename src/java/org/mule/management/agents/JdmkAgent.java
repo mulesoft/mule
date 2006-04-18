@@ -141,6 +141,7 @@ public class JdmkAgent implements UMOAgent
      */
     public void registered()
     {
+        // nothing to do
     }
 
     /*
@@ -150,6 +151,7 @@ public class JdmkAgent implements UMOAgent
      */
     public void unregistered()
     {
+        // nothing to do
     }
 
     /*
@@ -160,7 +162,6 @@ public class JdmkAgent implements UMOAgent
     public void initialise() throws InitialisationException
     {
         try {
-
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
             adaptor = createAdaptor();
             adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
