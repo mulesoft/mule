@@ -1,3 +1,4 @@
+
 package org.mule.tools.config.graph.components;
 
 import com.oy.shared.lm.graph.Graph;
@@ -72,7 +73,7 @@ public class GraphRenderer {
 				    env.getConfig().setExecuteCommand(f.getAbsolutePath());
                 } else {
 
-                    Properties p = new EnvironmentHelper().getEnvProperties();
+                    Properties p = EnvironmentHelper.getEnvironment();
                     String home = p.getProperty("MULE_HOME");
                     if(home!=null) {
                         f = new File(home + "/tools/config-graph/win32/dot.exe");
