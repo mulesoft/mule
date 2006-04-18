@@ -14,7 +14,6 @@
 
 package org.mule.util;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
@@ -22,8 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -80,33 +77,22 @@ public class EnvironmentHelper
     private static Properties getEnvironmentJDK14() throws Exception
     {
         Properties envProps = new Properties();
-        FileInputStream in = null;
-        File f = null;
+        Process process = null;
 
         try {
             boolean isUnix = true;
-            Process process = null;
-            StringBuffer cmdBuffer = new StringBuffer(80);
-            String tempEnvFileName = "mule-environment.tmp";
+            String command;
 
             if (SystemUtils.IS_OS_WINDOWS) {
-                cmdBuffer.append("cmd /c set");
+                command = "cmd /c set";
                 isUnix = false;
             }
             else {
-                cmdBuffer.append("export -p");
+                command = "export -p";
             }
 
-            cmdBuffer.append(" > ");
-            cmdBuffer.append(SystemUtils.getJavaIoTmpDir()).append(SystemUtils.FILE_SEPARATOR);
-            cmdBuffer.append(tempEnvFileName);
-
-            process = Runtime.getRuntime().exec(cmdBuffer.toString());
-            process.waitFor();
-
-            f = new File(SystemUtils.getJavaIoTmpDir(), tempEnvFileName);
-            in = new FileInputStream(f);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            process = Runtime.getRuntime().exec(command);
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -135,9 +121,8 @@ public class EnvironmentHelper
             throw e; // bubble up
         }
         finally {
-            IOUtils.closeQuietly(in);
-            if (f != null) {
-                f.delete();
+            if (process != null) {
+                process.destroy();
             }
         }
 
