@@ -29,6 +29,7 @@ public class EqualsFilter implements UMOFilter, ObjectFilter
 
     public EqualsFilter()
     {
+        super();
     }
 
     public EqualsFilter(Object compareTo)

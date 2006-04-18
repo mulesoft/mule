@@ -160,6 +160,7 @@ public abstract class AbstractUnit extends AbstractEntry implements Unit {
     protected abstract String doUndeploy() throws Exception;
 
     public void setRegistryComponent(RegistryComponent component) {
-
+        // nothing to do (yet?)
     }
+
 }

@@ -31,6 +31,7 @@ public class AndFilter implements UMOFilter
 
     public AndFilter()
     {
+        super();
     }
 
     public AndFilter(UMOFilter left, UMOFilter right)

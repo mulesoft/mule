@@ -45,6 +45,7 @@ public class MessagePropertyFilter implements UMOFilter
 
     public MessagePropertyFilter()
     {
+        super();
     }
 
     public MessagePropertyFilter(String expression)

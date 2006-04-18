@@ -141,6 +141,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
 
         public void release()
         {
+            // nothing to do
         }
 
         public void run()

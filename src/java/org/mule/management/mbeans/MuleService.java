@@ -46,7 +46,7 @@ public class MuleService implements MuleServiceMBean
     private String ip;
     private String os;
     private String buildDate;
-    //todo
+    //TODO
     private String copyright = "Copyright (c) 2003-2006 SymphonySoft Limited. All rights reserved.";
     private String license;
 
@@ -64,7 +64,9 @@ public class MuleService implements MuleServiceMBean
             InetAddress iad = InetAddress.getLocalHost();
             host = iad.getCanonicalHostName();
             ip = iad.getHostAddress();
-        } catch (UnknownHostException e) {}
+        } catch (UnknownHostException e) {
+            // ignore
+        }
     }
 
     public boolean isInstanciated()

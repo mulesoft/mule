@@ -26,6 +26,7 @@ public class ConstraintFilter implements Cloneable
 {
     public ConstraintFilter()
     {
+        super();
     }
 
     public boolean accept(UMOEvent event)

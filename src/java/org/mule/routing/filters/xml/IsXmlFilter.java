@@ -15,6 +15,7 @@ import org.mule.umo.UMOMessage;
 public class IsXmlFilter implements UMOFilter {
 
     public IsXmlFilter() {
+        super();
     }
 
     public boolean accept(UMOMessage obj) {

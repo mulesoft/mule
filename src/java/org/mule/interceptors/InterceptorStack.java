@@ -39,6 +39,7 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
 
     public InterceptorStack()
     {
+        super();
     }
 
     public InterceptorStack(List interceptors)

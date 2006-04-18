@@ -102,7 +102,7 @@ public abstract class AbstractEntry implements Entry, Serializable {
     }
 
     protected void checkDescriptor() throws RegistryException {
-
+        // nothing to do (yet?)
     }
 
 }

@@ -317,6 +317,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
      * framework
      */
     protected void doDispose() {
+        // nothing to do
     }
 
     public UMOEndpointURI getEndpointURI() {
@@ -529,11 +530,11 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
     }
 
     public void doStart() throws UMOException {
-
+        // nothing to do
     }
 
     public void doStop() throws UMOException {
-
+        // nothing to do
     }
 
     public abstract void doConnect() throws Exception;

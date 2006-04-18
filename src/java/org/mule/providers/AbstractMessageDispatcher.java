@@ -500,6 +500,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
         public void release()
         {
+            // nothing to do
         }
     }
 }

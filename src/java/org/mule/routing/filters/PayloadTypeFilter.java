@@ -30,6 +30,7 @@ public class PayloadTypeFilter implements UMOFilter
 
     public PayloadTypeFilter()
     {
+        super();
     }
 
     public PayloadTypeFilter(Class expectedType)

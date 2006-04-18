@@ -29,5 +29,5 @@ import org.mule.umo.lifecycle.Initialisable;
  */
 public interface LifecycleInterceptor extends UMOInterceptor, Initialisable, Disposable
 {
-
+    // no methods
 }

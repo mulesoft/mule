@@ -32,6 +32,7 @@ public class RegExFilter implements UMOFilter, ObjectFilter
 
     public RegExFilter()
     {
+        super();
     }
 
     public RegExFilter(String pattern)

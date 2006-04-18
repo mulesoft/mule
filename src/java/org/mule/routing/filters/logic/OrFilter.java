@@ -37,6 +37,7 @@ public class OrFilter implements UMOFilter
 
     public OrFilter()
     {
+        super();
     }
 
     public void setLeftFilter(UMOFilter leftFilter)

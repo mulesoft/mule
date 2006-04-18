@@ -410,7 +410,7 @@ public class OptimisedMuleProxy implements MuleProxy
 
     public void release()
     {
-
+        // nothing to do
     }
 
     /*

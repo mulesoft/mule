@@ -670,6 +670,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     protected void doStart() throws UMOException
     {
+        // template method
     }
 
     /**
@@ -679,6 +680,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     protected void doStop() throws UMOException
     {
+        // template method
     }
 
     /**
@@ -696,6 +698,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public void doInitialise() throws InitialisationException
     {
+        // template method
     }
 
     public UMOTransformer getDefaultInboundTransformer()
@@ -910,7 +913,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * @throws Exception
      */
     public void doConnect() throws Exception {
-
+        // template method
     }
 
     /**
@@ -919,7 +922,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * @throws Exception
      */
     public void doDisconnect() throws Exception {
-
+        // template method
     }
 
     /**

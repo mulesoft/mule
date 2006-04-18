@@ -29,6 +29,7 @@ public class NotFilter implements UMOFilter
 
     public NotFilter()
     {
+        super();
     }
 
     public NotFilter(UMOFilter filter)

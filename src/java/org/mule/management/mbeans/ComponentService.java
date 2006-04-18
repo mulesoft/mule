@@ -199,7 +199,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      */
     public void postDeregister()
     {
-
+        // nothing to do
     }
 
     private AbstractComponent getComponent()
