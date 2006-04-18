@@ -187,6 +187,7 @@ public class Base64
     /** Defeats instantiation. */
     private Base64()
     {
+        super();
     }
 
     /* ******** E N C O D I N G M E T H O D S ******** */
