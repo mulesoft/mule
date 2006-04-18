@@ -40,6 +40,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages
@@ -84,12 +86,15 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI() + ". Event id is: "
-                    + event.getId());
+                         + event.getId());
         }
         Session txSession = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
+
+        // will need this reference for any temporary destinations cleanup
+        Destination replyTo = null;
 
         try {
             // Retrieve the session for the current transaction
@@ -131,7 +136,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             //todo MULE20 remove resource info support
             if(!topic) {
                 topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(),
-                        JmsConstants.TOPIC_PROPERTY, false);
+                                                            JmsConstants.TOPIC_PROPERTY, false);
             }
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
@@ -140,11 +145,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             Object message = event.getTransformedMessage();
             if (!(message instanceof Message)) {
                 throw new DispatchException(new org.mule.config.i18n.Message(Messages.MESSAGE_NOT_X_IT_IS_TYPE_X_CHECK_TRANSFORMER_ON_X,
-                        "JMS message",
-                        message.getClass().getName(),
-                        connector.getName()),
-                        event.getMessage(),
-                        event.getEndpoint());
+                                                                             "JMS message",
+                                                                             message.getClass().getName(),
+                                                                             connector.getName()),
+                                            event.getMessage(),
+                                            event.getEndpoint());
             }
 
             Message msg = (Message) message;
@@ -153,7 +158,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
 
             UMOMessage eventMsg = event.getMessage();
-            Destination replyTo = null;
 
             // Some JMS implementations might not support the ReplyTo property.
             if (connector.supportsProperty(JmsConstants.JMS_REPLY_TO)) {
@@ -245,6 +249,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
             return null;
         } finally {
+            // TODO I wonder if those temporary destinations also implement BOTH interfaces...
+            // keep it 'simple' for now
+            if (replyTo != null &&
+                (replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic)) {
+                if (replyTo instanceof TemporaryQueue) {
+                    connector.closeQuietly((TemporaryQueue) replyTo);
+                } else {
+                    // hope there are no more non-standard tricks from jms vendors here ;)
+                    connector.closeQuietly((TemporaryTopic) replyTo);
+                }
+            }
             connector.closeQuietly(consumer);
             connector.closeQuietly(producer);
             if (session != null && !cacheJmsSession && txSession==null) {

@@ -52,6 +52,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -776,4 +778,46 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             }
         }
     }
+
+    public void closeQuietly(TemporaryQueue tempQueue)
+    {
+        if (tempQueue == null) {
+            return;
+        }
+
+        String queueName = "";
+        try {
+            tempQueue.delete();
+        } catch (JMSException e) {
+            if (logger.isErrorEnabled()) {
+                try {
+                    queueName = tempQueue.getQueueName();
+                } catch (JMSException innerEx) {
+                    // ignore, we are just trying to get the queue name
+                }
+                logger.error("Faled to delete a temporary queue " + queueName, e);
+            }
+        }
+    }
+
+    public void closeQuietly(TemporaryTopic tempTopic) {
+        if (tempTopic == null) {
+            return;
+        }
+
+        String topicName = "";
+        try {
+            tempTopic.delete();
+        } catch (JMSException e) {
+            if (logger.isErrorEnabled()) {
+                try {
+                    topicName = tempTopic.getTopicName();
+                } catch (JMSException innerEx) {
+                    // ignore, we are just trying to get the topic name
+                }
+                logger.error("Faled to delete a temporary topic " + topicName, e);
+            }
+        }
+    }
+
 }
