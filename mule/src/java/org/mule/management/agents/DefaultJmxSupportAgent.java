@@ -64,15 +64,19 @@ public class DefaultJmxSupportAgent implements UMOAgent {
     }
 
     public void registered() {
+        // nothing to do
     }
 
     public void unregistered() {
+        // nothing to do
     }
 
     public void start() throws UMOException {
+        // nothing to do
     }
 
     public void stop() throws UMOException {
+        // nothing to do
     }
 
     /**
@@ -81,7 +85,7 @@ public class DefaultJmxSupportAgent implements UMOAgent {
      * continue. This method should not throw Runtime exceptions.
      */
     public void dispose() {
-
+        // nothing to do
     }
 
     /**
