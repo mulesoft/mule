@@ -286,12 +286,16 @@ public class PropertiesHelper
     public static Properties getPropertiesFromQueryString(String query)
     {
         Properties props = new Properties();
+
         if (query == null) {
             return props;
         }
-        query = "&" + query;
+
+        query = new StringBuffer(query.length()+1).append('&').append(query).toString();
+
         int x = 0;
         while ((x = addProperty(query, x, props)) != -1) {
+            // run
         }
 
         return props;
