@@ -74,7 +74,7 @@ public class TestConnector extends AbstractConnector
      */
     protected void doDispose()
     {
-
+        // template method
     }
 
     /*
@@ -84,7 +84,7 @@ public class TestConnector extends AbstractConnector
      */
     public void doInitialise() throws InitialisationException
     {
-
+        // template method
     }
 
     /*
@@ -104,7 +104,7 @@ public class TestConnector extends AbstractConnector
      */
     protected void doStart() throws UMOException
     {
-
+        // template method
     }
 
     /*
@@ -114,7 +114,7 @@ public class TestConnector extends AbstractConnector
      */
     protected void doStop() throws UMOException
     {
-
+        // template method
     }
 
     /*
@@ -132,10 +132,12 @@ public class TestConnector extends AbstractConnector
         UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint) {
             public void doConnect() throws Exception
             {
+                // nothing to do
             }
 
             public void doDisconnect() throws Exception
             {
+                // nothing to do
             }
         };
         return receiver;
@@ -143,7 +145,7 @@ public class TestConnector extends AbstractConnector
 
     public void destroyReceiver(UMOMessageReceiver receiver, UMOEndpoint endpoint) throws Exception
     {
-
+        // nothing to do
     }
 
     public class DummyMessageAdapter extends AbstractMessageAdapter

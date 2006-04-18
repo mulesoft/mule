@@ -45,6 +45,7 @@ public class Orange implements Fruit, Callable
 
     public Orange()
     {
+        super();
     }
 
     public Orange(HashMap props) throws UMOException

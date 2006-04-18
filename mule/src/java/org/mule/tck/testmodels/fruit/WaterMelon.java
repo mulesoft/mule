@@ -40,6 +40,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
 
     public WaterMelon()
     {
+        super();
     }
 
     public WaterMelon(HashMap props) throws UMOException
@@ -50,13 +51,6 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         setSeeds((Integer) props.get("seeds"));
         state = "initialised";
     }
-
-    // public WaterMelon(String brand, Double radius, Integer seeds)
-    // {
-    // this.brand = brand;
-    // this.radius = radius;
-    // this.seeds = seeds;
-    // }
 
     public void bite()
     {

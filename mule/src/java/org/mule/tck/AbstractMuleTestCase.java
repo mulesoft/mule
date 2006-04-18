@@ -170,17 +170,19 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     protected void suitePreSetUp() throws Exception {
-
+        // nothing to do
     }
-    protected void suitePostSetUp() throws Exception {
 
+    protected void suitePostSetUp() throws Exception {
+        // nothing to do
     }
 
     protected void suitePreTearDown() throws Exception {
-
+        // nothing to do
     }
-    protected void suitePostTearDown() throws Exception {
 
+    protected void suitePostTearDown() throws Exception {
+        // nothing to do
     }
 
     protected final void tearDown() throws Exception {
@@ -218,11 +220,11 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     protected void doSetUp() throws Exception {
-
+        // template method
     }
 
     protected void doTearDown() throws Exception {
-
+        // template method
     }
 
     public static UMOManager getManager(boolean disableAdminAgent) throws Exception {

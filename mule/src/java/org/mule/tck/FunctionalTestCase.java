@@ -53,17 +53,16 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase {
     }
 
     protected void doPreFunctionalSetUp() throws Exception {
-
+        // template method
     }
 
     protected void doPostFunctionalSetUp() throws Exception {
-
+        // template method
     }
 
     protected void doFunctionalTearDown() throws Exception {
-
+        // template method
     }
-
 
     protected abstract String getConfigResources();
 
