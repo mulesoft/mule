@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.test.util;
 
 import org.mule.tck.AbstractMuleTestCase;
@@ -22,13 +23,16 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EnvironmentHelperTestCase extends AbstractMuleTestCase {
+public class EnvironmentHelperTestCase extends AbstractMuleTestCase
+{
 
-    public void testEnvironment() throws Exception {
-        EnvironmentHelper helper = new EnvironmentHelper();
-        Properties p = helper.getEnvProperties();
+    public void testEnvironment() throws Exception
+    {
+        Properties p = EnvironmentHelper.getEnvironment();
         assertNotNull(p);
         p.list(System.out);
+        assertFalse(p.isEmpty());
         assertNotNull(p.getProperty("JAVA_HOME"));
     }
+
 }
