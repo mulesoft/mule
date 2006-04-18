@@ -124,6 +124,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     private boolean cacheJmsSessions = false;
 
+    private boolean recoverJmsConnections = true;
+
     public JmsConnector()
     {
         receivers = new ConcurrentHashMap();
@@ -220,7 +222,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         // Existing connection strategy will be used to recover.
 
         final ConnectionStrategy connectionStrategy = getConnectionStrategy();
-        if (connectionStrategy != null && connection != null) {
+        if (recoverJmsConnections &&
+                connectionStrategy != null &&
+                connection != null) {
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException jmsException) {
                     logger.debug("About to recycle myself due to remote JMS connection shutdown.");
@@ -614,6 +618,16 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void setJndiContext(Context jndiContext)
     {
         this.jndiContext = jndiContext;
+    }
+
+    public void setRecoverJmsConnections(boolean recover)
+    {
+        this.recoverJmsConnections = recover;
+    }
+
+    public boolean isRecoverJmsConnections()
+    {
+        return this.recoverJmsConnections;
     }
 
     protected RedeliveryHandler createRedeliveryHandler() throws IllegalAccessException, NoSuchMethodException,
