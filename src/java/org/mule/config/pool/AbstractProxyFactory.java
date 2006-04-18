@@ -105,6 +105,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
 
     protected void afterComponentCreate(Object component) throws InitialisationException
     {
+        // nothing to do
     }
 
     public ObjectPool getPool() {
