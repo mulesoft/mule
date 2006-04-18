@@ -56,9 +56,14 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
             }
         }
 
-        //We must always register this converter as the Mule Message uses ConcurrentHashMaps,
-        // but XStream does not support them out of the box right now
-         xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
+        // We must always register this converter as the Mule Message uses
+        // ConcurrentHashMaps, but XStream does not support them out of the box right now
+        try {
+            xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
+        }
+        catch (ClassNotFoundException cnf) {
+            throw new TransformerException(this, cnf);
+        }
 
         addAliases();
         addConverters();
@@ -144,18 +149,23 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
         private Class jdk5ConurrentHashMap = null;
         private Class backportConurrentHashMap = null;
 
-        public ConcurrentHashMapConverter(Mapper mapper) {
+        public ConcurrentHashMapConverter(Mapper mapper) throws ClassNotFoundException {
             super(mapper);
             try {
                 jdk5ConurrentHashMap = ClassHelper.loadClass("java.util.concurrent.ConcurrentHashMap", getClass());
             } catch (ClassNotFoundException e) {
-
+                // ignore: probably running on JDK 1.4
             }
 
             try {
                 backportConurrentHashMap = ClassHelper.loadClass("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", getClass());
             } catch (ClassNotFoundException e) {
+                // ignore: maybe running Mule 3.0 with native util.concurrent :)
+            }
 
+            // ..however if both are null something is wrong.
+            if (jdk5ConurrentHashMap == null && backportConurrentHashMap == null) {
+                throw new ClassNotFoundException("Neither java.util.concurrent.ConcurrentHashMap nor edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap could be found - cannot continue.");
             }
         }
 
