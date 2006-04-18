@@ -24,6 +24,7 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.routing.RoutingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -40,7 +41,7 @@ import java.nio.channels.FileChannel;
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files
  * from a directory.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -155,7 +156,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
             if (destinationFile != null) {
                 // move sourceFile to new destination
                 fileWasMoved = this.moveFile(sourceFile, destinationFile);
-                
+
                 // move didn't work - bail out (will attempty rollback)
                 if (!fileWasMoved) {
                     throw new MuleException(new Message("file", 4, sourceFile.getAbsolutePath(),
@@ -198,8 +199,11 @@ public class FileMessageReceiver extends PollingMessageReceiver
             }
 
             // wrap exception & handle it
-            Exception ex = new MuleException(new Message("file", 2, sourceFile.getName(),
-                    (fileWasRolledBack ? "successful" : "unsuccessful")), e);
+            Exception ex = new RoutingException(new Message("file", 2, sourceFile.getName(),
+                                     (fileWasRolledBack ? "successful" : "unsuccessful")),
+                                     new MuleMessage(msgAdapter),
+                                     endpoint,
+                                     e);
             this.handleException(ex);
         }
     }
@@ -233,7 +237,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
             }
             finally {
                 IOUtils.closeQuietly(fis);
-                IOUtils.closeQuietly(fos);                
+                IOUtils.closeQuietly(fos);
             }
         }
 
