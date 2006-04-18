@@ -49,7 +49,7 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
      */
     public void activateObject(Object arg0) throws Exception
     {
-
+        // nothing to do
     }
 
     /*
@@ -81,6 +81,7 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
      */
     public void passivateObject(Object arg0) throws Exception
     {
+        // nothing to do
     }
 
     /*
