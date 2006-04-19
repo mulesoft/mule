@@ -37,6 +37,7 @@ public class LoanRequest implements Serializable
 
     public LoanRequest()
     {
+        super();
     }
 
     public LoanRequest(Customer customer, double loanAmount, int loanDuration)

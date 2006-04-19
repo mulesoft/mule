@@ -29,6 +29,7 @@ public class BankQuoteRequest implements Serializable
 
     public BankQuoteRequest()
     {
+        super();
     }
 
     public Bank[] getLenders()

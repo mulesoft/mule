@@ -14,9 +14,7 @@
 package org.mule.samples.loanbroker.service;
 
 import org.mule.samples.loanbroker.BankQuoteRequest;
-import org.mule.samples.loanbroker.CreditProfile;
 import org.mule.samples.loanbroker.LoanQuote;
-import org.mule.samples.loanbroker.LoanRequest;
 
 /**
  * <code>BankService</code> is a representation of a bank form which to obtain loan
@@ -27,7 +25,5 @@ import org.mule.samples.loanbroker.LoanRequest;
  */
 public interface BankService
 {
-    //LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile);
-
     LoanQuote getLoanQuote(BankQuoteRequest request);
 }
