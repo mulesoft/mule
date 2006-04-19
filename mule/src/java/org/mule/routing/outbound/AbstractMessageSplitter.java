@@ -35,12 +35,12 @@ import java.util.List;
 
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
-    // determines if the same endpoint will be matched multiple
-    // times until a match is not found
-    // This should be set by overriding classes
+    // Determines if the same endpoint will be matched multiple times until a
+    // match is not found. This should be set by overriding classes.
     protected boolean multimatch = true;
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public synchronized UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
     {
         String correlationId = (String) propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
                                                                       message);
