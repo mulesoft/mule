@@ -27,4 +27,5 @@ package org.mule.umo.lifecycle;
  */
 public interface UMOEventListener
 {
+    // no methods
 }

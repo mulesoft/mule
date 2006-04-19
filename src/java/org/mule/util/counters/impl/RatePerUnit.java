@@ -76,6 +76,7 @@ public class RatePerUnit extends AggregateCounter
         try {
             length = Long.parseLong(p);
         } catch (Exception e) {
+            length = 0;
         }
         if (length <= 0) {
             length = 128;
@@ -100,7 +101,7 @@ public class RatePerUnit extends AggregateCounter
                 }
                 total += sample.value;
             }
-            return total / (1 + current - sample.time);
+            return total / (1 + current - (sample != null ? sample.time : 0));
         }
     }
 

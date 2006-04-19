@@ -14,10 +14,12 @@
 package org.mule.umo.space;
 
 /**
- * todo document
+ * TODO document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class UMOSpaceRegistry {
+public class UMOSpaceRegistry
+{
+    // no methods
 }

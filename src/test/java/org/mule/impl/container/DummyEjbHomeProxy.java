@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import javax.ejb.CreateException;
@@ -32,19 +33,24 @@ public class DummyEjbHomeProxy implements DummyEjbHome
         return new DummyEjbBean();
     }
 
-    public EJBMetaData getEJBMetaData() throws RemoteException {
+    public EJBMetaData getEJBMetaData() throws RemoteException
+    {
         return null;
     }
 
-    public HomeHandle getHomeHandle() throws RemoteException {
+    public HomeHandle getHomeHandle() throws RemoteException
+    {
         return null;
     }
 
-    public void remove(Handle handle) throws RemoteException, RemoveException {
-
+    public void remove(Handle handle) throws RemoteException, RemoveException
+    {
+        // nothing to do
     }
 
-    public void remove(Object object) throws RemoteException, RemoveException {
-
+    public void remove(Object object) throws RemoteException, RemoveException
+    {
+        // nothing to do
     }
+
 }

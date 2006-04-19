@@ -145,6 +145,7 @@ public class FileMonitor
 
         public FileMonitorNotifier()
         {
+            super();
         }
 
         public FileMonitorNotifier(ExceptionListener exceptionListener)

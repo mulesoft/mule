@@ -81,6 +81,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     assertEquals(0, q.size());
                     q.put("String1");
                 } catch (Exception e) {
+                    // ignore, let test fail
                 }
             }
         };
@@ -124,6 +125,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     q.put("String2");
                     s.commit();
                 } catch (Exception e) {
+                    // ignore, let test fail
                 }
             }
         };
@@ -163,6 +165,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     Object o = q.take();
                     assertEquals("String1", o);
                 } catch (Exception e) {
+                    // ignore, let test fail
                 }
             }
         };

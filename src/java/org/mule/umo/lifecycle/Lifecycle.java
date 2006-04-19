@@ -24,5 +24,5 @@ package org.mule.umo.lifecycle;
  */
 public interface Lifecycle extends Startable, Stoppable, Disposable
 {
-
+    // no additional methods - see super interfaces
 }

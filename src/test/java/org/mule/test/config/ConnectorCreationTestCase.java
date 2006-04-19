@@ -36,18 +36,6 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
                                                                                   .getConnector()));
     }
 
-    // public void testAlwaysCreateUsingProperties() throws Exception {
-    // QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-    // Map props = new HashMap();
-    // props.put("createConnector", "ALWAYS");
-    //
-    // builder.registerEndpoint("test://inbound", "in", true, props);
-    // builder.registerEndpoint("test://outbound", "out", false, props);
-    // UMOComponent c = builder.registerComponent(EchoComponent.class.getName(),
-    // "echo", "in", "out", null);
-    // assertTrue(!c.getDescriptor().getInboundEndpoint().getConnector().equals(c.getDescriptor().getOutboundEndpoint().getConnector()));
-    // }
-
     public void testCreateOnce() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
@@ -66,18 +54,8 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
             builder.registerEndpoint("test://inbound?createConnector=NEVER", "in", true);
             fail("Should fail as there is no existing test connector");
         } catch (UMOException e) {
+            // expected
         }
     }
 
-    // public void testCreateNeverUsingProperties() throws Exception {
-    // Map props = new HashMap();
-    // props.put("createConnector", "NEVER");
-    // QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-    // try {
-    // builder.registerEndpoint("test://inbound", "in", true, props);
-    // fail("Should fail as there is no existing test connector");
-    // } catch (UMOException e) {
-    //
-    // }
-    // }
 }

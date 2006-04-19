@@ -90,7 +90,7 @@ public class AbstractTransactionContext
 
     public synchronized void finalCleanUp() throws ResourceManagerException
     {
-
+        // nothing to do (yet?)
     }
 
     public synchronized void notifyFinish()

@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.util.file;
 
 import java.io.File;
@@ -26,10 +27,12 @@ public class DeleteException extends IOException
 
     public DeleteException()
     {
+        super();
     }
 
     public DeleteException(File f)
     {
-        super(f.toString());
+        super(f != null ? f.toString() : "null");
     }
+
 }

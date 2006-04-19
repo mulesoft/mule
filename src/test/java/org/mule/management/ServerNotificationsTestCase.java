@@ -158,7 +158,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     }
 
     public static interface DummyNotificationListener extends CustomNotificationListener {
-
+        // no methods
     }
 
     public class DummyNotification extends CustomNotification {

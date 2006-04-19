@@ -295,7 +295,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void initialise() throws InitialisationException
     {
-
+        // nothing to do
     }
 
     protected String generateTransformerName()

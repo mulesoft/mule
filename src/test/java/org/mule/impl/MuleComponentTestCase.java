@@ -47,6 +47,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
+                    // ignore
                 }
                 try {
                     comp.resume();
@@ -66,15 +67,19 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         MuleDescriptor descriptor = getTestDescriptor("myComponent", "org.mule.components.simple.EchoComponent");
         UMOComponent comp = getTestComponent(descriptor);
         assertTrue(!comp.isStarted());
+
         try {
             comp.dispatchEvent(getTestEvent("hello"));
             fail();
         } catch (ComponentException e) {
+            // expected
         }
+
         try {
             comp.sendEvent(getTestEvent("hello"));
             fail();
         } catch (ComponentException e) {
+            // expected
         }
     }
 }

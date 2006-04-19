@@ -18,18 +18,22 @@ package org.mule.test.mule.model;
 import org.mule.umo.UMOEventContext;
 
 /**
- * A test object with multiple matching methods accepting
- * UMOEventContext for the discovery to fail..
- *
+ * A test object with multiple matching methods accepting UMOEventContext for
+ * the discovery to fail..
+ * 
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  */
 public class MultipleEventContextsTestObject
 {
-    public void onCall(UMOEventContext context) {
 
+    public void onCall(UMOEventContext context)
+    {
+        // nothing to do
     }
 
-    public void doCall(UMOEventContext context) {
-
+    public void doCall(UMOEventContext context)
+    {
+        // nothing to do
     }
+
 }
