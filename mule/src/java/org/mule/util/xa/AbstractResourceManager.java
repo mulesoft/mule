@@ -87,10 +87,12 @@ public abstract class AbstractResourceManager
 
     protected void doStart() throws ResourceManagerSystemException
     {
+        // template method
     }
 
     protected void recover() throws ResourceManagerSystemException
     {
+        // nothing to do (yet?)
     }
 
     public synchronized void stop() throws ResourceManagerSystemException

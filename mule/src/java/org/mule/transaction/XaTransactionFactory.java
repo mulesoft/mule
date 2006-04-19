@@ -32,6 +32,7 @@ public class XaTransactionFactory implements UMOTransactionFactory
 {
     public XaTransactionFactory()
     {
+        super();
     }
 
     public UMOTransaction beginTransaction() throws TransactionException

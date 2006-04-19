@@ -31,6 +31,7 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
 
     public AbstractXAResourceManager()
     {
+        super();
     }
 
 

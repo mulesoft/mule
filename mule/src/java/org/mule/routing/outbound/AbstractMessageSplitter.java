@@ -101,7 +101,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
      */
     protected void initialise(UMOMessage message)
     {
-
+        // nothing to do
     }
 
     /**

@@ -46,6 +46,7 @@ public class TestCounters extends TestCase
             CounterFactory.createCounter("create1", Type.NUMBER);
             fail("The creation of a duplicate counter should have failed");
         } catch (IllegalStateException e) {
+            // expected
         }
     }
 

@@ -17,16 +17,20 @@ package org.mule.test.mule.model;
 
 /**
  * A test object with multiple matching payloads for the discovery to fail.
- *
+ * 
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  */
 public class MultiplePayloadsTestObject
 {
-    public void someBusinessMethod(String parameter) {
 
+    public void someBusinessMethod(String parameter)
+    {
+        // nothing to do
     }
 
-    public void someSetter(String otherStringParameter) {
-
+    public void someSetter(String otherStringParameter)
+    {
+        // nothing to do
     }
+
 }

@@ -54,6 +54,7 @@ public class XaTransaction extends AbstractTransaction
      */
     public XaTransaction()
     {
+        super();
     }
 
     /*

@@ -58,6 +58,7 @@ public class FileManager extends AbstractXAResourceManager {
      * @see org.mule.transaction.xa.AbstractResourceManager#doBegin(org.mule.transaction.xa.AbstractTransactionContext)
      */
     protected void doBegin(AbstractTransactionContext context) {
+        // template method
     }
 
     /*
@@ -75,8 +76,7 @@ public class FileManager extends AbstractXAResourceManager {
      * @see org.mule.transaction.xa.AbstractResourceManager#doCommit(org.mule.transaction.xa.AbstractTransactionContext)
      */
     protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException {
-        // TODO Auto-generated method stub
-
+        // template method
     }
 
     /*
@@ -85,11 +85,11 @@ public class FileManager extends AbstractXAResourceManager {
      * @see org.mule.transaction.xa.AbstractResourceManager#doRollback(org.mule.transaction.xa.AbstractTransactionContext)
      */
     protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException {
-        // TODO Auto-generated method stub
-
+        // template method
     }
 
     protected class FileTransactionContext extends AbstractTransactionContext {
-
+        // nothing here yet
     }
+
 }

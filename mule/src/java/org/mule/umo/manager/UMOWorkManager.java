@@ -25,4 +25,5 @@ import javax.resource.spi.work.WorkManager;
  */
 public interface UMOWorkManager extends WorkManager, Lifecycle
 {
+    // no methods
 }
