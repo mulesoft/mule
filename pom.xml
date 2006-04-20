@@ -95,7 +95,7 @@
     <build>
         <defaultGoal>install</defaultGoal>
 
-        <!-- Proect version filters -->
+        <!-- Project version filters -->
         <filters>
             <filter>project.properties</filter>
         </filters>
