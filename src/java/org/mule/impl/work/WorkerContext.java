@@ -118,7 +118,6 @@ public class WorkerContext implements Work
      * Create a WorkWrapper.
      * 
      * @param work Work to be wrapped.
-     * @param transactionContextManager
      */
     public WorkerContext(Work work)
     {
