@@ -50,7 +50,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertTrue(c.getDefaultOutboundTransformer() instanceof SerializableToByteArray);
     }
 
-    public void testSerivceOverrides2() throws InterruptedException
+    public void testServiceOverrides2() throws InterruptedException
     {
         FileConnector c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector1");
         assertNotNull(c);
@@ -65,7 +65,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertNull(c.getServiceOverrides());
     }
 
-    public void testSerivceOverrides3() throws InterruptedException, UMOException
+    public void testServiceOverrides3() throws InterruptedException, UMOException
     {
         UMOEndpointURI uri = new MuleEndpointURI("file:///temp");
         UMOEndpoint endpoint = MuleEndpoint.createEndpointFromUri(uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
