@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.test.util.concurrent;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
@@ -21,6 +22,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitPolicy;
 
@@ -41,11 +43,13 @@ public class WaitPolicyTestCase extends TestCase
     private ThreadPoolExecutor _executor;
     private AtomicInteger _activeTasks;
 
-    public WaitPolicyTestCase(String name) {
+    public WaitPolicyTestCase(String name)
+    {
         super(name);
     }
 
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
         // allow 1 active & 1 queued Thread
         _executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS,
@@ -55,7 +59,8 @@ public class WaitPolicyTestCase extends TestCase
         _activeTasks = new AtomicInteger(0);
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         _executor.shutdown();
         _asyncGroup.destroy();
         super.tearDown();
@@ -66,12 +71,13 @@ public class WaitPolicyTestCase extends TestCase
     // when the Executor's queue is full.
     // Returns control to the caller when the thread has been started in
     // order to avoid OS-dependent delays in the control flow.
-    private Thread execute(final ExecutorService e, final Runnable r) throws InterruptedException {
+    private Thread execute(final ExecutorService e, final Runnable r) throws InterruptedException
+    {
         final Latch isRunning = new Latch();
 
-        Runnable asyncRunnable = new Runnable()
-        {
-            public void run() {
+        Runnable asyncRunnable = new Runnable() {
+            public void run()
+            {
                 isRunning.countDown();
                 e.execute(r);
             }
@@ -84,8 +90,8 @@ public class WaitPolicyTestCase extends TestCase
         return t;
     }
 
-
-    public void testWaitPolicyWithShutdownExecutor() throws Exception {
+    public void testWaitPolicyWithShutdownExecutor() throws Exception
+    {
         assertEquals(0, _activeTasks.get());
 
         // wants to wait forever, but will fail immediately
@@ -93,7 +99,7 @@ public class WaitPolicyTestCase extends TestCase
         _executor.shutdown();
 
         // should fail immediately
-        Thread failedThread = this.execute(_executor, new SleepyTask(1000));
+        Thread failedThread = this.execute(_executor, new SleepyTask("boo", 1000));
         Thread.sleep(500);
 
         List exceptions = _asyncGroup.collectedExceptions();
@@ -105,7 +111,8 @@ public class WaitPolicyTestCase extends TestCase
         assertEquals(0, _activeTasks.get());
     }
 
-    public void testWaitPolicyForever() throws Exception {
+    public void testWaitPolicyForever() throws Exception
+    {
         assertEquals(0, _activeTasks.get());
 
         // wait forever
@@ -113,11 +120,11 @@ public class WaitPolicyTestCase extends TestCase
         _executor.setRejectedExecutionHandler(policy);
 
         // 1 runs immediately
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("hans", 1000));
         // 2 is queued
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("franz", 1000));
         // 3 is initially rejected but waits forever
-        Runnable s3 = new SleepyTask(1000);
+        Runnable s3 = new SleepyTask("beavis", 1000);
         this.execute(_executor, s3);
 
         // last one should have been queued
@@ -134,7 +141,8 @@ public class WaitPolicyTestCase extends TestCase
         assertEquals(0, _activeTasks.get());
     }
 
-    public void testWaitPolicyWithTimeout() throws Exception {
+    public void testWaitPolicyWithTimeout() throws Exception
+    {
         assertEquals(0, _activeTasks.get());
 
         // set a reasonable retry interval
@@ -142,11 +150,11 @@ public class WaitPolicyTestCase extends TestCase
         _executor.setRejectedExecutionHandler(policy);
 
         // 1 runs immediately
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("hans", 1000));
         // 2 is queued
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("franz", 1000));
         // 3 is initially rejected but will eventually succeed
-        Runnable s3 = new SleepyTask(1000);
+        Runnable s3 = new SleepyTask("tweety", 1000);
         this.execute(_executor, s3);
 
         boolean allFinished = _executor.awaitTermination(4000, TimeUnit.MILLISECONDS);
@@ -155,23 +163,25 @@ public class WaitPolicyTestCase extends TestCase
         assertEquals(0, _activeTasks.get());
     }
 
-    public void testWaitPolicyWithTimeoutFailure() throws Exception {
+    public void testWaitPolicyWithTimeoutFailure() throws Exception
+    {
         assertEquals(0, _activeTasks.get());
 
         // set a really short wait interval
         long failureInterval = 100;
-        LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(failureInterval, TimeUnit.MILLISECONDS);
+        LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(failureInterval,
+                TimeUnit.MILLISECONDS);
         _executor.setRejectedExecutionHandler(policy);
 
         // 1 runs immediately
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("hans", 1000));
         // 2 is queued
-        this.execute(_executor, new SleepyTask(1000));
+        this.execute(_executor, new SleepyTask("franz", 1000));
 
         // 3 is initially rejected & will retry but should fail quickly
-        Runnable s3 = new SleepyTask(1000);
+        Runnable s3 = new SleepyTask("butthead", 1000);
         Thread failedThread = this.execute(_executor, s3);
-        Thread.sleep(failureInterval*2); // give failure a chance
+        Thread.sleep(failureInterval * 2); // give failure a chance
 
         List exceptions = _asyncGroup.collectedExceptions();
         assertEquals(1, exceptions.size());
@@ -192,19 +202,23 @@ public class WaitPolicyTestCase extends TestCase
         // needed to hand the rejected Runnable back to the TestCase
         private Runnable _lastRejected;
 
-        public LastRejectedWaitPolicy() {
+        public LastRejectedWaitPolicy()
+        {
             super();
         }
 
-        public LastRejectedWaitPolicy(long time, TimeUnit timeUnit) {
+        public LastRejectedWaitPolicy(long time, TimeUnit timeUnit)
+        {
             super(time, timeUnit);
         }
 
-        public Runnable lastRejectedRunnable() {
+        public Runnable lastRejectedRunnable()
+        {
             return _lastRejected;
         }
 
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
+        {
             _lastRejected = r;
             super.rejectedExecution(r, e);
         }
@@ -213,13 +227,26 @@ public class WaitPolicyTestCase extends TestCase
     // task to execute - just sleeps for the given interval
     class SleepyTask extends Object implements Runnable
     {
+        private String _name;
         private long _sleepTime;
 
-        public SleepyTask(long sleepTime) {
+        public SleepyTask(String name, long sleepTime)
+        {
+            if (StringUtils.isEmpty(name)) {
+                throw new IllegalArgumentException("SleepyTask needs a name!");
+            }
+
+            _name = name;
             _sleepTime = sleepTime;
         }
 
-        public void run() {
+        public String toString()
+        {
+            return this.getClass().getName() + "{" + _name + ", " + _sleepTime + "}";
+        }
+
+        public void run()
+        {
             _activeTasks.incrementAndGet();
 
             try {
@@ -241,18 +268,21 @@ public class WaitPolicyTestCase extends TestCase
     {
         private List _exceptions;
 
-        public ExceptionCollectingThreadGroup() {
+        public ExceptionCollectingThreadGroup()
+        {
             super("asyncGroup");
             _exceptions = new ArrayList();
         }
 
         // collected Map(Thread, Throwable) associations
-        public List collectedExceptions() {
+        public List collectedExceptions()
+        {
             return _exceptions;
         }
 
         // all uncaught Thread exceptions end up here
-        public void uncaughtException(Thread t, Throwable e) {
+        public void uncaughtException(Thread t, Throwable e)
+        {
             _exceptions.add(Collections.singletonMap(t, e));
         }
     }
