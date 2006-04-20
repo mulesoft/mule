@@ -25,6 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.StringUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitPolicy;
+import org.mule.util.concurrent.WaitableBoolean;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,14 +72,16 @@ public class WaitPolicyTestCase extends TestCase
     // when the Executor's queue is full.
     // Returns control to the caller when the thread has been started in
     // order to avoid OS-dependent delays in the control flow.
+    // At the time of return the Runnable may or may not be in the queue,
+    // running, or already finished. :-)
     private Thread execute(final ExecutorService e, final Runnable r) throws InterruptedException
     {
-        final Latch isRunning = new Latch();
+        final Latch submitterIsRunning = new Latch();
 
         Runnable asyncRunnable = new Runnable() {
             public void run()
             {
-                isRunning.countDown();
+                submitterIsRunning.countDown();
                 e.execute(r);
             }
         };
@@ -86,7 +89,8 @@ public class WaitPolicyTestCase extends TestCase
         Thread t = new Thread(_asyncGroup, asyncRunnable);
         t.setDaemon(true);
         t.start();
-        isRunning.await();
+
+        submitterIsRunning.await();
         return t;
     }
 
@@ -119,24 +123,30 @@ public class WaitPolicyTestCase extends TestCase
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(-1, TimeUnit.SECONDS);
         _executor.setRejectedExecutionHandler(policy);
 
-        // 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
-        // 2 is queued
+        // we need a notifier to prevent franz from being rejected prematurely
+        WaitableBoolean taskIsRunning = new WaitableBoolean(false);
+
+        // task 1 runs immediately
+        this.execute(_executor, new SleepyTask("hans", 1000, taskIsRunning));
+
+        // make sure task 1 is gone from the queue
+        taskIsRunning.whenTrue(null);
+
+        // task 2 is queued
         this.execute(_executor, new SleepyTask("franz", 1000));
-        // 3 is initially rejected but waits forever
+
+        // task 3 is initially rejected but waits forever
         Runnable s3 = new SleepyTask("beavis", 1000);
         this.execute(_executor, s3);
 
-        // last one should have been queued
-        boolean allFinished = _executor.awaitTermination(4000, TimeUnit.MILLISECONDS);
-        assertFalse(allFinished);
+        // last one task should have been queued
+        assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
         assertEquals(0, _activeTasks.get());
 
         // shutdown & try again
         _executor.shutdown();
-        allFinished = _executor.awaitTermination(4000, TimeUnit.MILLISECONDS);
-        assertTrue(allFinished);
+        assertTrue(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
         assertEquals(0, _activeTasks.get());
     }
@@ -149,16 +159,23 @@ public class WaitPolicyTestCase extends TestCase
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(2500, TimeUnit.MILLISECONDS);
         _executor.setRejectedExecutionHandler(policy);
 
-        // 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
+        // we need a notifier to prevent franz from being rejected prematurely
+        WaitableBoolean taskIsRunning = new WaitableBoolean(false);
+
+        // task 1 runs immediately
+        this.execute(_executor, new SleepyTask("hans", 1000, taskIsRunning));
+
+        // make sure task 1 is gone from the queue
+        taskIsRunning.whenTrue(null);
+
         // 2 is queued
         this.execute(_executor, new SleepyTask("franz", 1000));
+
         // 3 is initially rejected but will eventually succeed
         Runnable s3 = new SleepyTask("tweety", 1000);
         this.execute(_executor, s3);
 
-        boolean allFinished = _executor.awaitTermination(4000, TimeUnit.MILLISECONDS);
-        assertFalse(allFinished);
+        assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
         assertEquals(0, _activeTasks.get());
     }
@@ -173,8 +190,15 @@ public class WaitPolicyTestCase extends TestCase
                 TimeUnit.MILLISECONDS);
         _executor.setRejectedExecutionHandler(policy);
 
-        // 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
+        // we need a notifier to prevent franz from being rejected prematurely
+        WaitableBoolean taskIsRunning = new WaitableBoolean(false);
+
+        // task 1 runs immediately
+        this.execute(_executor, new SleepyTask("hans", 1000, taskIsRunning));
+
+        // make sure task 1 is gone from the queue
+        taskIsRunning.whenTrue(null);
+
         // 2 is queued
         this.execute(_executor, new SleepyTask("franz", 1000));
 
@@ -191,8 +215,7 @@ public class WaitPolicyTestCase extends TestCase
         assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
 
         _executor.shutdown();
-        boolean allFinished = _executor.awaitTermination(2500, TimeUnit.MILLISECONDS);
-        assertTrue(allFinished);
+        assertTrue(_executor.awaitTermination(2500, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
         assertEquals(0, _activeTasks.get());
     }
@@ -229,8 +252,14 @@ public class WaitPolicyTestCase extends TestCase
     {
         private String _name;
         private long _sleepTime;
+        private WaitableBoolean _isRunning;
 
         public SleepyTask(String name, long sleepTime)
+        {
+            this(name, sleepTime, null);
+        }
+
+        public SleepyTask(String name, long sleepTime, WaitableBoolean isRunning)
         {
             if (StringUtils.isEmpty(name)) {
                 throw new IllegalArgumentException("SleepyTask needs a name!");
@@ -238,6 +267,7 @@ public class WaitPolicyTestCase extends TestCase
 
             _name = name;
             _sleepTime = sleepTime;
+            _isRunning = isRunning;
         }
 
         public String toString()
@@ -247,6 +277,10 @@ public class WaitPolicyTestCase extends TestCase
 
         public void run()
         {
+            if (_isRunning != null) {
+                _isRunning.set(true);
+            }
+
             _activeTasks.incrementAndGet();
 
             try {
