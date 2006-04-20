@@ -22,7 +22,6 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.umo.UMOEvent;
 
-import javax.xml.rpc.handler.soap.SOAPMessageContext;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;
 
@@ -87,9 +86,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
     protected synchronized void processClientRequest(MessageContext msgContext, boolean setMustUnderstand)
             throws Exception
     {
-
-        SOAPMessageContext soapMsgContext = msgContext;
-        SOAPMessage msg = soapMsgContext.getMessage();
+        SOAPMessage msg = msgContext.getMessage();
         if (msg == null) {
             return;
         }
@@ -112,8 +109,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processClientResponse(MessageContext msgContext) throws Exception
     {
-        SOAPMessageContext soapMsgContext = msgContext;
-        SOAPMessage msg = soapMsgContext.getMessage();
+        SOAPMessage msg = msgContext.getMessage();
         if (msg == null) {
             return;
         }
@@ -143,8 +139,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processServerRequest(MessageContext msgContext) throws Exception
     {
-        SOAPMessageContext soapMsgContext = msgContext;
-        SOAPMessage msg = soapMsgContext.getMessage();
+        SOAPMessage msg = msgContext.getMessage();
         if (msg == null) {
             return;
         }
@@ -159,8 +154,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processServerResponse(MessageContext msgContext, boolean setMustUnderstand) throws Exception
     {
-        SOAPMessageContext soapMsgContext = msgContext;
-        SOAPMessage msg = soapMsgContext.getMessage();
+        SOAPMessage msg = msgContext.getMessage();
         if (msg == null) {
             return;
         }

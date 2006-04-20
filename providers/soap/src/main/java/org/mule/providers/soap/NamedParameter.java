@@ -92,6 +92,7 @@ public class NamedParameter {
     public static final QName XSD_LANGUAGE = new QName(URI_DEFAULT_SCHEMA_XSD, "language");
     public static final QName XSD_ID = new QName(URI_DEFAULT_SCHEMA_XSD, "ID");
     public static final QName XSD_SCHEMA = new QName(URI_DEFAULT_SCHEMA_XSD, "schema");
+    
 
     private QName name;
     private QName type;

@@ -18,7 +18,6 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ParameterDesc;
-import org.apache.axis.encoding.TypeMappingRegistryImpl;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
@@ -31,7 +30,7 @@ import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
-import org.mule.providers.soap.axis.extensions.MuleProvider;
+import org.mule.providers.soap.axis.extensions.MuleRPCProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -40,7 +39,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.xml.rpc.ParameterMode;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -91,10 +89,14 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             if (style != null && style.equalsIgnoreCase("message")) {
                 logger.debug("Creating Message Provider");
                 service = new SOAPService(new MuleMsgProvider(connector));
+//            } else if (style != null && style.equalsIgnoreCase("document")) {
+//                logger.debug("Creating Doc Provider");
+//                service = new SOAPService(new MuleDocLitProvider(connector));
             } else {
                 logger.debug("Creating RPC Provider");
-                service = new SOAPService(new MuleProvider(connector));
+                service = new SOAPService(new MuleRPCProvider(connector));
             }
+
             service.setEngine(connector.getAxisServer());
         }
 
@@ -102,6 +104,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setOption(serviceName, this);
         service.setOption(AxisConnector.SERVICE_PROPERTY_SERVCE_PATH, servicePath);
         service.setOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME, serviceName);
+
         service.setName(serviceName);
 
         // Add any custom options from the Descriptor config
@@ -124,13 +127,22 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        if (endpoint.getProperties().get("soapMethods") != null) {
-            Map methods = (Map) endpoint.getProperties().get("soapMethods");
+        Map methods = (Map) endpoint.getProperties().get("soapMethods");
+        if(methods == null) {
+            methods = (Map) descriptor.getProperties().get("soapMethods");
+        }
+        if (methods != null) {
             Iterator i = methods.keySet().iterator();
             StringBuffer buf = new StringBuffer(64);
             while (i.hasNext()) {
                 String name = (String) i.next();
-                SoapMethod method = new SoapMethod(name, (String) methods.get(name));
+                Object m = methods.get(name);
+                SoapMethod method = null;
+                if(m instanceof List) {
+                    method = new SoapMethod(name, (List)m);
+                } else {
+                    method = new SoapMethod(name, (String)m);
+                }
 
                 List namedParameters = method.getNamedParameters();
                 ParameterDesc[] parameters = new ParameterDesc[namedParameters.size()];
@@ -146,16 +158,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                     parameters[j] = new ParameterDesc(parameter.getName(), mode, parameter.getType());
                 }
 
-                service.getServiceDescription().addOperationDesc(new OperationDesc(name, parameters, method.getReturnType()));
-                buf.append(name + ",");
+                service.getServiceDescription().addOperationDesc(new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
+                buf.append(method.getName().getLocalPart() + ",");
             }
             methodNames = buf.toString();
             methodNames = methodNames.substring(0, methodNames.length() - 1);
         } else {
-            String[] methods = ServiceProxy.getMethodNames(interfaces);
+            String[] methodNamesArray = ServiceProxy.getMethodNames(interfaces);
             StringBuffer buf = new StringBuffer(64);
-            for (int i = 0; i < methods.length; i++) {
-                buf.append(methods[i]).append(",");
+            for (int i = 0; i < methodNamesArray.length; i++) {
+                buf.append(methodNamesArray[i]).append(",");
             }
             methodNames = buf.toString();
             methodNames = methodNames.substring(0, methodNames.length() - 1);
@@ -168,6 +180,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if(namespace==null) {
             namespace = Namespaces.makeNamespace(className);
         }
+
         //WSDL override
         String wsdlFile = (String) descriptor.getProperties().get("wsdlFile");
         if(wsdlFile!=null) {
@@ -235,16 +248,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
-        TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
+        //TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
         // TypeMappingImpl tm = (TypeMappingImpl) registry.();
         // Handle complex bean type automatically
-        // registry.setDoAutoTypes( true );
+         //registry.setDoAutoTypes( true );
         // Axis 1.2 fix to handle autotypes properly
-        AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
+       // AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
 
         // Load any explicitly defined bean types
         List types = (List) descriptor.getProperties().get("beanTypes");
-        connector.registerTypes(registry, types);
+        //todo connector.registerTypes(registry, types);
 
         service.setName(serviceName);
 
@@ -262,6 +275,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if(StringUtils.isNotBlank(namespace)) {
             service.getServiceDescription().setDefaultNamespace(namespace);
         }
+        service.init();
         service.stop();
     }
 

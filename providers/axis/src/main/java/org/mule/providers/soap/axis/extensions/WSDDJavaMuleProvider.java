@@ -23,7 +23,7 @@ import org.mule.providers.soap.axis.AxisConnector;
  * <code>WSDDJavaMuleProvider</code> is a factory class for creating the
  * MuleProvider
  * 
- * @see MuleProvider
+ * @see MuleRPCProvider
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -38,7 +38,7 @@ public class WSDDJavaMuleProvider extends WSDDProvider
     }
 
     /**
-     * Factory method for creating an <code>MuleProvider</code>.
+     * Factory method for creating an <code>MuleRPCProvider</code>.
      * 
      * @param wsddService a <code>WSDDService</code> value
      * @param engineConfiguration an <code>EngineConfiguration</code> value
@@ -52,7 +52,7 @@ public class WSDDJavaMuleProvider extends WSDDProvider
         if (serviceStyle.equals("message")) {
             return new MuleMsgProvider(connector);
         }
-        return new MuleProvider(connector);
+        return new MuleRPCProvider(connector);
     }
 
     /**

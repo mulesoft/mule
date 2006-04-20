@@ -95,11 +95,17 @@
     <build>
         <defaultGoal>install</defaultGoal>
 
+        <!-- Proect version filters -->
+        <filters>
+            <filter>project.properties</filter>
+        </filters>
+
         <!-- Directory layout -->
         <sourceDirectory>src/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/conf</directory>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <testResources>

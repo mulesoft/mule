@@ -14,12 +14,12 @@
  */
 package org.mule.providers.soap;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.converters.QNameConverter;
 import org.mule.util.ClassHelper;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -137,12 +137,18 @@ public class SoapMethod {
     }
 
     public NamedParameter addNamedParameter(QName name, QName type, String mode) {
+        if(name.getNamespaceURI().equals(StringUtils.EMPTY)) {
+            name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
+        }
         NamedParameter param = new NamedParameter(name, type, mode);
         namedParameters.add(param);
         return param;
     }
 
     public NamedParameter addNamedParameter(QName name, QName type, ParameterMode mode) {
+        if(name.getNamespaceURI().equals(StringUtils.EMPTY)) {
+            name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
+        }
         NamedParameter param = new NamedParameter(name, type, mode);
         namedParameters.add(param);
         return param;
