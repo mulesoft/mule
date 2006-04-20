@@ -95,10 +95,11 @@
     <build>
         <defaultGoal>install</defaultGoal>
 
+        <!-- Fails if the project doesn't have this file, need to push it down? -->
         <!-- Project version filters -->
-        <filters>
+        <!-- filters>
             <filter>project.properties</filter>
-        </filters>
+        </filters -->
 
         <!-- Directory layout -->
         <sourceDirectory>src/java</sourceDirectory>
