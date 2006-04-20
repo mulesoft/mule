@@ -69,7 +69,9 @@ public abstract class UMOServerNotification extends EventObject
     {
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
-        serverId = MuleManager.getInstance().getId();
+        if (MuleManager.isInstanciated()) {
+            serverId = MuleManager.getInstance().getId();
+        }
         timestamp = System.currentTimeMillis();
     }
 
