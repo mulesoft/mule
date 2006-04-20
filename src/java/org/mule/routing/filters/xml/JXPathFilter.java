@@ -35,7 +35,7 @@ import java.util.Map;
 public class JXPathFilter implements UMOFilter
 {
 
-    private static final Log LOGGER = LogFactory.getLog(JXPathFilter.class);
+    private static final Log logger = LogFactory.getLog(JXPathFilter.class);
 
     private String expression;
 
@@ -68,15 +68,8 @@ public class JXPathFilter implements UMOFilter
             return false;
         }
         if (expression == null) {
-            LOGGER.warn("Expression for JXPathFilter is not set");
+            logger.warn("Expression for JXPathFilter is not set");
             return false;
-        }
-
-        if (value == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Value for JXPathFilter is not set : true by default");
-            }
-            value = Boolean.TRUE.toString();
         }
 
         boolean res = false;
@@ -91,8 +84,8 @@ public class JXPathFilter implements UMOFilter
                 Document doc = (Document)obj;
                 o = doc.valueOf(expression);
             } else {
-		if (LOGGER.isDebugEnabled()) {
-		    LOGGER.debug("Passing object of type " + 
+		if (logger.isDebugEnabled()) {
+		    logger.debug("Passing object of type " +
 			    obj.getClass().toString() + " to JXPathContext");
 		}
                 JXPathContext context = JXPathContext.newContext(obj);
@@ -100,22 +93,24 @@ public class JXPathFilter implements UMOFilter
                 o = context.getValue(expression);
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
             }
 
             if (o != null) {
                 res = value.equals(o.toString());
+            } else if ("null".equals(value)) {
+                res = true;
             } else {
                 res = false;
-                LOGGER.warn("JXPathFilter Expression result is null (" + expression + ")");
+                logger.warn("JXPathFilter Expression result is null (" + expression + ")");
             }
         } catch (Exception e) {
-            LOGGER.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
+            logger.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("JXPathFilter accept object  : " + res);
+        if (logger.isDebugEnabled()) {
+            logger.debug("JXPathFilter accept object  : " + res);
         }
         return res;
 
@@ -142,6 +137,18 @@ public class JXPathFilter implements UMOFilter
             context.setFactory(factory);
         }
         context.setLenient(lenient);
+        //Special case handling where we just want ot check if a value is null
+        if((expression.endsWith("= null") || expression.endsWith("=null")) && value==null) {
+            value = "null";
+            expression = expression.substring(0, expression.lastIndexOf("="));
+        }
+
+        if (value == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Value for JXPathFilter is not set : true by default");
+            }
+            value = Boolean.TRUE.toString();
+        }
     }
 
     /**
