@@ -43,8 +43,8 @@ public class SyncLoanBroker
         UMOEventContext context = RequestContext.getEventContext();
 
         //get the customers credit profile
-        UMOMessage result = context.sendEvent(request.getCustomer());
-        bqr.getLoanRequest().setCreditProfile((CreditProfile)result.getPayload());
+        UMOMessage result = context.sendEvent(bqr);
+        bqr.getLoanRequest().setCreditProfile(((BankQuoteRequest)result.getPayload()).getLoanRequest().getCreditProfile());
 
         //This asynchronous dispatch will invoke all the bank services concurrently
         //The response of the Banks is handled by the response-router on this component

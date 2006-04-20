@@ -13,8 +13,7 @@
  */
 package org.mule.samples.loanbroker.service;
 
-import org.mule.samples.loanbroker.CreditProfile;
-import org.mule.samples.loanbroker.Customer;
+import org.mule.samples.loanbroker.BankQuoteRequest;
 
 /**
  * <code>CreditAgencyService</code> the service that provides a credit
@@ -25,5 +24,7 @@ import org.mule.samples.loanbroker.Customer;
  */
 public interface CreditAgencyService
 {
-    CreditProfile getCreditProfile(Customer customer);
+    //CreditProfile getCreditProfile(Customer customer);
+
+    BankQuoteRequest getCreditProfile(BankQuoteRequest request);
 }
