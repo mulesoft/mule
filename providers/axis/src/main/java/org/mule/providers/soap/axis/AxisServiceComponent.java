@@ -56,7 +56,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -473,11 +472,6 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     public void doPost(UMOEventContext context, WriterMessageAdapter response) throws ServletException, IOException
     {
-        long t0 = 0L;
-        long t1 = 0L;
-        long t2 = 0L;
-        long t3 = 0L;
-        long t4 = 0L;
         String soapAction = null;
         AxisEngine engine = getAxisServer();
         if (engine == null) {
@@ -488,9 +482,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         MessageContext msgContext = new MessageContext(engine);
         if (logger.isDebugEnabled()) {
             logger.debug("Enter: doPost()");
-        }
-        if (tlog.isDebugEnabled()) {
-            t0 = System.currentTimeMillis();
         }
         Message responseMsg = null;
         String contentType = null;
@@ -524,18 +515,13 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             // TODO session support
             // msgContext.setSession(new AxisHttpSession(req));
-            if (tlog.isDebugEnabled()) {
-                t1 = System.currentTimeMillis();
-            }
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Invoking Axis Engine.");
             }
             engine.invoke(msgContext);
             if (logger.isDebugEnabled()) {
                 logger.debug("Return from Axis Engine.");
-            }
-            if (tlog.isDebugEnabled()) {
-                t2 = System.currentTimeMillis();
             }
             if (RequestContext.getExceptionPayload() instanceof Exception) {
                 throw (Exception) RequestContext.getExceptionPayload().getException();
@@ -563,9 +549,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
 
         contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
-        if (tlog.isDebugEnabled()) {
-            t3 = System.currentTimeMillis();
-        }
 
         sendResponse(context.getMessage().getStringProperty(HttpConnector.HTTP_STATUS_PROPERTY, null),
                 contentType, response, responseMsg);
@@ -573,12 +556,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (logger.isDebugEnabled()) {
             logger.debug("Response sent.");
             logger.debug("Exit: doPost()");
-        }
-        if (tlog.isDebugEnabled()) {
-            t4 = System.currentTimeMillis();
-            tlog.debug("axisServlet.doPost: " + soapAction + " pre=" + (t1 - t0) + " invoke=" + (t2 - t1) + " post="
-                    + (t3 - t2) + " send=" + (t4 - t3) + " " + msgContext.getTargetService() + "."
-                    + (msgContext.getOperation() != null ? msgContext.getOperation().getName() : ""));
         }
     }
 
