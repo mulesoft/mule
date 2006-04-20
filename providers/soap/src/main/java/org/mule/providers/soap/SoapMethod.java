@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.soap;
@@ -137,7 +137,7 @@ public class SoapMethod {
     }
 
     public NamedParameter addNamedParameter(QName name, QName type, String mode) {
-        if(name.getNamespaceURI().equals(StringUtils.EMPTY)) {
+        if(StringUtils.isBlank(name.getNamespaceURI())) {
             name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
         }
         NamedParameter param = new NamedParameter(name, type, mode);
@@ -146,7 +146,7 @@ public class SoapMethod {
     }
 
     public NamedParameter addNamedParameter(QName name, QName type, ParameterMode mode) {
-        if(name.getNamespaceURI().equals(StringUtils.EMPTY)) {
+        if(StringUtils.isBlank(name.getNamespaceURI())) {
             name = new QName(getName().getNamespaceURI(), name.getLocalPart(), name.getPrefix());
         }
         NamedParameter param = new NamedParameter(name, type, mode);
