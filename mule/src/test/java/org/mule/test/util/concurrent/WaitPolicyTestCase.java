@@ -42,7 +42,6 @@ public class WaitPolicyTestCase extends TestCase
 {
     private ExceptionCollectingThreadGroup _asyncGroup;
     private ThreadPoolExecutor _executor;
-    private AtomicInteger _activeTasks;
 
     public WaitPolicyTestCase(String name)
     {
@@ -57,7 +56,7 @@ public class WaitPolicyTestCase extends TestCase
                 new LinkedBlockingQueue(1));
 
         _asyncGroup = new ExceptionCollectingThreadGroup();
-        _activeTasks = new AtomicInteger(0);
+        SleepyTask.activeTasks = new AtomicInteger(0);
     }
 
     protected void tearDown() throws Exception
@@ -96,7 +95,7 @@ public class WaitPolicyTestCase extends TestCase
 
     public void testWaitPolicyWithShutdownExecutor() throws Exception
     {
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
 
         // wants to wait forever, but will fail immediately
         _executor.setRejectedExecutionHandler(new LastRejectedWaitPolicy());
@@ -112,12 +111,12 @@ public class WaitPolicyTestCase extends TestCase
         Map.Entry threadFailure = (Map.Entry)((Map)exceptions.get(0)).entrySet().iterator().next();
         assertEquals(failedThread, threadFailure.getKey());
         assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
     }
 
     public void testWaitPolicyForever() throws Exception
     {
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
 
         // wait forever
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(-1, TimeUnit.SECONDS);
@@ -142,18 +141,18 @@ public class WaitPolicyTestCase extends TestCase
         // last one task should have been queued
         assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
 
         // shutdown & try again
         _executor.shutdown();
         assertTrue(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
     }
 
     public void testWaitPolicyWithTimeout() throws Exception
     {
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
 
         // set a reasonable retry interval
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(2500, TimeUnit.MILLISECONDS);
@@ -177,12 +176,12 @@ public class WaitPolicyTestCase extends TestCase
 
         assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
     }
 
     public void testWaitPolicyWithTimeoutFailure() throws Exception
     {
-        assertEquals(0, _activeTasks.get());
+        assertEquals(0, SleepyTask.activeTasks.get());
 
         // set a really short wait interval
         long failureInterval = 100;
@@ -217,108 +216,111 @@ public class WaitPolicyTestCase extends TestCase
         _executor.shutdown();
         assertTrue(_executor.awaitTermination(2500, TimeUnit.MILLISECONDS));
         assertSame(s3, policy.lastRejectedRunnable());
-        assertEquals(0, _activeTasks.get());
-    }
-
-    class LastRejectedWaitPolicy extends WaitPolicy
-    {
-        // needed to hand the rejected Runnable back to the TestCase
-        private Runnable _lastRejected;
-
-        public LastRejectedWaitPolicy()
-        {
-            super();
-        }
-
-        public LastRejectedWaitPolicy(long time, TimeUnit timeUnit)
-        {
-            super(time, timeUnit);
-        }
-
-        public Runnable lastRejectedRunnable()
-        {
-            return _lastRejected;
-        }
-
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
-        {
-            _lastRejected = r;
-            super.rejectedExecution(r, e);
-        }
-    }
-
-    // task to execute - just sleeps for the given interval
-    class SleepyTask extends Object implements Runnable
-    {
-        private String _name;
-        private long _sleepTime;
-        private WaitableBoolean _isRunning;
-
-        public SleepyTask(String name, long sleepTime)
-        {
-            this(name, sleepTime, null);
-        }
-
-        public SleepyTask(String name, long sleepTime, WaitableBoolean isRunning)
-        {
-            if (StringUtils.isEmpty(name)) {
-                throw new IllegalArgumentException("SleepyTask needs a name!");
-            }
-
-            _name = name;
-            _sleepTime = sleepTime;
-            _isRunning = isRunning;
-        }
-
-        public String toString()
-        {
-            return this.getClass().getName() + "{" + _name + ", " + _sleepTime + "}";
-        }
-
-        public void run()
-        {
-            if (_isRunning != null) {
-                _isRunning.set(true);
-            }
-
-            _activeTasks.incrementAndGet();
-
-            try {
-                synchronized (this) {
-                    this.wait(_sleepTime);
-                }
-            }
-            catch (InterruptedException iex) {
-                // ignore
-            }
-
-            _activeTasks.decrementAndGet();
-        }
-
-    }
-
-    // ThreadGroup wrapper that collects uncaught exceptions
-    class ExceptionCollectingThreadGroup extends ThreadGroup
-    {
-        private List _exceptions;
-
-        public ExceptionCollectingThreadGroup()
-        {
-            super("asyncGroup");
-            _exceptions = new ArrayList();
-        }
-
-        // collected Map(Thread, Throwable) associations
-        public List collectedExceptions()
-        {
-            return _exceptions;
-        }
-
-        // all uncaught Thread exceptions end up here
-        public void uncaughtException(Thread t, Throwable e)
-        {
-            _exceptions.add(Collections.singletonMap(t, e));
-        }
+        assertEquals(0, SleepyTask.activeTasks.get());
     }
 
 }
+
+class LastRejectedWaitPolicy extends WaitPolicy
+{
+    // needed to hand the rejected Runnable back to the TestCase
+    private Runnable _lastRejected;
+
+    public LastRejectedWaitPolicy()
+    {
+        super();
+    }
+
+    public LastRejectedWaitPolicy(long time, TimeUnit timeUnit)
+    {
+        super(time, timeUnit);
+    }
+
+    public Runnable lastRejectedRunnable()
+    {
+        return _lastRejected;
+    }
+
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
+    {
+        _lastRejected = r;
+        super.rejectedExecution(r, e);
+    }
+}
+
+// task to execute - just sleeps for the given interval
+class SleepyTask extends Object implements Runnable
+{
+    private String _name;
+    private long _sleepTime;
+    private WaitableBoolean _isRunning;
+    public static AtomicInteger activeTasks;
+
+    public SleepyTask(String name, long sleepTime)
+    {
+        this(name, sleepTime, null);
+    }
+
+    public SleepyTask(String name, long sleepTime, WaitableBoolean isRunning)
+    {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("SleepyTask needs a name!");
+        }
+
+        _name = name;
+        _sleepTime = sleepTime;
+        _isRunning = isRunning;
+    }
+
+    public String toString()
+    {
+        return this.getClass().getName() + "{" + _name + ", " + _sleepTime + "}";
+    }
+
+    public void run()
+    {
+        if (_isRunning != null) {
+            _isRunning.set(true);
+        }
+
+        activeTasks.incrementAndGet();
+
+        try {
+            synchronized (this) {
+                this.wait(_sleepTime);
+            }
+        }
+        catch (InterruptedException iex) {
+            // ignore
+        }
+
+        activeTasks.decrementAndGet();
+    }
+
+}
+
+// ThreadGroup wrapper that collects uncaught exceptions
+class ExceptionCollectingThreadGroup extends ThreadGroup
+{
+    private List _exceptions;
+
+    public ExceptionCollectingThreadGroup()
+    {
+        super("asyncGroup");
+        _exceptions = new ArrayList();
+    }
+
+    // collected Map(Thread, Throwable) associations
+    public List collectedExceptions()
+    {
+        return _exceptions;
+    }
+
+    // all uncaught Thread exceptions end up here
+    public void uncaughtException(Thread t, Throwable e)
+    {
+        _exceptions.add(Collections.singletonMap(t, e));
+    }
+
+}
+
