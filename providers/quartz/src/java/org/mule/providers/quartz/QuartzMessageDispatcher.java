@@ -59,7 +59,8 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(UMOEvent event) throws Exception
     {
         JobDetail jobDetail = new JobDetail();
-        jobDetail.setName(event.getEndpoint().getEndpointURI().toString());
+        // make the job name unique per endpoint (MULE-753)
+        jobDetail.setName(event.getEndpoint().getEndpointURI().toString() + "-" + event.getId());
 
         JobDataMap jobDataMap = new JobDataMap();
         UMOMessage msg = event.getMessage();
@@ -150,11 +151,10 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         trigger.setStartTime(new Date(start));
         trigger.setName(event.getEndpoint().getEndpointURI().toString());
         trigger.setGroup(groupName);
-        trigger.setJobName(event.getEndpoint().getEndpointURI().toString());
+        trigger.setJobName(jobDetail.getName());
         trigger.setJobGroup(jobGroupName);
 
         Scheduler scheduler = ((QuartzConnector)connector).getScheduler();
-        // TODO MULE-753
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
