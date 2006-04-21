@@ -8,7 +8,7 @@
 		<mule-descriptor name="TcpReceiver" 
 			implementation="org.mule.components.simple.NullComponent"
 			inboundEndpoint="tcp://localhost:4444"
-			outboundEndpoint="file://C:/temp/tests/mule">
+			outboundEndpoint="file://temp/tests/mule">
 			<inbound-router>
             	<router className="org.mule.routing.inbound.ForwardingConsumer"/>
            	</inbound-router> 		
