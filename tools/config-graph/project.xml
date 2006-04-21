@@ -6,6 +6,7 @@
     <name>Mule Config Graph</name>
     <groupId>mule</groupId>
     <id>mule-tools-config-graph</id>
+    <currentVersion>1.0</currentVersion>
     <inceptionYear>2005</inceptionYear>
     <package>org.mule.tools.config.graph</package>
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
