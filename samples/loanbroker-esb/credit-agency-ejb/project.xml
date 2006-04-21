@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <name>Credit Agency EJB App</name>
     <extend>${basedir}/../project.xml</extend>
     <id>credit-agency-ejb-sample</id>
-    <name>credit-agency-ejb-sample</name>
     <groupId>mule</groupId>
     <currentVersion>1.0</currentVersion>
     <description>Example EJB app for the Loan Broker ESB example</description>

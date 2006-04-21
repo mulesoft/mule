@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project.xml</extend>
     <id>mule-extras-acegi</id>
     <artifactId>mule-extras-acegi</artifactId>
     <name>Mule Acegi Security</name>
     <shortDescription>acegi</shortDescription>
-    <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components. for more information see
-        <a href="http://wiki.muleumo.org/display/MULE/Mule+Security">Mule Security</a>.
+    <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.
     </description>
     <url>http://www.muleumo.org/docs/modules/mule-extras-acegi/</url>
     <dependencies>

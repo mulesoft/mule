@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
 	<extend>${basedir}/../project.xml</extend>
 	<id>mule-extras-pgp</id>
 	<artifactId>mule-extras-pgp</artifactId>
 	<name>Mule PGP Security</name>
-	<description>A Mule implementation of PGP security using cryptix libraries. See <a href="http://www.cryptix.org/">Cryptix</a>.
+	<description>A Mule implementation of PGP security using Cryptix libraries.
 	</description>
 	<shortDescription>pgp</shortDescription>
     <url>http://www.muleumo.org/docs/modules/mule-extras-pgp/</url>

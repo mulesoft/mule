@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project.xml</extend>
     <id>mule-oracle-jms-provider</id>
     <artifactId>mule-oracle-jms-provider</artifactId>
     <name>Mule Oracle Advanced Queuing Provider</name>
     <shortDescription>mule-oracle-jms-provider</shortDescription>
-    <description>Adds Oracle-specific functionality to the standard Mule JMS provider.  For more information see:
-        <a href="http://mule.codehaus.org/Oracle+Integration">Oracle Integration</a>.
-    </description>
+    <description>Adds Oracle-specific functionality to the standard Mule JMS provider.</description>
     <dependencies>
         <dependency>
             <groupId>mule</groupId>

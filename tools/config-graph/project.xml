@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <pomVersion>3</pomVersion>
     <name>Mule Config Graph</name>
     <groupId>mule</groupId>
     <id>mule-tools-config-graph</id>
-    <version>1.0</version>
     <inceptionYear>2005</inceptionYear>
     <package>org.mule.tools.config.graph</package>
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>

@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project2.xml</extend>
     <pomVersion>3</pomVersion>
     <artifactId>mule-gigaspaces-provider</artifactId>
     <name>Mule GigaSpaces Provider</name>
     <description>Allows Mule to send and receive events via the GigaSpaces Jini implementation</description>
     <shortDescription>gs</shortDescription>
-    <url>http://www.muleumo.org/docs/modules/mule-jms-provider/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-gigaspaces-provider/</url>
     <dependencies>
  <dependency>
             <groupId>jini</groupId>

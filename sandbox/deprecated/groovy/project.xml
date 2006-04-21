@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project.xml</extend>
     <id>mule-extras-groovy</id>
     <artifactId>mule-extras-groovy</artifactId>
     <name>Groovy Support</name>
     <shortDescription>groovy</shortDescription>
-    <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts.
+    </description>
     <dependencies>
         <dependency>
             <artifactId>mule-vm-provider</artifactId>

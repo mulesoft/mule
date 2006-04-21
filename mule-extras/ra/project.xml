@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project.xml</extend>
     <groupId>mule</groupId>
     <id>mule-ra</id>
     <artifactId>mule-ra</artifactId>
     <name>Mule Resource Adapter</name>
     <shortDescription>ra</shortDescription>
-    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2ee application server and exposes Mule services via the JCA connector architecture.  for more information see
-        <a href="http://wiki.muleumo.org/display/MULE/Application+Servers">Application Servers</a>.
+    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.
     </description>
     <dependencies>
         <dependency>

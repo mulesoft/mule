@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
-
-<project>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project2.xml</extend>
     <pomVersion>3</pomVersion>
     <artifactId>mule-glue-provider</artifactId>
     <name>Mule Glue Provider</name>
-    <description>A Mule provider for Soap Connectivity using Glue. for more information see the
-        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
-    </description>
+    <description>A Mule provider for Soap Connectivity using Glue.</description>
     <shortDescription>glue</shortDescription>
     <url>http://www.muleumo.org/docs/modules/mule-glue-provider/</url>
     <dependencies>

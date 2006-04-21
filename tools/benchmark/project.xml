@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-   
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <name>Mule Benchmark</name>
@@ -99,9 +100,7 @@
     </dependencies>
     <build>
         <sourceDirectory>${basedir}/integration</sourceDirectory>
-        <sourceDirectory>${basedir}/usecases</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/integration</unitTestSourceDirectory>
-        <unitTestSourceDirectory>${basedir}/usecases</unitTestSourceDirectory>
         <unitTest>
             <resources>
                 <resource>
@@ -119,10 +118,12 @@
             </resources>
         </unitTest>
         <resources>
-            <includes>
-                <include>${basedir}/../LICENSE.txt</include>
-                <include>${basedir}/licenses/*.*</include>
-            </includes>
+			<resource>
+				<includes>
+					<include>${basedir}/../LICENSE.txt</include>
+					<include>${basedir}/licenses/*.*</include>
+				</includes>
+			</resource>
         </resources>
     </build>
 </project>
