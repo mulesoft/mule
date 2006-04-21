@@ -106,4 +106,16 @@
             <version>${commons_codec_version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <unitTest>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
 </project>
