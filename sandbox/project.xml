@@ -19,6 +19,7 @@
     <siteAddress>www.muleumo.org</siteAddress>
     <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
     <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+
     <dependencies>
         <dependency>
             <artifactId>mule-core</artifactId>
@@ -31,6 +32,7 @@
             </properties>
         </dependency>
     </dependencies>
+
     <build>
         <resources>
 			<resource>
@@ -41,4 +43,5 @@
 			</resource>
         </resources>
     </build>
+
 </project>

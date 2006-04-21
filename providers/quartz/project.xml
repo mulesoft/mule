@@ -10,6 +10,7 @@
     </description>
     <shortDescription>quartz</shortDescription>
     <url>http://www.muleumo.org/docs/modules/mule-quartz-provider/</url>
+
     <dependencies>
         <dependency>
             <groupId>quartz</groupId>
@@ -28,4 +29,5 @@
             </properties>
         </dependency>
     </dependencies>
+
 </project>

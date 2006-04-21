@@ -8,7 +8,8 @@
     <artifactId>mini-mule</artifactId>
     <name>Mini Mule</name>
     <shortDescription>mini-mule</shortDescription>
-    <description>Is a light-weight mini distribution of Mule that includes the core plus any providers that do not have other dependencies, such as vm, tcp, udp, multicst, file, jms, stream, servlet, ssl and the mule client</description>
+    <description>Is a light-weight mini distribution of Mule that includes the core plus any providers that do not have other dependencies, such as vm, tcp, udp, multicst, file, jms, stream, servlet, ssl and the mule client
+    </description>
     <dependencies>
         <dependency>
             <groupId>mule</groupId>
@@ -159,4 +160,3 @@
 		</dependency>
     </dependencies>
 </project>
-
