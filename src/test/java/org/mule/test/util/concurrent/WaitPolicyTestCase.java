@@ -111,6 +111,7 @@ public class WaitPolicyTestCase extends TestCase
 
         // must fail immediately
         Thread failedThread = this.execute(_executor, new SleepyTask("boo", 1000));
+        Thread.sleep(500);
 
         List exceptions = _asyncGroup.collectedExceptions();
         assertEquals(1, exceptions.size());
