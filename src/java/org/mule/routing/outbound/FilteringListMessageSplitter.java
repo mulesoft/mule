@@ -34,9 +34,9 @@ import java.util.Iterator;
  */
 public class FilteringListMessageSplitter extends AbstractMessageSplitter
 {
-    private CopyOnWriteArrayList payload;
-    private Map properties;
-
+    private static ThreadLocal payloads = new ThreadLocal();
+    private static ThreadLocal properties = new ThreadLocal();
+    
     /**
      * Template method can be used to split the message up before the
      * getMessagePart method is called .
@@ -47,14 +47,17 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     {
         if (message.getPayload() instanceof List) {
             // get a synchronised cloned list
-            payload = new CopyOnWriteArrayList((List) message.getPayload());
+            CopyOnWriteArrayList payload = new CopyOnWriteArrayList((List) message.getPayload());
+            payloads.set(payload);
             if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
                 // always set correlation group size, even if correlation id
                 // has already been set (usually you don't have group size yet
                 // by this point.
                 final int groupSize = payload.size();
-                logger.debug("java.util.List payload detected, setting correlation group size to " + groupSize);
                 message.setCorrelationGroupSize(groupSize);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("java.util.List payload detected, setting correlation group size to " + groupSize);
+                }
             }
         } else
         {
@@ -62,16 +65,17 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         }
         // Cache the properties here because for some message types getting the
         // properties can be expensive
-        properties = new HashMap();
+        Map props = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKey =  iterator.next();
-            properties.put(propertyKey, message.getProperty(propertyKey));
+            Object propertyKey = iterator.next();
+            props.put(propertyKey, message.getProperty(propertyKey));
         }
+        properties.set(props);
     }
 
     /**
      * Retrieves a specific message part for the given endpoint. the message
-     * will then be routed via the parovider.
+     * will then be routed via the provider.
      *
      * @param message  the current message being processed
      * @param endpoint the endpoint that will be used to route the resulting
@@ -80,14 +84,13 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
+        CopyOnWriteArrayList payload = (CopyOnWriteArrayList)payloads.get();
         for (int i = 0; i < payload.size(); i++) {
             Object object = payload.get(i);
-            UMOMessage result = new MuleMessage(object, new HashMap(properties));
+            UMOMessage result = new MuleMessage(object, (Map)properties.get());
             // If there is no filter assume that the endpoint can accept the
-            // message.
-            // Endpoints will be processed in order to only the last (if any) of
-            // the
-            // the endpoints may not have a filter
+            // message. Endpoints will be processed in order to only the last
+            // (if any) of the the endpoints may not have a filter
             if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Endpoint filter matched. Routing message over: "

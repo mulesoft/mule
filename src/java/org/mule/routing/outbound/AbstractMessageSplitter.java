@@ -39,7 +39,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     // match is not found. This should be set by overriding classes.
     protected boolean multimatch = true;
 
-    public synchronized UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
         String correlationId = (String) propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
@@ -47,10 +47,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         initialise(message);
 
         UMOEndpoint endpoint;
-        // UMOMessage message;
         UMOMessage result = null;
         List list = getEndpoints();
-        int i = 1;
+        int correlationSequence = 1;
         for (Iterator iterator = list.iterator(); iterator.hasNext();) {
             endpoint = (UMOEndpoint) iterator.next();
             message = getMessagePart(message, endpoint);
@@ -74,7 +73,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                         // implementations
                         final int groupSize = message.getCorrelationGroupSize();
                         message.setCorrelationGroupSize(groupSize);
-                        message.setCorrelationSequence(i++);
+                        message.setCorrelationSequence(correlationSequence++);
                     }
                     if (synchronous) {
                         result = send(session, message, endpoint);
@@ -94,7 +93,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     }
 
     /**
-     * Template method can be used to split the message up before the
+     * Template method that can be used to split the message up before the
      * getMessagePart method is called .
      * 
      * @param message the message being routed

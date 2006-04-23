@@ -57,13 +57,14 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
         UMOMessage result = null;
+
         if (endpoints == null || endpoints.size() == 0) {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
+
         UMOEndpoint ep = getEndpoint(0, message);
+
         try {
-
-
             if (synchronous) {
                 result = send(session, message, ep);
             } else {
