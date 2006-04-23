@@ -74,13 +74,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     }
 
     /**
-     * Retrieves a specific message part for the given endpoint. the message
-     * will then be routed via the provider.
-     *
-     * @param message  the current message being processed
-     * @param endpoint the endpoint that will be used to route the resulting
-     *                 message part
-     * @return the message part to dispatch
+     * @inheritDocs
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
