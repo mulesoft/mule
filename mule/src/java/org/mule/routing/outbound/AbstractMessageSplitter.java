@@ -106,7 +106,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     /**
      * Retrieves a specific message part for the given endpoint. the message
      * will then be routed via the provider.
-     * 
+     * <p/>
+     * <strong>NOTE:</strong>Implementations must provide proper synchronization
+                             for shared state (payload, properties, etc.)
      * @param message the current message being processed
      * @param endpoint the endpoint that will be used to route the resulting
      *            message part
