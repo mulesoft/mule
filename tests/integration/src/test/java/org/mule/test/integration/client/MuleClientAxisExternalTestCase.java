@@ -11,8 +11,11 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
@@ -22,31 +25,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a> 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
 {
     public void testRequestResponse() throws Throwable
     {
-        if(isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) {
+        if (isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) {
             return;
         }
 
-        String input =  "IBM";
+        String input = "IBM";
         Map properties = new HashMap();
-//        properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
-//        properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
+        // TODO probably can remove this?
+        // properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
+        // properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
         String url = "wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&method=GetQuote";
-        MuleClient client = null;
-        client = new MuleClient();
         UMOMessage result = null;
+        String resultPayload = StringUtils.EMPTY;
+
         try {
-            result = client.send(url, input,  properties);
-        } catch (UMOException e) {
-            e.printStackTrace();
+            MuleClient client = new MuleClient();
+            result = client.send(url, input, properties);
+            resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
         }
-        System.out.println("The quote for " + input + " is: " + result.getPayload());    
+        catch (UMOException e) {
+            fail(ExceptionUtils.getStackTrace(e));
         }
+
+        if (result != null) {
+            System.out.println("The quote for " + input + " is: " + result.getPayload());
+        }
+
+        assertNotNull(result);
+        assertTrue(resultPayload.startsWith("<StockQuotes><Stock><Symbol>IBM</Symbol>"));
+    }
 
 }
