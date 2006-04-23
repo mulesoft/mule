@@ -281,7 +281,7 @@ public class JmsTestUtils
             try {
                 msg.acknowledge();
             } catch (JMSException e) {
-
+                // TODO shouldn't we bail out here? something is obviosuly wrong
             }
             msg = subscriber.receiveNoWait();
         }

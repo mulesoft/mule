@@ -10,7 +10,9 @@ package  org.mule.test.usecases.axis;
 public class SubmitTrade  implements java.io.Serializable {
     private  org.mule.test.usecases.axis.Trade arg0;
 
-    public SubmitTrade() {
+    public SubmitTrade()
+    {
+        super();
     }
 
     public SubmitTrade(
@@ -44,9 +46,6 @@ public class SubmitTrade  implements java.io.Serializable {
             return false;
         }
         SubmitTrade other = (SubmitTrade) obj;
-        if (obj == null) {
-            return false;
-        }
         if (this == obj) {
             return true;
         }

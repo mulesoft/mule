@@ -102,8 +102,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
          */
         protected void doBegin(AbstractTransactionContext context)
         {
-            // TODO Auto-generated method stub
-
+            // template method
         }
 
         /*
@@ -113,7 +112,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
          */
         protected int doPrepare(AbstractTransactionContext context)
         {
-            // TODO Auto-generated method stub
+            // template method
             return 0;
         }
 
@@ -124,8 +123,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
          */
         protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
         {
-            // TODO Auto-generated method stub
-
+            // template method
         }
 
         /*
@@ -135,8 +133,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
          */
         protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
         {
-            // TODO Auto-generated method stub
-
+            // template method
         }
 
     }

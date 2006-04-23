@@ -28,6 +28,7 @@ public class Person
 
     public Person()
     {
+        super();
     }
 
     public Person(String firstName, String lastName)

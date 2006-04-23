@@ -15,13 +15,14 @@
 package org.mule.test.usecases.axis;
 
 /**
- * todo document
+ * TODO document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class InvalidTradeException extends Exception {
     public InvalidTradeException() {
+        super();
     }
 
     public InvalidTradeException(String message) {

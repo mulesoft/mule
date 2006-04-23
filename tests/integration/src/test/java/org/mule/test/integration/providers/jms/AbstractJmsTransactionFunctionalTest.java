@@ -420,7 +420,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
     }
 
     public abstract UMOTransactionFactory getTransactionFactory();
-//
+
     public class RollbackExceptionListener extends DefaultExceptionStrategy
     {
         private CountDownLatch countDown;
@@ -446,16 +446,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             if (t instanceof MessageRedeliveredException) {
                 countDown.countDown();
                 try {
-                    // MessageRedeliveredException mre =
-                    // (MessageRedeliveredException)t;
+                    // MessageRedeliveredException mre = (MessageRedeliveredException)t;
                     Message msg = (Message) message.getPayload();
 
                     assertNotNull(msg);
                     assertTrue(msg.getJMSRedelivered());
                     assertTrue(msg instanceof TextMessage);
                     // No need to commit transaction as the Tx template will
-                    // auto
-                    // matically commit by default
+                    // auto matically commit by default
                     super.handleMessagingException(message, t);
                 } catch (Exception e) {
                     fail(e.getMessage());
@@ -469,7 +467,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         public void handleException(Throwable t)
         {
-
+            // TODO is this really supposed to be empty?
         }
     }
 

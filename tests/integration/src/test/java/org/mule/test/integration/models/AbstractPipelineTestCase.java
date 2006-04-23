@@ -108,6 +108,7 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
     }
 
     protected void configureModel(UMOModel model) {
-        
+        // nothing to do here
     }
+
 }

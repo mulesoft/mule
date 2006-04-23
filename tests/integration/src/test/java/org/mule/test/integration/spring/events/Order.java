@@ -28,6 +28,7 @@ public class Order implements Serializable
 
     public Order()
     {
+        super();
     }
 
     public Order(String order)

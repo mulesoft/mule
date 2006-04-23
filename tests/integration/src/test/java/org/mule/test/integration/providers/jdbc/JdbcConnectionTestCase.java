@@ -43,6 +43,8 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
 	
     protected void emptyTable() throws Exception
     {
+        // TODO this overrides super.emptyTable() - is this correct?
+        // the entire test seems to be incomplete, see the comments below..
     }
 	
     public UMOConnector createConnector() throws Exception

@@ -27,7 +27,9 @@ public class Trade implements java.io.Serializable {
     private int tradeID;
     private int transaction;
 
-    public Trade() {
+    public Trade()
+    {
+        super();
     }
 
     public int getAccountID() {

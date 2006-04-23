@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.FunctionalTestCase;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -30,8 +29,6 @@ import java.util.List;
  */
 public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
 {
-    private static ClassPathXmlApplicationContext context;
-
     private static final Log logger = LogFactory.getLog(XABridgeJmsJdbcTestCase.class);
 
     protected String getConfigResources() {

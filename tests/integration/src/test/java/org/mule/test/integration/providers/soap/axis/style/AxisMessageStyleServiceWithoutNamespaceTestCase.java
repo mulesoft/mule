@@ -13,11 +13,10 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.providers.soap.SoapMethod;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.axis.AxisConnector;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;

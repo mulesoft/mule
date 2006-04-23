@@ -12,7 +12,9 @@ public class TradeStatus  implements java.io.Serializable {
     private java.lang.String status;
     private int tradeID;
 
-    public TradeStatus() {
+    public TradeStatus()
+    {
+        super();
     }
 
     public java.lang.String getStatus() {

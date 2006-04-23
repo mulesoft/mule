@@ -1,23 +1,26 @@
 /*
-=* AxisMessageStyleServiceTestCase.java
-=*
-=* Created on October 21, 2005, 1:11 PM
-=*
-=* To change this template, choose Tools | Options and locate the =emplate under
-=* the Source Creation and Management node. Right-click the template and =hoose
-=* Open. You can then make changes to the template in the Source Editor.
-=*/
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.test.integration.providers.soap.axis.style;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.providers.soap.SoapMethod;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.axis.AxisConnector;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -94,7 +97,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
         doSoapRequest(new QName("http://muleumo.org", "soapBodyElement"), getServiceEndpoint(), true, false, false);
     }
 
-    //Todo does work , complains about generated namespace...TestNS1
+    // TODO does work , complains about generated namespace...TestNS1
 //    public void testSoapRequestResponseWithSoapMethod() throws Exception {
 //        doSoapRequest(new QName("http://muleumo.org", "soapRequestResponse"), "axis:" + getServiceEndpoint(), false, true, false);
 //    }

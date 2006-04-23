@@ -27,6 +27,7 @@ public class Address
 
     public Address()
     {
+        super();
     }
 
     public Address(String address, String postcode)

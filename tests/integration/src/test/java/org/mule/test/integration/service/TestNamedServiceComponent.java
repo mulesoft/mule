@@ -47,6 +47,7 @@ public class TestNamedServiceComponent extends FunctionalTestComponent implement
 
     public String echo(String echo)
     {
+        // TODO apparently this was supposed to do something?
         UMOEventContext context = RequestContext.getEventContext();
         return echo;
     }

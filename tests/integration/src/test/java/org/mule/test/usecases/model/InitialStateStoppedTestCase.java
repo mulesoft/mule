@@ -1,8 +1,6 @@
 package org.mule.test.usecases.model;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
@@ -48,5 +46,4 @@ public class InitialStateStoppedTestCase extends AbstractMuleTestCase {
 //        }        
 	}
 
-	private static Log log = LogFactory.getLog(InitialStateStoppedTestCase.class);
 }

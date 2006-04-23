@@ -10,7 +10,9 @@ package org.mule.test.usecases.axis;
 public class SubmitTradeResponse  implements java.io.Serializable {
     private org.mule.test.usecases.axis.TradeStatus _return;
 
-    public SubmitTradeResponse() {
+    public SubmitTradeResponse()
+    {
+        super();
     }
 
     public SubmitTradeResponse(
@@ -44,9 +46,6 @@ public class SubmitTradeResponse  implements java.io.Serializable {
             return false;
         }
         SubmitTradeResponse other = (SubmitTradeResponse) obj;
-        if (obj == null) {
-            return false;
-        }
         if (this == obj) {
             return true;
         }

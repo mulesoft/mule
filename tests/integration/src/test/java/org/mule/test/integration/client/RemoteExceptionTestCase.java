@@ -60,9 +60,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
     }
 
     public void testClientTransformerException() throws Exception {
-
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
@@ -71,9 +70,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
     }
 
     public void testClientMalformedEndpointException() throws Exception {
-
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
@@ -82,9 +80,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
     }
 
     public void testClientComponentException() throws Exception {
-
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
@@ -92,4 +89,5 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
         assertTrue(exceptionPayload.getRootException() instanceof MuleException);
         assertEquals("Functional Test Component Exception", exceptionPayload.getRootException().getMessage());
     }
+
 }

@@ -23,8 +23,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.jms.TextMessage;
-
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
  * example config in the docco. this test is not run when building this module

@@ -13,10 +13,6 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -28,7 +24,7 @@ public class MuleXFireSoapClientTestCase extends MuleAxisSoapClientTestCase
         return "xfire";
     }
 
-    //Todo fix xfire doesn't currently support overloaded methods
+    // TODO fix: xfire doesn't currently support overloaded methods
     public void testRequestResponseComplex2() throws Exception {
         //no op
     }

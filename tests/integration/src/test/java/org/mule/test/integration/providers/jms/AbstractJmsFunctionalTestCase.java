@@ -66,8 +66,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         // By default the JmsTestUtils use the openjms config, though you can
-        // pass
-        // in other configs using the property below
+        // pass in other configs using the property below
 
         // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
@@ -100,6 +99,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
                 cnn.close();
             }
         } catch (JMSException e) {
+            // TODO shouldn't this be caught?
         }
     }
 
@@ -132,7 +132,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     public void afterInitialise() throws Exception
     {
-
+        // template method
     }
 
     protected UMOEndpointURI getInDest()

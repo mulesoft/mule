@@ -16,10 +16,8 @@ package org.mule.test.usecases.dlq;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
-
-import javax.jms.ObjectMessage;
+import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

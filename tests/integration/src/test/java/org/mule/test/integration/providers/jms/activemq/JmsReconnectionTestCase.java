@@ -159,11 +159,10 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         t0 = System.currentTimeMillis();
         while (true) {
             ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
-            if (event == null) {
-                fail("no notification event was received");
-            }
-            if (event.getAction() == ConnectionNotification.CONNECTION_FAILED) {
+            if (event != null && event.getAction() == ConnectionNotification.CONNECTION_FAILED) {
                 break;
+            } else {
+                fail("no notification event was received");
             }
             t1 = System.currentTimeMillis() - t0;
             if (t1 > TIME_OUT) {
@@ -245,6 +244,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         try {
             events.put(notification);
         } catch (InterruptedException e) {
+            throw new RuntimeException("Caught unexpected exception:", e);
         }
     }
 }

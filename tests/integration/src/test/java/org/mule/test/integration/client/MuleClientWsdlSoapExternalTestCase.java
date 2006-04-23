@@ -13,6 +13,8 @@
  */
 package org.mule.test.integration.client;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
@@ -34,15 +36,19 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase {
         }
 
         String url = "wsdl-xfire:" + WSDL_URL + "&method=" + METHOD;
-        MuleClient client = null;
+        UMOMessage result = null;
+        String resultPayload = StringUtils.EMPTY;
+
         try {
-            client = new MuleClient();
+            MuleClient client = new MuleClient();
+            result = client.send(url, INPUT, null);
+            resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
         } catch (UMOException e) {
-            e.printStackTrace();
+            fail(ExceptionUtils.getStackTrace(e));
         }
-        UMOMessage result = client.send(url, INPUT, null);
+
         assertNotNull(result);
-        assertEquals(OUTPUT, result.getPayload());
+        assertEquals(OUTPUT, resultPayload);
     }
 
     //This doesn't work as Axis WSDL parser doesn't grab the param names from the schema for some reason...

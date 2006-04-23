@@ -14,15 +14,9 @@
 */
 package org.mule.test.usecases.axis;
 
-import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
 
 import java.util.HashMap;
 import java.util.Map;
