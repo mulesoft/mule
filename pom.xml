@@ -75,13 +75,14 @@
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies</url>
         </repository>
-        <!--
+        
         <repository>
             <id>codehaus</id>
             <name>Codehaus</name>
             <url>http://dist.codehaus.org</url>
+            <layout>legacy</layout>
         </repository>
-        -->
+        
     </repositories>
     <pluginRepositories>
         <!--
