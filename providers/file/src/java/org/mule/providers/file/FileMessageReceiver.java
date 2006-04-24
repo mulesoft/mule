@@ -173,9 +173,6 @@ public class FileMessageReceiver extends PollingMessageReceiver
             if (((FileConnector)connector).isAutoDelete()) {
                 // no moveTo directory
                 if (destinationFile == null) {
-                    // make sure the adapter has lazy-loaded the file
-                    msgAdapter.getPayloadAsBytes();
-
                     // delete source
                     if (!sourceFile.delete()) {
                         // TODO better message
