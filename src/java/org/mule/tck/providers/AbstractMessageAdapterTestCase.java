@@ -12,6 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.tck.providers;
 
 import org.mule.impl.RequestContext;
@@ -23,12 +24,19 @@ import org.mule.umo.provider.UMOMessageAdapter;
  */
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         RequestContext.setEvent(getTestEvent("hello"));
     }
 
-    protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         RequestContext.clear();
+    }
+
+    protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    {
+        assertEquals(message, payload);
     }
 
     public void testMessageRetrieval() throws Exception
@@ -36,7 +44,8 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         Object message = getValidMessage();
         UMOMessageAdapter adapter = createAdapter(message);
 
-        assertEquals(message, adapter.getPayload());
+        doTestMessageEqualsPayload(message, adapter.getPayload());
+
         byte[] bytes = adapter.getPayloadAsBytes();
         assertNotNull(bytes);
 
@@ -48,7 +57,8 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         try {
             adapter = createAdapter(getInvalidMessage());
             fail("Message adapter should throw exception if an invalid messgae is set");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // expected
         }
     }
