@@ -13,13 +13,13 @@
  */
 package org.mule.ra;
 
-import java.io.Serializable;
-
-import javax.resource.spi.ConnectionRequestInfo;
-
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.Utility;
+
+import javax.resource.spi.ConnectionRequestInfo;
+
+import java.io.Serializable;
 
 /**
  * <code>MuleConnectionRequestInfo</code> TODO
@@ -92,25 +92,31 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
 
     public boolean equals(Object o)
     {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof MuleConnectionRequestInfo))
+        }
+        if (!(o instanceof MuleConnectionRequestInfo)) {
             return false;
+        }
 
         final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo) o;
 
         if (configurationBuilder != null ? !configurationBuilder.equals(muleConnectionRequestInfo.configurationBuilder)
-                : muleConnectionRequestInfo.configurationBuilder != null)
+                : muleConnectionRequestInfo.configurationBuilder != null) {
             return false;
+        }
         if (configurations != null ? !configurations.equals(muleConnectionRequestInfo.configurations)
-                : muleConnectionRequestInfo.configurations != null)
+                : muleConnectionRequestInfo.configurations != null) {
             return false;
+        }
         if (password != null ? !password.equals(muleConnectionRequestInfo.password)
-                : muleConnectionRequestInfo.password != null)
+                : muleConnectionRequestInfo.password != null) {
             return false;
+        }
         if (username != null ? !username.equals(muleConnectionRequestInfo.username)
-                : muleConnectionRequestInfo.username != null)
+                : muleConnectionRequestInfo.username != null) {
             return false;
+        }
 
         return true;
     }

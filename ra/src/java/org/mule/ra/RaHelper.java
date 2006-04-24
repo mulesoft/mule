@@ -13,10 +13,8 @@
  */
 package org.mule.ra;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Iterator;
-import java.util.Set;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionRequestInfo;
@@ -24,8 +22,10 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>RaHelper</code> is a collection of helper methods used by this RA
@@ -44,7 +44,6 @@ public class RaHelper
             if (info == null) {
                 return null;
             } else {
-
                 MuleConnectionRequestInfo muleInfo = (MuleConnectionRequestInfo) info;
 
                 // Can't create a PC with null values
@@ -55,12 +54,8 @@ public class RaHelper
                 }
 
                 char[] password = muleInfo.getPassword().toCharArray();
-
                 PasswordCredential pc = new PasswordCredential(muleInfo.getUserName(), password);
-
                 pc.setManagedConnectionFactory(mcf);
-                // logger.info("\tUtil::GetPasswordCred: returning a created
-                // PC");
                 return pc;
             }
         } else {
@@ -70,10 +65,12 @@ public class RaHelper
                     Set creds = subject.getPrivateCredentials(PasswordCredential.class);
                     Iterator iter = creds.iterator();
                     while (iter.hasNext()) {
-                        PasswordCredential temp = (PasswordCredential) iter.next();
-                        if (temp != null && temp.getManagedConnectionFactory() != null
-                                && temp.getManagedConnectionFactory().equals(mcf)) {
-                            return temp;
+                        PasswordCredential candidate = (PasswordCredential) iter.next();
+                        if (candidate != null) {
+                            ManagedConnectionFactory candidatemcf = candidate.getManagedConnectionFactory();
+                            if (candidatemcf != null && candidatemcf.equals(mcf)) {
+                                return candidate;
+                            }
                         }
                     }
                     return null;
@@ -87,45 +84,4 @@ public class RaHelper
         }
     }
 
-    /**
-     * Determines whether two PasswordCredentials are the same.
-     * 
-     * @param a first PasswordCredential
-     * @param b second PasswordCredential
-     * 
-     * @return true if the two parameters are equal; false otherwise
-     */
-
-    static public boolean isPasswordCredentialEqual(PasswordCredential a, PasswordCredential b)
-    {
-        if (a == b)
-            return true;
-        if ((a == null) && (b != null))
-            return false;
-        if ((a != null) && (b == null))
-            return false;
-
-        if (!isEqual(a.getUserName(), b.getUserName()))
-            return false;
-
-        String p1 = null;
-        String p2 = null;
-
-        if (a.getPassword() != null) {
-            p1 = new String(a.getPassword());
-        }
-        if (b.getPassword() != null) {
-            p2 = new String(b.getPassword());
-        }
-        return (isEqual(p1, p2));
-    }
-
-    static public boolean isEqual(String a, String b)
-    {
-        if (a == null) {
-            return (b == null);
-        } else {
-            return a.equals(b);
-        }
-    }
 }
