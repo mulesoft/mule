@@ -76,8 +76,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         if ((str = this.connector.getQuery(endpoint, writeStmt)) != null) {
             writeStmt = str;
         }
-        if (StringUtils.isEmpty(writeStmt)) {
-            throw new IllegalArgumentException("Write statement should not be null");
+        if (StringUtils.isBlank(writeStmt)) {
+            throw new IllegalArgumentException("Missing a write statement");
         }
         if (!"insert".equalsIgnoreCase(writeStmt.substring(0, 6))
                 && !"update".equalsIgnoreCase(writeStmt.substring(0, 6))
