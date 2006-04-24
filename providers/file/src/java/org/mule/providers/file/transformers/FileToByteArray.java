@@ -21,6 +21,7 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -40,6 +41,15 @@ public class FileToByteArray extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         File file = (File)src;
+
+        if (file == null) {
+            throw new TransformerException(this, new IllegalArgumentException("null file"));
+        }
+
+        if (!file.exists()) {
+            throw new TransformerException(this, new FileNotFoundException(file.getPath()));
+        }
+
         if (file.length() == 0) {
             logger.warn("File is empty: " + file.getAbsolutePath());
             return ArrayUtils.EMPTY_BYTE_ARRAY;
