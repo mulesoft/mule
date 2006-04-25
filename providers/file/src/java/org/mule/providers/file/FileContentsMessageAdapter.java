@@ -20,6 +20,8 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 
+import java.io.File;
+
 /**
  * <code>FileContentsMessageAdapter</code> provides a wrapper for file data. Users
  * can obtain the contents of the message through the payload property and can get
@@ -35,6 +37,11 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
     public FileContentsMessageAdapter(Object message) throws MessagingException
     {
         super(message);
+    }
+
+    protected void setMessage(File message) throws MessagingException
+    {
+        super.setMessage(message);
         // force reading of file (lazy loading would be really, really complicated)
         this.getPayload();
     }

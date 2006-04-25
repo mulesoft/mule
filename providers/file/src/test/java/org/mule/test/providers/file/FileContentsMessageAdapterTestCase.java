@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.mule.MuleManager;
 import org.mule.providers.file.FileContentsMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.io.File;
@@ -100,6 +101,43 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 
         // slight detour for testing :)
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());
+    }
+
+    public void testMultipleSetMessageCalls() throws Exception
+    {
+        // get new message adapter to test
+        AccessibleFCMAdapter adapter = new AccessibleFCMAdapter(messageFile);
+
+        // access first payload
+        doTestMessageEqualsPayload(validMessage, adapter.getPayload());
+
+        // create another source file
+        String secondMessageContent = "Hooray";
+        byte[] secondMessage = secondMessageContent.getBytes();
+        File secondFile = File.createTempFile("simple2", ".mule", messageFile.getParentFile());
+        FileUtils.writeStringToFile(secondFile, secondMessageContent, null);
+
+        // replace the first message content
+        adapter.setMessage(secondFile);
+
+        // make sure the file was properly read
+        doTestMessageEqualsPayload(secondMessage, adapter.getPayload());
+    }
+
+}
+
+// need this since setMessage is protected and we're in a different package
+class AccessibleFCMAdapter extends FileContentsMessageAdapter
+{
+
+    public AccessibleFCMAdapter(Object message) throws MessagingException
+    {
+        super(message);
+    }
+
+    protected void setMessage(File message) throws MessagingException
+    {
+        super.setMessage(message);
     }
 
 }
