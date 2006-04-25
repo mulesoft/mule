@@ -16,7 +16,7 @@
     <profiles>
         <profile>
             <!--
-                Sun's 1.4.x JVMs come with a bundle Crimson XML parser.
+                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
                 Unfortunately, it doesn't support validation against a
                 XML Schema. Detect 1.4.x and add xerces to the classpath.
                 5.x and above come with xerces pre-bundled.
