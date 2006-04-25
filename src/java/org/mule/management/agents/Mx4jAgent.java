@@ -17,6 +17,7 @@ import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
+import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -49,13 +50,108 @@ public class Mx4jAgent implements UMOAgent
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
 
+    //Adaptor overrides
+
+    private String login = null;
+
+    private String password = null;
+
+    private String authenticationMethod = "basic";
+
+    private String xslFilePath = null;
+
+    private String pathInJar = null;
+
+    private boolean cacheXsl = true;
+
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public void setAuthenticationMethod(String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
+    }
+
+    public String getXslFilePath() {
+        return xslFilePath;
+    }
+
+    public void setXslFilePath(String xslFilePath) {
+        this.xslFilePath = xslFilePath;
+    }
+
+    public String getPathInJar() {
+        return pathInJar;
+    }
+
+    public void setPathInJar(String pathInJar) {
+        this.pathInJar = pathInJar;
+    }
+
+    public boolean isCacheXsl() {
+        return cacheXsl;
+    }
+
+    public void setCacheXsl(boolean cacheXsl) {
+        this.cacheXsl = cacheXsl;
+    }
+
     protected Object createAdaptor() throws Exception
     {
-        Object adaptor = null;
+        Object adaptor;
         Log.redirectTo(new CommonsLogger());
         URI uri = new URI(jmxAdaptorUrl);
         adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
-        ((HttpAdaptor) adaptor).setProcessor(new XSLTProcessor());
+
+        // Set the XSLT Processor with any local overrides
+
+        XSLTProcessor processor = new XSLTProcessor();
+
+        if (xslFilePath != null) {
+
+            processor.setFile(xslFilePath);
+
+        }
+
+        if (pathInJar != null) {
+
+            processor.setPathInJar(pathInJar);
+
+        }
+
+        processor.setUseCache(cacheXsl);
+
+        ((HttpAdaptor) adaptor).setProcessor(processor);
+
+        //Set endpoint authentication if required
+
+        if (login != null) {
+
+            ((HttpAdaptor) adaptor).addAuthorization(login, password);
+
+            ((HttpAdaptor) adaptor).setAuthenticationMethod(authenticationMethod);
+
+            // will need to configure it with some keystore properties
+//            ((HttpAdaptor) adaptor).setSocketFactory(new SSLAdaptorServerSocketFactory());
+        }
+
         return adaptor;
     }
 
