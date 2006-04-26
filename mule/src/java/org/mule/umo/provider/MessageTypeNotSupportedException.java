@@ -18,9 +18,9 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 
 /**
- * <code>MessageTypeNotSupportedException</code> is thrown when a message
- * payload is set on a Message implementation of Message Adapter i not of
- * supported type for that message or adapter.
+ * <code>MessageTypeNotSupportedException</code> is thrown when a message payload
+ * is set on a Message implementation of MessageAdapter which is not of supported
+ * type for that message or adapter.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -31,15 +31,17 @@ public class MessageTypeNotSupportedException extends MessagingException
     public MessageTypeNotSupportedException(Object message, Class adapterClass)
     {
         super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
-                          message.getClass().getName(),
-                          adapterClass.getName()), message);
+                          (message != null ? message.getClass().getName() : "null"),
+                          (adapterClass != null ? adapterClass.getName() : "null class")),
+                          message);
     }
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass, Throwable cause)
     {
         super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
-                          message.getClass().getName(),
-                          adapterClass.getName()), message, cause);
+                (message != null ? message.getClass().getName() : "null"),
+                (adapterClass != null ? adapterClass.getName() : "null class")),
+                message, cause);
     }
 
 }
