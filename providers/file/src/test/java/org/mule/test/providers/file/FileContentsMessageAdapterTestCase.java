@@ -69,7 +69,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
      * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         if (payload.equals(validMessage)) {
             return new FileContentsMessageAdapter(messageFile);

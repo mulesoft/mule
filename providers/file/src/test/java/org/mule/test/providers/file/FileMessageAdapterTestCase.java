@@ -18,6 +18,7 @@ package org.mule.test.providers.file;
 import org.mule.MuleManager;
 import org.mule.providers.file.FileMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new FileMessageAdapter(payload);
     }
