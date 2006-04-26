@@ -13,18 +13,13 @@
  */
 package org.mule.routing.response;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
@@ -35,11 +30,18 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.concurrent.Latch;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
  * implementing response aggregator routers. This provides a thread-safe
  * implemenetation and allows developers to customise how and when events are
  * grouped and collated.
+ *
+ * Response Agrregators are used to collect responses that are usually sent to replyTo endpoints set
+ * on outbound routers. When an event is sent out via an outbound router, the response router will block the
+ * response flow on an UMOComponent until the Response Router resolves a reply or times out.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -89,17 +91,16 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     /**
      * Adds the event to an event group. Groups are defined by the correlationId
-     * on the message. If no correlationId is set a default group is created for
-     * all events without a correlationId. If there is no group for the current
-     * correlationId one will be created and added to the router.
+     * on the message. If no 'correlation Id' is returned from calling <code>getReplyAggregateIdentifier()</code>
+     * a routing exception will be thrown
      * 
-     * @param event
+     * @param event the reply event received by the response router
      * @return The event group for the current event or a new group if the current event
      * doesn't belong to an existing group
      */
     protected EventGroup addEvent(UMOEvent event) throws RoutingException
     {
-        Object cId = getAggregateIdentifier(event);
+        Object cId = getReplyAggregateIdentifier(event.getMessage());
 
         if (cId == null || cId.equals("-1")) {
             throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
@@ -130,18 +131,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         return new EventGroup(id);
     }
 
-    /**
-     * Extracts a Group identifier from the current event.  When an event is recieved with a group identifier
-     * not registered with this router, a new group is created.  The id returned here can be a correlationId or
-     * some custom aggregation Id.
-     * @param event the current event
-     * @return an aggregation Id for this event
-     */
-    protected Object getAggregateIdentifier(UMOEvent event) {
-        return correlationExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                                                               event.getMessage());
-    }
-
     protected void removeGroup(Object id)
     {
         eventGroups.remove(id);
@@ -149,31 +138,31 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
-        String messageId = null;
-        messageId = message.getUniqueId();
+        Object responseId = getCallResponseAggregateIdentifier(message);
+
         if (logger.isDebugEnabled()) {
-            logger.debug("Waiting for response for message id: " + messageId + " in " + this);
+            logger.debug("Waiting for response for message id: " + responseId + " in " + this);
         }
 
         Lock l = null;
         locksCollectionLock.lock();
-            l = (Lock) locks.get(messageId);
+            l = (Lock) locks.get(responseId);
             if (l == null) {
                 logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-                        + messageId + " in " + this);
+                        + responseId + " in " + this);
                 l = new Latch();
-                 if(locks.get(messageId)!=null) {
-                    throw new IllegalStateException("There is already a lock with ID: " + messageId);
+                 if(locks.get(responseId)!=null) {
+                    throw new IllegalStateException("There is already a lock with ID: " + responseId);
                 }
-                locks.put(messageId, l);
+                locks.put(responseId, l);
             } else {
-                logger.debug("Got latch for message: " + messageId);
+                logger.debug("Got latch for message: " + responseId);
             }
         locksCollectionLock.unlock();
 
         boolean b = false;
         try {
-            logger.debug("Waiting for response to message: " + messageId);
+            logger.debug("Waiting for response to message: " + responseId);
             if (getTimeout() <= 0) {
                 l.lock();
                 b = true;
@@ -192,11 +181,11 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             }
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
                                                            String.valueOf(getTimeout()),
-                                                           messageId), message, null);
+                                                           responseId), message, null);
         }
 
-        UMOMessage result = (UMOMessage) responseEvents.remove(messageId);
-        locks.remove(messageId);
+        UMOMessage result = (UMOMessage) responseEvents.remove(responseId);
+        locks.remove(responseId);
         if (result == null) {
             // this should never happen ,just using it as a safe gaurd for now
             throw new IllegalStateException("Response Message is null");
@@ -211,7 +200,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * on the last event received)
      * 
      * @param events
-     * @return
+     * @return true if the event gorep is ready for aggregation
      */
     protected abstract boolean shouldAggregate(EventGroup events);
 

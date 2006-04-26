@@ -34,8 +34,11 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      * be determined by volume, last modified time or some oher criteria based
      * on the last event received)
      *
+     * Because this is a Single response router it will return true if the event group size is 1.
+     * It will raise a warning if the event Group size is greater than 1.
+     *
      * @param events
-     * @return
+     * @return true if the event group size is 1 or greater
      */
     protected boolean shouldAggregate(EventGroup events)
     {
@@ -50,6 +53,9 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      * This method is invoked if the shouldAggregate method is called and
      * returns true. Once this method returns an aggregated message the event
      * group is removed from the router
+     *
+     * Because this is a Single response router it returns the first event in the event group.
+     * It will raise a warning if the event Group size is greater than 1.
      *
      * @param events the event group for this request
      * @return an aggregated message
