@@ -17,6 +17,7 @@ package org.mule.providers.soap.xfire;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
@@ -50,7 +51,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     private XFire xfire;
 
-    private ObjectServiceFactory serviceFactory;
+    private ServiceFactory serviceFactory;
 
     public XFireConnector()
     {
@@ -85,10 +86,13 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             xfire = new DefaultXFire();
         }
         if (serviceFactory == null) {
-            serviceFactory = new ObjectServiceFactory(xfire.getTransportManager());
+            serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
         }
-        else if (serviceFactory.getTransportManager() == null) {
-            serviceFactory.setTransportManager(xfire.getTransportManager());
+        if (serviceFactory instanceof ObjectServiceFactory) {
+            ObjectServiceFactory osf = (ObjectServiceFactory)serviceFactory;
+            if(osf.getTransportManager() == null) {
+                osf.setTransportManager(xfire.getTransportManager());
+            }
         }
     }
 
@@ -184,7 +188,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         return xfireDescriptor;
     }
 
-    public ObjectServiceFactory getServiceFactory()
+    public ServiceFactory getServiceFactory()
     {
         return serviceFactory;
     }

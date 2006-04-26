@@ -59,7 +59,6 @@ import org.mule.umo.lifecycle.RecoverableException;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,9 +125,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
                 method = endpointURI.getParams().getProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY);
             }
         }
-        if (method == null) {
-            throw new MuleException(new Message(Messages.PROPERTIES_X_NOT_SET, "method"));
-        }
 
         String serviceName = getService(eventContext);
         if(request==null) {
@@ -137,21 +133,25 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         if (request != null && request.endsWith("?wsdl")) {
             generateWSDL(response, serviceName);
-        }
+        } else {
 
-
-        ServiceRegistry reg = getServiceRegistry();
-        if (serviceName == null || serviceName.length() == 0 || !reg.hasService(serviceName)) {
-            if (!reg.hasService(serviceName)) {
-                eventMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
-                        String.valueOf(HttpConstants.SC_NOT_FOUND));
+            if (method == null) {
+                throw new MuleException(new Message(Messages.PROPERTIES_X_NOT_SET, "method"));
             }
 
-            generateServices(response);
-            return response;
-        }
-        invoke(eventContext, endpointURI, response, serviceName, method);
 
+            ServiceRegistry reg = getServiceRegistry();
+            if (serviceName == null || serviceName.length() == 0 || !reg.hasService(serviceName)) {
+                if (!reg.hasService(serviceName)) {
+                    eventMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
+                            String.valueOf(HttpConstants.SC_NOT_FOUND));
+                }
+
+                generateServices(response);
+                return response;
+            }
+            invoke(eventContext, endpointURI, response, serviceName, method);
+        }
         // Todo currently defeating streaming
         return response.getPayloadAsBytes();
     }

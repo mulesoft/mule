@@ -13,7 +13,13 @@
  */
 package org.mule.test.integration.providers.soap.xfire;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
 import org.mule.test.integration.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
+import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -35,6 +41,12 @@ public class XfireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoin
     }
 
     public void testLocationUrlInWSDL() throws Exception {
-        //Todo currently not working
+        Map props = new HashMap();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send(getWsdlEndpoint(), null, props);
+        assertNotNull(result);
+        System.out.println(result.getPayloadAsString());
+        assertTrue(result.getPayloadAsString().indexOf("wsdl:definitions") > -1);
     }
 }
