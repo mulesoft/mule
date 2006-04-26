@@ -17,6 +17,7 @@ package org.mule.test.providers.email;
 
 import org.mule.providers.email.MailMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.mail.Message;
@@ -38,7 +39,7 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new MailMessageAdapter(payload);
     }
@@ -50,10 +51,12 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public Object getValidMessage() throws Exception
     {
-        if (message == null) {
+        if (message == null)
+        {
             message = new MimeMessage(Session.getDefaultInstance(new Properties()));
             message.setContent("Test Email Message", "text/plain");
         }
+
         return message;
     }
 
