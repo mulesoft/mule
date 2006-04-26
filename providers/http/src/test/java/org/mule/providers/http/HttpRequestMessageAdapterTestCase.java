@@ -16,6 +16,7 @@ package org.mule.providers.http;
 
 import org.mule.providers.http.servlet.HttpRequestMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.servlet.ServletInputStream;
@@ -43,7 +44,7 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
         return getMockRequest("test message");
     }
 
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new HttpRequestMessageAdapter(payload);
     }
