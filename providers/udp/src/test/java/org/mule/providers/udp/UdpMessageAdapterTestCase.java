@@ -14,6 +14,7 @@
 package org.mule.providers.udp;
 
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.net.DatagramPacket;
@@ -30,7 +31,7 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return new DatagramPacket("Hello".getBytes(), 5);
     }
 
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new UdpMessageAdapter(payload);
     }
