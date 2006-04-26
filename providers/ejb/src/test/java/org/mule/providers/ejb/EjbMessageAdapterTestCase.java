@@ -23,7 +23,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
  */
 public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    public Object getValidMessage() throws MessagingException
+    public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
     }
