@@ -36,6 +36,7 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -54,6 +55,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.ConnectException;
 import java.util.Properties;
 
 /**
@@ -190,14 +192,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         try {
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
-            try {
-                processCookies(event);
-                client.executeMethod(getHostConfig(uri), httpMethod);
-            }
-            catch (Exception e) {
-                logger.error(e, e);
-            }
+            processCookies(event);
+            // TODO can we use this code for better reporting?
+            int code = client.executeMethod(getHostConfig(uri), httpMethod);
+
             return httpMethod;
+        }
+        catch (ConnectException cex) {
+            // TODO employ dispatcher reconnection strategy at this point
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), cex);
         }
         catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
