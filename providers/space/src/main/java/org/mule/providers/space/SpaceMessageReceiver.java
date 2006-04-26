@@ -148,8 +148,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
                     logger.trace("worker listening on space " + space);
                 }
 
-                // TODO transactions
-
+                // TODO transactions, using result
                 UMOMessageAdapter adapter = connector.getMessageAdapter(message);
                 UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
                 // if (returnMessage != null) {
