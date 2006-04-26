@@ -33,7 +33,7 @@ import org.mule.umo.provider.UMOConnectable;
 public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 {
 
-    private static ThreadLocal count = new ThreadLocal()
+    private static final ThreadLocal count = new ThreadLocal()
     {
         protected Object initialValue()
         {
