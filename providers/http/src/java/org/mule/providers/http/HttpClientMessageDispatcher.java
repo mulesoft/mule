@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -36,7 +36,6 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -61,7 +60,7 @@ import java.util.Properties;
 /**
  * <p>
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -229,7 +228,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
                 HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
-        HttpMethod httpMethod = null;
+        HttpMethod httpMethod;
         Object body = event.getTransformedMessage();
 
         if (body instanceof HttpMethod) {
@@ -309,7 +308,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
                                 + " " + httpMethod.getStatusText())));
             }
-            UMOMessage m = null;
+            UMOMessage m;
             // text or binary content?
             Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
             if ((header != null) && event.isStreaming()) {
