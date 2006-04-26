@@ -14,6 +14,7 @@
 package org.mule.providers.ejb;
 
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
@@ -22,12 +23,12 @@ import org.mule.umo.provider.UMOMessageAdapter;
  */
 public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    public Object getValidMessage() throws Exception
+    public Object getValidMessage() throws MessagingException
     {
         return "Hello".getBytes();
     }
 
-    public UMOMessageAdapter createAdapter(Object payload) throws Exception
+    public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new EjbMessageAdapter(payload);
     }
