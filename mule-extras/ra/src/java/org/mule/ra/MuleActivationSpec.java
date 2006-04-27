@@ -22,7 +22,7 @@ import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
-
+import java.io.Serializable;
 import java.util.Properties;
 
 /**
@@ -34,7 +34,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleActivationSpec implements ActivationSpec
+public class MuleActivationSpec implements ActivationSpec, Serializable
 {
     private Properties propertiesMap;
     private String endpointName;
