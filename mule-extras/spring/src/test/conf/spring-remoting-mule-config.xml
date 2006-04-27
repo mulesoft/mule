@@ -77,27 +77,6 @@
 
         </mule-descriptor>
 
-        <!--
-            SpringHttpInvokerComponent will receive a RemoteInvocation and execute
-            the requested method on a POJO specified by "serviceClass".
-            -->
-        <!--mule-descriptor name="doSomeWorkViaSpringUsingVm"
-            implementation="org.mule.extras.spring.remoting.SpringRemoteInvokerComponent">
-            <inbound-router>
-                <endpoint
-                    address="vm://springService"
-                    transformers="springInputXform"
-                    responseTransformers="springOutputXform"
-                    synchronous="true"/>
-            </inbound-router>
-
-            <properties>
-                <container-property name="serviceBean" reference="doSpringWork"/>
-                <property name="serviceInterface" value="org.mule.extras.spring.remoting.WorkInterface"/>
-            </properties>
-
-        </mule-descriptor-->
-
     </model>
 
 </mule-configuration>
