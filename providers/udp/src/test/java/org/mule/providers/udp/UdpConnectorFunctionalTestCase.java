@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.udp;
 
 import org.apache.commons.logging.Log;
@@ -40,6 +41,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     DatagramSocket s = null;
     URI serverUri = null;
+    int sentPackets = 0;
 
     protected void doSetUp() throws Exception
     {
@@ -49,9 +51,12 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void doTearDown() throws Exception
     {
-        try {
+        try
+        {
             s.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // ignore
         }
         super.doTearDown();
@@ -59,43 +64,45 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void sendTestData(int iterations) throws Exception
     {
-
         InetAddress inet = InetAddress.getByName(serverUri.getHost());
+
         s = new DatagramSocket(0);
-        for (int i = 0; i < iterations; i++) {
-            String msg = "Hello" + i;
+        s.setSoTimeout(2000);
 
-            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, serverUri.getPort());
-
-            System.out.println("sending message: " + i);
+        for (sentPackets = 0; sentPackets < iterations; sentPackets++)
+        {
+            String msg = "Hello" + sentPackets;
+            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet,
+                    serverUri.getPort());
             s.send(packet);
         }
     }
 
     protected void receiveAndTestResults() throws Exception
     {
-        int i = 0;
         URI uri = getOutDest().getUri();
         InetAddress inet = InetAddress.getByName(uri.getHost());
-        s.setSoTimeout(2000);
-        for (i = 0; i < 100; i++) {
+        int receivedPackets;
 
+        for (receivedPackets = 0; receivedPackets < sentPackets; receivedPackets++)
+        {
             DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, serverUri.getPort());
-
             s.receive(packet);
             UdpMessageAdapter adapter = new UdpMessageAdapter(packet);
             System.out.println("Received message: " + adapter.getPayloadAsString());
-
         }
-        assertEquals(100, i);
-        Thread.sleep(3000);
+
+        assertEquals(sentPackets, receivedPackets);
     }
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("udp://localhost:60131");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -103,9 +110,12 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getOutDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("udp://localhost:60132");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -116,8 +126,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         UdpConnector connector = new UdpConnector();
         connector.setName("testUdp");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-
-        connector.setBufferSize(1024);
         return connector;
     }
+
 }
