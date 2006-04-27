@@ -574,8 +574,8 @@
             <echo>Doing a local deployment</echo>
             <copy todir="${pom.siteDirectory}/../dist/nightly">
                 <fileset file="${maven.build.dir}/distributions/${maven.final.name}-dist.*"/>
-                <fileset file="${maven.build.dir}/mule-${pom.currentVersion}.jar"/>
-                <fileset file="${mule.release.dist.dir}/mule-ra-${pom.currentVersion}.rar"/>
+                <!--<fileset file="${maven.build.dir}/mule-${pom.currentVersion}.jar"/>-->
+                <!--<fileset file="${mule.release.dist.dir}/mule-ra-${pom.currentVersion}.rar"/>-->
             </copy>
 
             <!-- copy snapshot to the repo -->
@@ -596,9 +596,11 @@
                 <fileset file="${mule.release.dist.dir}/*.dtd"/>
             </copy>
 
-            <copy todir="${pom.siteDirectory}/../dist/nightly">
-                <fileset file="${pom.siteDirectory}/../dist/dtds/*.*"/>
-            </copy>
+            <!-- Do not overwrite stable version DTDs with snapshots -->
+            <!--<copy todir="${pom.siteDirectory}/../dist/nightly">-->
+                <!--<fileset file="${pom.siteDirectory}/../dist/dtds/*.*"/>-->
+            <!--</copy>-->
+            
             <!-- unzip doc site if there is one -->
             <u:available file="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz">
                 <delete dir="${pom.siteDirectory}/doc"/>
