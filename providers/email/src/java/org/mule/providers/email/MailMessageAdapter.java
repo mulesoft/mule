@@ -187,6 +187,8 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
             Header h = (Header)e.nextElement();
             headers.put(h.getName(), h.getValue());
         }
-        properties.put(name + ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
+        if(headers.size() > 0) {
+            properties.put(name + ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
+        }
     }
 }
