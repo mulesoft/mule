@@ -97,7 +97,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                                   endpoint.getEndpointURI().getUsername(),
                                   endpoint.getEndpointURI().getPassword());
 
-        session = MailUtils.createMailSession(url, (MailConnector)connector);
+        session = MailUtils.createMailSession(url, connector);
         session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);
