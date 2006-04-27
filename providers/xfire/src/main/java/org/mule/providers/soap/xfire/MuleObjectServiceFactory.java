@@ -83,7 +83,7 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory {
                 excludedMethods.add(getMethodName(c.getMethods()[i]));
             }
         } catch (ClassNotFoundException e) {
-
+            // can be ignored.
         }
     }
 
