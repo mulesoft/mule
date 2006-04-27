@@ -16,26 +16,23 @@ package org.mule.providers.http.servlet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.http.HttpConnector;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>HttpRequestMessageAdapter</code> is a MUle message adapter for
@@ -171,10 +168,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                 if (isText(request.getContentType())) {
                     BufferedReader reader = request.getReader();
                     StringBuffer buffer = new StringBuffer(8192);
-                    String line;
-                    while ((line = reader.readLine()) != null) {
+                    String line = reader.readLine();
+                    while (line != null) {
                         buffer.append(line);
-                        buffer.append(SystemUtils.LINE_SEPARATOR);
+                        line = reader.readLine();
+                        if(line!=null) buffer.append(SystemUtils.LINE_SEPARATOR);
                     }
                     this.message = buffer.toString();
                 }

@@ -21,7 +21,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -96,10 +95,5 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
                     }
                 });
         return (HttpServletRequest)proxy;
-    }
-
-    public void testMessageRetrieval() throws Exception
-    {
-        // TODO MULE-776
     }
 }
