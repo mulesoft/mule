@@ -179,7 +179,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
                 if (result == null) {
                     return null;
                 }
-                return (UMOMessage)new MuleMessage(connector.getMessageAdapter(result));
+                return new MuleMessage(connector.getMessageAdapter(result));
             } catch (SocketTimeoutException e) {
                 // we don't necesarily expect to receive a resonse here
                 logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
