@@ -62,6 +62,61 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
         super();
     }
 
+    public int hashCode()
+    {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((password == null) ? 0 : password.hashCode());
+        result = PRIME * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+
+        if (obj == null)
+        {
+            return false;
+        }
+
+        if (this.getClass() != obj.getClass())
+        {
+            return false;
+        }
+
+        final MuleManagedConnectionFactory other = (MuleManagedConnectionFactory)obj;
+
+        if (password == null)
+        {
+            if (other.password != null)
+            {
+                return false;
+            }
+        }
+        else if (!password.equals(other.password))
+        {
+            return false;
+        }
+
+        if (username == null)
+        {
+            if (other.username != null)
+            {
+                return false;
+            }
+        }
+        else if (!username.equals(other.username))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Creates a Connection Factory instance. The ConnectionFactory instance is
      * initialized with the passed ConnectionManager. In the managed scenario,
@@ -78,10 +133,12 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException
     {
         MuleConnectionFactory cf = null;
-        try {
+        try
+        {
             cf = new DefaultMuleConnectionFactory(this, cxManager, null);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new ResourceException(e.getMessage());
         }
         return cf;
@@ -89,8 +146,8 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
 
     /**
      * Creates a Connection Factory instance. The Connection Factory instance is
-     * initialized with a default ConnectionManager. In the non-managed
-     * scenario, the ConnectionManager is provided by the resource adapter.
+     * initialized with a default ConnectionManager. In the non-managed scenario, the
+     * ConnectionManager is provided by the resource adapter.
      * 
      * @return EIS-specific Connection Factory instance
      * @throws ResourceException
@@ -103,16 +160,14 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     }
 
     /**
-     * ManagedConnectionFactory uses the security information (passed as
-     * Subject) and additional ConnectionRequestInfo (which is specific to
-     * ResourceAdapter and opaque to application server) to create this new
-     * connection.
+     * ManagedConnectionFactory uses the security information (passed as Subject) and
+     * additional ConnectionRequestInfo (which is specific to ResourceAdapter and
+     * opaque to application server) to create this new connection.
      * 
      * @param subject
      *            caller's security information
      * @param cxRequestInfo
-     *            additional resource adapter specific connection request
-     *            information
+     *            additional resource adapter specific connection request information
      * @return ManagedConnection instance
      * @throws ResourceException
      *             if the attempt to create a connection fails
@@ -126,19 +181,18 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     }
 
     /**
-     * Returns a matched managed connection from the candidate set of
-     * connections. ManagedConnectionFactory uses the security info (as in
-     * Subject) and information provided through ConnectionRequestInfo and
-     * additional Resource Adapter specific criteria to do matching. A MC that
-     * has the requested store is returned as a match
+     * Returns a matched managed connection from the candidate set of connections.
+     * ManagedConnectionFactory uses the security info (as in Subject) and
+     * information provided through ConnectionRequestInfo and additional Resource
+     * Adapter specific criteria to do matching. A MC that has the requested store is
+     * returned as a match
      * 
      * @param connectionSet
      *            candidate connection set
      * @param subject
      *            caller's security information
      * @param cxRequestInfo
-     *            additional resource adapter specific connection request
-     *            information
+     *            additional resource adapter specific connection request information
      * @return ManagedConnection if resource adapter finds an acceptable match,
      *         otherwise null
      * @throws ResourceException
@@ -152,12 +206,15 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
         PasswordCredential pc = RaHelper.getPasswordCredential(this, subject, cxRequestInfo);
 
         Iterator it = connectionSet.iterator();
-        while (it.hasNext()) {
+        while (it.hasNext())
+        {
             Object obj = it.next();
-            if (obj instanceof MuleManagedConnection) {
+            if (obj instanceof MuleManagedConnection)
+            {
                 MuleManagedConnection mc = (MuleManagedConnection)obj;
                 PasswordCredential mcpc = mc.getPasswordCredential();
-                if (mcpc != null && pc != null && mcpc.equals(pc)) {
+                if (mcpc != null && pc != null && mcpc.equals(pc))
+                {
                     return mc;
                 }
             }
@@ -166,9 +223,9 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     }
 
     /**
-     * Sets the log writer for this ManagedConnectionFactory instance. The log
-     * writer is a character output stream to which all logging and tracing
-     * messages for this ManagedConnectionfactory instance will be printed.
+     * Sets the log writer for this ManagedConnectionFactory instance. The log writer
+     * is a character output stream to which all logging and tracing messages for
+     * this ManagedConnectionfactory instance will be printed.
      * 
      * @param out
      *            an output stream for error logging and tracing
@@ -195,8 +252,8 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     }
 
     /**
-     * Associate PropertyChangeListener with the ManagedConnectionFactory, in
-     * order to notify about properties changes.
+     * Associate PropertyChangeListener with the ManagedConnectionFactory, in order
+     * to notify about properties changes.
      * 
      * @param lis
      *            the PropertyChangeListener to be associated with the

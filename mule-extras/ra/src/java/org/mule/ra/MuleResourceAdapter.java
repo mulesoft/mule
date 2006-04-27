@@ -41,6 +41,7 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleResourceAdapter implements ResourceAdapter
+public class MuleResourceAdapter implements ResourceAdapter, Serializable
 {
     /**
      * logger used by this class
