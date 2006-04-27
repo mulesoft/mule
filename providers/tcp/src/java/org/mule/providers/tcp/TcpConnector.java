@@ -34,76 +34,29 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
 
-    public static final long DEFAULT_POLLING_FREQUENCY = 10;
-
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
-    private int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
+    protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
 
-    private int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
+    protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
 
-    private int bufferSize = DEFAULT_BUFFER_SIZE;
+    protected int bufferSize = DEFAULT_BUFFER_SIZE;
 
-    private int backlog = DEFAULT_BACKLOG;
+    protected int backlog = DEFAULT_BACKLOG;
 
-    private String tcpProtocolClassName = DefaultProtocol.class.getName();
+    protected String tcpProtocolClassName = DefaultProtocol.class.getName();
 
-    private TcpProtocol tcpProtocol;
+    protected TcpProtocol tcpProtocol;
 
-    ///////////////////////////////////////////////
-    // Does this protocol have any connected sockets?
-    ///////////////////////////////////////////////
-    private boolean sendSocketValid = false;
+    protected boolean keepSendSocketOpen = false;
 
-    private int receiveSocketsCount = 0;
-
-    ////////////////////////////////////////////////////////////////////////
-    //  Properties for 'keepSocketConnected' TcpMessageDispatcher
-    ////////////////////////////////////////////////////////////////////////
-    public static final int KEEP_RETRYING_INDEFINETLY = 0;
-
-    private boolean keepSendSocketOpen = false;
-
-    // Time to sleep between reconnects in msecs
-    private int reconnectMillisecs = 10000;
-
-    // -1 try to reconnect forever
-    private int maxRetryCount = KEEP_RETRYING_INDEFINETLY;
+    protected boolean keepAlive = false;
 
     public boolean isKeepSendSocketOpen()
     {
         return keepSendSocketOpen;
     }
 
-    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
-    {
-        this.keepSendSocketOpen = keepSendSocketOpen;
-    }
-
-    public int getReconnectMillisecs()
-    {
-        return reconnectMillisecs;
-    }
-
-    public void setReconnectMillisecs(int reconnectMillisecs)
-    {
-        this.reconnectMillisecs = reconnectMillisecs;
-    }
-
-    public int getMaxRetryCount()
-    {
-        return maxRetryCount;
-    }
-
-    public void setMaxRetryCount(int maxRetryCount)
-    {
-        // Dont set negative numbers
-        if (maxRetryCount >= KEEP_RETRYING_INDEFINETLY) {
-            this.maxRetryCount = maxRetryCount;
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
@@ -159,37 +112,6 @@ public class TcpConnector extends AbstractServiceEnabledConnector
         this.receiveTimeout = timeout;
     }
 
-    public boolean isSendSocketValid()
-    {
-        return sendSocketValid;
-    }
-
-    public void setSendSocketValid(boolean validity)
-    {
-        this.sendSocketValid = validity;
-    }
-
-    public boolean hasReceiveSockets()
-    {
-        return receiveSocketsCount > 0;
-    }
-
-    /**
-     * Update the number of receive sockets.
-     *
-     * @param addSocket increase the number if true, decrement otherwise
-     */
-    public synchronized void updateReceiveSocketsCount(boolean addSocket)
-    {
-        if (addSocket) {
-            this.receiveSocketsCount++;
-        }
-        else {
-            this.receiveSocketsCount--;
-        }
-    }
-
-
     public int getBufferSize()
     {
         return bufferSize;
@@ -236,5 +158,15 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     public boolean isRemoteSyncEnabled()
     {
         return true;
+    }
+
+    public boolean isKeepAlive()
+    {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive)
+    {
+        this.keepAlive = keepAlive;
     }
 }

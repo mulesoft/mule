@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.PropertiesHelper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,7 +41,6 @@ import java.net.URISyntaxException;
  * tcp.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
  * @version $Revision$
  */
 
@@ -50,7 +50,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
 
     protected SerializableToByteArray serializableToByteArray;
 
+    protected boolean keepSendSocketOpen = false;
+
     private TcpConnector connector;
+
 
     public TcpMessageDispatcher(UMOImmutableEndpoint endpoint) {
         super(endpoint);
@@ -114,19 +117,6 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     protected void doInternalDispatch(UMOEvent event) throws Exception {
         Object payload = event.getTransformedMessage();
 
-        final boolean keepSendSocketOpen = connector.isKeepSendSocketOpen();
-//        if (connectedSocket == null || !keepSendSocketOpen) {
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("Creating a new socket. keepSendSocketOpen is " + keepSendSocketOpen);
-//            }
-//            connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
-//        } else {
-//            reconnect(event, connector.getMaxRetryCount());
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("Reconnecting the socket. keepSendSocketOpen is " + keepSendSocketOpen);
-//            }
-//        }
-
         try {
             write(connectedSocket, payload);
             // If we're doing sync receive try and read return info from socket
@@ -189,8 +179,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
                 if (result == null) {
                     return null;
                 }
-                UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
-                return message;
+                return (UMOMessage)new MuleMessage(connector.getMessageAdapter(result));
             } catch (SocketTimeoutException e) {
                 // we don't necesarily expect to receive a resonse here
                 logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
@@ -233,56 +222,14 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         // template method
     }
 
-    /////////////////////////////////////////////////////////////////
-    // New keepSocketOpen option methods by P.Oikari
-    /////////////////////////////////////////////////////////////////
-//    public boolean reconnect(UMOEvent event, int maxRetries) throws Exception {
-//        if (null != connectedSocket) {
-//            // We already have a connected socket
-//            return true;
-//        }
-//
-//        boolean success = false;
-//
-//        int retryCount = -1;
-//
-//        while (!success && !disposed && (retryCount < maxRetries)) {
-//            try {
-//                connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
-//
-//                success = true;
-//
-//                connector.setSendSocketValid(true);
-//            } catch (Exception e) {
-//                success = false;
-//
-//                connector.setSendSocketValid(false);
-//
-//                if (maxRetries != TcpConnector.KEEP_RETRYING_INDEFINETLY) {
-//                    retryCount++;
-//                }
-//
-//                logger.warn("run() warning at host: '" + event.getEndpoint().getEndpointURI().getAddress() +
-//                        "'. Reason: " + e.getMessage());
-//
-//                if (retryCount < maxRetries) {
-//                    try {
-//                        Thread.sleep(connector.getReconnectMillisecs());
-//                    } catch (Exception ex) {
-//                        logger.warn("SocketConnector threadsleep interrupted. Reason: " + ex.getMessage());
-//                    }
-//                } else {
-//                    throw e;
-//                }
-//            }
-//        }
-//
-//        return (success);
-//    }
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        final boolean keepSendSocketOpen = connector.isKeepSendSocketOpen();
+        keepSendSocketOpen = connector.isKeepSendSocketOpen();
+
+        if(endpoint.getProperties().containsKey("keepSendSocketOpen")) {
+            keepSendSocketOpen = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "keepSendSocketOpen", keepSendSocketOpen);
+        }
 
         if(connectedSocket==null || connectedSocket.isClosed() || !keepSendSocketOpen)
         connectedSocket = initSocket(endpoint.getEndpointURI().getAddress());

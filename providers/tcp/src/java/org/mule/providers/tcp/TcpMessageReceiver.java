@@ -15,7 +15,6 @@
 package org.mule.providers.tcp;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -35,7 +34,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -45,6 +43,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 
 /**
@@ -73,7 +73,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
         }
 
         try {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
         } catch (WorkException e) {
             throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
@@ -116,21 +116,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                 Socket socket = null;
                 try {
                     socket = serverSocket.accept();
-                    assert (socket != null);
-
-                    TcpConnector connector = (TcpConnector) this.connector;
-
-                    if (connector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getReceiveBufferSize() != connector.getBufferSize()) {
-                        socket.setReceiveBufferSize(connector.getBufferSize());
-                    }
-                    if (connector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getSendBufferSize() != connector.getBufferSize()) {
-                        socket.setSendBufferSize(connector.getBufferSize());
-                    }
-                    if (connector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET && socket.getSoTimeout() != connector.getReceiveTimeout()) {
-                        socket.setSoTimeout(connector.getReceiveTimeout());
-                    }
-
-                    socket.setTcpNoDelay(true);
 
                     if (logger.isTraceEnabled()) {
                         logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
@@ -150,7 +135,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                     try {
                         Work work = createWork(socket);
                         try {
-                            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
+                            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
                         } catch (WorkException e) {
                             logger.error("Tcp Server receiver Work was not processed: " + e.getMessage(), e);
                         }
@@ -195,7 +180,24 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
 
             final TcpConnector tcpConnector = ((TcpConnector) connector);
             this.protocol = tcpConnector.getTcpProtocol();
-            tcpConnector.updateReceiveSocketsCount(true);
+
+            try {
+                if (tcpConnector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getReceiveBufferSize() != tcpConnector.getBufferSize()) {
+                    socket.setReceiveBufferSize(tcpConnector.getBufferSize());
+                }
+                if (tcpConnector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getSendBufferSize() != tcpConnector.getBufferSize()) {
+                    socket.setSendBufferSize(tcpConnector.getBufferSize());
+                }
+                if (tcpConnector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET && socket.getSoTimeout() != tcpConnector.getReceiveTimeout()) {
+                    socket.setSoTimeout(tcpConnector.getReceiveTimeout());
+                }
+
+                socket.setTcpNoDelay(true);
+                socket.setKeepAlive(tcpConnector.isKeepAlive());
+            } catch (SocketException e) {
+                logger.error("Failed to set Socket properties: " + e.getMessage(), e);
+            }
+
         }
 
         public void release() {
@@ -212,9 +214,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
                     socket.close();
                 }
             } catch (IOException e) {
-                logger.error("Socket close failed with: " + e);
-            } finally {
-                ((TcpConnector) connector).updateReceiveSocketsCount(false);
+                logger.warn("Socket close failed with: " + e);
             }
         }
 
@@ -228,17 +228,24 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
 
                 while (!socket.isClosed() && !disposing.get()) {
 
-                    byte[] b = protocol.read(dataIn);
-                    // end of stream
-                    if (b == null) {
-                        break;
-                    }
+                    byte[] b = null;
+                    try {
+                        b = protocol.read(dataIn);
+                            // end of stream
+                        if (b == null) {
+                            break;
+                        }
 
-                    byte[] result = processData(b);
-                    if (result != null) {
-                        protocol.write(dataOut, result);
+                        byte[] result = processData(b);
+                        if (result != null) {
+                            protocol.write(dataOut, result);
+                        }
+                        dataOut.flush();
+                    } catch (SocketTimeoutException e) {
+                        if(!socket.getKeepAlive()) {
+                            break;
+                        }
                     }
-                    dataOut.flush();
                 }
             } catch (Exception e) {
                 handleException(e);

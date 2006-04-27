@@ -81,8 +81,6 @@ public class HttpConnector extends TcpConnector
 
     private int keepAliveTimeout = 1000;
 
-    private boolean keepAlive = false;
-
     private String cookieSpec;
 
     private boolean enableCookies = false;
@@ -202,26 +200,6 @@ public class HttpConnector extends TcpConnector
     public void setProxyUsername(String string)
     {
         proxyUsername = string;
-    }
-
-    public int getKeepAliveTimeout()
-    {
-        return keepAliveTimeout;
-    }
-
-    public void setKeepAliveTimeout(int keepAliveTimeout)
-    {
-        this.keepAliveTimeout = keepAliveTimeout;
-    }
-
-    public boolean isKeepAlive()
-    {
-        return keepAlive;
-    }
-
-    public void setKeepAlive(boolean keepAlive)
-    {
-        this.keepAlive = keepAlive;
     }
 
     public Map getReceivers()

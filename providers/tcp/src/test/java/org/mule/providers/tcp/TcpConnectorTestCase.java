@@ -93,11 +93,6 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(1000, c.getReceiveTimeout());
         assertEquals(1000, c.getSendTimeout());
 
-
-        assertEquals("Default should be retry forever.", TcpConnector.KEEP_RETRYING_INDEFINETLY, c.getMaxRetryCount());
-        c.setMaxRetryCount(100);
-        assertEquals(100, c.getMaxRetryCount());
-
         c.dispose();
     }
 }
