@@ -15,9 +15,6 @@
 
 package org.mule.providers.email;
 
-import org.apache.commons.lang.StringUtils;
-import org.mule.MuleException;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -26,16 +23,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
-import java.util.Calendar;
 import java.util.Properties;
 
 /**
@@ -75,26 +62,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     private String from;
 
     /**
-     * Holds value of property SMTP password.
-     */
-    private String password;
-
-    /**
-     * Holds value of property hostname for the smtp server.
-     */
-    private String hostname = "localhost";
-
-    /**
-     * Holds value of property port for the smtp server.
-     */
-    private int port = DEFAULT_SMTP_PORT;
-
-    /**
-     * Holds value of property SMTPusername.
-     */
-    private String username;
-
-    /**
      * Any custom headers to be set on messages sent using this connector
      */
     private Properties customHeaders = new Properties();
@@ -111,102 +78,27 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     {
         initFromServiceDescriptor();
     }
+
+
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#createMessage(java.lang.Object)
-     */
-    public Object createMessage(Object message, Session session) throws Exception
-    {
-        if (message instanceof Message) {
-            return message;
-        }
-        String body = null;
-        if (message instanceof String) {
-            body = (String) message;
-        }
-        Message msg = createMessage(getFromAddress(), null, cc, bcc, defaultSubject, body, session);
-        return msg;
-    }
+    * (non-Javadoc)
+    *
+    * @see org.mule.providers.UMOConnector#getProtocol()
+    */
+   public String getProtocol()
+   {
+       return "smtp";
+   }
 
-    protected Message createMessage(String from,
-                                    String to,
-                                    String cc,
-                                    String bcc,
-                                    String subject,
-                                    String body,
-                                    Session session) throws MuleException
-    {
-        Message msg = new MimeMessage(session);
-        try {
-            // to
-            InternetAddress[] toAddrs = null;
-            if (StringUtils.isNotBlank(to)) {
-                toAddrs = InternetAddress.parse(to, false);
-                msg.setRecipients(Message.RecipientType.TO, toAddrs);
-            } else {
-                throw new MuleException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "toAddress"));
-            }
-            // sent date
-            msg.setSentDate(Calendar.getInstance().getTime());
-            // from
-            if (from == null) {
-                throw new IllegalArgumentException("From address must be set");
-            }
-            msg.setFrom(new InternetAddress(from));
-            // cc
-            InternetAddress[] ccAddrs = null;
-            if (StringUtils.isNotBlank(cc)) {
-                ccAddrs = InternetAddress.parse(cc, false);
-                msg.setRecipients(Message.RecipientType.CC, ccAddrs);
-            }
-            InternetAddress[] bccAddrs = null;
-            if (StringUtils.isNotBlank(bcc)) {
-                bccAddrs = InternetAddress.parse(bcc, false);
-                msg.setRecipients(Message.RecipientType.BCC, bccAddrs);
-            }
-            // subject
-            if (StringUtils.isNotBlank(subject)) {
-                msg.setSubject(subject);
-            } else {
-                msg.setSubject("(no subject)");
-            }
-            // TODO attachments
-
-            // create the Multipart and its parts to it
-            Multipart mp = new MimeMultipart();
-            MimeBodyPart mbp = new MimeBodyPart();
-            mbp.setText(body);
-            mp.addBodyPart(mbp);
-
-            // add the Multipart to the message
-            msg.setContent(mp);
-            return msg;
-        } catch (MuleException e) {
-            throw e;
-        } catch (MessagingException e) {
-            throw new MuleException(new org.mule.config.i18n.Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
-                                                                     "Email message"), e);
-        }
-    }
 
     /**
-     * @return
+     * @return The default from address to use
      */
     public String getFromAddress()
     {
         return from;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#getProtocol()
-     */
-    public String getProtocol()
-    {
-        return "smtp";
-    }
 
     /*
      * (non-Javadoc)
@@ -252,7 +144,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     }
 
     /**
-     * @return
+     * @return the default comma separated list of BCC addresses to use
      */
     public String getBccAddresses()
     {
@@ -260,7 +152,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     }
 
     /**
-     * @return
+     * @return the default comma separated list of CC addresses to use
      */
     public String getCcAddresses()
     {
@@ -268,36 +160,13 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     }
 
     /**
-     * @return
+     * @return the defualt message subject to use
      */
     public String getSubject()
     {
         return defaultSubject;
     }
 
-    /**
-     * @return
-     */
-    public String getHostname()
-    {
-        return hostname;
-    }
-
-    /**
-     * @return
-     */
-    public String getPassword()
-    {
-        return password;
-    }
-
-    /**
-     * @return
-     */
-    public String getUsername()
-    {
-        return username;
-    }
 
     /**
      * @param string
@@ -331,40 +200,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         from = string;
     }
 
-    /**
-     * @param string
-     */
-    public void setHostname(String string)
-    {
-        hostname = string;
-    }
-
-    /**
-     * @param string
-     */
-    public void setPassword(String string)
-    {
-        password = string;
-    }
-
-    /**
-     * @param string
-     */
-    public void setUsername(String string)
-    {
-        username = string;
-    }
-
-    public int getPort()
-    {
-        return port;
-    }
-
-    public void setPort(int port)
-    {
-        this.port = port;
-    }
-
     public String getReplyToAddresses() {
         return replyTo;
     }
@@ -395,5 +230,9 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public int getDefaultPort() {
+        return DEFAULT_SMTP_PORT;
     }
 }

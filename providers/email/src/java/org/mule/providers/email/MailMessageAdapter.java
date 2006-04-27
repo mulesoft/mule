@@ -15,24 +15,25 @@
 
 package org.mule.providers.email;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
-
-import javax.mail.Header;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.Part;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+
+import javax.mail.Header;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message.
@@ -41,6 +42,8 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  * @version $Revision$
  */
 public class MailMessageAdapter extends AbstractMessageAdapter {
+
+    public static final String ATTACHMENT_HEADERS_PROPERTY_POSTFIX = "Headers";
 
     private Part messagePart = null;
     private byte[] contentBuffer;
@@ -73,7 +76,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 InputStream is = messagePart.getInputStream();
                 // If the stream is not already buffered, wrap a BufferedInputStream
                 // around it.
-                if ((is instanceof BufferedInputStream) == false) {
+                if (!(is instanceof BufferedInputStream)) {
                     is = new BufferedInputStream(is);
                 }
 
@@ -101,7 +104,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 InputStream is = messagePart.getInputStream();
                 // If the stream is not already buffered, wrap a BufferedInputStream
                 // around it.
-                if ((is instanceof BufferedInputStream) == false) {
+                if (!(is instanceof BufferedInputStream)) {
                     is = new BufferedInputStream(is);
                 }
 
@@ -151,6 +154,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                         name = String.valueOf(i - 1);
                     }
                     addAttachment(name, part.getDataHandler());
+                    addAttachmentHeaders(name, part);
                 }
             } else {
                 messagePart = msg;
@@ -175,5 +179,14 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
             throw new MessagingException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
                     "Message Adapter"), e);
         }
+    }
+
+    protected void addAttachmentHeaders(String name, Part part) throws javax.mail.MessagingException {
+        Map headers = new HashMap(4);
+        for(Enumeration e = part.getAllHeaders(); e.hasMoreElements();) {
+            Header h = (Header)e.nextElement();
+            headers.put(h.getName(), h.getValue());
+        }
+        properties.put(name + ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
     }
 }

@@ -14,6 +14,7 @@
 */
 package org.mule.providers.email.transformers;
 
+import org.mule.providers.email.MailMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
@@ -24,10 +25,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Transforms a javax.mail.Message to a UMOMEssage and supports attachments
@@ -39,12 +40,15 @@ public class ObjectToMimeMessage extends StringToEmailMessage {
 
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
             throws Exception {
+
         if (context.getMessage().getAttachmentNames().size() > 0) {
             MimeMultipart multipart = new MimeMultipart("mixed"); // The contenttype must be multipart/mixed
             multipart.addBodyPart(getPayloadBodyPart(payload, contentType));
             for (Iterator it = context.getMessage().getAttachmentNames().iterator(); it.hasNext();) {
                 String name = (String) it.next();
                 BodyPart part = getBodyPartForAttachment(context.getMessage().getAttachment(name), name);
+                // Check message props for extra headers
+                addBodyPartHeaders(part, name, context);
                 multipart.addBodyPart(part);
             }
             // the payload must be set to the constructed MimeMultipart message
@@ -55,6 +59,21 @@ public class ObjectToMimeMessage extends StringToEmailMessage {
         }
         // now the message will contain the multipart payload, and the multipart contentType
         super.setContent(payload, msg, contentType, context);
+    }
+
+    protected void addBodyPartHeaders(BodyPart part, String name, UMOEventContext context) {
+
+        Map headers =  (Map)context.getMessage().getProperty(name + MailMessageAdapter.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
+        if(null!=headers) {
+            for(Iterator it = headers.keySet().iterator();it.hasNext();) {
+                try {
+                    String key = (String)it.next();
+                    part.setHeader(key, (String)headers.get(key));
+                } catch (MessagingException me) {
+                    logger.error("Failed to set bodypart header", me);
+                }
+            }
+        }
     }
 
     protected BodyPart getBodyPartForAttachment(DataHandler handler, String name) throws MessagingException {

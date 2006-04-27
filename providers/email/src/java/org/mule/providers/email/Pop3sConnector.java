@@ -32,13 +32,14 @@ public class Pop3sConnector extends Pop3Connector {
 
     public static final int DEFAULT_POP3S_PORT = 995;
 
-    public Pop3sConnector() {
-        setPort(DEFAULT_POP3S_PORT);
-    }
 
     public String getProtocol()
     {
         return "pop3s";
+    }
+
+    public int getDefaultPort() {
+        return DEFAULT_POP3S_PORT;
     }
 
     public void doInitialise() throws InitialisationException {

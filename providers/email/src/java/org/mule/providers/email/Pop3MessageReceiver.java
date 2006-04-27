@@ -43,7 +43,6 @@ import javax.mail.URLName;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -64,6 +63,8 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     protected Session session;
 
+    private Pop3Connector connector;
+
     public Pop3MessageReceiver(UMOConnector connector,
                                UMOComponent component,
                                UMOEndpoint endpoint,
@@ -72,6 +73,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     {
         super(connector, component, endpoint, checkFrequency);
         this.backupFolder = backupFolder;
+        this.connector = (Pop3Connector)connector;
     }
     
     public void doConnect() throws Exception
@@ -151,8 +153,12 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                         storeMessage(mimeMessage);
                         message = new MuleMessage(connector.getMessageAdapter(mimeMessage));
 
-                        // Mark as deleted
-                        messages[i].setFlag(Flags.Flag.DELETED, true);
+                        if(connector.isDeleteReadMessages()) {
+                            // Mark as deleted
+                            messages[i].setFlag(Flags.Flag.DELETED, true);
+                        } else {
+                            messages[i].setFlag(Flags.Flag.SEEN, true);
+                        }
                         routeMessage(message, endpoint.isSynchronous());
                     }
                 }

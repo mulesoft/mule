@@ -37,26 +37,27 @@ public class Pop3Connector extends AbstractServiceEnabledConnector implements Ma
      * Holds the time in milliseconds that the endpoint should wait before
      * checking a mailbox
      */
-    private long checkFrequency = DEFAULT_CHECK_FREQUENCY;
+    protected long checkFrequency = DEFAULT_CHECK_FREQUENCY;
 
     /**
      * holds a path where messages should be backed up to
      */
-    private String backupFolder = null;
+    protected String backupFolder = null;
 
      /**
      * A custom authenticator to bew used on any mail sessions created with this connector
      * This will only be used if user name credendtials are set on the endpoint
      */
-    private Authenticator authenticator = null;
+    protected Authenticator authenticator = null;
 
     /**
-     * Default mail port if one is not set
+     * Once a message has been read, should it be deleted
      */
-    private int port = DEFAULT_POP3_PORT;
+    protected boolean deleteReadMessages = true;
+
 
     /**
-     * @return
+     * @return the milliseconds between checking the folder for messages
      */
     public long getCheckFrequency()
     {
@@ -85,7 +86,7 @@ public class Pop3Connector extends AbstractServiceEnabledConnector implements Ma
     }
 
     /**
-     * @return
+     * @return a relative or absolute path to a directory on the file system
      */
     public String getBackupFolder()
     {
@@ -117,11 +118,15 @@ public class Pop3Connector extends AbstractServiceEnabledConnector implements Ma
         this.authenticator = authenticator;
     }
 
-    public int getPort() {
-        return port;
+    public int getDefaultPort() {
+        return DEFAULT_POP3_PORT;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public boolean isDeleteReadMessages() {
+        return deleteReadMessages;
+    }
+
+    public void setDeleteReadMessages(boolean deleteReadMessages) {
+        this.deleteReadMessages = deleteReadMessages;
     }
 }

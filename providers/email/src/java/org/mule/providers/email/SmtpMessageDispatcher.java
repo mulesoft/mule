@@ -14,7 +14,6 @@
  */
 package org.mule.providers.email;
 
-import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -30,7 +29,6 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.URLName;
-
 import java.util.Calendar;
 
 /**
@@ -136,13 +134,6 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     {
         doDispatch(event);
         return event.getMessage();
-    }
-
-    protected void sendMailMessage(String to, String cc, String bcc, String subject, String body) throws MuleException,
-            MessagingException
-    {
-        Message msg = connector.createMessage(connector.getFromAddress(), to, cc, bcc, subject, body, session);
-        sendMailMessage(msg);
     }
 
     protected void sendMailMessage(Message message) throws MessagingException

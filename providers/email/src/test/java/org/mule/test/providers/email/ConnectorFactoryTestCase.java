@@ -47,19 +47,13 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
         UMOConnector cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof SmtpConnector);
         SmtpConnector smtp = (SmtpConnector) cnn;
-        assertEquals("smtp.muleumo.org", smtp.getHostname());
-        assertEquals(25, smtp.getPort());
-        assertEquals("ross", smtp.getUsername());
-        assertEquals("password", smtp.getPassword());
+
 
         url = new MuleEndpointURI("smtp://ross:password@smtp.muleumo.org:1023?fromAddress=admin@muleumo.org&subject=Hello");
         cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof SmtpConnector);
         smtp = (SmtpConnector) cnn;
-        assertEquals("smtp.muleumo.org", smtp.getHostname());
-        assertEquals(1023, smtp.getPort());
-        assertEquals("ross", smtp.getUsername());
-        assertEquals("password", smtp.getPassword());
+        
         assertEquals("admin@muleumo.org", smtp.getFromAddress());
         assertEquals("Hello", smtp.getSubject());
     }

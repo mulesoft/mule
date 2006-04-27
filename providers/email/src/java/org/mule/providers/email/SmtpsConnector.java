@@ -34,7 +34,7 @@ public class SmtpsConnector extends SmtpConnector {
     public static final int DEFAULT_SMTPS_PORT = 465;
 
     public SmtpsConnector() throws InitialisationException {
-        setPort(DEFAULT_SMTPS_PORT);
+        super();
     }
 
     /*
@@ -44,6 +44,10 @@ public class SmtpsConnector extends SmtpConnector {
      */
     public String getProtocol() {
         return "smtps";
+    }
+
+    public int getDefaultPort() {
+        return DEFAULT_SMTPS_PORT;
     }
 
     public void doInitialise() throws InitialisationException {

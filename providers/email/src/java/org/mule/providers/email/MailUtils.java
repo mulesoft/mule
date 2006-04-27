@@ -25,7 +25,6 @@ import javax.mail.Session;
 import javax.mail.URLName;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
 import java.util.Properties;
 
 /**
@@ -74,7 +73,7 @@ public class MailUtils
             props.put("mail." + protocol +".host", url.getHost());
             int port = url.getPort();
             if(port==-1) {
-                port = connector.getPort();
+                port = connector.getDefaultPort();
             }
             props.put("mail." + protocol + ".port", String.valueOf(port));
 
