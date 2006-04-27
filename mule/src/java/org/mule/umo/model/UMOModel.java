@@ -177,8 +177,19 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return a descriptor for the given component name or null if there is no
      *         component registered by that name
      * @see UMODescriptor
+     * @deprecated use getComponent("name").getDescriptor()
      */
     UMODescriptor getDescriptor(String name);
+
+    /**
+     * Returns the UMOComponent object for the given component name
+     *
+     * @param name the name of the component
+     * @return the UMOComponent object for the given component name or null if there is no
+     *         component registered by that name
+     * @see UMOComponent
+     */
+    UMOComponent getComponent(String name);
 
     /**
      * Stops a single Mule Component. This can be useful when stopping and
