@@ -26,6 +26,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.PropertiesHelper;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
@@ -44,6 +45,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
     private VMConnector connector;
     private Object lock = new Object();
+    protected boolean queueEvents;
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
@@ -51,11 +53,13 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         super(connector, component, endpoint, new Long(10));
         this.connector = (VMConnector) connector;
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
+        queueEvents = this.connector.isQueueEvents();
+        queueEvents = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "queueEvents", queueEvents);
     }
 
     public void doConnect() throws Exception
     {
-        if (connector.isQueueEvents()) {
+        if (queueEvents) {
             // Ensure we can create a vm queue
             QueueSession queueSession = connector.getQueueSession();
             queueSession.getQueue(endpoint.getEndpointURI().getAddress());
@@ -74,7 +78,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     public void onEvent(UMOEvent event) throws UMOException
     {
-        if (connector.isQueueEvents()) {
+        if (queueEvents) {
             QueueSession queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
             try {
