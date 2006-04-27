@@ -15,7 +15,6 @@
 package org.mule.impl.model;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -308,7 +307,6 @@ public abstract class AbstractComponent implements UMOComponent {
     }
 
     protected void handleException(Exception e) {
-        RequestContext.getEvent().getEndpoint().getConnector().getExceptionListener().exceptionThrown(e);
         if (exceptionListener instanceof DefaultComponentExceptionStrategy) {
             if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null) {
                 ((DefaultComponentExceptionStrategy) exceptionListener).setComponent(this);

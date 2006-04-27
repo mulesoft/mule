@@ -36,11 +36,10 @@ import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
 import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkEvent;
-
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkManager;
 import java.util.NoSuchElementException;
 
 /**
@@ -320,7 +319,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 //If we're doing a draining stop, read all events from the queue
                 //before stopping
                 if (stopping.get()) {
-                    if (queueSession.getQueue(descriptor.getName() + ".component").size() == 0) {
+                    if (queueSession==null || queueSession.getQueue(descriptor.getName() + ".component").size() == 0) {
                         stopping.set(false);
                         break;
                     }
@@ -363,7 +362,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                     break;
                 } else if (e instanceof NoSuchElementException) {
                     handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT),
-                            event.getMessage(),
+                            (event==null ? null : event.getMessage()),
                             this,
                             e));
                 } else if (e instanceof UMOException) {
@@ -371,12 +370,12 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 } else if (e instanceof WorkException) {
                     handleException(new ComponentException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                             descriptor.getName()),
-                            event.getMessage(),
+                            (event==null ? null : event.getMessage()),
                             this,
                             e));
                 } else {
                     handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT),
-                            event.getMessage(),
+                            (event==null ? null : event.getMessage()),
                             this,
                             e));
                 }
