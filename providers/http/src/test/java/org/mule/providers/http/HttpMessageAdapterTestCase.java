@@ -38,27 +38,4 @@ public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return new HttpMessageAdapter(payload);
     }
-
-    public void testMessageRetrieval() throws Exception
-    {
-        Object message = getValidMessage();
-        UMOMessageAdapter adapter = createAdapter(message);
-
-        assertEquals("Hello", adapter.getPayloadAsString());
-        byte[] bytes = adapter.getPayloadAsBytes();
-        assertNotNull(bytes);
-
-        String stringMessage = adapter.getPayloadAsString();
-        assertNotNull(stringMessage);
-
-        assertNotNull(adapter.getPayload());
-
-        try {
-            adapter = createAdapter(getInvalidMessage());
-            fail("Message adapter should throw exception if an invalid messgae is set");
-        }
-        catch (Exception e) {
-            // expected
-        }
-    }
 }

@@ -98,7 +98,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         logger.debug("processing packet: " + packet.toXML());
         Work work = createWork(packet);
         try {
-            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
+            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
         } catch (WorkException e) {
             logger.error("Xmpp Server receiver work failed: " + e.getMessage(), e);
         }

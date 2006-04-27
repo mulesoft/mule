@@ -31,7 +31,6 @@ import org.mule.umo.space.UMOSpaceException;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-
 import java.util.Properties;
 
 /**
@@ -68,7 +67,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
             throw new ConnectException(new Message("space", 1, destination), e, this);
         }
         try {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
         }
         catch (WorkException e) {
             throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
@@ -93,7 +92,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
                     Object message = space.take(Long.MAX_VALUE);
                     Work work = createWork(space, message);
                     try {
-                        getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
+                        getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
                     }
                     catch (WorkException e) {
                         logger.error("GS Server receiver Work was not processed: " + e.getMessage(), e);

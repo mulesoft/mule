@@ -16,7 +16,6 @@ package org.mule.impl.internal.notifications;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -29,9 +28,10 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +44,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ServerNotificationManager implements Work, Disposable
+public class ServerNotificationManager implements Work, Disposable, WorkListener
 {
     /**
      * logger used by this class
@@ -74,7 +74,7 @@ public class ServerNotificationManager implements Work, Disposable
 
     public void start(UMOWorkManager workManager) throws LifecycleException {
         try {
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
         } catch (WorkException e) {
             throw new LifecycleException(e, this);
         }
@@ -270,5 +270,35 @@ public class ServerNotificationManager implements Work, Disposable
                 return false;
             }
         }
+    }
+
+    public void workAccepted(WorkEvent event) {
+        handleWorkException(event, "workAccepted");
+    }
+
+    public void workRejected(WorkEvent event) {
+        handleWorkException(event, "workRejected");
+    }
+
+    public void workStarted(WorkEvent event) {
+        handleWorkException(event, "workStarted");
+    }
+
+    public void workCompleted(WorkEvent event) {
+        handleWorkException(event, "workCompleted");
+    }
+
+     protected void handleWorkException(WorkEvent event, String type) {
+        Exception e = null;
+        if(event!=null && event.getException()!=null) {
+            e = event.getException();
+        } else {
+            return;
+        }
+        if(event.getException().getCause()!=null) {
+            e = (Exception)event.getException().getCause();
+        }
+        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+        logger.error(e);
     }
 }

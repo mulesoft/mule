@@ -29,7 +29,6 @@ import org.mule.umo.transformer.UMOTransformer;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -85,7 +84,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         }
 
         try {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
         } catch (WorkException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
@@ -145,7 +144,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                         logger.trace("Received packet on: " + inetAddress.toString());
                         Work work = createWork(packet);
                         try {
-                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, null);
+                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
                         } catch (WorkException e) {
                             logger.error("Udp receiver interrupted: " + e.getMessage(), e);
                         }
