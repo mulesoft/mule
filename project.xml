@@ -59,98 +59,10 @@
         </mailingList>
     </mailingLists>
     <developers>
-        <developer>
-            <name>Ross Mason</name>
-            <id>rossmason</id>
-            <email>ross.mason@symphonysoft.com</email>
-            <organization>SymphonySoft Limited</organization>
-        </developer>
-        <developer>
-            <name>Hitoshi Ozawa</name>
-            <id>hozawa</id>
-            <email>h_ozawa@s4.dion.ne.jp</email>
-        </developer>
-        <developer>
-            <name>Guillaume Nodet</name>
-            <id>gnt</id>
-            <email>gnt@codehaus.org</email>
-        </developer>
-        <developer>
-            <name>Brian Topping</name>
-            <id>topping</id>
-            <email>topping@codehaus.org</email>
-        </developer>
-        <developer>
-            <!-- Stephane Vanmeerhaeghe -->
-            <name>St&#233;phane Vanmeerhaeghe</name>
-            <id></id>
-            <email></email>
-        </developer>
-        <developer>
-            <name>Andrew Perepelytsya</name>
-            <id>aperepel</id>
-            <email>aperepel@itci.com</email>
-            <organization>IT Consulting International Corp.</organization>
-        </developer>
-        <developer>
-            <name>Lajos Moczar</name>
-            <id>lajos</id>
-            <email>lajos@galatea.com</email>
-            <organization>Galatea IS Inc.</organization>
-        </developer>
-        <developer>
-      	    <name>Holger Hoffstaette</name>
-            <id>holger</id>
-            <email>holger@codehaus.org</email>
-            <organization></organization>
-        </developer>
+        <!-- Refer to http://mule.codehaus.org/Team -->
     </developers>
     <contributors>
-        <contributor>
-            <name>Ben Alex</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Ian De Beer</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Magnus Stattin</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Andy Depue</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <!-- Jerome Bernard -->
-            <name>J&#233;r&#244;me Bernard</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Stefan Ledent</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Brian Kalbfus</name>
-            <email></email>
-        </contributor>
-        <contributor>
-            <name>Michael Watson</name>
-            <organization>Estafet Limited</organization>
-        </contributor>
-        <contributor>
-            <name>Robert Leftwich</name>
-            <email></email>
-        </contributor>
-        <contributor>
-        	<name>Foo Shoong Weng</name>
-            <email></email>
-        </contributor>
-        <contributor>
-        	<name>Zed Shaw</name>
-            <email></email>
-        </contributor>
+        <!-- Refer to http://mule.codehaus.org/Team -->
     </contributors>
     <dependencies/>
     <build>
