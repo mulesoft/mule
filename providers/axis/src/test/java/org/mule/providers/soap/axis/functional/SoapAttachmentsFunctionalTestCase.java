@@ -55,7 +55,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         callbackCount = 0;
         connector = createConnector();
     }
-	
+
     protected UMOEndpointURI getInDest()
     {
         try {
@@ -70,7 +70,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
     {
         return null;
     }
-	
+
     protected UMOConnector createConnector() throws Exception
     {
         AxisConnector connector = new AxisConnector();
@@ -98,19 +98,19 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments", false);
 
-    	AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
-    	for(int i = 0; i < iterations; i++) {
-    		UMOMessage msg = new MuleMessage("testPayload");
-    		File tempFile = File.createTempFile("test", ".att");
-    		tempFile.deleteOnExit();
-	    	msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
-	    	MuleEvent event = new MuleEvent(msg, ep, null, true);
-	    	UMOMessage result = client.send(event);
-	    	assertNotNull(result);
-	    	assertNotNull(result.getPayload());
-	    	assertEquals(result.getPayloadAsString(), "Done");
-	    	callbackCount++;
-    	}
+        AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
+        for(int i = 0; i < iterations; i++) {
+            UMOMessage msg = new MuleMessage("testPayload");
+            File tempFile = File.createTempFile("test", ".att");
+            tempFile.deleteOnExit();
+            msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
+            MuleEvent event = new MuleEvent(msg, ep, null, true);
+            UMOMessage result = client.send(event);
+            assertNotNull(result);
+            assertNotNull(result.getPayload());
+            assertEquals(result.getPayloadAsString(), "Done");
+            callbackCount++;
+        }
     }
 
     protected void receiveAndTestResults() throws Exception
