@@ -17,6 +17,7 @@ package org.mule.providers.vm;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -223,7 +224,11 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        // template method
+        if (connector.isQueueEvents()) {
+            //use the default queue profile to configure this queue.
+            // Todo We may want to allow users to specify this at the connector level
+            MuleManager.getConfiguration().getQueueProfile().configureQueue(endpoint.getEndpointURI().getAddress());
+        }
     }
 
     protected void doDisconnect() throws Exception

@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.vm;
@@ -26,7 +26,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
@@ -36,7 +35,7 @@ import java.util.List;
  * <code>VMMessageReceiver</code> is a listener of events from a mule
  * component which then simply <p/> passes the events on to the target
  * component.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -45,7 +44,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
     private VMConnector connector;
     private Object lock = new Object();
-    protected boolean queueEvents;
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
@@ -53,16 +51,17 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         super(connector, component, endpoint, new Long(10));
         this.connector = (VMConnector) connector;
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
-        queueEvents = this.connector.isQueueEvents();
-        queueEvents = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "queueEvents", queueEvents);
     }
 
     public void doConnect() throws Exception
     {
-        if (queueEvents) {
+        if (connector.isQueueEvents()) {
             // Ensure we can create a vm queue
             QueueSession queueSession = connector.getQueueSession();
-            queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+            Queue q = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+            if(logger.isDebugEnabled()) {
+                logger.debug("Current queue depth for queue: " + endpoint.getEndpointURI().getAddress() + " is: " + q.size());
+            }
         }
     }
 
@@ -78,7 +77,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     public void onEvent(UMOEvent event) throws UMOException
     {
-        if (queueEvents) {
+        if (connector.isQueueEvents()) {
             QueueSession queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
             try {
@@ -95,7 +94,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    
+
     public Object onCall(UMOEvent event) throws UMOException
     {
         return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event.isSynchronous());
@@ -106,7 +105,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         UMOEvent event = (UMOEvent) queue.take();
-        routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
+        if(event!=null) {
+            routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
+        }
         return null;
     }
 
