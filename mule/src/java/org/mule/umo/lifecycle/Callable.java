@@ -18,7 +18,7 @@ package org.mule.umo.lifecycle;
 import org.mule.umo.UMOEventContext;
 
 /**
- * <code>SyncronousCallable</code> is used to provide UMOs with an interface
+ * <code>Callable</code> is used to provide UMOs with an interface
  * that supports event calls. UMO components do not have to implement this
  * interface, though the onCall method provides an example lifecycle method that
  * is executed when a event is received for the implementing component.
