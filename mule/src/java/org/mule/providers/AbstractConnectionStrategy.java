@@ -55,10 +55,10 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                             doConnect(connectable);
                         } catch (FatalConnectException e) {
                             resetState();
-                        	// TODO: this cast is evil
-                        	if (connectable instanceof AbstractMessageReceiver) {
-                        		((AbstractMessageReceiver) connectable).handleException(e);
-                        	}
+                            // TODO: this cast is evil
+                            if (connectable instanceof AbstractMessageReceiver) {
+                                ((AbstractMessageReceiver) connectable).handleException(e);
+                            }
                         }
                     }
                 });
@@ -93,11 +93,11 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
     public abstract void resetState();
 
     protected String getDescription(UMOConnectable connectable) {
-    	if (connectable instanceof UMOMessageReceiver) {
-    		return ((UMOMessageReceiver) connectable).getEndpointURI().toString();
-    	} else {
-    		return connectable.toString();
-    	}
+        if (connectable instanceof UMOMessageReceiver) {
+            return ((UMOMessageReceiver) connectable).getEndpointURI().toString();
+        } else {
+            return connectable.toString();
+        }
     }
 
 }

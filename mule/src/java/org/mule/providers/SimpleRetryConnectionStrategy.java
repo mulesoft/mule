@@ -47,12 +47,12 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
         while (true) {
-            int currentCount = ((AtomicInteger)count.get()).incrementAndGet();
+            int currentCount = ((AtomicInteger) count.get()).incrementAndGet();
 
             try {
                 connectable.connect();
                 if (logger.isDebugEnabled()) {
-                	logger.debug("Successfully connected to " + getDescription(connectable));
+                    logger.debug("Successfully connected to " + getDescription(connectable));
                 }
                 break;
             } catch (InterruptedException ie) {
@@ -76,7 +76,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 }
 
                 if (logger.isInfoEnabled()) {
-                	logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt " + currentCount + " of " + retryCount);
+                    logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt " + currentCount + " of " + retryCount);
                 }
 
                 try {
@@ -94,7 +94,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
      * Resets any state stored in the retry strategy
      */
     public synchronized void resetState() {
-        ((AtomicInteger)count.get()).set(0);
+        ((AtomicInteger) count.get()).set(0);
     }
 
     public int getRetryCount()
