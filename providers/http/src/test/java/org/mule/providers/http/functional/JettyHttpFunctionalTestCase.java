@@ -18,7 +18,6 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.lang.SystemUtils;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.umo.endpoint.MalformedEndpointException;
@@ -84,6 +83,6 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        assertTrue(msg.endsWith(TEST_MESSAGE + SystemUtils.LINE_SEPARATOR + " Received"));
+        assertTrue(msg.endsWith(TEST_MESSAGE  + " Received"));
     }
 }
