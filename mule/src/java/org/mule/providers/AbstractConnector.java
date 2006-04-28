@@ -982,7 +982,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * Whether to fire message notifications for every message that is sent or received from this connector
-     * @return
      */
     public boolean isEnableMessageEvents() {
         return enableMessageEvents;
@@ -1044,7 +1043,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * @return true if the protocol is supported by this connector.
      */
     public boolean supportsProtocol(String protocol) {
-    	return supportedProtocols.contains(protocol.toLowerCase());
+        return supportedProtocols.contains(protocol.toLowerCase());
     }
 
     /**
@@ -1074,7 +1073,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * @return A new work manager of an existing one if the work manager is being shared
      */
     UMOWorkManager createReceiverWorkManager(String name) {
-        UMOWorkManager wm = null;
+        UMOWorkManager wm;
         if(useSingleReceiverThreadPool && receiverWorkManager!=null) {
             wm = receiverWorkManager;
         } else {
@@ -1194,16 +1193,22 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     protected void handleWorkException(WorkEvent event, String type) {
-        Exception e = null;
-        if(event!=null && event.getException()!=null) {
+        Throwable e;
+        if (event != null && event.getException() != null) {
             e = event.getException();
         } else {
             return;
         }
-        if(event.getException().getCause()!=null) {
-            e = (Exception)event.getException().getCause();
+        if (event.getException().getCause() != null) {
+            e = event.getException().getCause();
         }
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
-        handleException(e);
+        logger.error("Work caused exception on '" + type +
+                     "'. Work being executed was: " + event.getWork().toString());
+        if (e instanceof Exception) {
+            handleException((Exception) e);
+        } else {
+            throw new MuleRuntimeException(new Message(Messages.CONNECTOR_CAUSED_ERROR,
+                                                       getName()), e);
+        }
     }
 }
