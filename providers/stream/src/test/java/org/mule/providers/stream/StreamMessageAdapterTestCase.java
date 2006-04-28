@@ -20,7 +20,7 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
- * <code>StreamMEssageAdapterTestCase</code> TODO (document class)
+ * <code>StreamMessageAdapterTestCase</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -33,9 +33,8 @@ public class StreamMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
-    public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
-    {
-        return new StreamMessageAdapter(payload.toString());
+    public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException {
+        return new StreamMessageAdapter(payload);
     }
 
     /*
