@@ -155,7 +155,9 @@ public class MuleTestUtils {
 
     public static TestConnector getTestConnector()
     {
-        return new TestConnector();
+        TestConnector testConnector = new TestConnector();
+        testConnector.setName("testConnector");
+        return testConnector;
     }
 
     public static UMOComponent getTestComponent(MuleDescriptor descriptor)
