@@ -54,7 +54,7 @@ public class Base64Encoder extends AbstractTransformer
                 buf = (byte[])src;
             }
 
-            String result = Base64.encodeBytes(buf);
+            String result = Base64.encodeBytes(buf, Base64.DONT_BREAK_LINES);
 
             if (getReturnClass().equals(byte[].class)) {
                 return result.getBytes(encoding);
