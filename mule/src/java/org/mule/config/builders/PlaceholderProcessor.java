@@ -22,10 +22,10 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.TemplateParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -58,6 +58,7 @@ public class PlaceholderProcessor
 
     private Map types = new HashMap();
     private Map schemes = new HashMap();
+    private TemplateParser parser = TemplateParser.createAntStyleParser();
 
     public PlaceholderProcessor()
     {
@@ -86,38 +87,43 @@ public class PlaceholderProcessor
     }
 
     public String processValue(String value) throws ConfigurationException {
-        String realValue = null;
-        String key = null;
-
-        UMOManager manager = MuleManager.getInstance();
-
-        int x = value.indexOf("${");
-        while(x > -1) {
-            int y = value.indexOf("}", x +1);
-            if(y==-1) {
-                return null;
-            }
-            key = value.substring(x+2, y);
-            realValue = (String)manager.getProperty(key);
-            if(logger.isDebugEnabled()) {
-                logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
-            }
-            if(realValue!=null) {
-                realValue = processEncryptedValue(realValue);
-                if(realValue==null) {
-                    return null;
-                }
-                value = value.substring(0, x) +  realValue + value.substring(y+1);
-
-                // fix for a bug when realValue.length <= key.length
-                y = y - 3 + (realValue.length() - key.length());
-            } else {
-                logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is. This is not necessarily a problem as the placeholder may not be a Mule placeholder.");
-            }
-            x = value.indexOf("${", y);
-        }
-        return value;
+        return parser.parse(MuleManager.getInstance().getProperties(), value);
     }
+
+//    public String processValue(String value) throws ConfigurationException {
+//        String realValue = null;
+//        String key = null;
+//
+//        UMOManager manager = MuleManager.getInstance();
+//
+//        parser.parse(manager.getProperties(), value);
+//        int x = value.indexOf("${");
+//        while(x > -1) {
+//            int y = value.indexOf("}", x +1);
+//            if(y==-1) {
+//                return null;
+//            }
+//            key = value.substring(x+2, y);
+//            realValue = (String)manager.getProperty(key);
+//            if(logger.isDebugEnabled()) {
+//                logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
+//            }
+//            if(realValue!=null) {
+//                realValue = processEncryptedValue(realValue);
+//                if(realValue==null) {
+//                    return null;
+//                }
+//                value = value.substring(0, x) +  realValue + value.substring(y+1);
+//
+//                // fix for a bug when realValue.length <= key.length
+//                y = y - 3 + (realValue.length() - key.length());
+//            } else {
+//                logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is. This is not necessarily a problem as the placeholder may not be a Mule placeholder.");
+//            }
+//            x = value.indexOf("${", y);
+//        }
+//        return value;
+//    }
 
     protected String processEncryptedValue(String value) throws ConfigurationException
     {
