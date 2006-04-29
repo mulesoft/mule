@@ -13,14 +13,13 @@
  */
 package org.mule.test.util;
 
+import junit.framework.TestCase;
 import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -39,7 +38,7 @@ public class TemplateParserTestCase extends TestCase
         assertEquals("smtp://ross.mason@symphonysoft.com", result);
         string = "smtp://[toAddress]";
         result = tp.parse(props, string);
-        assertEquals("smtp://", result);
+        assertEquals("smtp://[toAddress]", result);
 
     }
 
@@ -109,7 +108,7 @@ public class TemplateParserTestCase extends TestCase
         assertEquals("Some String with value1 and value2 in it", result);
         string = "A${prop1-2}B${prop1}C${prop2}";
         result = tp.parse(props, string);
-        assertEquals("Avalue2Bvalue1C", result);
+        assertEquals("Avalue2Bvalue1C${prop2}", result);
 
     }
 }
