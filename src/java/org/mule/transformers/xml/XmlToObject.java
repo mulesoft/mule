@@ -13,6 +13,8 @@
  */
 package org.mule.transformers.xml;
 
+import java.io.ByteArrayInputStream;
+
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
@@ -43,7 +45,7 @@ public class XmlToObject extends AbstractXStreamTransformer
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
         if(src instanceof byte[]) {
-            return getXStream().fromXML(new String((byte[])src));
+            return getXStream().fromXML(new ByteArrayInputStream((byte[])src));
         } else if(src instanceof String) {
             return getXStream().fromXML(src.toString());
         } else {
