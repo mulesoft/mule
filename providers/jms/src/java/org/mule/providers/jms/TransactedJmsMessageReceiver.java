@@ -34,7 +34,6 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
-
 import java.util.List;
 
 /**
@@ -169,7 +168,17 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
 
         // Retrieve message
-        Message message = ctx.consumer.receive(frequency);
+        Message message = null;
+        try {
+            message = ctx.consumer.receive(frequency);
+        } catch (JMSException e) {
+            //If we're being disconnected, ignore the exception
+            if(!this.isConnected()) {
+                //ignore
+            } else {
+                throw e;
+            }
+        }
         if (message == null) {
             if (tx != null) {
                 tx.setRollbackOnly();
