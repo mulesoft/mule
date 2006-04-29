@@ -17,7 +17,6 @@ import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
-import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
