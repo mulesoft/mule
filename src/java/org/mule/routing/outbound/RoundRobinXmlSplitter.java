@@ -74,10 +74,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                     endpoint = (UMOEndpoint) getEndpoints().get(epCounter);
                 }
 
-                if (message == null) {
-                    // Log a warning if there are no messages for a given endpoint
-                    logger.warn("Message part is null for endpoint: " + endpoint.getEndpointURI().toString());
-                } else if (endpoint == null) {
+                if (endpoint == null) {
                     logger.error("There was no matching endpoint for message part: " + part.asXML());
                 }
                 else {
