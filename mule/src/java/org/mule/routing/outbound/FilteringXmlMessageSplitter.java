@@ -27,6 +27,8 @@ import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -163,19 +165,19 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                     if (namespaces != null) {
                         xpath.setNamespaceURIs(namespaces);
                     }
-                    List nodes = xpath.selectNodes(dom4jDoc);
+                    List foundNodes = xpath.selectNodes(dom4jDoc);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Split into " + nodes.size());
+                        logger.debug("Split into " + foundNodes.size());
                     }
                     List parts = new ArrayList();
-                    //Rather than reparsing these in when individual messages are created, lets do it now
-                    //We can also avoid parsing the Xml again altogether
-                    for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+                    // Rather than reparsing these when individual messages are created, lets do it now
+                    // We can also avoid parsing the Xml again altogether
+                    for (Iterator iterator = foundNodes.iterator(); iterator.hasNext();) {
                         Node node = (Node) iterator.next();
-                        if(node instanceof Element) {
-                            //Can't do detach here just in case the source object was a document.
-                            node = (Node)node.clone();
-                            parts.add(DocumentHelper.createDocument((Element)node));
+                        if (node instanceof Element) {
+                            // Can't do detach here just in case the source object was a document.
+                            node = (Node) node.clone();
+                            parts.add(DocumentHelper.createDocument((Element) node));
                         } else {
                             logger.warn("Dcoument node: " + node.asXML() + " is not an element and thus is not a valid part");
                         }
@@ -186,7 +188,9 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 logger.warn("Unsupported message type, ignoring");
             }
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Failed to initialise the payload: " + ex.getMessage(), ex);
+            StringWriter writer = new StringWriter(512);
+            ex.printStackTrace(new PrintWriter(writer));
+            throw new IllegalArgumentException("Failed to initialise the payload: " + writer.toString());
         }
 
         Map theProperties = new HashMap();

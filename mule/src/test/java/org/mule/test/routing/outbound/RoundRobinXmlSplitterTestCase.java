@@ -20,7 +20,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.routing.outbound.RoundRobinXmlSplitter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -127,7 +126,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
 
-        FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
+        RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);
 
@@ -170,7 +169,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     public void testInvalidXmlPayloadThrowsException() throws Exception {
         Mock session = MuleTestUtils.getMockSession();
 
-        FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
+        RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
 
         UMOMessage message = new MuleMessage("This is not XML.");
 
