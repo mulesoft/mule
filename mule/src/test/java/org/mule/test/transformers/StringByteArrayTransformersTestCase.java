@@ -1,6 +1,6 @@
 /*
  * $Header$
- * $Revision$
+ * $Revision: 1506 $
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 1506 $
  */
 public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {

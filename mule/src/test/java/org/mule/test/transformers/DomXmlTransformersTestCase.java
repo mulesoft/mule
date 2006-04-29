@@ -2,7 +2,7 @@
  * <code>DomXmlTransformersTestCase</code> TODO
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 611 $
  */
 package org.mule.test.transformers;
 
@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 611 $
  */
 public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 {

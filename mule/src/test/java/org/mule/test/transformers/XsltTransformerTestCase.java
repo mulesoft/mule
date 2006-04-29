@@ -1,6 +1,6 @@
 /*
  * $Header$
- * $Revision$
+ * $Revision: 1983 $
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
@@ -19,7 +19,7 @@ import org.mule.util.Utility;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 1983 $
  */
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {

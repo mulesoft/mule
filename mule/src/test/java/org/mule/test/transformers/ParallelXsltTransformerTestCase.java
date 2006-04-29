@@ -72,7 +72,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 						} catch (TransformerException e) {
 							actualResults.add(e);
 						}
-    				};
+    				}
     				signalDone();
     			}
     		}).start();
@@ -87,7 +87,6 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 			Object result = it.next();
 			if (result instanceof Exception) throw (Exception)result;
 			
-			
 	        if (expectedResult instanceof String && expectedResult instanceof String ) {
 	        	XMLAssert.assertXMLEqual((String)expectedResult, (String)result);			
 			} else {
@@ -100,7 +99,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 	}
 	private int getCallsPerThread() {
 		return 100;
-	};
+	}
 
 	protected  static String normalizeString(String rawString) {
     	return rawString.replaceAll("\r\n", "\n");

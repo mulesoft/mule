@@ -1,6 +1,6 @@
 /*
  * $Header$
- * $Revision$
+ * $Revision: 1665 $
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 1665 $
  */
 public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTestCase
 {
