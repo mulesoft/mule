@@ -13,39 +13,50 @@
  */
 package org.mule.transformers.xml;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.io.DOMWriter;
-import org.mule.transformers.AbstractTransformer;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+
 import org.mule.umo.transformer.TransformerException;
+import org.w3c.dom.Document;
 
 /**
  * <code>XmlToDomDocument</code> Transform a XML String to
  * org.w3c.dom.Document.
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
+ * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
  * @version $Revision$
  */
-public class XmlToDomDocument extends AbstractTransformer
+public class XmlToDomDocument extends AbstractXmlTransformer
 {
 
     public XmlToDomDocument()
     {
         registerSourceType(String.class);
+        registerSourceType(byte[].class);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try {
-            String xml = (String) src;
-            org.dom4j.Document dom4jDoc = DocumentHelper.parseText(xml);
-            if(org.dom4j.Document.class.equals(getReturnClass())) {
-                return dom4jDoc;
-            } else {
-                return new DOMWriter().write(dom4jDoc);
-            }
-        } catch (Exception e) {
-            throw new TransformerException(this, e);
-        }
-    }
-
+	    try {
+	        Source sourceDoc = getXmlSource(src);
+	        // If returnClass is not set, assume W3C DOM
+	        // This is the original behaviour
+	        ResultHolder holder = getResultHolder(returnClass != null ? returnClass : Document.class);
+	        
+	        assert(sourceDoc != null);
+	        assert(holder != null);
+	
+			Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+			idTransformer.setOutputProperty(OutputKeys.ENCODING,encoding);
+			idTransformer.transform(sourceDoc, holder.getResult());
+	        
+	        Object result = holder.getResultObject(); 
+	        return result;
+	    } catch (Exception e) {
+	        throw new TransformerException(this, e);
+	    }
+    }    
 }

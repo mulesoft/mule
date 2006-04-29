@@ -38,4 +38,8 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         System.out.println("\n\n" + result);
         //XMLAssert.assertXMLEqual("Xml documents have different data.", (String) getResultData(), (String) result);
     }
+    
+    protected  String normalizeString(String rawString) {
+    	return rawString.replaceAll("\r\n", "").replaceAll("\n", "");
+    }
 }

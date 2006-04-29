@@ -37,7 +37,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(null);
     }
 
-    protected  static String normalizeString(String rawString) {
+    protected  String normalizeString(String rawString) {
     	return rawString.replaceAll("\r\n", "\n");
     }
     
