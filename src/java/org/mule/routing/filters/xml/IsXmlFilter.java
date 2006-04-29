@@ -1,11 +1,15 @@
 package org.mule.routing.filters.xml;
 
+import java.io.ByteArrayInputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
+import org.dom4j.io.SAXReader;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.xml.sax.InputSource;
 
 /**
  * <code>IsXmlFilter</code> accepts a String or byte[] if its contents are valid XML.
@@ -27,7 +31,7 @@ public class IsXmlFilter implements UMOFilter {
 	        if (obj instanceof String) {
 	            DocumentHelper.parseText((String) obj);
 	        } else if (obj instanceof byte[]) {
-	            DocumentHelper.parseText(new String((byte []) obj));
+                new SAXReader().read(new InputSource(new ByteArrayInputStream((byte[]) obj)));
 	        } else {
 	        	throw new DocumentException("Object must be a string or byte array");
 	        }
