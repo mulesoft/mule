@@ -13,6 +13,7 @@
  */
 package org.mule.routing.outbound;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -27,8 +28,6 @@ import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -188,9 +187,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 logger.warn("Unsupported message type, ignoring");
             }
         } catch (Exception ex) {
-            StringWriter writer = new StringWriter(512);
-            ex.printStackTrace(new PrintWriter(writer));
-            throw new IllegalArgumentException("Failed to initialise the payload: " + writer.toString());
+            throw new IllegalArgumentException("Failed to initialise the payload: " + ExceptionUtils.getStackTrace(ex));
         }
 
         Map theProperties = new HashMap();
