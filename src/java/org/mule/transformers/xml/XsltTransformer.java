@@ -69,7 +69,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
      * @param src The source XML (String, byte[], DOM, etc.)
      * @return The result String (or DOM)
      */
-    public Object doTransform(Object src, String encoding) throws TransformerException {
+    public synchronized Object doTransform(Object src, String encoding) throws TransformerException {
         try {
             Source sourceDoc = getXmlSource(src);
             ResultHolder holder = getResultHolder(returnClass == null && src != null ? src.getClass() : returnClass);
