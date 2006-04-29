@@ -45,6 +45,7 @@ public class AddressTO implements Serializable, Cloneable {
     }
 
     public AddressTO() {
+        super();
     }
 
     public AddressTO(String houseNumber, String street, String city) {
@@ -79,12 +80,11 @@ public class AddressTO implements Serializable, Cloneable {
     }
 
     public Object clone() {
-
         Object clone = null;
         try {
             clone = super.clone();
         } catch (CloneNotSupportedException cloneNotSupportedException) {
-            ;
+            // too bad
         }
         return clone;
     }

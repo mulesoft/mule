@@ -30,6 +30,7 @@ public class CreditProfileTO implements Serializable {
     private boolean valid;
 
     public CreditProfileTO() {
+        super();
     }
 
     public CreditProfileTO(CustomerTO customerTO) {

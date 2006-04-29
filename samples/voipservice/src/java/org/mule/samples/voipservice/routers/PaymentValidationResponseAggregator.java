@@ -56,7 +56,7 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
         } catch (TransformerException e) {
             throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"), new MuleMessage(events, (Map)null), null, e);
         }
-        if (one && two) {
+        if (one && two && creditProfileTO != null) {
             creditProfileTO.setValid(true);
         }
         return new MuleMessage(creditProfileTO, event.getMessage());

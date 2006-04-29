@@ -48,6 +48,7 @@ public class CreditCardTO implements Serializable, Cloneable {
     }
 
     public CreditCardTO() {
+        super();
     }
 
     public CreditCardTO(String cardNumber, String validTill, String cardType) {
@@ -81,12 +82,11 @@ public class CreditCardTO implements Serializable, Cloneable {
     }
 
     public Object clone() {
-
         Object clone = null;
         try {
             clone = super.clone();
         } catch (CloneNotSupportedException cloneNotSupportedException) {
-            ;
+            // too bad
         }
         return clone;
     }

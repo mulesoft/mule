@@ -24,6 +24,7 @@ public class ServiceParamTO implements Serializable {
     private CreditCardTO creditCardTO;
 
     public ServiceParamTO() {
+        super();
     }
 
     public ServiceParamTO(CustomerTO customerTO, CreditCardTO creditCardTO) {

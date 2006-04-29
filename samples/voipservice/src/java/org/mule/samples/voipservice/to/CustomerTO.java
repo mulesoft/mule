@@ -44,6 +44,7 @@ public class CustomerTO implements Serializable, Cloneable {
     }
 
     public CustomerTO() {
+        super();
     }
 
     public CustomerTO(String firstName, String lastName) {
@@ -93,7 +94,6 @@ public class CustomerTO implements Serializable, Cloneable {
     }
 
     public Object clone() {
-
         Object clone = null;
         try {
             clone = super.clone();
@@ -101,7 +101,7 @@ public class CustomerTO implements Serializable, Cloneable {
                 ((CustomerTO) clone).setAddress((AddressTO) addressTO.clone());
             }
         } catch (CloneNotSupportedException cloneNotSupportedException) {
-            ;
+            // too bad
         }
         return clone;
     }
