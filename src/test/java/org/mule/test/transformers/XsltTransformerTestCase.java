@@ -13,7 +13,6 @@
  */
 package org.mule.test.transformers;
 
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.Utility;
@@ -22,7 +21,7 @@ import org.mule.util.Utility;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XsltTransformerTestCase extends AbstractTransformerTestCase
+public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
 
     private String srcData;

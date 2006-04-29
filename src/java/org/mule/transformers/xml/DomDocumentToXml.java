@@ -13,8 +13,6 @@
  */
 package org.mule.transformers.xml;
 
-import org.dom4j.io.DOMReader;
-import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
@@ -24,27 +22,22 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public class DomDocumentToXml extends AbstractTransformer
+public class DomDocumentToXml extends AbstractXmlTransformer
 {
     public DomDocumentToXml()
     {
-        registerSourceType(org.w3c.dom.Document.class);
-        registerSourceType(org.dom4j.Document.class);
         setReturnClass(String.class);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-
         try {
-            org.dom4j.Document dom4jDoc = null;
-            if(src instanceof org.w3c.dom.Document) {
-                org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) src;
-                dom4jDoc = new DOMReader().read(x3cDoc);
-            } else {
-                dom4jDoc = (org.dom4j.Document)src;
-            }
-            return dom4jDoc.asXML();
+        	// We now offer XML in byte OR String form.
+        	// String remains the default like before.
+        	if (byte[].class.equals(returnClass))
+        		return convertToBytes(src, encoding);
+        	else 
+        		return convertToText(src);
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
