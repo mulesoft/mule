@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * This router will split the Xml message into parts based on the xpath expression and
- * router each new event to the endpoints on the router, one after the other.
+ * route each new event to the endpoints on the router, one after the other.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: $
@@ -51,34 +51,33 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
 
             UMOEndpoint endpoint;
             UMOMessage result = null;
-            Document part = null;
-            List parts = (List) FilteringXmlMessageSplitter.nodes.get();
-            if(parts == null) {
+            Document part;
+            List parts = (List) nodes.get();
+            if (parts == null) {
                 logger.error("There are no parts for current message. No events were routed: " + message);
                 return null;
             }
             int correlationSequence = 1;
             int epCounter = 0;
-            for (Iterator iterator = parts.iterator(); iterator.hasNext();epCounter++) {
-                part = (Document)iterator.next();
-                if(epCounter == endpoints.size()) {
+            for (Iterator iterator = parts.iterator(); iterator.hasNext(); epCounter++) {
+                part = (Document) iterator.next();
+                if (epCounter == endpoints.size()) {
                     epCounter = 0;
                 }
                 //Create the message
                 Map theProperties = (Map) properties.get();
                 message = new MuleMessage(part, new HashMap(theProperties));
 
-                if(enableEndpointFiltering) {
+                if (enableEndpointFiltering) {
                     endpoint = getEndpointForMessage(message);
                 } else {
-                    endpoint = (UMOEndpoint)getEndpoints().get(epCounter);
+                    endpoint = (UMOEndpoint) getEndpoints().get(epCounter);
                 }
 
                 if (message == null) {
                     // Log a warning if there are no messages for a given endpoint
                     logger.warn("Message part is null for endpoint: " + endpoint.getEndpointURI().toString());
-                }
-                else if(endpoint==null) {
+                } else if (endpoint == null) {
                     logger.error("There was no matching endpoint for message part: " + part.asXML());
                 }
                 else {
@@ -108,48 +107,48 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
             }
             return result;
         } finally {
-            FilteringXmlMessageSplitter.nodes.set(null);
-            FilteringXmlMessageSplitter.properties.set(null);
+            nodes.set(null);
+            properties.set(null);
         }
     }
 
     /**
-         * Retrieves a specific message part for the given endpoint. the message
-         * will then be routed via the parovider.
-         *
-         * @param message  the current message being processed
-         * @return the message part to dispatch
-         */
-        protected UMOEndpoint getEndpointForMessage(UMOMessage message)
-        {
-            for (int i = 0; i < endpoints.size(); i++) {
-                UMOEndpoint endpoint = (UMOEndpoint) endpoints.get(i);
+     * Retrieves a specific message part for the given endpoint. the message
+     * will then be routed via the parovider.
+     *
+     * @param message  the current message being processed
+     * @return the message part to dispatch
+     */
+    protected UMOEndpoint getEndpointForMessage(UMOMessage message)
+    {
+        for (int i = 0; i < endpoints.size(); i++) {
+            UMOEndpoint endpoint = (UMOEndpoint) endpoints.get(i);
 
-                try {
-                    if (endpoint.getFilter() == null || endpoint.getFilter().accept(message)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Endpoint filter matched for node " +
-                                    i + ". Routing message over: " +
-                                    endpoint.getEndpointURI().toString());
-                        }
-                        return endpoint;
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Endpoint filter did not match");
-                        }
+            try {
+                if (endpoint.getFilter() == null || endpoint.getFilter().accept(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Endpoint filter matched for node " +
+                                i + ". Routing message over: " +
+                                endpoint.getEndpointURI().toString());
                     }
-                } catch (Exception e) {
-                    logger.error("Unable to create message for node at position " + i, e);
-                    return null;
+                    return endpoint;
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Endpoint filter did not match");
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Unable to create message for node at position " + i, e);
+                return null;
             }
-
-            return null;
         }
+
+        return null;
+    }
 
 
     public void addEndpoint(UMOEndpoint endpoint) {
-        if(endpoint.getFilter()!=null && !enableEndpointFiltering) {
+        if (endpoint.getFilter() != null && !enableEndpointFiltering) {
             throw new IllegalStateException("Endpoints on the RoundRobin splitter router cannot have filters associated with them");
         }
         super.addEndpoint(endpoint);
