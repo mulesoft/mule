@@ -79,8 +79,6 @@ public class HttpConnector extends TcpConnector
 
     private String proxyPassword = null;
 
-    private int keepAliveTimeout = 1000;
-
     private String cookieSpec;
 
     private boolean enableCookies = false;
@@ -123,7 +121,7 @@ public class HttpConnector extends TcpConnector
      */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
         String key = endpoint.getEndpointURI().toString();
-        int i = key.indexOf("?");
+        int i = key.indexOf('?');
         if(i > -1) {
             key = key.substring(0, i);
         }
