@@ -15,8 +15,6 @@ package org.mule.samples.errorhandler;
 
 import org.mule.util.ClassHelper;
 
-import java.lang.reflect.Constructor;
-
 /**
  * 
  * <code>ExceptionBean</code> TODO -document class
@@ -44,7 +42,6 @@ public class ExceptionBean
     /**
 	 * The stack trace, as returned by getStackTrace().
 	 */
-    //private List stackTrace = new ArrayList();
     private String[] stackTrace;
 
     static transient boolean showRootStackOnly = true;
@@ -55,6 +52,7 @@ public class ExceptionBean
 
     public ExceptionBean()
     {
+        super();
     }
 
     public ExceptionBean(Throwable exception)
@@ -79,7 +77,6 @@ public class ExceptionBean
     {
         if (originalException == null)
         {
-            Constructor c = null;
             Throwable t = null;
             try
             {

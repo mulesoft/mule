@@ -30,7 +30,10 @@ public class ErrorMessage
     /**
 	 *  
 	 */
-    public ErrorMessage() {}
+    public ErrorMessage()
+    {
+        super();
+    }
 
     public ErrorMessage(ExceptionBean exception) throws InstantiationException
     {

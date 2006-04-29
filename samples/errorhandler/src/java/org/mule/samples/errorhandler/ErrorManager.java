@@ -18,10 +18,8 @@ package org.mule.samples.errorhandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.impl.RequestContext;
 import org.mule.samples.errorhandler.handlers.DefaultHandler;
 import org.mule.samples.errorhandler.handlers.FatalHandler;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 
 import java.util.HashMap;
@@ -42,8 +40,6 @@ public class ErrorManager
 
     private Map handlers = new HashMap();
     private ExceptionHandler defaultHandler = null;
-    private ExceptionHandler fatalHandler = null;
-    private UMOEvent currentEvent;
 
     /*
 	 * (non-Javadoc)
@@ -53,7 +49,6 @@ public class ErrorManager
     public ErrorManager()
     {
         defaultHandler = new DefaultHandler();
-        fatalHandler = new FatalHandler();
     }
     
     public void setHandlers(ExceptionHandler[] eh)
@@ -85,21 +80,20 @@ public class ErrorManager
     public void onException(ErrorMessage msg) throws UMOException
     {
         Class eClass = null;
-        ExceptionHandler eb = null;
-        // the other way to obtain a reference to the current event is to implement
-        //the org.mule.umo.lifecycle.Callable or AsynchonousCallable
-        currentEvent = RequestContext.getEvent();
+        ExceptionHandler eh = null;
+
         try
         {
             eClass = msg.getException().toException().getClass();
-            eb = getHandler(eClass);
-            eb.onException(msg);
+            eh = getHandler(eClass);
+            eh.onException(msg);
         }
         catch (Exception e)
         {
+            logger.error("Failed to handle Exception using handler: " +
+                    (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
 
-            logger.error("Failed to handle Exception using handler: " + eb.getClass().getName() + " : " + e);
-            if (eb instanceof DefaultHandler)
+            if (eh instanceof DefaultHandler)
             {
                 logger.error(
                     "As the failure happened in the Default Exception handler, now using Fatal Behaviour "
@@ -109,7 +103,7 @@ public class ErrorManager
                 handleFatal(e);
 
             }
-            else if (eb instanceof FatalHandler)
+            else if (eh instanceof FatalHandler)
             {
                 logger.fatal("Exception caught handling Fatal exception: " + e);
                 ((MuleManager)MuleManager.getInstance()).shutdown(e, false);
@@ -120,11 +114,8 @@ public class ErrorManager
                     "Exception Handler resorting to Default Behaviour : "
                         + DefaultHandler.class.getName()
                         + ", due to exception in configured behavour : "
-                        + eb.getClass().getName()
-                        + " : "
-                        + e);
+                        + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
                 handleDefault(msg, e);
-
             }
         }
     }

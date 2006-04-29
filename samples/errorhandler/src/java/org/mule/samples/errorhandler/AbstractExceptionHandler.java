@@ -15,9 +15,6 @@
 
 package org.mule.samples.errorhandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -29,10 +26,6 @@ import java.util.Iterator;
  * @version $Revision$
  */
 public abstract class AbstractExceptionHandler implements ExceptionHandler {
-
-    /** logger used by this class */
-    private static transient Log logger =
-        LogFactory.getLog(AbstractExceptionHandler.class);
 
     protected HashMap registry = new HashMap();
     
