@@ -13,14 +13,6 @@
  */
 package org.mule.samples.echo;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.NullPayload;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
