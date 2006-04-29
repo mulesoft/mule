@@ -84,11 +84,11 @@ public class TemplateParser
             propname = match.substring(pre, match.length() - post);
             value = props.get(propname);
             if (value == null) {
-                logger.error("Value " + propname + " not found in context");
-                value = "";
+                if(logger.isWarnEnabled()) logger.warn("Value " + propname + " not found in context");
+            } else {
+                match = escape(match);
+                result = result.replaceAll(match, value.toString());
             }
-            match = escape(match);
-            result = result.replaceAll(match, value.toString());
         }
         return result;
     }
