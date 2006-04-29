@@ -86,8 +86,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 		for (Iterator it = actualResults.iterator(); it.hasNext();) {
 			Object result = it.next();
 			if (result instanceof Exception) throw (Exception)result;
-			
-	        if (expectedResult instanceof String && expectedResult instanceof String ) {
+
+	        if (expectedResult instanceof String && result instanceof String ) {
 	        	XMLAssert.assertXMLEqual((String)expectedResult, (String)result);			
 			} else {
 				XMLAssert.assertEquals(expectedResult, result);
