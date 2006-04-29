@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.jdbc;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -34,17 +35,20 @@ import java.util.regex.Pattern;
 public abstract class JdbcUtils
 {
 
-	public static void close(Connection con) throws SQLException
+    public static void close(Connection con) throws SQLException
     {
-        if (con != null && !con.isClosed()) {
+        if (con != null && !con.isClosed())
+        {
             con.close();
         }
     }
 
     public static void commitAndClose(Connection con) throws SQLException
     {
-        if (con != null) {
-            if (con.getAutoCommit() == false) {
+        if (con != null)
+        {
+            if (con.getAutoCommit() == false)
+            {
                 con.commit();
             }
             con.close();
@@ -53,8 +57,10 @@ public abstract class JdbcUtils
 
     public static void rollbackAndClose(Connection con) throws SQLException
     {
-        if (con != null) {
-            if (con.getAutoCommit() == false) {
+        if (con != null)
+        {
+            if (con.getAutoCommit() == false)
+            {
                 con.rollback();
             }
             con.close();
@@ -62,8 +68,8 @@ public abstract class JdbcUtils
     }
 
     /**
-     * Parse the given statement filling the parameter list and return the ready
-     * to use statement.
+     * Parse the given statement filling the parameter list and return the ready to
+     * use statement.
      * 
      * @param stmt
      * @param params
@@ -71,13 +77,15 @@ public abstract class JdbcUtils
      */
     public static String parseStatement(String stmt, List params)
     {
-        if (stmt == null) {
+        if (stmt == null)
+        {
             return stmt;
         }
         Pattern p = Pattern.compile("\\$\\{[^\\}]*\\}");
         Matcher m = p.matcher(stmt);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
+        StringBuffer sb = new StringBuffer(200);
+        while (m.find())
+        {
             String key = m.group();
             m.appendReplacement(sb, "?");
             params.add(key);
@@ -86,75 +94,106 @@ public abstract class JdbcUtils
         return sb.toString();
     }
 
-    public static Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object root) throws Exception
+    public static Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object root)
+            throws Exception
     {
         Object[] params = new Object[paramNames.size()];
-        for (int i = 0; i < paramNames.size(); i++) {
-        	boolean valueResolved = false;
-            String param = (String) paramNames.get(i);
+        for (int i = 0; i < paramNames.size(); i++)
+        {
+            String param = (String)paramNames.get(i);
             String name = param.substring(2, param.length() - 1);
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
-            if ("NOW".equalsIgnoreCase(name)) {
+
+            if ("NOW".equalsIgnoreCase(name))
+            {
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
                 foundValue = true;
-            } else if (root instanceof org.w3c.dom.Document) {
-				org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) root;
-				org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
-				try {
-				    Node node = dom4jDoc.selectSingleNode(name);
-				    if (node != null) {
-					    value = node.getText();
+            }
+            else if (root instanceof org.w3c.dom.Document)
+            {
+                org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document)root;
+                org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
+                try
+                {
+                    Node node = dom4jDoc.selectSingleNode(name);
+                    if (node != null)
+                    {
+                        value = node.getText();
                         foundValue = true;
-				    }
-                } catch (Exception ignored) {
-				    value = null;
-				}
-            } else if (root instanceof org.dom4j.Document) {
-				org.dom4j.Document dom4jDoc = (org.dom4j.Document) root;
-				try {
-				    Node node = dom4jDoc.selectSingleNode(name);
-				    if (node != null) {
-					    value = node.getText();
-                        foundValue = true;
-				    }
-		                } catch (Exception ignored) {
-				    value = null;
-				} 
-            } else if (root instanceof org.dom4j.Node) {
-				org.dom4j.Node dom4jNode = (org.dom4j.Node) root;
-				try {
-				    Node node = dom4jNode.selectSingleNode(name);
-				    if (node != null) {
-					    value = node.getText();
-                        foundValue = true;
-				    }
-		                } catch (Exception ignored) {
-				    value = null;
-				} 
-            } else {
-                try {
-                    value = PropertyUtils.getProperty(root, name);
-                    foundValue = (value!=null);
-                } catch (Exception ignored) {
-				    value = null;
+                    }
+                }
+                catch (Exception ignored)
+                {
+                    // ignore
                 }
             }
-            if (value == null) {
-                  value = endpoint.getProperty(name);
-                  foundValue = foundValue || endpoint.getProperties().containsKey(name);
-              }
-              if (name.equals("payload")) {
-                  value = root;
-                 foundValue = true;
-              }
-             // Allow null values which may be acceptable to the user
-             if (value == null && ! foundValue) {
-                  throw new IllegalArgumentException("Can not retrieve argument " + name);
-              }
-              params[i] = value;
+            else if (root instanceof org.dom4j.Document)
+            {
+                org.dom4j.Document dom4jDoc = (org.dom4j.Document)root;
+                try
+                {
+                    Node node = dom4jDoc.selectSingleNode(name);
+                    if (node != null)
+                    {
+                        value = node.getText();
+                        foundValue = true;
+                    }
+                }
+                catch (Exception ignored)
+                {
+                    // ignore
+                }
+            }
+            else if (root instanceof org.dom4j.Node)
+            {
+                org.dom4j.Node dom4jNode = (org.dom4j.Node)root;
+                try
+                {
+                    Node node = dom4jNode.selectSingleNode(name);
+                    if (node != null)
+                    {
+                        value = node.getText();
+                        foundValue = true;
+                    }
+                }
+                catch (Exception ignored)
+                {
+                    // ignore
+                }
+            }
+            else
+            {
+                try
+                {
+                    value = PropertyUtils.getProperty(root, name);
+                    foundValue = (value != null);
+                }
+                catch (Exception ignored)
+                {
+                    // ignore
+                }
+            }
+            if (value == null)
+            {
+                value = endpoint.getProperty(name);
+                foundValue = foundValue || endpoint.getProperties().containsKey(name);
+            }
+            if (name.equals("payload"))
+            {
+                value = root;
+                foundValue = true;
+            }
+            // Allow null values which may be acceptable to the user
+            if (value == null && !foundValue)
+            {
+                throw new IllegalArgumentException("Can not retrieve argument " + name);
+            }
+            params[i] = value;
         }
+
         return params;
     }
+
 }

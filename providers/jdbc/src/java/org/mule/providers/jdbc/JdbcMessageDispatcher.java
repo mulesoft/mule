@@ -176,7 +176,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                     return null;
                 }
             } while (true);
-            if (result != null && ackStmt != null) {
+            if (ackStmt != null) {
                 int nbRows = connector.createQueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpoint, ackParams, result));
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
