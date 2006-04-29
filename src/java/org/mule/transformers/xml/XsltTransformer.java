@@ -47,6 +47,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
     private String xslFile;
 
     public XsltTransformer() {
+        super();
     }
 
     /**

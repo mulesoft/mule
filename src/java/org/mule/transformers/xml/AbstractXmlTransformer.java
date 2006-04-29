@@ -94,33 +94,33 @@ abstract public class AbstractXmlTransformer extends AbstractTransformer {
         	return new ResultHolder() {
         		ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
         		StreamResult result = new StreamResult(resultStream);
-        		public Result getResult() { return result; };
-        		public Object getResultObject() { return resultStream.toByteArray(); };
+        		public Result getResult() { return result; }
+        		public Object getResultObject() { return resultStream.toByteArray(); }
         	};
         } else if (String.class.equals(desiredClass)) {
         	return new ResultHolder() {
         		StringWriter writer = new StringWriter();
         		StreamResult result = new StreamResult(writer);
-        		public Result getResult() { return result; };
-        		public Object getResultObject() { return writer.getBuffer().toString(); };
+        		public Result getResult() { return result; }
+        		public Object getResultObject() { return writer.getBuffer().toString(); }
         	};
         } else if (org.w3c.dom.Document.class.isAssignableFrom(desiredClass)) {
         	return new ResultHolder() {
         		DOMResult result = new DOMResult();
-        		public Result getResult() { return result; };
-        		public Object getResultObject() { return (org.w3c.dom.Document)result.getNode(); };
+        		public Result getResult() { return result; }
+        		public Object getResultObject() { return result.getNode(); }
         	};
         } else if (org.dom4j.io.DocumentResult.class.isAssignableFrom(desiredClass)) {
         	return new ResultHolder() {
         		DocumentResult result = new DocumentResult();
-        		public Result getResult() { return result; };
-        		public Object getResultObject() { return result; };
+        		public Result getResult() { return result; }
+        		public Object getResultObject() { return result; }
         	};
 	    } else if (org.dom4j.Document.class.isAssignableFrom(desiredClass)) {
 	    	return new ResultHolder() {
 	    		DocumentResult result = new DocumentResult();
-	    		public Result getResult() { return result; };
-	    		public Object getResultObject() { return ((DocumentResult)result).getDocument(); };
+	    		public Result getResult() { return result; }
+	    		public Object getResultObject() { return result.getDocument(); }
 	    	};
 	    }
 	    return null;

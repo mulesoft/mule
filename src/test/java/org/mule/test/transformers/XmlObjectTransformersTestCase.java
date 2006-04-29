@@ -1,6 +1,6 @@
 /*
  * $Header$
- * $Revision$
+ * $Revision: 1665 $
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
@@ -20,7 +20,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 1665 $
  */
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
