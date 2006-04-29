@@ -29,6 +29,7 @@ public class Customer implements Serializable
 
     public Customer()
     {
+        super();
     }
 
     public Customer(String name, int ssn)

@@ -16,8 +16,6 @@ package org.mule.samples.loanbroker.esb.bank;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.UMODescriptorAware;
-import org.mule.samples.loanbroker.esb.message.CreditProfile;
-import org.mule.samples.loanbroker.esb.message.CustomerQuoteRequest;
 import org.mule.samples.loanbroker.esb.message.LoanQuote;
 import org.mule.samples.loanbroker.esb.message.LoanQuoteRequest;
 import org.mule.umo.UMODescriptor;

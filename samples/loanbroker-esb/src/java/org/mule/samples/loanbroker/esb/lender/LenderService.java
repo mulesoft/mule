@@ -19,9 +19,6 @@ import org.mule.samples.loanbroker.esb.bank.Bank;
 import org.mule.samples.loanbroker.esb.message.CreditProfile;
 import org.mule.samples.loanbroker.esb.message.LoanQuoteRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * <code>DefaultLenderService</code> is responsible for contacting the relivant
  * banks depending on the amount of the loan
@@ -40,13 +37,13 @@ public class LenderService
     public Bank[] getLenderList(CreditProfile creditProfile, Double loanAmount)
     {
         Bank[] lenders;
-        if ((loanAmount.doubleValue() >= (double) 20000))
+        if ((loanAmount.doubleValue() >= 20000))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank1", getEndpoint("Bank1"));
             lenders[1] =new Bank("Bank2", getEndpoint("Bank2"));
 
-        } else if (((loanAmount.doubleValue() >= (double) 10000) && (loanAmount.doubleValue() <= (double) 19999)))
+        } else if (((loanAmount.doubleValue() >= 10000) && (loanAmount.doubleValue() <= 19999)))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank3", getEndpoint("Bank3"));

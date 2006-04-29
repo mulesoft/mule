@@ -40,6 +40,7 @@ public class LoanQuoteRequest implements Serializable
 
     public LoanQuoteRequest()
     {
+        super();
     }
 
     public Bank[] getLenders()
