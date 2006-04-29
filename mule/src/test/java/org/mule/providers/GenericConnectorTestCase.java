@@ -55,11 +55,11 @@ public class GenericConnectorTestCase extends AbstractMuleTestCase {
     private Work getTestWork() {
         return new Work() {
             public void release() {
-
+                // noop
             }
 
             public void run() {
-
+                // noop
             }
         };
     }
