@@ -69,16 +69,15 @@ public class TransactionCoordination
 
     public void unbindTransaction(UMOTransaction transaction) throws TransactionException
     {
-        UMOTransaction oldTx = (UMOTransaction) transactions.get();
-//        if(oldTx==null) {
-//            throw new IllegalTransactionStateException(new Message(Messages.TX_NO_CURRENT_TRANSACTION));
-//
-//        }
-        if (oldTx!=null && !oldTx.equals(transaction)) {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
+        try {
+            UMOTransaction oldTx = (UMOTransaction) transactions.get();
+            if (oldTx!=null && !oldTx.equals(transaction)) {
+                throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
+            }
+        } finally {
+            transactions.set(null);
+            decrementCounter();
         }
-        transactions.set(null);
-        decrementCounter();
     }
 
     public void bindTransaction(UMOTransaction transaction) throws TransactionException
