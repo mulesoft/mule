@@ -30,7 +30,7 @@ import java.util.Map;
 public class WSDLGenerationTestCase extends FunctionalTestCase {
 
     /**
-     * The generated proxy name have increasing counter if run
+     * The generated proxy names have increasing counter if run
      * from the top-level m2 build, can be e.g. $Proxy12.
      * Check optionally for 3 digits to be on the safe side.
      */
