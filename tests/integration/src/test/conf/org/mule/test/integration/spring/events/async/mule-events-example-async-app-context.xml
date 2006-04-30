@@ -4,6 +4,13 @@
     <bean id="jmsConnectionFactory" class="org.activemq.ActiveMQConnectionFactory">
 		<property name="brokerURL"><value>vm://localhost</value></property>
 		<property name="useEmbeddedBroker"><value>true</value></property>
+        <property name="brokerContainerFactory">
+            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
+                <constructor-arg index="0">
+                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
+                </constructor-arg>
+            </bean>
+        </property>
 	</bean>
 
     <!-- the jms server connector config -->
