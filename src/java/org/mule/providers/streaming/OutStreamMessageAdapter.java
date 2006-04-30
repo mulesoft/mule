@@ -17,7 +17,7 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.StringMessageHelper;
 
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
