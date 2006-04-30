@@ -66,7 +66,7 @@ public class JmsMessageUtils
         }
         else if (object instanceof Map) {
             MapMessage map = session.createMapMessage();
-            Map.Entry entry = null;
+            Map.Entry entry;
             Map temp = (Map)object;
 
             for (Iterator i = temp.entrySet().iterator(); i.hasNext();) {
@@ -81,7 +81,7 @@ public class JmsMessageUtils
             InputStream temp = (InputStream)object;
 
             byte[] buffer = new byte[1024 * 4];
-            int len = 0;
+            int len;
             try {
                 while ((len = temp.read(buffer)) != -1) {
                     stream.writeBytes(buffer, 0, len);
@@ -115,7 +115,7 @@ public class JmsMessageUtils
 
     public static Object getObjectForMessage(Message source) throws JMSException
     {
-        Object result = null;
+        Object result;
         try {
             if (source instanceof ObjectMessage) {
                 result = ((ObjectMessage)source).getObject();
@@ -137,7 +137,7 @@ public class JmsMessageUtils
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
                 byte[] buffer = new byte[1024 * 4];
-                int len = 0;
+                int len;
                 bm.reset();
                 while ((len = bm.readBytes(buffer)) != -1) {
                     baos.write(buffer, 0, len);
@@ -164,7 +164,7 @@ public class JmsMessageUtils
 
                 result = new java.util.Vector();
                 try {
-                    Object obj = null;
+                    Object obj;
                     while ((obj = sm.readObject()) != null) {
                         ((java.util.Vector)result).addElement(obj);
                     }
