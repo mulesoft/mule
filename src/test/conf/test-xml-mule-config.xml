@@ -59,7 +59,7 @@
             </properties>
         </transformer>
         <transformer name="TestTransformer" className="org.mule.transformers.NoActionTransformer"
-        			returnClass="[B" />
+                    returnClass="[B" />
     </transformers>
 
     <global-endpoints>

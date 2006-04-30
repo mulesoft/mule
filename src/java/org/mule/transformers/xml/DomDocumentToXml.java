@@ -32,12 +32,12 @@ public class DomDocumentToXml extends AbstractXmlTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try {
-        	// We now offer XML in byte OR String form.
-        	// String remains the default like before.
-        	if (byte[].class.equals(returnClass))
-        		return convertToBytes(src, encoding);
-        	else 
-        		return convertToText(src);
+            // We now offer XML in byte OR String form.
+            // String remains the default like before.
+            if (byte[].class.equals(returnClass))
+                return convertToBytes(src, encoding);
+            else
+                return convertToText(src);
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }

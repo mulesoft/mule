@@ -412,6 +412,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
     
     public void setEncoding(String encoding) {
-    	this.encoding = encoding;
+        this.encoding = encoding;
     }
 }

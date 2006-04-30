@@ -27,75 +27,75 @@ import java.io.Serializable;
 public abstract class AbstractEntry implements Entry, Serializable {
 
 
-	protected transient String currentState;
-	protected String name;
-	protected String installRoot;
-	protected String stateAtShutdown;
+    protected transient String currentState;
+    protected String name;
+    protected String installRoot;
+    protected String stateAtShutdown;
     protected transient Registry registry;
 
     protected AbstractEntry(Registry registry) {
-		this.currentState = UNKNOWN;
-		this.stateAtShutdown = UNKNOWN;
+        this.currentState = UNKNOWN;
+        this.stateAtShutdown = UNKNOWN;
         this.registry = registry;
-	}
+    }
 
-	protected void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
-		this.currentState = UNKNOWN;
-	}
+    protected void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.currentState = UNKNOWN;
+    }
 
-	
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Entry#getName()
-	 */
-	public String getName() {
-		return this.name;
-	}
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Entry#getInstallRoot()
-	 */
-	public String getInstallRoot() {
-		return this.installRoot;
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Entry#getName()
+     */
+    public String getName() {
+        return this.name;
+    }
 
-	/* (non-Javadoc)
-	 * @see javax.jbi.management.LifeCycleMBean#getCurrentState()
-	 */
-	public synchronized String getCurrentState() {
-		return this.currentState;
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Entry#getInstallRoot()
+     */
+    public String getInstallRoot() {
+        return this.installRoot;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Entry#getStatusAtShutdown()
-	 */
-	public String getStateAtShutdown() {
-		return this.stateAtShutdown;
-	}
+    /* (non-Javadoc)
+     * @see javax.jbi.management.LifeCycleMBean#getCurrentState()
+     */
+    public synchronized String getCurrentState() {
+        return this.currentState;
+    }
 
-	public void setCurrentState(String currentState) throws RegistryException {
-		this.currentState = currentState;
-		getRegistry().save();
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Entry#getStatusAtShutdown()
+     */
+    public String getStateAtShutdown() {
+        return this.stateAtShutdown;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Entry#setInstallRoot(java.lang.String)
-	 */
-	public void setInstallRoot(String installRoot) {
-		this.installRoot = installRoot;
-	}
+    public void setCurrentState(String currentState) throws RegistryException {
+        this.currentState = currentState;
+        getRegistry().save();
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Entry#setInstallRoot(java.lang.String)
+     */
+    public void setInstallRoot(String installRoot) {
+        this.installRoot = installRoot;
+    }
 
-	public void setStateAtShutdown(String statusAtShutdown) {
-		this.stateAtShutdown = statusAtShutdown;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Registry getRegistry() {
-		return registry;
-	}
+    public void setStateAtShutdown(String statusAtShutdown) {
+        this.stateAtShutdown = statusAtShutdown;
+    }
+
+    public Registry getRegistry() {
+        return registry;
+    }
 
     public void setRegistry(Registry registry) {
         this.registry = registry;

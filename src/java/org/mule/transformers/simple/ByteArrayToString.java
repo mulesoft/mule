@@ -39,9 +39,9 @@ public class ByteArrayToString extends AbstractTransformer
             return src;
         }
         if (encoding != null) {
-        	return StringMessageHelper.getString((byte[])src, encoding);
+            return StringMessageHelper.getString((byte[])src, encoding);
         } else {
-        	return StringMessageHelper.getString((byte[])src);
+            return StringMessageHelper.getString((byte[])src);
         }
     }
 }

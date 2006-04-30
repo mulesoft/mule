@@ -59,7 +59,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
               try {
                 return new String(result, encoding);
               } catch (UnsupportedEncodingException ex){
-            	return new String(result);
+                return new String(result);
               }
             } else {
               return new String(result);

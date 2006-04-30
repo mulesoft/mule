@@ -51,13 +51,13 @@ public class FutureMessageResult extends FutureTask
     }
 
     public UMOMessage getMessage()
-    	throws InterruptedException, ExecutionException, TransformerException
+        throws InterruptedException, ExecutionException, TransformerException
     {
         return this.getMessage(this.get());
     }
 
     public UMOMessage getMessage(long timeout)
-    	throws InterruptedException, ExecutionException, TimeoutException, TransformerException
+        throws InterruptedException, ExecutionException, TimeoutException, TransformerException
     {
         return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
     }
@@ -85,8 +85,8 @@ public class FutureMessageResult extends FutureTask
      */
     public void execute()
     {
-    	// TODO MULE-732 - rather use ExecutorService.submit()
-    	new Thread(this).start();
+        // TODO MULE-732 - rather use ExecutorService.submit()
+        new Thread(this).start();
     }
 
 }

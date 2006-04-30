@@ -53,111 +53,111 @@ abstract public class AbstractXmlTransformer extends AbstractTransformer {
     }
 
     public Source getXmlSource(Object src) {
-		if (src instanceof byte[]) {
-			return new StreamSource(new ByteArrayInputStream((byte[]) src));
-		} else if (src instanceof String) {
-			return new StreamSource(new StringReader((String) src));
-		} else if (src instanceof DocumentSource) {
-			return (Source) src;
-		} else if (src instanceof Document) {
-			return new DocumentSource((Document) src);
-		} else if (src instanceof org.w3c.dom.Document) {
-			return new DOMSource((org.w3c.dom.Document) src);
-		} else
-			return null;
-	}
-
-	/**
-	 * Result callback interface used when processing XML through JAXP 
-	 *
-	 */
-    protected static interface ResultHolder {
-		
-		/**
-		 * @return A Result to use in a transformation (e.g. writing a DOM to a stream) 
-		 */
-		Result getResult();
-
-		/**
-		 * @return The actual result as produced after the call to 'transform'.
-		 */
-		Object getResultObject();
-	}
-
-	/**
-	 * @param desiredClass Java class representing the desired format 
-	 * @return Callback interface representing the desiredClass - or null
-	 * if the return class isn't supported.
-	 */
-	protected static ResultHolder getResultHolder(Class desiredClass) {
-        if (byte[].class.equals(desiredClass)) {
-        	return new ResultHolder() {
-        		ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-        		StreamResult result = new StreamResult(resultStream);
-        		public Result getResult() { return result; }
-        		public Object getResultObject() { return resultStream.toByteArray(); }
-        	};
-        } else if (String.class.equals(desiredClass)) {
-        	return new ResultHolder() {
-        		StringWriter writer = new StringWriter();
-        		StreamResult result = new StreamResult(writer);
-        		public Result getResult() { return result; }
-        		public Object getResultObject() { return writer.getBuffer().toString(); }
-        	};
-        } else if (org.w3c.dom.Document.class.isAssignableFrom(desiredClass)) {
-        	return new ResultHolder() {
-        		DOMResult result = new DOMResult();
-        		public Result getResult() { return result; }
-        		public Object getResultObject() { return result.getNode(); }
-        	};
-        } else if (org.dom4j.io.DocumentResult.class.isAssignableFrom(desiredClass)) {
-        	return new ResultHolder() {
-        		DocumentResult result = new DocumentResult();
-        		public Result getResult() { return result; }
-        		public Object getResultObject() { return result; }
-        	};
-	    } else if (org.dom4j.Document.class.isAssignableFrom(desiredClass)) {
-	    	return new ResultHolder() {
-	    		DocumentResult result = new DocumentResult();
-	    		public Result getResult() { return result; }
-	    		public Object getResultObject() { return result.getDocument(); }
-	    	};
-	    }
-	    return null;
+        if (src instanceof byte[]) {
+            return new StreamSource(new ByteArrayInputStream((byte[]) src));
+        } else if (src instanceof String) {
+            return new StreamSource(new StringReader((String) src));
+        } else if (src instanceof DocumentSource) {
+            return (Source) src;
+        } else if (src instanceof Document) {
+            return new DocumentSource((Document) src);
+        } else if (src instanceof org.w3c.dom.Document) {
+            return new DOMSource((org.w3c.dom.Document) src);
+        } else
+            return null;
     }
 
-	protected String convertToText(Object obj)
-	 throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException {
-		// Catch the direct translations
-		if (obj instanceof String) {
-			return (String) obj;
-		} else if (obj instanceof Document) {
-			return ((Document) obj).asXML();
-		}
-		// No easy fix, so use the transformer.
-		Source src = getXmlSource(obj);
-		if (src == null) return null;
-		
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		
-		TransformerFactory.newInstance().newTransformer().transform(src, result);
-		return writer.getBuffer().toString();
-	}
+    /**
+     * Result callback interface used when processing XML through JAXP
+     *
+     */
+    protected static interface ResultHolder {
 
-	protected String convertToBytes(Object obj, String preferredEncoding)
-	 throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException {
-		// Always use the transformer, even for byte[] (to get the encoding right!)
-		Source src = getXmlSource(obj);
-		if (src == null) return null;
-		
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		
-		Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
-		idTransformer.setOutputProperty(OutputKeys.ENCODING, preferredEncoding);
-		idTransformer.transform(src, result);
-		return writer.getBuffer().toString();
-	}
+        /**
+         * @return A Result to use in a transformation (e.g. writing a DOM to a stream)
+         */
+        Result getResult();
+
+        /**
+         * @return The actual result as produced after the call to 'transform'.
+         */
+        Object getResultObject();
+    }
+
+    /**
+     * @param desiredClass Java class representing the desired format
+     * @return Callback interface representing the desiredClass - or null
+     * if the return class isn't supported.
+     */
+    protected static ResultHolder getResultHolder(Class desiredClass) {
+        if (byte[].class.equals(desiredClass)) {
+            return new ResultHolder() {
+                ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+                StreamResult result = new StreamResult(resultStream);
+                public Result getResult() { return result; }
+                public Object getResultObject() { return resultStream.toByteArray(); }
+            };
+        } else if (String.class.equals(desiredClass)) {
+            return new ResultHolder() {
+                StringWriter writer = new StringWriter();
+                StreamResult result = new StreamResult(writer);
+                public Result getResult() { return result; }
+                public Object getResultObject() { return writer.getBuffer().toString(); }
+            };
+        } else if (org.w3c.dom.Document.class.isAssignableFrom(desiredClass)) {
+            return new ResultHolder() {
+                DOMResult result = new DOMResult();
+                public Result getResult() { return result; }
+                public Object getResultObject() { return result.getNode(); }
+            };
+        } else if (org.dom4j.io.DocumentResult.class.isAssignableFrom(desiredClass)) {
+            return new ResultHolder() {
+                DocumentResult result = new DocumentResult();
+                public Result getResult() { return result; }
+                public Object getResultObject() { return result; }
+            };
+        } else if (org.dom4j.Document.class.isAssignableFrom(desiredClass)) {
+            return new ResultHolder() {
+                DocumentResult result = new DocumentResult();
+                public Result getResult() { return result; }
+                public Object getResultObject() { return result.getDocument(); }
+            };
+        }
+        return null;
+    }
+
+    protected String convertToText(Object obj)
+     throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException {
+        // Catch the direct translations
+        if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof Document) {
+            return ((Document) obj).asXML();
+        }
+        // No easy fix, so use the transformer.
+        Source src = getXmlSource(obj);
+        if (src == null) return null;
+
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+
+        TransformerFactory.newInstance().newTransformer().transform(src, result);
+        return writer.getBuffer().toString();
+    }
+
+    protected String convertToBytes(Object obj, String preferredEncoding)
+     throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException {
+        // Always use the transformer, even for byte[] (to get the encoding right!)
+        Source src = getXmlSource(obj);
+        if (src == null) return null;
+
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+
+        Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+        idTransformer.setOutputProperty(OutputKeys.ENCODING, preferredEncoding);
+        idTransformer.transform(src, result);
+        return writer.getBuffer().toString();
+    }
 
 }

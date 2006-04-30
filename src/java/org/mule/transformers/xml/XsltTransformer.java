@@ -56,9 +56,9 @@ public class XsltTransformer extends AbstractXmlTransformer {
 
     public void initialise() throws InitialisationException {
         try {
-    	    StreamSource source = getStreamSource();
-    	    TransformerFactory factory = TransformerFactory.newInstance();
-    	    transformer = factory.newTransformer(source);
+            StreamSource source = getStreamSource();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            transformer = factory.newTransformer(source);
         } catch (Throwable te) {
             throw new InitialisationException(te, this);
         }
@@ -101,7 +101,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
         }
     }
 
-	/**
+    /**
      * @return Returns the xslFile.
      */
     public String getXslFile() {

@@ -44,20 +44,20 @@ public class XmlRegistryStore implements RegistryStore {
         this.context = context;
     }
 
-	public void save(Registry registry) throws RegistryException {
-		synchronized (registry) {
-			try {
-				Writer w = new FileWriter(new File(registry.getStoreLocation()));
-				getXStream().toXML(registry, w);
-				w.close();
-			} catch (Exception e) {
-				throw new RegistryException("Could not save registry", e);
-			}
-		}
-	}
-	
+    public void save(Registry registry) throws RegistryException {
+        synchronized (registry) {
+            try {
+                Writer w = new FileWriter(new File(registry.getStoreLocation()));
+                getXStream().toXML(registry, w);
+                w.close();
+            } catch (Exception e) {
+                throw new RegistryException("Could not save registry", e);
+            }
+        }
+    }
 
-	public Registry load(String storeLocation) throws RegistryException {
+
+    public Registry load(String storeLocation) throws RegistryException {
         try {
             Reader r = new FileReader(storeLocation);
             AbstractRegistry reg = (AbstractRegistry) getXStream().fromXML(r);
@@ -69,29 +69,29 @@ public class XmlRegistryStore implements RegistryStore {
             throw new RegistryException("Could not load registry", e);
         }
     }
-	
-	public Registry create(String store, RegistryFactory factory) throws RegistryException {
-		Registry reg = factory.create(this, context);
+
+    public Registry create(String store, RegistryFactory factory) throws RegistryException {
+        Registry reg = factory.create(this, context);
         if(reg instanceof AbstractRegistry) {
             ((AbstractRegistry)reg).initialize();
             ((AbstractRegistry)reg).setStoreLocation(store);
         }
-		save(reg);
-		return reg;
-	}
-	
-	private static XStream getXStream() {
-		if (xstream == null) {
-			xstream = new XStream(new StaxDriver());
-//			xstream.alias("registry", BaseRegistry.class);
-//			xstream.alias("engine", EngineImpl.class);
-//			xstream.alias("binding", BindingImpl.class);
-//			xstream.alias("library", LibraryImpl.class);
-//			xstream.alias("assembly", AssemblyImpl.class);
-//			xstream.alias("unit", UnitImpl.class);
-		}
-		return xstream;
-	}
-	
-	private static transient XStream xstream;
+        save(reg);
+        return reg;
+    }
+
+    private static XStream getXStream() {
+        if (xstream == null) {
+            xstream = new XStream(new StaxDriver());
+//            xstream.alias("registry", BaseRegistry.class);
+//            xstream.alias("engine", EngineImpl.class);
+//            xstream.alias("binding", BindingImpl.class);
+//            xstream.alias("library", LibraryImpl.class);
+//            xstream.alias("assembly", AssemblyImpl.class);
+//            xstream.alias("unit", UnitImpl.class);
+        }
+        return xstream;
+    }
+
+    private static transient XStream xstream;
 }

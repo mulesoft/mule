@@ -38,8 +38,8 @@ import org.mule.util.Utility;
 
 public class WildcardFilter implements UMOFilter, ObjectFilter
 {
-	private static final Log LOGGER = LogFactory.getLog(WildcardFilter.class);
-	
+    private static final Log LOGGER = LogFactory.getLog(WildcardFilter.class);
+
     protected String[] patterns;
     protected String pattern;
     private boolean caseSensitive = true;
@@ -56,12 +56,12 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     
     public boolean accept(UMOMessage message)
     {
-    	try {
-    		return accept(message.getPayloadAsString());
-    	} catch (Exception e) {
-    		LOGGER.warn("An exception occured while filtering", e);
-    		return false;
-    	}
+        try {
+            return accept(message.getPayloadAsString());
+        } catch (Exception e) {
+            LOGGER.warn("An exception occured while filtering", e);
+            return false;
+        }
     }
 
     public boolean accept(Object object)

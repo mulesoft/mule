@@ -88,7 +88,7 @@ public class CounterFactory
         
         public String getName()
         {
-        	return this.name;
+            return this.name;
         }
     }
 

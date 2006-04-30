@@ -95,11 +95,11 @@ public class MuleTestUtils {
     public static UMOEvent getTestEvent(Object data) throws Exception
     {
         UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
-		UMOSession session = getTestSession(component);
-		return new MuleEvent(new MuleMessage(data, new HashMap()),
-				getTestEndpoint("test1",
-				UMOEndpoint.ENDPOINT_TYPE_SENDER),
-				session, true);
+        UMOSession session = getTestSession(component);
+        return new MuleEvent(new MuleMessage(data, new HashMap()),
+                getTestEndpoint("test1",
+                UMOEndpoint.ENDPOINT_TYPE_SENDER),
+                session, true);
     }
 
     public static UMOEventContext getTestEventContext(Object data) throws Exception

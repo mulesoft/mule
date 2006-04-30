@@ -50,11 +50,11 @@ public class UUDecoder extends AbstractTransformer
         String data = null;
         if (src instanceof byte[]) {
           if (encoding != null) {
-        	 try {
+             try {
                data = new String((byte[]) src, encoding);
-        	 } catch (UnsupportedEncodingException ex){
-        	   data = new String((byte[]) src);
-        	 }
+             } catch (UnsupportedEncodingException ex){
+               data = new String((byte[]) src);
+             }
           } else {
             data = new String((byte[]) src);
           }

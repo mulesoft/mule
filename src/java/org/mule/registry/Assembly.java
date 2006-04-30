@@ -20,11 +20,11 @@ package org.mule.registry;
  */
 public interface Assembly extends Entry {
 
-	void restoreState() throws RegistryException;
+    void restoreState() throws RegistryException;
 
-	void saveAndShutdown() throws RegistryException;
+    void saveAndShutdown() throws RegistryException;
 
-	boolean isTransient();
+    boolean isTransient();
 
     void setTransient(boolean isTransient);
 
@@ -55,24 +55,24 @@ public interface Assembly extends Entry {
      * @param name the name of the unit
      * @return the Unit or <code>null</code> if not found
      */
-	Unit getUnit(String name);
-	
-	/**
-	 * Get all units of this Assembly
-	 * @return the units of this Assembly
-	 */
-	Unit[] getUnits();
-	
-	/**
-	 * Return the descriptor for this component.
-	 * @return
-	 */
-	RegistryDescriptor getDescriptor() throws RegistryException;
+    Unit getUnit(String name);
+
+    /**
+     * Get all units of this Assembly
+     * @return the units of this Assembly
+     */
+    Unit[] getUnits();
+
+    /**
+     * Return the descriptor for this component.
+     * @return
+     */
+    RegistryDescriptor getDescriptor() throws RegistryException;
 
     void setDescriptor(RegistryDescriptor descriptor) throws RegistryException;
 
-	String deploy() throws RegistryException;
-	
-	String undeploy() throws RegistryException;
-	
+    String deploy() throws RegistryException;
+
+    String undeploy() throws RegistryException;
+
 }

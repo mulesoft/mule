@@ -27,20 +27,20 @@ public class IsXmlFilter implements UMOFilter {
     }
     
     private boolean accept(Object obj) {
-    	try {
-	        if (obj instanceof String) {
-	            DocumentHelper.parseText((String) obj);
-	        } else if (obj instanceof byte[]) {
+        try {
+            if (obj instanceof String) {
+                DocumentHelper.parseText((String) obj);
+            } else if (obj instanceof byte[]) {
                 new SAXReader().read(new InputSource(new ByteArrayInputStream((byte[]) obj)));
-	        } else {
-	        	throw new DocumentException("Object must be a string or byte array");
-	        }
-    		log.debug("Filter result = true (message is valid XML)");
-	        return true;
-    	} catch (DocumentException e) {
-    		log.debug("Filter result = false (message is not valid XML): " + e.getMessage());
-    		return false;
-    	}
+            } else {
+                throw new DocumentException("Object must be a string or byte array");
+            }
+            log.debug("Filter result = true (message is valid XML)");
+            return true;
+        } catch (DocumentException e) {
+            log.debug("Filter result = false (message is not valid XML): " + e.getMessage());
+            return false;
+        }
     }
 
     private static Log log = LogFactory.getLog(IsXmlFilter.class);

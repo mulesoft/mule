@@ -23,49 +23,49 @@ import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
  */
 
 public class CountDownLatch extends edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch
-	implements Lock
+    implements Lock
 {
 
-	public CountDownLatch(int count)
-	{
-		super(count);
-	}
+    public CountDownLatch(int count)
+    {
+        super(count);
+    }
 
-	public void lock()
-	{
-		try
-		{
-			super.await();
-		}
-		catch (InterruptedException ex)
-		{
-			// ignore
-		}
-	}
+    public void lock()
+    {
+        try
+        {
+            super.await();
+        }
+        catch (InterruptedException ex)
+        {
+            // ignore
+        }
+    }
 
-	public void lockInterruptibly() throws InterruptedException
-	{
-		super.await();
-	}
+    public void lockInterruptibly() throws InterruptedException
+    {
+        super.await();
+    }
 
-	public boolean tryLock()
-	{
-		return (super.getCount() == 0);
-	}
+    public boolean tryLock()
+    {
+        return (super.getCount() == 0);
+    }
 
-	public boolean tryLock(long time, TimeUnit unit) throws InterruptedException
-	{
-		return super.await(time, unit);
-	}
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException
+    {
+        return super.await(time, unit);
+    }
 
-	public void unlock()
-	{
-		super.countDown();
-	}
+    public void unlock()
+    {
+        super.countDown();
+    }
 
-	public Condition newCondition()
-	{
-		throw new UnsupportedOperationException();
-	}
+    public Condition newCondition()
+    {
+        throw new UnsupportedOperationException();
+    }
 
 }

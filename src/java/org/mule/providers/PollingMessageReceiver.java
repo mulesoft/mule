@@ -68,14 +68,14 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
         try {
             Thread.sleep(STARTUP_DELAY);
             while (!stopped.get()) {
-            	connected.whenTrue(null);
-        		try {
-        			poll();
-        		} catch (InterruptedException e) {
-        			return;
-        		} catch (Exception e) {
+                connected.whenTrue(null);
+                try {
+                    poll();
+                } catch (InterruptedException e) {
+                    return;
+                } catch (Exception e) {
                     handleException(e);
-        		}
+                }
                 Thread.sleep(frequency);
             }
         } catch (InterruptedException e) {

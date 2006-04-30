@@ -18,27 +18,27 @@ package org.mule.registry;
  */
 public interface Entry {
 
-	/**
-	 * Name of this entry
-	 * @return
-	 */
-	String getName();
+    /**
+     * Name of this entry
+     * @return
+     */
+    String getName();
 
     void setName(String name);
 
-	/**
-	 * Retrieves the installation directory.
-	 * @return the installation directory
-	 */
-	String getInstallRoot();
-	
-	/**
-	 * Sets the installation directory.
-	 * 
-	 * @param installRoot the installation directory
-	 */
-	void setInstallRoot(String installRoot);
-	
+    /**
+     * Retrieves the installation directory.
+     * @return the installation directory
+     */
+    String getInstallRoot();
+
+    /**
+     * Sets the installation directory.
+     *
+     * @param installRoot the installation directory
+     */
+    void setInstallRoot(String installRoot);
+
     /**
      * Get the current state of this managed compononent.
      * 
@@ -48,16 +48,16 @@ public interface Entry {
     String getCurrentState();
 
     /**
-	 * Status before JBI was shutdown.
-	 * @return
-	 */
-	String getStateAtShutdown();
+     * Status before JBI was shutdown.
+     * @return
+     */
+    String getStateAtShutdown();
 
-	/**
-	 * Set the state before the server was shutdown.
-	 * @param state
-	 */
-	void setStateAtShutdown(String state) throws RegistryException;
+    /**
+     * Set the state before the server was shutdown.
+     * @param state
+     */
+    void setStateAtShutdown(String state) throws RegistryException;
 
     void setCurrentState(String state) throws RegistryException;
 

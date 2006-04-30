@@ -19,22 +19,22 @@ import junit.framework.TestCase;
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class EndpointTransformerTestCase extends TestCase {
-	
-	public void testTransformerProperty() throws UMOException {
-		QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+
+    public void testTransformerProperty() throws UMOException {
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.getManager().registerTransformer(new NoActionTransformer());
-		UMOEndpoint endpoint = 
-			builder.registerEndpoint("test:///tmp?transformers=NoActionTransformer",
-									 "test", false);
-		assertEquals("NoActionTransformer", endpoint.getTransformer().getName());
-	}
+        UMOEndpoint endpoint =
+            builder.registerEndpoint("test:///tmp?transformers=NoActionTransformer",
+                                     "test", false);
+        assertEquals("NoActionTransformer", endpoint.getTransformer().getName());
+    }
 
     public void testResponseTransformerProperty() throws UMOException {
-		QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.getManager().registerTransformer(new NoActionTransformer());
-		UMOEndpoint endpoint =
-			builder.registerEndpoint("test:///tmp?responseTransformers=NoActionTransformer",
-									 "test", false);
-		assertEquals("NoActionTransformer", endpoint.getResponseTransformer().getName());
-	}
+        UMOEndpoint endpoint =
+            builder.registerEndpoint("test:///tmp?responseTransformers=NoActionTransformer",
+                                     "test", false);
+        assertEquals("NoActionTransformer", endpoint.getResponseTransformer().getName());
+    }
 }

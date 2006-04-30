@@ -19,8 +19,8 @@ package org.mule.registry;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 public interface Unit extends Entry {
-	
-	void init() throws RegistryException;
+
+    void init() throws RegistryException;
 
     /**
      * Start the item.
@@ -44,16 +44,16 @@ public interface Unit extends Entry {
      */
     void shutDown() throws RegistryException;
     
-	RegistryComponent getRegistryComponent();
+    RegistryComponent getRegistryComponent();
 
-	void setRegistryComponent(RegistryComponent component);
+    void setRegistryComponent(RegistryComponent component);
 
-	Assembly getAssembly();
+    Assembly getAssembly();
 
-	void setAssembly(Assembly assembly);
+    void setAssembly(Assembly assembly);
 
-	String deploy() throws RegistryException;
+    String deploy() throws RegistryException;
 
-	String undeploy() throws RegistryException;
-	
+    String undeploy() throws RegistryException;
+
 }

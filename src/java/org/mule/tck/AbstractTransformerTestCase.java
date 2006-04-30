@@ -38,7 +38,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     }
 
     protected  String normalizeString(String rawString) {
-    	return rawString.replaceAll("\r\n", "\n");
+        return rawString.replaceAll("\r\n", "\n");
     }
     
     public void testTransform() throws Exception
@@ -49,11 +49,11 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         Object expectedResult = getResultData();
         // Special case for string results
         if (result instanceof String && expectedResult instanceof String ) {
-			assertEquals(normalizeString((String)expectedResult), normalizeString((String)result));			
-		} else {
-			boolean b = compareResults(expectedResult, result);
-			assertTrue(b);
-		}
+            assertEquals(normalizeString((String)expectedResult), normalizeString((String)result));
+        } else {
+            boolean b = compareResults(expectedResult, result);
+            assertTrue(b);
+        }
     }
 
     public void testRoundtripTransform() throws Exception

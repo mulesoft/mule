@@ -25,246 +25,246 @@ import junit.framework.TestCase;
 
 public class WaitableBooleanTestCase extends TestCase
 {
-	private WaitableBoolean TRUE;
-	private WaitableBoolean FALSE;
+    private WaitableBoolean TRUE;
+    private WaitableBoolean FALSE;
 
-	public WaitableBooleanTestCase(String name)
-	{
-		super(name);
-	}
+    public WaitableBooleanTestCase(String name)
+    {
+        super(name);
+    }
 
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		TRUE = new WaitableBoolean(true);
-		FALSE = new WaitableBoolean(false);
-	}
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        TRUE = new WaitableBoolean(true);
+        FALSE = new WaitableBoolean(false);
+    }
 
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
 
-	public void testHashCode()
-	{
-		assertTrue(TRUE.hashCode() != FALSE.hashCode());
-		assertEquals(TRUE.hashCode(), (new WaitableBoolean(true)).hashCode());
-		assertEquals(FALSE.hashCode(), (new WaitableBoolean(false)).hashCode());
-	}
+    public void testHashCode()
+    {
+        assertTrue(TRUE.hashCode() != FALSE.hashCode());
+        assertEquals(TRUE.hashCode(), (new WaitableBoolean(true)).hashCode());
+        assertEquals(FALSE.hashCode(), (new WaitableBoolean(false)).hashCode());
+    }
 
-	public void testCompareToBoolean()
-	{
-		assertEquals(0, TRUE.compareTo(true));
-		assertEquals(1, TRUE.compareTo(false));
-		assertEquals(0, FALSE.compareTo(false));
-		assertEquals(-1, FALSE.compareTo(true));
-	}
+    public void testCompareToBoolean()
+    {
+        assertEquals(0, TRUE.compareTo(true));
+        assertEquals(1, TRUE.compareTo(false));
+        assertEquals(0, FALSE.compareTo(false));
+        assertEquals(-1, FALSE.compareTo(true));
+    }
 
-	public void testCompareToWaitableBoolean()
-	{
-		assertEquals(0, TRUE.compareTo(new WaitableBoolean(true)));
-		assertEquals(1, TRUE.compareTo(new WaitableBoolean(false)));
-		assertEquals(0, FALSE.compareTo(new WaitableBoolean(false)));
-		assertEquals(-1, FALSE.compareTo(new WaitableBoolean(true)));
-	}
+    public void testCompareToWaitableBoolean()
+    {
+        assertEquals(0, TRUE.compareTo(new WaitableBoolean(true)));
+        assertEquals(1, TRUE.compareTo(new WaitableBoolean(false)));
+        assertEquals(0, FALSE.compareTo(new WaitableBoolean(false)));
+        assertEquals(-1, FALSE.compareTo(new WaitableBoolean(true)));
+    }
 
-	public void testEqualsObject()
-	{
-		assertFalse(TRUE.equals(FALSE));
-		assertFalse(FALSE.equals(TRUE));
-		assertTrue(TRUE.equals(new WaitableBoolean(true)));
-		assertTrue(FALSE.equals(new WaitableBoolean(false)));
-	}
+    public void testEqualsObject()
+    {
+        assertFalse(TRUE.equals(FALSE));
+        assertFalse(FALSE.equals(TRUE));
+        assertTrue(TRUE.equals(new WaitableBoolean(true)));
+        assertTrue(FALSE.equals(new WaitableBoolean(false)));
+    }
 
-	public void testToString()
-	{
-		assertEquals("true", TRUE.toString());
-		assertEquals("false", FALSE.toString());
-	}
+    public void testToString()
+    {
+        assertEquals("true", TRUE.toString());
+        assertEquals("false", FALSE.toString());
+    }
 
-	public void testGet()
-	{
-		assertTrue(TRUE.get());
-		assertFalse(FALSE.get());
-	}
+    public void testGet()
+    {
+        assertTrue(TRUE.get());
+        assertFalse(FALSE.get());
+    }
 
-	public void testSet()
-	{
-		assertTrue(TRUE.set(true));
-		assertTrue(TRUE.set(false));
-		assertFalse(TRUE.set(true));
-		assertFalse(FALSE.set(false));
-		assertFalse(FALSE.set(true));
-		assertTrue(FALSE.set(true));
-	}
+    public void testSet()
+    {
+        assertTrue(TRUE.set(true));
+        assertTrue(TRUE.set(false));
+        assertFalse(TRUE.set(true));
+        assertFalse(FALSE.set(false));
+        assertFalse(FALSE.set(true));
+        assertTrue(FALSE.set(true));
+    }
 
-	public void testCommit()
-	{
-		assertTrue(TRUE.commit(true, true));
-		assertTrue(TRUE.get());
-		assertFalse(TRUE.commit(false, true));
-		assertTrue(TRUE.commit(true, false));
-		assertFalse(TRUE.get());
-		assertTrue(TRUE.commit(false, true));
-		assertTrue(TRUE.get());
-	}
+    public void testCommit()
+    {
+        assertTrue(TRUE.commit(true, true));
+        assertTrue(TRUE.get());
+        assertFalse(TRUE.commit(false, true));
+        assertTrue(TRUE.commit(true, false));
+        assertFalse(TRUE.get());
+        assertTrue(TRUE.commit(false, true));
+        assertTrue(TRUE.get());
+    }
 
-	public void testComplement()
-	{
-		assertFalse(TRUE.complement());
-		assertFalse(TRUE.get());
+    public void testComplement()
+    {
+        assertFalse(TRUE.complement());
+        assertFalse(TRUE.get());
 
-		assertTrue(FALSE.complement());
-		assertTrue(FALSE.get());
-	}
+        assertTrue(FALSE.complement());
+        assertTrue(FALSE.get());
+    }
 
-	public void testAnd()
-	{
-		assertTrue((new WaitableBoolean(true)).and(true));
-		assertFalse((new WaitableBoolean(true)).and(false));
-		assertFalse((new WaitableBoolean(false)).and(false));
-		assertFalse((new WaitableBoolean(false)).and(true));
+    public void testAnd()
+    {
+        assertTrue((new WaitableBoolean(true)).and(true));
+        assertFalse((new WaitableBoolean(true)).and(false));
+        assertFalse((new WaitableBoolean(false)).and(false));
+        assertFalse((new WaitableBoolean(false)).and(true));
 
-		assertTrue(TRUE.and(true));
-		assertTrue(TRUE.get());
-		assertFalse(TRUE.and(false));
-		assertFalse(TRUE.get());
-	}
+        assertTrue(TRUE.and(true));
+        assertTrue(TRUE.get());
+        assertFalse(TRUE.and(false));
+        assertFalse(TRUE.get());
+    }
 
-	public void testOr()
-	{
-		assertTrue((new WaitableBoolean(true)).or(true));
-		assertTrue((new WaitableBoolean(true)).or(false));
-		assertFalse((new WaitableBoolean(false)).or(false));
-		assertTrue((new WaitableBoolean(false)).or(true));
+    public void testOr()
+    {
+        assertTrue((new WaitableBoolean(true)).or(true));
+        assertTrue((new WaitableBoolean(true)).or(false));
+        assertFalse((new WaitableBoolean(false)).or(false));
+        assertTrue((new WaitableBoolean(false)).or(true));
 
-		assertTrue(TRUE.or(true));
-		assertTrue(TRUE.get());
-		assertTrue(TRUE.or(false));
-		assertTrue(TRUE.get());
-	}
+        assertTrue(TRUE.or(true));
+        assertTrue(TRUE.get());
+        assertTrue(TRUE.or(false));
+        assertTrue(TRUE.get());
+    }
 
-	public void testXor()
-	{
-		assertFalse((new WaitableBoolean(true)).xor(true));
-		assertTrue((new WaitableBoolean(true)).xor(false));
-		assertFalse((new WaitableBoolean(false)).xor(false));
-		assertTrue((new WaitableBoolean(false)).xor(true));
-	}
+    public void testXor()
+    {
+        assertFalse((new WaitableBoolean(true)).xor(true));
+        assertTrue((new WaitableBoolean(true)).xor(false));
+        assertFalse((new WaitableBoolean(false)).xor(false));
+        assertTrue((new WaitableBoolean(false)).xor(true));
+    }
 
-	public void testWhenFalse() throws InterruptedException
-	{
-		final WaitableBoolean blocker = new WaitableBoolean(true);
-		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+    public void testWhenFalse() throws InterruptedException
+    {
+        final WaitableBoolean blocker = new WaitableBoolean(true);
+        final WaitableBoolean actionPerformed = new WaitableBoolean(false);
 
-		Runnable switcher = new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Thread.sleep(500);
-					blocker.set(false);
-				}
-				catch (InterruptedException iex)
-				{
-					// ignore
-				}
-			}
-		};
+        Runnable switcher = new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(500);
+                    blocker.set(false);
+                }
+                catch (InterruptedException iex)
+                {
+                    // ignore
+                }
+            }
+        };
 
-		Runnable action = new Runnable()
-		{
-			public void run()
-			{
-				actionPerformed.set(true);
-			}
-		};
+        Runnable action = new Runnable()
+        {
+            public void run()
+            {
+                actionPerformed.set(true);
+            }
+        };
 
-		new Thread(switcher).start();
-		blocker.whenFalse(action);
-		assertFalse(blocker.get());
-		assertTrue(actionPerformed.get());
-	}
+        new Thread(switcher).start();
+        blocker.whenFalse(action);
+        assertFalse(blocker.get());
+        assertTrue(actionPerformed.get());
+    }
 
-	public void testWhenFalseAlreadyFalse() throws InterruptedException
-	{
-		final WaitableBoolean blocker = new WaitableBoolean(false);
-		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+    public void testWhenFalseAlreadyFalse() throws InterruptedException
+    {
+        final WaitableBoolean blocker = new WaitableBoolean(false);
+        final WaitableBoolean actionPerformed = new WaitableBoolean(false);
 
-		Runnable action = new Runnable()
-		{
-			public void run()
-			{
-				actionPerformed.set(true);
-			}
-		};
+        Runnable action = new Runnable()
+        {
+            public void run()
+            {
+                actionPerformed.set(true);
+            }
+        };
 
-		blocker.whenFalse(action);
-		assertFalse(blocker.get());
-		assertTrue(actionPerformed.get());
-	}
+        blocker.whenFalse(action);
+        assertFalse(blocker.get());
+        assertTrue(actionPerformed.get());
+    }
 
-	public void testWhenTrue() throws InterruptedException
-	{
-		final WaitableBoolean blocker = new WaitableBoolean(false);
-		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+    public void testWhenTrue() throws InterruptedException
+    {
+        final WaitableBoolean blocker = new WaitableBoolean(false);
+        final WaitableBoolean actionPerformed = new WaitableBoolean(false);
 
-		Runnable switcher = new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Thread.sleep(500);
-					blocker.set(true);
-				}
-				catch (InterruptedException iex)
-				{
-					// ignore
-				}
-			}
-		};
+        Runnable switcher = new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(500);
+                    blocker.set(true);
+                }
+                catch (InterruptedException iex)
+                {
+                    // ignore
+                }
+            }
+        };
 
-		Runnable action = new Runnable()
-		{
-			public void run()
-			{
-				actionPerformed.set(true);
-			}
-		};
+        Runnable action = new Runnable()
+        {
+            public void run()
+            {
+                actionPerformed.set(true);
+            }
+        };
 
-		new Thread(switcher).start();
-		blocker.whenTrue(action);
-		assertTrue(blocker.get());
-		assertTrue(actionPerformed.get());
-	}
+        new Thread(switcher).start();
+        blocker.whenTrue(action);
+        assertTrue(blocker.get());
+        assertTrue(actionPerformed.get());
+    }
 
-	public void testWhenTrueAlreadyTrue() throws InterruptedException
-	{
-		final WaitableBoolean blocker = new WaitableBoolean(true);
-		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+    public void testWhenTrueAlreadyTrue() throws InterruptedException
+    {
+        final WaitableBoolean blocker = new WaitableBoolean(true);
+        final WaitableBoolean actionPerformed = new WaitableBoolean(false);
 
-		Runnable action = new Runnable()
-		{
-			public void run()
-			{
-				actionPerformed.set(true);
-			}
-		};
+        Runnable action = new Runnable()
+        {
+            public void run()
+            {
+                actionPerformed.set(true);
+            }
+        };
 
-		blocker.whenTrue(action);
-		assertTrue(blocker.get());
-		assertTrue(actionPerformed.get());
-	}
+        blocker.whenTrue(action);
+        assertTrue(blocker.get());
+        assertTrue(actionPerformed.get());
+    }
 
-	public void testGetLock()
-	{
-		WaitableBoolean b = new WaitableBoolean(true);
-		assertSame(b, b.getLock());
+    public void testGetLock()
+    {
+        WaitableBoolean b = new WaitableBoolean(true);
+        assertSame(b, b.getLock());
 
-		b = new WaitableBoolean(true, this);
-		assertSame(this, b.getLock());
-	}
+        b = new WaitableBoolean(true, this);
+        assertSame(this, b.getLock());
+    }
 
 }

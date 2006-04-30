@@ -40,6 +40,6 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
     }
     
     protected  String normalizeString(String rawString) {
-    	return rawString.replaceAll("\r\n", "").replaceAll("\n", "");
+        return rawString.replaceAll("\r\n", "").replaceAll("\n", "");
     }
 }
