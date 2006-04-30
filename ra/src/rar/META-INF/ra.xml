@@ -67,7 +67,7 @@
                 <connection-impl-class>org.mule.ra.DefaultMuleConnection</connection-impl-class>
             </connection-definition>
             <transaction-support>NoTransaction</transaction-support>
-	        <authentication-mechanism>
+            <authentication-mechanism>
                 <authentication-mechanism-type>BasicPassword</authentication-mechanism-type>
                 <credential-interface>javax.resource.spi.security.PasswordCredential</credential-interface>
             </authentication-mechanism>
