@@ -296,12 +296,12 @@ public class HttpResponse
         disableKeepAlive = keepalive;
     }
 
-	public String getFallbackCharset() {
-		return fallbackCharset;
-	}
+    public String getFallbackCharset() {
+        return fallbackCharset;
+    }
 
-	public void setFallbackCharset(String overrideCharset) {
-		this.fallbackCharset = overrideCharset;
-	}
+    public void setFallbackCharset(String overrideCharset) {
+        this.fallbackCharset = overrideCharset;
+    }
 
 }

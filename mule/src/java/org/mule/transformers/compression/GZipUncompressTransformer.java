@@ -27,7 +27,7 @@ import java.io.IOException;
  * @version $Revision$
  */
 public class GZipUncompressTransformer extends GZipCompressTransformer
-{	
+{
     public GZipUncompressTransformer()
     {
         super();

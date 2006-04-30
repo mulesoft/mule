@@ -37,11 +37,11 @@ import javax.management.ObjectName;
 public class ComponentService implements ComponentServiceMBean, MBeanRegistration, ComponentStatsMBean
 {
 
-	/**
-	 * logger used by this class
-	 */
-	private static transient Log LOGGER = LogFactory.getLog(ComponentService.class);
-	
+    /**
+     * logger used by this class
+     */
+    private static transient Log LOGGER = LogFactory.getLog(ComponentService.class);
+
     private MBeanServer server;
 
     private String name;
@@ -158,22 +158,22 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
      */
     public void postRegister(Boolean registrationDone) {
-		try {
-			if (getComponent().getStatistics() != null) {
-				statsName = new ObjectName(objectName.getDomain()
-						+ ":type=org.mule.Statistics,component=" + getName());
+        try {
+            if (getComponent().getStatistics() != null) {
+                statsName = new ObjectName(objectName.getDomain()
+                        + ":type=org.mule.Statistics,component=" + getName());
                 // unregister old version if exists
                 if (this.server.isRegistered(statsName)) {
-                	this.server.unregisterMBean(statsName);
+                    this.server.unregisterMBean(statsName);
                 }
 
-				this.server.registerMBean(new ComponentStats(getComponent()
-						.getStatistics()), this.statsName);
-			}
-		} catch (Exception e) {
-			LOGGER.error("Error post-registering the MBean", e);
-		}
-	}
+                this.server.registerMBean(new ComponentStats(getComponent()
+                        .getStatistics()), this.statsName);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error post-registering the MBean", e);
+        }
+    }
 
     /*
      * (non-Javadoc)

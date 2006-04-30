@@ -39,7 +39,7 @@
             <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>

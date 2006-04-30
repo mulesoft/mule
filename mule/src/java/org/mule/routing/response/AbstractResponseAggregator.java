@@ -61,7 +61,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     public void process(UMOEvent event) throws RoutingException
     {
-    	AtomicBoolean doAggregate = new AtomicBoolean(false);
+        AtomicBoolean doAggregate = new AtomicBoolean(false);
         EventGroup eg = addEvent(event);
         doAggregate.compareAndSet(false, shouldAggregate(eg));
 

@@ -248,21 +248,21 @@ public class GraphConfig {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals(name)) {
                 if (i + 1 >= args.length) {
-		    break;
+            break;
                 } else {
                     String arg = args[i + 1];
                     if (arg.startsWith("-")) {
                         break;
                     } else {
                         rval = arg;
-			break;
+            break;
                     }
                 }
             }
         }
-	if(rval == null || rval.length() == 0) {
-	    rval = null;
-	}
+    if(rval == null || rval.length() == 0) {
+        rval = null;
+    }
         return rval;
     }
 
@@ -346,21 +346,21 @@ public class GraphConfig {
         this.outputFilename = outputFilename;
     }
 
-	public Properties getUrls() {
-		return urls;
-	}
+    public Properties getUrls() {
+        return urls;
+    }
 
-	public void setUrls(Properties urls) {
-		this.urls = urls;
-	}
+    public void setUrls(Properties urls) {
+        this.urls = urls;
+    }
 
-	public File getUrlsFile() {
-		return urlsFile;
-	}
+    public File getUrlsFile() {
+        return urlsFile;
+    }
 
-	public void setUrlsFile(File urlsFile) {
-		this.urlsFile = urlsFile;
-	}
+    public void setUrlsFile(File urlsFile) {
+        this.urlsFile = urlsFile;
+    }
 
     public boolean isShowConnectors() {
         return showConnectors;

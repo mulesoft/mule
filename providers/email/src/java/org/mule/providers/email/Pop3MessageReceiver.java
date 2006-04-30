@@ -84,7 +84,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
             if(inbox.length()==0) {
                 inbox = Pop3Connector.MAILBOX;
             } else {
-            	inbox = inbox.substring(1);	
+                inbox = inbox.substring(1);
             }
         } else {
             inbox = Pop3Connector.MAILBOX;

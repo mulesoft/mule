@@ -27,17 +27,17 @@ import org.mule.util.StringMessageHelper;
  */
 public class DefaultHandler extends AbstractExceptionHandler {
 
-	
-	public DefaultHandler() {
-		super();
-        registerException(Throwable.class);
-	}
 
-	public void processException(ErrorMessage message, Throwable t) throws HandlerException {
-	
-		System.out.println( StringMessageHelper.getBoilerPlate("Exception received in /n" +
+    public DefaultHandler() {
+        super();
+        registerException(Throwable.class);
+    }
+
+    public void processException(ErrorMessage message, Throwable t) throws HandlerException {
+
+        System.out.println( StringMessageHelper.getBoilerPlate("Exception received in /n" +
                 " DEFAULT EXCEPTION HANDLER /n." +
                 " Logic could be put in here to enrich the message content"));
-	}
+    }
 
 }

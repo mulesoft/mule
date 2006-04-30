@@ -42,10 +42,10 @@ public class ErrorManager
     private ExceptionHandler defaultHandler = null;
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.impl.MuleUMO#initialise(java.util.Properties)
-	 */
+     * (non-Javadoc)
+     *
+     * @see org.mule.impl.MuleUMO#initialise(java.util.Properties)
+     */
     public ErrorManager()
     {
         defaultHandler = new DefaultHandler();

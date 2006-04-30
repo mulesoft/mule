@@ -12,24 +12,24 @@ import org.mule.ide.core.model.IMuleModelElement;
  */
 public abstract class MuleModelElement implements IMuleModelElement {
 
-	/** Indicates whether the config was resolved and loaded */
-	private IStatus status = Status.OK_STATUS;
+    /** Indicates whether the config was resolved and loaded */
+    private IStatus status = Status.OK_STATUS;
 
-	/**
-	 * Sets the 'status' field.
-	 * 
-	 * @param status The 'status' value.
-	 */
-	protected void setStatus(IStatus status) {
-		this.status = status;
-	}
+    /**
+     * Sets the 'status' field.
+     *
+     * @param status The 'status' value.
+     */
+    protected void setStatus(IStatus status) {
+        this.status = status;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.ide.core.model.IMuleModelElement#getStatus()
-	 */
-	public IStatus getStatus() {
-		return status;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.ide.core.model.IMuleModelElement#getStatus()
+     */
+    public IStatus getStatus() {
+        return status;
+    }
 }

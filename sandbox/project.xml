@@ -28,19 +28,19 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>
 
     <build>
         <resources>
-			<resource>
-				<includes>
-					<include>${basedir}/../LICENSE.txt</include>
-					<include>${basedir}/licenses/*.*</include>
-				</includes>
-			</resource>
+            <resource>
+                <includes>
+                    <include>${basedir}/../LICENSE.txt</include>
+                    <include>${basedir}/licenses/*.*</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 

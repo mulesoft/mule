@@ -118,12 +118,12 @@
             </resources>
         </unitTest>
         <resources>
-			<resource>
-				<includes>
-					<include>${basedir}/../LICENSE.txt</include>
-					<include>${basedir}/licenses/*.*</include>
-				</includes>
-			</resource>
+            <resource>
+                <includes>
+                    <include>${basedir}/../LICENSE.txt</include>
+                    <include>${basedir}/licenses/*.*</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 </project>

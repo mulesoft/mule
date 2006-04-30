@@ -7,22 +7,22 @@ import org.mule.MuleServer;
 
 public class MuleShutdownCommand extends MuleCommand implements Serializable {
 
-	/** Command id */
-	private static final String ID = "shutdown";
+    /** Command id */
+    private static final String ID = "shutdown";
 
-	/** Command description */
-	private static final String DESCRIPTION = "Shutdown Server Instance";
+    /** Command description */
+    private static final String DESCRIPTION = "Shutdown Server Instance";
 
-	public MuleShutdownCommand() {
-		super(ID, DESCRIPTION);
-	}
+    public MuleShutdownCommand() {
+        super(ID, DESCRIPTION);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.ide.core.server.MuleCommand#executeOn(org.mule.MuleServer)
-	 */
-	public void executeOn(MuleServer server) {
-		MuleManager.getInstance().dispose();
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.ide.core.server.MuleCommand#executeOn(org.mule.MuleServer)
+     */
+    public void executeOn(MuleServer server) {
+        MuleManager.getInstance().dispose();
+    }
 }

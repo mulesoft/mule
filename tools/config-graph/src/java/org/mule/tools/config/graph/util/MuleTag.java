@@ -1,34 +1,34 @@
 package org.mule.tools.config.graph.util;
 
 public interface MuleTag {
-	String ATTRIBUTE_ADDRESS = "address";
+    String ATTRIBUTE_ADDRESS = "address";
 
-	String ELEMENT_ENDPOINT = "endpoint";
+    String ELEMENT_ENDPOINT = "endpoint";
 
-	String ATTRIBUTE_INBOUNDENDPOINT = "inboundEndpoint";
-	
-	String ATTRIBUTE_OUTBOUNDENDPOINT = "outboundEndpoint";
-	
-	String ATTRIBUTE_CLASS_NAME = "className";
-	String ATTRIBUTE_RETURN_CLASS = "returnClass";
+    String ATTRIBUTE_INBOUNDENDPOINT = "inboundEndpoint";
 
-	String ATTRIBUTE_NAME = "name";
-	String ATTRIBUTE_TYPE = "type";
-	String ATTRIBUTE_VALUE = "value";
-	String ATTRIBUTE_SYNCHRONOUS = "synchronous";
+    String ATTRIBUTE_OUTBOUNDENDPOINT = "outboundEndpoint";
 
-	String ELEMENT_AGENT = "agent";
-	String ELEMENT_AGENTS = "agents";
-	String ELEMENT_CONNECTOR = "connector";
-	String ELEMENT_CONNECTION_STRATEGY = "connection-strategy";
-	String ELEMENT_ENDPOINT_IDENTFIERS = "endpoint-identifiers";
-	String ELEMENT_TRANSFORMERS = "transformers";
-	String ELEMENT_TRANSFORMER = "transformer";
-	String ELEMENT_MODEL = "model";
-	String ELEMENT_MULE_DESCRIPTOR = "mule-descriptor";
-	String ELEMENT_EXCEPTION_STRATEGY = "exception-strategy";
-	String ELEMENT_CATCH_ALL_STRATEGY = "catch-all-strategy";
-	String ELEMENT_MULE_ENVIRONMENT_PROPERTIES = "mule-environment-properties";
+    String ATTRIBUTE_CLASS_NAME = "className";
+    String ATTRIBUTE_RETURN_CLASS = "returnClass";
+
+    String ATTRIBUTE_NAME = "name";
+    String ATTRIBUTE_TYPE = "type";
+    String ATTRIBUTE_VALUE = "value";
+    String ATTRIBUTE_SYNCHRONOUS = "synchronous";
+
+    String ELEMENT_AGENT = "agent";
+    String ELEMENT_AGENTS = "agents";
+    String ELEMENT_CONNECTOR = "connector";
+    String ELEMENT_CONNECTION_STRATEGY = "connection-strategy";
+    String ELEMENT_ENDPOINT_IDENTFIERS = "endpoint-identifiers";
+    String ELEMENT_TRANSFORMERS = "transformers";
+    String ELEMENT_TRANSFORMER = "transformer";
+    String ELEMENT_MODEL = "model";
+    String ELEMENT_MULE_DESCRIPTOR = "mule-descriptor";
+    String ELEMENT_EXCEPTION_STRATEGY = "exception-strategy";
+    String ELEMENT_CATCH_ALL_STRATEGY = "catch-all-strategy";
+    String ELEMENT_MULE_ENVIRONMENT_PROPERTIES = "mule-environment-properties";
 
     String ELEMENT_FILTER = "filter";
     String ELEMENT_LEFT_FILTER = "left-filter";

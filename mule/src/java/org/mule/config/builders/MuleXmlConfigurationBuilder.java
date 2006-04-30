@@ -625,9 +625,9 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
             public void begin(String string, String string1, Attributes attributes) throws Exception
             {
                 String value = attributes.getValue("name");
-				if (value == null) {
-					value = attributes.getValue("className");
-				}
+                if (value == null) {
+                    value = attributes.getValue("className");
+                }
                 UMOManager man = (UMOManager) digester.getRoot();
                 UMOInterceptorStack interceptorStack = man.lookupInterceptorStack(value);
                 MuleDescriptor temp = (MuleDescriptor) digester.peek();

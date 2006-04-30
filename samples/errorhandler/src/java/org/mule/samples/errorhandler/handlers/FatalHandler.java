@@ -37,8 +37,8 @@ public class FatalHandler extends DefaultHandler
        registerException(FatalException.class);
     }
 
-	public void processException(ErrorMessage message, Throwable t) throws HandlerException
-	{
+    public void processException(ErrorMessage message, Throwable t) throws HandlerException
+    {
         System.out.println( StringMessageHelper.getBoilerPlate("Exception received in \n" +
                 " FATAL EXCEPTION HANDLER \n." +
                 " Logic could be put in here to enrich the message content"));

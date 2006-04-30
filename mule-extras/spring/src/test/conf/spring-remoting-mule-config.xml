@@ -56,7 +56,7 @@
                     Set the classname of the POJO service bean.
                     This is consumed by SpringHttpInvokerComponent.
                     -->
-                <!--				<property name="serviceClass" value="jcej.httpInvoker.DoSomeWork"/>-->
+                <!--                <property name="serviceClass" value="jcej.httpInvoker.DoSomeWork"/>-->
                 <!--
                     Instead of setting the class, provide SpringHttpInvokerComponent
                     with a Spring managed bean instead.

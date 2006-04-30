@@ -61,9 +61,9 @@ public class MessageNotification extends UMOServerNotification
 
     protected String getPayloadToString()
     {
-    	if (source instanceof UMOConnectable) {
-    		return ((UMOConnectable) source).getConnectionDescription();
-    	}
+        if (source instanceof UMOConnectable) {
+            return ((UMOConnectable) source).getConnectionDescription();
+        }
         return source.toString();
     }
 

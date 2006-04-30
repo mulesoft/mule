@@ -43,15 +43,15 @@
         <property name="synchronous"><value>true</value></property>
         <property name="model"><value>test-model</value></property>
         <property name="serverUrl"><value></value></property>
-	    <property name="persistenceStrategy"><ref local="queuePS"/></property>
+        <property name="persistenceStrategy"><ref local="queuePS"/></property>
     </bean>
 
     <bean id="muleEndpointIdentifiers" class="java.util.HashMap">
         <constructor-arg>
             <map>
                 <entry key="AppleQueue"><value>test://apple.queue</value></entry>
-	            <entry key="Banana Queue"><value>test://banana.queue</value></entry>
-	            <entry key="Test Queue"><value>test://test.queue</value></entry>
+                <entry key="Banana Queue"><value>test://banana.queue</value></entry>
+                <entry key="Test Queue"><value>test://test.queue</value></entry>
             </map>
         </constructor-arg>
     </bean>
@@ -224,9 +224,9 @@
 
     <!-- by default the componet builder will use this context to resolve objects, though you can
     specify a different context config if you want -->
-	<bean id="containerContext" class="org.mule.extras.spring.SpringContainerContext"/>
+    <bean id="containerContext" class="org.mule.extras.spring.SpringContainerContext"/>
 
-	<bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
+    <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
         <property name="outboundEndpoint"><ref local="appleInEndpoint"/></property>
         <property name="outboundTransformer"><ref local="TestCompressionTransformer"/></property>
         <property name="implementation"><value>local:orange</value></property>
@@ -352,7 +352,7 @@
                 </property>
             </bean>
         </property>
-	</bean>
+    </bean>
 
     <bean id="appleComponent" class="org.mule.impl.MuleDescriptor">
         <property name="inboundEndpoint"><ref local="appleInEndpoint"/></property>
@@ -490,7 +490,7 @@
         <property name="entryPointResolver"><ref local="entryPointResolver"/></property>
         <property name="lifecycleAdapterFactory"><ref local="lifecycleAdapterFactory"/></property>
         <property name="exceptionListener"><ref local="dummyExceptionStrategy"/></property>
-	</bean>
+    </bean>
 
     <!-- components that are used by referencing the container throught the builder -->
     <bean id="fruitBowl" class="org.mule.tck.testmodels.fruit.FruitBowl">

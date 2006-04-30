@@ -94,15 +94,15 @@ public class UniversalSender extends BasicHandler {
                 msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector()).getAxisServer().getTypeMappingRegistry());
             }
             Object payload = null;
-        	int contentLength = 0;
+            int contentLength = 0;
             if (msgContext.getRequestMessage().countAttachments() > 0) {
                 File temp = File.createTempFile("soap", ".tmp");
                 temp.deleteOnExit(); // TODO cleanup files earlier (IOUtils has a file tracker)
-	            FileOutputStream fos = new FileOutputStream(temp);
-	            msgContext.getRequestMessage().writeTo(fos);
-	            fos.close();
-	            contentLength = (int) temp.length();
-	            payload = new FileInputStream(temp);
+                FileOutputStream fos = new FileOutputStream(temp);
+                msgContext.getRequestMessage().writeTo(fos);
+                fos.close();
+                contentLength = (int) temp.length();
+                payload = new FileInputStream(temp);
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 msgContext.getRequestMessage().writeTo(baos);
@@ -123,7 +123,7 @@ public class UniversalSender extends BasicHandler {
             }
             props.put("SOAPAction", uri);
             if (contentLength > 0) {
-            	props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
+                props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
             }
 
             if(props.get(HttpConstants.HEADER_CONTENT_TYPE)==null) {
@@ -153,7 +153,7 @@ public class UniversalSender extends BasicHandler {
                 }
                 // remove temp file created for streaming
                 if (payload instanceof File) {
-                	((File) payload).delete();
+                    ((File) payload).delete();
                 }
             } else {
                 session.dispatchEvent(dispatchEvent);

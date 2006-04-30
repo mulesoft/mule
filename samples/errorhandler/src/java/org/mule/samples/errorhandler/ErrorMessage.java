@@ -28,8 +28,8 @@ public class ErrorMessage
     private Throwable throwable;
     private Map properties = new HashMap();
     /**
-	 *  
-	 */
+     *
+     */
     public ErrorMessage()
     {
         super();
@@ -52,17 +52,17 @@ public class ErrorMessage
     }
 
     /**
-	 * @return Returns the exception.
-	 */
+     * @return Returns the exception.
+     */
     public ExceptionBean getException()
     {
         return exception;
     }
 
     /**
-	 * @param exception
-	 *            The exception to set.
-	 */
+     * @param exception
+     *            The exception to set.
+     */
     public void setException(ExceptionBean exception) throws InstantiationException
     {
         this.exception = exception;
@@ -70,34 +70,34 @@ public class ErrorMessage
     }
 
     /**
-	 * @return Returns the properties.
-	 */
+     * @return Returns the properties.
+     */
     public Map getProperties()
     {
         return properties;
     }
 
     /**
-	 * @param properties
-	 *            The properties to set.
-	 */
+     * @param properties
+     *            The properties to set.
+     */
     public void setProperties(Map properties)
     {
         this.properties = properties;
     }
 
     /**
-	 * @return Returns the throwable.
-	 */
+     * @return Returns the throwable.
+     */
     public Throwable getThrowable()
     {
         return throwable;
     }
 
     /**
-	 * @param throwable
-	 *            The throwable to set.
-	 */
+     * @param throwable
+     *            The throwable to set.
+     */
     public void setThrowable(Throwable throwable)
     {
         this.throwable = throwable;

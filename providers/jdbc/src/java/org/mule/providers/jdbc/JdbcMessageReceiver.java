@@ -64,13 +64,13 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-    	Connection con = null;
+        Connection con = null;
         try {
             con = this.connector.getConnection();
         } catch (Exception e) {
             throw new ConnectException(e, this);
         } finally {
-        	JdbcUtils.close(con);
+            JdbcUtils.close(con);
         }
     }
 

@@ -4,9 +4,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../../project.xml</extend>
     <groupId>mule</groupId>
-  	<artifactId>mule-vendor-ibmmqe</artifactId>
-  	<name>IBM MQe support</name>
-  	<dependencies>
+      <artifactId>mule-vendor-ibmmqe</artifactId>
+      <name>IBM MQe support</name>
+      <dependencies>
         <dependency>
             <artifactId>mule-jms-provider</artifactId>
             <groupId>mule</groupId>
@@ -14,7 +14,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -28,18 +28,18 @@
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
-	    <dependency>
-	      <groupId>MQeBase</groupId>
-	      <artifactId>MQeBase</artifactId>
-	      <jar>${basedir}/main/lib/MQe/MQeBase.jar</jar>
-	      <type>jar</type>
-	    </dependency>
-	    <dependency>
-	      <groupId>MQeJMS</groupId>
-	      <artifactId>MQeJMS</artifactId>
-	      <jar>${basedir}/main/lib/MQe/MQeJMS.jar</jar>
-	      <type>jar</type>
-	    </dependency>
-  	</dependencies>
+        <dependency>
+          <groupId>MQeBase</groupId>
+          <artifactId>MQeBase</artifactId>
+          <jar>${basedir}/main/lib/MQe/MQeBase.jar</jar>
+          <type>jar</type>
+        </dependency>
+        <dependency>
+          <groupId>MQeJMS</groupId>
+          <artifactId>MQeJMS</artifactId>
+          <jar>${basedir}/main/lib/MQe/MQeJMS.jar</jar>
+          <type>jar</type>
+        </dependency>
+      </dependencies>
 </project>
 

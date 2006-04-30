@@ -26,22 +26,22 @@ import org.mule.util.ClassHelper;
 public class ExceptionBean
 {
     /**
-	 * Specific details about the Throwable. For example, for <tt>FileNotFoundException</tt>,
-	 * this contains the name of the file that could not be found.
-	 */
+     * Specific details about the Throwable. For example, for <tt>FileNotFoundException</tt>,
+     * this contains the name of the file that could not be found.
+     */
     private String detailMessage;
 
     /**
-	 * The throwable that caused this throwable to get thrown, or null if this
-	 * throwable was not caused by another throwable, or if the causative
-	 * throwable is unknown.
-	 */
+     * The throwable that caused this throwable to get thrown, or null if this
+     * throwable was not caused by another throwable, or if the causative
+     * throwable is unknown.
+     */
 
     private ExceptionBean cause = null;
 
     /**
-	 * The stack trace, as returned by getStackTrace().
-	 */
+     * The stack trace, as returned by getStackTrace().
+     */
     private String[] stackTrace;
 
     static transient boolean showRootStackOnly = true;

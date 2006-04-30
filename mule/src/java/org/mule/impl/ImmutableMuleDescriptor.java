@@ -293,7 +293,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     
     public String getEncoding()
     {
-    	return encoding;
+        return encoding;
     }
 
     /*

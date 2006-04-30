@@ -32,94 +32,94 @@ import java.util.List;
  */
 public abstract class AbstractLibrary extends AbstractEntry implements Library {
 
-	protected List components;
-	protected List classPathElements;
-	protected boolean isClassLoaderParentFirst;
+    protected List components;
+    protected List classPathElements;
+    protected boolean isClassLoaderParentFirst;
     protected RegistryDescriptor descriptor;
 
-	protected AbstractLibrary(Registry registry) {
+    protected AbstractLibrary(Registry registry) {
         super(registry);
-		this.components = new ArrayList();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Library#getReferringComponents()
-	 */
-	public RegistryComponent[] getComponents() {
-		Collection c = new ArrayList();
-		for (Iterator it = this.components.iterator(); it.hasNext();) {
-			String ref = (String) it.next();
-			RegistryComponent comp = getRegistry().getComponent(ref);
-			c.add(comp);
-		}
-		return (RegistryComponent[]) c.toArray(new RegistryComponent[c.size()]);
-	}
-	
-	public void addComponent(RegistryComponent component) {
-		this.components.add(component.getName());
-	}
-	
-	public void removeComponent(RegistryComponent component) {
-		this.components.remove(component.getName());
-	}
+        this.components = new ArrayList();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
-	 */
-	protected void checkDescriptor() throws RegistryException {
-		super.checkDescriptor();
-		// Check that it is a service assembly
-		if (!getDescriptor().isSharedLibrary()) {
-			throw new RegistryException("shared library should be set");
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.jbi.management.LifeCycleMBean#start()
-	 */
-	public synchronized void install() throws RegistryException {
-		if (!getCurrentState().equals(UNKNOWN)) {
-			throw new RegistryException("Illegal status: " + getCurrentState());
-		}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Library#getReferringComponents()
+     */
+    public RegistryComponent[] getComponents() {
+        Collection c = new ArrayList();
+        for (Iterator it = this.components.iterator(); it.hasNext();) {
+            String ref = (String) it.next();
+            RegistryComponent comp = getRegistry().getComponent(ref);
+            c.add(comp);
+        }
+        return (RegistryComponent[]) c.toArray(new RegistryComponent[c.size()]);
+    }
+
+    public void addComponent(RegistryComponent component) {
+        this.components.add(component.getName());
+    }
+
+    public void removeComponent(RegistryComponent component) {
+        this.components.remove(component.getName());
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
+     */
+    protected void checkDescriptor() throws RegistryException {
+        super.checkDescriptor();
+        // Check that it is a service assembly
+        if (!getDescriptor().isSharedLibrary()) {
+            throw new RegistryException("shared library should be set");
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jbi.management.LifeCycleMBean#start()
+     */
+    public synchronized void install() throws RegistryException {
+        if (!getCurrentState().equals(UNKNOWN)) {
+            throw new RegistryException("Illegal status: " + getCurrentState());
+        }
         try {
             doInstall();
         } catch (Exception e) {
             throw new RegistryException(e);
         }
         // Set current state
-		setCurrentState(SHUTDOWN);
-	}
+        setCurrentState(SHUTDOWN);
+    }
 
-	/* (non-Javadoc)
-	 * @see javax.jbi.management.LifeCycleMBean#start()
-	 */
-	public synchronized void uninstall() throws RegistryException {
-		if (!getCurrentState().equals(SHUTDOWN)) {
-			throw new RegistryException("Illegal status: " + getCurrentState());
-		}
+    /* (non-Javadoc)
+     * @see javax.jbi.management.LifeCycleMBean#start()
+     */
+    public synchronized void uninstall() throws RegistryException {
+        if (!getCurrentState().equals(SHUTDOWN)) {
+            throw new RegistryException("Illegal status: " + getCurrentState());
+        }
         try {
             doUninstall();
         } catch (Exception e) {
             throw new RegistryException(e);
         }
         Utility.deleteTree(new File(getInstallRoot()));
-		getRegistry().removeLibrary(this);
-		setCurrentState(UNKNOWN);
-	}
+        getRegistry().removeLibrary(this);
+        setCurrentState(UNKNOWN);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Library#getClassPathElements()
-	 */
-	public List getClassPathElements() {
-		return this.classPathElements;
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Library#getClassPathElements()
+     */
+    public List getClassPathElements() {
+        return this.classPathElements;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Library#isClassLoaderParentFirst()
-	 */
-	public boolean isClassLoaderParentFirst() {
-		return this.isClassLoaderParentFirst;
-	}
+    /* (non-Javadoc)
+     * @see org.mule.jbi.registry.Library#isClassLoaderParentFirst()
+     */
+    public boolean isClassLoaderParentFirst() {
+        return this.isClassLoaderParentFirst;
+    }
 
     public void setDescriptor(RegistryDescriptor descriptor) {
         this.descriptor = descriptor;

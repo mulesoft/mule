@@ -7,10 +7,10 @@ package org.mule.ide.core.server;
  */
 public interface IMuleCommandListener {
 
-	/**
-	 * Called when a command is receved by the server controller.
-	 * 
-	 * @param command the command received
-	 */
-	public void commandReceived(MuleCommand command);
+    /**
+     * Called when a command is receved by the server controller.
+     *
+     * @param command the command received
+     */
+    public void commandReceived(MuleCommand command);
 }

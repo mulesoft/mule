@@ -34,7 +34,7 @@ public class AsyncSpringEventsTestCase extends SpringEventsTestCase
 
     public void testReceivingASpringEvent() throws Exception
     {
-    	//todo fix synchronisation issue
+        //todo fix synchronisation issue
     }
 
     public void testReceivingAllEvents() throws Exception {

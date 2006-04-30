@@ -52,56 +52,56 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     int running = 0;
     
     public synchronized void signalStarted() {
-    	++running;
+        ++running;
     }
     
     public synchronized void signalDone() {
-    	if (--running == 0) this.notify();
+        if (--running == 0) this.notify();
     }
     
     public void testParallelTransformation() throws Exception {
-    	final UMOTransformer transformer = getTransformer();
-    	
-    	for (int i=0; i < getParallelThreadCount(); ++i) {
-    		new Thread(new Runnable() {
-    			public void run() {
-    				signalStarted();
-    				for (int j=0; j < getCallsPerThread(); ++j) {
-    					try {
-							actualResults.add(transformer.transform(srcData));
-						} catch (TransformerException e) {
-							actualResults.add(e);
-						}
-    				}
-    				signalDone();
-    			}
-    		}).start();
-    	}
-    	checkResult();
+        final UMOTransformer transformer = getTransformer();
+
+        for (int i=0; i < getParallelThreadCount(); ++i) {
+            new Thread(new Runnable() {
+                public void run() {
+                    signalStarted();
+                    for (int j=0; j < getCallsPerThread(); ++j) {
+                        try {
+                            actualResults.add(transformer.transform(srcData));
+                        } catch (TransformerException e) {
+                            actualResults.add(e);
+                        }
+                    }
+                    signalDone();
+                }
+            }).start();
+        }
+        checkResult();
     }
 
     private synchronized void checkResult() throws Exception {
-		wait();
-		Object expectedResult = resultData;
-		for (Iterator it = actualResults.iterator(); it.hasNext();) {
-			Object result = it.next();
-			if (result instanceof Exception) throw (Exception)result;
+        wait();
+        Object expectedResult = resultData;
+        for (Iterator it = actualResults.iterator(); it.hasNext();) {
+            Object result = it.next();
+            if (result instanceof Exception) throw (Exception)result;
 
-	        if (expectedResult instanceof String && result instanceof String ) {
-	        	XMLAssert.assertXMLEqual((String)expectedResult, (String)result);			
-			} else {
-				XMLAssert.assertEquals(expectedResult, result);
-			}
-		}
-	}
+            if (expectedResult instanceof String && result instanceof String ) {
+                XMLAssert.assertXMLEqual((String)expectedResult, (String)result);
+            } else {
+                XMLAssert.assertEquals(expectedResult, result);
+            }
+        }
+    }
     private int getParallelThreadCount() {
-		return 20;
-	}
-	private int getCallsPerThread() {
-		return 100;
-	}
+        return 20;
+    }
+    private int getCallsPerThread() {
+        return 100;
+    }
 
-	protected  static String normalizeString(String rawString) {
-    	return rawString.replaceAll("\r\n", "\n");
+    protected  static String normalizeString(String rawString) {
+        return rawString.replaceAll("\r\n", "\n");
     }
 }

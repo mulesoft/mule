@@ -12,14 +12,14 @@
         </properties>
     </container-context>
 
-	<model name="test-quartz">
+    <model name="test-quartz">
 
         <mule-descriptor name="EchoUMO"
             inboundEndpoint="vm://input"
             implementation="org.mule.extras.quartz.DummyComponent"
             containerManaged="false">
         </mule-descriptor>
-		
-	</model>
+
+    </model>
 
 </mule-configuration>

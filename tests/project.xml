@@ -14,7 +14,7 @@
     <description>
         Integration tests ensure that Mule sub projects work well together. 
         Use cases are scenarios presented on the Mailing lists.
-	Vendor tests are tests that require a third-party product (database, application server, etc.) in order to run.
+    Vendor tests are tests that require a third-party product (database, application server, etc.) in order to run.
     </description>
     <url>http://wiki.muleumo.org/display/MULEPROJ/Integration+Tests</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
@@ -506,7 +506,7 @@
             <groupId>oro</groupId>
             <version>${oro_version}</version>
         </dependency>
-		<!-- required my ActiveMQ 3.x -->
+        <!-- required my ActiveMQ 3.x -->
         <dependency>
             <groupId>concurrent</groupId>
             <artifactId>concurrent</artifactId>
@@ -556,19 +556,19 @@
             <url>http://hsqldb.sourceforge.net/</url>
         </dependency>
         <dependency>
-        	<groupId>xapool</groupId>
-        	<artifactId>xapool</artifactId>
-        	<version>${xapool_version}</version>
+            <groupId>xapool</groupId>
+            <artifactId>xapool</artifactId>
+            <version>${xapool_version}</version>
         </dependency>
         <dependency>
-        	<groupId>hibernate</groupId>
-        	<artifactId>hibernate</artifactId>
-        	<version>${hibernate_version}</version>
+            <groupId>hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>${hibernate_version}</version>
         </dependency>
         <dependency>
-        	<groupId>groovy</groupId>
-        	<artifactId>groovy-all</artifactId>
-        	<version>${groovy_version}</version>
+            <groupId>groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy_version}</version>
         </dependency>
         <!-- Quartz tests -->
         <dependency>

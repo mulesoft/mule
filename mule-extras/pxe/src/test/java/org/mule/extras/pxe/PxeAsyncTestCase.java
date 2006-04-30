@@ -58,7 +58,7 @@ public class PxeAsyncTestCase extends AbstractMuleTestCase
         dbf.setNamespaceAware(true);
         Document soap = dbf.newDocumentBuilder().parse(
                 ClassHelper.getResourceAsStream("asyncRequest.xml", getClass()));
-		Map props = new HashMap();
+        Map props = new HashMap();
         UMOMessage result = client.sendDirect("pxe", null, new DOMSource(soap.getDocumentElement()), props);
         assertNotNull(result);
         String xml = DOMUtils.domToString(((Element)result.getPayload()));
@@ -73,7 +73,7 @@ public class PxeAsyncTestCase extends AbstractMuleTestCase
         dbf.setNamespaceAware(true);
         Document soap = dbf.newDocumentBuilder().parse(
                 ClassHelper.getResourceAsStream("asyncRequest.xml", getClass()));
-		Map props = new HashMap();
+        Map props = new HashMap();
         client.dispatchDirect("pxe", new DOMSource(soap.getDocumentElement()), props);
         //todo apart from there being no exception how do I verify the result??
     }

@@ -31,9 +31,9 @@ import org.mule.umo.MessagingException;
 public class OracleJmsMessageAdapter extends JmsMessageAdapter {
 
     public OracleJmsMessageAdapter(Object message) throws MessagingException {
-    	super(message);
+        super(message);
     }
-	
+
     /** If the message payload is XML, returns the XML as an array of bytes.
      * If the message payload is an ADT, simply returns {@code Object.toString().getBytes()} 
      * in order to avoid a null pointer exception.  
@@ -41,21 +41,21 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
      * 
      * @see JmsMessageAdapter#getPayloadAsBytes */
     public byte[] getPayloadAsBytes() throws Exception {
-    	Object jmsMessage = getPayload();
-    	if (jmsMessage instanceof AdtMessage) {
-    		Object adtMessage = ((AdtMessage) jmsMessage).getAdtPayload();
-    		if (adtMessage instanceof XMLType) {
-    			return ((XMLType) adtMessage).getBytesValue();
-    		}
+        Object jmsMessage = getPayload();
+        if (jmsMessage instanceof AdtMessage) {
+            Object adtMessage = ((AdtMessage) jmsMessage).getAdtPayload();
+            if (adtMessage instanceof XMLType) {
+                return ((XMLType) adtMessage).getBytesValue();
+            }
             else {
                 return adtMessage.toString().getBytes();
             }
-    	}
+        }
         else {
             return super.getPayloadAsBytes();
         }
     }
-    	
+
     /** If the message payload is XML, returns the XML as a string.
      * If the message payload is an ADT, simply returns {@code Object.toString()} in 
      * order to avoid a null pointer exception.  
@@ -73,16 +73,16 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
      */
     public String getPayloadAsString(String encoding) throws Exception {
         Object jmsMessage = getPayload();
-    	if (jmsMessage instanceof AdtMessage) {
-    		Object adtMessage = ((AdtMessage) jmsMessage).getAdtPayload();
-    		if (adtMessage instanceof XMLType) {
-    			return ((XMLType) adtMessage).getStringVal();
-    		}
+        if (jmsMessage instanceof AdtMessage) {
+            Object adtMessage = ((AdtMessage) jmsMessage).getAdtPayload();
+            if (adtMessage instanceof XMLType) {
+                return ((XMLType) adtMessage).getStringVal();
+            }
             else {
                 return adtMessage.toString();
             }
-    	}
-    	else {
+        }
+        else {
             return super.getPayloadAsString(encoding);
         }
     }

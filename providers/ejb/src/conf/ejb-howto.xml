@@ -1,8 +1,8 @@
 
 <!-- 
-	receiverArgumentClass = class that implements EjbAble interface for EjbReceiver.
-	 
-	Current connector assumes that both Receiver and Dispatcher EJBHomes are registered to same JNDI instance
+    receiverArgumentClass = class that implements EjbAble interface for EjbReceiver.
+
+    Current connector assumes that both Receiver and Dispatcher EJBHomes are registered to same JNDI instance
 
 -->
 
@@ -13,13 +13,13 @@
         <property name="securityPolicy" value="wideopen.policy"/>
         <property name="pollingFrequency" value="20000"/>
       
-      	<property name="receiverArgumentClass" value="mule.test.ejb.EjbTester"/>
+          <property name="receiverArgumentClass" value="mule.test.ejb.EjbTester"/>
         
         <list name="methodArgumentTypes">
-	        <entry value="java.lang.String/"/>
-	        <entry value="java.lang.String/"/>
-    	  </list>    	
-    	    	
+            <entry value="java.lang.String/"/>
+            <entry value="java.lang.String/"/>
+          </list>
+
     </properties>
 </connector>
 

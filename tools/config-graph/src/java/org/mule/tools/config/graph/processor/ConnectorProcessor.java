@@ -12,34 +12,34 @@ import java.util.List;
 
 public class ConnectorProcessor extends TagProcessor {
 
-	public ConnectorProcessor( GraphEnvironment environment) {
-		super(environment);
-	}
+    public ConnectorProcessor( GraphEnvironment environment) {
+        super(environment);
+    }
 
-	public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
         if(!environment.getConfig().isShowConnectors()) return;
 
-		List connectorsElement = currentElement.getChildren(MuleTag.ELEMENT_CONNECTOR);
-		for (Iterator iter = connectorsElement.iterator(); iter.hasNext();) {
-			Element connector = (Element) iter.next();
-			GraphNode connectorNode = graph.addNode();
-			connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_CONNECTOR);
-			String name = connector.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
-			connectorNode.getInfo().setHeader(name);
+        List connectorsElement = currentElement.getChildren(MuleTag.ELEMENT_CONNECTOR);
+        for (Iterator iter = connectorsElement.iterator(); iter.hasNext();) {
+            Element connector = (Element) iter.next();
+            GraphNode connectorNode = graph.addNode();
+            connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_CONNECTOR);
+            String name = connector.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
+            connectorNode.getInfo().setHeader(name);
 
-			StringBuffer caption = new StringBuffer();
+            StringBuffer caption = new StringBuffer();
 
-			String className = connector.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
-			caption.append(MuleTag.ATTRIBUTE_CLASS_NAME + " :" + className + "\n");
+            String className = connector.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
+            caption.append(MuleTag.ATTRIBUTE_CLASS_NAME + " :" + className + "\n");
 
-			appendProfiles(connector, caption);
-			appendProperties(connector, caption);
-			appendDescription(connector, caption);
-			connectorNode.getInfo().setCaption(caption.toString());
+            appendProfiles(connector, caption);
+            appendProperties(connector, caption);
+            appendDescription(connector, caption);
+            connectorNode.getInfo().setCaption(caption.toString());
 
             //Process connection strategy
             ConnectionStrategyProcessor connectionStrategyProcessor = new ConnectionStrategyProcessor(environment);
             connectionStrategyProcessor.process(graph, connector, connectorNode);
-		}
-	}
+        }
+    }
 }

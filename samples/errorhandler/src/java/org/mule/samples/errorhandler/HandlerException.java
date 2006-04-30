@@ -13,11 +13,11 @@ import org.mule.umo.UMOException;
  */
 public class HandlerException extends UMOException {
 
-	public HandlerException(String message) {
-		super(Message.createStaticMessage(message));
-	}
-	
-	public HandlerException(String message, Throwable cause) {
-		super(Message.createStaticMessage(message), cause);
-	}
+    public HandlerException(String message) {
+        super(Message.createStaticMessage(message));
+    }
+
+    public HandlerException(String message, Throwable cause) {
+        super(Message.createStaticMessage(message), cause);
+    }
 }

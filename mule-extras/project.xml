@@ -30,18 +30,18 @@
                 <mule.mini>true</mule.mini>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>
     <build>
         <resources>
-			<resource>
-				<includes>
-					<include>${basedir}/../LICENSE.txt</include>
-					<include>${basedir}/licenses/*.*</include>
-				</includes>
-			</resource>
+            <resource>
+                <includes>
+                    <include>${basedir}/../LICENSE.txt</include>
+                    <include>${basedir}/licenses/*.*</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 </project>

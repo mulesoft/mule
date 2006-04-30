@@ -4,15 +4,15 @@
 
 <mule-configuration id="test" version="1.0">
 
-	<model name="model">
-		<mule-descriptor name="TcpReceiver" 
-			implementation="org.mule.components.simple.NullComponent"
-			inboundEndpoint="tcp://localhost:4444"
-			outboundEndpoint="file://temp/tests/mule">
-			<inbound-router>
-            	<router className="org.mule.routing.inbound.ForwardingConsumer"/>
-           	</inbound-router> 		
+    <model name="model">
+        <mule-descriptor name="TcpReceiver"
+            implementation="org.mule.components.simple.NullComponent"
+            inboundEndpoint="tcp://localhost:4444"
+            outboundEndpoint="file://temp/tests/mule">
+            <inbound-router>
+                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
+               </inbound-router>
         </mule-descriptor>
-	</model>
-	
+    </model>
+
 </mule-configuration>

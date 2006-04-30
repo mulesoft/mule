@@ -25,7 +25,7 @@
    }%>
 Enter a stock symbol:
 <form method="POST" name="submitSymbol" action="">
-	<table>
+    <table>
         <tr><td>
             <input type="text" name="symbol"/></td><td><input type="submit" name="Go" value=" Go " />
         </td></tr>

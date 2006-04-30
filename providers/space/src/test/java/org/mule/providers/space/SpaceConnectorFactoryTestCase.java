@@ -35,6 +35,6 @@ public class SpaceConnectorFactoryTestCase extends AbstractMuleTestCase
     }
     
     public String getEndpointURI() {
-    	return "space:/test.space";
+        return "space:/test.space";
     }
 }

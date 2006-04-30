@@ -22,5 +22,5 @@ import javax.activation.DataHandler;
  */
 public interface SoapAttachmentsFunctionalTest
 {
-	public String receiveMessageWithAttachments(String payload, DataHandler[] attachments);
+    public String receiveMessageWithAttachments(String payload, DataHandler[] attachments);
 }

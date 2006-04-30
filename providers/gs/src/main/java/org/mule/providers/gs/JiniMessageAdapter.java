@@ -30,8 +30,8 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 public class JiniMessageAdapter extends AbstractMessageAdapter
 {
-	private Entry message;
-	
+    private Entry message;
+
     public JiniMessageAdapter(Object message) throws MessagingException
     {
         if(message==null) {
@@ -40,7 +40,7 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
         if(message instanceof Entry) {
             this.message = (Entry)message;
         } else {
-    	    this.message = new JiniMessage(null, message);
+            this.message = new JiniMessage(null, message);
         }
     }
 
@@ -62,7 +62,7 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-    	Object payload = message;
+        Object payload = message;
         if(message instanceof JiniMessage) {
             payload = ((JiniMessage)message).getPayload();
         }

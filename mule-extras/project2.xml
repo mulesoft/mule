@@ -33,7 +33,7 @@
                 <mule.mini>true</mule.mini>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>

@@ -7,7 +7,7 @@ package org.mule.ide.core.server;
  */
 public class CommandSendException extends Exception {
 
-	public CommandSendException(String message) {
-		super(message);
-	}
+    public CommandSendException(String message) {
+        super(message);
+    }
 }

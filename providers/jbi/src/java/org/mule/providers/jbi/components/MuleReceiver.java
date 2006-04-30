@@ -106,7 +106,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
             this.receiver.setListener(this);
         } catch (Exception e) {
-        	// TODO fix me
+            // TODO fix me
             e.printStackTrace();
             throw new JBIException(e);
         }
@@ -134,7 +134,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
                 if(logger.isDebugEnabled()) {
                     StringBuffer buf = new StringBuffer("Found the following endpoints for: ");
-                   	buf.append(targetService).append(SystemUtils.LINE_SEPARATOR);
+                       buf.append(targetService).append(SystemUtils.LINE_SEPARATOR);
                     for (int i = 0; i < eps.length; i++) {
                         ServiceEndpoint ep = eps[i];
                         buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append(SystemUtils.LINE_SEPARATOR);

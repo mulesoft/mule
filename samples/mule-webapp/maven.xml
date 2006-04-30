@@ -38,7 +38,7 @@
             <fileset dir="../stockquote/conf">
                 <includes name="*.xsl"/>
             </fileset>
-	    </copy>
+        </copy>
 
         <!-- create the war -->
         <zip zipfile="mule.war">

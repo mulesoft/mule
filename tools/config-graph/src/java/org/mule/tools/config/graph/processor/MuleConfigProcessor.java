@@ -9,24 +9,24 @@ import org.mule.tools.config.graph.util.MuleTag;
 
 public class MuleConfigProcessor extends TagProcessor {
 
-	public MuleConfigProcessor( GraphEnvironment environment) {
-		super(environment);
-	}
+    public MuleConfigProcessor( GraphEnvironment environment) {
+        super(environment);
+    }
 
-	public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
 
-		Element muleConfig = currentElement.getChild(MuleTag.ELEMENT_MULE_ENVIRONMENT_PROPERTIES);
-		if(muleConfig!=null) {
+        Element muleConfig = currentElement.getChild(MuleTag.ELEMENT_MULE_ENVIRONMENT_PROPERTIES);
+        if(muleConfig!=null) {
             //Set whether the event flows are synchronous or not by default. This controls the style of arrows created
             String twoway = muleConfig.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS);
             environment.setDefaultTwoWay("true".equalsIgnoreCase(twoway));
             if(!environment.getConfig().isShowConfig()) return;
 
-			GraphNode configNode = graph.addNode();
-			configNode.getInfo().setFillColor(ColorRegistry.COLOR_CONFIG);
-			configNode.getInfo().setHeader("Mule Config");
+            GraphNode configNode = graph.addNode();
+            configNode.getInfo().setFillColor(ColorRegistry.COLOR_CONFIG);
+            configNode.getInfo().setHeader("Mule Config");
 
-			StringBuffer caption = new StringBuffer();
+            StringBuffer caption = new StringBuffer();
             appendAttribute(muleConfig, MuleTag.ATTRIBUTE_SYNCHRONOUS, caption);
             appendAttribute(muleConfig, "serverUrl", caption);
             appendAttribute(muleConfig, "clientMode", caption);
@@ -43,10 +43,10 @@ public class MuleConfigProcessor extends TagProcessor {
 
             ConnectionStrategyProcessor processor = new ConnectionStrategyProcessor(environment);
             processor.process(graph, muleConfig, configNode);
-			appendProfiles(muleConfig, caption);
-			appendDescription(muleConfig, caption);
+            appendProfiles(muleConfig, caption);
+            appendDescription(muleConfig, caption);
 
-			configNode.getInfo().setCaption(caption.toString());
-		}
-	}
+            configNode.getInfo().setCaption(caption.toString());
+        }
+    }
 }

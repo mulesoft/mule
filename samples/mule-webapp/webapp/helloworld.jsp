@@ -17,7 +17,7 @@
      <%}%>
 Please enter your name:
 <form method="POST" name="submitName" action="">
-	<table>
+    <table>
         <tr><td>
             <input type="text" name="name"/></td><td><input type="submit" name="Go" value=" Go " />
         </td></tr>

@@ -3,8 +3,8 @@
 <beans>
 
     <bean id="jmsConnectionFactory" class="org.activemq.ActiveMQConnectionFactory">
-		<property name="brokerURL"><value>vm://localhost</value></property>
-		<property name="useEmbeddedBroker"><value>true</value></property>
+        <property name="brokerURL"><value>vm://localhost</value></property>
+        <property name="useEmbeddedBroker"><value>true</value></property>
         <property name="brokerContainerFactory">
             <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
                 <constructor-arg index="0">
@@ -12,18 +12,18 @@
                 </constructor-arg>
             </bean>
         </property>
-	</bean>
+    </bean>
 
     <!-- the jms server connector config -->
-	<bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
-       	<property name="connectionFactory"><ref local="jmsConnectionFactory"/></property>
-       	<property name="specification"><value>1.1</value></property>
-		<property name="jndiProviderProperties">
-			<map>
-				<entry key="brokerURL"><value>vm://localhost</value></entry>
-			</map>
-		</property>
-	</bean>
+    <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
+           <property name="connectionFactory"><ref local="jmsConnectionFactory"/></property>
+           <property name="specification"><value>1.1</value></property>
+        <property name="jndiProviderProperties">
+            <map>
+                <entry key="brokerURL"><value>vm://localhost</value></entry>
+            </map>
+        </property>
+    </bean>
 
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
    application context will look in the container for a bean called applicationEventMulticaster and

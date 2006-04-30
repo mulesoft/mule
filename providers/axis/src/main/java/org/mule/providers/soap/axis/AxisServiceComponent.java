@@ -528,7 +528,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             // remove temporary file used for soap message with attachment
             if (request instanceof File) {
-            	((File) request).delete();
+                ((File) request).delete();
             }
             responseMsg = msgContext.getResponseMessage();
             if (responseMsg == null) {

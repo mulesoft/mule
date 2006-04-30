@@ -24,23 +24,23 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
 {
     public static final String CONFIG_INIT_PARAMETER = "org.mule.config";
 
-	public void init() throws ServletException
-	{
-		try
-		{
-			String config = getServletContext().getInitParameter(CONFIG_INIT_PARAMETER);
-			if(config == null)
-			{
-				config = getDefaultConfigResource();
-			}
-			
-			createManager(config, getServletContext());
-		}
-		catch (ConfigurationException e)
-		{
+    public void init() throws ServletException
+    {
+        try
+        {
+            String config = getServletContext().getInitParameter(CONFIG_INIT_PARAMETER);
+            if(config == null)
+            {
+                config = getDefaultConfigResource();
+            }
+
+            createManager(config, getServletContext());
+        }
+        catch (ConfigurationException e)
+        {
             getServletContext().log(e.getMessage(), e);
-		}
-	}
+        }
+    }
 
     /**
      * Used to actually construct the UMOManager instance
@@ -63,14 +63,14 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         return "/WEB-INF/mule-config.xml";
     }
 
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{
-		getServletContext().log("(" + request.getRequestURI() + ")" + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	}
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        getServletContext().log("(" + request.getRequestURI() + ")" + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
 
-	public void destroy()
-	{
+    public void destroy()
+    {
         MuleManager.getInstance().dispose();
-	}
+    }
 }

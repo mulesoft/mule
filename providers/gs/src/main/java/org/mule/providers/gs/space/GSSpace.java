@@ -53,7 +53,7 @@ public class GSSpace extends AbstractSpace {
 
     protected void findSpace(String spaceUrl) throws FinderException {
         logger.info("Connecting to space: " + spaceUrl);
-	    space = (JavaSpace)SpaceFinder.find(spaceUrl);
+        space = (JavaSpace)SpaceFinder.find(spaceUrl);
     }
 
     public void doPut(Object value) throws UMOSpaceException {

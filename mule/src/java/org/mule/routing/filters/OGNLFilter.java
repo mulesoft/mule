@@ -27,54 +27,54 @@ import org.mule.umo.UMOMessage;
 
 public class OGNLFilter implements UMOFilter
 {
-	private static final Log LOGGER = LogFactory.getLog(OGNLFilter.class);
+    private static final Log LOGGER = LogFactory.getLog(OGNLFilter.class);
 
-	private String expression;
+    private String expression;
 
-	public String getExpression()
-	{
-		return expression;
-	}
+    public String getExpression()
+    {
+        return expression;
+    }
 
-	public void setExpression(String expression)
-	{
-		this.expression = expression;
-	}
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
 
-	public boolean accept(UMOMessage message)
-	{
-		if (message == null)
-		{
-			return false;
-		}
+    public boolean accept(UMOMessage message)
+    {
+        if (message == null)
+        {
+            return false;
+        }
 
-		Object candidate = message.getPayload();
-		if (candidate == null)
-		{
-			return false;
-		}
+        Object candidate = message.getPayload();
+        if (candidate == null)
+        {
+            return false;
+        }
 
-		if (expression == null)
-		{
-			LOGGER.warn("Expression for OGNLFilter is not set");
-			return false;
-		}
+        if (expression == null)
+        {
+            LOGGER.warn("Expression for OGNLFilter is not set");
+            return false;
+        }
 
-		try
-		{
-			Object result = Ognl.getValue(expression, candidate);
-			if (result instanceof Boolean)
-			{
-				return ((Boolean)result).booleanValue();
-			}
-		}
+        try
+        {
+            Object result = Ognl.getValue(expression, candidate);
+            if (result instanceof Boolean)
+            {
+                return ((Boolean)result).booleanValue();
+            }
+        }
 
-		catch (OgnlException ex) {
+        catch (OgnlException ex) {
             LOGGER.error("Error evaluating OGNL expression.", ex);
         }
 
-		// default: reject
-		return false;
-	}
+        // default: reject
+        return false;
+    }
 
 }

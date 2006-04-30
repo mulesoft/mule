@@ -59,7 +59,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
         ((DefaultListableBeanFactory) beanDefinitionRegistry).registerCustomEditor(
-				UMOTransformer.class,
+                UMOTransformer.class,
                 new TransformerEditor());
     }
 

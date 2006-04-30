@@ -132,30 +132,30 @@ public class TemplateParser
     }
 
     private String escape(String string) {
-		int length = string.length();
-		if (length == 0) {
-			// nothing to do
-			return string;
-		}
-		else {
-			StringBuffer buffer = new StringBuffer(length*2);
-			for (int i = 0; i < length; i++) {
-				char currentCharacter = string.charAt(i);
-				switch (currentCharacter) {
-					case '[':
-					case ']':
-					case '{':
-					case '}':
-					case '$':
-						buffer.append("\\");
-						// fall through to append original character
-					default:
-						buffer.append(currentCharacter);
-				}
-			}
-			return buffer.toString();
-		}
-	}
+        int length = string.length();
+        if (length == 0) {
+            // nothing to do
+            return string;
+        }
+        else {
+            StringBuffer buffer = new StringBuffer(length*2);
+            for (int i = 0; i < length; i++) {
+                char currentCharacter = string.charAt(i);
+                switch (currentCharacter) {
+                    case '[':
+                    case ']':
+                    case '{':
+                    case '}':
+                    case '$':
+                        buffer.append("\\");
+                        // fall through to append original character
+                    default:
+                        buffer.append(currentCharacter);
+                }
+            }
+            return buffer.toString();
+        }
+    }
 
     public String getStyle() {
         return style;

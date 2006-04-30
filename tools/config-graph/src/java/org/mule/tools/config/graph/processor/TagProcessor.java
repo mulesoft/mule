@@ -14,57 +14,57 @@ import java.util.List;
 
 public abstract class TagProcessor {
 
-	protected static GraphEnvironment environment;
+    protected static GraphEnvironment environment;
 
 
-	public TagProcessor(GraphEnvironment env) {
-		environment = env;
-	}
+    public TagProcessor(GraphEnvironment env) {
+        environment = env;
+    }
 
     public abstract void process(Graph graph, Element currentElement, GraphNode parent);
 
-	public static void appendProperties(Element element, StringBuffer caption) {
-		Element properties = element.getChild(MuleTag.ELEMENT_PROPERTIES);
-		if (properties != null) {
-			for (Iterator iterator = properties.getChildren(MuleTag.ELEMENT_PROPERTY)
-					.iterator(); iterator.hasNext();) {
-				Element property = (Element) iterator.next();
-				caption.append(property.getAttributeValue(MuleTag.ATTRIBUTE_NAME) + " :"
-						+ lookupPropertyTemplate(property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE)) + "\n");
-			}
-		}
-		for (Iterator iterator = element.getAttributes().iterator(); iterator
-				.hasNext();) {
-			Attribute a = (Attribute) iterator.next();
-			if (!ignoreAttribute(a.getName())) {
-				caption.append(a.getName() + " :" + a.getValue() + "\n");
-			}
-		}
-	}
+    public static void appendProperties(Element element, StringBuffer caption) {
+        Element properties = element.getChild(MuleTag.ELEMENT_PROPERTIES);
+        if (properties != null) {
+            for (Iterator iterator = properties.getChildren(MuleTag.ELEMENT_PROPERTY)
+                    .iterator(); iterator.hasNext();) {
+                Element property = (Element) iterator.next();
+                caption.append(property.getAttributeValue(MuleTag.ATTRIBUTE_NAME) + " :"
+                        + lookupPropertyTemplate(property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE)) + "\n");
+            }
+        }
+        for (Iterator iterator = element.getAttributes().iterator(); iterator
+                .hasNext();) {
+            Attribute a = (Attribute) iterator.next();
+            if (!ignoreAttribute(a.getName())) {
+                caption.append(a.getName() + " :" + a.getValue() + "\n");
+            }
+        }
+    }
 
-	protected static boolean ignoreAttribute(String name) {
-		if (name == null || "".equals(name))
-			return true;
-		for (Iterator iterator = environment.getConfig().getIgnoredAttributes().iterator(); iterator
-				.hasNext();) {
-			String s = (String) iterator.next();
-			if (name.equals(s)) {
-				return true;
-			}
+    protected static boolean ignoreAttribute(String name) {
+        if (name == null || "".equals(name))
+            return true;
+        for (Iterator iterator = environment.getConfig().getIgnoredAttributes().iterator(); iterator
+                .hasNext();) {
+            String s = (String) iterator.next();
+            if (name.equals(s)) {
+                return true;
+            }
 
-		}
-		return false;
-	}
-	public static void appendDescription(Element e, StringBuffer caption) {
-		Element description = e.getChild(MuleTag.ELEMENT_DESCRIPTION);
-		if (description != null) {
-			caption.append("\n-------------------\n").append(
-					description.getText()).append("\n");
-		}
-	}
+        }
+        return false;
+    }
+    public static void appendDescription(Element e, StringBuffer caption) {
+        Element description = e.getChild(MuleTag.ELEMENT_DESCRIPTION);
+        if (description != null) {
+            caption.append("\n-------------------\n").append(
+                    description.getText()).append("\n");
+        }
+    }
 
     protected void appendProfiles(Element descriptor, StringBuffer caption) {
-		List elements  = descriptor.getChildren(MuleTag.ELEMENT_THREADING_PROFILE);
+        List elements  = descriptor.getChildren(MuleTag.ELEMENT_THREADING_PROFILE);
         for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
             Element threadingProfile = (Element) iterator.next();
             if (threadingProfile != null) {
@@ -75,20 +75,20 @@ public abstract class TagProcessor {
                 appendAttribute(threadingProfile, "id", caption);
             }
         }
-		Element poolingProfile = descriptor.getChild(MuleTag.ELEMENT_POOLING_PROFILE);
-		if (poolingProfile != null) {
-			appendAttribute(poolingProfile, "exhaustedAction", caption);
-			appendAttribute(poolingProfile, "maxActive", caption);
-			appendAttribute(poolingProfile, "maxIdle", caption);
-			appendAttribute(poolingProfile, "maxWait", caption);
-		}
+        Element poolingProfile = descriptor.getChild(MuleTag.ELEMENT_POOLING_PROFILE);
+        if (poolingProfile != null) {
+            appendAttribute(poolingProfile, "exhaustedAction", caption);
+            appendAttribute(poolingProfile, "maxActive", caption);
+            appendAttribute(poolingProfile, "maxIdle", caption);
+            appendAttribute(poolingProfile, "maxWait", caption);
+        }
 
         Element queueProfile = descriptor.getChild(MuleTag.ELEMENT_QUEUE_PROFILE);
-		if (queueProfile != null) {
-			appendAttribute(poolingProfile, "maxOutstandingMessages", caption);
-			appendAttribute(poolingProfile, "persistent", caption);
-		}
-	}
+        if (queueProfile != null) {
+            appendAttribute(poolingProfile, "maxOutstandingMessages", caption);
+            appendAttribute(poolingProfile, "persistent", caption);
+        }
+    }
 
     protected void appendAttribute(Element e, String name, StringBuffer caption) {
         if(e.getAttribute(name) == null) return;

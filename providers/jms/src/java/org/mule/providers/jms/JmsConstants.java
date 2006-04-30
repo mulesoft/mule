@@ -20,19 +20,19 @@ package org.mule.providers.jms;
 
 public class JmsConstants
 {
-	public static final String JMS_SPECIFICATION_102B = "1.0.2b";
-	public static final String JMS_SPECIFICATION_11 = "1.1";
+    public static final String JMS_SPECIFICATION_102B = "1.0.2b";
+    public static final String JMS_SPECIFICATION_11 = "1.1";
 
-	public static final String JMS_CORRELATION_ID = "JMSCorrelationID";
-	public static final String JMS_DELIVERY_MODE = "JMSDeliveryMode";
-	public static final String JMS_DESTINATION = "JMSDestination";
-	public static final String JMS_EXPIRATION = "JMSExpiration";
-	public static final String JMS_MESSAGE_ID = "JMSMessageID";
-	public static final String JMS_PRIORITY = "JMSPriority";
-	public static final String JMS_REDELIVERED = "JMSRedelivered";
-	public static final String JMS_REPLY_TO = "JMSReplyTo";
-	public static final String JMS_TIMESTAMP = "JMSTimestamp";
-	public static final String JMS_TYPE = "JMSType";
+    public static final String JMS_CORRELATION_ID = "JMSCorrelationID";
+    public static final String JMS_DELIVERY_MODE = "JMSDeliveryMode";
+    public static final String JMS_DESTINATION = "JMSDestination";
+    public static final String JMS_EXPIRATION = "JMSExpiration";
+    public static final String JMS_MESSAGE_ID = "JMSMessageID";
+    public static final String JMS_PRIORITY = "JMSPriority";
+    public static final String JMS_REDELIVERED = "JMSRedelivered";
+    public static final String JMS_REPLY_TO = "JMSReplyTo";
+    public static final String JMS_TIMESTAMP = "JMSTimestamp";
+    public static final String JMS_TYPE = "JMSType";
 
     //QoS properties
     public static final String TIME_TO_LIVE_PROPERTY = "timeToLive";

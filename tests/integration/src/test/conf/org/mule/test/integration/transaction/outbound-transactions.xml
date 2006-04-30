@@ -13,10 +13,10 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
                 <beans>
                 <bean id="jmsConnectionFactory"
-		class="org.activemq.ActiveMQConnectionFactory">
-		<property name="brokerURL"><value>vm://localhost</value></property>
-		<property name="useEmbeddedBroker"><value>true</value></property>
-	</bean>
+        class="org.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost</value></property>
+        <property name="useEmbeddedBroker"><value>true</value></property>
+    </bean>
                 </beans>
                 ]]>
             </text-property>
@@ -45,10 +45,10 @@
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
                     <endpoint address="jms://my.queue1">
-	                    <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                     </endpoint>
                     <endpoint address="jms://my.queue2">
-	                    <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                     </endpoint>
                     <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                 </router>

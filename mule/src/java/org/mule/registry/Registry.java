@@ -21,55 +21,55 @@ import org.mule.ManagementContext;
  */
 public interface Registry {
 
-	String getStoreLocation();
-	
-	RegistryComponent[] getComponents();
-	
-	RegistryComponent getComponent(String name);
+    String getStoreLocation();
+
+    RegistryComponent[] getComponents();
+
+    RegistryComponent getComponent(String name);
 
     ManagementContext getManagementContext();
 
     RegistryComponent addComponent(String name, ComponentType type) throws RegistryException;
 
 
-	/**
-	 * Remove a registered component from the list.
-	 * Internal use only.
-	 * 
-	 * @param component the component to remove
-	 */
-	void removeComponent(RegistryComponent component);
-	
-	/**
-	 * Return all engines. 
-	 * 
-	 * @return
-	 */
-	RegistryComponent[] getComponents(ComponentType type);
+    /**
+     * Remove a registered component from the list.
+     * Internal use only.
+     *
+     * @param component the component to remove
+     */
+    void removeComponent(RegistryComponent component);
+
+    /**
+     * Return all engines.
+     *
+     * @return
+     */
+    RegistryComponent[] getComponents(ComponentType type);
 
     RegistryComponent addTransientComponent(String name, ComponentType type, Object component, Object bootstrap) throws RegistryException;
 
-	Library[] getLibraries();
-	
-	Library getLibrary(String name);
-	
-	Library addLibrary(String name) throws RegistryException;
-	
-	void removeLibrary(Library library);
-	
-	Assembly[] getAssemblies();
-	
-	Assembly getAssembly(String name);
-	
-	Assembly addAssembly(String name);
-	
-	void removeAssembly(Assembly assembly);
-	
-	void addTransientUnit(String suName, RegistryComponent component, String installRoot) throws RegistryException;
-	
-	void start() throws RegistryException;
-	
-	void shutDown() throws RegistryException;
+    Library[] getLibraries();
+
+    Library getLibrary(String name);
+
+    Library addLibrary(String name) throws RegistryException;
+
+    void removeLibrary(Library library);
+
+    Assembly[] getAssemblies();
+
+    Assembly getAssembly(String name);
+
+    Assembly addAssembly(String name);
+
+    void removeAssembly(Assembly assembly);
+
+    void addTransientUnit(String suName, RegistryComponent component, String installRoot) throws RegistryException;
+
+    void start() throws RegistryException;
+
+    void shutDown() throws RegistryException;
 
     void save() throws RegistryException;
 

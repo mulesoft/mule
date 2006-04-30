@@ -36,6 +36,6 @@ public class GSConnectorFactoryTestCase extends AbstractMuleTestCase
     }
     
     public String getEndpointURI() {
-    	return "gs:rmi://localhoast:1000/MyContainer/JavaSpaces";
+        return "gs:rmi://localhoast:1000/MyContainer/JavaSpaces";
     }
 }

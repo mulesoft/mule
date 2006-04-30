@@ -29,90 +29,90 @@ import com.ibm.mqe.registry.MQeRegistry;
  */
 public class IBMMQeConnector extends JmsConnector {
 
-	private String queueManagerName;
+    private String queueManagerName;
 
-	private String baseDirectoryName;
+    private String baseDirectoryName;
 
-	private MQeQueueManager mqeQMgr;
+    private MQeQueueManager mqeQMgr;
 
     public String getProtocol() {
         return "mqe";
     }
 
     public void doInitialise() throws InitialisationException {
-    	setSpecification("1.0.2b");
-	    try {
-	    	startQueueManager();
-	    } catch (Exception e) {
-	    	throw new InitialisationException(
-				       new Message(Messages.X_FAILED_TO_INITIALISE, "MQe connector"), e, this);
-	    }
-		setConnectionFactory(new MQeQueueConnectionFactory());
-	    super.doInitialise();
-	}
+        setSpecification("1.0.2b");
+        try {
+            startQueueManager();
+        } catch (Exception e) {
+            throw new InitialisationException(
+                       new Message(Messages.X_FAILED_TO_INITIALISE, "MQe connector"), e, this);
+        }
+        setConnectionFactory(new MQeQueueConnectionFactory());
+        super.doInitialise();
+    }
 
-	/**
-	 * This creates and starts the QueueManager from a pre-existing registry.
-	 *
-	 */
-	public MQeQueueManager startQueueManager() throws Exception {
-		logger.debug("Starting the queue manager.");
+    /**
+     * This creates and starts the QueueManager from a pre-existing registry.
+     *
+     */
+    public MQeQueueManager startQueueManager() throws Exception {
+        logger.debug("Starting the queue manager.");
 
-		// Create all the configuration information needed to construct the
-		// queue manager in memory.
-		MQeFields config = new MQeFields();
+        // Create all the configuration information needed to construct the
+        // queue manager in memory.
+        MQeFields config = new MQeFields();
 
-		// Construct the queue manager section parameters.
-		MQeFields queueManagerSection = new MQeFields();
+        // Construct the queue manager section parameters.
+        MQeFields queueManagerSection = new MQeFields();
 
-		queueManagerSection.putAscii(MQeQueueManager.Name, queueManagerName);
-		config.putFields(MQeQueueManager.QueueManager, queueManagerSection);
+        queueManagerSection.putAscii(MQeQueueManager.Name, queueManagerName);
+        config.putFields(MQeQueueManager.QueueManager, queueManagerSection);
 
-		// Construct the registry section parameters.
-		// In this examples, we use a public registry.
-		MQeFields registrySection = new MQeFields();
+        // Construct the registry section parameters.
+        // In this examples, we use a public registry.
+        MQeFields registrySection = new MQeFields();
 
-		registrySection.putAscii(
-			MQeRegistry.Adapter,
-			"com.ibm.mqe.adapters.MQeDiskFieldsAdapter");
-		registrySection.putAscii(
-			MQeRegistry.DirName,
-			baseDirectoryName + queueManagerName + "/Registry");
+        registrySection.putAscii(
+            MQeRegistry.Adapter,
+            "com.ibm.mqe.adapters.MQeDiskFieldsAdapter");
+        registrySection.putAscii(
+            MQeRegistry.DirName,
+            baseDirectoryName + queueManagerName + "/Registry");
 
-		config.putFields("Registry", registrySection);
+        config.putFields("Registry", registrySection);
 
-		MQeQueueManager myQueueManager = new MQeQueueManager();
+        MQeQueueManager myQueueManager = new MQeQueueManager();
 
-		myQueueManager.activate(config);
-		logger.debug("Queue manager started.");
-		return myQueueManager;
-	}
+        myQueueManager.activate(config);
+        logger.debug("Queue manager started.");
+        return myQueueManager;
+    }
 
-	/**
-	 * @return Returns the queueManager.
-	 */
-	public String getQueueManagerName() {
-		return queueManagerName;
-	}
+    /**
+     * @return Returns the queueManager.
+     */
+    public String getQueueManagerName() {
+        return queueManagerName;
+    }
 
-	/**
-	 * @param queueManager The queueManager to set.
-	 */
-	public void setQueueManagerName(String queueManager) {
-		this.queueManagerName = queueManager;
-	}
+    /**
+     * @param queueManager The queueManager to set.
+     */
+    public void setQueueManagerName(String queueManager) {
+        this.queueManagerName = queueManager;
+    }
 
-	/**
-	 * @return Returns the baseDirectoryName.
-	 */
-	public String getBaseDirectoryName() {
-		return baseDirectoryName;
-	}
+    /**
+     * @return Returns the baseDirectoryName.
+     */
+    public String getBaseDirectoryName() {
+        return baseDirectoryName;
+    }
 
-	/**
-	 * @param baseDirectoryName The baseDirectoryName to set.
-	 */
-	public void setBaseDirectoryName(String baseDirectoryName) {
-		this.baseDirectoryName = baseDirectoryName;
-	}
+    /**
+     * @param baseDirectoryName The baseDirectoryName to set.
+     */
+    public void setBaseDirectoryName(String baseDirectoryName) {
+        this.baseDirectoryName = baseDirectoryName;
+    }
 }

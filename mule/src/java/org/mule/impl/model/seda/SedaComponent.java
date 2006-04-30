@@ -239,7 +239,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
 
         if (logger.isTraceEnabled()) {
-        	logger.trace("Event added to queue for: " + descriptor.getName());
+            logger.trace("Event added to queue for: " + descriptor.getName());
         }
     }
 
@@ -380,7 +380,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                             e));
                 }
             } finally {
-            	stopping.set(false);
+                stopping.set(false);
                 if (proxy != null && componentPerRequest) {
                     proxy.dispose();
                 }

@@ -22,36 +22,36 @@ public class MuleDocPostRenderer extends VelocitySupport implements PostRenderer
         template = env.getProperties().getProperty("muleDocTemplate");
         if(template==null)  {
             template = DEFAULT_MULE_TEMPLATE;
-		}
+        }
     }
 
-	public void postRender(GraphEnvironment env, Map context, Graph graph) {
-		
-		try {
+    public void postRender(GraphEnvironment env, Map context, Graph graph) {
 
-			VelocityContext velocityContext = new VelocityContext();
+        try {
 
-			for (Iterator iter = context.keySet().iterator(); iter.hasNext();) {
-				String key = (String) iter.next();
-				String value = (String) context.get(key);
-				velocityContext.put(key, value);
-			}
-			
-			velocityContext.put("graph",graph);
-			Template t = ve.getTemplate(template);
-			File file = new File(context.get("htmlFileName").toString());
-			FileWriter writer = new FileWriter(file);
+            VelocityContext velocityContext = new VelocityContext();
 
-			env.log("generating " + file);
+            for (Iterator iter = context.keySet().iterator(); iter.hasNext();) {
+                String key = (String) iter.next();
+                String value = (String) context.get(key);
+                velocityContext.put(key, value);
+            }
 
-			t.merge(velocityContext, writer);
-			writer.flush();
-			writer.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            velocityContext.put("graph",graph);
+            Template t = ve.getTemplate(template);
+            File file = new File(context.get("htmlFileName").toString());
+            FileWriter writer = new FileWriter(file);
+
+            env.log("generating " + file);
+
+            t.merge(velocityContext, writer);
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
-	
 
-	
+
+

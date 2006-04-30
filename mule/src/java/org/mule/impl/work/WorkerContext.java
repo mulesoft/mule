@@ -283,7 +283,7 @@ public class WorkerContext implements Work
         // and ignore/replace whatever is associated with the current thread.
         try {
             if (executionContext == null || executionContext.getXid() == null) {
-            	// TODO currently unused, see below
+                // TODO currently unused, see below
                 // ExecutionContext context = new ExecutionContext();
                 try {
                     worker.run();

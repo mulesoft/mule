@@ -14,39 +14,39 @@ import org.mule.schema.DocumentRoot;
  */
 public interface IMuleConfiguration extends IMuleModelElement, Comparable {
 
-	/**
-	 * Get the unique configuration id.
-	 * 
-	 * @return the unique id
-	 */
-	public String getId();
+    /**
+     * Get the unique configuration id.
+     *
+     * @return the unique id
+     */
+    public String getId();
 
-	/**
-	 * Get the configuration description.
-	 * 
-	 * @return the description
-	 */
-	public String getDescription();
+    /**
+     * Get the configuration description.
+     *
+     * @return the description
+     */
+    public String getDescription();
 
-	/**
-	 * Gets the project-relative path to the config file.
-	 * 
-	 * @return the path
-	 */
-	public String getRelativePath();
+    /**
+     * Gets the project-relative path to the config file.
+     *
+     * @return the path
+     */
+    public String getRelativePath();
 
-	/**
-	 * Get the project-relative IPath to the configuration file.
-	 * 
-	 * @return the project-relative path
-	 */
-	public IPath getFilePath();
+    /**
+     * Get the project-relative IPath to the configuration file.
+     *
+     * @return the project-relative path
+     */
+    public IPath getFilePath();
 
-	/**
-	 * Get the underlying EMF model document root object.
-	 * 
-	 * @return the EMF model
-	 * @throws MuleModelException
-	 */
-	public DocumentRoot getConfigDocument() throws MuleModelException;
+    /**
+     * Get the underlying EMF model document root object.
+     *
+     * @return the EMF model
+     * @throws MuleModelException
+     */
+    public DocumentRoot getConfigDocument() throws MuleModelException;
 }

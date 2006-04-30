@@ -63,11 +63,11 @@ public class DefaultMessageService implements MessageService {
     public void soapRequestResponse(SOAPEnvelope req, SOAPEnvelope resp) throws SOAPException {
         //Echo back
         logger.debug("envelopeTest Called");
-   	SOAPBody body = resp.getBody();
-    	Name ns0 =  resp.createName("TestNS0", "ns0", "http://example.com");
-    	Name ns1 =  resp.createName("TestNS1", "ns1", "http://example.com");
-    	SOAPElement bodyElmnt = body.addBodyElement(ns0);
-    	SOAPElement el = bodyElmnt.addChildElement(ns1);
-    	el.addTextNode("TEST RESPONSE");
+       SOAPBody body = resp.getBody();
+        Name ns0 =  resp.createName("TestNS0", "ns0", "http://example.com");
+        Name ns1 =  resp.createName("TestNS1", "ns1", "http://example.com");
+        SOAPElement bodyElmnt = body.addBodyElement(ns0);
+        SOAPElement el = bodyElmnt.addChildElement(ns1);
+        el.addTextNode("TEST RESPONSE");
     }
 }

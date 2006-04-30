@@ -193,11 +193,11 @@
 
     <!-- Endpoint Template -->
     <xsl:template match="endpoint|global-endpoint">
-		<xsl:element name="bean">
-			<xsl:if test="@name">
-				<xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
-			</xsl:if>
-			<xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
+        <xsl:element name="bean">
+            <xsl:if test="@name">
+                <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
@@ -233,14 +233,14 @@
     </xsl:template>
 
     <xsl:template match="interceptor">
-    	<xsl:choose>
-    		<xsl:when test="@name">
-    			<ref local="{@name}" />
-    		</xsl:when>
-    		<xsl:otherwise>
-    			<bean class="{@className}" />
-    		</xsl:otherwise>
-    	</xsl:choose>
+        <xsl:choose>
+            <xsl:when test="@name">
+                <ref local="{@name}" />
+            </xsl:when>
+            <xsl:otherwise>
+                <bean class="{@className}" />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="model">
@@ -343,9 +343,9 @@
             <xsl:apply-templates select="outbound-router"/>
             <xsl:apply-templates select="response-router"/>
             <property name="interceptors">
-				<list>
-					<xsl:apply-templates select="interceptor"/>
-				</list>
+                <list>
+                    <xsl:apply-templates select="interceptor"/>
+                </list>
             </property>
             <xsl:apply-templates select="exception-strategy"/>
             <xsl:apply-templates select="threading-profile"/>
@@ -617,8 +617,8 @@
         </property>
     </xsl:template>
 
-	<!-- security templates -->
-	<xsl:template match="security-manager">
+    <!-- security templates -->
+    <xsl:template match="security-manager">
         <xsl:variable name="type">
             <xsl:choose>
                 <xsl:when test="@className">
@@ -628,30 +628,30 @@
             </xsl:choose>
         </xsl:variable>
         <bean class="{$type}">
-        	<property name="providers">
-	        	<list>
-	        		<xsl:apply-templates select="security-provider"/>
-	        	</list>
-	        </property>
+            <property name="providers">
+                <list>
+                    <xsl:apply-templates select="security-provider"/>
+                </list>
+            </property>
         </bean>
-	</xsl:template>
-	<xsl:template match="security-provider">
+    </xsl:template>
+    <xsl:template match="security-provider">
         <xsl:variable name="type" select="@className"/>
-		<bean class="{$type}">
-			<property name="name"><value><xsl:value-of select="@name"/></value></property>
+        <bean class="{$type}">
+            <property name="name"><value><xsl:value-of select="@name"/></value></property>
             <xsl:apply-templates select="properties"/>
-		</bean>
-	</xsl:template>
-	<xsl:template match="security-filter">
-		<property name="securityFilter">
-			<bean class="{@className}">
-	            <xsl:apply-templates select="properties"/>
-	            <xsl:if test="@useProviders">
-	            	NOT IMPLEMENTED
-	            </xsl:if>
-			</bean>
-		</property>
-	</xsl:template>
+        </bean>
+    </xsl:template>
+    <xsl:template match="security-filter">
+        <property name="securityFilter">
+            <bean class="{@className}">
+                <xsl:apply-templates select="properties"/>
+                <xsl:if test="@useProviders">
+                    NOT IMPLEMENTED
+                </xsl:if>
+            </bean>
+        </property>
+    </xsl:template>
 
     <!-- general utilities -->
     <xsl:template name="makeBean">
@@ -711,13 +711,13 @@
         <property name="{local-name()}">
             <bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <property name="endpointURI">
-					<bean class="org.mule.impl.endpoint.MuleEndpointURI">
-						<constructor-arg index="0">
-							<value>
-								<xsl:value-of select="."/>
-							</value>
-						</constructor-arg>
-					</bean>
+                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                        <constructor-arg index="0">
+                            <value>
+                                <xsl:value-of select="."/>
+                            </value>
+                        </constructor-arg>
+                    </bean>
                 </property>
             </bean>
         </property>

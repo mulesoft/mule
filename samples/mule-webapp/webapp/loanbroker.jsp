@@ -46,7 +46,7 @@
      <%} else {%>
 <form method="POST" name="submitRequest" action="">
     Send 10 random requests:
-	<table>
+    <table>
         <tr><td>
             <input type="hidden" name="random" value="10"/><input type="submit" name="submit" value="Submit" />
         </td></tr>
@@ -55,7 +55,7 @@
 <br/>- Or -<br/>
 <form method="POST" name="submitRequest" action="">
     Please enter your Loan Details:
-	<table>
+    <table>
         <tr><td>Name: </td><td>
             <input type="text" name="name"/>
         </td></tr>

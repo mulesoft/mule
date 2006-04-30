@@ -29,95 +29,95 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  */
 public class MuleJobBean extends QuartzJobBean {
 
-	private String endpoint;
-	private String muleManager;
-	private Object payload;
-	private boolean synchronous = false;
-	
-	public MuleJobBean() {
-	}
+    private String endpoint;
+    private String muleManager;
+    private Object payload;
+    private boolean synchronous = false;
 
-	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		try {
-			MuleClient mc = new MuleClient();
-			if (muleManager != null) {
-				RemoteDispatcher rd = mc.getRemoteDispatcher(muleManager);
-				if (synchronous) {
-					rd.sendRemote(endpoint, payload, null);
-				} else {
-					rd.dispatchRemote(endpoint, payload, null);
-				}
-			} else {
-				if (synchronous) {
-					mc.send(endpoint, payload, null);
-				} else {
-					mc.dispatch(endpoint, payload, null);
-				}
-			}
-		} catch (Exception e) {
-			throw new JobExecutionException(e);
-		}
-	}
+    public MuleJobBean() {
+    }
 
-	/**
-	 * @return Returns the endpoint.
-	 */
-	public String getEndpoint() {
-		return endpoint;
-	}
-	
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        try {
+            MuleClient mc = new MuleClient();
+            if (muleManager != null) {
+                RemoteDispatcher rd = mc.getRemoteDispatcher(muleManager);
+                if (synchronous) {
+                    rd.sendRemote(endpoint, payload, null);
+                } else {
+                    rd.dispatchRemote(endpoint, payload, null);
+                }
+            } else {
+                if (synchronous) {
+                    mc.send(endpoint, payload, null);
+                } else {
+                    mc.dispatch(endpoint, payload, null);
+                }
+            }
+        } catch (Exception e) {
+            throw new JobExecutionException(e);
+        }
+    }
 
-	/**
-	 * @param endpoint The endpoint to set.
-	 */
-	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
-	}
-	
+    /**
+     * @return Returns the endpoint.
+     */
+    public String getEndpoint() {
+        return endpoint;
+    }
 
-	/**
-	 * @return Returns the muleManager.
-	 */
-	public String getMuleManager() {
-		return muleManager;
-	}
-	
 
-	/**
-	 * @param muleManager The muleManager to set.
-	 */
-	public void setMuleManager(String muleManager) {
-		this.muleManager = muleManager;
-	}
-	
+    /**
+     * @param endpoint The endpoint to set.
+     */
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
 
-	/**
-	 * @return Returns the payload.
-	 */
-	public Object getPayload() {
-		return payload;
-	}
-	
 
-	/**
-	 * @param payload The payload to set.
-	 */
-	public void setPayload(Object payload) {
-		this.payload = payload;
-	}
+    /**
+     * @return Returns the muleManager.
+     */
+    public String getMuleManager() {
+        return muleManager;
+    }
 
-	/**
-	 * @param synchronous The synchronous to set.
-	 */
-	public void setSynchronous(boolean synchronous) {
-		this.synchronous = synchronous;
-	}
 
-	/**
-	 * @return Returns the synchronous.
-	 */
-	public boolean isSynchronous() {
-		return synchronous;
-	}
+    /**
+     * @param muleManager The muleManager to set.
+     */
+    public void setMuleManager(String muleManager) {
+        this.muleManager = muleManager;
+    }
+
+
+    /**
+     * @return Returns the payload.
+     */
+    public Object getPayload() {
+        return payload;
+    }
+
+
+    /**
+     * @param payload The payload to set.
+     */
+    public void setPayload(Object payload) {
+        this.payload = payload;
+    }
+
+    /**
+     * @param synchronous The synchronous to set.
+     */
+    public void setSynchronous(boolean synchronous) {
+        this.synchronous = synchronous;
+    }
+
+    /**
+     * @return Returns the synchronous.
+     */
+    public boolean isSynchronous() {
+        return synchronous;
+    }
 
 }

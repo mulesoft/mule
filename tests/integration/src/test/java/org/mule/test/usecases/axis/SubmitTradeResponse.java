@@ -16,7 +16,7 @@ public class SubmitTradeResponse  implements java.io.Serializable {
     }
 
     public SubmitTradeResponse(
-    		org.mule.test.usecases.axis.TradeStatus _return) {
+            org.mule.test.usecases.axis.TradeStatus _return) {
            this._return = _return;
     }
 

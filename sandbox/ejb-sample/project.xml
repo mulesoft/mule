@@ -16,10 +16,10 @@
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
-    	<!--<dependency>-->
+        <!--<dependency>-->
             <!--<groupId>geronimo-spec</groupId>-->
             <!--<artifactId>geronimo-spec-ejb</artifactId>-->
             <!--<version>${geronimo_spec_ejb_version}</version>-->

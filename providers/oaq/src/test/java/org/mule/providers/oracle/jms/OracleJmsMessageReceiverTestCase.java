@@ -33,24 +33,24 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public UMOConnector getConnector() throws Exception {
         if (connector == null) {
-        	connector = new OracleJmsConnector();
-			connector.setName("TestConnector");
-			connector.setUrl("jdbc:oracle:oci:@TEST_DB");
-			connector.setUsername("scott");
-			connector.setPassword("tiger");
+            connector = new OracleJmsConnector();
+            connector.setName("TestConnector");
+            connector.setUrl("jdbc:oracle:oci:@TEST_DB");
+            connector.setUsername("scott");
+            connector.setPassword("tiger");
             connector.initialise();
         }
         return connector;
     }
 
     public UMOMessageReceiver getMessageReceiver() throws Exception {
-    	getConnector();
+        getConnector();
         endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
         endpoint.setConnector(getConnector());
         Mock mockComponent = new Mock(UMOComponent.class);
         return new OracleJmsMessageReceiver((AbstractConnector) endpoint.getConnector(),
-		                                     (UMOComponent) mockComponent.proxy(),
-		                                     endpoint);
+                                             (UMOComponent) mockComponent.proxy(),
+                                             endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception {

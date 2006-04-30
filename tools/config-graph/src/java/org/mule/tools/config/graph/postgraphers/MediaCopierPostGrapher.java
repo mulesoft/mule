@@ -9,19 +9,19 @@ import java.io.IOException;
 
 public class MediaCopierPostGrapher implements PostGrapher {
 
-	public String getStatusTitle() {
-		
-		return "Copy Media files (logo, css,...)";
-	}
+    public String getStatusTitle() {
 
-	public void postGrapher(GraphEnvironment env) {
+        return "Copy Media files (logo, css,...)";
+    }
 
-		try {
-			FileUtils.copyDirectory(new File("./src/resources/media/"),env.getConfig().getOutputDirectory());
-		} catch (IOException e) {
-			env.logError(e.getMessage(), e);
-		
-		}
-	}
+    public void postGrapher(GraphEnvironment env) {
+
+        try {
+            FileUtils.copyDirectory(new File("./src/resources/media/"),env.getConfig().getOutputDirectory());
+        } catch (IOException e) {
+            env.logError(e.getMessage(), e);
+
+        }
+    }
 
 }

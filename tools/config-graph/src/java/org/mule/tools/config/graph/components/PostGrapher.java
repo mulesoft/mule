@@ -4,7 +4,7 @@ import org.mule.tools.config.graph.config.GraphEnvironment;
 
 public interface PostGrapher {
 
-	public String getStatusTitle();
-	public abstract void postGrapher(GraphEnvironment env);
+    public String getStatusTitle();
+    public abstract void postGrapher(GraphEnvironment env);
 
 }

@@ -77,15 +77,15 @@ public class HelloSampleTestCase extends TestCase
         assertNotNull(name.getName());
         assertNull(name.getGreeting());
         
-		result = trans.transform("Another Wilma\r\n");
+        result = trans.transform("Another Wilma\r\n");
         
-		assertNotNull(result);
-		assertTrue(result instanceof NameString);
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
 
-		name = (NameString)result;
+        name = (NameString)result;
 
-		assertNotNull(name.getName());
-		assertEquals("Another Wilma", name.getName());
+        assertNotNull(name.getName());
+        assertEquals("Another Wilma", name.getName());
     }
     
     public void testNameToChatTransformer() throws Exception

@@ -26,10 +26,10 @@ public interface RegistryComponent extends Entry {
     ComponentType getType();
 
 
-	void restoreState() throws RegistryException;
+    void restoreState() throws RegistryException;
 
-	void saveAndShutdown() throws RegistryException;
-	
+    void saveAndShutdown() throws RegistryException;
+
     /**
      * Start the item.
      * 
@@ -52,73 +52,73 @@ public interface RegistryComponent extends Entry {
      */
     void shutDown() throws RegistryException;
 
-	/**
-	 * Retrieves the libraries that this component uses.
-	 * @return
-	 */
-	Library[] getLibraries();
-	
-	/**
-	 * Units deployed to this component
-	 * @return
-	 */
-	Unit[] getUnits();
-	
-	/**
-	 * 
-	 */
-	List getClassPathElements();
-	
-	void setClassPathElements(List elements);
+    /**
+     * Retrieves the libraries that this component uses.
+     * @return
+     */
+    Library[] getLibraries();
 
-	boolean isClassLoaderParentFirst();
-	
-	boolean isTransient();
+    /**
+     * Units deployed to this component
+     * @return
+     */
+    Unit[] getUnits();
+
+    /**
+     *
+     */
+    List getClassPathElements();
+
+    void setClassPathElements(List elements);
+
+    boolean isClassLoaderParentFirst();
+
+    boolean isTransient();
 
     void setTransient(boolean isTransient);
 
-	/**
-	 * Return the component implementation.
-	 * @return
-	 */
-	Object getComponent();
+    /**
+     * Return the component implementation.
+     * @return
+     */
+    Object getComponent();
 
     void setComponent(Object component);
-	/**
-	 * Return the descriptor for this component.
-	 * @return
-	 */
-	RegistryDescriptor getDescriptor() throws RegistryException;
-	
-	void setDescriptor(RegistryDescriptor descriptor) throws RegistryException;
+    /**
+     * Return the descriptor for this component.
+     * @return
+     */
+    RegistryDescriptor getDescriptor() throws RegistryException;
 
-	/**
-	 * Return the ObjectName under which the lifecycle mbean is registered.
-	 * @return
-	 */
-	ObjectName getObjectName();
-	
-	/**
-	 * Return the private component workspace
-	 * @return
-	 */
-	String getWorkspaceRoot();
-	
-	void setWorkspaceRoot(String workspaceRoot);
+    void setDescriptor(RegistryDescriptor descriptor) throws RegistryException;
 
-	/**
-	 * Install this component.
-	 * 
-	 * @throws RegistryException
-	 */
-	void install() throws RegistryException;
+    /**
+     * Return the ObjectName under which the lifecycle mbean is registered.
+     * @return
+     */
+    ObjectName getObjectName();
 
-	/**
-	 * Uninstall this component.
-	 * 
-	 * @throws RegistryException
-	 */
-	void uninstall() throws RegistryException;
+    /**
+     * Return the private component workspace
+     * @return
+     */
+    String getWorkspaceRoot();
+
+    void setWorkspaceRoot(String workspaceRoot);
+
+    /**
+     * Install this component.
+     *
+     * @throws RegistryException
+     */
+    void install() throws RegistryException;
+
+    /**
+     * Uninstall this component.
+     *
+     * @throws RegistryException
+     */
+    void uninstall() throws RegistryException;
 
     Registry getRegistry();
 

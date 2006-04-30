@@ -102,13 +102,13 @@
 
    <!-- Datatypes for Responder -->
 
-	<complexType name="AsyncRequestCT">
+    <complexType name="AsyncRequestCT">
       <sequence>
          <element ref="typ:AsyncRequest"/>
       </sequence>
    </complexType>
 
-	<element name="AsyncRequest">
+    <element name="AsyncRequest">
             <complexType>
                <sequence>
                   <element name="Order" type="typ:OrderCT"/>
@@ -118,13 +118,13 @@
          </element>
 
 
-	<complexType name="ResponseCT">
+    <complexType name="ResponseCT">
       <sequence>
          <element ref="typ:Response"/>
       </sequence>
    </complexType>
 
-	<element name="Response">
+    <element name="Response">
             <complexType>
                <sequence>
                   <element name="Order" type="typ:OrderCT"/>
@@ -138,10 +138,10 @@
    <complexType name="AllOrderCT">
       <sequence>
          <element ref="typ:AllOrders" minOccurs="1" maxOccurs="1"/>      
-	</sequence>
+    </sequence>
    </complexType>
 
-	<element name="AllOrders">
+    <element name="AllOrders">
             <complexType>
                <sequence>
                   <element name="Order" type="typ:OrderCT" maxOccurs="unbounded"/>

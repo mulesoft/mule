@@ -53,7 +53,7 @@ public class HiveMindContext extends AbstractContainerContext
     
     protected Registry getRegistry()
     {
-	return this.registry;
+    return this.registry;
     }
 
     /*
@@ -63,7 +63,7 @@ public class HiveMindContext extends AbstractContainerContext
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-	
+
         if (registry == null) {
             throw new IllegalStateException("HiveMind registry has not been set");
         }
@@ -111,18 +111,18 @@ public class HiveMindContext extends AbstractContainerContext
      */
     public void initialise() throws InitialisationException, RecoverableException
     {
-    	   if (registry == null) {
-    	        logger.debug("About to initilise the registry...");
-    	    	try {
-    	    		registry = RegistryBuilder.constructDefaultRegistry();
-    	    		
-    	    	} catch (Exception e) {
-    	    		throw new InitialisationException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER),e,this);
-    	    	}
-    	        logger.debug(" ... registry initialized");
-    	   } else {
-    	        logger.debug("Registry already initialized...");
-    	   }
+           if (registry == null) {
+                logger.debug("About to initilise the registry...");
+                try {
+                    registry = RegistryBuilder.constructDefaultRegistry();
+
+                } catch (Exception e) {
+                    throw new InitialisationException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER),e,this);
+                }
+                logger.debug(" ... registry initialized");
+           } else {
+                logger.debug("Registry already initialized...");
+           }
     }
 
     /**

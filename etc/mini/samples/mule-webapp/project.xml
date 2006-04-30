@@ -53,11 +53,11 @@
     </dependencies>
     <build>
         <resources>
-			<resource>
-				<includes>
-					<include>${basedir}/../../LICENSE.txt</include>
-				</includes>
-			</resource>
+            <resource>
+                <includes>
+                    <include>${basedir}/../../LICENSE.txt</include>
+                </includes>
+            </resource>
             <resource>
                 <directory>../hello</directory>
                 <includes>

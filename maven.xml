@@ -9,10 +9,10 @@
     | Developer targets
     ======================================================================================
 
-    maven idea		- will build an IDEA project and sub-modules for all sub-projects
-    			  (doesn't work with IDEA 5.0 :( )
-    			  This will preseve your current workspace
-    maven idea-new	- Will create a new multi-module project, overwriting your current workspace
+    maven idea        - will build an IDEA project and sub-modules for all sub-projects
+                  (doesn't work with IDEA 5.0 :( )
+                  This will preseve your current workspace
+    maven idea-new    - Will create a new multi-module project, overwriting your current workspace
 
 
     maven eclipse - Creates an Eclipse project with sub modules and dependencies set up

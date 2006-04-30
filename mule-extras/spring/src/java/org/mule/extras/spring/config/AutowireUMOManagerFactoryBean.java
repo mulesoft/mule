@@ -320,8 +320,8 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             return;
         }
         for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			String name = entry.getKey().toString();
+            Map.Entry entry = (Map.Entry) iterator.next();
+            String name = entry.getKey().toString();
             manager.registerInterceptorStack(name, (UMOInterceptorStack) entry.getValue());
         }
     }

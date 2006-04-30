@@ -43,7 +43,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-    	AtomicBoolean doAggregate = new AtomicBoolean(false);
+        AtomicBoolean doAggregate = new AtomicBoolean(false);
         EventGroup eg = null;
         // synchronized (lock)
         // {

@@ -15,28 +15,28 @@
     </global-endpoints>
 
     <model name="Dual XMPP Test">
-    	<mule-descriptor name="Inbound Listener"
-    		implementation="org.mule.components.simple.EchoComponent">
-    		<inbound-router>
-    			<global-endpoint name="inbound"/>
-    		</inbound-router>
-    		<outbound-router>
-    			<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-    				<endpoint address="vm://relay.queue"/>
-    			</router>
-    		</outbound-router>
-    	</mule-descriptor>
-    	<mule-descriptor name="Outbound Sender"
-    		implementation="org.mule.components.simple.EchoComponent">
-    		<inbound-router>
+        <mule-descriptor name="Inbound Listener"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://relay.queue"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        <mule-descriptor name="Outbound Sender"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
                 <endpoint address="vm://relay.queue"/>
-			</inbound-router>
-    		<outbound-router>
-    			<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<global-endpoint name="outbound"/>
-    			</router>
-    		</outbound-router>
-    	</mule-descriptor>
-	</model>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="outbound"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 
 </mule-configuration>

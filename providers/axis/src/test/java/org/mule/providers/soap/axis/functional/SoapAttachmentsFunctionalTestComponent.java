@@ -24,11 +24,11 @@ import javax.activation.DataHandler;
  */
 public class SoapAttachmentsFunctionalTestComponent extends FunctionalTestComponent implements SoapAttachmentsFunctionalTest
 {
-	public String receiveMessageWithAttachments(String payload, DataHandler[] attachments) {
-		if(payload != null && attachments != null && attachments.length > 0) {
-			return "Done";
-		}
+    public String receiveMessageWithAttachments(String payload, DataHandler[] attachments) {
+        if(payload != null && attachments != null && attachments.length > 0) {
+            return "Done";
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

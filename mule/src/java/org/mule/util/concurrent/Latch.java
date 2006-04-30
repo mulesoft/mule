@@ -21,9 +21,9 @@ package org.mule.util.concurrent;
 public class Latch extends CountDownLatch
 {
 
-	public Latch()
-	{
-		super(1);
-	}
+    public Latch()
+    {
+        super(1);
+    }
 
 }

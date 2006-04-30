@@ -9,11 +9,11 @@ import org.mule.tools.config.graph.util.MuleTag;
 
 public class ConnectionStrategyProcessor extends TagProcessor {
 
-	public ConnectionStrategyProcessor( GraphEnvironment environment ) {
-		super(environment);
-	}
+    public ConnectionStrategyProcessor( GraphEnvironment environment ) {
+        super(environment);
+    }
 
-	public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
         //Process connection strategy
         Element cs = currentElement.getChild(MuleTag.ELEMENT_CONNECTION_STRATEGY);
         if(cs!=null) {
@@ -27,5 +27,5 @@ public class ConnectionStrategyProcessor extends TagProcessor {
             csNode.getInfo().setCaption(caption.toString());
             addRelation(graph, parent, csNode, null);
         }
-	}
+    }
 }

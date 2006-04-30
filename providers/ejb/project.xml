@@ -16,7 +16,7 @@
             <version>${pom.currentVersion}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>

@@ -8,11 +8,11 @@
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.tck.functional.FunctionalTestComponent">
-			<inbound-router>
-				<endpoint address="file://./test">
-					<filter pattern="*.txt" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
-				</endpoint>
-			</inbound-router>
+            <inbound-router>
+                <endpoint address="file://./test">
+                    <filter pattern="*.txt" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
+                </endpoint>
+            </inbound-router>
         </mule-descriptor>
 
     </model>

@@ -39,17 +39,17 @@ import java.util.HashMap;
  */
 public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
 
-	protected JdbcConnector connector;
-	
+    protected JdbcConnector connector;
+
     protected void emptyTable() throws Exception
     {
         // TODO this overrides super.emptyTable() - is this correct?
         // the entire test seems to be incomplete, see the comments below..
     }
-	
+
     public UMOConnector createConnector() throws Exception
     {
-    	connector = (JdbcConnector) super.createConnector();
+        connector = (JdbcConnector) super.createConnector();
         SimpleRetryConnectionStrategy strategy = new SimpleRetryConnectionStrategy();
         strategy.setRetryCount(10);
         strategy.setFrequency(1000);
@@ -58,14 +58,14 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
         return connector;
     }
 
-	protected DataSource createDataSource() throws Exception {
+    protected DataSource createDataSource() throws Exception {
         jdbcDataSource ds = new jdbcDataSource();
         ds.setDatabase("jdbc:hsqldb:hsql://localhost");
         ds.setUser("sa");
-		return ds;
-	}
+        return ds;
+    }
     
-	public void testReconnection() throws Exception {
+    public void testReconnection() throws Exception {
 
         MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
 
@@ -80,7 +80,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
         MuleManager.getInstance().start();
         connector.registerListener(component, endpoint);
 
-		// The hsqldb instance should be put offline before starting test
+        // The hsqldb instance should be put offline before starting test
         // The receiver should try to connect to the database
         //
         // Then put hsqldb online.
@@ -89,6 +89,6 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
         // Put hsqldb offline.
         // The receiver should try to connect to the database. 
         Thread.sleep(1000);
-	}
+    }
 
 }

@@ -38,12 +38,12 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
     
 
     public byte[] getPayloadAsBytes() throws Exception {
-		return convertToBytes(getPayload());
-	}
+        return convertToBytes(getPayload());
+    }
 
 
 
-	/**
+    /**
      * Converts the message implementation into a String representation
      *
      * @param encoding The encoding to use when transforming the message (if necessary). The parameter is

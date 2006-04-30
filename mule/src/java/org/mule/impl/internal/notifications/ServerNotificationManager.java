@@ -183,27 +183,27 @@ public class ServerNotificationManager implements Work, Disposable, WorkListener
      * @see Thread#run()
      */
     public void run()
-	{
-		UMOServerNotification notification = null;
-		while (!disposed)
-		{
-			try
-			{
-				notification = (UMOServerNotification)eventQueue.take();
-				if (notification != null)
-				{
-					notifyListeners(notification);
-				}
-			}
-			catch (InterruptedException e)
-			{
-				if (!disposed)
-				{
-					logger.error("Failed to take notificationication from server notificationication queue", e);
-				}
-			}
-		}
-	}
+    {
+        UMOServerNotification notification = null;
+        while (!disposed)
+        {
+            try
+            {
+                notification = (UMOServerNotification)eventQueue.take();
+                if (notification != null)
+                {
+                    notifyListeners(notification);
+                }
+            }
+            catch (InterruptedException e)
+            {
+                if (!disposed)
+                {
+                    logger.error("Failed to take notificationication from server notificationication queue", e);
+                }
+            }
+        }
+    }
 
     protected class Listener {
 

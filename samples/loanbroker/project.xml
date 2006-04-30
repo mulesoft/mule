@@ -42,7 +42,7 @@
             <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
                 <ignore>true</ignore>
             </properties>
         </dependency>
@@ -53,7 +53,7 @@
             <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
                 <ignore>true</ignore>
             </properties>
         </dependency>
@@ -64,7 +64,7 @@
             <url>http://muleumo.org/docs/modules/mule-soap-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
                 <ignore>true</ignore>
             </properties>
         </dependency>

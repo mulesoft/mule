@@ -80,14 +80,14 @@ public class JXPathFilter implements UMOFilter
             if (obj instanceof String) {
                 Document doc = DocumentHelper.parseText((String) obj);
                 o = doc.valueOf(expression);
-	    } else if (obj instanceof org.dom4j.Document) {
+        } else if (obj instanceof org.dom4j.Document) {
                 Document doc = (Document)obj;
                 o = doc.valueOf(expression);
             } else {
-		if (logger.isDebugEnabled()) {
-		    logger.debug("Passing object of type " +
-			    obj.getClass().toString() + " to JXPathContext");
-		}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Passing object of type " +
+                obj.getClass().toString() + " to JXPathContext");
+        }
                 JXPathContext context = JXPathContext.newContext(obj);
                 initialise(context);
                 o = context.getValue(expression);

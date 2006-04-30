@@ -151,8 +151,8 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             } catch (Exception e) {
                 handleException(e);
             } finally {
-            	lock.unlock();
-			}
+                lock.unlock();
+            }
         }
 
         public Object doInTransaction() throws Exception

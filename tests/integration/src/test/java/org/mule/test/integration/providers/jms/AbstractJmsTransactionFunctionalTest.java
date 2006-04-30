@@ -107,7 +107,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
-        		+ " of " + countDownInitialCount
+                + " of " + countDownInitialCount
                 + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);
@@ -148,7 +148,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
-        		+ " of " + countDownInitialCount
+                + " of " + countDownInitialCount
                 + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);
@@ -209,7 +209,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
-        		+ " of " + countDownInitialCount
+                + " of " + countDownInitialCount
                 + " checkpoints hit", countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
@@ -271,7 +271,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         afterInitialise();
         countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
-        		+ " of " + countDownInitialCount
+                + " of " + countDownInitialCount
                 + " checkpoints hit", countDown.tryLock());
 
         // Sleep a while to allow transaction to be rolled back
@@ -516,7 +516,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         afterInitialise();
         countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
-        		+ " of " + countDownInitialCount
+                + " of " + countDownInitialCount
                 + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);

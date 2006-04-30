@@ -11,16 +11,16 @@
     <goal name="default" prereqs="clean, checkVars, ejb:ejb, ejb:stage"/>
 
     <goal name="checkVars">
-    	<j:if test="${appserver==null}">
-    	    <j:set var="appserver" value="jboss"/>
-    	</j:if>
+        <j:if test="${appserver==null}">
+            <j:set var="appserver" value="jboss"/>
+        </j:if>
     </goal>
     
     <preGoal name="ejb:ejb">
-    	<echo>copying appserver files from ${maven.src.dir}/conf/${appserver} to ${maven.build.dir}/classes</echo>
-    	<ant:copy todir="${maven.build.dir}/classes/META-INF">
-    	    <ant:fileset dir="${maven.src.dir}/conf/${appserver}" includes="*"/>
-    	</ant:copy>
+        <echo>copying appserver files from ${maven.src.dir}/conf/${appserver} to ${maven.build.dir}/classes</echo>
+        <ant:copy todir="${maven.build.dir}/classes/META-INF">
+            <ant:fileset dir="${maven.src.dir}/conf/${appserver}" includes="*"/>
+        </ant:copy>
     </preGoal>
 
     <goal name="sendq" prereqs="setclasspath">

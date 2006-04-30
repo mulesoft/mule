@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.IStatus;
  */
 public class MuleModelException extends CoreException {
 
-	public MuleModelException(IStatus status) {
-		super(status);
-	}
+    public MuleModelException(IStatus status) {
+        super(status);
+    }
 }

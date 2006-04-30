@@ -16,7 +16,7 @@ import java.util.Iterator;
  * 
  *  
  *   &amp;ltDQMessage&amp;gt
- *   		&amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
+ *           &amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
  *          ....
  *    &amp;lt/DQMessage&amp;gt
  *   

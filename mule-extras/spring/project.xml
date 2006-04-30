@@ -25,7 +25,7 @@
             <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -35,7 +35,7 @@
             <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <!-- required by http -->
@@ -46,7 +46,7 @@
             <url>http://muleumo.org/docs/modules/mule-tcp-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -56,7 +56,7 @@
             <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -66,7 +66,7 @@
             <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -76,7 +76,7 @@
             <url>http://muleumo.org/docs/modules/mule-jdbc-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -91,9 +91,9 @@
             </properties>
         </dependency>
         <dependency>
-        	<groupId>hibernate</groupId>
-        	<artifactId>hibernate</artifactId>
-        	<version>${hibernate_version}</version>
+            <groupId>hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>${hibernate_version}</version>
         </dependency>
         <dependency>
             <artifactId>commons-httpclient</artifactId>

@@ -11,7 +11,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <!-- useful for the functional tests -->
@@ -22,7 +22,7 @@
             <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>

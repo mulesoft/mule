@@ -17,7 +17,7 @@
      <%}%>
 Please enter something:
 <form method="POST" name="submitEcho" action="">
-	<table>
+    <table>
         <tr><td>
             <input type="text" name="echo"/></td><td><input type="submit" name="Go" value=" Go " />
         </td></tr>

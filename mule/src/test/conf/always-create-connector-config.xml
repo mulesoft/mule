@@ -13,17 +13,17 @@
     </global-endpoints>
 
     <model name="Dual Connector Test">
-    	<mule-descriptor name="Inbound Listener"
-    		implementation="org.mule.components.simple.EchoComponent">
-    		<inbound-router>
-    			<global-endpoint name="inbound"/>
-    		</inbound-router>
-    		<outbound-router>
-    			<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-    				<global-endpoint name="outbound"/>
-    			</router>
-    		</outbound-router>
-    	</mule-descriptor>
-	</model>
+        <mule-descriptor name="Inbound Listener"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="outbound"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 
 </mule-configuration>

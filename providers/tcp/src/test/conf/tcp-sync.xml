@@ -4,26 +4,26 @@
 
 <mule-configuration id="test" version="1.0">
 
-	<!-- Mule properties -->
-	<mule-environment-properties synchronous="false" remoteSync="false" />
-	
-	<connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
-		<properties>
-			<property name="timeout" value="60000"/>
-		<!-- 
-			<property name="bufferSize" value="1048576"/>
-		 -->
-		 	<property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.LengthProtocol"/>
-		</properties>
-	</connector>
-	
-	<model name="model">
-		<mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.EchoComponent">
-			<inbound-router>
-                <endpoint address="tcp://localhost:4544" synchronous="true"/>
-			</inbound-router>
-		</mule-descriptor>
+    <!-- Mule properties -->
+    <mule-environment-properties synchronous="false" remoteSync="false" />
 
-	</model>
-	
+    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
+        <properties>
+            <property name="timeout" value="60000"/>
+        <!--
+            <property name="bufferSize" value="1048576"/>
+         -->
+             <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.LengthProtocol"/>
+        </properties>
+    </connector>
+
+    <model name="model">
+        <mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:4544" synchronous="true"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+
 </mule-configuration>

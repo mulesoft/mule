@@ -55,7 +55,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         props.put("use", "Literal");
 
         SubmitTrade submittrade = new SubmitTrade();
-		submittrade.setArg0(trade);
+        submittrade.setArg0(trade);
 
         //We need to name the parameters weh using Doc/Lit
 //        SoapMethod method = new SoapMethod(new QName("submitTrade"), SubmitTradeResponse.class);

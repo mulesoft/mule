@@ -57,7 +57,7 @@ public class PxeHelloWorldTestCase extends AbstractMuleTestCase
         dbf.setNamespaceAware(true);
         Document soap = dbf.newDocumentBuilder().parse(
                 ClassHelper.getResourceAsStream("helloRequest.soap", getClass()));
-		Map props = new HashMap();
+        Map props = new HashMap();
         UMOMessage result = client.send("vm://pxe.in", new DOMSource(soap.getDocumentElement()), props);
         assertNotNull(result);
         StringWriter w = new StringWriter();

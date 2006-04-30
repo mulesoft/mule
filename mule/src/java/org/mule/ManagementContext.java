@@ -121,99 +121,99 @@ public class ManagementContext {
     }
 
     public static final String TEMP_DIR = "temp";
-	public static final String COMPONENTS_DIR = "components";
-	public static final String LIBRARIES_DIR = "libraries";
-	public static final String ASSEMBLIES_DIR = "assemblies";
-	public static final String INSTALL_DIR = "install";
-	public static final String DEPLOY_DIR = "deploy";
-	public static final String PROCESSED_DIR = "processed";
-	public static final String WORKSPACE_DIR = "workspace";
+    public static final String COMPONENTS_DIR = "components";
+    public static final String LIBRARIES_DIR = "libraries";
+    public static final String ASSEMBLIES_DIR = "assemblies";
+    public static final String INSTALL_DIR = "install";
+    public static final String DEPLOY_DIR = "deploy";
+    public static final String PROCESSED_DIR = "processed";
+    public static final String WORKSPACE_DIR = "workspace";
 
-	private int counter;
+    private int counter;
 
-	public synchronized File getNewTempDir(File rootDir) {
-		while (true) {
-			String s = Integer.toHexString(++counter);
-			while (s.length() < 8) {
-				s = "0" + s;
-			}
-			File f = new File(rootDir, File.separator + TEMP_DIR + File.separator + s);
-			if (!f.exists()) {
-				return f;
-			}
-		}
-	}
+    public synchronized File getNewTempDir(File rootDir) {
+        while (true) {
+            String s = Integer.toHexString(++counter);
+            while (s.length() < 8) {
+                s = "0" + s;
+            }
+            File f = new File(rootDir, File.separator + TEMP_DIR + File.separator + s);
+            if (!f.exists()) {
+                return f;
+            }
+        }
+    }
 
-	public File getComponentInstallDir(File rootDir, String name) {
-		return new File(rootDir, COMPONENTS_DIR + File.separator + validateString(name));
-	}
+    public File getComponentInstallDir(File rootDir, String name) {
+        return new File(rootDir, COMPONENTS_DIR + File.separator + validateString(name));
+    }
 
-	public File getComponentWorkspaceDir(File rootDir, String name) {
-		return new File(rootDir, WORKSPACE_DIR + File.separator + validateString(name));
-	}
+    public File getComponentWorkspaceDir(File rootDir, String name) {
+        return new File(rootDir, WORKSPACE_DIR + File.separator + validateString(name));
+    }
 
-	public File getLibraryInstallDir(File rootDir, String name) {
-		return new File(rootDir, LIBRARIES_DIR + File.separator + validateString(name));
-	}
+    public File getLibraryInstallDir(File rootDir, String name) {
+        return new File(rootDir, LIBRARIES_DIR + File.separator + validateString(name));
+    }
 
-	public File getAssemblyInstallDir(File rootDir, String name) {
-		return new File(rootDir, ASSEMBLIES_DIR + File.separator + validateString(name));
-	}
+    public File getAssemblyInstallDir(File rootDir, String name) {
+        return new File(rootDir, ASSEMBLIES_DIR + File.separator + validateString(name));
+    }
 
-	public static File getAutoInstallDir(File rootDir) {
-		return new File(rootDir, INSTALL_DIR);
-	}
+    public static File getAutoInstallDir(File rootDir) {
+        return new File(rootDir, INSTALL_DIR);
+    }
 
-	public File getAutoInstallProcessedDir(File rootDir) {
-		return new File(rootDir, INSTALL_DIR + File.separator + PROCESSED_DIR);
-	}
+    public File getAutoInstallProcessedDir(File rootDir) {
+        return new File(rootDir, INSTALL_DIR + File.separator + PROCESSED_DIR);
+    }
 
-	public File getAutoDeployDir(File rootDir) {
-		return new File(rootDir, DEPLOY_DIR);
-	}
+    public File getAutoDeployDir(File rootDir) {
+        return new File(rootDir, DEPLOY_DIR);
+    }
 
-	public File getAutoDeployProcessedDir(File rootDir) {
-		return new File(rootDir, DEPLOY_DIR + File.separator + PROCESSED_DIR);
-	}
+    public File getAutoDeployProcessedDir(File rootDir) {
+        return new File(rootDir, DEPLOY_DIR + File.separator + PROCESSED_DIR);
+    }
 
-	public void deleteMarkedDirectories(File dir) {
-    	if (dir != null && dir.isDirectory()) {
-    		if (new File(dir, ".delete").isFile()) {
-    			deleteDir(dir);
-    		} else {
-	    		File[] children = dir.listFiles();
-	    		for (int i = 0; i < children.length; i++) {
-	    			if (children[i].isDirectory()) {
-	    				deleteMarkedDirectories(children[i]);
-	    			}
-				}
-	    	}
-    	}
-	}
+    public void deleteMarkedDirectories(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            if (new File(dir, ".delete").isFile()) {
+                deleteDir(dir);
+            } else {
+                File[] children = dir.listFiles();
+                for (int i = 0; i < children.length; i++) {
+                    if (children[i].isDirectory()) {
+                        deleteMarkedDirectories(children[i]);
+                    }
+                }
+            }
+        }
+    }
 
-	public void deleteDir(String dir) {
-		deleteDir(new File(dir));
-	}
+    public void deleteDir(String dir) {
+        deleteDir(new File(dir));
+    }
 
-	public void deleteDir(File dir) {
-		Utility.deleteTree(dir);
-		if (dir.isDirectory()) {
-			try {
-				new File(dir, ".delete").createNewFile();
-			} catch (IOException e) {
-				logger.warn("Could not mark directory to be deleted", e);
-			}
-		}
-	}
+    public void deleteDir(File dir) {
+        Utility.deleteTree(dir);
+        if (dir.isDirectory()) {
+            try {
+                new File(dir, ".delete").createNewFile();
+            } catch (IOException e) {
+                logger.warn("Could not mark directory to be deleted", e);
+            }
+        }
+    }
 
-	public void createDirectories(File rootDir) throws IOException {
-		Utility.createFile(rootDir.getAbsolutePath());
-		Utility.createFile(new File(rootDir, COMPONENTS_DIR).getAbsolutePath());
-		Utility.createFile(new File(rootDir, WORKSPACE_DIR).getAbsolutePath());
-		Utility.createFile(new File(rootDir, LIBRARIES_DIR).getAbsolutePath());
-		Utility.createFile(new File(rootDir, ASSEMBLIES_DIR).getAbsolutePath());
-		Utility.createFile(getAutoInstallDir(rootDir).getAbsolutePath());
-		Utility.createFile(getAutoDeployDir(rootDir).getAbsolutePath());
-		Utility.createFile(getAutoDeployProcessedDir(rootDir).getAbsolutePath());
-	}
+    public void createDirectories(File rootDir) throws IOException {
+        Utility.createFile(rootDir.getAbsolutePath());
+        Utility.createFile(new File(rootDir, COMPONENTS_DIR).getAbsolutePath());
+        Utility.createFile(new File(rootDir, WORKSPACE_DIR).getAbsolutePath());
+        Utility.createFile(new File(rootDir, LIBRARIES_DIR).getAbsolutePath());
+        Utility.createFile(new File(rootDir, ASSEMBLIES_DIR).getAbsolutePath());
+        Utility.createFile(getAutoInstallDir(rootDir).getAbsolutePath());
+        Utility.createFile(getAutoDeployDir(rootDir).getAbsolutePath());
+        Utility.createFile(getAutoDeployProcessedDir(rootDir).getAbsolutePath());
+    }
 }

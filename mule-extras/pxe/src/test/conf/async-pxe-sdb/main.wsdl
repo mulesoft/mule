@@ -60,7 +60,7 @@
         <port name="ProcessPORT" binding="proc:ProcessBIND">
             <soap:address location="http://localhost:8080/pxe/soap/async/invoke"/>
         </port>
-	<port name="CallbackPORT" binding="proc:CallbackBIND">
+    <port name="CallbackPORT" binding="proc:CallbackBIND">
             <soap:address location="http://localhost:8080/pxe/soap/async/callback"/>
         </port>
 

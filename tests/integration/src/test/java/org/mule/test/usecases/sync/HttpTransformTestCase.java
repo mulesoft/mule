@@ -36,36 +36,36 @@ public class HttpTransformTestCase extends FunctionalTestCase {
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
-		GZipUncompressTransformer gu = new GZipUncompressTransformer();
+        GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setReturnClass(String.class);
         assertNotNull(message.getPayload());
-		String result = (String) gu.transform(message.getPayloadAsBytes());
+        String result = (String) gu.transform(message.getPayloadAsBytes());
         assertEquals("<string>payload</string>", result);
     }
-	
-	public void testBinary() throws Exception
-	{
+
+    public void testBinary() throws Exception
+    {
         MuleClient client = new MuleClient();
-		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        Object payload = Arrays.asList(new Integer[] {new Integer(42)});
         UMOMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
-		ByteArrayToSerializable bas = new ByteArrayToSerializable();
-		assertNotNull(message.getPayload());
-		assertTrue(message.getPayload() instanceof byte[]);
-		Object result = bas.transform(message.getPayload());
-		assertEquals(payload, result);
-	}
-	
-	public void testBinaryWithBridge() throws Exception
-	{
+        ByteArrayToSerializable bas = new ByteArrayToSerializable();
+        assertNotNull(message.getPayload());
+        assertTrue(message.getPayload() instanceof byte[]);
+        Object result = bas.transform(message.getPayload());
+        assertEquals(payload, result);
+    }
+
+    public void testBinaryWithBridge() throws Exception
+    {
         MuleClient client = new MuleClient();
-		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        Object payload = Arrays.asList(new Integer[] {new Integer(42)});
         UMOMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
-		ByteArrayToSerializable bas = new ByteArrayToSerializable();
-		assertNotNull(message.getPayload());
-		assertTrue(message.getPayload() instanceof byte[]);
-		Object result = bas.transform(message.getPayload());
-		assertEquals(payload, result);
-	}	
+        ByteArrayToSerializable bas = new ByteArrayToSerializable();
+        assertNotNull(message.getPayload());
+        assertTrue(message.getPayload() instanceof byte[]);
+        Object result = bas.transform(message.getPayload());
+        assertEquals(payload, result);
+    }
 }

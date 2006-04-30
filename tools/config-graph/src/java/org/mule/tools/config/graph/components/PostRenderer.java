@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface PostRenderer {
 
-	public abstract void postRender(GraphEnvironment env, Map context,Graph graph);
+    public abstract void postRender(GraphEnvironment env, Map context,Graph graph);
 
 }

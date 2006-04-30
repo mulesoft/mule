@@ -16,7 +16,7 @@ public class SubmitTrade  implements java.io.Serializable {
     }
 
     public SubmitTrade(
-    		 org.mule.test.usecases.axis.Trade arg0) {
+             org.mule.test.usecases.axis.Trade arg0) {
            this.arg0 = arg0;
     }
 

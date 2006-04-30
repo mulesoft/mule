@@ -28,16 +28,16 @@ public interface ExceptionHandler {
     public ErrorManager getErrorManager();
     
     public void setErrorManager(ErrorManager errorManager);
-	
-	public void onException(ErrorMessage message) throws HandlerException;
-	
-	public void registerException(Class exceptionClass);
-	
-	public void unRegisterException(Class exceptionClass);
-	
-	public Iterator getRegisteredClasses();
-	
-	public boolean isRegisteredFor(Class exceptionClass);
-	
-	
+
+    public void onException(ErrorMessage message) throws HandlerException;
+
+    public void registerException(Class exceptionClass);
+
+    public void unRegisterException(Class exceptionClass);
+
+    public Iterator getRegisteredClasses();
+
+    public boolean isRegisteredFor(Class exceptionClass);
+
+
 }

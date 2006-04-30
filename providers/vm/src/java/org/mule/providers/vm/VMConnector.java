@@ -162,14 +162,14 @@ public class VMConnector extends AbstractServiceEnabledConnector
         if (tx != null) {
             if (tx.hasResource(qm)) {
                 if (logger.isDebugEnabled()) {
-                	logger.debug("Retrieving queue session from current transaction");
+                    logger.debug("Retrieving queue session from current transaction");
                 }
                 return (QueueSession) tx.getResource(qm);
             }
         }
 
         if (logger.isDebugEnabled()) {
-			logger.debug("Retrieving new queue session from queue manager");
+            logger.debug("Retrieving new queue session from queue manager");
         }
 
         QueueSession session = qm.getQueueSession();
@@ -195,7 +195,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
         receiver = (UMOMessageReceiver) receivers.get(endpointUri.getAddress());
         if (receiver != null) {
             if (logger.isDebugEnabled()) {
-            	logger.debug("Found exact receiver match on endpointUri: " + endpointUri);
+                logger.debug("Found exact receiver match on endpointUri: " + endpointUri);
             }
             return receiver;
         }
@@ -209,14 +209,14 @@ public class VMConnector extends AbstractServiceEnabledConnector
                 receiver.getEndpoint().setEndpointURI(new MuleEndpointURI(endpointUri, filterAddress));
 
                 if (logger.isDebugEnabled()) {
-	                logger.debug("Found receiver match on endpointUri: " +
-	                		receiver.getEndpointURI() + " against " + endpointUri);
+                    logger.debug("Found receiver match on endpointUri: " +
+                            receiver.getEndpointURI() + " against " + endpointUri);
                 }
                 return receiver;
             }
         }
         if (logger.isDebugEnabled()) {
-        	logger.debug("No receiver found for endpointUri: " + endpointUri);
+            logger.debug("No receiver found for endpointUri: " + endpointUri);
         }
         return null;
     }

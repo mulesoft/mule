@@ -83,7 +83,7 @@
                 <exclude>**/Plexus*.*</exclude>
 
                 <exclude>**/PxeHelloWorldTestCase.*</exclude>
-		        <exclude>**/PxeAsyncTestCase.*</exclude>
+                <exclude>**/PxeAsyncTestCase.*</exclude>
 
                 <!-- Disable ftp because it needs a server -->
                 <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>
@@ -117,7 +117,7 @@
         </unitTest>
     </build>
     <reports>
-	<report>maven-pmd-plugin</report>
+    <report>maven-pmd-plugin</report>
         <report>maven-simian-plugin</report>
         <report>maven-jdepend-plugin</report>
         <report>maven-jxr-plugin</report>

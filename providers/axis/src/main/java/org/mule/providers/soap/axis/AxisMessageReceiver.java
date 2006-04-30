@@ -81,8 +81,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
         SOAPService existing = this.connector.getAxisServer().getService(serviceName);
         if( existing != null) {
-        	service = existing;
-        	logger.debug("Using existing service for " + serviceName);
+            service = existing;
+            logger.debug("Using existing service for " + serviceName);
         } else {
             //Check if the style is message. If so, we need to create
             //a message oriented provider

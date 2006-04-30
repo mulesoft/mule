@@ -48,7 +48,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {
-        	// slurp
+            // slurp
         }
         
         MuleTransactionConfig tc = new MuleTransactionConfig();
@@ -81,7 +81,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {
-        	// hmm..mesages
+            // hmm..mesages
         }
 
         MuleTransactionConfig tc = new MuleTransactionConfig();
@@ -116,7 +116,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {
-        	// yum!
+            // yum!
         }
 
         MuleTransactionConfig tc = new MuleTransactionConfig();
@@ -151,7 +151,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             public Object doInTransaction() throws Exception 
             {
                 while (client.receive("jms://replyTo.queue", 2000) != null) {
-                	// munch..
+                    // munch..
                 }
 
                 return null;

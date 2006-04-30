@@ -33,25 +33,25 @@
             <groupId>oracle-jdbc</groupId>
             <artifactId>ojdbc</artifactId>
             <jar>ojdbc14.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
         </dependency>
         <dependency>
             <groupId>oracle-jms</groupId>
             <artifactId>aqapi</artifactId>
             <jar>aqapi13.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
         </dependency>
         <dependency>
             <groupId>oracle-jms</groupId>
             <artifactId>jmscommon</artifactId>
             <jar>jmscommon.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
         </dependency>
         <dependency>
             <groupId>oracle-xdb</groupId>
             <artifactId>xdb</artifactId>
             <jar>xdb.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
         </dependency>
 
         <!-- Xalan is included to override Oracle's javax.xml.transform classes
@@ -66,14 +66,14 @@
             <groupId>oracle-xdb</groupId>
             <artifactId>xmlparserv2</artifactId>
             <jar>xmlparserv2.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
         </dependency>
 
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.0</version>
-			<url>http://xmlunit.sourceforge.net</url>
+            <url>http://xmlunit.sourceforge.net</url>
         </dependency>
     </dependencies>
 </project>

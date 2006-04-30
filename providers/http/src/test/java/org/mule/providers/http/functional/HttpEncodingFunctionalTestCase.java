@@ -54,7 +54,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     }
 
     protected String getExpectedContentType() {
-    	return "text/baz;charset=UTF-16BE";
+        return "text/baz;charset=UTF-16BE";
     }
     
     public UMOMessage send(String url, Object payload, String contentType) throws Exception {

@@ -42,7 +42,7 @@ public class SgmlEntityDecoder extends AbstractTransformer
               try {
                 return SgmlCodec.decodeString(new String((byte[])src, encoding));
               } catch (UnsupportedEncodingException ex){
-            	return SgmlCodec.decodeString(new String((byte[])src));
+                return SgmlCodec.decodeString(new String((byte[])src));
               }
             } else {
               return SgmlCodec.decodeString(new String((byte[])src));

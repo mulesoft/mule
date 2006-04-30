@@ -77,9 +77,9 @@
      <build>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
         <resources>
-			<resource>
-		       <directory>src/resources</directory>
-		    </resource>
+            <resource>
+               <directory>src/resources</directory>
+            </resource>
         </resources>
         <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
          <unitTest>

@@ -18,18 +18,18 @@ public class GalleryPostGrapher extends AbstractIndexer{
         }
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.tools.config.graph.PostGrapher#postGrapher(org.mule.tools.config.graph.GraphConfig)
-	 */
-	public void postGrapher(GraphEnvironment env) {
-		File[] htmlFiles = getFiles(env.getConfig(),".gif");
-		String targetFile = env.getConfig().applyWorkingDirectory(env.getProperty("muleGalleryOutputName", "gallery.html"));
-		doRendering(env, htmlFiles, template, targetFile);
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.tools.config.graph.PostGrapher#postGrapher(org.mule.tools.config.graph.GraphConfig)
+     */
+    public void postGrapher(GraphEnvironment env) {
+        File[] htmlFiles = getFiles(env.getConfig(),".gif");
+        String targetFile = env.getConfig().applyWorkingDirectory(env.getProperty("muleGalleryOutputName", "gallery.html"));
+        doRendering(env, htmlFiles, template, targetFile);
 
-	}
-	public String getStatusTitle() {	
-		return "Generating Gallery page";
-	}
+    }
+    public String getStatusTitle() {
+        return "Generating Gallery page";
+    }
 }

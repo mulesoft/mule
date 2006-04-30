@@ -45,20 +45,20 @@ public class HttpRequestToString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-    	String param = null;
-    	if (src instanceof byte[]) {
+        String param = null;
+        if (src instanceof byte[]) {
           if (encoding != null) {
-        	try {   
-    	      param = new String((byte[]) src, encoding);
-        	} catch (UnsupportedEncodingException ex){
-        		param = new String((byte[]) src);
-        	}
+            try {
+              param = new String((byte[]) src, encoding);
+            } catch (UnsupportedEncodingException ex){
+                param = new String((byte[]) src);
+            }
            } else {
-    	      param = new String((byte[]) src);
+              param = new String((byte[]) src);
            }
-    	} else {
-        	param = src.toString();
-    	}
+        } else {
+            param = src.toString();
+        }
         int equals = param.indexOf("=");
         if(equals > -1)
         {

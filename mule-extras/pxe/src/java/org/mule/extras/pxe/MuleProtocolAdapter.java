@@ -35,62 +35,62 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleProtocolAdapter implements ProtocolAdapter {
 
-	private Log logger = LogFactory.getLog(MuleProtocolAdapter.class);
+    private Log logger = LogFactory.getLog(MuleProtocolAdapter.class);
 
-	private boolean isRunning = false;
+    private boolean isRunning = false;
 
-	/** Service provider context. */
-	private ServiceProviderContext context;
+    /** Service provider context. */
+    private ServiceProviderContext context;
 
-	public String getProviderURI() {
-		return this.context.getConfig().getProviderURI();
-	}
+    public String getProviderURI() {
+        return this.context.getConfig().getProviderURI();
+    }
 
-	public boolean isRunning() throws ServiceProviderException {
-		return this.isRunning;
-	}
+    public boolean isRunning() throws ServiceProviderException {
+        return this.isRunning;
+    }
 
-	public void activateService(ServiceContext service) throws ServiceProviderException {
-		logger.info("Activating service: " + service);
-		PxeComponent.getInstance().activateService(service);
-	}
+    public void activateService(ServiceContext service) throws ServiceProviderException {
+        logger.info("Activating service: " + service);
+        PxeComponent.getInstance().activateService(service);
+    }
 
-	public void deactivateService(ServiceContext service) throws ServiceProviderException {
-		logger.info("Deactivating service: " + service);
-		PxeComponent.getInstance().deactivateService(service);
-	}
+    public void deactivateService(ServiceContext service) throws ServiceProviderException {
+        logger.info("Deactivating service: " + service);
+        PxeComponent.getInstance().deactivateService(service);
+    }
 
     public InteractionHandler createInteractionHandler(Class aClass) throws ServiceProviderException {
         return null;
     }
 
-	public void deployService(ServiceConfig service) throws ServiceProviderException {
-		logger.info("Deploying service: " + service);
-	}
+    public void deployService(ServiceConfig service) throws ServiceProviderException {
+        logger.info("Deploying service: " + service);
+    }
 
-	public void undeployService(ServiceConfig service) throws ServiceProviderException {
-		logger.info("Undeploying service: " + service);
-	}
+    public void undeployService(ServiceConfig service) throws ServiceProviderException {
+        logger.info("Undeploying service: " + service);
+    }
 
-	public void initialize(ServiceProviderContext context) throws ServiceProviderException {
-		logger.info("Initializing");
-		this.context = context;
-	}
+    public void initialize(ServiceProviderContext context) throws ServiceProviderException {
+        logger.info("Initializing");
+        this.context = context;
+    }
 
-	public void start() throws ServiceProviderException {
-		logger.info("Starting");
-		this.isRunning = true;
-	}
+    public void start() throws ServiceProviderException {
+        logger.info("Starting");
+        this.isRunning = true;
+    }
 
-	public void stop() throws ServiceProviderException {
-		logger.info("Stopping");
-		this.isRunning = false;
-	}
+    public void stop() throws ServiceProviderException {
+        logger.info("Stopping");
+        this.isRunning = false;
+    }
 
-	public void onServiceEvent(ServiceEvent serviceEvent) throws ServiceProviderException, MessageExchangeException {
-		logger.info("Service event: " + serviceEvent);
-		if (serviceEvent instanceof MessageExchangeEvent) {
-			PxeComponent.getInstance().onMessageExchange((MessageExchangeEvent) serviceEvent);
-		}
-	}
+    public void onServiceEvent(ServiceEvent serviceEvent) throws ServiceProviderException, MessageExchangeException {
+        logger.info("Service event: " + serviceEvent);
+        if (serviceEvent instanceof MessageExchangeEvent) {
+            PxeComponent.getInstance().onMessageExchange((MessageExchangeEvent) serviceEvent);
+        }
+    }
 }

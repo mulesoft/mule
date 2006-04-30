@@ -38,7 +38,7 @@ public final class DQMessageUtils
     /**
      * Logger for this class
      */
-	private static Log log = LogFactory.getLog(DQMessageUtils.class);
+    private static Log log = LogFactory.getLog(DQMessageUtils.class);
 
     public static final String RECORD_DESCRIPTOR_KEY = "recordDescriptor";
 

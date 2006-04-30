@@ -58,9 +58,9 @@ public class ThreadingProfile
      * Default value for MAX_THREAD_TTL
      */
     public static final long DEFAULT_MAX_THREAD_TTL = 60000;
-	/**
-	 * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
-	 */
+    /**
+     * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
+     */
     public static final long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
     /**
      * Default value for do threading
@@ -136,10 +136,10 @@ public class ThreadingProfile
         return threadTTL;
     }
 
-	public long getThreadWaitTimeout()
-	{
-		return threadWaitTimeout;
-	}
+    public long getThreadWaitTimeout()
+    {
+        return threadWaitTimeout;
+    }
 
     public int getThreadPriority()
     {
@@ -181,10 +181,10 @@ public class ThreadingProfile
         this.threadTTL = threadTTL;
     }
 
-	public void setThreadWaitTimeout(long threadWaitTimeout)
-	{
-		this.threadWaitTimeout = threadWaitTimeout;
-	}
+    public void setThreadWaitTimeout(long threadWaitTimeout)
+    {
+        this.threadWaitTimeout = threadWaitTimeout;
+    }
 
     public void setPoolExhaustedAction(int poolExhaustPolicy)
     {
@@ -270,36 +270,36 @@ public class ThreadingProfile
         }
 
         switch (poolExhaustPolicy) {
-	        case WHEN_EXHAUSTED_DISCARD_OLDEST: {
-	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
-	            break;
-	        }
-	        case WHEN_EXHAUSTED_RUN: {
-	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-	            break;
-	        }
-	        case WHEN_EXHAUSTED_ABORT: {
-	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-	            break;
-	        }
-	        case WHEN_EXHAUSTED_DISCARD: {
-	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-	            break;
-	        }
-	        case WHEN_EXHAUSTED_WAIT: {
-	            pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-	            break;
-	        }
-	        default: {
-	            pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-	            break;
-	        }
+            case WHEN_EXHAUSTED_DISCARD_OLDEST: {
+                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+                break;
+            }
+            case WHEN_EXHAUSTED_RUN: {
+                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+                break;
+            }
+            case WHEN_EXHAUSTED_ABORT: {
+                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+                break;
+            }
+            case WHEN_EXHAUSTED_DISCARD: {
+                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                break;
+            }
+            case WHEN_EXHAUSTED_WAIT: {
+                pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
+                break;
+            }
+            default: {
+                pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
+                break;
+            }
         }
     }
 
     private ThreadPoolExecutor configurePool()
     {
-    	ThreadPoolExecutor pool;
+        ThreadPoolExecutor pool;
         if (maxBufferSize > 0) {
             pool = new ThreadPoolExecutor(0, maxBufferSize, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue(maxBufferSize));
         } else {
@@ -320,15 +320,15 @@ public class ThreadingProfile
     }
 
     public String toString()
-	{
-		return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
-				+ maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
-				+ ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
-				+ threadWaitTimeout + ", doThreading=" + doThreading + ", threadPriority="
-				+ threadPriority + ", workManagerFactory=" + workManagerFactory
-				+ ", rejectedExecutionHandler=" + rejectedExecutionHandler + ", threadFactory="
-				+ threadFactory + "}";
-	}
+    {
+        return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
+                + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
+                + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
+                + threadWaitTimeout + ", doThreading=" + doThreading + ", threadPriority="
+                + threadPriority + ", workManagerFactory=" + workManagerFactory
+                + ", rejectedExecutionHandler=" + rejectedExecutionHandler + ", threadFactory="
+                + threadFactory + "}";
+    }
 
     public static class NamedThreadFactory implements ThreadFactory
     {

@@ -30,10 +30,10 @@
             </properties>
         </dependency>
         <dependency>
-        	<artifactId>oro</artifactId>
-        	<groupId>oro</groupId>
-        	<version>${oro_version}</version>
-        	<url>http://jakarta.apache.org/oro/</url>
+            <artifactId>oro</artifactId>
+            <groupId>oro</groupId>
+            <version>${oro_version}</version>
+            <url>http://jakarta.apache.org/oro/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -41,7 +41,7 @@
             <version>${pom.currentVersion}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
     </dependencies>

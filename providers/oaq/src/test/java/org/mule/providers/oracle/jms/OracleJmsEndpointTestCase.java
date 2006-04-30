@@ -25,16 +25,16 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 public class OracleJmsEndpointTestCase extends AbstractMuleTestCase
 {
     public void testWithoutPayloadFactory() throws Exception {
-    	UMOEndpointURI url = 
-    		new MuleEndpointURI("jms://XML_QUEUE?transformers=XMLMessageToString");
+        UMOEndpointURI url =
+            new MuleEndpointURI("jms://XML_QUEUE?transformers=XMLMessageToString");
         assertNull(url.getParams().getProperty(OracleJmsConnector.PAYLOADFACTORY_PROPERTY));
     }
 
     public void testWithPayloadFactory() throws Exception {
-    	UMOEndpointURI url = 
-    		new MuleEndpointURI("jms://XML_QUEUE" +
-				"?" + OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory" +
-	            "&transformers=XMLMessageToString");
+        UMOEndpointURI url =
+            new MuleEndpointURI("jms://XML_QUEUE" +
+                "?" + OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory" +
+                "&transformers=XMLMessageToString");
         assertEquals("oracle.xdb.XMLTypeFactory", url.getParams().getProperty(OracleJmsConnector.PAYLOADFACTORY_PROPERTY));
     }
 }

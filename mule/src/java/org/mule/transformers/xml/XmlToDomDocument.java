@@ -40,23 +40,23 @@ public class XmlToDomDocument extends AbstractXmlTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-	    try {
-	        Source sourceDoc = getXmlSource(src);
-	        // If returnClass is not set, assume W3C DOM
-	        // This is the original behaviour
-	        ResultHolder holder = getResultHolder(returnClass != null ? returnClass : Document.class);
-	        
-	        assert(sourceDoc != null);
-	        assert(holder != null);
-	
-			Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
-			idTransformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-			idTransformer.transform(sourceDoc, holder.getResult());
-	        
-	        Object result = holder.getResultObject(); 
-	        return result;
-	    } catch (Exception e) {
-	        throw new TransformerException(this, e);
-	    }
+        try {
+            Source sourceDoc = getXmlSource(src);
+            // If returnClass is not set, assume W3C DOM
+            // This is the original behaviour
+            ResultHolder holder = getResultHolder(returnClass != null ? returnClass : Document.class);
+
+            assert(sourceDoc != null);
+            assert(holder != null);
+
+            Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+            idTransformer.setOutputProperty(OutputKeys.ENCODING,encoding);
+            idTransformer.transform(sourceDoc, holder.getResult());
+
+            Object result = holder.getResultObject();
+            return result;
+        } catch (Exception e) {
+            throw new TransformerException(this, e);
+        }
     }    
 }

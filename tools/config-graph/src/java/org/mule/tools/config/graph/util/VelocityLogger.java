@@ -12,13 +12,13 @@ public class VelocityLogger implements LogSystem {
         this.environment = environment;
     }
 
-		public void init(RuntimeServices arg0) throws Exception {
+        public void init(RuntimeServices arg0) throws Exception {
 
-		}
+        }
 
-		public void logVelocityMessage(int arg0, String arg1) {
-			if(environment!=null) environment.log(arg1);
-		}
+        public void logVelocityMessage(int arg0, String arg1) {
+            if(environment!=null) environment.log(arg1);
+        }
 
     public GraphEnvironment getEnvironment() {
         return environment;

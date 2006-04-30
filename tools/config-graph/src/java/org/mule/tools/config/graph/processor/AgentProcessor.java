@@ -11,32 +11,32 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AgentProcessor extends TagProcessor {
-	public AgentProcessor(GraphEnvironment environment) {
-		super(environment);
-	}
+    public AgentProcessor(GraphEnvironment environment) {
+        super(environment);
+    }
 
-	public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
         if(!environment.getConfig().isShowAgents()) return;
 
         Element agents = currentElement.getChild(MuleTag.ELEMENT_AGENTS);
         if(agents==null) return;
 
-		List agentsElement = agents.getChildren(MuleTag.ELEMENT_AGENT);
-		for (Iterator iter = agentsElement.iterator(); iter.hasNext();) {
-			Element connector = (Element) iter.next();
-			GraphNode connectorNode = graph.addNode();
-			connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_AGENTS);
-			String name = connector.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
-			connectorNode.getInfo().setHeader(name);
+        List agentsElement = agents.getChildren(MuleTag.ELEMENT_AGENT);
+        for (Iterator iter = agentsElement.iterator(); iter.hasNext();) {
+            Element connector = (Element) iter.next();
+            GraphNode connectorNode = graph.addNode();
+            connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_AGENTS);
+            String name = connector.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
+            connectorNode.getInfo().setHeader(name);
 
-			StringBuffer caption = new StringBuffer();
+            StringBuffer caption = new StringBuffer();
 
-			String className = connector.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
-			caption.append(MuleTag.ATTRIBUTE_CLASS_NAME + " :" + className + "\n");
+            String className = connector.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
+            caption.append(MuleTag.ATTRIBUTE_CLASS_NAME + " :" + className + "\n");
 
-			appendProperties(connector, caption);
-			appendDescription(connector, caption);
-			connectorNode.getInfo().setCaption(caption.toString());
-		}
-	}
+            appendProperties(connector, caption);
+            appendDescription(connector, caption);
+            connectorNode.getInfo().setCaption(caption.toString());
+        }
+    }
 }

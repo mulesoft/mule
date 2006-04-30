@@ -95,7 +95,7 @@
         </exception-strategy>
 
         <mule-descriptor name="orangeComponent"
-        	inboundEndpoint="Test Queue"
+            inboundEndpoint="Test Queue"
             implementation="local:orange">
 
             <inbound-router>

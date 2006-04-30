@@ -29,7 +29,7 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
     public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
         try {
-        	connectable.connect();
+            connectable.connect();
         } catch (Exception e) {
             throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
                                                         getClass().getName(),

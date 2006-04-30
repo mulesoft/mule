@@ -11,21 +11,21 @@ public class OutboundFilterProcessor extends TagProcessor{
 
     private GraphNode endpointNode;
 
-	  public OutboundFilterProcessor(GraphEnvironment environment , GraphNode endpointNode) {
-		super(environment);
+      public OutboundFilterProcessor(GraphEnvironment environment , GraphNode endpointNode) {
+        super(environment);
           this.endpointNode = endpointNode;
-	}
+    }
 
     public void process(Graph graph, Element currentElement, GraphNode parent) {
         process(graph, currentElement, endpointNode, parent);
     }
 
-	/**
-	 * 
-	 * todo doesn't currently support And/Or logic filters
-	 */
+    /**
+     *
+     * todo doesn't currently support And/Or logic filters
+     */
     private void process(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
-    	// TODO doesn't currently support And/Or logic filters
+        // TODO doesn't currently support And/Or logic filters
         Element filter=endpoint.getChild(MuleTag.ELEMENT_FILTER);
         if (filter == null) filter=endpoint.getChild(MuleTag.ELEMENT_LEFT_FILTER);
         if (filter == null) filter=endpoint.getChild(MuleTag.ELEMENT_RIGHT_FILTER);

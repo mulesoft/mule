@@ -30,35 +30,35 @@ import junit.framework.TestCase;
 public class CollectionUtilTestCase extends TestCase
 {
 
-	public void testMapCreationNullClass()
-	{
-		try
-		{
-			CollectionUtil.mapWithKeysAndValues(null, (String[])null, (String[])null);
-			fail();
-		}
-		catch (IllegalArgumentException ex)
-		{
-			// expected
-		}
-	}
+    public void testMapCreationNullClass()
+    {
+        try
+        {
+            CollectionUtil.mapWithKeysAndValues(null, (String[])null, (String[])null);
+            fail();
+        }
+        catch (IllegalArgumentException ex)
+        {
+            // expected
+        }
+    }
 
-	public void testMapCreationWithoutElements()
-	{
-		Map m = CollectionUtil.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
-		assertTrue(m.isEmpty());
-	}
+    public void testMapCreationWithoutElements()
+    {
+        Map m = CollectionUtil.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
+        assertTrue(m.isEmpty());
+    }
 
-	public void testCaseInsensitiveMapCreation()
-	{
-		List strings = Arrays.asList(new String[]{"foo"});
+    public void testCaseInsensitiveMapCreation()
+    {
+        List strings = Arrays.asList(new String[]{"foo"});
 
-		Map m = CollectionUtil.mapWithKeysAndValues(CaseInsensitiveMap.class,
-				strings.iterator(), strings.iterator());
+        Map m = CollectionUtil.mapWithKeysAndValues(CaseInsensitiveMap.class,
+                strings.iterator(), strings.iterator());
 
-		assertEquals("foo", m.get("foo"));
-		assertEquals("foo", m.get("Foo"));
-		assertEquals("foo", m.get("FOO"));
-	}
+        assertEquals("foo", m.get("foo"));
+        assertEquals("foo", m.get("Foo"));
+        assertEquals("foo", m.get("FOO"));
+    }
 
 }

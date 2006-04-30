@@ -4,24 +4,24 @@
 
 <mule-configuration id="test" version="1.0">
 
-	<!-- Mule properties -->
-	<mule-environment-properties synchronous="false" remoteSync="false" />
-	
-	<connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
-		
-	</connector>
-	
-	<transformers>
-		<transformer name="transformer" className="org.mule.transformers.xml.ObjectToXml"></transformer>
-	</transformers>
-	
-	<model name="model">
-		<mule-descriptor name="TcpReceiver" 
-			implementation="org.mule.components.simple.EchoComponent"
-			inboundEndpoint="tcp://localhost:4444/?synchronous=true"
-			responseTransformer="transformer">
-		</mule-descriptor>
+    <!-- Mule properties -->
+    <mule-environment-properties synchronous="false" remoteSync="false" />
 
-	</model>
-	
+    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
+
+    </connector>
+
+    <transformers>
+        <transformer name="transformer" className="org.mule.transformers.xml.ObjectToXml"></transformer>
+    </transformers>
+
+    <model name="model">
+        <mule-descriptor name="TcpReceiver"
+            implementation="org.mule.components.simple.EchoComponent"
+            inboundEndpoint="tcp://localhost:4444/?synchronous=true"
+            responseTransformer="transformer">
+        </mule-descriptor>
+
+    </model>
+
 </mule-configuration>

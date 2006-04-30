@@ -31,41 +31,41 @@ import org.mule.ide.MuleIDEPackage;
  * @generated
  */
 public class MuleIDEResourceFactoryImpl extends ResourceFactoryImpl {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ExtendedMetaData extendedMetaData;
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    protected ExtendedMetaData extendedMetaData;
 
-	/**
-	 * Creates an instance of the resource factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MuleIDEResourceFactoryImpl() {
-		super();
-		extendedMetaData = new BasicExtendedMetaData(new EPackageRegistryImpl(EPackage.Registry.INSTANCE));
-		extendedMetaData.putPackage(null, MuleIDEPackage.eINSTANCE);
-	}
+    /**
+     * Creates an instance of the resource factory.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public MuleIDEResourceFactoryImpl() {
+        super();
+        extendedMetaData = new BasicExtendedMetaData(new EPackageRegistryImpl(EPackage.Registry.INSTANCE));
+        extendedMetaData.putPackage(null, MuleIDEPackage.eINSTANCE);
+    }
 
-	/**
-	 * Creates an instance of the resource.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Resource createResource(URI uri) {
-		XMLResource result = new MuleIDEResourceImpl(uri);
-		result.getDefaultSaveOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, extendedMetaData);
-		result.getDefaultLoadOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, extendedMetaData);
+    /**
+     * Creates an instance of the resource.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public Resource createResource(URI uri) {
+        XMLResource result = new MuleIDEResourceImpl(uri);
+        result.getDefaultSaveOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, extendedMetaData);
+        result.getDefaultLoadOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, extendedMetaData);
 
-		result.getDefaultSaveOptions().put(XMLResource.OPTION_SCHEMA_LOCATION, Boolean.TRUE);
-		result.getDefaultSaveOptions().put(XMLResource.OPTION_USE_ENCODED_ATTRIBUTE_STYLE, Boolean.TRUE);
+        result.getDefaultSaveOptions().put(XMLResource.OPTION_SCHEMA_LOCATION, Boolean.TRUE);
+        result.getDefaultSaveOptions().put(XMLResource.OPTION_USE_ENCODED_ATTRIBUTE_STYLE, Boolean.TRUE);
 
-		result.getDefaultLoadOptions().put(XMLResource.OPTION_USE_LEXICAL_HANDLER, Boolean.TRUE);
-		return result;
-	}
+        result.getDefaultLoadOptions().put(XMLResource.OPTION_USE_LEXICAL_HANDLER, Boolean.TRUE);
+        return result;
+    }
 
 } //MuleIDEResourceFactoryImpl

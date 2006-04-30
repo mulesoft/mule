@@ -18,23 +18,23 @@ import org.eclipse.emf.ecore.xmi.impl.XMLResourceImpl;
  * @generated
  */
 public class MuleIDEResourceImpl extends XMLResourceImpl {
-	/**
-	 * Creates an instance of the resource.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param uri the URI of the new resource.
-	 * @generated
-	 */
-	public MuleIDEResourceImpl(URI uri) {
-		super(uri);
-	}
+    /**
+     * Creates an instance of the resource.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param uri the URI of the new resource.
+     * @generated
+     */
+    public MuleIDEResourceImpl(URI uri) {
+        super(uri);
+    }
 
-	/**
-	 * Overrides the standard encoding
-	 */
-	protected void init()
-	{
-		super.init();
-		encoding = "UTF-8";
-	}
+    /**
+     * Overrides the standard encoding
+     */
+    protected void init()
+    {
+        super.init();
+        encoding = "UTF-8";
+    }
 } //MuleIDEResourceImpl

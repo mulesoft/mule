@@ -17,22 +17,22 @@
     The example demonstrates how easy it is to swap out different transports while never
     affecting the application.
 
-	This file defines the configuration for the hello sample application.  The application
-	has two components -
-	1. The Greeter component that adds a greeting to the event it receives
-	2. The ChitChater component that adds some additional conversation to the event it receives
-	An event is triggered by input through the system console and the outbound event is
-	aslo written out through the system console.
+    This file defines the configuration for the hello sample application.  The application
+    has two components -
+    1. The Greeter component that adds a greeting to the event it receives
+    2. The ChitChater component that adds some additional conversation to the event it receives
+    An event is triggered by input through the system console and the outbound event is
+    aslo written out through the system console.
     </description>
 
 <mule-environment-properties synchronous="true"/>
     
     <!--
-    	All transformers must be defined here.  For this example we have two transformers
-    	used to transform the inbound events for the Greeter and Chatter components into
-    	objects they understand.  The entryPointResolver configured on the Model below will
-    	determine which method to call on our components based on the return types of these
-    	transformers.
+        All transformers must be defined here.  For this example we have two transformers
+        used to transform the inbound events for the Greeter and Chatter components into
+        objects they understand.  The entryPointResolver configured on the Model below will
+        determine which method to call on our components based on the return types of these
+        transformers.
     -->
     <transformers>
         <transformer name="StringToNameString" className="org.mule.samples.hello.StringToNameString"

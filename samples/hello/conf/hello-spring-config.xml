@@ -12,12 +12,12 @@
     <!-- Used to set mule object names to their corresponding bean id -->
     <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
     <!--
-    	The system stream connector is used to send and receive information via the
-    	System.in and System.out. Note this connector is only really useful for testing
-    	purposes.
-    	promptMessage - is what is written to the console
-    	messageDelayTime - is the time in milliseconds before the user is prompted again.
-    	These properties are set as bean properties on the connector.
+        The system stream connector is used to send and receive information via the
+        System.in and System.out. Note this connector is only really useful for testing
+        purposes.
+        promptMessage - is what is written to the console
+        messageDelayTime - is the time in milliseconds before the user is prompted again.
+        These properties are set as bean properties on the connector.
     -->
     <bean id="systemStreamConnector" class="org.mule.providers.stream.SystemStreamConnector">
         <property name="promptMessage"><value>Please enter your name: </value></property>

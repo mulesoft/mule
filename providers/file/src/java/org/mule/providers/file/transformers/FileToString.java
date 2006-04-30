@@ -41,11 +41,11 @@ public class FileToString extends AbstractTransformer
     {
         if (src instanceof byte[]) {
             if (encoding != null) {
-            	try {
+                try {
                   return new String((byte[]) src, encoding);
-            	} catch (UnsupportedEncodingException ex){
-            	  return new String((byte[]) src);
-            	}
+                } catch (UnsupportedEncodingException ex){
+                  return new String((byte[]) src);
+                }
               } else {
                 return new String((byte[]) src);
               }

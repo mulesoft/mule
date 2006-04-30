@@ -58,9 +58,9 @@ public class DQMessageAdapter extends AbstractMessageAdapter
 
     public final byte[] getPayloadAsBytes() throws Exception
     {
-    	if(serializableToByteArray==null) {
-    		serializableToByteArray = new SerializableToByteArray();
-    	}
+        if(serializableToByteArray==null) {
+            serializableToByteArray = new SerializableToByteArray();
+        }
         return (byte[])serializableToByteArray.doTransform(message, getEncoding());
     }
 

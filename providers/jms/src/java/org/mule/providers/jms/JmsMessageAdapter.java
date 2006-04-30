@@ -40,7 +40,7 @@ import java.util.Enumeration;
 public class JmsMessageAdapter extends AbstractMessageAdapter
 {
 
-	private Message message = null;
+    private Message message = null;
 
     public JmsMessageAdapter(Object message) throws MessagingException
     {

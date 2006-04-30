@@ -7,12 +7,12 @@ package org.mule.test.integration.providers.jms.oracle;
  */
 public abstract class TestConfig {
 
-	// The following queues are created and dropped automatically by the integration
-	// tests.  You only need to change them if these names will create a conflict for 
-	// you.
-	public static String QUEUE_RAW = "TEST_RAW";
-	public static String QUEUE_TEXT = "TEST_TEXT";
-	public static String QUEUE_TEXT2 = "TEST_TEXT2";
+    // The following queues are created and dropped automatically by the integration
+    // tests.  You only need to change them if these names will create a conflict for
+    // you.
+    public static String QUEUE_RAW = "TEST_RAW";
+    public static String QUEUE_TEXT = "TEST_TEXT";
+    public static String QUEUE_TEXT2 = "TEST_TEXT2";
     public static String QUEUE_XML = "TEST_XML";
 
     public static String TEXT_MESSAGE = "This is a text message.";
