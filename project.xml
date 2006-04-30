@@ -98,9 +98,6 @@
                 <!-- TODO Not working... yet -->
                 <exclude>**/*XFireLoanBrokerSynchronousFunctionalTestCase.*</exclude>
                 
-                <!-- TODO MULE-787 -->
-                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
-
             </excludes>
 
             <resources>
