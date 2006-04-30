@@ -1,6 +1,6 @@
 package org.mule.providers.spring;
 
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 
 import org.apache.commons.logging.Log;

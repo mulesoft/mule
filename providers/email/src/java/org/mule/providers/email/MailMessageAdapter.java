@@ -28,7 +28,7 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;

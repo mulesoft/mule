@@ -14,7 +14,7 @@
 package org.mule.transformers.xml;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 

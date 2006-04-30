@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.tcp.TcpProtocol;
 
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +29,7 @@ import java.net.SocketTimeoutException;
  * The DefaultProtocol class is an application level tcp protocol that does
  * nothing. Reading is performed in reading the socket until no more bytes are
  * available. Writing simply writes the data to the socket.
- * 
+ *
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
