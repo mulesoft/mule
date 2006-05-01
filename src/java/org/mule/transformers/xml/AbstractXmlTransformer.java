@@ -87,9 +87,10 @@ abstract public class AbstractXmlTransformer extends AbstractTransformer {
     /**
      * @param desiredClass Java class representing the desired format
      * @return Callback interface representing the desiredClass - or null
-     * if the return class isn't supported.
+     * if the return class isn't supported (or is null).
      */
     protected static ResultHolder getResultHolder(Class desiredClass) {
+        if (desiredClass == null) return null;
         if (byte[].class.equals(desiredClass)) {
             return new ResultHolder() {
                 ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
