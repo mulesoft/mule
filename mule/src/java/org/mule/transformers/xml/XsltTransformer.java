@@ -73,10 +73,11 @@ public class XsltTransformer extends AbstractXmlTransformer {
     public synchronized Object doTransform(Object src, String encoding) throws TransformerException {
         try {
             Source sourceDoc = getXmlSource(src);
-            ResultHolder holder = getResultHolder(returnClass == null && src != null ? src.getClass() : returnClass);
+            if (sourceDoc == null) return null;
+            
+            ResultHolder holder = getResultHolder(returnClass);
+            if (holder == null) holder = getResultHolder(src.getClass()); 
            
-            assert(sourceDoc != null);
-
             DefaultErrorListener errorListener = new DefaultErrorListener(this);
             transformer.setErrorListener(errorListener);
             transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
