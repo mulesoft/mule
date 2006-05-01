@@ -26,17 +26,6 @@
 <!--        <agent name="JMX" className="org.mule.management.agents.DefaultJmxSupportAgent"/>-->
 <!--    </agents>-->
 
-    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
-    bean types for the objects you're passing around -->
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <list name="beanTypes">
-                <entry value="org.mule.samples.loanbroker.Customer"/>
-                <entry value="org.mule.samples.loanbroker.BankQuoteRequest"/>
-            </list>
-        </properties>
-    </connector>
-
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.
@@ -44,37 +33,24 @@
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
-        <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
-        <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
+        <endpoint-identifier name="CreditAgency" value="xfire:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
+        <endpoint-identifier name="CreditAgencyReceiver" value="xfire:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
-        <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>
-        <endpoint-identifier name="Bank2" value="axis:http://localhost:20080/mule"/>
-        <endpoint-identifier name="Bank3" value="axis:http://localhost:30080/mule"/>
-        <endpoint-identifier name="Bank4" value="axis:http://localhost:40080/mule"/>
-        <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
+        <endpoint-identifier name="Bank1" value="xfire:http://localhost:10080/mule"/>
+        <endpoint-identifier name="Bank2" value="xfire:http://localhost:20080/mule"/>
+        <endpoint-identifier name="Bank3" value="xfire:http://localhost:30080/mule"/>
+        <endpoint-identifier name="Bank4" value="xfire:http://localhost:40080/mule"/>
+        <endpoint-identifier name="Bank5" value="xfire:http://localhost:50080/mule"/>
     </endpoint-identifiers>
-
-    <!--    <endpoint-identifiers>-->
-    <!--        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>-->
-    <!--        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>-->
-    <!--        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>-->
-    <!--        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>-->
-    <!--        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>-->
-    <!--        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>-->
-    <!--        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>-->
-    <!--        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>-->
-    <!--        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>-->
-    <!--        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>-->
-    <!--    </endpoint-identifiers>-->
 
     <!--
        The Mule model initialises and manages your UMO components
    -->
     <model name="loan-broker">
-        <!-- by declaring the Axis service component we can overload its default
+        <!-- by declaring the Fire service component we can overload its default
         configuration to add more threads or pooled resources -->
-        <mule-descriptor name="_axisServiceComponent"
-            implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+        <mule-descriptor name="_xfireServiceComponent"
+            implementation="org.mule.providers.soap.xfire.XFireServiceComponent">
             <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
             <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
         </mule-descriptor>

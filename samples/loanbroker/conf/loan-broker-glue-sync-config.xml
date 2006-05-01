@@ -19,44 +19,20 @@
 <!--        <agent name="JMX" className="org.mule.management.agents.DefaultJmxSupportAgent"/>-->
 <!--    </agents>-->
 
-    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
-    bean types for the objects you're passing around -->
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <list name="beanTypes">
-                <entry value="org.mule.samples.loanbroker.Customer"/>
-                <entry value="org.mule.samples.loanbroker.BankQuoteRequest"/>
-            </list>
-        </properties>
-    </connector>
-
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
-        <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
-        <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
+        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
+        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://localhost/LenderService?method=setLenderList"/>
         <!-- The method parameter for the bank endpoints is added programmitcally when the bank objects are
         created -->
-        <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>
-        <endpoint-identifier name="Bank2" value="axis:http://localhost:20080/mule"/>
-        <endpoint-identifier name="Bank3" value="axis:http://localhost:30080/mule"/>
-        <endpoint-identifier name="Bank4" value="axis:http://localhost:40080/mule"/>
-        <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
+        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>
+        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>
+        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>
+        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>
+        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>
     </endpoint-identifiers>
-
-<!--    <endpoint-identifiers>-->
-<!--        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>-->
-<!--        <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>-->
-<!--        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>-->
-<!--        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>-->
-<!--        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService?method=setLenderList"/>-->
-<!--        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>-->
-<!--        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>-->
-<!--        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>-->
-<!--        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>-->
-<!--        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>-->
-<!--    </endpoint-identifiers>-->
 
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker"
