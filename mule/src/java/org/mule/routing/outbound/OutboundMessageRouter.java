@@ -97,7 +97,6 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
             }
             return catchAll(message, session, synchronous);
         } else if (!matchfound) {
-            System.err.println(message.toString());
             logger.warn("Message did not match any routers on: " + session.getComponent().getDescriptor().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message.");
         }
@@ -116,7 +115,6 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
     {
         List endpoints = new ArrayList();
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
-
             UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
             if (umoOutboundRouter.isMatch(message)) {
                 endpoints.addAll(umoOutboundRouter.getEndpoints());
@@ -125,6 +123,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
                 }
             }
         }
+
         UMOEndpoint[] result = new UMOEndpoint[endpoints.size()];
         return (UMOEndpoint[]) endpoints.toArray(result);
     }
