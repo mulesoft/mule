@@ -15,14 +15,14 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleEvent;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.AbstractComponent;
@@ -102,9 +102,12 @@ public class DefaultReplyToHandler implements ReplyToHandler
     {
         UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null) {
-            UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
-            endpoint = MuleEndpoint.getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-            endpointCache.put(endpointUri, endpoint);
+            endpoint = MuleManager.getInstance().lookupEndpoint(endpointUri);
+            if(endpoint == null) {
+                UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
+                endpoint = MuleEndpoint.getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                endpointCache.put(endpointUri, endpoint);
+            }
         }
         return endpoint;
     }
