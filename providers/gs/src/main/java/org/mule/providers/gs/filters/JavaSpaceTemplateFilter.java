@@ -15,10 +15,9 @@
 package org.mule.providers.gs.filters;
 
 import net.jini.core.entry.Entry;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.mule.config.i18n.Message;
+import org.mule.providers.gs.JiniMessage;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
@@ -39,9 +38,9 @@ public class JavaSpaceTemplateFilter implements UMOFilter
 
     public static final String NULL_VALUE = "null";
 
-    private String expectedType = null;
-    private Map fields = new HashMap();
-    private Entry entry = null;
+    protected String expectedType = null;
+    protected Map fields = new HashMap();
+    protected Entry entry = null;
 
     public JavaSpaceTemplateFilter()
     {
@@ -102,13 +101,22 @@ public class JavaSpaceTemplateFilter implements UMOFilter
             if (expectedType == null) {
                 return null; // Match all template
             }
-            entry = (Entry)ClassHelper.instanciateClass(expectedType, ClassHelper.NO_ARGS);
-            if (entry.getClass().isAssignableFrom(Entry.class)) {
-                throw new IllegalArgumentException(new Message("gs", 1, expectedType).toString());
+            Object entryType = ClassHelper.instanciateClass(expectedType, ClassHelper.NO_ARGS);
+            if (!(entryType instanceof Entry)) {
+                entry = new JiniMessage(null, entryType);
+                if (fields.size() > 0) {
+                    //Populate any properties on the message
+                    BeanUtils.populate(entry, fields);
+                    //populate properties on the payload
+                    BeanUtils.populate(((JiniMessage)entry).getPayload(), fields);
+                }
+            } else {
+                entry = (Entry)entryType;
+                if (fields.size() > 0) {
+                    BeanUtils.populate(entry, fields);
+                }
             }
-            if (fields.size() > 0) {
-                BeanUtils.populate(entry, fields);
-            }
+
         }
         return entry;
     }
@@ -137,6 +145,6 @@ public class JavaSpaceTemplateFilter implements UMOFilter
 
     public String toString()
     {
-        return "JiniEntryFilter{" + "expectedType=" + expectedType + ", fields=" + fields + "}";
+        return "Filter{" + "expectedType=" + expectedType + ", fields=" + fields + "}";
     }
 }
