@@ -21,7 +21,6 @@ import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -39,7 +38,7 @@ import java.util.Map;
 /**
  * <code>DefaultReplyToHandler</code> is responsible for processing a message
  * replyTo header.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -85,7 +84,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
         // dispatch the event
         try {
-            endpoint.getConnector().getDispatcher(new ImmutableMuleEndpoint(replyTo.toString(), false)).dispatch(replyToEvent);
+            endpoint.getConnector().getDispatcher(endpoint).dispatch(replyToEvent);
             if (logger.isInfoEnabled()) {
                 logger.info("reply to sent: " + endpoint);
             }
