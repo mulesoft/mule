@@ -65,7 +65,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     {
         String timeoutString = servletConfig.getInitParameter(REQUEST_TIMEOUT_PROPERTY);
         if (timeoutString != null) {
-            timeout = new Long(timeoutString).longValue();
+            timeout = Long.parseLong(timeoutString);
         }
         logger.info("Default request timeout for GET methods is: " + timeout);
 
@@ -112,7 +112,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             }
         }
         else {
-            HttpResponse httpResponse = null;
+            HttpResponse httpResponse;
             if (message.getAdapter() instanceof WriterMessageAdapter) {
                 WriterMessageAdapter adapter = (WriterMessageAdapter)message.getAdapter();
                 httpResponse = new HttpResponse();
@@ -134,11 +134,11 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             else {
 
                 servletResponse.setContentType(contentType);
-                // Encoding: tis method will check the charset on the content
-                // type
+                // Encoding: this method will check the charset on the content type
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
             servletResponse.setStatus(HttpServletResponse.SC_OK);
+            servletResponse.flushBuffer();
         }
     }
 
