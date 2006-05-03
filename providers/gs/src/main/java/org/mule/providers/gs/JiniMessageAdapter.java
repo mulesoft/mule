@@ -11,21 +11,23 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import net.jini.core.entry.Entry;
+
+import org.apache.commons.lang.StringUtils;
+import org.mule.MuleManager;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.UUID;
 
-import java.util.Iterator;
-
 /**
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.
- *
+ * 
  * @see Entry
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,47 +39,87 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
     public JiniMessageAdapter(Object message) throws MessagingException
     {
-        if(message==null) {
+        if (message == null)
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
-        if(message instanceof Entry) {
+
+        if (message instanceof Entry)
+        {
             this.message = (Entry)message;
-        } else {
+        }
+        else
+        {
             this.message = new JiniMessage(null, message);
         }
 
-        if(this.message instanceof JiniMessage) {
+        if (this.message instanceof JiniMessage)
+        {
             JiniMessage jm = (JiniMessage)this.message;
-            id = (jm.getMessageId());
-            if(id==null) id = UUID.getUUID();
 
-            setCorrelationId(jm.getCorrelationId());
-            setCorrelationGroupSize(jm.getCorrelationGroupSize().intValue());
-            setCorrelationSequence(jm.getCorrelationSequence().intValue());
-            setReplyTo(jm.getReplyTo());
-            setEncoding(jm.getEncoding());
-            setExceptionPayload(jm.getExceptionPayload());
-            for (Iterator iterator = jm.getProperties().keySet().iterator(); iterator.hasNext();) {
-                Object o = iterator.next();
-                setProperty(o, jm.getProperties().get(o));
+            // accept or create
+            this.id = jm.getMessageId();
+            if (this.id == null)
+            {
+                id = UUID.getUUID();
             }
-        } else {
+
+            // accept null
+            this.setCorrelationId(jm.getCorrelationId());
+
+            // accept or default
+            Integer value = jm.getCorrelationGroupSize();
+            this.setCorrelationGroupSize(value != null ? value.intValue() : -1);
+
+            // accept or default
+            value = jm.getCorrelationSequence();
+            this.setCorrelationSequence(value != null ? value.intValue() : -1);
+
+            // accept null
+            this.setReplyTo(jm.getReplyTo());
+
+            // accept or default
+            this.setEncoding(StringUtils.defaultIfEmpty(jm.getEncoding(), MuleManager.getConfiguration()
+                    .getEncoding()));
+
+            // accept null
+            this.setExceptionPayload(jm.getExceptionPayload());
+
+            // accept all (as handled by superclass)
+            this.addProperties(jm.getProperties());
+        }
+        else
+        {
             id = UUID.getUUID();
         }
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding
+     *            The encoding to use when transforming the message (if necessary).
+     *            The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
+     * @throws Exception
+     *             Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
-        if(message instanceof JiniMessage) {
-            return ((JiniMessage)message).getPayload().toString();
-        } else {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
+        if (message instanceof JiniMessage)
+        {
+            Object payload = ((JiniMessage)message).getPayload();
+            if (payload != null)
+            {
+                return payload.toString();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
             return message.toString();
         }
     }
@@ -85,7 +127,8 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
     public byte[] getPayloadAsBytes() throws Exception
     {
         Object payload = message;
-        if(message instanceof JiniMessage) {
+        if (message instanceof JiniMessage)
+        {
             payload = ((JiniMessage)message).getPayload();
         }
 
@@ -94,14 +137,18 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
     public Object getPayload()
     {
-        if(message instanceof JiniMessage) {
+        if (message instanceof JiniMessage)
+        {
             return ((JiniMessage)message).getPayload();
-        } else {
+        }
+        else
+        {
             return message;
         }
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
         return id;
     }
 }
