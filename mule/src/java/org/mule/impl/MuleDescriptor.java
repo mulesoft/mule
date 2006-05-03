@@ -414,4 +414,16 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
+
+    /**
+     * Sets the name of the contaier where the object for this descriptor resides. If this value
+     * is 'none' the 'implementaiton' attributed is expected to be a fully qualified class name that
+     * will be instanciated.
+     *
+     * @param containerName the container name, or null if it is not known - in which case each container will be queried
+     *                      for the component implementation.
+     */
+    public void setContainer(String containerName) {
+        this.container = containerName;
+    }
 }

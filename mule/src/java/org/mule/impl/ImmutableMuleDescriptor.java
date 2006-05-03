@@ -16,7 +16,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -54,6 +53,7 @@ import java.util.Map;
 
 public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 {
+    public static final String NOT_CONTAINER_MANAGED = "none";
     /**
      * The initial states that the component can be started in
      */
@@ -167,8 +167,16 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected List initialisationCallbacks = new ArrayList();
 
+
     protected String encoding = null;
-    
+
+    /**
+     * The name of the container that the component implementation resides in
+     * If null, the containe ris not known, if 'none' the component is instanciated from
+     * its implementaiton class name
+     */
+    protected String container = null;
+
     /**
      * Default constructor. Initalises common properties for the
      * MuleConfiguration object
@@ -304,12 +312,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("name=" + name);
-        buffer.append(", outbound endpoint=" + outboundEndpoint);
-        buffer.append(", send transformer=" + outboundTransformer);
-        buffer.append(", inbound endpointUri=" + inboundEndpoint);
-        buffer.append(", receive transformer=" + inboundTransformer);
-        buffer.append(", encoding=" + encoding);
+        buffer.append("name=").append(name);
+        buffer.append(", outbound endpoint=").append(outboundEndpoint);
+        buffer.append(", send transformer=").append(outboundTransformer);
+        buffer.append(", inbound endpointUri=").append(inboundEndpoint);
+        buffer.append(", receive transformer=").append(inboundTransformer);
+        buffer.append(", encoding=").append(encoding);
         return buffer.toString();
     }
 
@@ -354,7 +362,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     public boolean isContainerManaged()
     {
-        return containerManaged;
+        return !NOT_CONTAINER_MANAGED.equalsIgnoreCase(container);
     }
 
     public Class getImplementationClass() throws UMOException
@@ -454,5 +462,17 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     public String getInitialState() {
         return initialState;
+    }
+
+    /**
+     * Returns the name of the contaier where the object for this descriptor resides. If this value
+     * is 'none' the 'implementaiton' attributed is expected to be a fully qualified class name that
+     * will be instanciated.
+     *
+     * @return the container name, or null if it is not known - in which case each container will be queried
+     *         for the component implementation.
+     */
+    public String getContainer() {
+        return container;
     }
 }

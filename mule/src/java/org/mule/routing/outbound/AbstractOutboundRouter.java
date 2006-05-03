@@ -14,7 +14,6 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -164,45 +163,6 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 logger.debug("Extracted correlation Id as: " + o);
             }
             correlation = o.toString();
-
-            // TODO clean this up
-            //int seq = 1;
-            // o =
-            // propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-            // message);
-            // if (logger.isDebugEnabled()) logger.debug("Extracted correlation
-            // sequence as: " + o);
-            // if (o != null)
-            // {
-            // try
-            // {
-            // seq = Integer.parseInt(o.toString());
-            // } catch (NumberFormatException e)
-            // {
-            // if (logger.isDebugEnabled()) logger.debug("Invalid Correlation
-            // sequence value: " + o.toString() + ". Defaulting to 1");
-            // seq = 1;
-            // }
-            // }
-
-            //int group = 1;
-            // o =
-            // propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-            // message);
-            // if (logger.isDebugEnabled()) logger.debug("Extracted correlation
-            // Group size as: " + o);
-            // if (o != null)
-            // {
-            // try
-            // {
-            // group = Integer.parseInt(o.toString());
-            // } catch (NumberFormatException e)
-            // {
-            // if (logger.isDebugEnabled()) logger.debug("Invalid Correlation
-            // group value: " + o.toString() + ". Defaulting to 1");
-            // group = 1;
-            // }
-            // }
 
             if (logger.isDebugEnabled()) {
                 StringBuffer buf = new StringBuffer();

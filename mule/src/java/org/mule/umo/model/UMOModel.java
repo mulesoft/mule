@@ -177,7 +177,6 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return a descriptor for the given component name or null if there is no
      *         component registered by that name
      * @see UMODescriptor
-     * @deprecated use getComponent("name").getDescriptor()
      */
     UMODescriptor getDescriptor(String name);
 

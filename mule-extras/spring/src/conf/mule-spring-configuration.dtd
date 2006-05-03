@@ -867,7 +867,7 @@ Jndi
     An entry Point resolver is used to determine which method on a UMO object
     should receive events
 -->
-<!ELEMENT entry-point-resolver EMPTY>
+<!ELEMENT entry-point-resolver (properties?)>
 
 <!--
     The fully qualified class name of the resolver to use on this model
@@ -972,8 +972,16 @@ Jndi
 <!--
     If an IoC container is being used this property can be set to determine if this component
     is constructed (and contained in) the container or is instanciated by Mule.
+    This is being deprecated in favour of the 'ontainer' property below.
 -->
 <!ATTLIST mule-descriptor containerManaged            (true | false)            "true">
+
+<!--
+    If an IoC container is being used this property can be set to determine which container explicitly
+    the component should be loaded from. Also you can specify to not load the component from a Container
+    context by setting this value to 'none'.
+-->
+<!ATTLIST mule-descriptor container			NMTOKEN		#IMPLIED>
 
 <!--
     Determines if only a single instance of this component is created.  This is useful when a

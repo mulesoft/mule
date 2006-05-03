@@ -602,7 +602,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     {
         // Create Mule UMOs
         path += "/mule-descriptor";
-        addObjectCreateOrGetFromContainer(path, DEFAULT_DESCRIPTOR, "className", "ref", false);
+        addObjectCreateOrGetFromContainer(path, DEFAULT_DESCRIPTOR, "className", "ref", "container", false);
 
         addSetPropertiesRule(path, digester);
 
@@ -1022,6 +1022,12 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     protected void addObjectCreateOrGetFromContainer(final String path, String defaultImpl, final String classAttrib, final String refAttrib, final boolean classRefRequired) {
         digester.addRule(path, new ObjectGetOrCreateRule(
                 defaultImpl, classAttrib, refAttrib, classAttrib,
+                classRefRequired, "getContainerContext"));
+    }
+
+    protected void addObjectCreateOrGetFromContainer(final String path, String defaultImpl, final String classAttrib, final String refAttrib, final String containerAttrib, final boolean classRefRequired) {
+        digester.addRule(path, new ObjectGetOrCreateRule(
+                defaultImpl, classAttrib, refAttrib, containerAttrib, classAttrib,
                 classRefRequired, "getContainerContext"));
     }
 }
