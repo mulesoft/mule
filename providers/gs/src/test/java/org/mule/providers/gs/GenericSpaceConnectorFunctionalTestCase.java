@@ -41,7 +41,7 @@ public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFun
     protected String checkPreReqs() {
         if(System.getProperty("com.gs.home", null) != null) {
             System.setProperty("com.gs.security.enabled", "false");
-            System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/bin/policy.all");
+            System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/policy/policy.all");
             return null;
         }
         return "com.gs.home VM parameter not set.";
