@@ -18,6 +18,7 @@ package org.mule.providers.jms;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.ArrayUtils;
 import org.mule.util.compression.CompressionHelper;
 
 import javax.jms.BytesMessage;
@@ -41,6 +42,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with Jms messages in Mule
@@ -148,7 +150,7 @@ public class JmsMessageUtils
                 if (result != null) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("JMSToObject: extracted " + ((byte[])result).length
-                                + " bytes from JMS BytesMessage");
+                                     + " bytes from JMS BytesMessage");
                     }
                 }
             }
@@ -162,11 +164,11 @@ public class JmsMessageUtils
             else if (source instanceof StreamMessage) {
                 StreamMessage sm = (StreamMessage)source;
 
-                result = new java.util.Vector();
+                result = new Vector();
                 try {
                     Object obj;
                     while ((obj = sm.readObject()) != null) {
-                        ((java.util.Vector)result).addElement(obj);
+                        ((Vector)result).addElement(obj);
                     }
                 }
                 catch (MessageEOFException eof) {
@@ -228,12 +230,20 @@ public class JmsMessageUtils
             baos.write(bs.toByteArray());
             os.close();
             bs.close();
-        }
-        else if (message instanceof TextMessage) {
-            TextMessage tMsg = (TextMessage)message;
-            baos.write(tMsg.getText().getBytes());
-        }
-        else {
+        } else if (message instanceof TextMessage) {
+            TextMessage tMsg = (TextMessage) message;
+            String tMsgText = tMsg.getText();
+
+            if (null == tMsgText) {
+                // Avoid creating new instances of byte arrays,
+                // even empty ones. The load on this part of the
+                // code can be high.
+                baos.write(ArrayUtils.EMPTY_BYTE_ARRAY);
+            } else {
+                baos.write(tMsgText.getBytes());
+
+            }
+        } else {
             throw new JMSException("Cannot get bytes from Map Message");
         }
 
