@@ -14,23 +14,26 @@
 package org.mule.providers.gs;
 
 import net.jini.core.entry.Entry;
-
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.util.UUID;
+
+import java.util.Iterator;
 
 /**
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.
  *
  * @see Entry
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public class JiniMessageAdapter extends AbstractMessageAdapter
 {
-    private Entry message;
+    protected Entry message;
+    protected String id;
 
     public JiniMessageAdapter(Object message) throws MessagingException
     {
@@ -41,6 +44,25 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
             this.message = (Entry)message;
         } else {
             this.message = new JiniMessage(null, message);
+        }
+
+        if(this.message instanceof JiniMessage) {
+            JiniMessage jm = (JiniMessage)this.message;
+            id = (jm.getMessageId());
+            if(id==null) id = UUID.getUUID();
+
+            setCorrelationId(jm.getCorrelationId());
+            setCorrelationGroupSize(jm.getCorrelationGroupSize().intValue());
+            setCorrelationSequence(jm.getCorrelationSequence().intValue());
+            setReplyTo(jm.getReplyTo());
+            setEncoding(jm.getEncoding());
+            setExceptionPayload(jm.getExceptionPayload());
+            for (Iterator iterator = jm.getProperties().keySet().iterator(); iterator.hasNext();) {
+                Object o = iterator.next();
+                setProperty(o, jm.getProperties().get(o));
+            }
+        } else {
+            id = UUID.getUUID();
         }
     }
 
@@ -66,12 +88,20 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
         if(message instanceof JiniMessage) {
             payload = ((JiniMessage)message).getPayload();
         }
-        
+
         return convertToBytes(payload);
     }
 
     public Object getPayload()
     {
-        return message;
+        if(message instanceof JiniMessage) {
+            return ((JiniMessage)message).getPayload();
+        } else {
+            return message;
+        }
+    }
+
+    public String getUniqueId() {
+        return id;
     }
 }

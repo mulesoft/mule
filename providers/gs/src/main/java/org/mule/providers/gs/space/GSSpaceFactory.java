@@ -14,19 +14,17 @@
 package org.mule.providers.gs.space;
 
 import com.j_spaces.core.IJSpace;
-import com.j_spaces.core.client.ExternalEntry;
 import com.j_spaces.core.client.FinderException;
 import com.j_spaces.core.client.LocalTransactionManager;
-
 import net.jini.core.entry.Entry;
 import net.jini.core.transaction.server.TransactionManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.space.CreateSpaceException;
 import org.mule.providers.gs.GSConnector;
+import org.mule.providers.gs.JiniMessage;
 import org.mule.providers.gs.JiniTransactionFactory;
 import org.mule.providers.gs.filters.JavaSpaceTemplateFilter;
 import org.mule.umo.UMOFilter;
@@ -78,6 +76,8 @@ public class GSSpaceFactory implements UMOSpaceFactory {
      */
     public UMOSpace create(UMOImmutableEndpoint endpoint) throws UMOSpaceException {
         try {
+            //Todo the Spaces themselves are keyed on endpoint + any filtering information. Should that
+            //info also be included in the space name??
             GSSpace space = new GSSpace(endpoint.getEndpointURI().toString(), enableMonitorEvents);
 
             //Because Jini uses its own transaction management we need to set the Manager on the
@@ -96,11 +96,15 @@ public class GSSpaceFactory implements UMOSpaceFactory {
                 if(filter instanceof JavaSpaceTemplateFilter) {
                     space.setEntryTemplate(((JavaSpaceTemplateFilter)filter).getEntry());
                 } else {
-                    logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not a JiniEntryFilter. Endpoint will match all entries of all types for this endpoint");
+                    if(!endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER)) {
+                        logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not a JiniEntryFilter. Endpoint will match all entries of all types for this endpoint");
+                    }
                     space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
                 }
             } else {
-                logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not set. Endpoint will match all entries of all types for this endpoint");
+                if(!endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER)) {
+                    logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not set. Endpoint will match all entries of all types for this endpoint");
+                }
                 space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
             }
             return space;
@@ -110,7 +114,7 @@ public class GSSpaceFactory implements UMOSpaceFactory {
     }
 
     protected Entry createDefaultEntry(String identifier) {
-        ExternalEntry template = new ExternalEntry(identifier, null);
-        return template;
+        //return new ExternalEntry(identifier, null);
+        return new JiniMessage();
     }
 }

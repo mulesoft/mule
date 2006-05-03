@@ -14,9 +14,12 @@
 
 package org.mule.providers.space;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.space.UMOSpace;
@@ -89,18 +92,22 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
      */
     public UMOSpace getSpace(UMOImmutableEndpoint endpoint) throws UMOSpaceException
     {
-        String spaceUrl = endpoint.getEndpointURI().toString();
-        logger.info("looking for space: " + spaceUrl);
-        UMOSpace space = (UMOSpace)spaces.get(spaceUrl);
+        String spaceKey = getSpaceKey(endpoint);
+        logger.info("looking for space: " + spaceKey);
+        UMOSpace space = (UMOSpace)spaces.get(spaceKey);
         if (space == null) {
-            logger.info("Space not found, creating space: " + spaceUrl);
+            logger.info("Space not found, creating space: " + spaceKey);
             space = spaceFactory.create(endpoint);
-            spaces.put(spaceUrl, space);
+            spaces.put(spaceKey, space);
             if (endpoint.getTransactionConfig().getFactory() != null) {
                 space.setTransactionFactory(endpoint.getTransactionConfig().getFactory());
             }
         }
         return space;
+    }
+
+    protected String getSpaceKey(UMOImmutableEndpoint endpoint) {
+        return endpoint.getEndpointURI().toString();
     }
 
     public UMOSpaceFactory getSpaceFactory()
@@ -135,4 +142,15 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
         spaces.clear();
     }
 
+    /**
+     * The method determines the key used to store the receiver against.
+     *
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint  the endpoint being registered for the component
+     * @return the key to store the newly created receiver against
+     */
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+        return super.getReceiverKey(component, endpoint) +
+                (endpoint.getFilter()!=null ? '#' + endpoint.getFilter().toString() : StringUtils.EMPTY);
+    }
 }

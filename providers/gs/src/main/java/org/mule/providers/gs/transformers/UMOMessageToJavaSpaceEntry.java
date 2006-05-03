@@ -14,11 +14,14 @@
 package org.mule.providers.gs.transformers;
 
 import net.jini.core.entry.Entry;
-
 import org.mule.providers.gs.JiniMessage;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Convers an outbound event ot a JavaSpace entry that can be written to the space.
@@ -40,7 +43,21 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer {
             return src;
         } else {
             String destination = context.getEndpointURI().toString();
-            return new JiniMessage(destination, src);
+            JiniMessage msg = new JiniMessage(destination, src);
+            msg.setMessageId(context.getMessage().getUniqueId());
+            msg.setCorrelationId(context.getMessage().getCorrelationId());
+            msg.setCorrelationGroupSize(new Integer(context.getMessage().getCorrelationGroupSize()));
+            msg.setCorrelationSequence(new Integer(context.getMessage().getCorrelationSequence()));
+            msg.setReplyTo(context.getMessage().getReplyTo());
+            msg.setEncoding(context.getMessage().getEncoding());
+            msg.setExceptionPayload(context.getMessage().getExceptionPayload());
+            Map props = new HashMap();
+            for (Iterator iterator = context.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
+                Object o =  iterator.next();
+                props.put(o, context.getMessage().getProperty(o));
+            }
+            msg.setProperties(props);
+            return msg;
         }
     }
 }

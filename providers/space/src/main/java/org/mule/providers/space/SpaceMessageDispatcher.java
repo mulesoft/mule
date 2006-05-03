@@ -102,14 +102,12 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
         if (logger.isInfoEnabled()) {
             logger.info("Connecting to space '" + destination + "'");
         }
-        UMOSpace space = connector.getSpace(destination);
 
         Object result = space.take(timeout);
         if (result == null) {
             return null;
         }
-        UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
-        return message;
+        return (UMOMessage)new MuleMessage(connector.getMessageAdapter(result));
     }
 
     public Object getDelegateSession() throws UMOException

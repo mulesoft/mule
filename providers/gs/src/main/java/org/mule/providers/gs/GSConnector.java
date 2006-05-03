@@ -17,6 +17,7 @@ import org.mule.providers.gs.space.GSSpaceFactory;
 import org.mule.providers.space.SpaceConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 
@@ -80,8 +81,10 @@ public class GSConnector extends SpaceConnector {
         return getSpaceFactory().create(spaceUrl);
     }
 
-//    protected String getSpaceKey(UMOEndpoint endpoint) {
-//        return endpoint.getEndpointURI().toString() + (endpoint.getFilter()!=null ? ":" + endpoint.getFilter() : "");
-//    }
+    protected String getSpaceKey(UMOImmutableEndpoint endpoint) {
+        String spaceKey = super.getSpaceKey(endpoint);
+        spaceKey += (endpoint.getFilter()!=null ? '#' + endpoint.getFilter().toString() : "");
+        return spaceKey;
+    }
 
 }
