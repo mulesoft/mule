@@ -179,4 +179,13 @@ public interface UMOImmutableDescriptor
      * @return the initial state of this component
      */
     String getInitialState();
+
+    /**
+     * Returns the name of the contaier where the object for this descriptor resides. If this value
+     * is 'none' the 'implementaiton' attributed is expected to be a fully qualified class name that
+     * will be instanciated.
+     * @return the container name, or null if it is not known - in which case each container will be queried
+     * for the component implementation.
+     */
+    String getContainer();
 }

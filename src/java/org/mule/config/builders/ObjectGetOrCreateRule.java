@@ -19,6 +19,7 @@ import org.apache.commons.digester.ObjectCreateRule;
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.manager.UMOContainerContext;
 import org.xml.sax.Attributes;
 
@@ -40,6 +41,7 @@ public class ObjectGetOrCreateRule extends ObjectCreateRule
     protected boolean classRefRequired = false;
     protected String containerMethodName;
     protected UMOContainerContext context;
+    protected String containerAttrib;
 
     public ObjectGetOrCreateRule(String defaultImpl, String className, String containerMethodName) {
         this(defaultImpl, className, DEFAULT_REF_ATTRIBUTE, false, containerMethodName);
@@ -66,6 +68,17 @@ public class ObjectGetOrCreateRule extends ObjectCreateRule
         this.classAttrib = classAttrib;
     }
 
+    public ObjectGetOrCreateRule(String defaultImpl, String className, String refAttrib, String containerAttrib,
+                                     String classAttrib, boolean classRefRequired, String containerMethodName) {
+            super(defaultImpl, className);
+            this.refAttrib = refAttrib;
+            this.containerAttrib = containerAttrib;
+            this.classRefRequired = classRefRequired;
+            this.containerMethodName = containerMethodName;
+            this.classAttrib = classAttrib;
+        }
+
+
     /**
      * This method is deprecated in the Digester API however the API still uses it and we must overload it in order to
      * customse the ObjectCreateRuleBehaviour
@@ -74,9 +87,18 @@ public class ObjectGetOrCreateRule extends ObjectCreateRule
      */
     public void begin(Attributes attributes) throws Exception
     {
+
         String ref = attributes.getValue(refAttrib);
+        String container = null;
+        if(containerAttrib!=null) {
+            container = attributes.getValue(containerAttrib);
+        }
         if(ref!=null) {
-            Object obj = getContainer().getComponent(ref);
+            Object cRef = ref;
+            if(container!=null) {
+                cRef = new ContainerKeyPair(container, ref);
+            }
+            Object obj = getContainer().getComponent(cRef);
             digester.push(obj);
         } else {
             String classRef = attributes.getValue(classAttrib);
