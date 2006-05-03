@@ -21,7 +21,7 @@ import org.mule.util.PropertiesHelper;
 import java.util.Map;
 
 /**
- * The default wrapper Template for a GigiSpace entry
+ * The default wrapper Template for a GigaSpace entry
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
