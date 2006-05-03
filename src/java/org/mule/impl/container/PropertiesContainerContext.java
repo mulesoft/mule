@@ -25,12 +25,14 @@ import java.util.Map;
 /**
  * Provides a facade for accessing System properties and properties on the ManagementContext.
  * This container context serves 3 functions -
- * 1. It also allows System properties to be set in Mule Xml (by setting the systemProperties Map)
- * 2. Allows you to load System properties into the mule context sothat you can you templates in MuleXml that
- * refer to System properties (i.e. ${os.name})
- * 3. Provides a consistent way to set abitary properties on the Management Context. Setting properties on this
- * container context is equivilent to using the <environment-properties> element in Mule Xml.  This element may
- * be removed in future.
+ * <ol>
+ * <li>Allows System properties to be set in Mule Xml (by setting the #systemProperties Map)
+ * <li>Allows one to load System properties into the mule context so that MuleXml templates referring
+ * to System properties can be used (i.e. ${os.name}).
+ * <li>Provides a consistent way to set abitary properties on the Management Context. Setting properties on this
+ * container context is equivilent to using the <environment-properties> element in Mule Xml.  The latter element may
+ * be removed in the future.
+ * </ol>
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: $
@@ -56,10 +58,10 @@ public class PropertiesContainerContext extends AbstractContainerContext {
      * Queries a component from the underlying container. For this container it will look up a property on the
      * Mule Management Context.
      *
-     * @param key the key fo find the component with. Its up to the individual
+     * @param key the key fo find the component with. It's up to the individual
      *            implementation to check the type of this key and look up
      *            objects accordingly
-     * @return The component found in the container
+     * @return the component found in the container
      * @throws org.mule.umo.manager.ObjectNotFoundException
      *          if the component is not found
      */
