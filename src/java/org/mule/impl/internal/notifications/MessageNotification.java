@@ -22,7 +22,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
- * These notifications are fire when either a message is recieved via an endpoint, or dispatcher of if
+ * These notifications are fire when either a message is received via an endpoint, or dispatcher of if
  * a receive call is made on a dispatcher.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

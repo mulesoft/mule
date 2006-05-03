@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * <code>UMOImmutableEndpoint</code> describes a Message endpoint where data
- * is sent or recieved. An Enpoint is an Resource address (EndpointUri), with
+ * is sent or received. An Enpoint is an Resource address (EndpointUri), with
  * associated transformation, transaction and filtering rules.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

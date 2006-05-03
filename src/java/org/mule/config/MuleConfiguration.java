@@ -199,7 +199,7 @@ public class MuleConfiguration
     private String[] configResources = new String[] {};
 
     /**
-     * This is the url used by the server itself to recieve incomming requests.
+     * This is the url used by the server itself to receive incomming requests.
      * This enables clients such as the Mule Client to marshal remote requests
      * to a MuleManager instance. The default value is tcp://localhost:61616
      */
