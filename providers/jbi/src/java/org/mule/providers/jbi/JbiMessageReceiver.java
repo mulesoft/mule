@@ -36,7 +36,7 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
 /**
- * Is a Jbi component that can recieve events over Mule transports. This is an indeopendent
+ * Is a Jbi component that can receive events over Mule transports. This is an indeopendent
  * Jbi component implementation that can be used in Any Jbi container, including but not limited
  * to Mule JBI.
  *

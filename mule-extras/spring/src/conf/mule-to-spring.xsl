@@ -540,7 +540,7 @@
                 <xsl:when test="@id='dispatcher'">dispatcherThreadingProfile</xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
-                        <xsl:when test="@id='reciever'">receiverThreadingProfile</xsl:when>
+                        <xsl:when test="@id='receiver'">receiverThreadingProfile</xsl:when>
                         <xsl:otherwise>
                             <xsl:choose>
                                 <xsl:when test="@id='component'">componentThreadingProfile</xsl:when>

@@ -114,7 +114,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             httpServer.start();
         }
         catch (Exception e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jetty Http Reciever"),
+            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jetty Http Receiver"),
                     e, this);
         }
     }
@@ -125,7 +125,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             httpServer.stop(true);
         }
         catch (InterruptedException e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jetty Http Reciever"),
+            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jetty Http Receiver"),
                     e, this);
         }
     }

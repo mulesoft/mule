@@ -16,7 +16,7 @@ package org.mule.tools.benchmark;
 import org.mule.umo.UMOException;
 
 /**
- * <code>SenderAndReceiver</code> runs a sender and reciever in the same VM
+ * <code>SenderAndReceiver</code> runs a sender and receiver in the same VM
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$

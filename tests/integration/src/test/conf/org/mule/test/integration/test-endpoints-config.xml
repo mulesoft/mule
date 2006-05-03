@@ -64,7 +64,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <!-- test Uri reciever endpoint specifying a provider with endpoint overrriden and
+        <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
         test outbound router config combining endpoints -->
         <mule-descriptor name="TestComponent4"
             implementation="org.mule.test.integration.service.TestComponent">

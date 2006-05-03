@@ -39,7 +39,7 @@ import java.io.IOException;
  * can either specify the transport name i.e. to read from Jms orders.queue
  * http://www.mycompany.com/rest/jms/orders/queue <p/> or a Mule endpoint name
  * to target a specific endpoint config. This would get the first email message
- * recieved by the orderEmailInbox endpoint. <p/>
+ * received by the orderEmailInbox endpoint. <p/>
  * http://www.mycompany.com/rest/ordersEmailInbox <p/> POST Do a sysnchrous call
  * and return a result
  * http://www.clientapplication.com/service/clientquery?custId=1234 <p/> PUT Do

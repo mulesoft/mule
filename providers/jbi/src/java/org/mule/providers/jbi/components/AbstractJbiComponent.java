@@ -228,7 +228,7 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
 
             doInit();
             if (logger.isDebugEnabled()) {
-                logger.debug("Jbi Reciever Component initialized: " + name);
+                logger.debug("Jbi Receiver Component initialized: " + name);
             }
         } catch (JBIException e) {
             throw e;

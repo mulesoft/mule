@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * <code>GlueMessageReceiver</code> is used to recieve Glue bounded services
+ * <code>GlueMessageReceiver</code> is used to receive Glue bounded services
  * for Mule components.
  * 
  * services are bound in the Glue Registry using the Virtualservice

@@ -76,7 +76,7 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
     }
 
     /**
-     * Extracts a Group identifier from the current event.  When an event is recieved with a group identifier
+     * Extracts a Group identifier from the current event.  When an event is received with a group identifier
      * not registered with this router, a new group is created.  The id returned here can be a correlationId or
      * some custom aggregation Id.
      *

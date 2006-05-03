@@ -91,7 +91,7 @@ public class JmsReader
                         message = consumer.receive(1000);
                         if (message != null) {
 
-                            logger.info("onMessage: Message recieved");
+                            logger.info("onMessage: Message received");
 
                             if (message instanceof TextMessage) {
                                 logger.info("Message Content is: " + ((TextMessage) message).getText());
@@ -172,7 +172,7 @@ public class JmsReader
                     message = consumer.receive(1000);
                     if (message != null) {
 
-                        logger.info("\n***** onMessage: Message recieved");
+                        logger.info("\n***** onMessage: Message received");
 
                         if (message instanceof TextMessage) {
                             logger.info("Message Content is: " + ((TextMessage) message).getText());

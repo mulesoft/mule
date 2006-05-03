@@ -107,7 +107,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
      *
      * @param connector the endpoint that created this listener
      * @param component the component to associate with the receiver. When data
-     *                  is recieved the component <code>dispatchEvent</code> or
+     *                  is received the component <code>dispatchEvent</code> or
      *                  <code>sendEvent</code> is used to dispatch the data to the
      *                  relivant UMO.
      * @param endpoint  the provider contains the endpointUri on which the

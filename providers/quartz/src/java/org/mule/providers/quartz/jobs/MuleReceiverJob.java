@@ -28,7 +28,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * Invokes a Quartz Message reciever with the payload attached to the quartz job
+ * Invokes a Quartz Message receiver with the payload attached to the quartz job
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

@@ -101,7 +101,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * Authenticates the current message if authenticate is set to true. This
      * method will always populate the secure context in the session
      * 
-     * @param event the current message recieved
+     * @param event the current message received
      * @throws org.mule.umo.security.SecurityException if authentication fails
      */
     public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,

@@ -65,7 +65,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * The Xfire service component recieves requests for Xfire services it manages
+ * The Xfire service component receives requests for Xfire services it manages
  * and marshalls requests and responses
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

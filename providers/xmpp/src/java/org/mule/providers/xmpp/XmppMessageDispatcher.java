@@ -29,7 +29,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>XmppMessageDispatcher</code> allows Mule events to be sent and
- * recieved over Xmpp
+ * received over Xmpp
  * 
  * @author Peter Braswell
  * @author Ross Mason

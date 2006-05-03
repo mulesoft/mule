@@ -155,7 +155,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * UMOMessage and any context information.
      * 
      * @param message the UMOMessage being processed when the exception occurred
-     * @param failedEndpoint optional; the endpoint being dispatched or recieved
+     * @param failedEndpoint optional; the endpoint being dispatched or received
      *            on when the error occurred. This is NOT the endpoint that the
      *            message will be disptched on and is only supplied to this
      *            method for logging purposes

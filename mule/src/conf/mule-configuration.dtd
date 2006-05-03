@@ -181,7 +181,7 @@ Implementations must implement org.mule.umo.UMOPoolFactory.
 <!--
 The threading profile system id.  This is used to identify which system
 component should use the profile. This attribute is only used when declaring profiles on
-the mule-evironment-properties element and on connector components where 'messageReciever'
+the mule-evironment-properties element and on connector components where 'messageReceiver'
 or 'messageSender' can be used. For all other cases it can be set to 'default'.
 -->
 <!ATTLIST threading-profile id  (receiver|dispatcher|component|default)  "default">
@@ -560,7 +560,7 @@ Jndi
 <!ATTLIST endpoint connector    IDREF           #IMPLIED>
 <!--
     Determines whether the endpoint provider is a sender, receiver or a senderAndReceiver.
-    An endpoint can be senderAndReciever meaning that there is no difference for the endpoint
+    An endpoint can be senderAndReceiver meaning that there is no difference for the endpoint
     configuration if it is used as a sender or receiver.
 
 -->

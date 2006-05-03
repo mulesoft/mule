@@ -31,7 +31,7 @@ public interface UMOResponseRouter extends UMORouter
 {
     /**
      * This method is invoked when an event is received via an endpoint on this Response Router.
-     * It is responsible for tieing up the event it recieves with responses waiting to return back
+     * It is responsible for tieing up the event it receives with responses waiting to return back
      * to the callee.
      * This method will be called by a different thread to the getResponse method. The getResponse() method block
      * the response execution until the process method signals that a match is found.

@@ -91,7 +91,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         eventCount = 0;
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        builder.registerComponent(FunctionalTestComponent.class.getName(), "testJmsReconnection", getRecieverEndpoint("jms://reconnect.queue"), null, null);
+        builder.registerComponent(FunctionalTestComponent.class.getName(), "testJmsReconnection", getReceiverEndpoint("jms://reconnect.queue"), null, null);
     }
 
     /**
@@ -113,7 +113,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         ServerTools.killActiveMq();
     }
 
-    protected UMOEndpoint getRecieverEndpoint(String URI) throws UMOException {
+    protected UMOEndpoint getReceiverEndpoint(String URI) throws UMOException {
         return new MuleEndpoint(URI, true);
     }
 

@@ -11,7 +11,7 @@
 
 
 <!-- benchmark tools -->
-  <goal name="reciever" prereqs="setclasspath"
+  <goal name="receiver" prereqs="setclasspath"
     description="Runs a benchmark Mule Receiver">
 
     <j:if test="${empty(endpoints)}">

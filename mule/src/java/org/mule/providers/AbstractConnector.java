@@ -211,7 +211,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     private UMOWorkManager dispatcherWorkManager = null;
 
     /**
-     * Should a single receiver thread pool be created for all recievers
+     * Should a single receiver thread pool be created for all receivers
      * It is recommended that if you have a lot of receivers being registered per connector that this should be set
      * to true
      */
@@ -1111,10 +1111,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Should a single receiver thread pool be created for all recievers
+     * Should a single receiver thread pool be created for all receivers
      * It is recommended that if you have a lot of receivers being registered per connector that this should be set
      * to true
-     * @return true is a single thread pool is being used for all recievers on this connector
+     * @return true is a single thread pool is being used for all receivers on this connector
      */
     public boolean isUseSingleReceiverThreadPool() {
         return useSingleReceiverThreadPool;

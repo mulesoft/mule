@@ -33,7 +33,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * <code>HttpsMessageReceiver</code> is a Https server implementation used to
- * recieve incoming requests over https
+ * receive incoming requests over https
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

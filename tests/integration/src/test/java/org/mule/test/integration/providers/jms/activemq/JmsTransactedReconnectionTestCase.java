@@ -25,7 +25,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
  */
 public class JmsTransactedReconnectionTestCase extends JmsReconnectionTestCase {
 
-    protected UMOEndpoint getRecieverEndpoint(String URI) throws UMOException {
+    protected UMOEndpoint getReceiverEndpoint(String URI) throws UMOException {
         MuleEndpoint ep = new MuleEndpoint(URI, true);
         ep.getTransactionConfig().setFactory(new JmsClientAcknowledgeTransactionFactory());
         ep.getTransactionConfig().setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);

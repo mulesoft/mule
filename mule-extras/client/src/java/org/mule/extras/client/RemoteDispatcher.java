@@ -43,7 +43,7 @@ import org.mule.util.MuleObjectHelper;
 import java.util.Map;
 
 /**
- * <code>RemoteDispatcher</code> is used to make and recieve requests to a
+ * <code>RemoteDispatcher</code> is used to make and receive requests to a
  * remote Mule instance. It is used to proxy requests to Mule using the Server
  * Url as the the transport channel.
  *

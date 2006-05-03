@@ -197,7 +197,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
                 if (strategy.isCompressed(bytes)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Message recieved is compressed");
+                        logger.debug("Message received is compressed");
                     }
                     result = strategy.uncompressByteArray(bytes);
                 } else {
