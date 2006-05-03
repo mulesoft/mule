@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -138,8 +138,8 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
             servletResponse.setStatus(HttpServletResponse.SC_OK);
-            servletResponse.flushBuffer();
         }
+        servletResponse.flushBuffer();
     }
 
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
