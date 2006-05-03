@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
@@ -22,12 +23,26 @@ import org.mule.umo.provider.UMOMessageAdapter;
  */
 public class JiniMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
+
+    public void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    {
+        if (message instanceof JiniMessage && payload instanceof String)
+        {
+            assertEquals(((JiniMessage)message).getPayload(), payload);
+        }
+        else
+        {
+            fail("message must be a JiniMessage and payload must be a String");
+        }
+    }
+
     public Object getValidMessage() throws Exception
     {
         return new JiniMessage(null, "hello");
     }
 
-    public Object getInvalidMessage() {
+    public Object getInvalidMessage()
+    {
         return null;
     }
 
@@ -35,4 +50,5 @@ public class JiniMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return new JiniMessageAdapter(payload);
     }
+
 }
