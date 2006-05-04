@@ -24,6 +24,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.pool.BasePoolableObjectFactory;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.StackObjectPool;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -42,9 +45,10 @@ import org.mule.util.Utility;
 
 public class XsltTransformer extends AbstractXmlTransformer {
 
-    private Transformer transformer;
-
+    private ObjectPool transformerPool;
+    private int maxIdleTransformers = 2;
     private String xslFile;
+    private static final int MIN_IDLE = 1;
 
     public XsltTransformer() {
         super();
@@ -56,9 +60,14 @@ public class XsltTransformer extends AbstractXmlTransformer {
 
     public void initialise() throws InitialisationException {
         try {
-            StreamSource source = getStreamSource();
-            TransformerFactory factory = TransformerFactory.newInstance();
-            transformer = factory.newTransformer(source);
+            transformerPool = new StackObjectPool(new BasePoolableObjectFactory() {
+                public Object makeObject() throws Exception {
+                    StreamSource source = getStreamSource();
+                    TransformerFactory factory = TransformerFactory.newInstance();
+                    return factory.newTransformer(source);
+                }
+            }, Math.max(MIN_IDLE, maxIdleTransformers));
+            transformerPool.addObject();
         } catch (Throwable te) {
             throw new InitialisationException(te, this);
         }
@@ -70,7 +79,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
      * @param src The source XML (String, byte[], DOM, etc.)
      * @return The result String (or DOM)
      */
-    public synchronized Object doTransform(Object src, String encoding) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException {
         try {
             Source sourceDoc = getXmlSource(src);
             if (sourceDoc == null) return null;
@@ -79,24 +88,31 @@ public class XsltTransformer extends AbstractXmlTransformer {
             if (holder == null) holder = getResultHolder(src.getClass()); 
            
             DefaultErrorListener errorListener = new DefaultErrorListener(this);
-            transformer.setErrorListener(errorListener);
-            transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Before transform: " + convertToText(src));
+            Transformer transformer = null;
+            try {
+                transformer = (Transformer)transformerPool.borrowObject();
+                
+                transformer.setErrorListener(errorListener);
+                transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
+    
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Before transform: " + convertToText(src));
+                }
+    
+                transformer.transform(sourceDoc, holder.getResult());
+                Object result = holder.getResultObject(); 
+    
+                if (logger.isDebugEnabled()) {
+                    logger.debug("After transform: " + convertToText(result));
+                }
+                
+                if(errorListener.isError()) {
+                    throw errorListener.getException();
+                }
+                return result;
+            } finally {
+                if (transformer != null) transformerPool.returnObject(transformer);
             }
-
-            transformer.transform(sourceDoc, holder.getResult());
-            Object result = holder.getResultObject(); 
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("After transform: " + convertToText(result));
-            }
-
-            if(errorListener.isError()) {
-                throw errorListener.getException();
-            }
-            return result;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
@@ -190,5 +206,21 @@ public class XsltTransformer extends AbstractXmlTransformer {
         public void warning(javax.xml.transform.TransformerException exception) throws javax.xml.transform.TransformerException {
             logger.warn(exception.getMessage());
         }
+    }
+
+    /**
+     * @return The current maximum number of allowable idle transformer objects in the pool
+     */
+    public int getMaxIdleTransformers() {
+        return maxIdleTransformers;
+    }
+
+    /**
+     * Sets the the current maximum number of idle transformer objects allowed in the pool
+     * 
+     * @param maxIdleTransformers New maximum size to set
+     */
+    public void setMaxIdleTransformers(int maxIdleTransformers) {
+        this.maxIdleTransformers = maxIdleTransformers;
     }
 }
