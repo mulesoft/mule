@@ -26,7 +26,7 @@ import javax.resource.spi.work.Work;
 
 /**
  *
- * Registers a single JmsMessage listene but uses a thread pool to process incoming messages
+ * Registers a single JmsMessage listener but uses a thread pool to process incoming messages
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -41,7 +41,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
     public void onMessage(Message message) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Message received it is of type: " + message.getClass().getName());
+                logger.debug("Message received of type: " + message.getClass().getName());
                 if (message.getJMSDestination() != null) {
                     logger.debug("Message received on " + message.getJMSDestination() + " ("
                             + message.getJMSDestination().getClass().getName() + ")");
@@ -55,7 +55,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
             if (message.getJMSRedelivered()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                            + " is redelivered. handing off to Exception Handler");
+                            + " has redelivered flag set, handing off to Exception Handler");
                 }
                 redeliveryHandler.handleRedelivery(message);
             }
