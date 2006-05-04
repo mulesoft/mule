@@ -16,6 +16,7 @@ package org.mule.transformers.xml;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
@@ -48,6 +49,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
     private ObjectPool transformerPool;
     private int maxIdleTransformers = 2;
     private String xslFile;
+    private String xslt;
     private static final int MIN_IDLE = 1;
 
     public XsltTransformer() {
@@ -139,6 +141,11 @@ public class XsltTransformer extends AbstractXmlTransformer {
      * @throws InitialisationException
      */
     private StreamSource getStreamSource() throws InitialisationException {
+        
+        if (xslt != null) {
+            return new StreamSource(new StringReader(xslt));
+        }
+        
         if (xslFile == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xslFile"), this);
         }
@@ -222,5 +229,13 @@ public class XsltTransformer extends AbstractXmlTransformer {
      */
     public void setMaxIdleTransformers(int maxIdleTransformers) {
         this.maxIdleTransformers = maxIdleTransformers;
+    }
+
+    public String getXslt() {
+        return xslt;
+    }
+
+    public void setXslt(String xslt) {
+        this.xslt = xslt;
     }
 }
