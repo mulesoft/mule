@@ -13,6 +13,7 @@
  */
 package org.mule.test.transformers;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.mule.tck.AbstractTransformerTestCase;
 
 /**
@@ -36,7 +37,7 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         assertNotNull(result);
         System.out.println(getResultData());
         System.out.println("\n\n" + result);
-        //XMLAssert.assertXMLEqual("Xml documents have different data.", (String) getResultData(), (String) result);
+        XMLAssert.assertXMLEqual("Xml documents have different data.", (String) getResultData(), (String) result);
     }
     
     protected  String normalizeString(String rawString) {

@@ -73,7 +73,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                 "  <adapter class=\"org.mule.providers.DefaultMessageAdapter\">\n" +
                 "    <message class=\"string\">test</message>\n" +
                 "    <id>" + testObject.getUniqueId() + "</id>\n" +
-                "    <properties>\n" +
+                "    <properties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\">\n" +
                 "      <entry>\n" +
                 "        <string>object</string>\n" +
                 "        <org.mule.tck.testmodels.fruit.Apple>\n" +
@@ -90,7 +90,8 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                 "        <int>1</int>\n" +
                 "      </entry>\n" +
                 "    </properties>\n" +
-                "    <attachments/>\n" +
+                "    <attachments  class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n" +
+                "    <encoding>UTF-8</encoding>\n" +
                 "  </adapter>\n" +
                 "</org.mule.impl.MuleMessage>";
     }
