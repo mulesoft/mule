@@ -98,12 +98,12 @@ public class MuleSessionHandler implements UMOSessionHandler {
             buf.append(";");
             buf.append(o).append("=").append(session.getProperty(o));
             if(logger.isDebugEnabled()) {
-            logger.debug("Adding property to sesion header: " + o + "=" + session.getProperty(o));
+            logger.debug("Adding property to session header: " + o + "=" + session.getProperty(o));
         }
         }
         String sessionString = buf.toString();
         if(logger.isDebugEnabled()) {
-            logger.debug("Adding sesion header to message: " + sessionString);
+            logger.debug("Adding session header to message: " + sessionString);
         }
         sessionString = (String)encoder.transform(sessionString);
         message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString);
