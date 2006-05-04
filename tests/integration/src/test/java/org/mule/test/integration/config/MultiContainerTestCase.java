@@ -14,9 +14,12 @@
 package org.mule.test.integration.config;
 
 import org.mule.MuleManager;
+import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
@@ -63,5 +66,30 @@ public class MultiContainerTestCase extends FunctionalTestCase
         o = (Orange) context.getComponent("Orange");
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
+    }
+
+    public void testSpecificContainerAddressingForComponents() throws Exception
+    {
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
+        d.setContainer("plexus");
+        builder.registerComponent(d);
+        UMOComponent c = builder.getManager().getModel().getComponent("myOrange");
+        assertNotNull(c);
+        Object o = c.getInstance();
+        assertTrue(o instanceof Orange);
+        Orange orange = (Orange)o;
+        assertEquals(10, orange.getSegments().intValue());
+
+        d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
+        d.setContainer("spring");
+        builder.registerComponent(d);
+        c = builder.getManager().getModel().getComponent("myOrange2");
+        assertNotNull(c);
+        o = c.getInstance();
+        assertTrue(o instanceof Orange);
+        orange = (Orange)o;
+        assertEquals(8, orange.getSegments().intValue());
+
     }
 }

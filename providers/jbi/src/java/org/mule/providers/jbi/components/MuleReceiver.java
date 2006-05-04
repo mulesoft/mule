@@ -39,7 +39,6 @@ import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
-
 import java.io.OutputStream;
 
 /**
@@ -234,6 +233,10 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
         public boolean isStarted() {
             return true;
+        }
+
+        public Object getInstance() throws UMOException {
+            return null;
         }
     }
 

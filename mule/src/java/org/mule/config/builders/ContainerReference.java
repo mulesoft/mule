@@ -20,7 +20,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 import java.util.List;
@@ -62,17 +61,9 @@ public class ContainerReference
 
     public void resolveReference(UMOContainerContext ctx) throws ContainerException
     {
-        Object comp = null;
-        try {
-            comp = ctx.getComponent(new ContainerKeyPair(container, containerRef));
-        } catch (ObjectNotFoundException e) {
-            if (required) {
-                throw e;
-            } else {
-                logger.warn("Component reference not found: " + e.getMessage());
-                return;
-            }
-        }
+        Object comp = ctx.getComponent(new ContainerKeyPair(container, containerRef, required));
+        if(comp==null) return;
+        
         try {
             if (object instanceof Map) {
                 ((Map) object).put(propertyName, comp);

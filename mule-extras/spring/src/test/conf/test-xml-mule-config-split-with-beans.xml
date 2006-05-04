@@ -13,7 +13,7 @@
                 <properties>
                     <property name="testEndpointProperty" value="Prop1"/>
                     <bean name="testEndpointBeanProperty" class="java.lang.String">
-                        <constructor-arg>
+                        <constructor-arg index="0" type="java.lang.String">
                             <value>Prop2</value>
                         </constructor-arg>
                     </bean>
@@ -53,7 +53,7 @@
         <bean name="exceptionListener" class="org.mule.impl.DefaultExceptionStrategy"/>
 
         <bean name="version" class="java.lang.String">
-            <constructor-arg>
+            <constructor-arg index="0" type="java.lang.String">
                 <value>1.1</value>
             </constructor-arg>
         </bean>

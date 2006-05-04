@@ -17,7 +17,6 @@ package org.mule.umo.provider;
 import org.mule.umo.UMOExceptionPayload;
 
 import javax.activation.DataHandler;
-
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
@@ -106,11 +105,11 @@ public interface UMOMessageAdapter extends Serializable {
      * gets the unique identifier for the message. It's up to the implementation
      * to ensure a unique id
      *
-     * @return a unique message id
-     * @throws UniqueIdNotSupportedException if the message does not support a
-     *                                       unique identifier
+     * @return a unique message id.  The Id should never be null. If the underlying transport does
+     * not have the notion of a message Id, one shuold be generated.  The generated Id should be a
+     * UUID.
      */
-    String getUniqueId() throws UniqueIdNotSupportedException;
+    String getUniqueId();
 
     /**
      * Gets a property from the event

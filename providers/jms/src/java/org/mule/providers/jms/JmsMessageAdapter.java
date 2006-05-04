@@ -18,12 +18,10 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-
 import java.util.Enumeration;
 
 /**
@@ -164,8 +162,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
+    public String getUniqueId() {
         return (String) properties.get(JmsConstants.JMS_MESSAGE_ID);
     }
 

@@ -98,7 +98,7 @@
         </exception-strategy>
 
         <mule-descriptor name="orangeComponent"
-            implementation="local:orange">
+            implementation="orange" container="descriptor">
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">

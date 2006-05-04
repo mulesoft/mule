@@ -20,10 +20,8 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.activation.DataHandler;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -203,8 +201,7 @@ public class MuleMessage implements UMOMessage
         adapter.setDoubleProperty(name, value);
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
+    public String getUniqueId() {
         return adapter.getUniqueId();
     }
 

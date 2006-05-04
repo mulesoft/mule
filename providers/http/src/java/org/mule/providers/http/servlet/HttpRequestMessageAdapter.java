@@ -15,6 +15,7 @@
 package org.mule.providers.http.servlet;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.SystemUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -28,7 +29,6 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -200,8 +200,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         return request;
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
+    public String getUniqueId() {
 
         HttpSession session = null;
 

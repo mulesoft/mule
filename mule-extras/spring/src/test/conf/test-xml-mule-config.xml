@@ -96,7 +96,8 @@
 
         <mule-descriptor name="orangeComponent"
             inboundEndpoint="Test Queue"
-            implementation="local:orange">
+            implementation="orange"
+            container="descriptor">
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">

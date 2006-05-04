@@ -17,6 +17,7 @@ package org.mule.tck;
 import org.mule.MuleManager;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.SimpleRetryConnectionStrategy;
@@ -279,7 +280,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
                                                                 .getModel()
                                                                 .getDescriptor("orangeComponent");
-        assertEquals("local:orange", descriptor.getImplementation());
+        assertEquals(new DescriptorContainerKeyPair("orangeComponent", "orange"), descriptor.getImplementation());
+        assertEquals("descriptor", descriptor.getContainer());
         assertNotNull(descriptor.getProperties().get("orange"));
         assertEquals(Orange.class, descriptor.getImplementationClass());
     }

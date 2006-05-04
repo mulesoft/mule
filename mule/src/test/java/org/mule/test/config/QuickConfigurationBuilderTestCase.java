@@ -144,7 +144,8 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             //register components
             UMOEndpoint ep1 = m.lookupEndpoint("appleInEndpoint");
             ep1.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
-            UMODescriptor d = builder.createDescriptor("local:orange", "orangeComponent", null, ep1, props);
+            UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
+            d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
             dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
             d.setExceptionListener(dces);

@@ -23,7 +23,6 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import java.io.File;
 
@@ -148,8 +147,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
+    public String getUniqueId() {
         return file.getAbsolutePath();
     }
 

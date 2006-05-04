@@ -22,6 +22,7 @@ import org.apache.hivemind.impl.RegistryBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
@@ -70,7 +71,9 @@ public class HiveMindContext extends AbstractContainerContext
         if (key == null) {
             throw new ObjectNotFoundException("Component not found for null key");
         }
-        
+        if(key instanceof ContainerKeyPair) {
+            key = ((ContainerKeyPair)key).getKey();
+        }
         Object component = null;
         
         if (key instanceof String) {

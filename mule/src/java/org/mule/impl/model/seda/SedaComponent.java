@@ -141,7 +141,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     protected MuleProxy createComponentProxy() throws InitialisationException {
 
         try {
-            Object component = createComponent();
+            Object component = lookupComponent();
             MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
             getStatistics().setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());

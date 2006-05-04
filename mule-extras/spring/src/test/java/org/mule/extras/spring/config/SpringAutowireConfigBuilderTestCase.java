@@ -15,6 +15,7 @@ package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.manager.UMOManager;
@@ -42,7 +43,7 @@ public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTe
         UMOManager manager = MuleManager.getInstance();
         assertNotNull(manager.getContainerContext());
 
-        Object object = manager.getContainerContext().getComponent("org.mule.tck.testmodels.fruit.FruitBowl");
+        Object object = manager.getContainerContext().getComponent(new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
         FruitBowl bowl = (FruitBowl) object;

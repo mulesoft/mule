@@ -922,7 +922,7 @@ Jndi
     on the input and outputig a result, thus triggering futher events in the system.
 -->
 
-<!ELEMENT mule-descriptor ((inbound-router)?, (outbound-router)?, (response-router)?, (interceptor)*, (threading-profile)?, (pooling-profile)?, (queue-profile)?, (exception-strategy)?, (properties)?)>
+<!ELEMENT mule-descriptor ((inbound-router)?, (outbound-router)?, (response-router)?, (interceptor)*, (threading-profile)?, (pooling-profile)?, (queue-profile)?, (exception-strategy)?, (properties)?, (bean)*)>
 
 <!--
     name
@@ -1217,7 +1217,7 @@ or relax dtd validation on their parser
           A collection of properties for the parent component
 -->
 
-<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties | text-property)*)>
+<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties | text-property | bean | spring-property)*)>
 
 <!--
           An property element allows arbitrary name/value pairs.

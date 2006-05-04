@@ -15,7 +15,7 @@
 package org.mule.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
+import org.apache.commons.lang.UnhandledException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ExceptionHelper;
@@ -42,7 +42,6 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
-import org.apache.commons.lang.UnhandledException;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -51,13 +50,12 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
+import javax.jms.XAConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -304,7 +302,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         } catch (Exception e) {
             throw new ConnectException(e, this);
         } finally {
-            connectionFactory = null;
+            //connectionFactory = null;
             connection = null;
         }
     }

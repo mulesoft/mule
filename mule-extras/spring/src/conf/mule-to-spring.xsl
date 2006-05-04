@@ -4,7 +4,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:java="http://xml.apache.org/xslt/java"
     version='1.0'>
-    
+
     <xsl:param name="firstContext" />
 
     <xsl:output method="xml" indent="yes" encoding="ISO-8859-1" standalone="yes"
@@ -333,6 +333,13 @@
                     </value>
                 </property>
             </xsl:if>
+            <xsl:if test="@container">
+                <property name="container">
+                    <value>
+                        <xsl:value-of select="@container"/>
+                    </value>
+                </property>
+            </xsl:if>
 
             <xsl:apply-templates select="@inboundEndpoint" mode="addEndpointURI"/>
             <xsl:apply-templates select="@outboundEndpoint" mode="addEndpointURI"/>
@@ -479,7 +486,7 @@
     <xsl:template match="global-endpoint">
         <bean class="org.mule.impl.endpoint.MuleEndpoint"
             factory-method="getEndpointFromUri">
-            <constructor-arg index="0">
+            <constructor-arg index="0" type="java.lang.String">
                 <value>
                     <xsl:value-of select="@name"/>
                 </value>
@@ -698,7 +705,7 @@
      <xsl:template match="@address" mode="addEndpointURI">
         <property name="endpointURI">
             <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                <constructor-arg index="0">
+                <constructor-arg index="0" type="java.lang.String">
                     <value>
                         <xsl:value-of select="."/>
                     </value>
@@ -712,7 +719,7 @@
             <bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                        <constructor-arg index="0">
+                        <constructor-arg index="0" type="java.lang.String">
                             <value>
                                 <xsl:value-of select="."/>
                             </value>
@@ -741,7 +748,7 @@
         <property name="{$propertyName}">
             <bean class="org.mule.util.MuleObjectHelper"
                 factory-method="getTransformer">
-                <constructor-arg index="0">
+                <constructor-arg index="0"  type="java.lang.String">
                     <value>
                         <xsl:value-of select="."/>
                     </value>

@@ -229,7 +229,8 @@
     <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
         <property name="outboundEndpoint"><ref local="appleInEndpoint"/></property>
         <property name="outboundTransformer"><ref local="TestCompressionTransformer"/></property>
-        <property name="implementation"><value>local:orange</value></property>
+        <property name="implementation"><value>orange</value></property>
+        <property name="container"><value>descriptor</value></property>
         <property name="inboundRouter">
             <bean id="orangeInboundMessageRouter" class="org.mule.routing.inbound.InboundMessageRouter">
                 <property name="catchAllStrategy">

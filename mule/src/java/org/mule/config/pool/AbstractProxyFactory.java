@@ -14,14 +14,12 @@
 package org.mule.config.pool;
 
 import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
-import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
@@ -59,37 +57,17 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         Object impl = descriptor.getImplementation();
         Object component = null;
 
-        if (impl instanceof String) {
-            String reference = impl.toString();
+        if(impl instanceof String) {
+            impl = new ContainerKeyPair(null, impl);
+        }
+        if (impl instanceof ContainerKeyPair) {
+            component = manager.getContainerContext().getComponent(impl);
 
-            if (reference.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
-                String refName = reference.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
-                component = descriptor.getProperties().get(refName);
-                if (component == null) {
-                    throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X,
-                                                                  refName,
-                                                                  descriptor.getName()), this);
-                }
-            }
-
-            if (component == null) {
-                if (descriptor.isContainerManaged()) {
-                    component = manager.getContainerContext().getComponent(reference);
-                } else {
-                    try {
-                        component = ClassHelper.instanciateClass(reference, new Object[] {});
-                    } catch (Exception e) {
-                        throw new InitialisationException(new Message(Messages.CANT_INSTANCIATE_NON_CONTAINER_REF_X,
-                                                                      reference), e, descriptor);
-                    }
-                }
+            if(descriptor.isSingleton()) {
+                descriptor.setImplementation(component);
             }
         } else {
             component = impl;
-        }
-        //If a singleton we can keep using the same instnace
-        if(descriptor.isSingleton()) {
-            descriptor.setImplementation(component);
         }
 
         // Call any custom initialisers

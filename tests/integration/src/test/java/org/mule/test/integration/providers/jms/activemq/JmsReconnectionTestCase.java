@@ -16,7 +16,6 @@ package org.mule.test.integration.providers.jms.activemq;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
@@ -24,9 +23,7 @@ import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.model.seda.SedaModel;
@@ -35,17 +32,13 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.test.integration.ServerTools;
 import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
 
 import javax.jms.ConnectionFactory;
-
-import java.util.HashMap;
 
 /**
  * This test needs the path to an activemq distribution.
@@ -91,7 +84,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         eventCount = 0;
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        builder.registerComponent(FunctionalTestComponent.class.getName(), "testJmsReconnection", getReceiverEndpoint("jms://reconnect.queue"), null, null);
+        builder.registerComponent(FunctionalTestComponent.class.getName(),
+                "testJmsReconnection", getReceiverEndpoint("jms://reconnect.queue"), null, null);
     }
 
     /**
@@ -99,7 +93,6 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
      * If the current environment does not have the preReqs of the test return false and the test will
      * be skipped.
      *
-     * @return
      */
     protected String checkPreReqs() {
         if(System.getProperty(ServerTools.ACTIVEMQ_HOME, null)!=null) {
@@ -139,19 +132,19 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
             return;
         }
         
-        MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
-
-        UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint("test",
-                new MuleEndpointURI("jms://my.queue"),
-                connector,
-                null,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                0, null,
-                new HashMap());
-        MuleManager.getInstance().start();
-        MuleManager.getInstance().registerListener(this);
-        connector.registerListener(component, endpoint);
+//        MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
+//
+//        UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
+//        UMOEndpoint endpoint = new MuleEndpoint("test",
+//                new MuleEndpointURI("jms://my.queue"),
+//                connector,
+//                null,
+//                UMOEndpoint.ENDPOINT_TYPE_SENDER,
+//                0, null,
+//                new HashMap());
+//        MuleManager.getInstance().start();
+//        MuleManager.getInstance().registerListener(this);
+//        connector.registerListener(component, endpoint);
 
         // Start time
         long t0, t1;

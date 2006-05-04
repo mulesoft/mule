@@ -17,7 +17,6 @@ package org.mule.providers.vm;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 /**
  * <code>VMMessageAdapter</code> provides a common abstraction of Mule Event
@@ -82,8 +81,7 @@ public class VMMessageAdapter extends AbstractMessageAdapter
         this.message = message;
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
+    public String getUniqueId() {
         return message.getUniqueId();
     }
 
