@@ -13,15 +13,13 @@
  */
 package org.mule.providers;
 
-import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.UUID;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object
@@ -38,10 +36,6 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
      */
     protected Object message;
 
-    /**
-     * A generated UUID for this message
-     */
-    protected String id = null;
 
     /**
      * Creates a default message adapter with properties and attachments
@@ -50,7 +44,6 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
      * @see NullPayload
      */
     public DefaultMessageAdapter(Object message) {
-        id = UUID.getUUID();
         if (message == null) {
             this.message = new NullPayload();
         } else {
@@ -60,11 +53,8 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
 
     public DefaultMessageAdapter(Object message, UMOMessageAdapter previous) {
         if (previous != null) {
-            try {
-                id = previous.getUniqueId();
-            } catch (UniqueIdNotSupportedException e) {
-                id = UUID.getUUID();
-            }
+            id = previous.getUniqueId();
+
             if (message == null) {
                 this.message = new NullPayload();
             } else {
@@ -147,7 +137,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
         return message;
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException {
+    public String getUniqueId() {
         return id;
     }
 }

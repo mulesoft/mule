@@ -15,7 +15,6 @@ package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -27,7 +26,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.ArrayList;
@@ -184,9 +182,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         {
             super(message);
         }
-        public String getUniqueId() throws UniqueIdNotSupportedException
-        {
-            throw new UniqueIdNotSupportedException(this);
+        public String getUniqueId() {
+            return "";
         }
     }
     

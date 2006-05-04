@@ -18,31 +18,22 @@ package org.mule.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.routing.inbound.InboundMessageRouter;
-import org.mule.routing.inbound.InboundPassThroughRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
-import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.ExceptionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -260,8 +251,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     public void setImplementationInstance(Object instance)
     {
+        if(name==null) {
+            throw new NullPointerException("UMODescriptor.name");
+        }
         properties.put(DEFAULT_INSTANCE_REF_NAME, instance);
-        setImplementation(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL + DEFAULT_INSTANCE_REF_NAME);
+        setImplementation(new DescriptorContainerKeyPair(name, DEFAULT_INSTANCE_REF_NAME));
     }
 
     public void setInboundRouter(UMOInboundMessageRouter routerList)
@@ -277,98 +271,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setContainerManaged(boolean value)
     {
         containerManaged = value;
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        MuleConfiguration config = MuleManager.getConfiguration();
-        if (threadingProfile == null) {
-            threadingProfile = config.getComponentThreadingProfile();
-        }
-        if (poolingProfile == null) {
-            poolingProfile = config.getPoolingProfile();
-        }
-        if (queueProfile == null) {
-            queueProfile = config.getQueueProfile();
-        }
-
-        if (exceptionListener == null) {
-            exceptionListener = MuleManager.getInstance().getModel().getExceptionListener();
-        } else if (exceptionListener instanceof Initialisable) {
-            ((Initialisable) exceptionListener).initialise();
-        }
-
-        if (inboundEndpoint != null) {
-            if (inboundTransformer != null) {
-                inboundEndpoint.setTransformer(inboundTransformer);
-            }
-            ((MuleEndpoint) inboundEndpoint).initialise();
-            // If the transformer was set on the endpoint uri, it will only
-            // be initialised when the endpoint is initialised, hence we make
-            // this call here to ensure a consistent state
-            if (inboundTransformer == null) {
-                inboundTransformer = inboundEndpoint.getTransformer();
-            }
-        }
-
-        if (outboundEndpoint != null) {
-            if (outboundTransformer != null) {
-                outboundEndpoint.setTransformer(outboundTransformer);
-            }
-            ((MuleEndpoint) outboundEndpoint).initialise();
-            // If the transformer was set on the endpoint uri, it will only
-            // be initialised when the endpoint is initialised, hence we make
-            // this call here to ensure a consistent state
-            if (outboundTransformer == null) {
-                outboundTransformer = outboundEndpoint.getTransformer();
-            }
-        }
-
-        if (exceptionListener instanceof Initialisable) {
-            ((Initialisable) exceptionListener).initialise();
-        }
-
-        MuleEndpoint endpoint;
-        if (inboundRouter == null) {
-            // Create Default routes that route to the default inbound and
-            // outbound endpoints
-            inboundRouter = new InboundMessageRouter();
-            inboundRouter.addRouter(new InboundPassThroughRouter());
-        } else {
-            if (inboundRouter.getCatchAllStrategy() != null
-                    && inboundRouter.getCatchAllStrategy().getEndpoint() != null) {
-                ((MuleEndpoint) inboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
-            }
-            for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();) {
-                endpoint = (MuleEndpoint) iterator.next();
-                endpoint.initialise();
-            }
-        }
-
-        if (responseRouter != null) {
-            for (Iterator iterator = responseRouter.getEndpoints().iterator(); iterator.hasNext();) {
-                endpoint = (MuleEndpoint) iterator.next();
-                endpoint.initialise();
-            }
-        }
-
-        if (outboundRouter == null) {
-            outboundRouter = new OutboundMessageRouter();
-            outboundRouter.addRouter(new OutboundPassThroughRouter(this));
-        } else {
-            if (outboundRouter.getCatchAllStrategy() != null
-                    && outboundRouter.getCatchAllStrategy().getEndpoint() != null) {
-                ((MuleEndpoint) outboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
-            }
-            UMOOutboundRouter router = null;
-            for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();) {
-                router = (UMOOutboundRouter) iterator.next();
-                for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();) {
-                    endpoint = (MuleEndpoint) iterator1.next();
-                    endpoint.initialise();
-                }
-            }
-        }
     }
 
     public void addInitialisationCallback(InitialisationCallback callback)
@@ -410,7 +312,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setInitialState(String state) {
         this.initialState = state;
     }
-    
+
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }

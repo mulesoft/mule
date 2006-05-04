@@ -76,5 +76,21 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable
      */
     void resume() throws UMOException;
 
+    /**
+     * Determines whether this component has been started
+     * @return true is the component is started andready to receive events
+     */
     boolean isStarted();
+
+    /**
+     * Gets the underlying instance form this component
+     * Where the Component implmentation provides pooling this is no 1-2-1 mapping
+     * between UMOComponent and instance, so this method will return the object in initial state.
+     *
+     * If the underlying component is Container managed in Spring or another IoC container then the
+     * object instance in the IoC container will be returned
+     *
+     * @return the underlying instance form this component
+     */
+    Object getInstance() throws UMOException;
 }

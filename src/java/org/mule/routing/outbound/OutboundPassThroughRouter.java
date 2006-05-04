@@ -13,8 +13,8 @@
  */
 package org.mule.routing.outbound;
 
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -37,7 +37,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
         super();
     }
 
-    public OutboundPassThroughRouter(UMODescriptor descriptor)
+    public OutboundPassThroughRouter(UMOImmutableDescriptor descriptor)
     {
         super();
         if (descriptor != null && descriptor.getOutboundEndpoint() != null) {

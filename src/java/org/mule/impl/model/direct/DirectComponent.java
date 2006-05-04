@@ -46,7 +46,7 @@ public class DirectComponent extends AbstractComponent {
     protected void doInitialise() throws InitialisationException {
 
         try {
-            Object component = createComponent();
+            Object component = lookupComponent();
             proxy = new DefaultMuleProxy(component, descriptor, null);
             proxy.setStatistics(getStatistics());
         } catch (UMOException e) {

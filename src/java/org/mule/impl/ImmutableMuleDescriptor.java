@@ -16,25 +16,31 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.impl.container.ContainerKeyPair;
+import org.mule.impl.container.DescriptorContainerContext;
+import org.mule.impl.container.DescriptorContainerKeyPair;
+import org.mule.impl.container.MuleContainerContext;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.inbound.InboundPassThroughRouter;
+import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -53,21 +59,13 @@ import java.util.Map;
 
 public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 {
-    public static final String NOT_CONTAINER_MANAGED = "none";
     /**
      * The initial states that the component can be started in
      */
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
-    /**
-     * Implementation type can be prepended to the implementation string to
-     * control how the implementation is loaded. Local mean that the
-     * implementation is loaded from the object references i.e. local:myRef
-     * would get the implementation from the ObjectReference called myRef. Other
-     * implementations may include jndi:myRef
-     */
-    public static final String IMPLEMENTATION_TYPE_LOCAL = "local:";
+
     /**
      * Property that allows for a property file to be used to load properties
      * instead of listing them directly in the mule-configuration file
@@ -217,6 +215,107 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         inboundRouter.addRouter(new InboundPassThroughRouter());
     }
 
+     public void initialise() throws InitialisationException
+    {
+        MuleConfiguration config = MuleManager.getConfiguration();
+        if (threadingProfile == null) {
+            threadingProfile = config.getComponentThreadingProfile();
+        }
+        if (poolingProfile == null) {
+            poolingProfile = config.getPoolingProfile();
+        }
+        if (queueProfile == null) {
+            queueProfile = config.getQueueProfile();
+        }
+
+        if (exceptionListener == null) {
+            exceptionListener = MuleManager.getInstance().getModel().getExceptionListener();
+        } else if (exceptionListener instanceof Initialisable) {
+            ((Initialisable) exceptionListener).initialise();
+        }
+
+        if (inboundEndpoint != null) {
+            if (inboundTransformer != null) {
+                inboundEndpoint.setTransformer(inboundTransformer);
+            }
+            ((MuleEndpoint) inboundEndpoint).initialise();
+            // If the transformer was set on the endpoint uri, it will only
+            // be initialised when the endpoint is initialised, hence we make
+            // this call here to ensure a consistent state
+            if (inboundTransformer == null) {
+                inboundTransformer = inboundEndpoint.getTransformer();
+            }
+        }
+
+        if (outboundEndpoint != null) {
+            if (outboundTransformer != null) {
+                outboundEndpoint.setTransformer(outboundTransformer);
+            }
+            ((MuleEndpoint) outboundEndpoint).initialise();
+            // If the transformer was set on the endpoint uri, it will only
+            // be initialised when the endpoint is initialised, hence we make
+            // this call here to ensure a consistent state
+            if (outboundTransformer == null) {
+                outboundTransformer = outboundEndpoint.getTransformer();
+            }
+        }
+
+        if (exceptionListener instanceof Initialisable) {
+            ((Initialisable) exceptionListener).initialise();
+        }
+
+        MuleEndpoint endpoint;
+        if (inboundRouter == null) {
+            // Create Default routes that route to the default inbound and
+            // outbound endpoints
+            inboundRouter = new InboundMessageRouter();
+            inboundRouter.addRouter(new InboundPassThroughRouter());
+        } else {
+            if (inboundRouter.getCatchAllStrategy() != null
+                    && inboundRouter.getCatchAllStrategy().getEndpoint() != null) {
+                ((MuleEndpoint) inboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
+            }
+            for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();) {
+                endpoint = (MuleEndpoint) iterator.next();
+                endpoint.initialise();
+            }
+        }
+
+        if (responseRouter != null) {
+            for (Iterator iterator = responseRouter.getEndpoints().iterator(); iterator.hasNext();) {
+                endpoint = (MuleEndpoint) iterator.next();
+                endpoint.initialise();
+            }
+        }
+
+        if (outboundRouter == null) {
+            outboundRouter = new OutboundMessageRouter();
+            outboundRouter.addRouter(new OutboundPassThroughRouter(this));
+        } else {
+            if (outboundRouter.getCatchAllStrategy() != null
+                    && outboundRouter.getCatchAllStrategy().getEndpoint() != null) {
+                ((MuleEndpoint) outboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
+            }
+            UMOOutboundRouter router = null;
+            for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();) {
+                router = (UMOOutboundRouter) iterator.next();
+                for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();) {
+                    endpoint = (MuleEndpoint) iterator1.next();
+                    endpoint.initialise();
+                }
+            }
+        }
+        //Is a referenc of an implementation object?
+        if(implementationReference instanceof String) {
+            if(DescriptorContainerContext.DESCRIPTOR_CONTIANER_NAME.equals(container)) {
+                implementationReference = new DescriptorContainerKeyPair(name, implementationReference);
+            } else {
+                implementationReference = new ContainerKeyPair(container, implementationReference);
+            }
+        }
+    }
+
+
     /*
      * (non-Javadoc)
      * 
@@ -362,32 +461,16 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     public boolean isContainerManaged()
     {
-        return !NOT_CONTAINER_MANAGED.equalsIgnoreCase(container);
+        return !MuleContainerContext.MULE_CONTAINER_NAME.equalsIgnoreCase(container);
     }
 
     public Class getImplementationClass() throws UMOException
     {
         // check for other types of references
-        String impl = null;
         Class implClass = null;
-        if (implementationReference instanceof String) {
-            impl = implementationReference.toString();
-            if (impl.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
-                impl = impl.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
-                Object obj = properties.get(impl);
-                if (obj != null) {
-                    implClass = obj.getClass();
-                    // If its a string it must be a container reference or a
-                    // classname
-                    if (implClass.equals(String.class)) {
-                        implClass = getImplementationForReference(impl);
-                    }
-                } else {
-                    throw new MuleException(new Message(Messages.NO_COMPONENT_FOR_LOCAL_REFERENCE, impl));
-                }
-            } else {
-                implClass = getImplementationForReference(impl);
-            }
+        if (implementationReference instanceof String || implementationReference instanceof ContainerKeyPair) {
+            Object object = MuleManager.getInstance().getContainerContext().getComponent(implementationReference);
+            implClass = object.getClass();
         } else {
             implClass = implementationReference.getClass();
         }
@@ -406,14 +489,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected Class getImplementationForReference(String reference) throws ContainerException
     {
-        Class clazz = null;
-        try {
-            clazz = ClassHelper.loadClass(reference, getClass());
-        } catch (Exception e) {
-            Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
-            clazz = object.getClass();
-        }
-        return clazz;
+        Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
+        return object.getClass();
     }
 
     public void fireInitialisationCallbacks(Object component) throws InitialisationException

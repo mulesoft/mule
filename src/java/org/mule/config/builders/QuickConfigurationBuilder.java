@@ -202,8 +202,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                                                    UMOEndpointURI sendEndpointUri) throws UMOException
     {
         MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setImplementationInstance(component);
         descriptor.setName(name);
+        descriptor.setImplementationInstance(component);
 
         // Create the endpoints
         UMOEndpoint inboundProvider = null;

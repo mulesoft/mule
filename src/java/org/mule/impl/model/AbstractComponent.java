@@ -24,6 +24,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.ComponentException;
@@ -37,13 +38,12 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.util.ClassHelper;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
 
 /**
- * todo document
+ * A base implementation for all UMOComponents in Mule
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -274,8 +274,7 @@ public abstract class AbstractComponent implements UMOComponent {
                     + event.getEndpoint().getEndpointURI());
         }
         RequestContext.setEvent(event);
-        UMOMessage result = doSend(event);
-        return result;
+        return doSend(event);
     }
 
     /**
@@ -320,37 +319,15 @@ public abstract class AbstractComponent implements UMOComponent {
      * @return
      * @throws UMOException
      */
-    protected Object createComponent() throws UMOException
+    protected Object lookupComponent() throws UMOException
     {
         UMOManager manager = MuleManager.getInstance();
         Object impl = descriptor.getImplementation();
         Object component = null;
 
-        if (impl instanceof String) {
-            String reference = impl.toString();
+        if (impl instanceof ContainerKeyPair) {
+            component = manager.getContainerContext().getComponent(impl);
 
-            if (reference.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
-                String refName = reference.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
-                component = descriptor.getProperties().get(refName);
-                if (component == null) {
-                    throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X,
-                                                                  refName,
-                                                                  descriptor.getName()), this);
-                }
-            }
-
-            if (component == null) {
-                if (descriptor.isContainerManaged()) {
-                    component = manager.getContainerContext().getComponent(reference);
-                } else {
-                    try {
-                        component = ClassHelper.instanciateClass(reference, new Object[] {});
-                    } catch (Exception e) {
-                        throw new InitialisationException(new Message(Messages.CANT_INSTANCIATE_NON_CONTAINER_REF_X,
-                                                                      reference), e, descriptor);
-                    }
-                }
-            }
             if(descriptor.isSingleton()) {
                 descriptor.setImplementation(component);
             }
@@ -405,5 +382,19 @@ public abstract class AbstractComponent implements UMOComponent {
     protected abstract UMOMessage doSend(UMOEvent event) throws UMOException;
 
     protected abstract void doDispatch(UMOEvent event) throws UMOException;
+
+    /**
+     * Gets the underlying instance form this component
+     * Where the Component implmentation provides pooling this is no 1-2-1 mapping
+     * between UMOComponent and instance, so this method will return the object in initial state.
+     * <p/>
+     * If the underlying component is Container managed in Spring or another IoC container then the
+     * object instance in the IoC container will be returned
+     *
+     * @return the underlying instance form this component
+     */
+    public Object getInstance() throws UMOException {
+        return lookupComponent();
+    }
 
 }

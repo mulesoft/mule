@@ -16,7 +16,6 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,12 +25,11 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.UUID;
 
 import javax.activation.DataHandler;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -59,21 +57,14 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     protected String encoding = MuleManager.getConfiguration().getEncoding();
 
     protected UMOExceptionPayload exceptionPayload;
+    protected String id = UUID.getUUID();
 
     public String toString()
     {
-        String id;
-
-        try {
-            id = getUniqueId();
-        } catch (UniqueIdNotSupportedException e) {
-            id = "[uniqueId not supported]";
-        }
-
         StringBuffer buf = new StringBuffer(120);
         buf.append(getClass().getName());
         buf.append('{');
-        buf.append("id=").append(id);
+        buf.append("id=").append(getUniqueId());
         buf.append(", payload=").append(getPayload().getClass().getName());
         buf.append(", correlationId=").append(getCorrelationId());
         buf.append(", correlationGroup=").append(getCorrelationGroupSize());
@@ -153,7 +144,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public String getUniqueId()
     {
-        throw new UniqueIdNotSupportedException(this);
+        return id;
     }
 
     public Object getProperty(String name, Object defaultValue)

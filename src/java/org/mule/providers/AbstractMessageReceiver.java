@@ -44,7 +44,6 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -269,13 +268,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     protected UMOMessage handleUnacceptedFilter(UMOMessage message) {
         String messageId = null;
-        try {
-            messageId = message.getUniqueId();
-        } catch (UniqueIdNotSupportedException e) {
-            messageId = "'Current Message (no unique id)'";
+        messageId = message.getUniqueId();
+
+        if(logger.isDebugEnabled()) {
+            logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
+                   + ". Message is being ignored");
         }
-        logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
-                + ". Message is being ignored");
 
         return null;
     }

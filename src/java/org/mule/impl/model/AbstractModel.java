@@ -153,6 +153,9 @@ public abstract class AbstractModel implements UMOModel
             throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
         }
 
+        if(initialised.get()) {
+            descriptor.initialise();
+        }
         // Set the es if one wasn't set in the configuration
         if (descriptor.getExceptionListener() == null) {
             descriptor.setExceptionListener(exceptionListener);

@@ -23,23 +23,35 @@ package org.mule.impl.container;
  */
 public class ContainerKeyPair
 {
-    private String contaimerName;
+    private String containerName;
     private Object key;
+    private boolean required = true;
 
-    public ContainerKeyPair(String contaimerName, Object key)
+    public ContainerKeyPair(String containerName, Object key)
     {
-        this.contaimerName = contaimerName;
+        this.containerName = containerName;
         this.key = key;
     }
 
-    public String getContaimerName()
+    public ContainerKeyPair(String containerName, Object key, boolean required)
     {
-        return contaimerName;
+        this.containerName = containerName;
+        this.key = key;
+        this.required = required;
+    }
+
+    public String getContainerName()
+    {
+        return containerName;
     }
 
     public Object getKey()
     {
         return key;
+    }
+
+    public boolean isRequired() {
+        return required;
     }
 
     // here we only return the key value as string so that
@@ -48,5 +60,28 @@ public class ContainerKeyPair
     public String toString()
     {
         return key.toString();
+    }
+
+    public String toFullString() {
+        return "Container Key{key=" + key.toString() + ", container=" + containerName + ", required=" + required + "}";
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final ContainerKeyPair that = (ContainerKeyPair) o;
+
+        if (!containerName.equals(that.containerName)) return false;
+        if (!key.equals(that.key)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = containerName.hashCode();
+        result = 29 * result + key.hashCode();
+        return result;
     }
 }

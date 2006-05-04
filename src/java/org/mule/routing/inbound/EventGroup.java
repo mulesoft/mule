@@ -14,9 +14,7 @@
 package org.mule.routing.inbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -92,11 +90,7 @@ public class EventGroup implements Serializable
         buf.append(", current events (").append(events.size()).append(")");
         for (Iterator iterator = events.iterator(); iterator.hasNext();) {
             UMOEvent event = (UMOEvent) iterator.next();
-            try {
-                buf.append(", ").append(event.getMessage().getUniqueId());
-            } catch (UniqueIdNotSupportedException e) {
-                buf.append(", ").append(e.getMessage());
-            }
+            buf.append(", ").append(event.getMessage().getUniqueId());
         }
         return buf.toString();
     }

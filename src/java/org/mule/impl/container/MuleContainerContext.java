@@ -25,7 +25,7 @@ import java.io.Reader;
  * <code>MuleContainerContext</code> is a default resolver that doesn't
  * support external reference resolution. It's function is to provide a complete
  * implementation when a componenet resolver is not defined. The default
- * (legacy) behaviour is to build a component key as a fully qualified class
+ * behaviour is to build a component key as a fully qualified class
  * name
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -33,9 +33,11 @@ import java.io.Reader;
  */
 public class MuleContainerContext extends AbstractContainerContext
 {
+    public static final String MULE_CONTAINER_NAME = "mule";
+
     public MuleContainerContext()
     {
-        super("mule");
+        super(MULE_CONTAINER_NAME);
     }
 
     /*
