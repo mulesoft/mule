@@ -34,25 +34,21 @@ import java.util.List;
  * @version $Revision$
  */
 
-public class LoanConsumer
-{
+public class LoanConsumer {
     private List customers = new ArrayList();
     private MuleClient client = null;
 
-    public LoanConsumer() throws UMOException
-    {
+    public LoanConsumer() throws UMOException {
         init();
     }
 
-    public LoanConsumer(String config) throws UMOException
-    {
+    public LoanConsumer(String config) throws UMOException {
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure(config);
         init();
     }
 
-    private void init() throws UMOException
-    {
+    private void init() throws UMOException {
         client = new MuleClient();
 
         customers.add(new Customer("Jenson Button", 123));
@@ -67,39 +63,34 @@ public class LoanConsumer
         customers.add(new Customer("Jarno Trulli", 192));
     }
 
-    public void close()
-    {
+    public void close() {
         MuleManager.getInstance().dispose();
     }
 
-    public LoanRequest createRequest()
-    {
+    public LoanRequest createRequest() {
         int index = new Double(Math.random() * 10).intValue();
         Customer c = (Customer) customers.get(index);
 
         return new LoanRequest(c, getRandomAmount(), getRandomDuration());
     }
 
-    private static double getRandomAmount()
-    {
+    private static double getRandomAmount() {
         return Math.round(Math.random() * 18000);
     }
 
-    private static int getRandomDuration()
-    {
+    private static int getRandomDuration() {
         return new Double(Math.random() * 60).intValue();
     }
 
-    public void request(LoanRequest request, boolean sync) throws Exception
-    {
-        if(!sync) {
+    public void request(LoanRequest request, boolean sync) throws Exception {
+        if (!sync) {
             client.dispatch("vm://LoanBrokerRequests", request, null);
             System.out.println("Sent Async request");
             //let the request catch up
             Thread.sleep(1500);
         } else {
             UMOMessage result = client.send("vm://LoanBrokerRequests", request, null);
-            if(result==null) {
+            if (result == null) {
                 System.out.println("A result was not received, an error must have occurred. Check the logs.");
             } else {
                 System.out.println("Loan Consumer received a Quote: " + result.getPayload());
@@ -107,22 +98,18 @@ public class LoanConsumer
         }
     }
 
-    public void requestDispatch(int number, String endpoint) throws Exception
-    {
-        for (int i = 0; i < number; i++)
-        {
-            client.dispatch(endpoint,createRequest(), null);
+    public void requestDispatch(int number, String endpoint) throws Exception {
+        for (int i = 0; i < number; i++) {
+            client.dispatch(endpoint, createRequest(), null);
         }
     }
 
-    public List requestSend(int number, String endpoint) throws Exception
-    {
+    public List requestSend(int number, String endpoint) throws Exception {
         List results = new ArrayList(number);
         UMOMessage result;
-        for (int i = 0; i < number; i++)
-        {
-            result = client.send(endpoint,createRequest(), null);
-            if(result!=null) {
+        for (int i = 0; i < number; i++) {
+            result = client.send(endpoint, createRequest(), null);
+            if (result != null) {
                 results.add(result.getPayload());
             }
         }
@@ -130,172 +117,161 @@ public class LoanConsumer
     }
 
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         LoanConsumer loanConsumer = null;
         boolean synchronous = false;
 
-        try
-        {
-            if (args.length > 0)
-            {
+        try {
+            if (args.length > 0) {
                 loanConsumer = new LoanConsumer(args[0]);
 
                 int i = 100;
-                if(args.length > 1) {
+                if (args.length > 1) {
                     i = Integer.parseInt(args[1]);
                 }
 
                 boolean sync = false;
-                if(args.length > 2) {
+                if (args.length > 2) {
                     sync = Boolean.valueOf(args[2]).booleanValue();
                 }
 
-                if(sync) {
+                if (sync) {
                     long start = System.currentTimeMillis();
                     List results = loanConsumer.requestSend(i, "vm://LoanBrokerRequests");
                     System.out.println("Number or quotes received: " + results.size());
                     List output = new ArrayList(results.size());
-                    int x=1;
-                    for (Iterator iterator = results.iterator(); iterator.hasNext();x++)
-                    {
+                    int x = 1;
+                    for (Iterator iterator = results.iterator(); iterator.hasNext(); x++) {
                         LoanQuote quote = (LoanQuote) iterator.next();
                         output.add(x + ". " + quote.toString());
                     }
                     System.out.println(StringMessageHelper.getBoilerPlate(output, '*', 80));
                     long cur = System.currentTimeMillis();
                     System.out.println(Utility.getFormattedDuration(cur - start));
-                    System.out.println("Avg request: " + ((cur-start)/x));
+                    System.out.println("Avg request: " + ((cur - start) / x));
                 } else {
                     loanConsumer.requestDispatch(i, "vm://LoanBrokerRequests");
                 }
-            } else
-            {
-                System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Loan Broker example"));
-                
-                int response = 0;
-                String provider = "axis";
-
-                while (response != 'a' && /* response != 'g' && */ response != 'x')
-                {
-                    // System.out.println("\nWhich SOAP stack would you like to use: [a]xis, [g]lue or [x]fire?");
-                    System.out.println("\nWhich SOAP stack would you like to use: [a]xis or [x]fire?");
-                    response = readCharacter();
-                    switch (response)
-                    {
-                        case 'a':
-                        {
-                            provider = "axis";
-                            break;
-                        }
-
-                        // TODO re-enable glue when the locahost/IP issue is fixed
-//                        case 'g':
-//                        {
-//                            provider = "glue";
-//                            break;
-//                        }
-
-                        case 'x':
-                        {
-                            provider = "xfire";
-                            break;
-                        }
-                    }
-                }
-
-                response = 0;
-                while (response != 'a' && response != 's')
-                {
-                    System.out.println("\nWould you like to run the [s]ynchronous or [a]synchronous version?");
-                    response = readCharacter();
-                    switch (response)
-                    {
-                        case 'a':
-                        {
-                            System.out.println("Loading Asynchronous Loan Broker");
-                            synchronous = false;
-                            break;
-                        }
-
-                        case 's':
-                        {
-                            System.out.println("Loading Synchronous Loan Broker");
-                            synchronous = true;
-                            break;
-                        }
-                    }
-                }
-
-                String config = "loan-broker-" + provider + "-" + (synchronous ? "sync" : "async") + "-config.xml";
+            } else {
+                String config = getConfig();
                 loanConsumer = new LoanConsumer(config);
-
-                response = 0;
-                while (response != 'q')
-                {
-                    System.out.println("\n[1] make a loan request");
-                    System.out.println("[2] send 100 random requests");
-                    System.out.println("[3] send x requests");
-                    System.out.println("[q] quit");
-                    System.out.println("\nPlease make your selection: ");
-
-                    response = readCharacter();
-                    
-                    switch (response)
-                    {
-                        case '1':
-                        {
-                            LoanRequest request = getRequestFromUser();
-                            loanConsumer.request(request, synchronous);
-                            break;
-                        }
-                        
-                        case '2':
-                        {
-                            loanConsumer.sendRandomRequests(100, synchronous);
-                            break;
-                        }
-                        
-                        case '3':
-                        {
-                            System.out.println("Enter number of requests: ");
-                            int number = Integer.parseInt(readString());
-                            if(number < 1) {
-                                System.out.println("Number of requests must be at least 1");
-                            } else {
-                                loanConsumer.sendRandomRequests(number, synchronous);
-                            }
-                            break;
-                        }
-
-                        case 'q':
-                        {
-                            System.out.println("Exiting now.");
-                            loanConsumer.close();
-                            System.exit(0);
-                        }
-
-                        default:
-                        {
-                            System.out.println("That response is not recognised, try again.");
-                        }
-                    }
-                }
+                loanConsumer.run(synchronous);
             }
-        } catch (Exception e)
-        {
+
+        } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace(System.err);
             System.exit(1);
         }
     }
 
+    protected static String getConfig() throws IOException {
+        boolean synchronous = false;
+        System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Loan Broker example"));
+
+        int response = 0;
+        String provider = "axis";
+
+        while (response != 'a' && /* response != 'g' && */ response != 'x') {
+            // System.out.println("\nWhich SOAP stack would you like to use: [a]xis, [g]lue or [x]fire?");
+            System.out.println("\nWhich SOAP stack would you like to use: [a]xis or [x]fire?");
+            response = readCharacter();
+            switch (response) {
+                case 'a': {
+                    provider = "axis";
+                    break;
+                }
+
+                // TODO re-enable glue when the locahost/IP issue is fixed
+//                        case 'g':
+//                        {
+//                            provider = "glue";
+//                            break;
+//                        }
+
+                case 'x': {
+                    provider = "xfire";
+                    break;
+                }
+            }
+        }
+
+        response = 0;
+        while (response != 'a' && response != 's') {
+            System.out.println("\nWould you like to run the [s]ynchronous or [a]synchronous version?");
+            response = readCharacter();
+            switch (response) {
+                case 'a': {
+                    System.out.println("Loading Asynchronous Loan Broker");
+                    synchronous = false;
+                    break;
+                }
+
+                case 's': {
+                    System.out.println("Loading Synchronous Loan Broker");
+                    synchronous = true;
+                    break;
+                }
+            }
+        }
+
+        String config = "loan-broker-" + provider + "-" + (synchronous ? "sync" : "async") + "-config.xml";
+        return config;
+    }
+
+    protected void run(boolean synchronous) throws Exception {
+
+        int response = 0;
+        while (response != 'q') {
+            System.out.println("\n[1] make a loan request");
+            System.out.println("[2] send 100 random requests");
+            System.out.println("[3] send x requests");
+            System.out.println("[q] quit");
+            System.out.println("\nPlease make your selection: ");
+
+            response = readCharacter();
+
+            switch (response) {
+                case '1': {
+                    LoanRequest request = getRequestFromUser();
+                    request(request, synchronous);
+                    break;
+                }
+
+                case '2': {
+                    sendRandomRequests(100, synchronous);
+                    break;
+                }
+
+                case '3': {
+                    System.out.println("Enter number of requests: ");
+                    int number = Integer.parseInt(readString());
+                    if (number < 1) {
+                        System.out.println("Number of requests must be at least 1");
+                    } else {
+                        sendRandomRequests(number, synchronous);
+                    }
+                    break;
+                }
+
+                case 'q': {
+                    System.out.println("Exiting now.");
+                    close();
+                    System.exit(0);
+                }
+
+                default: {
+                    System.out.println("That response is not recognised, try again.");
+                }
+            }
+        }
+    }
+
     protected void sendRandomRequests(int number, boolean synchronous) throws Exception {
-        if(synchronous) {
+        if (synchronous) {
             List list = this.requestSend(number, "vm://LoanBrokerRequests");
-            int i=1;
-            for (Iterator iterator = list.iterator(); iterator.hasNext();i++)
-            {
+            int i = 1;
+            for (Iterator iterator = list.iterator(); iterator.hasNext(); i++) {
                 System.out.println("Request " + i + ": " + iterator.next().toString());
             }
         } else {
@@ -303,22 +279,19 @@ public class LoanConsumer
         }
     }
 
-    private static int readCharacter() throws IOException
-    {
+    protected static int readCharacter() throws IOException {
         byte[] buf = new byte[16];
         System.in.read(buf);
         return buf[0];
     }
 
-    private static String readString() throws IOException
-    {
+    protected static String readString() throws IOException {
         byte[] buf = new byte[80];
         System.in.read(buf);
         return new String(buf).trim();
     }
 
-    private static LoanRequest getRequestFromUser() throws IOException
-    {
+    protected static LoanRequest getRequestFromUser() throws IOException {
         System.out.println("Enter your name:");
         String name = readString();
 
@@ -329,21 +302,17 @@ public class LoanConsumer
         String duration = readString();
 
         int d = 0;
-        try
-        {
+        try {
             d = Integer.parseInt(duration);
-        } catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             System.out.println("Failed to parse duration: " + duration + ". Using random default");
             d = getRandomDuration();
         }
 
         double a = 0;
-        try
-        {
+        try {
             a = Double.valueOf(amount).doubleValue();
-        } catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             System.out.println("Failed to parse amount: " + amount + ". Using random default");
             a = getRandomAmount();
         }
@@ -353,8 +322,7 @@ public class LoanConsumer
         return request;
     }
 
-    private static int getRandomSsn()
-    {
+    private static int getRandomSsn() {
         return new Double(Math.random() * 6000).intValue();
     }
 

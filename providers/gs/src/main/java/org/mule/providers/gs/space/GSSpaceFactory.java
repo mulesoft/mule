@@ -28,6 +28,7 @@ import org.mule.providers.gs.JiniMessage;
 import org.mule.providers.gs.JiniTransactionFactory;
 import org.mule.providers.gs.filters.JavaSpaceTemplateFilter;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
@@ -90,22 +91,25 @@ public class GSSpaceFactory implements UMOSpaceFactory {
                 space.setTransactionFactory(txFactory);
             }
 
-            //Now set the Entry template on the space
-            if(endpoint.getFilter()!=null) {
-                UMOFilter filter = endpoint.getFilter();
-                if(filter instanceof JavaSpaceTemplateFilter) {
-                    space.setEntryTemplate(((JavaSpaceTemplateFilter)filter).getEntry());
+            //We do not need to set an entry template if we are not recieving messages from the space
+            if(!endpoint.getType().equalsIgnoreCase(UMOEndpoint.ENDPOINT_TYPE_SENDER)) {
+                //Now set the Entry template on the space
+                if(endpoint.getFilter()!=null) {
+                    UMOFilter filter = endpoint.getFilter();
+                    if(filter instanceof JavaSpaceTemplateFilter) {
+                        space.setEntryTemplate(((JavaSpaceTemplateFilter)filter).getEntry());
+                    } else {
+                        if(!endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER)) {
+                            logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not a JiniEntryFilter. Endpoint will match all entries of all types for this endpoint");
+                        }
+                        space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
+                    }
                 } else {
                     if(!endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER)) {
-                        logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not a JiniEntryFilter. Endpoint will match all entries of all types for this endpoint");
+                        logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not set. Endpoint will match all entries of all types for this endpoint");
                     }
                     space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
                 }
-            } else {
-                if(!endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER)) {
-                    logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not set. Endpoint will match all entries of all types for this endpoint");
-                }
-                space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
             }
             return space;
         } catch (Exception e) {

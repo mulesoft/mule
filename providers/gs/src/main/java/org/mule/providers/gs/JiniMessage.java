@@ -38,6 +38,7 @@ public class JiniMessage implements Entry
     public Map properties;
     public String encoding;
     public UMOExceptionPayload exceptionPayload;
+    public String payloadType;
 
 
     public JiniMessage()
@@ -53,7 +54,7 @@ public class JiniMessage implements Entry
     {
         super();
         this.destination = destination;
-        this.payload = payload;
+        setPayload(payload);
     }
 
     public String getCorrelationId() {
@@ -128,6 +129,11 @@ public class JiniMessage implements Entry
     public void setPayload(Object payload)
     {
         this.payload = payload;
+        if(payload!=null) {
+            payloadType = payload.getClass().getName();
+        } else {
+            payloadType = null;
+        }
     }
 
     public Map getProperties() {
@@ -152,6 +158,14 @@ public class JiniMessage implements Entry
 
     public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
         this.exceptionPayload = exceptionPayload;
+    }
+
+    public String getPayloadType() {
+        return payloadType;
+    }
+
+    public void setPayloadType(String payloadType) {
+        this.payloadType = payloadType;
     }
 
     public String toString()

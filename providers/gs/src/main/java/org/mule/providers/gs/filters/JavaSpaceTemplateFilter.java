@@ -18,7 +18,6 @@ import net.jini.core.entry.Entry;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.providers.gs.JiniMessage;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
 
@@ -33,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JavaSpaceTemplateFilter implements UMOFilter
+public class JavaSpaceTemplateFilter implements JavaSpaceFilter
 {
 
     public static final String NULL_VALUE = "null";
