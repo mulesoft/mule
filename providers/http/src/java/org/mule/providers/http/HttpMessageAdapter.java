@@ -25,8 +25,8 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
@@ -56,6 +56,10 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         else if (message instanceof byte[]) {
             this.message = message;
+            //If the adapter is being created as part of a response flow, just wrap the HttpResponse
+        } else if (message instanceof HttpResponse) {
+            this.message = message;
+            return;
         }
         else {
             throw new MessageTypeNotSupportedException(message, getClass());
