@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * <code>FileToString</code> reads a file's contents intor a string.
+ * <code>FileToString</code> reads a file's contents into a string.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
