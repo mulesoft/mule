@@ -3,11 +3,11 @@ package org.mule.tools.config.graph.processor;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphEdge;
 import com.oy.shared.lm.graph.GraphNode;
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
-import org.mule.util.Utility;
 
 import java.util.Iterator;
 import java.util.List;
@@ -93,7 +93,7 @@ public abstract class TagProcessor {
     protected void appendAttribute(Element e, String name, StringBuffer caption) {
         if(e.getAttribute(name) == null) return;
         String value = e.getAttributeValue(name);
-        if(value!=null) caption.append(name + " = " + (Utility.EMPTY_STRING.equals(value) ? "\"\"" : lookupPropertyTemplate(value)) + "\n");
+        if(value!=null) caption.append(name + " = " + (StringUtils.EMPTY.equals(value) ? "\"\"" : lookupPropertyTemplate(value)) + "\n");
     }
 
 

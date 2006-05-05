@@ -3,12 +3,12 @@ package org.mule.tools.config.graph.components;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
+import org.apache.commons.io.FileUtils;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.postrenderers.FileCleanerPostRenderer;
 import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
 import org.mule.tools.config.graph.util.DOTtoMAP;
 import org.mule.util.EnvironmentHelper;
-import org.mule.util.Utility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ public class GraphRenderer {
         DOTtoMAP.transform(exeFile, dotFileName, mapFileName, env);
 
         Map context = new HashMap();
-        String map = Utility.fileToString(mapFileName);
+        String map = FileUtils.readFileToString(new File(mapFileName), "UTF-8");
         String path = env.getConfig().getOutputDirectory().getAbsolutePath() + File.separator;
         context.put("dotFileName", path + filename + ".dot");
         context.put("mapFileName", path + filename + ".cmapx");
