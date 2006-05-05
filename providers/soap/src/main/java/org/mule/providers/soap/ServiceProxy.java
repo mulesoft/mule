@@ -13,11 +13,13 @@
  */
 package org.mule.providers.soap;
 
+import org.apache.commons.lang.ClassUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassHelper;
-import org.apache.commons.lang.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ public class ServiceProxy
         }
 
         interfaces = removeInterface(interfaces, Callable.class);
+        interfaces = removeInterface(interfaces, Disposable.class);
+        interfaces = removeInterface(interfaces, Initialisable.class);
         return interfaces;
     }
 
