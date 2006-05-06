@@ -437,7 +437,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
                 umoMessageDispatcher.dispose();
             }
             dispatchers.clear();
-            dispatchers = null;
             logger.debug("Dispatchers Disposed");
         }
     }
