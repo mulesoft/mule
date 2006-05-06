@@ -127,7 +127,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter {
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception {
-        return getPayloadAsString().getBytes();
+        return convertToBytes(message);
     }
 
     /**
