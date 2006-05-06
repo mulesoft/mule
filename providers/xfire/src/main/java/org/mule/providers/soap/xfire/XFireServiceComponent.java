@@ -34,19 +34,23 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.transport.TransportManager;
 import org.codehaus.xfire.transport.http.HtmlServiceWriter;
-import org.codehaus.xfire.transport.local.LocalTransport;
 import org.codehaus.xfire.util.STAXUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.UMODescriptorAware;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -56,6 +60,7 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.manager.UMOWorkManager;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -71,7 +76,7 @@ import java.io.UnsupportedEncodingException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
+public class XFireServiceComponent implements Callable, Initialisable, Lifecycle, UMODescriptorAware
 {
 
     public final String DEFAULT_CONTENT_TYPE = "text/html";
@@ -83,9 +88,19 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     protected XFire xfire;
 
-    // Todo Use MuleLocalTransport. Need to find a clean way to supply a work
     // manager to the component
-    protected Transport transport = new LocalTransport();
+    protected Transport transport;
+
+    public void setDescriptor(UMODescriptor descriptor) {
+        UMOWorkManager wm = ((MuleDescriptor)descriptor).getThreadingProfile().createWorkManager("xfire-local-transport");
+        try {
+            wm.start();
+        } catch (UMOException e) {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "local channel work manager", e));
+        }
+        transport = new MuleLocalTransport(wm);
+        getTransportManager().register(transport);
+    }
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
@@ -176,12 +191,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     public void dispose()
     {
         // template method
-    }
-
-    protected void registerTransport()
-    {
-        TransportManager transportManager = getTransportManager();
-        transportManager.register(transport);
     }
 
     protected TransportManager getTransportManager()

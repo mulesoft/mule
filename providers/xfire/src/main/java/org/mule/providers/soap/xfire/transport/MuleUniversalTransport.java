@@ -26,6 +26,7 @@ import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractTransport;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.DefaultEndpoint;
+import org.codehaus.xfire.wsdl11.WSDL11Transport;
 
 /**
  * todo document
@@ -33,7 +34,7 @@ import org.codehaus.xfire.transport.DefaultEndpoint;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleUniversalTransport extends AbstractTransport
+public class MuleUniversalTransport extends AbstractTransport implements WSDL11Transport
 {
 
     public static final String SOAP11_HTTP_BINDING = "http://schemas.xmlsoap.org/soap/http";

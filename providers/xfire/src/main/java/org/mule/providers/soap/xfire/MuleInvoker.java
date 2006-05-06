@@ -24,9 +24,9 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;
-
 import java.lang.reflect.Method;
 
 /**
@@ -78,5 +78,9 @@ public class MuleInvoker implements Invoker
         else {
             return null;
         }
+    }
+
+    public UMOImmutableEndpoint getEndpoint() {
+        return receiver.getEndpoint();
     }
 }

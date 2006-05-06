@@ -17,6 +17,7 @@ package org.mule.providers.soap.xfire.transport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.soap.SoapTransport;
 import org.codehaus.xfire.soap.SoapTransportHelper;
 import org.codehaus.xfire.transport.AbstractTransport;
@@ -24,6 +25,8 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.DefaultEndpoint;
 import org.codehaus.xfire.transport.MapSession;
 import org.codehaus.xfire.transport.Session;
+import org.codehaus.xfire.wsdl11.WSDL11Transport;
+import org.mule.providers.soap.xfire.MuleInvoker;
 import org.mule.umo.manager.UMOWorkManager;
 
 /**
@@ -32,7 +35,7 @@ import org.mule.umo.manager.UMOWorkManager;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleLocalTransport extends AbstractTransport implements SoapTransport
+public class MuleLocalTransport extends AbstractTransport implements SoapTransport, WSDL11Transport
 {
     /**
      * logger used by this class
@@ -50,6 +53,11 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
         super();
         SoapTransportHelper.createSoapTransport(this);
         this.workManager = workManager;
+    }
+
+    public String getServiceURL(Service service) {
+        String ep =  ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
+        return ep + "/" + service.getSimpleName();
     }
 
     protected Channel createNewChannel(String uri)
