@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -30,7 +30,6 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -42,7 +41,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.transformer.TransformerException;
@@ -506,16 +504,16 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             else {
                 //Try and wrap the response in the correct messageAdapter, if this doesn't work for some reason
                 //just use a standard adater
-                try {
-                    UMOMessageAdapter adapter = endpoint.getConnector().getMessageAdapter(result);
-                    returnMessage = new MuleMessage(adapter, returnMessage);
-                } catch (MessagingException e) {
-                    if(logger.isWarnEnabled()) {
-                        logger.warn("Failed to wrap response in " + endpoint.getConnector().getProtocol() + ". Error is: " + e.getMessage());
-                    }
+//                try {
+//                    UMOMessageAdapter adapter = endpoint.getConnector().getMessageAdapter(result);
+//                    returnMessage = new MuleMessage(adapter, returnMessage);
+//                } catch (MessagingException e) {
+//                    if(logger.isWarnEnabled()) {
+//                        logger.warn("Failed to wrap response in " + endpoint.getConnector().getProtocol() + ". Error is: " + e.getMessage());
+//                    }
                     returnMessage = new MuleMessage(result, returnMessage);
-                }
-
+//                }
+//
             }
         }
         else {
