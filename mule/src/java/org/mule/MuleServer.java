@@ -9,7 +9,7 @@
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  */
 package org.mule;
 
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * <code>MuleServer</code> is a simple application that represents a local
  * Mule Server deamon. It is initalised with a mule-config.xml file.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -196,16 +196,6 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * gets the configuration builder used by this server.
-     * 
-     * @return a configuration builder or null if one has not been set
-     */
-    public static ConfigurationBuilder getConfigBuilder()
-    {
-        return configBuilder;
-    }
-
-    /**
      * Sets the configuration builder to use for this server.
      * Note that if a builder is not set and the server's start method is call
      * the default is an instance of <code>MuleXmlConfigurationBuilder</code>.
@@ -215,6 +205,15 @@ public class MuleServer implements Runnable
     public static void setConfigBuilder(ConfigurationBuilder configBuilder)
     {
         MuleServer.configBuilder = configBuilder;
+    }
+
+    /**
+     * Returns the class name of the configuration builder used to create
+     * this MuleServer.  
+     * @return FQN of the current config builder
+     */
+    public static String getConfigBuilderClassName() {
+        return configBuilderClassName;
     }
 
     /**
