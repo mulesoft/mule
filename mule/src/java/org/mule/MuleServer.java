@@ -15,6 +15,7 @@ package org.mule;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ExceptionHelper;
@@ -64,6 +65,12 @@ public class MuleServer implements Runnable
     private static ConfigurationBuilder configBuilder = null;
 
     /**
+     * A FQN of the #configBuilder class, required in case
+     * MuleServer is reinitialised.
+     */
+    private static String configBuilderClassName;
+
+    /**
      * default constructor
      */
     public MuleServer()
@@ -105,12 +112,13 @@ public class MuleServer implements Runnable
             System.exit(0);
         }
 
-        String builder = getOption("-builder", opts);
-        if (builder != null) {
+        // save the class name, as we will dispose of the configBuilder instance later
+        configBuilderClassName = getOption("-configBuilderClassName", opts);
+        if (configBuilderClassName != null) {
             try {
-                configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(builder, MuleServer.class).newInstance();
+                configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(configBuilderClassName, MuleServer.class).newInstance();
             } catch (Exception e) {
-                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + builder), e);
+                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + configBuilderClassName), e);
             }
         } else {
             // use this by default
@@ -188,9 +196,7 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * gets the configuration builder used by this server. Note that if a
-     * builder is not set and the server's start method is call the default is
-     * an instance of <code>MuleXmlConfigurationBuilder</code>.
+     * gets the configuration builder used by this server.
      * 
      * @return a configuration builder or null if one has not been set
      */
@@ -200,7 +206,9 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * sets the configuration builder to use for this server.
+     * Sets the configuration builder to use for this server.
+     * Note that if a builder is not set and the server's start method is call
+     * the default is an instance of <code>MuleXmlConfigurationBuilder</code>.
      * 
      * @param configBuilder the configuration builder instance to use
      */
@@ -223,9 +231,11 @@ public class MuleServer implements Runnable
             // System.setSecurityManager(new RMISecurityManager());
         }
 
-        if (configBuilder == null) {
-            configBuilder = new MuleXmlConfigurationBuilder();
+        // check the class name, not the instance (which is disposed when finished configuring)
+        if (StringUtils.isNotBlank(configBuilderClassName)) {
+            configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(configBuilderClassName, MuleServer.class).newInstance();
         }
+
         if (!configBuilder.isConfigured()) {
             if (configurationResources != null) {
                 configBuilder.configure(configurationResources);
@@ -235,6 +245,12 @@ public class MuleServer implements Runnable
             }
         }
         logger.info("Mule Server initialized.");
+
+        // We don't need a configuration builder now, keep only the config.
+        // This statement dereferences the builder and, e.g. in case of
+        // MuleXmlConfigurationBuilder frees up a lot of resources
+        // retained by commons-digester and parser.
+        configBuilder = null;
     }
 
     /**
