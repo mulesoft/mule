@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -17,7 +17,7 @@ package org.mule.providers.soap.xfire;
 
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.fault.XFireFault;
-import org.codehaus.xfire.service.binding.Invoker;
+import org.codehaus.xfire.service.invoker.Invoker;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
 
 /**
  * Invokes a Mule Service via an Xfire binding
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
