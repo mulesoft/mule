@@ -35,6 +35,9 @@ import java.util.List;
  */
 
 public class LoanConsumer {
+
+    private static boolean synchronous = false;
+
     private List customers = new ArrayList();
     private MuleClient client = null;
 
@@ -119,7 +122,6 @@ public class LoanConsumer {
 
     public static void main(String[] args) {
         LoanConsumer loanConsumer = null;
-        boolean synchronous = false;
 
         try {
             if (args.length > 0) {
@@ -130,12 +132,11 @@ public class LoanConsumer {
                     i = Integer.parseInt(args[1]);
                 }
 
-                boolean sync = false;
                 if (args.length > 2) {
-                    sync = Boolean.valueOf(args[2]).booleanValue();
+                    synchronous = Boolean.valueOf(args[2]).booleanValue();
                 }
 
-                if (sync) {
+                if (synchronous) {
                     long start = System.currentTimeMillis();
                     List results = loanConsumer.requestSend(i, "vm://LoanBrokerRequests");
                     System.out.println("Number or quotes received: " + results.size());
@@ -166,7 +167,6 @@ public class LoanConsumer {
     }
 
     protected static String getConfig() throws IOException {
-        boolean synchronous = false;
         System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Loan Broker example"));
 
         int response = 0;
