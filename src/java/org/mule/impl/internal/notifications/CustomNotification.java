@@ -58,7 +58,7 @@ public class CustomNotification extends UMOServerNotification
     protected String getActionName(int action)
     {
         int i = action - CUSTOM_EVENT_ACTION_START_RANGE;
-        if (i - 1 > getActionNames().length) {
+        if (i - 1 >= getActionNames().length || i < 0) {
             return String.valueOf(action);
         }
         return getActionNames()[i - 1];
