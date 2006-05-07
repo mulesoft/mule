@@ -39,6 +39,10 @@ import java.util.List;
  */
 public class MuleServer implements Runnable
 {
+    /**
+     * Default configuration builder class name.
+     */
+    public static final Class DEFAULT_CONFIG_BUILDER_CLASS = MuleXmlConfigurationBuilder.class;
 
     /**
      * logger used by this class
@@ -62,7 +66,6 @@ public class MuleServer implements Runnable
      * MuleServer is reinitialised.
      */
     private static String configBuilderClassName = null;
-
 
     /**
      * default constructor
@@ -107,7 +110,7 @@ public class MuleServer implements Runnable
         }
 
         // save the ConfigrationBuilderClass name
-        String cfgBuilderClassName = getOption("-configBuilderClassName", opts);
+        String cfgBuilderClassName = getOption("-builder", opts);
         if (cfgBuilderClassName != null) {
             try {
                 setConfigBuilderClassName(cfgBuilderClassName);
@@ -133,7 +136,7 @@ public class MuleServer implements Runnable
 
     /**
      * Start the mule server
-     * 
+     *
      * @param ownThread determines if the server will run in its own daemon
      *            thread or the current calling thread
      */
@@ -163,7 +166,7 @@ public class MuleServer implements Runnable
 
     /**
      * Getter for property messengerURL.
-     * 
+     *
      * @return Value of property messengerURL.
      */
     public String getConfigurationResources()
@@ -173,7 +176,7 @@ public class MuleServer implements Runnable
 
     /**
      * Setter for property messengerURL.
-     * 
+     *
      * @param configurationResources New value of property
      *            configurationResources.
      */
@@ -186,8 +189,8 @@ public class MuleServer implements Runnable
      * Sets the configuration builder to use for this server.
      * Note that if a builder is not set and the server's start method is called
      * the default is an instance of <code>MuleXmlConfigurationBuilder</code>.
-     * 
-     * @param configBuilder the configuration builder instance to use
+     *
+     * @param builderClassName the configuration builder FQN to use
      * @throws ClassNotFoundException if the class with the given name can not be loaded
      */
     public static void setConfigBuilderClassName(String builderClassName)
@@ -216,13 +219,14 @@ public class MuleServer implements Runnable
         if (configBuilderClassName != null) {
             return configBuilderClassName;
         } else {
-            return MuleXmlConfigurationBuilder.class.getName();
+            return DEFAULT_CONFIG_BUILDER_CLASS.getName();
         }
     }
 
     /**
      * Initializes this daemon. Derived classes could add some extra behaviour
      * if they wish.
+     * @throws Exception if failed to initialize
      */
     protected void initialize() throws Exception
     {
@@ -236,7 +240,7 @@ public class MuleServer implements Runnable
 
         // create a new ConfigurationBuilder that is disposed afterwards
         Class cfgBuilderClass = ClassHelper.loadClass(getConfigBuilderClassName(), MuleServer.class);
-        ConfigurationBuilder cfgBuilder = (ConfigurationBuilder)cfgBuilderClass.newInstance();
+        ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) cfgBuilderClass.newInstance();
 
         if (!cfgBuilder.isConfigured()) {
             if (configurationResources != null) {
