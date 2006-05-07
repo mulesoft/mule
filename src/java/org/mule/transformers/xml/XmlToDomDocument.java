@@ -18,7 +18,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
-import org.mule.transformers.xml.AbstractXmlTransformer.ResultHolder;
 import org.mule.umo.transformer.TransformerException;
 import org.w3c.dom.Document;
 
@@ -50,7 +49,6 @@ public class XmlToDomDocument extends AbstractXmlTransformer
             ResultHolder holder = getResultHolder(returnClass);
             if (holder == null) holder = getResultHolder(Document.class); 
 
-            assert(sourceDoc != null);
             assert(holder != null);
 
             Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
