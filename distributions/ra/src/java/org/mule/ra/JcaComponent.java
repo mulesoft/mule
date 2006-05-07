@@ -14,7 +14,6 @@
 package org.mule.ra;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -23,6 +22,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
@@ -32,6 +32,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 
@@ -158,19 +159,18 @@ public class JcaComponent implements UMOComponent
         Object impl = descriptor.getImplementation();
         Object component = null;
 
-        String reference = impl.toString();
-        if (reference.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
-            String refName = reference.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
-            component = descriptor.getProperties().get(refName);
-            if (component == null) {
-                throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X,
-                                                              refName,
-                                                              descriptor.getName()), this);
+        try {
+            if (impl instanceof ContainerKeyPair) {
+                component = MuleManager.getInstance().getContainerContext().getComponent(impl);
+
+                if(descriptor.isSingleton()) {
+                    descriptor.setImplementation(component);
+                }
+            } else {
+                component = impl;
             }
-        } else {
-            throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X,
-                                                          MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL + "xxx",
-                                                          descriptor.getName()), this);
+        } catch (ObjectNotFoundException e) {
+            throw new InitialisationException(e, this);
         }
 
         // Call any custom initialisers
@@ -180,5 +180,19 @@ public class JcaComponent implements UMOComponent
 
     public boolean isStarted() {
         return started; 
+    }
+
+    /**
+     * Gets the underlying instance form this component
+     * Where the Component implmentation provides pooling this is no 1-2-1 mapping
+     * between UMOComponent and instance, so this method will return the object in initial state.
+     * <p/>
+     * If the underlying component is Container managed in Spring or another IoC container then the
+     * object instance in the IoC container will be returned
+     *
+     * @return the underlying instance form this component
+     */
+    public Object getInstance() throws UMOException {
+        return component;
     }
 }
