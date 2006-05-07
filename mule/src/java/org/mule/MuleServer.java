@@ -15,9 +15,7 @@ package org.mule;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ConfigurationException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
@@ -57,18 +55,14 @@ public class MuleServer implements Runnable
     /**
      * one or more configuration urls or filenames separated by commas
      */
-    private String configurationResources;
-
-    /**
-     * The configuration builder used to construct the MuleManager
-     */
-    private static ConfigurationBuilder configBuilder = null;
+    private String configurationResources = null;
 
     /**
      * A FQN of the #configBuilder class, required in case
      * MuleServer is reinitialised.
      */
-    private static String configBuilderClassName;
+    private static String configBuilderClassName = null;
+
 
     /**
      * default constructor
@@ -109,24 +103,17 @@ public class MuleServer implements Runnable
         if (config == null) {
             Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
             logger.fatal(message.toString());
-            System.exit(0);
+            System.exit(1);
         }
 
-        // save the class name, as we will dispose of the configBuilder instance later
-        configBuilderClassName = getOption("-configBuilderClassName", opts);
-        if (configBuilderClassName != null) {
+        // save the ConfigrationBuilderClass name
+        String cfgBuilderClassName = getOption("-configBuilderClassName", opts);
+        if (cfgBuilderClassName != null) {
             try {
-                configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(configBuilderClassName, MuleServer.class).newInstance();
+                setConfigBuilderClassName(cfgBuilderClassName);
             } catch (Exception e) {
-                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + configBuilderClassName), e);
-            }
-        } else {
-            // use this by default
-            try {
-                configBuilder = new MuleXmlConfigurationBuilder();
-            } catch (ConfigurationException e) {
-                logger.fatal(e.getMessage(), e);
-                System.exit(0);
+                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + cfgBuilderClassName), e);
+                System.exit(1);
             }
         }
 
@@ -197,23 +184,40 @@ public class MuleServer implements Runnable
 
     /**
      * Sets the configuration builder to use for this server.
-     * Note that if a builder is not set and the server's start method is call
+     * Note that if a builder is not set and the server's start method is called
      * the default is an instance of <code>MuleXmlConfigurationBuilder</code>.
      * 
      * @param configBuilder the configuration builder instance to use
+     * @throws ClassNotFoundException if the class with the given name can not be loaded
      */
-    public static void setConfigBuilder(ConfigurationBuilder configBuilder)
+    public static void setConfigBuilderClassName(String builderClassName)
+        throws ClassNotFoundException
     {
-        MuleServer.configBuilder = configBuilder;
+        if (builderClassName != null) {
+            Class cls = ClassHelper.loadClass(builderClassName, MuleServer.class);
+            if (ConfigurationBuilder.class.isAssignableFrom(cls)) {
+                MuleServer.configBuilderClassName = builderClassName;
+            } else {
+                throw new IllegalArgumentException("Not a usable ConfigurationBuilder class: "
+                        + builderClassName);
+            }
+        } else {
+            MuleServer.configBuilderClassName = null;
+        }
     }
 
     /**
      * Returns the class name of the configuration builder used to create
-     * this MuleServer.  
+     * this MuleServer.
      * @return FQN of the current config builder
      */
-    public static String getConfigBuilderClassName() {
-        return configBuilderClassName;
+    public static String getConfigBuilderClassName()
+    {
+        if (configBuilderClassName != null) {
+            return configBuilderClassName;
+        } else {
+            return MuleXmlConfigurationBuilder.class.getName();
+        }
     }
 
     /**
@@ -230,26 +234,20 @@ public class MuleServer implements Runnable
             // System.setSecurityManager(new RMISecurityManager());
         }
 
-        // check the class name, not the instance (which is disposed when finished configuring)
-        if (StringUtils.isNotBlank(configBuilderClassName)) {
-            configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(configBuilderClassName, MuleServer.class).newInstance();
-        }
+        // create a new ConfigurationBuilder that is disposed afterwards
+        Class cfgBuilderClass = ClassHelper.loadClass(getConfigBuilderClassName(), MuleServer.class);
+        ConfigurationBuilder cfgBuilder = (ConfigurationBuilder)cfgBuilderClass.newInstance();
 
-        if (!configBuilder.isConfigured()) {
+        if (!cfgBuilder.isConfigured()) {
             if (configurationResources != null) {
-                configBuilder.configure(configurationResources);
+                cfgBuilder.configure(configurationResources);
             } else {
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-                configBuilder.configure(DEFAULT_CONFIGURATION);
+                cfgBuilder.configure(DEFAULT_CONFIGURATION);
             }
         }
-        logger.info("Mule Server initialized.");
 
-        // We don't need a configuration builder now, keep only the config.
-        // This statement dereferences the builder and, e.g. in case of
-        // MuleXmlConfigurationBuilder frees up a lot of resources
-        // retained by commons-digester and parser.
-        configBuilder = null;
+        logger.info("Mule Server initialized.");
     }
 
     /**
