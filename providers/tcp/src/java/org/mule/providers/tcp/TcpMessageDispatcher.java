@@ -13,6 +13,7 @@
  */
 package org.mule.providers.tcp;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -23,7 +24,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -225,24 +225,21 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        keepSendSocketOpen = connector.isKeepSendSocketOpen();
+        keepSendSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(),
+                "keepSendSocketOpen", connector.isKeepSendSocketOpen());
 
-        if(endpoint.getProperties().containsKey("keepSendSocketOpen")) {
-            keepSendSocketOpen = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "keepSendSocketOpen", keepSendSocketOpen);
+        if(connectedSocket==null || connectedSocket.isClosed() || !keepSendSocketOpen) {
+            connectedSocket = initSocket(endpoint.getEndpointURI().getAddress());
         }
-
-        if(connectedSocket==null || connectedSocket.isClosed() || !keepSendSocketOpen)
-        connectedSocket = initSocket(endpoint.getEndpointURI().getAddress());
     }
 
     protected void doDisconnect() throws Exception {
        if (null != connectedSocket && !connectedSocket.isClosed()) {
             try {
                 connectedSocket.close();
-
                 connectedSocket = null;
             } catch (IOException e) {
-                logger.warn("ConnectedSocked close raised exception. Reason: " + e.getMessage());
+                logger.warn("ConnectedSocked.close() raised exception. Reason: " + e.getMessage());
             }
         }
     }
