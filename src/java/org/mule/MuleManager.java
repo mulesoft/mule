@@ -711,8 +711,8 @@ public class MuleManager implements UMOManager
         boolean disable = MapUtils.getBooleanValue(System.getProperties(),
                 MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, false);
 
-        // if endpointUri is null do not setup server components
-        if (StringUtils.isEmpty(config.getServerUrl())) {
+        // if endpointUri is blanked out do not setup server components
+        if (StringUtils.isBlank(config.getServerUrl())) {
             logger.info("Server endpointUri is null, not registering Mule Admin agent");
             disable = true;
         }
