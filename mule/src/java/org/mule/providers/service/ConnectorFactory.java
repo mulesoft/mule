@@ -235,7 +235,7 @@ public class ConnectorFactory
         PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
                                                              connector.getProtocol().toLowerCase(), props);
         if (props.size() > 0) {
-            props = PropertiesHelper.removeNamspaces(props);
+            props = PropertiesHelper.removeNamespaces(props);
             org.mule.util.BeanUtils.populateWithoutFail(connector, props, true);
         }
 

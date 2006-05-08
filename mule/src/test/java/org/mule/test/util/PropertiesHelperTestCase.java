@@ -98,25 +98,13 @@ public class PropertiesHelperTestCase extends TestCase
         props.put("longProperty", "999999999");
         props.put("3456.stringProperty", "string");
 
-        props = PropertiesHelper.removeNamspaces(props);
+        props = PropertiesHelper.removeNamespaces(props);
 
         assertTrue(PropertiesHelper.getBooleanProperty(props, "booleanProperty", false));
         assertEquals(0.1243, 0, PropertiesHelper.getDoubleProperty(props, "doubleProperty", 0));
         assertEquals(14, PropertiesHelper.getIntProperty(props, "intProperty", 0));
         assertEquals(999999999, 0, PropertiesHelper.getLongProperty(props, "longProperty", 0));
         assertEquals("string", PropertiesHelper.getStringProperty(props, "stringProperty", ""));
-    }
-
-    public void testReverseProperties() throws Exception
-    {
-        HashMap props = new HashMap();
-
-        props.put("name1", "value1");
-        props.put("name2", "value2");
-
-        Map newProps = PropertiesHelper.reverseProperties(props);
-        assertEquals("name1", newProps.get("value1"));
-        assertEquals("name2", newProps.get("value2"));
     }
 
     public void testMapNull() throws Exception

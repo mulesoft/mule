@@ -52,33 +52,32 @@ public class PropertiesHelper
      * This method reads the file in to a java.util.Properties object and
      * returns it.
      */
-    public static synchronized java.util.Properties loadProperties(String fileName) throws Exception
+    public static synchronized Properties loadProperties(String fileName) throws Exception
     {
-        java.util.Properties p = null;
         try {
             FileInputStream is = new FileInputStream(fileName);
-            p = new java.util.Properties();
+            Properties p = new java.util.Properties();
             p.load(is);
+            return p;
         }
         catch (Exception ex) {
             throw ex;
         }
-        return p;
     }
 
     public static String removeXmlNamespacePrefix(String eleName)
     {
-        int i = eleName.indexOf(":");
+        int i = eleName.indexOf(':');
         return eleName.substring(i + 1, eleName.length());
     }
 
     public static String removeNamespacePrefix(String eleName)
     {
-        int i = eleName.lastIndexOf(".");
+        int i = eleName.lastIndexOf('.');
         return eleName.substring(i + 1, eleName.length());
     }
 
-    public static Map removeNamspaces(Map properties)
+    public static Map removeNamespaces(Map properties)
     {
         HashMap props = new HashMap(properties.size());
         Map.Entry entry;
@@ -195,30 +194,6 @@ public class PropertiesHelper
             newProps.put(entry.getValue(), entry.getKey());
         }
         return newProps;
-    }
-
-    public static int getIntValue(Object value)
-    {
-        if (value instanceof Integer) {
-            return ((Integer)value).intValue();
-        }
-        return Integer.parseInt(value.toString());
-    }
-
-    public static long getLongValue(Object value)
-    {
-        if (value instanceof Long) {
-            return ((Long)value).longValue();
-        }
-        return Long.parseLong(value.toString());
-    }
-
-    public static boolean getBooleanValue(Object value)
-    {
-        if (value instanceof Boolean) {
-            return ((Boolean)value).booleanValue();
-        }
-        return Boolean.valueOf(value.toString()).booleanValue();
     }
 
     /**
