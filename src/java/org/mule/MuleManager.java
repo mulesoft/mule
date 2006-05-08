@@ -14,6 +14,8 @@
 package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,7 +68,6 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
@@ -76,6 +77,7 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -706,9 +708,8 @@ public class MuleManager implements UMOManager
     protected void registerAdminAgent() throws UMOException {
         // Allows users to disable all server components and connections
         // this can be useful for testing
-        boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),
-                                                              MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY,
-                                                              false);
+        boolean disable = MapUtils.getBooleanValue(System.getProperties(),
+                MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, false);
 
         // if endpointUri is null do not setup server components
         if (StringUtils.isEmpty(config.getServerUrl())) {
@@ -1008,12 +1009,12 @@ public class MuleManager implements UMOManager
         Manifest mf = config.getManifest();
         Map att = mf.getMainAttributes();
         if (att.values().size() > 0) {
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Title"), notset)
+            message.add(MapUtils.getString(att, new Attributes.Name("Specification-Title"), notset)
                     + " " + new Message(Messages.VERSION).getMessage() + " "
-                    + PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Version"), notset));
+                    + MapUtils.getString(att, new Attributes.Name("Implementation-Version"), notset));
 
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Vendor"), notset));
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Vendor"), notset));
+            message.add(MapUtils.getString(att, new Attributes.Name("Specification-Vendor"), notset));
+            message.add(MapUtils.getString(att, new Attributes.Name("Implementation-Vendor"), notset));
         } else {
             message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }

@@ -15,6 +15,7 @@
 
 package org.mule.test.util;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.mule.util.CollectionUtil;
 import org.mule.util.PropertiesHelper;
@@ -30,29 +31,6 @@ import junit.framework.TestCase;
  */
 public class PropertiesHelperTestCase extends TestCase
 {
-    public void testPropertyHelpers() throws Exception
-    {
-        HashMap props = new HashMap();
-
-        props.put("booleanProperty", "true");
-        props.put("doubleProperty", "0.1243");
-        props.put("intProperty", "14");
-        props.put("longProperty", "999999999");
-        props.put("stringProperty", "string");
-
-        assertTrue(PropertiesHelper.getBooleanProperty(props, "booleanProperty", false));
-        assertEquals(0.1243, 0, PropertiesHelper.getDoubleProperty(props, "doubleProperty", 0));
-        assertEquals(14, PropertiesHelper.getIntProperty(props, "intProperty", 0));
-        assertEquals(999999999, 0, PropertiesHelper.getLongProperty(props, "longProperty", 0));
-        assertEquals("string", PropertiesHelper.getStringProperty(props, "stringProperty", ""));
-
-        assertTrue(!PropertiesHelper.getBooleanProperty(props, "booleanPropertyX", false));
-        assertEquals(1, 0, PropertiesHelper.getDoubleProperty(props, "doublePropertyX", 1));
-        assertEquals(1, PropertiesHelper.getIntProperty(props, "intPropertyX", 1));
-        assertEquals(1, 0, PropertiesHelper.getLongProperty(props, "longPropertyX", 1));
-        assertEquals("", PropertiesHelper.getStringProperty(props, "stringPropertyX", ""));
-
-    }
 
     public void testRemoveNameSpacePrefix()
     {
@@ -100,11 +78,11 @@ public class PropertiesHelperTestCase extends TestCase
 
         props = PropertiesHelper.removeNamespaces(props);
 
-        assertTrue(PropertiesHelper.getBooleanProperty(props, "booleanProperty", false));
-        assertEquals(0.1243, 0, PropertiesHelper.getDoubleProperty(props, "doubleProperty", 0));
-        assertEquals(14, PropertiesHelper.getIntProperty(props, "intProperty", 0));
-        assertEquals(999999999, 0, PropertiesHelper.getLongProperty(props, "longProperty", 0));
-        assertEquals("string", PropertiesHelper.getStringProperty(props, "stringProperty", ""));
+        assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
+        assertEquals(0.1243, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
+        assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
+        assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
+        assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
     }
 
     public void testMapNull() throws Exception
