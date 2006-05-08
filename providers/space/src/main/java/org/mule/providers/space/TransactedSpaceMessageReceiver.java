@@ -14,6 +14,7 @@
 
 package org.mule.providers.space;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
@@ -25,7 +26,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
-import org.mule.util.PropertiesHelper;
 
 import java.util.List;
 import java.util.Properties;
@@ -47,9 +47,7 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
     {
         super(connector, component, endpoint, new Long(0));
         this.connector = (SpaceConnector)connector;
-
-        this.frequency = PropertiesHelper
-                .getLongProperty(endpoint.getProperties(), "frequency", 100000L);
+        this.frequency = MapUtils.getLongValue(endpoint.getProperties(), "frequency", 100000L);
     }
 
     protected List getMessages() throws Exception
