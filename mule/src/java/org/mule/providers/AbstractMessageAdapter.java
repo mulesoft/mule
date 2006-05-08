@@ -157,27 +157,27 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public int getIntProperty(String name, int defaultValue)
     {
-        return PropertiesHelper.getIntProperty(properties, name, defaultValue);
+        return MapUtils.getIntValue(properties, name, defaultValue);
     }
 
     public long getLongProperty(String name, long defaultValue)
     {
-        return PropertiesHelper.getLongProperty(properties, name, defaultValue);
+        return MapUtils.getLongValue(properties, name, defaultValue);
     }
 
     public double getDoubleProperty(String name, double defaultValue)
     {
-        return PropertiesHelper.getDoubleProperty(properties, name, defaultValue);
+        return MapUtils.getDoubleValue(properties, name, defaultValue);
     }
 
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
-        return PropertiesHelper.getBooleanProperty(properties, name, defaultValue);
+        return MapUtils.getBooleanValue(properties, name, defaultValue);
     }
 
     public String getStringProperty(String name, String defaultValue)
     {
-        return PropertiesHelper.getStringProperty(properties, name, defaultValue);
+        return MapUtils.getString(properties, name, defaultValue);
     }
 
     public void setBooleanProperty(String name, boolean value)

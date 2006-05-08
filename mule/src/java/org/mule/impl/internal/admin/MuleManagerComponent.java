@@ -13,6 +13,7 @@
  */
 package org.mule.impl.internal.admin;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -47,7 +48,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.PropertiesHelper;
 
 import java.util.Map;
 
@@ -167,9 +167,9 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
             UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
-            long timeout = PropertiesHelper.getLongProperty(action.getProperties(),
-                                                            MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY,
-                                                            MuleManager.getConfiguration().getSynchronousEventTimeout());
+            long timeout = MapUtils.getLongValue(action.getProperties(),
+                    MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY,
+                    MuleManager.getConfiguration().getSynchronousEventTimeout());
 
 
             UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
