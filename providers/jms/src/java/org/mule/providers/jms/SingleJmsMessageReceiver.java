@@ -14,6 +14,7 @@
  */
 package org.mule.providers.jms;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -25,7 +26,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -164,7 +164,8 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
             //todo MULE20 remove resource Info support
             if(!topic) {
-                topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);
+                topic = MapUtils.getBooleanValue(endpoint.getProperties(),
+                        JmsConstants.TOPIC_PROPERTY, false);
             }
 
             Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);

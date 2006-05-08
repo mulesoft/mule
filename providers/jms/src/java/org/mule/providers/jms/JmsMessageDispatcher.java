@@ -16,6 +16,7 @@ package org.mule.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -29,7 +30,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
 
@@ -133,10 +133,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             boolean topic = false;
             String resourceInfo = endpointUri.getResourceInfo();
             topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
-            //todo MULE20 remove resource info support
+            //TODO MULE20 remove resource info support
             if(!topic) {
-                topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(),
-                                                            JmsConstants.TOPIC_PROPERTY, false);
+                topic = MapUtils.getBooleanValue(event.getEndpoint().getProperties(),
+                        JmsConstants.TOPIC_PROPERTY, false);
             }
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);

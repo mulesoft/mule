@@ -14,6 +14,7 @@
  */
 package org.mule.providers.jms;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.SingleAttemptConnectionStrategy;
@@ -26,7 +27,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -34,6 +34,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
+
 import java.util.List;
 
 /**
@@ -96,8 +97,8 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             this.reuseSession = true;
         }
         // User may override reuse strategy if necessary
-        this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", this.reuseConsumer);
-        this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", this.reuseSession);
+        this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer", this.reuseConsumer);
+        this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession", this.reuseSession);
 
         // Check if the destination is a queue and
         // if we are in transactional mode.
