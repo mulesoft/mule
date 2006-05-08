@@ -13,6 +13,7 @@
  */
 package org.mule.providers.ejb;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.rmi.RmiConnector;
@@ -20,9 +21,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
 
 import javax.ejb.EJBObject;
+
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -95,14 +96,11 @@ public class EjbConnectorUtil
     {
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
 
-        String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
-                RmiConnector.PARAM_SERVICE_METHOD,
-                null);
+        String methodName = MapUtils.getString(endpointUri.getParams(),
+                RmiConnector.PARAM_SERVICE_METHOD, null);
 
         if (null == methodName) {
-            methodName = (String) endpoint
-                    .getProperties()
-                    .get(RmiConnector.PARAM_SERVICE_METHOD);
+            methodName = (String) endpoint.getProperties().get(RmiConnector.PARAM_SERVICE_METHOD);
 
             if (null == methodName) {
                 throw new InitialisationException(new org.mule.config.i18n.Message("ejb",

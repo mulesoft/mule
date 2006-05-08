@@ -13,6 +13,7 @@
  */
 package org.mule.providers.ejb;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.rmi.RmiConnector;
@@ -25,7 +26,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
 
 import javax.ejb.EJBObject;
 
@@ -112,9 +112,8 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
     protected Method getMethodObject(UMOEvent event, EJBObject remoteObject) throws UMOException, NoSuchMethodException, ClassNotFoundException {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-        String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
-                RmiConnector.PARAM_SERVICE_METHOD,
-                null);
+        String methodName = MapUtils.getString(endpointUri.getParams(),
+                RmiConnector.PARAM_SERVICE_METHOD, null);
 
         if (null == methodName) {
             methodName = (String) event.getMessage().getProperty(RmiConnector.PARAM_SERVICE_METHOD);
