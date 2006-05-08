@@ -13,6 +13,7 @@
  */
 package org.mule.extras.spring.events;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -49,7 +50,6 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -60,13 +60,13 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.beans.ExceptionListener;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -336,9 +336,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     private boolean isSubscriptionMatch(String endpoint, String[] subscriptions)
     {
         for (int i = 0; i < subscriptions.length; i++) {
-            String subscription = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
-                                                                     subscriptions[i],
-                                                                     subscriptions[i]);
+            String subscription = MapUtils.getString(MuleManager.getInstance().getEndpointIdentifiers(),
+                    subscriptions[i], subscriptions[i]);
 
             // Subscriptions can be full Mule Urls or resource specific such as
             // my.queue
