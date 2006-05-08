@@ -118,7 +118,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             Map props = new HashMap();
             PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol().toLowerCase(), props);
             if (props.size() > 0) {
-                props = PropertiesHelper.removeNamspaces(props);
+                props = PropertiesHelper.removeNamespaces(props);
                 org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
             }
         } catch (Exception e) {

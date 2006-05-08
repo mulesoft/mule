@@ -13,13 +13,13 @@
  */
 package org.mule.config;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.Utility;
 
@@ -110,7 +110,7 @@ public class ExceptionHelper {
                 throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
             }
             errorCodes.load(is);
-            reverseErrorCodes = PropertiesHelper.reverseProperties(errorCodes);
+            reverseErrorCodes = MapUtils.invertMap(errorCodes);
             is = SpiHelper.findServiceDescriptor("org/mule/config",
                     "mule-exception-config.properties",
                     ExceptionHelper.class);

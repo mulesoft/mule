@@ -80,7 +80,6 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
@@ -851,7 +850,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                                                               responseTrans,
                                                               createConnector,
                                                               digester.peek());
-                String encoding = attributes.getValue("encoding");
+                // TODO encoding
+                // String encoding = attributes.getValue("encoding");
                 digester.push(ref);
             }
 
@@ -1002,7 +1002,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
             // outboundendpoint attributes of the descriptor
             String endpoint = attributes.getValue("inboundEndpoint");
             if (endpoint != null) {
-                Object o = PropertiesHelper.getProperty(manager.getEndpoints(), endpoint, null);
+                Object o = manager.getEndpoints().get(endpoint);
                 if (o != null) {
                     addEndpointReference("setInboundEndpoint", endpoint, digester.peek());
                 }
@@ -1010,7 +1010,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
             endpoint = attributes.getValue("outboundEndpoint");
             if (endpoint != null) {
-                Object o = PropertiesHelper.getProperty(manager.getEndpoints(), endpoint, null);
+                Object o = manager.getEndpoints().get(endpoint);
                 if (o != null) {
                     addEndpointReference("setOutboundEndpoint", endpoint, digester.peek());
                 }

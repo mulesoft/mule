@@ -13,6 +13,7 @@
  */
 package org.mule.impl.internal.admin;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -26,7 +27,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 
 import java.io.File;
@@ -116,7 +116,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     {
         if (eventLogger != null) {
             String actionKey = e.EVENT_NAME + "." + e.getActionName();
-            String level = (String) PropertiesHelper.getProperty(levelMappings, actionKey, e.getType());
+            String level = MapUtils.getString(levelMappings, actionKey, e.getType());
 
             eventLogger.log(Level.toLevel(level, Level.INFO), e);
         }

@@ -16,6 +16,8 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +32,7 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.UUID;
 
 import javax.activation.DataHandler;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -149,7 +152,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public Object getProperty(String name, Object defaultValue)
     {
-        return PropertiesHelper.getProperty(properties, name, defaultValue);
+        return MapUtils.getObject(properties, name, defaultValue);
     }
 
     public int getIntProperty(String name, int defaultValue)

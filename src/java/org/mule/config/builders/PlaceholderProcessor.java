@@ -174,7 +174,7 @@ public class PlaceholderProcessor
             name = (String) iterator.next();
             Map schemeConfig = new HashMap();
             PropertiesHelper.getPropertiesWithPrefix(props, name + ".", schemeConfig);
-            schemeConfig = PropertiesHelper.removeNamspaces(schemeConfig);
+            schemeConfig = PropertiesHelper.removeNamespaces(schemeConfig);
 
             String type = (String)schemeConfig.get("type");
             String clazz = (String)types.get(type);
