@@ -15,14 +15,15 @@
 
 package org.mule.providers.http;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -106,12 +107,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             else {
                 conn = new HttpServerConnection(socket);
             }
-            cookieSpec = PropertiesHelper.getStringProperty(endpoint.getProperties(),
+
+            cookieSpec = MapUtils.getString(endpoint.getProperties(),
                     HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector)connector).getCookieSpec());
 
-            enableCookies = PropertiesHelper.getBooleanProperty(endpoint.getProperties(),
-                    HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector)connector)
-                            .isEnableCookies());
+            enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
+                    HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector)connector).isEnableCookies());
         }
 
         public void run()

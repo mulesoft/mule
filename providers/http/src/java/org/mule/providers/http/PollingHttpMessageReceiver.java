@@ -15,6 +15,8 @@
 
 package org.mule.providers.http;
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -25,9 +27,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -56,8 +56,7 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
     {
         this(connector, component, endpoint, new Long(1000));
 
-        long pollingFrequency = PropertiesHelper.getLongProperty(endpoint.getProperties(),
-                "pollingFrequency", -1);
+        long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", -1);
         if (pollingFrequency > 0) {
             setFrequency(pollingFrequency);
         }
