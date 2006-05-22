@@ -95,8 +95,8 @@
                 <exclude>**/GlueEchoTestCase.*</exclude>
                 <exclude>**/GlueLoanBrokerSynchronousFunctionalTestCase.*</exclude>
 
-                <!-- TODO Not working... yet -->
-                <exclude>**/*XFireLoanBrokerSynchronousFunctionalTestCase.*</exclude>
+                <!-- TODO doesn't consistently work. Depends on network adapter being used -->
+                <exclude>**/*MulticastConnectorFunctionalTestCase.*</exclude>
                 
             </excludes>
 

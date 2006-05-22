@@ -67,7 +67,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         // properties can be expensive
         Map props = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKey = iterator.next();
+            String propertyKey = (String)iterator.next();
             props.put(propertyKey, message.getProperty(propertyKey));
         }
         properties.set(props);

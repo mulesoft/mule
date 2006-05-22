@@ -136,98 +136,95 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
             return;
         }
 
-        try {
-            MuleManager.getInstance().start();
-            MuleManager.getInstance().registerListener(this);
+        MuleManager.getInstance().start();
+        MuleManager.getInstance().registerListener(this);
 
-            // Start time
-            long t0, t1;
-            // Check that connection fails
-            t0 = System.currentTimeMillis();
-            while (true) {
-                ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
-                if (event != null && event.getAction() == ConnectionNotification.CONNECTION_FAILED) {
-                    break;
-                } else {
-                    fail("no notification event was received: " + event);
-                }
-                t1 = System.currentTimeMillis() - t0;
-                if (t1 > TIME_OUT) {
-                    fail("No connection attempt");
-                }
+        // Start time
+        long t0, t1;
+        // Check that connection fails
+        t0 = System.currentTimeMillis();
+        while (true) {
+            ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
+            if (event != null && event.getAction() == ConnectionNotification.CONNECTION_FAILED) {
+                break;
+            } else {
+                fail("no notification event was received: " + event);
             }
-
-            // Launch activemq
-            ServerTools.launchActiveMq(BROKER_URL);
-            // Check that connection succeed
-            t0 = System.currentTimeMillis();
-            while (true) {
-                ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
-                if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
-                    break;
-                }
-                t1 = System.currentTimeMillis() - t0;
-                if (t1 > TIME_OUT) {
-                    fail("Connection should have succeeded");
-                }
+            t1 = System.currentTimeMillis() - t0;
+            if (t1 > TIME_OUT) {
+                fail("No connection attempt");
             }
-
-            Thread.sleep(3000);
-            MuleClient client = new MuleClient();
-
-            MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener() {
-                public void onNotification(UMOServerNotification notification) {
-                    if(notification.getSource().equals("test1")) {
-                        eventLatch1.countDown();
-                    } else if(notification.getSource().equals("test2")) {
-                        eventLatch2.countDown();
-                    }
-
-                }
-            });
-            client.sendNoReceive("jms://reconnect.queue", "test1", null);
-            //we should be able to do a sync call here and get a response message back
-            //but there is a bug in ActiveMq that causes a null pointer
-            //assertNotNull(m);
-            //assertEquals("Received: test", m.getPayloadAsString());
-            assertTrue("1st Event should have been received", eventLatch1.await(15000L, TimeUnit.MILLISECONDS));
-
-            // Kill activemq
-            ServerTools.killActiveMq();
-            // Check that the connection is lost
-            t0 = System.currentTimeMillis();
-            while (true) {
-                ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
-                if (event.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
-                    break;
-                }
-                t1 = System.currentTimeMillis() - t0;
-                if (t1 > TIME_OUT) {
-                    fail("Connection should have been lost");
-                }
-            }
-            // Restart activemq
-            ServerTools.launchActiveMq(BROKER_URL);
-            // Check that connection succeed
-            t0 = System.currentTimeMillis();
-            while (true) {
-                ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
-                if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
-                    break;
-                }
-                t1 = System.currentTimeMillis() - t0;
-                if (t1 > TIME_OUT) {
-                    fail("Connection should have succeeded");
-                }
-            }
-
-            //Lets send another test message to esure everything is back up
-            client.sendNoReceive("jms://reconnect.queue", "test2", null);
-            assertTrue("2nd Event should have been received", eventLatch2.await(15000L, TimeUnit.MILLISECONDS));
-        } finally {
-            //Lets send a message nd to end to make sure all Jms connections have recovered
-            ServerTools.killActiveMq();
         }
+
+        // Launch activemq
+        ServerTools.launchActiveMq(BROKER_URL);
+        // Check that connection succeed
+        t0 = System.currentTimeMillis();
+        while (true) {
+            ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
+            if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() - t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have succeeded");
+            }
+        }
+
+        Thread.sleep(3000);
+        MuleClient client = new MuleClient();
+
+        MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener() {
+            public void onNotification(UMOServerNotification notification) {
+                if(notification.getSource().equals("test1")) {
+                    eventLatch1.countDown();
+                } else if(notification.getSource().equals("test2")) {
+                    eventLatch2.countDown();
+                }
+
+            }
+        });
+        client.sendNoReceive("jms://reconnect.queue", "test1", null);
+        //we should be able to do a sync call here and get a response message back
+        //but there is a bug in ActiveMq that causes a null pointer
+        //assertNotNull(m);
+        //assertEquals("Received: test", m.getPayloadAsString());
+        assertTrue("1st Event should have been received", eventLatch1.await(15000L, TimeUnit.MILLISECONDS));
+
+        // Kill activemq
+        ServerTools.killActiveMq();
+        // Check that the connection is lost
+        t0 = System.currentTimeMillis();
+        while (true) {
+            ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
+            assertNotNull("Disconnect event should have been received", event);
+            if (event.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() - t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have been lost");
+            }
+        }
+        // Restart activemq
+        ServerTools.launchActiveMq(BROKER_URL);
+        // Check that connection succeed
+        t0 = System.currentTimeMillis();
+        while (true) {
+            ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
+            if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() - t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have succeeded");
+            }
+        }
+
+        //Lets send another test message to esure everything is back up
+        client.sendNoReceive("jms://reconnect.queue", "test2", null);
+        assertTrue("2nd Event should have been received", eventLatch2.await(15000L, TimeUnit.MILLISECONDS));
+
     }
 
 

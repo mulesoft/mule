@@ -15,20 +15,19 @@ package org.mule.routing.inbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.routing.AggregationException;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.RoutingException;
 
 import java.util.Map;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into
- * a single message
+ * a single message.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -39,7 +38,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     protected static final String NO_CORRELATION_ID = "no-id";
 
     protected Map eventGroups = new ConcurrentHashMap();
-    private Object lock = new Object();
+    private final Object lock = new Object();
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
@@ -54,6 +53,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
         // }
         if (doAggregate.get()) {
             synchronized (lock) {
+                // TODO how should we handle EventGroup if still null? 
                 UMOMessage returnMessage = aggregateEvents(eg);
                 removeGroup(eg.getGroupId());
                 UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
@@ -73,7 +73,8 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
      * correlationId one will be created and added to the router.
      * 
      * @param event
-     * @return
+     * @return returns either a new EventGroup with the new event added or an Existing EventGoup
+     * with the new event added
      */
     protected EventGroup addEvent(UMOEvent event)
     {
@@ -107,7 +108,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
      * on the last event received)
      * 
      * @param events
-     * @return
+     * @return true if the group is ready for aggregation
      */
     protected abstract boolean shouldAggregate(EventGroup events);
 
@@ -118,9 +119,9 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
      * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws RoutingException if the aggregation fails. in this scenario the
+     * @throws AggregationException if the aggregation fails. in this scenario the
      *             whole event group is removed and passed to the exception
      *             handler for this componenet
      */
-    protected abstract UMOMessage aggregateEvents(EventGroup events) throws RoutingException;
+    protected abstract UMOMessage aggregateEvents(EventGroup events) throws AggregationException;
 }

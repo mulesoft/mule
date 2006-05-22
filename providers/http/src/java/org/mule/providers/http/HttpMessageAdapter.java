@@ -48,9 +48,14 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
             this.message = ((Object[])message)[0];
             if (((Object[])message).length > 1) {
                 Map props = (Map)((Object[])message)[1];
-                for (Iterator iterator = props.keySet().iterator(); iterator.hasNext();) {
-                    Object o = iterator.next();
-                    setProperty(o, props.get(o));
+                for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+                    Map.Entry e = (Map.Entry)iterator.next();
+                    String key = (String)e.getKey();
+                    Object value = e.getValue();
+                    // skip incoming null values
+                    if (value != null) {
+                        setProperty(key, value);
+                    }
                 }
             }
         }
@@ -64,7 +69,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
-        String temp = (String)properties.get(HttpConnector.HTTP_VERSION_PROPERTY);
+        String temp = getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, null);
         if (HttpConstants.HTTP10.equalsIgnoreCase(temp)) {
             http11 = false;
         }
@@ -143,11 +148,11 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
      */
-    public Object getProperty(Object key)
+    public Object getProperty(String key)
     {
         if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key)) {
             if (!http11) {
-                String connection = (String)super.getProperty(HttpConstants.HEADER_CONNECTION);
+                String connection = super.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
                 if (connection != null && connection.equalsIgnoreCase("close")) {
                     return "false";
                 }
@@ -167,7 +172,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     public Header getHeader(String name)
     {
-        String value = (String)getProperty(name);
+        String value = getStringProperty(name, null);
         if (value == null) {
             return null;
         }

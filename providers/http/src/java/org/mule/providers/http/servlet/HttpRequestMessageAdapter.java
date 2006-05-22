@@ -56,11 +56,13 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             if (parameterMap != null && parameterMap.size() > 0) {
                 for (Iterator iterator = parameterMap.entrySet().iterator(); iterator.hasNext();) {
                     Map.Entry entry = (Map.Entry) iterator.next();
-                    if(entry.getValue() !=null) {
-                        if(entry.getValue().getClass().isArray() && ((Object[])entry.getValue()).length==1) {
-                            properties.put(entry.getKey(), ((Object[])entry.getValue())[0]);
+                    String key = (String)entry.getKey();
+                    Object value = entry.getValue();
+                    if(value != null) {
+                        if(value.getClass().isArray() && ((Object[])value).length==1) {
+                            setProperty(key, ((Object[])value)[0]);
                         } else {
-                            properties.put(entry.getKey(), entry.getValue());
+                            setProperty(key, value);
                         }
                     }
                 }
@@ -77,7 +79,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                 if(key.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
                     realKey = key.substring(2);
                 }
-                properties.put(realKey, request.getHeader(key));
+                setProperty(realKey, request.getHeader(key));
             }
         }
         else {

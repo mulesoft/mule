@@ -48,7 +48,7 @@ public interface UMOMessageAdapter extends Serializable {
      * @param key the key on which to lookup the property value
      * @return the property value or null if the property does not exist
      */
-    Object getProperty(Object key);
+    Object getProperty(String key);
 
     /**
      * Set a property on the message
@@ -56,7 +56,7 @@ public interface UMOMessageAdapter extends Serializable {
      * @param key   the key on which to associate the value
      * @param value the property value
      */
-    void setProperty(Object key, Object value);
+    void setProperty(String key, Object value);
 
     /**
      * Removes a property on this message
@@ -64,7 +64,7 @@ public interface UMOMessageAdapter extends Serializable {
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
-    Object removeProperty(Object key);
+    Object removeProperty(String key);
 
      /**
      * Converts the message implementation into a String representation

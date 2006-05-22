@@ -583,7 +583,7 @@
         </dependency>
         <dependency>
             <groupId>quartz</groupId>
-            <artifactId>quartz</artifactId>
+            <artifactId>quartz-all</artifactId>
             <version>${quartz_version}</version>
             <url>http://www.opensymphony.com/quartz/</url>
         </dependency>

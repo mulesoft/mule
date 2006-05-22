@@ -27,7 +27,6 @@ import org.apache.tools.ant.util.Watchdog;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 
 import javax.jms.JMSException;
-
 import java.io.File;
 
 /**
@@ -123,8 +122,12 @@ public class ServerTools
 
     public static void killActiveMq()
     {
-        if (activemq != null) {
-            activemq.kill();
+        try {
+            if (activemq != null) {
+                activemq.kill();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 

@@ -53,8 +53,8 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer {
             msg.setExceptionPayload(context.getMessage().getExceptionPayload());
             Map props = new HashMap();
             for (Iterator iterator = context.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
-                Object o =  iterator.next();
-                props.put(o, context.getMessage().getProperty(o));
+                String key = (String)iterator.next();
+                props.put(key, context.getMessage().getProperty(key));
             }
             msg.setProperties(props);
             return msg;

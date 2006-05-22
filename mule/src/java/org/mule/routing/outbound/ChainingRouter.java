@@ -66,9 +66,10 @@ public class ChainingRouter extends FilteringOutboundRouter
                 if (!lastEndpointInChain) {
 
                     UMOMessage tempResult = send(session, intermediaryResult, endpoint);
-                    //Need to propergate Correlation info and replyTo. Because there is no guarantee that an external
-                    //system will preserve headers (in fact most will not)
-                    if(tempResult!=null) {
+                    // Need to propagate correlation info and replyTo, because there
+                    // is no guarantee that an external system will preserve headers
+                    // (in fact most will not)
+                    if (tempResult != null && intermediaryResult != null) {
                         tempResult.setCorrelationId(intermediaryResult.getCorrelationId());
                         tempResult.setCorrelationSequence(intermediaryResult.getCorrelationSequence());
                         tempResult.setCorrelationGroupSize(intermediaryResult.getCorrelationGroupSize());
@@ -77,11 +78,12 @@ public class ChainingRouter extends FilteringOutboundRouter
                     intermediaryResult = tempResult;
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Received Chain result '" + i + "': " + (intermediaryResult==null ? "null" : intermediaryResult.toString()));
+                        logger.debug("Received Chain result '" + i + "': "
+                            + (intermediaryResult != null ? intermediaryResult.toString() : "null"));
                     }
                     if (intermediaryResult == null) {
-                        logger.warn("Chaining router cannot process any further endpoints. " +
-                                    "There was no result returned from endpoint invocation: " + endpoint);
+                        logger.warn("Chaining router cannot process any further endpoints. "
+                                + "There was no result returned from endpoint invocation: " + endpoint);
                         break;
                     }
                 } else {
@@ -90,8 +92,9 @@ public class ChainingRouter extends FilteringOutboundRouter
                     if (synchronous) {
                         resultToReturn = send(session, intermediaryResult, endpoint);
                         if (logger.isDebugEnabled()) {
-                        logger.debug("Received final Chain result '" + i + "': " + (resultToReturn==null ? "null" : resultToReturn.toString()));
-                    }
+                            logger.debug("Received final Chain result '" + i + "': "
+                                + (resultToReturn == null ? "null" : resultToReturn.toString()));
+                        }
                     } else {
                         // reset the previous call result to avoid confusion
                         resultToReturn = null;

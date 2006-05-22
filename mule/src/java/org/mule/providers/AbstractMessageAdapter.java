@@ -19,6 +19,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -85,7 +86,11 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
             synchronized(props) {
                 for (Iterator iter = props.entrySet().iterator(); iter.hasNext();) {
                     Map.Entry entry = (Map.Entry) iter.next();
-                    setProperty(entry.getKey(), entry.getValue());
+                    String key = (String)entry.getKey();
+                    Object value = entry.getValue();
+                    if (value != null) {
+                        setProperty(key, value);
+                    }
                 }
             }
         }
@@ -102,7 +107,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      * @param key
      *            the key of the property to remove
      */
-    public Object removeProperty(Object key)
+    public Object removeProperty(String key)
     {
         return properties.remove(key);
     }
@@ -112,7 +117,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      * 
      * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
      */
-    public Object getProperty(Object key)
+    public Object getProperty(String key)
     {
         return properties.get(key);
     }
@@ -133,15 +138,20 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
      *      java.lang.Object)
      */
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Object value)
     {
         if (key != null) {
             if (value != null) {
                 properties.put(key, value);
             }
             else {
+                logger.warn("setProperty(key, value) called with null value; removing key: " + key
+                        + "; please report the following stack trace to dev@mule.codehaus.org.", new Throwable());
                 properties.remove(key);
             }
+        } else {
+            logger.warn("setProperty(key, value) ignored because of null key for object: " + value
+                    + "; please report the following stack trace to dev@mule.codehaus.org.", new Throwable());
         }
     }
 
@@ -182,27 +192,27 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void setBooleanProperty(String name, boolean value)
     {
-        properties.put(name, Boolean.valueOf(value));
+        setProperty(name, Boolean.valueOf(value));
     }
 
     public void setIntProperty(String name, int value)
     {
-        properties.put(name, new Integer(value));
+        setProperty(name, new Integer(value));
     }
 
     public void setLongProperty(String name, long value)
     {
-        properties.put(name, new Long(value));
+        setProperty(name, new Long(value));
     }
 
     public void setDoubleProperty(String name, double value)
     {
-        properties.put(name, new Double(value));
+        setProperty(name, new Double(value));
     }
 
     public void setStringProperty(String name, String value)
     {
-        properties.put(name, value);
+        setProperty(name, value);
     }
 
     public Object getReplyTo()
@@ -212,7 +222,11 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void setReplyTo(Object replyTo)
     {
-        setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+        if (replyTo != null) {
+            setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+        } else {
+            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        }
     }
 
     public String getCorrelationId()
@@ -222,7 +236,11 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void setCorrelationId(String correlationId)
     {
-        setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
+        if (StringUtils.isNotBlank(correlationId)) {
+            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
+        } else {
+            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        }
     }
 
     /**

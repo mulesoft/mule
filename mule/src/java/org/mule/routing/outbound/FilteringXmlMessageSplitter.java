@@ -49,7 +49,7 @@ import java.util.Map;
  * You may reference an external schema from the classpath by using
  * the <code>externalSchemaLocation</code> property.
  * <p/>
- * Note that each part returned is actually returned as a new Document
+ * Note that each part returned is actually returned as a new Document.
  *
  * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
@@ -62,6 +62,10 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
     // JAXP property for specifying external XSD location
     private static final String JAXP_PROPERTIES_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
+    // JAXP properties for specifying external XSD language (as required by newer JAXP implementation)
+    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema"; 
 
     protected static ThreadLocal properties = new ThreadLocal();
     protected static ThreadLocal nodes = new ThreadLocal();
@@ -147,6 +151,9 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                     throw new IllegalArgumentException("Couldn't find schema at " + getExternalSchemaLocation());
                 }
 
+                // Set schema language property (must be done before the schemaSource is set)
+                reader.setProperty(JAXP_PROPERTIES_SCHEMA_LANGUAGE, JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE);
+
                 // Need this one to map schemaLocation to a physical location
                 reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
 
@@ -192,7 +199,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
         Map theProperties = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKey =  iterator.next();
+            String propertyKey = (String)iterator.next();
             theProperties.put(propertyKey, message.getProperty(propertyKey));
         }
         properties.set(theProperties);
@@ -200,7 +207,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
     /**
      * Retrieves a specific message part for the given endpoint. the message
-     * will then be routed via the parovider.
+     * will then be routed via the provider.
      *
      * @param message  the current message being processed
      * @param endpoint the endpoint that will be used to route the resulting

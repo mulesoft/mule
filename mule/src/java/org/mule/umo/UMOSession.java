@@ -14,7 +14,7 @@
  */
 package org.mule.umo;
 
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOSecurityContext;
 
 import java.io.Serializable;
@@ -80,7 +80,7 @@ public interface UMOSession extends Serializable
      * @throws UMOException if the event fails to be processed by the component
      *             or the transport for the endpoint
      */
-    UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException;
+    UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -129,7 +129,7 @@ public interface UMOSession extends Serializable
      * @throws UMOException if the event fails to be processed by the component
      *             or the transport for the endpoint
      */
-    void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException;
+    void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -154,7 +154,7 @@ public interface UMOSession extends Serializable
      * @return The requested event or null if the request times out
      * @throws UMOException if the request operation fails
      */
-    UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException;
+    UMOMessage receiveEvent(UMOImmutableEndpoint endpoint, long timeout) throws UMOException;
 
     /**
      * Requests a synchronous receive of an event on the component
@@ -193,7 +193,7 @@ public interface UMOSession extends Serializable
      * @return the event to send/dispatch
      * @throws UMOException if the evnet cannot be created
      */
-    UMOEvent createOutboundEvent(UMOMessage message, UMOEndpoint endpoint, UMOEvent previousEvent) throws UMOException;
+    UMOEvent createOutboundEvent(UMOMessage message, UMOImmutableEndpoint endpoint, UMOEvent previousEvent) throws UMOException;
 
     /**
      * Returns the unique id for this session

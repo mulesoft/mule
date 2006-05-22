@@ -393,7 +393,7 @@ public interface UMOEvent
      *         the underlying message does not return the removed property
      * @deprecated use event.getMessage().removeProperty()
      */
-    Object removeProperty(Object key);
+    Object removeProperty(String key);
 
     /**
      * Determines whether the event flow is being streamed

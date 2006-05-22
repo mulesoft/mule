@@ -111,7 +111,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
 
     /**
      * Retrieves a specific message part for the given endpoint. the message
-     * will then be routed via the parovider.
+     * will then be routed via the provider.
      *
      * @param message  the current message being processed
      * @return the message part to dispatch

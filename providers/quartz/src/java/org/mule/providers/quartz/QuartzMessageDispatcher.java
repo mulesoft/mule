@@ -65,8 +65,8 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         JobDataMap jobDataMap = new JobDataMap();
         UMOMessage msg = event.getMessage();
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-            Object propertyKeys = iterator.next();
-            jobDataMap.put(propertyKeys, msg.getProperty(propertyKeys));
+            String propertyKey = (String)iterator.next();
+            jobDataMap.put(propertyKey, msg.getProperty(propertyKey));
         }
         jobDetail.setJobDataMap(jobDataMap);
 

@@ -88,61 +88,81 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         }
 
         try {
-            setProperty(JmsConstants.JMS_CORRELATION_ID, this.message.getJMSCorrelationID());
+            String value =  this.message.getJMSCorrelationID();
+            if (value != null) {
+                setProperty(JmsConstants.JMS_CORRELATION_ID, value);
+            }
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_DELIVERY_MODE, new Integer(this.message.getJMSDeliveryMode()));
+            int value = this.message.getJMSDeliveryMode();
+            setProperty(JmsConstants.JMS_DELIVERY_MODE, new Integer(value));
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_DESTINATION, this.message.getJMSDestination());
+            Destination value = this.message.getJMSDestination();
+            if (value != null) {
+                setProperty(JmsConstants.JMS_DESTINATION, value);
+            }
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_EXPIRATION, new Long(this.message.getJMSExpiration()));
+            long value = this.message.getJMSExpiration();
+            setProperty(JmsConstants.JMS_EXPIRATION, new Long(value));
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_MESSAGE_ID, this.message.getJMSMessageID());
+            String value = this.message.getJMSMessageID();
+            if (value != null) {
+                setProperty(JmsConstants.JMS_MESSAGE_ID, value);
+            }
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_PRIORITY, new Integer(this.message.getJMSPriority()));
+            int value = this.message.getJMSPriority();
+            setProperty(JmsConstants.JMS_PRIORITY, new Integer(value));
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(this.message.getJMSRedelivered()));
+            boolean value = this.message.getJMSRedelivered();
+            setProperty(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(value));
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_REPLY_TO, this.message.getJMSReplyTo());
+            Destination value = this.message.getJMSReplyTo();
+            if (value != null) {
+                setProperty(JmsConstants.JMS_REPLY_TO, value);
+            }
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_TIMESTAMP, new Long(this.message.getJMSTimestamp()));
+            long value = this.message.getJMSTimestamp();
+            setProperty(JmsConstants.JMS_TIMESTAMP, new Long(value));
         } catch (JMSException e) {
             // ignored
         }
 
         try {
-            setProperty(JmsConstants.JMS_TYPE, this.message.getJMSType());
+            String value = this.message.getJMSType();
+            if (value != null) {
+                setProperty(JmsConstants.JMS_TYPE, value);
+            }
         } catch (JMSException e) {
             // ignored
         }
@@ -152,7 +172,10 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             while (e.hasMoreElements()) {
                 String key = (String) e.nextElement();
                 try {
-                    setProperty(key, this.message.getObjectProperty(key));
+                    Object value = this.message.getObjectProperty(key);
+                    if (value != null) {
+                        setProperty(key, value);
+                    }
                 } catch (JMSException e1) {
                     // ignored
                 }
@@ -163,7 +186,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     }
 
     public String getUniqueId() {
-        return (String) properties.get(JmsConstants.JMS_MESSAGE_ID);
+        return (String)getProperty(JmsConstants.JMS_MESSAGE_ID);
     }
 
     /**
@@ -196,7 +219,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public String getCorrelationId()
     {
-        return (String) properties.get(JmsConstants.JMS_CORRELATION_ID);
+        return (String)getProperty(JmsConstants.JMS_CORRELATION_ID);
     }
 
     /**
@@ -225,9 +248,9 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public Object getReplyTo()
     {
-        Object replyTo = properties.get(JmsConstants.JMS_REPLY_TO);
+        Object replyTo = getProperty(JmsConstants.JMS_REPLY_TO);
         if (replyTo == null) {
-            replyTo = properties.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
         return replyTo;
     }

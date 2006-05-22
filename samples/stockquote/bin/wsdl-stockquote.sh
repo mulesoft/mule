@@ -7,6 +7,6 @@ fi
 # Set your application specific classpath like this
 export CLASSPATH=$MULE_HOME/samples/stockquote/conf:$MULE_HOME/samples/stockquote/classes
 
-$MULE_HOME/bin/mule -config ../conf/xfire-wsdl-mule-config.xml
+$MULE_HOME/bin/mule -config ../conf/wsdl-mule-config.xml
 
 export CLASSPATH=

@@ -1,5 +1,5 @@
 /*
- * $Header$
+ * $Header $
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ import org.mule.umo.lifecycle.Lifecycle;
 import javax.resource.spi.work.WorkManager;
 
 /**
- * <code>UMOWorkManager</code> TODO
+ * <code>UMOWorkManager</code> Extends the stanard WorkManager to add lifecycle methods
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

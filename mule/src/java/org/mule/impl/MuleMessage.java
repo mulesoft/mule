@@ -91,12 +91,12 @@ public class MuleMessage implements UMOMessage
      * @param key the key on which to lookup the property value
      * @return the property value or null if the property does not exist
      */
-    public Object getProperty(Object key)
+    public Object getProperty(String key)
     {
-        return adapter.getProperty(key.toString());
+        return adapter.getProperty(key);
     }
 
-    public Object removeProperty(Object key)
+    public Object removeProperty(String key)
     {
         return adapter.removeProperty(key);
     }
@@ -107,9 +107,9 @@ public class MuleMessage implements UMOMessage
      * @param key the key on which to associate the value
      * @param value the property value
      */
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Object value)
     {
-        adapter.setProperty(key.toString(), value);
+        adapter.setProperty(key, value);
     }
 
     /**

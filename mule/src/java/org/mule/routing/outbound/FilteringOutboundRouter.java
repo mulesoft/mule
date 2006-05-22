@@ -142,7 +142,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             //Also add the endpoint propertie so that users can set fallback values when the property is not set on the event
             props.putAll(ep.getProperties());
             for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
-                Object propertyKey =  iterator.next();
+                String propertyKey = (String)iterator.next();
                 props.put(propertyKey, message.getProperty(propertyKey));
             }
             String newUriString = parser.parse(props, uri);

@@ -183,7 +183,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
             super(message);
         }
         public String getUniqueId() {
-            return "";
+            return "123";
         }
     }
     

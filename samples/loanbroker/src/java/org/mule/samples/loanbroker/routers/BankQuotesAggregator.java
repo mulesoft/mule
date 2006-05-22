@@ -15,12 +15,12 @@ package org.mule.samples.loanbroker.routers;
 
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
+import org.mule.routing.AggregationException;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.samples.loanbroker.LoanQuote;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
@@ -42,12 +42,12 @@ public class BankQuotesAggregator extends CorrelationAggregator
      *
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.umo.routing.RoutingException
+     * @throws AggregationException
      *          if the aggregation fails.  in this scenario the whole
      *          event group is removed and passed to the exception handler for this
      *          componenet
      */
-    protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
+    protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException
     {
         try
         {
@@ -80,7 +80,7 @@ public class BankQuotesAggregator extends CorrelationAggregator
             //}
         } catch (TransformerException e)
         {
-            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events), null, e);
+            throw new AggregationException(Message.createStaticMessage("Failed to get lowest quote"), events, null, e);
         }
     }
 
@@ -91,7 +91,7 @@ public class BankQuotesAggregator extends CorrelationAggregator
      * or some oher criteria based on the last event received)
      *
      * @param events
-     * @return
+     * @return true if the events are ready to be aggregated
      */
     protected boolean shouldAggregate(EventGroup events)
     {

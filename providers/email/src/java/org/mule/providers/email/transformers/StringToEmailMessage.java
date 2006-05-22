@@ -90,8 +90,8 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             Map props = new HashMap(MuleManager.getInstance().getProperties());
             UMOMessage msg = context.getMessage();
             for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-                Object propertyKeys = iterator.next();
-                props.put(propertyKeys, context.getMessage().getProperty(propertyKeys));
+                String propertyKey = (String)iterator.next();
+                props.put(propertyKey, context.getMessage().getProperty(propertyKey));
             }
             headers.putAll(templateParser.parse(props, otherHeaders));
         }

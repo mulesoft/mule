@@ -170,7 +170,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         adapter = new StreamMessageAdapter(request.getBody(), conn.getOutputStream());
                         for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
                             Map.Entry entry = (Map.Entry)iterator.next();
-                            adapter.setProperty(entry.getKey(), entry.getValue());
+                            adapter.setProperty((String)entry.getKey(), entry.getValue());
                         }
                     }
                     else {

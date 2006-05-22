@@ -14,12 +14,11 @@
 
 package org.mule.providers.jms;
 
+import com.mockobjects.dynamic.Mock;
+
 import org.mule.tck.AbstractMuleTestCase;
 
-import javax.jms.Message;
 import javax.jms.TextMessage;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>

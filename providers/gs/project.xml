@@ -26,6 +26,12 @@
             <jar>JSpaces.jar</jar>
         </dependency>
         <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xml_apis_version}</version>
+            <ignore>true</ignore>
+        </dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>${xerces_impl_version}</version>

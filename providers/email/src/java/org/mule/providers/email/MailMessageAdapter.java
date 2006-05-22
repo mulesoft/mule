@@ -172,7 +172,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
 
             for (Enumeration e = msg.getAllHeaders(); e.hasMoreElements();) {
                 Header h = (Header) e.nextElement();
-                properties.put(h.getName(), h.getValue());
+                setProperty(h.getName(), h.getValue());
             }
 
         } catch (Exception e) {
@@ -188,7 +188,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
             headers.put(h.getName(), h.getValue());
         }
         if(headers.size() > 0) {
-            properties.put(name + ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
+            setProperty(name + ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
         }
     }
 }

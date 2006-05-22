@@ -54,18 +54,19 @@ public class FunctionalTestComponent implements Callable
         if (eventCallback != null) {
             eventCallback.eventReceived(context, this);
         }
+        String replyMessage;
+        if(returnMessage!=null) {
+            replyMessage = returnMessage;
+        } else {
+            replyMessage = contents + " Received";
+        }
 
-        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context.getComponentDescriptor().getName(), contents, FunctionalTestNotification.EVENT_RECEIVED));
+        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context.getComponentDescriptor().getName(), contents, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if(throwException) {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
         }
-        if(returnMessage!=null) {
-            return returnMessage;
-        } else {
-            contents += " Received";
-            return contents;
-        }
+        return replyMessage;
     }
 
     public EventCallback getEventCallback()

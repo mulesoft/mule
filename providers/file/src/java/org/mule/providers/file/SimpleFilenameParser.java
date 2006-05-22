@@ -13,6 +13,7 @@
  */
 package org.mule.providers.file;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.UUID;
 import org.mule.util.Utility;
@@ -42,7 +43,7 @@ public class SimpleFilenameParser implements FilenameParser
 {
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SS";
 
-    private long count = 1;
+    private AtomicLong count = new AtomicLong(0);
 
     public String getFilename(UMOMessageAdapter adapter, String pattern)
     {
@@ -89,7 +90,7 @@ public class SimpleFilenameParser implements FilenameParser
             }
             index = pattern.indexOf("$" + left + "COUNT" + right);
             if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "COUNT\\" + right, String.valueOf(getCount()));
+                filename = filename.replaceAll("\\$\\" + left + "COUNT\\" + right, String.valueOf(count.getAndIncrement()));
             }
             index = pattern.indexOf("$" + left + "ORIGINALNAME" + right);
             if (index > -1 && adapter != null) {
@@ -100,10 +101,5 @@ public class SimpleFilenameParser implements FilenameParser
             }
         }
         return filename;
-    }
-
-    protected synchronized long getCount()
-    {
-        return count++;
     }
 }

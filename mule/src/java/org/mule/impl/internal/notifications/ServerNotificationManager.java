@@ -18,6 +18,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.filters.WildcardFilter;
@@ -28,7 +29,6 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
@@ -44,7 +44,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ServerNotificationManager implements Work, Disposable, WorkListener
+public class ServerNotificationManager implements Work, Disposable
 {
     /**
      * logger used by this class
@@ -57,6 +57,7 @@ public class ServerNotificationManager implements Work, Disposable, WorkListener
     private LinkedBlockingQueue eventQueue;
     private boolean disposed = false;
     private List listeners;
+    private WorkListener workListener;
 
 
     public ServerNotificationManager()
@@ -70,11 +71,12 @@ public class ServerNotificationManager implements Work, Disposable, WorkListener
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingQueue();
         listeners = new CopyOnWriteArrayList();
+        workListener = MuleManager.getConfiguration().getWorkListener();
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException {
         try {
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, workListener);
         } catch (WorkException e) {
             throw new LifecycleException(e, this);
         }
@@ -272,33 +274,14 @@ public class ServerNotificationManager implements Work, Disposable, WorkListener
         }
     }
 
-    public void workAccepted(WorkEvent event) {
-        handleWorkException(event, "workAccepted");
+    public WorkListener getWorkListener() {
+        return workListener;
     }
 
-    public void workRejected(WorkEvent event) {
-        handleWorkException(event, "workRejected");
-    }
-
-    public void workStarted(WorkEvent event) {
-        handleWorkException(event, "workStarted");
-    }
-
-    public void workCompleted(WorkEvent event) {
-        handleWorkException(event, "workCompleted");
-    }
-
-     protected void handleWorkException(WorkEvent event, String type) {
-        Exception e = null;
-        if(event!=null && event.getException()!=null) {
-            e = event.getException();
-        } else {
-            return;
+    public void setWorkListener(WorkListener workListener) {
+        if(workListener==null) {
+            throw new NullPointerException("workListener");
         }
-        if(event.getException().getCause()!=null) {
-            e = (Exception)event.getException().getCause();
-        }
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
-        logger.error(e);
+        this.workListener = workListener;
     }
 }

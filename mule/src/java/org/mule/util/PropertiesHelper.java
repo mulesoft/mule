@@ -16,6 +16,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,14 +56,20 @@ public class PropertiesHelper
      */
     public static synchronized Properties loadProperties(String fileName) throws Exception
     {
+        InputStream is = null;
         try {
-            FileInputStream is = new FileInputStream(fileName);
-            Properties p = new java.util.Properties();
+            is = new BufferedInputStream(new FileInputStream(fileName));
+            Properties p = new Properties();
             p.load(is);
             return p;
         }
         catch (Exception ex) {
             throw ex;
+        }
+        finally {
+            if (is != null) {
+                is.close();
+            }
         }
     }
 

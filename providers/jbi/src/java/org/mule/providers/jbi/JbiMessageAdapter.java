@@ -40,8 +40,11 @@ public class JbiMessageAdapter extends AbstractMessageAdapter
         if (message instanceof NormalizedMessage) {
             this.message = (NormalizedMessage) message;
             for (Iterator iterator = this.message.getPropertyNames().iterator(); iterator.hasNext();) {
-                String s = (String) iterator.next();
-                properties.put(s, this.message.getProperty(s));
+                String key = (String) iterator.next();
+                Object value = this.message.getProperty(key);
+                if (value != null) {
+                    setProperty(key, value);
+                }
             }
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
