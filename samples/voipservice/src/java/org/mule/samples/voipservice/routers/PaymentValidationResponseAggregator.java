@@ -43,7 +43,7 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
         CreditProfileTO creditProfileTO = null;
 
         try {
-            for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = events.iterator(); iterator.hasNext();) {
                 event = (UMOEvent) iterator.next();
                 creditProfileTO = (CreditProfileTO) event.getTransformedMessage();
                 if (creditProfileTO.getCreditScore() >= CreditProfileTO.CREDIT_LIMIT) {

@@ -71,12 +71,15 @@ public class VoipConsumer {
     public static void main(String[] args) {
         VoipConsumer voipConsumer = null;
         int response = 0;
+
         try {
             voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
 
-            System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Voip Services Provisioning Example. This examples was published" +
-                    "\nas a part of a featured article on java.net titled Service Provisioning Through ESB" +
-                    "\nhttp://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html.", '*', 90));
+            String msg = "Welcome to the Mule Voip Services Provisioning Example."
+                + " This example was published as part of a featured article on java.net"
+                + " titled 'Service Provisioning Through ESB' (http://today.java.net/lpt/a/233).";
+
+            System.out.println(StringMessageHelper.getBoilerPlate(msg, '*', 70));
 
             while (response != 'q') {
                 System.out.println("\n[1] make a service request");
