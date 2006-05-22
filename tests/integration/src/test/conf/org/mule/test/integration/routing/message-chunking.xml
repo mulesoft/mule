@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Message_Chunking_Test" version="1.0">
+
+    <mule-environment-properties enableMessageEvents="true" synchronous="true"/>
+    
+    <model name="main">
+
+       <mule-descriptor name="Receiver" implementation="org.mule.components.simple.BridgeComponent">
+           <inbound-router>
+               <endpoint address="vm://inbound.channel"/>
+           </inbound-router>
+           <outbound-router>
+               <router className="org.mule.routing.outbound.MessageChunkingRouter">
+                   <endpoint address="vm://chunking.channel"/>
+                   <properties>
+                       <property name="chunkSize" value="2"/>
+                   </properties>
+               </router>
+           </outbound-router>
+        </mule-descriptor>
+
+       <mule-descriptor name="ChunkingReceiver"
+            implementation="org.mule.tck.functional.FunctionalTestComponent">
+           <inbound-router>
+               <endpoint address="vm://chunking.channel"/>
+               <router className="org.mule.routing.inbound.MessageChunkingAggregator"/>
+           </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>
