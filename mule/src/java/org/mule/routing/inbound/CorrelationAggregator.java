@@ -37,17 +37,17 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
      */
     protected boolean shouldAggregate(EventGroup events)
     {
-        int size = events.getExpectedSize();
+        int size = events.expectedSize();
         if (size == -1) {
             logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used.  Message is being forwarded");
             return true;
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Aggregator: Current Event groups = " + eventGroups.size());
-            logger.debug("correlation size is " + size + ". current event group size is " + events.getSize()
+            logger.debug("correlation size is " + size + ". current event group size is " + events.size()
                     + " for correlation " + events.getGroupId());
         }
-        return size == events.getSize();
+        return size == events.size();
     }
 
     /**

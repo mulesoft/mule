@@ -13,12 +13,12 @@
  */
 package org.mule.routing.inbound;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
 
     protected List resequenceEvents(EventGroup events)
     {
-        List result = new ArrayList(events.getEvents());
+        List result = IteratorUtils.toList(events.iterator(), events.size());
         if (comparator != null) {
             Collections.sort(result, comparator);
         } else {

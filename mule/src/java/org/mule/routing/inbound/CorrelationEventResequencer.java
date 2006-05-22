@@ -37,12 +37,12 @@ public class CorrelationEventResequencer extends AbstractEventResequencer
 
     protected boolean shouldResequence(EventGroup events)
     {
-        UMOEvent event = (UMOEvent) events.getEvents().get(0);
+        UMOEvent event = (UMOEvent) events.iterator().next();
         int size = event.getMessage().getCorrelationGroupSize();
         if (size == -1) {
             logger.warn("Correlation Group Size not set, but CorrelationResequencer is being used.  This can cause messages to be held indefinitely");
         }
-        return size == events.getSize();
+        return size == events.size();
     }
 
     private class CorrelationSequenceComparator implements Comparator

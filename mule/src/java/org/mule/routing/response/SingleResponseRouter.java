@@ -42,7 +42,7 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      */
     protected boolean shouldAggregate(EventGroup events)
     {
-        int size = events.getExpectedSize();
+        int size = events.expectedSize();
         if(size > 1) {
             logger.warn("Correlation Group Size is not 1. The SingleResponse Aggregator will only handle single replyTo events for a response router.  If there will be multiple events for a single request use the 'ResponseCorrelationAggregator'");
         }
@@ -65,7 +65,7 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      *          handler for this componenet
      */
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException {
-        return ((UMOEvent)events.getEvents().get(0)).getMessage();
+        return ((UMOEvent)events.iterator().next()).getMessage();
     }
 
 }
