@@ -94,7 +94,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         {
             StringBuffer newPayload = new StringBuffer();
             UMOEvent event = null;
-            for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = events.iterator(); iterator.hasNext();) {
                 event = (UMOEvent) iterator.next();
                 try {
                     newPayload.append(event.getMessageAsString()).append(" ");

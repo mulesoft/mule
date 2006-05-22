@@ -52,9 +52,9 @@ public class EventGroup implements Serializable
         return groupId;
     }
 
-    public List getEvents()
+    public Iterator iterator()
     {
-        return events;
+        return events.iterator();
     }
 
     public void addEvent(UMOEvent event)
@@ -72,12 +72,12 @@ public class EventGroup implements Serializable
         return created;
     }
 
-    public int getSize()
+    public int size()
     {
         return events.size();
     }
 
-    public int getExpectedSize()
+    public int expectedSize()
     {
         return expectedSize;
     }
@@ -85,8 +85,8 @@ public class EventGroup implements Serializable
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append("Event Group Id").append(groupId);
-        buf.append(", Expected size=").append(expectedSize);
+        buf.append("Event Group Id=").append(groupId);
+        buf.append(", expected size=").append(expectedSize);
         buf.append(", current events (").append(events.size()).append(")");
         for (Iterator iterator = events.iterator(); iterator.hasNext();) {
             UMOEvent event = (UMOEvent) iterator.next();
