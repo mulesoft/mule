@@ -281,7 +281,11 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     protected void finalize() throws Throwable {
-        clearAllCounters();
+        try {
+            clearAllCounters();
+        } finally {
+            super.finalize();
+        }
     }
 
     protected class TestInfo {

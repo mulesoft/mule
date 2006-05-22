@@ -49,14 +49,13 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     private String logFile = null;
     private String logConfigFile = null;
     private String chainsawHost = "localhost";
-    private int chainsawPort = 4445;
-    private boolean enableChainsaw = false;
+    private int chainsawPort = -1;
     private Map levelMappings = new HashMap();
 
     /**
      * Should be a 1 line description of the agent
      * 
-     * @return
+     * @return the description of this Agent
      */
     public String getDescription()
     {
@@ -64,7 +63,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         if (StringUtils.isNotBlank(logFile)) {
             buf.append("Logging notifications to: ").append(logFile);
         }
-        if (enableChainsaw) {
+        if (chainsawPort > -1) {
             buf.append(" Chainsaw: ").append(chainsawHost).append(":").append(chainsawPort);
         }
         if (buf.length() == 0) {
@@ -102,7 +101,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                     Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"), logFile, true);
                     eventLogger.addAppender(file);
                 }
-                if (enableChainsaw) {
+                if (chainsawPort > -1) {
                     Appender chainsaw = new SocketAppender(chainsawHost, chainsawPort);
                     eventLogger.addAppender(chainsaw);
                 }
@@ -160,16 +159,6 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     public void setChainsawPort(int chainsawPort)
     {
         this.chainsawPort = chainsawPort;
-    }
-
-    public boolean isEnableChainsaw()
-    {
-        return enableChainsaw;
-    }
-
-    public void setEnableChainsaw(boolean enableChainsaw)
-    {
-        this.enableChainsaw = enableChainsaw;
     }
 
     public Map getLevelMappings()

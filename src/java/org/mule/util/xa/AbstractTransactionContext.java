@@ -14,7 +14,7 @@
  */
 package org.mule.util.xa;
 
-import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.uuid.UUIDGenerator;
 
 import javax.transaction.Status;
 

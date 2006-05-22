@@ -50,7 +50,7 @@ public class ExceptionMessage extends BaseMessage
         if(ctx!=null) {
             UMOMessage msg = ctx.getMessage();
             for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-                Object propertyKey =  iterator.next();
+                String propertyKey =  (String)iterator.next();
                 setProperty(propertyKey, msg.getProperty(propertyKey));
             }
         }

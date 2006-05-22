@@ -29,6 +29,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
@@ -132,7 +133,7 @@ public final class MuleSession implements UMOSession
         dispatchEvent(message, MuleManager.getInstance().lookupEndpoint(endpointName));
     }
 
-    public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
@@ -163,7 +164,7 @@ public final class MuleSession implements UMOSession
         return router.route(message, this, true);
     }
 
-    public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
@@ -324,7 +325,7 @@ public final class MuleSession implements UMOSession
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
-    public UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException
+    public UMOMessage receiveEvent(UMOImmutableEndpoint endpoint, long timeout) throws UMOException
     {
         try {
             UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
@@ -334,7 +335,7 @@ public final class MuleSession implements UMOSession
         }
     }
 
-    public UMOEvent createOutboundEvent(UMOMessage message, UMOEndpoint endpoint, UMOEvent previousEvent)
+    public UMOEvent createOutboundEvent(UMOMessage message, UMOImmutableEndpoint endpoint, UMOEvent previousEvent)
             throws UMOException
     {
         if (endpoint == null) {
@@ -347,9 +348,9 @@ public final class MuleSession implements UMOSession
         }
 
         // Use default transformer if none is set
-        if (endpoint.getTransformer() == null) {
+        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint) {
             if (endpoint.getConnector() instanceof AbstractConnector) {
-                endpoint.setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
+                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
                 logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
             }
         }

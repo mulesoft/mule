@@ -353,7 +353,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
         }
         if(!remoteSync) {
-            event.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
             event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;

@@ -24,9 +24,15 @@ import org.mule.impl.internal.notifications.CustomNotification;
 public class FunctionalTestNotification extends CustomNotification {
 
     public static final int EVENT_RECEIVED = -999999;
+    private Object replyMessage = null;
 
-    public FunctionalTestNotification(String componentName, Object message, int action) {
+    public FunctionalTestNotification(String componentName, Object message, Object replyMessage, int action) {
         super(message, action);
         resourceIdentifier = componentName;
+        this.replyMessage = replyMessage;
+    }
+
+    public Object getReplyMessage() {
+        return replyMessage;
     }
 }

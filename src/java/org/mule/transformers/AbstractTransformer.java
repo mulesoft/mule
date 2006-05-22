@@ -15,6 +15,7 @@
 package org.mule.transformers;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -89,7 +90,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     protected void registerSourceType(Class aClass)
     {
         if (aClass.equals(Object.class)) {
-            logger.warn("java.lang.Object has been added as an acceptable sourcetype for this transformer, there will be no source type checking performed");
+            logger.debug("java.lang.Object has been added as an acceptable sourcetype for this transformer, there will be no source type checking performed");
         }
         sourceTypes.add(aClass);
     }
@@ -110,10 +111,8 @@ public abstract class AbstractTransformer implements UMOTransformer
     public String getName()
     {
         if (name == null) {
-            name = getClass().getName();
-            name = name.substring(name.lastIndexOf(".") + 1);
+            setName(ClassUtils.getShortClassName(getClass()));
         }
-        logger.debug("Setting transformer name to: " + name);
         return name;
     }
 
@@ -122,6 +121,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void setName(String string)
     {
+        logger.debug("Setting transformer name to: " + name);
         name = string;
     }
 

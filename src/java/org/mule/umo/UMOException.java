@@ -96,12 +96,16 @@ public abstract class UMOException extends Exception
         return errorCode;
     }
 
+    public Message getI18nMessage() {
+        return i18nMessage;
+    }
+
     public int getMessageCode()
     {
         return (i18nMessage == null ? 0 : i18nMessage.getCode());
     }
 
-    public void addInfo(String name, String info)
+    public void addInfo(String name, Object info)
     {
         this.info.put(name, info);
     }

@@ -24,10 +24,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
+import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.ClassHelper;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
 
+import javax.resource.spi.work.WorkListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.Attributes;
@@ -232,6 +234,8 @@ public class MuleConfiguration
      * defined for the connector
      */
     private ConnectionStrategy connectionStrategy = new SingleAttemptConnectionStrategy();
+
+    private WorkListener workListener = new DefaultWorkListener();
 
     public MuleConfiguration()
     {
@@ -559,5 +563,16 @@ public class MuleConfiguration
 
     public void setEnableMessageEvents(boolean enableMessageEvents) {
         this.enableMessageEvents = enableMessageEvents;
+    }
+
+    public WorkListener getWorkListener() {
+        return workListener;
+    }
+
+    public void setWorkListener(WorkListener workListener) {
+        if(workListener==null) {
+            throw new NullPointerException("workListener");
+        }
+        this.workListener = workListener;
     }
 }

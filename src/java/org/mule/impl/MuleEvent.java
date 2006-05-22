@@ -200,22 +200,19 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected void fillProperties(UMOEvent previousEvent)
     {
-        Object prop = null;
-        Object value = null;
-        Object currentValue = null;
         if (previousEvent != null) {
             UMOMessage msg = previousEvent.getMessage();
             synchronized (msg) {
                 for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-                    prop = iterator.next();
-                    value = msg.getProperty(prop);
+                    String prop = (String)iterator.next();
+                    Object value = msg.getProperty(prop);
                     // don't overwrite property on the message
                     if (!ignoreProperty(prop, value)) {
                         message.setProperty(prop, value);
                     }
 
                     if(logger.isDebugEnabled()) {
-                        currentValue = message.getProperty(prop);
+                        Object currentValue = message.getProperty(prop);
                         if(!value.equals(currentValue)) {
                             logger.warn("Property on the current message " + prop +"=" + currentValue +
                                 " overrides property on the previous event: " + prop +"=" + value);
@@ -223,20 +220,19 @@ public class MuleEvent extends EventObject implements UMOEvent
                     }
                 }
             }
-
         }
 
         if (endpoint != null && endpoint.getProperties() != null) {
             for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();) {
-                prop = iterator.next();
-                value = endpoint.getProperties().get(prop);
+                String prop = (String)iterator.next();
+                Object value = endpoint.getProperties().get(prop);
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop, value)) {
                     message.setProperty(prop, value);
                 }
 
                 if(logger.isDebugEnabled()) {
-                    currentValue = message.getProperty(prop);
+                    Object currentValue = message.getProperty(prop);
                     if(!value.equals(currentValue)) {
                         logger.warn("Property on the current message " + prop +"=" + currentValue +
                             " overrides property on the endpoint: " + prop +"=" + value);
@@ -244,16 +240,19 @@ public class MuleEvent extends EventObject implements UMOEvent
                 }
             }
         }
+
         setCredentials();
     }
 
-    protected boolean ignoreProperty(Object key, Object value) {
+    protected boolean ignoreProperty(String key, Object value) {
         if(value==null || key==null) {
             return true;
         }
+
         if(key.toString().startsWith(MuleProperties.PROPERTY_PREFIX) && message.getProperty(key) != null) {
             return true;
         }
+
         for (int i = 0; i < ignorredPropertyOverides.length; i++) {
             if(key.equals(ignorredPropertyOverides[i])) {
                 return false;
@@ -263,6 +262,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         if (message.getProperty(key) != null) {
             return true;
         }
+
         return false;
     }
 
@@ -721,7 +721,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @return the removed property or null if the property was not found or if
      *         the underlying message does not return the removed property
      */
-    public Object removeProperty(Object key)
+    public Object removeProperty(String key)
     {
         return message.removeProperty(key);
     }

@@ -14,7 +14,7 @@
  */
 package org.mule.util.queue;
 
-import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.uuid.UUIDGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;

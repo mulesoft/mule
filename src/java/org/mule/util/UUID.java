@@ -15,7 +15,7 @@
 
 package org.mule.util;
 
-import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * <code>UUID</code> Generates a UUID using the doom dark JUG library

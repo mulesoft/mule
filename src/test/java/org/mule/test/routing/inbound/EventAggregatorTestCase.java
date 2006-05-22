@@ -15,6 +15,7 @@ package org.mule.test.routing.inbound;
 
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
+import org.mule.routing.AggregationException;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
@@ -27,7 +28,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 
 import java.util.Iterator;
@@ -90,7 +90,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
             return false;
         }
 
-        protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
+        protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException
         {
             StringBuffer newPayload = new StringBuffer();
             UMOEvent event = null;
@@ -99,7 +99,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
                 try {
                     newPayload.append(event.getMessageAsString()).append(" ");
                 } catch (UMOException e) {
-                    throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+                    throw new AggregationException(events, event.getEndpoint(), e);
                 }
             }
             return new MuleMessage(newPayload.toString(), event.getMessage());

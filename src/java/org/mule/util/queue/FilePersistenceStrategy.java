@@ -16,10 +16,10 @@ package org.mule.util.queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.doomdark.uuid.UUIDGenerator;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.util.file.DeleteException;
+import org.safehaus.uuid.UUIDGenerator;
 
 import java.io.File;
 import java.io.FileInputStream;

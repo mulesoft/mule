@@ -187,7 +187,7 @@ public class DefaultMuleProxy implements MuleProxy
     private void checkDisposed()
     {
         if (umo.isDisposed()) {
-            throw new IllegalStateException("Components Disposed Of");
+            throw new IllegalStateException("Component has already been disposed of");
         }
     }
 

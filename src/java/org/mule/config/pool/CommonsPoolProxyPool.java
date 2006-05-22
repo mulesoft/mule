@@ -27,6 +27,7 @@ import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -64,20 +65,14 @@ public class CommonsPoolProxyPool implements ObjectPool
     public CommonsPoolProxyPool(MuleDescriptor descriptor, ObjectFactory factory)
     {
         this.factory = factory;
-        GenericObjectPool.Config config = new GenericObjectPool.Config();
 
-       // if(descriptor.isSingleton()) {
-            //config.maxIdle = 1;
-            //config.maxActive = 1;
-        //} else {
-            config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
-            config.maxActive = descriptor.getPoolingProfile().getMaxActive();
-        //}
+        GenericObjectPool.Config config = new GenericObjectPool.Config();
+        config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
+        config.maxActive = descriptor.getPoolingProfile().getMaxActive();
         config.maxWait = descriptor.getPoolingProfile().getMaxWait();
         config.whenExhaustedAction = (byte) descriptor.getPoolingProfile().getExhaustedAction();
 
         init(descriptor, config);
-
     }
 
     /**
@@ -96,11 +91,14 @@ public class CommonsPoolProxyPool implements ObjectPool
     private void init(MuleDescriptor descriptor, GenericObjectPool.Config config)
     {
         components = new ArrayList();
-        if(factory==null) {
+
+        if (factory == null) {
             setFactory(new CommonsPoolProxyFactory(descriptor));
         }
+
         pool = new GenericObjectPool((PoolableObjectFactory) factory, config);
-        if(factory instanceof CommonsPoolProxyFactory) {
+
+        if (factory instanceof CommonsPoolProxyFactory) {
             ((CommonsPoolProxyFactory)factory).setPool(this);
         }
     }
@@ -163,13 +161,11 @@ public class CommonsPoolProxyPool implements ObjectPool
     public void clearPool()
     {
         synchronized (components) {
-            Disposable proxy = null;
-            for (int i = 0; i < components.size(); i++) {
-                proxy = (Disposable) components.get(i);
-                proxy.dispose();
+            for (Iterator i = components.iterator(); i.hasNext();) {
+                ((Disposable) i.next()).dispose();
             }
+            components.clear();
         }
-        components.clear();
         pool.clear();
     }
 
@@ -183,15 +179,18 @@ public class CommonsPoolProxyPool implements ObjectPool
     public void onRemove(Object proxy)
     {
         synchronized (components) {
-            components.remove(proxy);
+            final boolean wasRemoved = components.remove(proxy);
+            if (wasRemoved) {
+                ((Disposable) proxy).dispose();
+            }
         }
     }
 
     public void start() throws UMOException
     {
         synchronized (components) {
-            for (int i = 0; i < components.size(); i++) {
-                ((Startable) components.get(i)).start();
+            for (Iterator i = components.iterator(); i.hasNext();) {
+                ((Startable) i.next()).start();
             }
         }
     }
@@ -199,8 +198,8 @@ public class CommonsPoolProxyPool implements ObjectPool
     public void stop() throws UMOException
     {
         synchronized (components) {
-            for (int i = 0; i < components.size(); i++) {
-                ((Stoppable) components.get(i)).stop();
+            for (Iterator i = components.iterator(); i.hasNext();) {
+                ((Stoppable) i.next()).stop();
             }
         }
     }
