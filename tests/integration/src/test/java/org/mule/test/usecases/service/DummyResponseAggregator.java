@@ -30,6 +30,6 @@ public class DummyResponseAggregator extends ResponseCorrelationAggregator
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         logger.info(StringMessageHelper.getBoilerPlate("Response Agregator aggregating: " + events));
-        return ((UMOEvent)events.getEvents().get(0)).getMessage();
+        return ((UMOEvent)events.iterator().next()).getMessage();
     }
 }

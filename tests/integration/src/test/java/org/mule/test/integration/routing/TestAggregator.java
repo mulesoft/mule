@@ -44,7 +44,7 @@ public class TestAggregator extends ResponseCorrelationAggregator
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         StringBuffer buffer = new StringBuffer();
-        for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = events.iterator(); iterator.hasNext();) {
             UMOEvent event = (UMOEvent) iterator.next();
             try {
                 buffer.append(event.getTransformedMessageAsString());
