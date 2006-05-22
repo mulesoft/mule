@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker.esb.routers;
 
 import org.mule.config.i18n.Message;
@@ -24,12 +25,11 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
- * <code>BankQuotesAggregator</code> receives a number of quotes and selectes
- * the lowest
- *
+ * <code>BankQuotesAggregator</code> receives a number of quotes and selectes the
+ * lowest
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,15 +37,15 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
 {
     /**
      * This method is invoked if the shouldAggregate method is called and returns
-     * true.  Once this method returns an aggregated message the event group is removed
-     * from the router
-     *
-     * @param events the event group for this request
+     * true. Once this method returns an aggregated message the event group is
+     * removed from the router
+     * 
+     * @param events
+     *            the event group for this request
      * @return an aggregated message
      * @throws org.mule.umo.routing.RoutingException
-     *          if the aggregation fails.  in this scenario the whole
-     *          event group is removed and passed to the exception handler for this
-     *          componenet
+     *             if the aggregation fails. in this scenario the whole event group
+     *             is removed and passed to the exception handler for this componenet
      */
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
@@ -55,28 +55,30 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
             LoanQuote quote = null;
             UMOEvent event = null;
 
-            List list = events.getEvents();
-                for (Iterator iterator = list.iterator(); iterator.hasNext();)
+            for (Iterator iterator = events.iterator(); iterator.hasNext();)
+            {
+                event = (UMOEvent)iterator.next();
+                quote = (LoanQuote)event.getTransformedMessage();
+                logger.info("Processing quote: " + quote);
+                if (lowestQuote == null)
                 {
-                    event = (UMOEvent) iterator.next();
-                    quote = (LoanQuote)event.getTransformedMessage();
-                    logger.info("Processing quote: " + quote);
-                    if (lowestQuote == null)
+                    lowestQuote = quote;
+                }
+                else
+                {
+                    if (quote.getInterestRate() < lowestQuote.getInterestRate())
                     {
                         lowestQuote = quote;
-                    } else
-                    {
-                        if (quote.getInterestRate() < lowestQuote.getInterestRate())
-                        {
-                            lowestQuote = quote;
-                        }
                     }
                 }
-                logger.info("Lowest quote is: " + lowestQuote);
-                return new MuleMessage(lowestQuote, event.getMessage());
-        } catch (TransformerException e)
+            }
+            logger.info("Lowest quote is: " + lowestQuote);
+            return new MuleMessage(lowestQuote, event.getMessage());
+        }
+        catch (TransformerException e)
         {
-            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events), null, e);
+            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"),
+                    new MuleMessage(events), null, e);
         }
     }
 }
