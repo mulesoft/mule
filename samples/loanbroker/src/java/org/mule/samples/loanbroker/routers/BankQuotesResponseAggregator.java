@@ -24,7 +24,6 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>BankQuotesAggregator</code> receives a number of quotes and selectes
@@ -55,30 +54,27 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
             LoanQuote quote = null;
             UMOEvent event = null;
 
-            List list = events.getEvents();
-            //synchronized(list) {
-                for (Iterator iterator = list.iterator(); iterator.hasNext();)
-                {
+            for (Iterator iterator = events.iterator(); iterator.hasNext();)
+            {
+                event = (UMOEvent) iterator.next();
+                quote = (LoanQuote)event.getTransformedMessage();
+                logger.info("Processing quote: " + quote);
 
-                //for (int i = 0; i < list.size(); i++)
-                //{
-                    event = (UMOEvent) iterator.next();
-                    quote = (LoanQuote)event.getTransformedMessage();
-                    logger.info("Processing quote: " + quote);
-                    if (lowestQuote == null)
+                if (lowestQuote == null)
+                {
+                    lowestQuote = quote;
+                }
+                else
+                {
+                    if (quote.getInterestRate() < lowestQuote.getInterestRate())
                     {
                         lowestQuote = quote;
-                    } else
-                    {
-                        if (quote.getInterestRate() < lowestQuote.getInterestRate())
-                        {
-                            lowestQuote = quote;
-                        }
                     }
                 }
-                logger.info("Lowest quote is: " + lowestQuote);
-                return new MuleMessage(lowestQuote, event.getMessage());
-            //}
+            }
+
+            logger.info("Lowest quote is: " + lowestQuote);
+            return new MuleMessage(lowestQuote, event.getMessage());
         } catch (TransformerException e)
         {
             throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events), null, e);
