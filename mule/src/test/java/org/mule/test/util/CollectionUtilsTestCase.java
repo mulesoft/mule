@@ -14,7 +14,7 @@
 package org.mule.test.util;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.mule.util.CollectionUtil;
+import org.mule.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,14 +27,14 @@ import junit.framework.TestCase;
  * @author Holger Hoffstaette
  */
 
-public class CollectionUtilTestCase extends TestCase
+public class CollectionUtilsTestCase extends TestCase
 {
 
     public void testMapCreationNullClass()
     {
         try
         {
-            CollectionUtil.mapWithKeysAndValues(null, (String[])null, (String[])null);
+            CollectionUtils.mapWithKeysAndValues(null, (String[])null, (String[])null);
             fail();
         }
         catch (IllegalArgumentException ex)
@@ -45,7 +45,7 @@ public class CollectionUtilTestCase extends TestCase
 
     public void testMapCreationWithoutElements()
     {
-        Map m = CollectionUtil.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
+        Map m = CollectionUtils.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
         assertTrue(m.isEmpty());
     }
 
@@ -53,7 +53,7 @@ public class CollectionUtilTestCase extends TestCase
     {
         List strings = Arrays.asList(new String[]{"foo"});
 
-        Map m = CollectionUtil.mapWithKeysAndValues(CaseInsensitiveMap.class,
+        Map m = CollectionUtils.mapWithKeysAndValues(CaseInsensitiveMap.class,
                 strings.iterator(), strings.iterator());
 
         assertEquals("foo", m.get("foo"));

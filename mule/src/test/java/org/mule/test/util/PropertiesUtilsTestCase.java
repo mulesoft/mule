@@ -17,8 +17,8 @@ package org.mule.test.util;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.mule.util.CollectionUtil;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.CollectionUtils;
+import org.mule.util.PropertiesUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,40 +29,40 @@ import junit.framework.TestCase;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PropertiesHelperTestCase extends TestCase
+public class PropertiesUtilsTestCase extends TestCase
 {
 
     public void testRemoveNameSpacePrefix()
     {
         String temp = "this.is.a.namespace";
-        String result = PropertiesHelper.removeNamespacePrefix(temp);
+        String result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("namespace", result);
 
         temp = "this.namespace";
-        result = PropertiesHelper.removeNamespacePrefix(temp);
+        result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("namespace", result);
 
         temp = "namespace";
-        result = PropertiesHelper.removeNamespacePrefix(temp);
+        result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("namespace", result);
 
         temp = "this_is-a-namespace";
-        result = PropertiesHelper.removeNamespacePrefix(temp);
+        result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("this_is-a-namespace", result);
     }
 
     public void testRemoveXMLNameSpacePrefix()
     {
         String temp = "j:namespace";
-        String result = PropertiesHelper.removeXmlNamespacePrefix(temp);
+        String result = PropertiesUtils.removeXmlNamespacePrefix(temp);
         assertEquals("namespace", result);
 
         temp = "this-namespace";
-        result = PropertiesHelper.removeNamespacePrefix(temp);
+        result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("this-namespace", result);
 
         temp = "namespace";
-        result = PropertiesHelper.removeNamespacePrefix(temp);
+        result = PropertiesUtils.removeNamespacePrefix(temp);
         assertEquals("namespace", result);
     }
 
@@ -76,7 +76,7 @@ public class PropertiesHelperTestCase extends TestCase
         props.put("longProperty", "999999999");
         props.put("3456.stringProperty", "string");
 
-        props = PropertiesHelper.removeNamespaces(props);
+        props = PropertiesUtils.removeNamespaces(props);
 
         assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
         assertEquals(0.1243, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
@@ -88,36 +88,36 @@ public class PropertiesHelperTestCase extends TestCase
     public void testMapNull() throws Exception
     {
         Map props = null;
-        assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
-        assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
+        assertEquals("{}", PropertiesUtils.propertiesToString(props, false));
+        assertEquals("{}", PropertiesUtils.propertiesToString(props, true));
     }
 
     public void testMapEmpty() throws Exception
     {
         Map props = new HashMap();
-        assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
-        assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
+        assertEquals("{}", PropertiesUtils.propertiesToString(props, false));
+        assertEquals("{}", PropertiesUtils.propertiesToString(props, true));
     }
 
     public void testMapSingleElement() throws Exception
     {
-        Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"},
+        Map props = CollectionUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"},
                 new Object[]{"bar"});
 
-        assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{foo=bar}", PropertiesUtils.propertiesToString(props, false));
         assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR + "}",
-                PropertiesHelper.propertiesToString(props, true));
+                PropertiesUtils.propertiesToString(props, true));
     }
 
     public void testMapTwoElements() throws Exception
     {
-        Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class, new Object[]{"foo","foozle"},
+        Map props = CollectionUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo","foozle"},
                 new Object[]{"bar","doozle"});
 
-        assertEquals("{foo=bar, foozle=doozle}", PropertiesHelper.propertiesToString(props, false));
+        assertEquals("{foo=bar, foozle=doozle}", PropertiesUtils.propertiesToString(props, false));
 
         assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR
-                + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}", PropertiesHelper
+                + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}", PropertiesUtils
                 .propertiesToString(props, true));
     }
 

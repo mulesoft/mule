@@ -16,7 +16,7 @@
 package org.mule.test.util;
 
 import org.apache.commons.lang.SystemUtils;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +30,13 @@ import junit.framework.TestCase;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StringMessageHelperTestCase extends TestCase
+public class StringMessageUtilsTestCase extends TestCase
 {
 
     /**
      * 
      */
-    public StringMessageHelperTestCase()
+    public StringMessageUtilsTestCase()
     {
         super();
     }
@@ -44,19 +44,19 @@ public class StringMessageHelperTestCase extends TestCase
     public void testGetObjectValue() throws Exception
     {
         Object test = "Oscar";
-        Object result = StringMessageHelper.getObjectValue(test);
+        Object result = StringMessageUtils.getObjectValue(test);
         assertEquals("Oscar", result);
 
         test = getClass();
-        result = StringMessageHelper.getObjectValue(test);
+        result = StringMessageUtils.getObjectValue(test);
         assertEquals(getClass().getName(), result);
 
         test = new TestObject("Ernie");
-        result = StringMessageHelper.getObjectValue(test);
+        result = StringMessageUtils.getObjectValue(test);
         assertEquals(test.toString(), result);
 
         test = new AnotherTestObject("Bert");
-        result = StringMessageHelper.getObjectValue(test);
+        result = StringMessageUtils.getObjectValue(test);
         assertEquals("Bert", result);
 
     }
@@ -66,14 +66,14 @@ public class StringMessageHelperTestCase extends TestCase
         String result;
         String msg1 = "There is not substitution here";
 
-        result = StringMessageHelper.getFormattedMessage(msg1, null);
+        result = StringMessageUtils.getFormattedMessage(msg1, null);
         assertEquals(msg1, result);
 
-        result = StringMessageHelper.getFormattedMessage(msg1, new Object[] {});
+        result = StringMessageUtils.getFormattedMessage(msg1, new Object[] {});
         assertEquals(msg1, result);
 
         String msg2 = "There should be a variable {0}, {1} and {2}";
-        result = StringMessageHelper.getFormattedMessage(msg2, new Object[] { "here", "there", "everywhere" });
+        result = StringMessageUtils.getFormattedMessage(msg2, new Object[] { "here", "there", "everywhere" });
         assertEquals("There should be a variable here, there and everywhere", result);
     }
 
@@ -84,7 +84,7 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("is a");
         msgs.add("Boiler Plate");
 
-        String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
+        String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
         assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR + "* This     *" +
                      SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR + "* Boiler   *" +
                      SystemUtils.LINE_SEPARATOR + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "************", plate);
@@ -98,7 +98,7 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("is a");
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
-        String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
+        String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
         assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR +
                      "* This     *" + SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR +
                      "* Boiler   *" + SystemUtils.LINE_SEPARATOR + "* Plate    *" + SystemUtils.LINE_SEPARATOR +
@@ -114,13 +114,13 @@ public class StringMessageHelperTestCase extends TestCase
     public void testTruncate()
     {
         String msg = "this is a test message for truncating";
-        String result = StringMessageHelper.truncate(msg, 100, true);
+        String result = StringMessageUtils.truncate(msg, 100, true);
         assertEquals(msg, result);
 
-        result = StringMessageHelper.truncate(msg, 10, false);
+        result = StringMessageUtils.truncate(msg, 10, false);
         assertEquals("this is a ...", result);
 
-        result = StringMessageHelper.truncate(msg, 10, true);
+        result = StringMessageUtils.truncate(msg, 10, true);
         assertEquals("this is a ...[10 of 37]", result);
     }
 
