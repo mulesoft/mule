@@ -15,7 +15,7 @@ package org.mule.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -104,7 +104,7 @@ public class MuleDtdResolver implements EntityResolver
                 String dtdFile = systemId.substring(systemId.indexOf(dtdName));
                 logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
-                InputStream is = ClassHelper.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
+                InputStream is = ClassUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
                 if (is != null) {
                     source = new InputSource(is);
                     source.setPublicId(publicId);

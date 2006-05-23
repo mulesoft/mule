@@ -18,7 +18,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -40,7 +40,7 @@ public class TestCatchAllStrategy implements UMORouterCatchAllStrategy
 
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        System.out.println(StringMessageHelper.getBoilerPlate("Caught an event in the router!", '*', 40));
+        System.out.println(StringMessageUtils.getBoilerPlate("Caught an event in the router!", '*', 40));
         return null;
     }
 }

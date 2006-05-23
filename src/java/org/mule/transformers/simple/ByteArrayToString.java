@@ -15,7 +15,7 @@ package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>ByteArrayToString</code> converts a byte array into a String.
@@ -39,9 +39,9 @@ public class ByteArrayToString extends AbstractTransformer
             return src;
         }
         if (encoding != null) {
-            return StringMessageHelper.getString((byte[])src, encoding);
+            return StringMessageUtils.getString((byte[])src, encoding);
         } else {
-            return StringMessageHelper.getString((byte[])src);
+            return StringMessageUtils.getString((byte[])src);
         }
     }
 }

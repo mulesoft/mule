@@ -21,8 +21,8 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
-import org.mule.util.ClassHelper;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.ClassUtils;
+import org.mule.util.StringMessageUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ public class MuleServer implements Runnable
             }
         } else {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-            URL configUrl = ClassHelper.getResource(DEFAULT_CONFIGURATION, MuleServer.class);
+            URL configUrl = ClassUtils.getResource(DEFAULT_CONFIGURATION, MuleServer.class);
             if (configUrl != null) {
                 config = configUrl.toExternalForm();
                 server.setConfigurationResources(config);
@@ -197,7 +197,7 @@ public class MuleServer implements Runnable
         throws ClassNotFoundException
     {
         if (builderClassName != null) {
-            Class cls = ClassHelper.loadClass(builderClassName, MuleServer.class);
+            Class cls = ClassUtils.loadClass(builderClassName, MuleServer.class);
             if (ConfigurationBuilder.class.isAssignableFrom(cls)) {
                 MuleServer.configBuilderClassName = builderClassName;
             } else {
@@ -239,7 +239,7 @@ public class MuleServer implements Runnable
         }
 
         // create a new ConfigurationBuilder that is disposed afterwards
-        Class cfgBuilderClass = ClassHelper.loadClass(getConfigBuilderClassName(), MuleServer.class);
+        Class cfgBuilderClass = ClassUtils.loadClass(getConfigBuilderClassName(), MuleServer.class);
         ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) cfgBuilderClass.newInstance();
 
         if (!cfgBuilder.isConfigured()) {
@@ -277,7 +277,7 @@ public class MuleServer implements Runnable
         msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())));
         msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
 
-        shutdownMessage = StringMessageHelper.getBoilerPlate(msgs, '*', 80);
+        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
         System.exit(0);
     }
@@ -292,7 +292,7 @@ public class MuleServer implements Runnable
         msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
         msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())).getMessage());
         msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
-        shutdownMessage = StringMessageHelper.getBoilerPlate(msgs, '*', 80);
+        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
 
         System.exit(0);
 

@@ -16,7 +16,7 @@ package org.mule.impl.container;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.ejb.EJBHome;
 import javax.naming.NamingException;
@@ -57,13 +57,13 @@ public class EjbContainerContext extends RmiContainerContext
             throw new ObjectNotFoundException(key.toString());
         } else if(homeObject instanceof EJBHome) {
 
-            Method method = ClassHelper.getMethod("create", null, homeObject.getClass());
+            Method method = ClassUtils.getMethod("create", null, homeObject.getClass());
             if(method==null) {
                 throw new ObjectNotFoundException(key.toString(),
                         new IllegalArgumentException(new Message(Messages.EJB_OBJECT_X_MISSING_CREATE, key).toString()));
             }
             try {
-                return method.invoke(homeObject, ClassHelper.NO_ARGS);
+                return method.invoke(homeObject, ClassUtils.NO_ARGS);
             } catch (Exception e) {
                 throw new ObjectNotFoundException(key.toString(), e);
             }

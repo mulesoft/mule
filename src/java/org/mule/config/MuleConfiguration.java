@@ -25,7 +25,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
 
@@ -435,11 +435,11 @@ public class MuleConfiguration
     {
         if (manifest == null) {
             manifest = new Manifest();
-            InputStream is = ClassHelper.getResourceAsStream("META-INF/Mule.mf", getClass());
+            InputStream is = ClassUtils.getResourceAsStream("META-INF/Mule.mf", getClass());
             // a bit of a kludge as depending on how the jar is build the
             // Meta-inf can be lower or upper case...
             if (is == null) {
-                is = ClassHelper.getResourceAsStream("meta-inf/Mule.mf", getClass());
+                is = ClassUtils.getResourceAsStream("meta-inf/Mule.mf", getClass());
             }
             if (is != null) {
                 try {

@@ -24,7 +24,7 @@ import org.apache.commons.digester.RuleSetBase;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PropertyFactory;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.Utility;
 import org.xml.sax.Attributes;
 
@@ -172,7 +172,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String clazz = attributes.getValue("factory");
                 String name = attributes.getValue("name");
                 Object props = digester.peek();
-                Object obj = ClassHelper.instanciateClass(clazz, ClassHelper.NO_ARGS);
+                Object obj = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
                 if (obj instanceof PropertyFactory) {
                     if (props instanceof Map) {
                         obj = ((PropertyFactory) obj).create((Map) props);

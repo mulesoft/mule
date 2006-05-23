@@ -27,7 +27,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -109,7 +109,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
                         if (logger.isDebugEnabled()) {
                             try {
                                 logger.warn("Message fragment is: "
-                                        + StringMessageHelper.truncate(event.getMessageAsString(), 100, true));
+                                        + StringMessageUtils.truncate(event.getMessageAsString(), 100, true));
                             } catch (UMOException e) {
                                 // ignore
                             }

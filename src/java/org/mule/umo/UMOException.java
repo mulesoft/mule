@@ -18,7 +18,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -152,7 +152,7 @@ public abstract class UMOException extends Exception
             return getMessage();
         }
         StringBuffer buf = new StringBuffer(1024);
-        buf.append(SystemUtils.LINE_SEPARATOR).append(StringMessageHelper.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(SystemUtils.LINE_SEPARATOR).append(StringMessageUtils.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Type                  : ").append(getClass().getName()).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Code                  : ").append(getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
@@ -164,25 +164,25 @@ public abstract class UMOException extends Exception
             int pad = 22 - s.length();
             buf.append(s);
             if (pad > 0) {
-                buf.append(StringMessageHelper.charString(' ', pad));
+                buf.append(StringMessageUtils.charString(' ', pad));
             }
             buf.append(": ");
             buf.append(info.get(s)).append(SystemUtils.LINE_SEPARATOR);
         }
 
         // print exception stack
-        buf.append(StringMessageHelper.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringMessageUtils.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(new Message(Messages.EXCEPTION_STACK_IS)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(ExceptionHelper.getExceptionStack(this));
 
-        buf.append(StringMessageHelper.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringMessageUtils.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(new Message(Messages.ROOT_STACK_TRACE)).append(SystemUtils.LINE_SEPARATOR);
         Throwable root = ExceptionHelper.getRootException(this);
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
         buf.append(w.toString()).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(StringMessageHelper.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringMessageUtils.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
 
         return buf.toString();
     }

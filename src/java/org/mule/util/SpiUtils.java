@@ -25,9 +25,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Properties;
 
-public class SpiHelper
+public class SpiUtils
 {
-    private static final Log logger = LogFactory.getLog(SpiHelper.class);
+    private static final Log logger = LogFactory.getLog(SpiUtils.class);
 
     public static final String SERVICE_ROOT = "META-INF/services/";
 
@@ -143,6 +143,6 @@ public class SpiHelper
         } else {
             path = SERVICE_ROOT + path + name;
         }
-        return ClassHelper.getResourceAsStream(path, currentClass);
+        return ClassUtils.getResourceAsStream(path, currentClass);
     }
 }

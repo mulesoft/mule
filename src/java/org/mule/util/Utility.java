@@ -189,7 +189,7 @@ public class Utility
      */
     public static URL getResource(final String resourceName, final Class callingClass)
     {
-        URL url = ClassHelper.getResource(resourceName, callingClass);
+        URL url = ClassUtils.getResource(resourceName, callingClass);
 
         if (url == null) {
             url = (URL)AccessController.doPrivileged(new PrivilegedAction() {

@@ -15,7 +15,7 @@ package org.mule.impl.container;
 
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.naming.NamingException;
 
@@ -43,7 +43,7 @@ public class RmiContainerContext extends JndiContainerContext
     public void initialise() throws InitialisationException {
         super.initialise();
         if(securityPolicy!=null) {
-            if(ClassHelper.getResource(securityPolicy, getClass())!=null) {
+            if(ClassUtils.getResource(securityPolicy, getClass())!=null) {
                 System.setProperty("java.security.policy", securityPolicy);
             } else {
                 System.out.println("");
@@ -54,7 +54,7 @@ public class RmiContainerContext extends JndiContainerContext
         if (System.getSecurityManager() == null) {
             try {
                 if(securityManager!=null) {
-                    Class clazz = ClassHelper.loadClass(securityManager, getClass());
+                    Class clazz = ClassUtils.loadClass(securityManager, getClass());
                     System.setSecurityManager((SecurityManager)clazz.newInstance());
                 }
             } catch (Exception e) {

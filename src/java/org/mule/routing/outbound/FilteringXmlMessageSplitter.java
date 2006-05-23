@@ -23,7 +23,7 @@ import org.dom4j.io.SAXReader;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.xml.sax.SAXException;
 
 import java.io.InputStream;
@@ -146,7 +146,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 SAXReader reader = new SAXReader();
                 setDoSchemaValidation(reader, isValidateSchema());
 
-                InputStream xsdAsStream = ClassHelper.getResourceAsStream(getExternalSchemaLocation(), getClass());
+                InputStream xsdAsStream = ClassUtils.getResourceAsStream(getExternalSchemaLocation(), getClass());
                 if (xsdAsStream == null) {
                     throw new IllegalArgumentException("Couldn't find schema at " + getExternalSchemaLocation());
                 }

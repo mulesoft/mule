@@ -19,8 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
-import org.mule.util.ClassHelper;
-import org.mule.util.SpiHelper;
+import org.mule.util.ClassUtils;
+import org.mule.util.SpiUtils;
 import org.mule.util.Utility;
 
 import java.io.IOException;
@@ -103,7 +103,7 @@ public class ExceptionHelper {
             registerExceptionReader(new NamingExceptionReader());
             J2SE_VERSION = System.getProperty("java.specification.version");
 
-            InputStream is = SpiHelper.findServiceDescriptor("org/mule/config",
+            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config",
                     "mule-exception-codes.properties",
                     ExceptionHelper.class);
             if (is == null) {
@@ -111,7 +111,7 @@ public class ExceptionHelper {
             }
             errorCodes.load(is);
             reverseErrorCodes = MapUtils.invertMap(errorCodes);
-            is = SpiHelper.findServiceDescriptor("org/mule/config",
+            is = SpiUtils.findServiceDescriptor("org/mule/config",
                     "mule-exception-config.properties",
                     ExceptionHelper.class);
             if (is == null) {
@@ -139,7 +139,7 @@ public class ExceptionHelper {
             return (Class) clazz;
         } else {
             try {
-                clazz = ClassHelper.loadClass(clazz.toString(), ExceptionHelper.class);
+                clazz = ClassUtils.loadClass(clazz.toString(), ExceptionHelper.class);
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(), e);
                 return null;
@@ -168,7 +168,7 @@ public class ExceptionHelper {
                 return null;
             }
         } else {
-            InputStream is = SpiHelper.findServiceDescriptor("org/mule/config", protocol
+            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config", protocol
                     + "-exception-mappings.properties", ExceptionHelper.class);
             if (is == null) {
                 errorMappings.put(protocol, "not found");

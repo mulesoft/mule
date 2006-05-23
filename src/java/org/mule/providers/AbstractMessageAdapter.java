@@ -29,7 +29,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
 import javax.activation.DataHandler;
@@ -75,7 +75,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
         buf.append(", exceptionPayload=").append(exceptionPayload);
-        buf.append(", properties=").append(PropertiesHelper.propertiesToString(properties, true));
+        buf.append(", properties=").append(PropertiesUtils.propertiesToString(properties, true));
         buf.append('}');
         return buf.toString();
     }

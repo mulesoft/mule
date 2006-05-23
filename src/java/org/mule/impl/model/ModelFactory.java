@@ -17,8 +17,8 @@ package org.mule.impl.model;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.util.BeanUtils;
-import org.mule.util.ClassHelper;
-import org.mule.util.SpiHelper;
+import org.mule.util.ClassUtils;
+import org.mule.util.SpiUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,15 +36,15 @@ public class ModelFactory {
     public static final String MODEL_SERVICE_PATH = "org/mule/models";
 
     public static UMOModel createModel(String type) throws ModelServiceNotFoundException {
-        String location = SpiHelper.SERVICE_ROOT + MODEL_SERVICE_PATH;
-        InputStream is = SpiHelper.findServiceDescriptor(MODEL_SERVICE_PATH, type, ConnectorFactory.class);
+        String location = SpiUtils.SERVICE_ROOT + MODEL_SERVICE_PATH;
+        InputStream is = SpiUtils.findServiceDescriptor(MODEL_SERVICE_PATH, type, ConnectorFactory.class);
         try {
             if (is != null) {
                 Properties props = new Properties();
                 props.load(is);
                 String clazz = props.getProperty("model");
                 try {
-                    UMOModel model = (UMOModel) ClassHelper.instanciateClass(clazz, ClassHelper.NO_ARGS, ModelFactory.class );
+                    UMOModel model = (UMOModel) ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS, ModelFactory.class );
                     BeanUtils.populateWithoutFail(model, props, false);
                     return model;
                 } catch (Exception e) {

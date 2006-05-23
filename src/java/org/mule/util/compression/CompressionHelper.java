@@ -17,7 +17,7 @@ package org.mule.util.compression;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -46,7 +46,7 @@ public class CompressionHelper
                 public Object run()
                 {
                     try {
-                        Object o = ClassHelper.loadClass(CompressionStrategy.COMPRESSION_DEFAULT,
+                        Object o = ClassUtils.loadClass(CompressionStrategy.COMPRESSION_DEFAULT,
                                 CompressionHelper.class).newInstance();
                         if (logger.isDebugEnabled()) {
                             logger.debug("Found CompressionStrategy: " + o.getClass().getName());

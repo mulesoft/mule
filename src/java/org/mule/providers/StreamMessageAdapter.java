@@ -14,7 +14,7 @@
 package org.mule.providers;
 
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
                 out = (OutputStream)message;
             } else if (message instanceof String) {
                 out = new ByteArrayOutputStream(message.toString().length());
-                out.write(StringMessageHelper.getBytes(message.toString()));
+                out.write(StringMessageUtils.getBytes(message.toString()));
             } else if (message instanceof byte[]) {
                 out = new ByteArrayOutputStream(((byte[])message).length);
                 out.write((byte[])message);
@@ -62,7 +62,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception {
         if(out instanceof ByteArrayOutputStream) {
-            return StringMessageHelper.getString(((ByteArrayOutputStream)out).toByteArray(), encoding);
+            return StringMessageUtils.getString(((ByteArrayOutputStream)out).toByteArray(), encoding);
         } else {
             logger.warn("Attempting to get the String contents of a non-ByteArray output stream");
             return out.toString();
@@ -81,7 +81,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
             return ((ByteArrayOutputStream)out).toByteArray();
         } else {
             logger.warn("Attempting to get the bytes of a non-ByteArray output stream");
-            return StringMessageHelper.getBytes(out.toString());
+            return StringMessageUtils.getBytes(out.toString());
         }
     }
 
@@ -94,11 +94,11 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
     }
 
     public void write(String string) throws IOException {
-        out.write(StringMessageHelper.getBytes(string));
+        out.write(StringMessageUtils.getBytes(string));
     }
 
     public void write(String string, int offset, int len) throws IOException {
-        out.write(StringMessageHelper.getBytes(string), offset, len);
+        out.write(StringMessageUtils.getBytes(string), offset, len);
     }
 
     public void write(byte[] bytes) throws IOException {

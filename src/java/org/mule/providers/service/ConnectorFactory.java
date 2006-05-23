@@ -13,7 +13,6 @@
  */
 package org.mule.providers.service;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -28,11 +27,12 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.BeanUtils;
+import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectFactory;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.SpiHelper;
+import org.mule.util.PropertiesUtils;
+import org.mule.util.SpiUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -203,12 +203,12 @@ public class ConnectorFactory
         // if there is a factory, use it
         try {
             if (csd.getConnectorFactory() != null) {
-                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(csd.getConnectorFactory(),
+                ObjectFactory factory = (ObjectFactory) ClassUtils.loadClass(csd.getConnectorFactory(),
                                                                               ConnectorFactory.class).newInstance();
                 connector = (UMOConnector) factory.create();
             } else {
                 if (csd.getConnector() != null) {
-                    connector = (UMOConnector) ClassHelper.loadClass(csd.getConnector(), ConnectorFactory.class)
+                    connector = (UMOConnector) ClassUtils.loadClass(csd.getConnector(), ConnectorFactory.class)
                                                           .newInstance();
                     if (connector instanceof AbstractServiceEnabledConnector) {
                         ((AbstractServiceEnabledConnector) connector).initialiseFromUrl(url);
@@ -232,11 +232,11 @@ public class ConnectorFactory
         // these are set on the Manager with a protocol i.e.
         // jms.specification=1.1
         Map props = new HashMap();
-        PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
+        PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
                                                              connector.getProtocol().toLowerCase(), props);
         if (props.size() > 0) {
-            props = PropertiesHelper.removeNamespaces(props);
-            org.mule.util.BeanUtils.populateWithoutFail(connector, props, true);
+            props = PropertiesUtils.removeNamespaces(props);
+            BeanUtils.populateWithoutFail(connector, props, true);
         }
 
         return connector;
@@ -253,8 +253,8 @@ public class ConnectorFactory
         ConnectorServiceDescriptor csd = (ConnectorServiceDescriptor) csdCache.get(new CSDKey(protocol, overrides));
         if (csd == null) {
 
-            String location = SpiHelper.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
-            InputStream is = SpiHelper.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol, ConnectorFactory.class);
+            String location = SpiUtils.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
+            InputStream is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol, ConnectorFactory.class);
             try {
                 if (is != null) {
                     Properties props = new Properties();

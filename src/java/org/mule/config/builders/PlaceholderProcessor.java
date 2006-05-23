@@ -23,8 +23,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.util.BeanUtils;
-import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.ClassUtils;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.TemplateParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -165,16 +165,16 @@ public class PlaceholderProcessor
                 + File.separator + DEFAULT_ENCRYPTION_PROPERTIES_FILE);
 
         logger.info("Attempting to load encryption properties from: " + path);
-        Properties props = PropertiesHelper.loadProperties(path);
+        Properties props = PropertiesUtils.loadProperties(path);
 
         Map names = new HashMap();
-        PropertiesHelper.getPropertiesWithPrefix(props, "name", names);
+        PropertiesUtils.getPropertiesWithPrefix(props, "name", names);
         String name;
         for (Iterator iterator = names.values().iterator(); iterator.hasNext();) {
             name = (String) iterator.next();
             Map schemeConfig = new HashMap();
-            PropertiesHelper.getPropertiesWithPrefix(props, name + ".", schemeConfig);
-            schemeConfig = PropertiesHelper.removeNamespaces(schemeConfig);
+            PropertiesUtils.getPropertiesWithPrefix(props, name + ".", schemeConfig);
+            schemeConfig = PropertiesUtils.removeNamespaces(schemeConfig);
 
             String type = (String)schemeConfig.get("type");
             String clazz = (String)types.get(type);
@@ -182,7 +182,7 @@ public class PlaceholderProcessor
                 throw new IllegalArgumentException("Unknown encryption type: " + type);
             }
             logger.debug("Found Class: " + clazz + " for type: " + type);
-            UMOEncryptionStrategy strat = (UMOEncryptionStrategy)ClassHelper.instanciateClass(clazz, ClassHelper.NO_ARGS, PlaceholderProcessor.class);
+            UMOEncryptionStrategy strat = (UMOEncryptionStrategy)ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS, PlaceholderProcessor.class);
             BeanUtils.populateWithoutFail(strat, schemeConfig, true);
             schemes.put(name, strat);
         }

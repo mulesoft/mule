@@ -17,7 +17,7 @@ package org.mule.impl.container;
 
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.io.Reader;
 
@@ -55,7 +55,7 @@ public class MuleContainerContext extends AbstractContainerContext
             if (key instanceof Class) {
                 clazz = (Class) key;
             } else {
-                clazz = ClassHelper.loadClass(key.toString(), getClass());
+                clazz = ClassUtils.loadClass(key.toString(), getClass());
             }
             return clazz.newInstance();
         } catch (Exception e) {

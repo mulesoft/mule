@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.Utility;
 
 import java.io.IOException;
@@ -170,7 +170,7 @@ public class MuleService implements MuleServiceMBean
         if(license==null) {
             try {
                 license = Utility.loadResourceAsString("LICENSE.txt", getClass());
-                license = StringMessageHelper.getBoilerPlate(license, ' ', 80);
+                license = StringMessageUtils.getBoilerPlate(license, ' ', 80);
             } catch (IOException e) {
                 logger.warn("Failed to load LICENSE.txt", e);
             }
