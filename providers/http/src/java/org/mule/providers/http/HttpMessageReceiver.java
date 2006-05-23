@@ -35,7 +35,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import javax.resource.spi.work.Work;
 
@@ -300,7 +300,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             receiver = connector.getReceiver(requestUri.toString());
             if(receiver==null && logger.isWarnEnabled()) {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName() + " with URI key: " + requestUri.toString());
-                logger.warn("Receivers on connector are: " + PropertiesHelper.propertiesToString(connector.getReceivers(), true));
+                logger.warn("Receivers on connector are: " + PropertiesUtils.propertiesToString(connector.getReceivers(), true));
             }
         }
 

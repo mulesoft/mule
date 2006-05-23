@@ -17,7 +17,7 @@ package org.mule.config.converters;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>TransactionFactoryConverter</code> TODO
@@ -47,7 +47,7 @@ public class TransactionFactoryConverter implements Converter
             return (value);
         }
         try {
-            Object factory = ClassHelper.loadClass(value.toString(), getClass()).newInstance();
+            Object factory = ClassUtils.loadClass(value.toString(), getClass()).newInstance();
             return factory;
         } catch (Exception e) {
             throw new ConversionException(e);

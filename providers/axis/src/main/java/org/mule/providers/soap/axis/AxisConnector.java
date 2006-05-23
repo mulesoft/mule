@@ -45,7 +45,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.xml.namespace.QName;
 
@@ -215,7 +215,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             Object temp = getAxisTransportProtocols().get(protocol);
             Class clazz = null;
             if (temp instanceof String) {
-                clazz = ClassHelper.loadClass(temp.toString(), getClass());
+                clazz = ClassUtils.loadClass(temp.toString(), getClass());
             } else {
                 clazz = (Class) temp;
             }
@@ -533,7 +533,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         if (types != null) {
             Class clazz;
             for (Iterator iterator = types.iterator(); iterator.hasNext();) {
-                clazz = ClassHelper.loadClass(iterator.next().toString(), getClass());
+                clazz = ClassUtils.loadClass(iterator.next().toString(), getClass());
                 String localName = Types.getLocalNameFromFullName(clazz.getName());
                 QName xmlType = new QName(Namespaces.makeNamespace(clazz.getName()),
                                           localName);

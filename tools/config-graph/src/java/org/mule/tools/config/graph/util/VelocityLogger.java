@@ -1,3 +1,4 @@
+
 package org.mule.tools.config.graph.util;
 
 import org.apache.velocity.runtime.RuntimeServices;
@@ -13,7 +14,7 @@ public class VelocityLogger implements LogSystem {
     }
 
         public void init(RuntimeServices arg0) throws Exception {
-
+            // nothing to do
         }
 
         public void logVelocityMessage(int arg0, String arg1) {

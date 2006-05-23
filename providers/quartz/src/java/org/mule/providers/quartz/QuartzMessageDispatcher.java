@@ -23,7 +23,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -81,7 +81,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             jobDetail.setJobClass(DelegatingJob.class);
         }
         else if (jobClass != null) {
-            jobDetail.setJobClass(ClassHelper.loadClass(jobClass, getClass()));
+            jobDetail.setJobClass(ClassUtils.loadClass(jobClass, getClass()));
         }
         else {
             Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);

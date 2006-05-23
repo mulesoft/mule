@@ -15,7 +15,7 @@ package org.mule.umo.manager;
 
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.util.EventObject;
 
@@ -48,7 +48,7 @@ public abstract class UMOServerNotification extends EventObject
     public static final int NULL_ACTION = 0;
     public static final Object NULL_MESSAGE = new Object();
 
-    public final String EVENT_NAME = ClassHelper.getClassName(getClass());
+    public final String EVENT_NAME = ClassUtils.getClassName(getClass());
 
     protected String serverId;
 

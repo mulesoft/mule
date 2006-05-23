@@ -17,7 +17,7 @@ package org.mule.samples.errorhandler.handlers;
 import org.mule.samples.errorhandler.AbstractExceptionHandler;
 import org.mule.samples.errorhandler.ErrorMessage;
 import org.mule.samples.errorhandler.HandlerException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  *  <code>DefaultHandler</code> TODO (document class)
@@ -35,7 +35,7 @@ public class DefaultHandler extends AbstractExceptionHandler {
 
     public void processException(ErrorMessage message, Throwable t) throws HandlerException {
 
-        System.out.println( StringMessageHelper.getBoilerPlate("Exception received in /n" +
+        System.out.println( StringMessageUtils.getBoilerPlate("Exception received in /n" +
                 " DEFAULT EXCEPTION HANDLER /n." +
                 " Logic could be put in here to enrich the message content"));
     }

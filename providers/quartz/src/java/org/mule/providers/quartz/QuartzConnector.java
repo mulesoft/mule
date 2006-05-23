@@ -20,7 +20,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
@@ -82,7 +82,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
                     if (factoryProperties != null) {
                         args = new Object[] { factoryProperties };
                     }
-                    factory = (SchedulerFactory) ClassHelper.instanciateClass(factoryClassName, args);
+                    factory = (SchedulerFactory) ClassUtils.instanciateClass(factoryClassName, args);
                 }
                 scheduler = factory.getScheduler();
             }

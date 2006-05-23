@@ -25,7 +25,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -168,7 +168,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
 
         try {
-            if (ClassHelper.getResource(configFile, getClass()) == null) {
+            if (ClassUtils.getResource(configFile, getClass()) == null) {
                 logger.warn("Spring config resource: " + configFile
                         + " not found on class path, attempting to load it from local file");
                 setExternalBeanFactory(new FileSystemXmlApplicationContext(configFile));

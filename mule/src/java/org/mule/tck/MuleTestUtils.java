@@ -45,7 +45,7 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.util.HashMap;
 
@@ -81,7 +81,7 @@ public class MuleTestUtils {
         // need to build endpoint this way to avoid depenency to any endpoint
         // jars
         UMOConnector connector = null;
-        connector = (UMOConnector) ClassHelper.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+        connector = (UMOConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
                                                          AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");

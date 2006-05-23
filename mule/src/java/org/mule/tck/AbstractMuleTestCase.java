@@ -29,7 +29,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.Utility;
 
 import java.io.File;
@@ -123,7 +123,7 @@ public abstract class AbstractMuleTestCase extends TestCase {
 
     public boolean isOffline(String method) {
         if (offline) {
-            System.out.println(StringMessageHelper.getBoilerPlate("Working offline cannot run test: " + method, '=', 80));
+            System.out.println(StringMessageUtils.getBoilerPlate("Working offline cannot run test: " + method, '=', 80));
         }
         return offline;
     }
@@ -131,14 +131,14 @@ public abstract class AbstractMuleTestCase extends TestCase {
     public boolean isPrereqsMet(String method) {
         prereqs = checkPreReqs();
         if (prereqs != null) {
-            System.out.println(StringMessageHelper.getBoilerPlate("WARNING\nPrerequisites for test: " + method + " were not met. skipping test: " + prereqs, '=', 80));
+            System.out.println(StringMessageUtils.getBoilerPlate("WARNING\nPrerequisites for test: " + method + " were not met. skipping test: " + prereqs, '=', 80));
         }
         return prereqs == null;
     }
 
     protected final void setUp() throws Exception
     {
-        System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));
+        System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
         MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
         MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
 

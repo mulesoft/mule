@@ -17,7 +17,7 @@ import org.mule.MuleManager;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -72,7 +72,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected abstract void setEndpoint(URI uri, Properties props) throws MalformedEndpointException;
 
     protected Properties getPropertiesForURI(URI uri) throws MalformedEndpointException {
-        Properties properties = PropertiesHelper.getPropertiesFromQueryString(uri.getQuery());
+        Properties properties = PropertiesUtils.getPropertiesFromQueryString(uri.getQuery());
 
         String tempEndpointName = (String) properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_NAME);
         if (tempEndpointName != null) {

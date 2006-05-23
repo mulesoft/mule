@@ -15,7 +15,7 @@
 package org.mule.providers.http;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.mule.util.CollectionUtil;
+import org.mule.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -174,7 +174,7 @@ public class HttpConstants
                 HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
                 HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING};
 
-            REQUEST_HEADER_NAMES = Collections.unmodifiableMap(CollectionUtil.mapWithKeysAndValues(
+            REQUEST_HEADER_NAMES = Collections.unmodifiableMap(CollectionUtils.mapWithKeysAndValues(
                     CaseInsensitiveMap.class, strings, strings));
 
             strings = new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,HEADER_CACHE_CONTROL,
@@ -185,7 +185,7 @@ public class HttpConstants
                 HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VARY,HEADER_VIA,HEADER_WARNING,
                 HEADER_WWW_AUTHENTICATE};
 
-            RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(CollectionUtil.mapWithKeysAndValues(
+            RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(CollectionUtils.mapWithKeysAndValues(
                     CaseInsensitiveMap.class, strings, strings));
 
             strings = new String[]{HEADER_ALLOW,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
@@ -194,7 +194,7 @@ public class HttpConstants
                 HEADER_DATE,HEADER_EXPIRES,HEADER_KEEP_ALIVE,HEADER_LAST_MODIFIED,HEADER_PRAGMA,
                 HEADER_TRAILER,HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VIA,HEADER_WARNING};
 
-            Map allHeaders = CollectionUtil.mapWithKeysAndValues(CaseInsensitiveMap.class, strings,
+            Map allHeaders = CollectionUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings,
                     strings);
             allHeaders.putAll(REQUEST_HEADER_NAMES);
             allHeaders.putAll(RESPONSE_HEADER_NAMES);

@@ -24,7 +24,7 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -146,7 +146,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         if (name == null) {
             name = httpServletRequest.getParameter("endpoint");
             if (name == null) {
-                Properties params = PropertiesHelper.getPropertiesFromQueryString(httpServletRequest
+                Properties params = PropertiesUtils.getPropertiesFromQueryString(httpServletRequest
                         .getQueryString());
                 name = params.getProperty("endpoint");
                 if (name == null) {

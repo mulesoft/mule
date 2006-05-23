@@ -28,7 +28,7 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class BeanUtils
+public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
 {
     /**
      * logger used by this class

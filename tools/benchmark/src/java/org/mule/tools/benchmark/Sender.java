@@ -13,22 +13,21 @@
  */
 package org.mule.tools.benchmark;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.extras.client.MuleClient;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.QueueProfile;
-import org.mule.config.PoolingProfile;
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
+import org.mule.config.ThreadingProfile;
+import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.service.ConnectorFactory;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.manager.UMOManager;
 
 import java.util.Arrays;
 

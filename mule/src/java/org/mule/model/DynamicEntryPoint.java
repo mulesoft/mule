@@ -22,7 +22,7 @@ import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.UMOEntryPoint;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -71,7 +71,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         } else if (methodOverride != null) {
             payload = context.getTransformedMessage();
             //Get the method that matches the method name with the current argument types
-            method = ClassHelper.getMethod(methodOverride.toString(), ClassHelper.getClassTypes(payload), component.getClass());
+            method = ClassUtils.getMethod(methodOverride.toString(), ClassUtils.getClassTypes(payload), component.getClass());
             validateMethod(component, method, methodOverride.toString());
         }
 
@@ -105,8 +105,8 @@ public class DynamicEntryPoint implements UMOEntryPoint
         }
 
         // Are any methods on the component accepting an context?
-        List methods = ClassHelper.getSatisfiableMethods(component.getClass(),
-                                                         ClassHelper.getClassTypes(context),
+        List methods = ClassUtils.getSatisfiableMethods(component.getClass(),
+                                                         ClassUtils.getClassTypes(context),
                                                          true,
                                                          true,
                                                          false);
@@ -123,8 +123,8 @@ public class DynamicEntryPoint implements UMOEntryPoint
             addMethod(component, (Method) methods.get(0), context.getClass());
             return invokeCurrent(component, context);
         } else {
-            methods = ClassHelper.getSatisfiableMethods(component.getClass(),
-                                                        ClassHelper.getClassTypes(payload),
+            methods = ClassUtils.getSatisfiableMethods(component.getClass(),
+                                                        ClassUtils.getClassTypes(payload),
                                                         true,
                                                         true,
                                                         true);

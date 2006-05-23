@@ -13,13 +13,12 @@
  */
 package org.mule.providers.soap;
 
-import org.apache.commons.lang.ClassUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class ServiceProxy
             interfaces = new Class[ifaces.size()];
             for (int i = 0; i < ifaces.size(); i++) {
                 String iface = (String) ifaces.get(i);
-                interfaces[i] = ClassHelper.loadClass(iface, ServiceProxy.class);
+                interfaces[i] = ClassUtils.loadClass(iface, ServiceProxy.class);
             }
         }
 

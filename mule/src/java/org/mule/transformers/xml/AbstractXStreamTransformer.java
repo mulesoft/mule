@@ -24,7 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -93,7 +93,7 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
             entry = (Map.Entry) iterator.next();
             classname = entry.getValue().toString();
             try {
-                clazz = ClassHelper.loadClass(classname, getClass());
+                clazz = ClassUtils.loadClass(classname, getClass());
             } catch (ClassNotFoundException e) {
                 throw new TransformerException(new Message(Messages.CLASS_X_NOT_FOUND, classname), this, e);
             }
@@ -112,7 +112,7 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
         for (Iterator iterator = converters.iterator(); iterator.hasNext();) {
             classname = iterator.next().toString();
             try {
-                clazz = ClassHelper.loadClass(classname, getClass());
+                clazz = ClassUtils.loadClass(classname, getClass());
                 xstream.registerConverter((Converter) clazz.newInstance());
             } catch (Exception e) {
                 throw new TransformerException(this, e);
@@ -152,13 +152,13 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
         public ConcurrentHashMapConverter(Mapper mapper) throws ClassNotFoundException {
             super(mapper);
             try {
-                jdk5ConurrentHashMap = ClassHelper.loadClass("java.util.concurrent.ConcurrentHashMap", getClass());
+                jdk5ConurrentHashMap = ClassUtils.loadClass("java.util.concurrent.ConcurrentHashMap", getClass());
             } catch (ClassNotFoundException e) {
                 // ignore: probably running on JDK 1.4
             }
 
             try {
-                backportConurrentHashMap = ClassHelper.loadClass("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", getClass());
+                backportConurrentHashMap = ClassUtils.loadClass("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", getClass());
             } catch (ClassNotFoundException e) {
                 // ignore: maybe running Mule 3.0 with native util.concurrent :)
             }

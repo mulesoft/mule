@@ -35,7 +35,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 
@@ -71,7 +71,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
         }
 
         try {
-            adapterClass = ClassHelper.loadClass(serviceDescriptor.getMessageAdapter(), getClass());
+            adapterClass = ClassUtils.loadClass(serviceDescriptor.getMessageAdapter(), getClass());
         } catch (ClassNotFoundException e) {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Message Adapter: "
                     + serviceDescriptor.getMessageAdapter()), e);

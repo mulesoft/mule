@@ -22,7 +22,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
 
@@ -101,7 +101,7 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
                 return null;
             }
         } else {
-            return ClassHelper.getResource(scriptLocation, getClass());
+            return ClassUtils.getResource(scriptLocation, getClass());
         }
     }
 

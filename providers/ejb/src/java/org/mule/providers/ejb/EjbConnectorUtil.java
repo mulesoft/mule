@@ -20,7 +20,7 @@ import org.mule.providers.rmi.RmiConnector;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.ejb.EJBObject;
 
@@ -72,9 +72,9 @@ public class EjbConnectorUtil
         try {
             Object ref = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port).lookup(serviceName);
 
-            Method method = ClassHelper.getMethod("create", null, ref.getClass());
+            Method method = ClassUtils.getMethod("create", null, ref.getClass());
 
-            remoteObj = (EJBObject) method.invoke(ref, ClassHelper.NO_ARGS);
+            remoteObj = (EJBObject) method.invoke(ref, ClassUtils.NO_ARGS);
         }
         catch (Exception e) {
             throw new RemoteException("Remote EJBObject lookup failed for '" + inetAddress.getHostAddress() + ":" + port + serviceName + "'", e);
@@ -113,7 +113,7 @@ public class EjbConnectorUtil
         // Attempt to init params
         if (clazz.equals(EjbMessageReceiver.class)) {
             try {
-                EjbAble object = (EjbAble) ClassHelper.instanciateClass(connector.getReceiverArgumentClass(), ClassHelper.NO_ARGS);
+                EjbAble object = (EjbAble) ClassUtils.instanciateClass(connector.getReceiverArgumentClass(), ClassUtils.NO_ARGS);
 
                 argumentClasses = object.argumentClasses();
 

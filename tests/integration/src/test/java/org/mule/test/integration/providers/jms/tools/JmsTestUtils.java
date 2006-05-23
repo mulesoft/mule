@@ -12,7 +12,7 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.Utility;
 
 import javax.jms.Connection;
@@ -73,7 +73,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties() throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
+        InputStream is = ClassUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
 
         String jmsProps = OPEN_JMS_PROPERTIES;
         if (is != null) {
@@ -87,7 +87,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties(String propertyFile) throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(propertyFile, JmsTestUtils.class);
+        InputStream is = ClassUtils.getResourceAsStream(propertyFile, JmsTestUtils.class);
 
         Properties p = new Properties();
         p.load(is);
@@ -201,7 +201,7 @@ public class JmsTestUtils
             String className = ((Reference)ref).getClassName();
             try {
 
-                ref = ClassHelper.loadClass(className, JmsTestUtils.class).newInstance();
+                ref = ClassUtils.loadClass(className, JmsTestUtils.class).newInstance();
             } catch (Exception e) {
                 throw new NamingException("Failed to instanciate class: " + className + ". Exception was: " + e.toString());
             }

@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class BusinessErrorManager implements Callable
         msgs.add("Error is: " + msg.getException().getDetailMessage());
         msgs.add("Error class: " + msg.getException().getClass().getName()); 
            
-        logger.info("\n" + StringMessageHelper.getBoilerPlate(msgs, '*', 80));
+        logger.info("\n" + StringMessageUtils.getBoilerPlate(msgs, '*', 80));
         context.setStopFurtherProcessing(true);
         return null;
     }

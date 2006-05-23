@@ -21,7 +21,7 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>FunctionalTestComponent</code> is a component that can be used by
@@ -45,9 +45,9 @@ public class FunctionalTestComponent implements Callable
     {
         String contents = context.getTransformedMessageAsString();
         String msg = null;
-        msg = StringMessageHelper.getBoilerPlate("Message Received in component: "
+        msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
-                + StringMessageHelper.truncate(contents, 100, true), '*', 80);
+                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
 

@@ -20,7 +20,7 @@ import org.mule.samples.loanbroker.esb.message.Customer;
 import org.mule.samples.loanbroker.esb.message.CustomerQuoteRequest;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.io.IOException;
 
@@ -63,7 +63,7 @@ public class Main
         Main loanConsumer = null;
         int response = 0;
         try {
-                System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Loan Broker ESB example. This example demonstrates using JMS, Web Services, Http/Rest and EJBs using an ESB architecture." +
+                System.out.println(StringMessageUtils.getBoilerPlate("Welcome to the Mule Loan Broker ESB example. This example demonstrates using JMS, Web Services, Http/Rest and EJBs using an ESB architecture." +
                         "\nFor more information see http://mule.codehaus.org/LoanBroker." +
                         "\n\nThe example demonstrates integrating EJB applications in 2 ways -" +
                         "\n1. Calling out to a remote EJB using a Mule Endpoint." +

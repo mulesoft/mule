@@ -33,7 +33,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StringMessageHelper
+public class StringMessageUtils
 {
     public static final String DEFAULT_ENCODING = "UTF-8";
     public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");

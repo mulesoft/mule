@@ -17,7 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.tcp.protocols.DefaultProtocol;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
@@ -62,7 +62,7 @@ public class TcpConnector extends AbstractServiceEnabledConnector
         super.doInitialise();
         if (tcpProtocol == null) {
             try {
-                tcpProtocol = (TcpProtocol) ClassHelper.instanciateClass(tcpProtocolClassName, null);
+                tcpProtocol = (TcpProtocol) ClassUtils.instanciateClass(tcpProtocolClassName, null);
             } catch (Exception e) {
                 throw new InitialisationException(new Message("tcp", 3), e);
             }

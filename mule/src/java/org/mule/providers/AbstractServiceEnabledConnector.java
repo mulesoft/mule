@@ -27,7 +27,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.BeanUtils;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -116,9 +116,9 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             //This provides a really convenient way to set properties on object form unit
             //tests
             Map props = new HashMap();
-            PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol().toLowerCase(), props);
+            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol().toLowerCase(), props);
             if (props.size() > 0) {
-                props = PropertiesHelper.removeNamespaces(props);
+                props = PropertiesUtils.removeNamespaces(props);
                 org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
             }
         } catch (Exception e) {

@@ -18,7 +18,7 @@ import org.codehaus.xfire.transport.TransportManager;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -78,7 +78,7 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory {
      */
     public void addIgnoredMethods(String className) {
         try {
-            Class c = ClassHelper.loadClass(className, getClass());
+            Class c = ClassUtils.loadClass(className, getClass());
             for (int i = 0; i < c.getMethods().length; i++) {
                 excludedMethods.add(getMethodName(c.getMethods()[i]));
             }

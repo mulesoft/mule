@@ -35,7 +35,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PropertiesHelper
+public class PropertiesUtils
 {
 
     private static List maskedProperties = new ArrayList();

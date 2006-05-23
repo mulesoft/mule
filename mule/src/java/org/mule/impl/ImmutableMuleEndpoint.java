@@ -39,7 +39,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 
 import java.util.Collections;
@@ -414,7 +414,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public String toString()
     {
-        return ClassHelper.getClassName(this.getClass()) + "{connector=" + connector + ", endpointUri="
+        return ClassUtils.getClassName(this.getClass()) + "{connector=" + connector + ", endpointUri="
                 + endpointUri + ", transformer=" + transformer + ", name='" + name + "'" + ", type='"
                 + type + "'" + ", properties=" + properties + ", transactionConfig=" + transactionConfig
                 + ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages

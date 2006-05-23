@@ -18,7 +18,7 @@ import org.mule.samples.errorhandler.AbstractExceptionHandler;
 import org.mule.samples.errorhandler.ErrorMessage;
 import org.mule.samples.errorhandler.HandlerException;
 import org.mule.samples.errorhandler.exceptions.BusinessException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class BusinessHandler extends AbstractExceptionHandler
 
     protected void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        System.out.println( StringMessageHelper.getBoilerPlate("Exception received in /n" +
+        System.out.println( StringMessageUtils.getBoilerPlate("Exception received in /n" +
                 " BUSINESS EXCEPTION HANDLER /n." +
                 " Logic could be put in here to enrich the message content"));
     }

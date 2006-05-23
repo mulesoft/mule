@@ -33,14 +33,14 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EnvironmentHelper
+public class EnvironmentUtils
 {
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(EnvironmentHelper.class);
+    protected static transient Log logger = LogFactory.getLog(EnvironmentUtils.class);
 
-    private EnvironmentHelper()
+    private EnvironmentUtils()
     {
         // forbidden
     }

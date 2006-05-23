@@ -2,6 +2,7 @@ package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
@@ -28,8 +29,8 @@ public class ResponseRouterProcessor extends TagProcessor {
                     .getChild(MuleTag.ELEMENT_ENDPOINT);
             String endpointAdress = endpoint
                     .getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
-            GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(endpointAdress, parent
-                    .getInfo().getHeader());
+            GraphNode out = environment.getEndpointRegistry().getEndpoint(endpointAdress,
+                    parent.getInfo().getHeader());
             addEdge(graph, out, responseRouter, "in", isTwoWay(endpoint));
         }
     }

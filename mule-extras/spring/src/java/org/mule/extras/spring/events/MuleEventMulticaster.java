@@ -49,7 +49,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -691,7 +691,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             if (getSubscriptionFilter() == null) {
                 setSubscriptionFilter(WildcardFilter.class);
             }
-            ObjectFilter filter = (ObjectFilter) ClassHelper.instanciateClass(getSubscriptionFilter(),
+            ObjectFilter filter = (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(),
                                                                               new Object[] { pattern });
             return filter;
         } catch (Exception e) {

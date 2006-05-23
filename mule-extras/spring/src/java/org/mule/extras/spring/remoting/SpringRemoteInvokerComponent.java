@@ -21,7 +21,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
@@ -78,7 +78,7 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
         if (serviceClass != null) {
             Object service = null;
             try {
-                service = ClassHelper.instanciateClass(serviceClass, null);
+                service = ClassUtils.instanciateClass(serviceClass, null);
             }
             catch (Exception e) {
                 throw new InitialisationException(e, this);

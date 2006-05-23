@@ -22,7 +22,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.Utility;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
@@ -92,7 +92,7 @@ public class PicoContainerContext extends AbstractContainerContext
         Object component = null;
         if (key instanceof String) {
             try {
-                Class keyClass = ClassHelper.loadClass((String) key, getClass());
+                Class keyClass = ClassUtils.loadClass((String) key, getClass());
                 component = container.getComponentInstance(keyClass);
             } catch (ClassNotFoundException e) {
                 component = container.getComponentInstance(key);

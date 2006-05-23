@@ -41,7 +41,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.BeanUtils;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -632,7 +632,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             InvocationTargetException, InstantiationException, ClassNotFoundException
     {
         if (redeliveryHandler != null) {
-            return (RedeliveryHandler) ClassHelper.instanciateClass(redeliveryHandler, ClassHelper.NO_ARGS);
+            return (RedeliveryHandler) ClassUtils.instanciateClass(redeliveryHandler, ClassUtils.NO_ARGS);
         } else {
             return new DefaultRedeliveryHandler();
         }

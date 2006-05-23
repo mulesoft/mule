@@ -14,8 +14,6 @@
  */
 package org.mule.transformers;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,7 +25,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.BeanUtils;
+import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -317,7 +316,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void setSourceType(String type) throws ClassNotFoundException
     {
-        Class clazz = ClassHelper.loadClass(type, getClass());
+        Class clazz = ClassUtils.loadClass(type, getClass());
         registerSourceType(clazz);
     }
 

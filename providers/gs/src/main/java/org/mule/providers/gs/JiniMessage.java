@@ -16,7 +16,7 @@ package org.mule.providers.gs;
 
 import net.jini.core.entry.Entry;
 import org.mule.umo.UMOExceptionPayload;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import java.util.Map;
 
@@ -180,7 +180,7 @@ public class JiniMessage implements Entry
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
         buf.append(", exceptionPayload=").append(getExceptionPayload());
-        buf.append(", properties=").append(PropertiesHelper.propertiesToString(properties, true));
+        buf.append(", properties=").append(PropertiesUtils.propertiesToString(properties, true));
         buf.append('}');
         return buf.toString();
     }

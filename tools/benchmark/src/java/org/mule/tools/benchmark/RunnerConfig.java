@@ -47,7 +47,10 @@ public class RunnerConfig
     private String model = "default";
     private String connectorConfig;
 
-    public RunnerConfig() {}
+    public RunnerConfig()
+    {
+        super();
+    }
 
     public RunnerConfig(String[] args)
     {

@@ -1,7 +1,7 @@
 /* 
  * $Header$
- * $Revision:$
- * $Date:$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -39,7 +39,8 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$
  */
-public class ClassHelper {
+public class ClassUtils extends org.apache.commons.lang.ClassUtils
+{
     public static final Object[] NO_ARGS = new Object[]{};
 
     public static boolean isConcrete(Class clazz) {
@@ -76,7 +77,7 @@ public class ClassHelper {
         if (url == null) {
             url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
-                    return ClassHelper.class.getClassLoader().getResource(resourceName);
+                    return ClassUtils.class.getClassLoader().getResource(resourceName);
                 }
             });
 
@@ -111,7 +112,7 @@ public class ClassHelper {
             enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
                     try {
-                        return ClassHelper.class.getClassLoader().getResources(resourceName);
+                        return ClassUtils.class.getClassLoader().getResources(resourceName);
                     } catch (IOException e) {
                         return null;
                     }
@@ -198,7 +199,7 @@ public class ClassHelper {
             clazz = (Class) AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
                     try {
-                        return ClassHelper.class.getClassLoader().loadClass(className);
+                        return ClassUtils.class.getClassLoader().loadClass(className);
                     } catch (ClassNotFoundException e) {
                         return null;
                     }
@@ -274,7 +275,7 @@ public class ClassHelper {
     public static Object instanciateClass(String name, Object[] constructorArgs) throws ClassNotFoundException,
             SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
-        Class clazz = loadClass(name, ClassHelper.class);
+        Class clazz = loadClass(name, ClassUtils.class);
         return instanciateClass(clazz, constructorArgs);
 
     }

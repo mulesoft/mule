@@ -18,7 +18,7 @@ package org.mule.model;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.model.ModelException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>TooManySatisfiableMethodsException</code> is thrown by
@@ -36,11 +36,11 @@ public class TooManySatisfiableMethodsException extends ModelException
      */
     public TooManySatisfiableMethodsException(Object component)
     {
-        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageHelper.getObjectValue(component)));
+        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageUtils.getObjectValue(component)));
     }
 
     public TooManySatisfiableMethodsException(Object component, Exception cause)
     {
-        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageHelper.getObjectValue(component)), cause);
+        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageUtils.getObjectValue(component)), cause);
     }
 }

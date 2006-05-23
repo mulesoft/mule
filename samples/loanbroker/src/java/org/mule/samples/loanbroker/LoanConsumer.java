@@ -18,7 +18,7 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.Utility;
 
 import java.io.IOException;
@@ -146,7 +146,7 @@ public class LoanConsumer {
                         LoanQuote quote = (LoanQuote) iterator.next();
                         output.add(x + ". " + quote.toString());
                     }
-                    System.out.println(StringMessageHelper.getBoilerPlate(output, '*', 80));
+                    System.out.println(StringMessageUtils.getBoilerPlate(output, '*', 80));
                     long cur = System.currentTimeMillis();
                     System.out.println(Utility.getFormattedDuration(cur - start));
                     System.out.println("Avg request: " + ((cur - start) / x));
@@ -167,7 +167,7 @@ public class LoanConsumer {
     }
 
     protected static String getConfig() throws IOException {
-        System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Loan Broker example"));
+        System.out.println(StringMessageUtils.getBoilerPlate("Welcome to the Mule Loan Broker example"));
 
         int response = 0;
         String provider = "axis";

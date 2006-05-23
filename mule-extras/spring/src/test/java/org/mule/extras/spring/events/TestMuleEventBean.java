@@ -14,7 +14,7 @@
 package org.mule.extras.spring.events;
 
 import org.mule.tck.functional.EventCallback;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -33,7 +33,7 @@ public class TestMuleEventBean implements MuleEventListener
     {
         MuleApplicationEvent e = (MuleApplicationEvent) event;
 
-        System.out.println(StringMessageHelper.getBoilerPlate("Received message on " + e.getEndpoint()));
+        System.out.println(StringMessageUtils.getBoilerPlate("Received message on " + e.getEndpoint()));
 
         if (eventCallback != null) {
             try {

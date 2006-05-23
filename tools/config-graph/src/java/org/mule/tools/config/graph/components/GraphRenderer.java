@@ -8,7 +8,7 @@ import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.postrenderers.FileCleanerPostRenderer;
 import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
 import org.mule.tools.config.graph.util.DOTtoMAP;
-import org.mule.util.EnvironmentHelper;
+import org.mule.util.EnvironmentUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,7 +73,7 @@ public class GraphRenderer {
                     env.getConfig().setExecuteCommand(f.getAbsolutePath());
                 } else {
 
-                    Properties p = EnvironmentHelper.getEnvironment();
+                    Properties p = EnvironmentUtils.getEnvironment();
                     String home = p.getProperty("MULE_HOME");
                     if(home!=null) {
                         f = new File(home + "/tools/config-graph/win32/dot.exe");

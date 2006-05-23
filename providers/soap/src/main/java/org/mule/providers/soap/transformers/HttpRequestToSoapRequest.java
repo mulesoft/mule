@@ -21,8 +21,8 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.PropertiesUtils;
+import org.mule.util.StringMessageUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -71,7 +71,7 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
 
         int i = request.indexOf('?');
         String query = request.substring(i + 1);
-        Properties p = PropertiesHelper.getPropertiesFromQueryString(query);
+        Properties p = PropertiesUtils.getPropertiesFromQueryString(query);
 
         String method = (String)p.remove(SoapConstants.SOAP_METHOD_PROPERTY);
         if (method == null) {
@@ -90,7 +90,7 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         }
 
         StringBuffer result = new StringBuffer(8192);
-        String header = StringMessageHelper.getFormattedMessage(SOAP_HEADER, new Object[]{encoding});
+        String header = StringMessageUtils.getFormattedMessage(SOAP_HEADER, new Object[]{encoding});
 
         if (p.size() > 0) {
             result.append(header);

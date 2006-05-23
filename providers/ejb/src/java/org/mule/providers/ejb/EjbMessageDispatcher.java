@@ -25,7 +25,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.ejb.EJBObject;
 
@@ -99,9 +99,9 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
         try {
             Object ref = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port).lookup(serviceName);
 
-            Method method = ClassHelper.getMethod("create", null, ref.getClass());
+            Method method = ClassUtils.getMethod("create", null, ref.getClass());
 
-            remoteObj = (EJBObject) method.invoke(ref, ClassHelper.NO_ARGS);
+            remoteObj = (EJBObject) method.invoke(ref, ClassUtils.NO_ARGS);
         } catch (Exception e) {
             throw new RemoteException("Remote EJBObject lookup failed for '" + inetAddress.getHostAddress() + ":" + port + serviceName + "'", e);
         }
@@ -132,7 +132,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
             String[] split = arguments.split(",");
 
             for (int i = 0; i < split.length; i++) {
-                methodArgumentTypes.add(ClassHelper.loadClass(split[i].trim(), getClass()));
+                methodArgumentTypes.add(ClassUtils.loadClass(split[i].trim(), getClass()));
 
             }
         } else if (event.getTransformedMessage().getClass().isArray()) {

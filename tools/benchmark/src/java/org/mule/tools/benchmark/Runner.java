@@ -17,7 +17,7 @@ import org.mule.MuleManager;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.timer.EventTimerTask;
 import org.mule.util.timer.TimeEvent;
 import org.mule.util.timer.TimeEventListener;
@@ -76,7 +76,7 @@ public class Runner implements TimeEventListener
     protected void loadConnectors() throws Exception {
         List protocols = new ArrayList();
         if(config.getConnectorConfig()!=null) {
-            Properties props = PropertiesHelper.loadProperties(config.getConnectorConfig());
+            Properties props = PropertiesUtils.loadProperties(config.getConnectorConfig());
             for (Iterator iterator = protocols.iterator(); iterator.hasNext();) {
                 Map.Entry entry = (Map.Entry) iterator.next();
                 String key = entry.getKey().toString();
@@ -84,10 +84,10 @@ public class Runner implements TimeEventListener
                 if(!protocols.contains(protocol)) {
                     protocols.add(protocol);
                     Map pp = new HashMap();
-                    PropertiesHelper.getPropertiesWithPrefix(props, protocol, pp);
+                    PropertiesUtils.getPropertiesWithPrefix(props, protocol, pp);
                     UMOConnector cnn = ConnectorFactory.getServiceDescriptor(protocol).createConnector(protocol);
                     cnn.setName(cnn.toString());
-                    pp = PropertiesHelper.removeNamspaces(pp);
+                    pp = PropertiesUtils.removeNamespaces(pp);
                     org.mule.util.BeanUtils.populateWithoutFail(cnn, pp, true);
                     MuleManager.getInstance().registerConnector(cnn);
                 }

@@ -15,7 +15,7 @@ package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractJndiConnector;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.Utility;
 
 import java.net.URL;
@@ -182,7 +182,7 @@ public class RmiConnector extends AbstractJndiConnector
 
             for (int i = 0; i < methodArgumentTypes.size(); i++) {
                 String className = (String) methodArgumentTypes.get(i);
-                argumentClasses[i] = ClassHelper.loadClass(className.trim(), this.getClass());
+                argumentClasses[i] = ClassUtils.loadClass(className.trim(), this.getClass());
             }
         }
 

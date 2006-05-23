@@ -26,7 +26,7 @@ import org.mule.samples.voipservice.to.CustomerTO;
 import org.mule.samples.voipservice.to.ServiceParamTO;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import java.io.IOException;
 
@@ -79,7 +79,7 @@ public class VoipConsumer {
                 + " This example was published as part of a featured article on java.net"
                 + " titled 'Service Provisioning Through ESB' (http://today.java.net/lpt/a/233).";
 
-            System.out.println(StringMessageHelper.getBoilerPlate(msg, '*', 70));
+            System.out.println(StringMessageUtils.getBoilerPlate(msg, '*', 70));
 
             while (response != 'q') {
                 System.out.println("\n[1] make a service request");

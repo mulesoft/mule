@@ -26,7 +26,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.umo.UMOFilter;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -137,7 +137,7 @@ public abstract class AbstractDigesterConfiguration
      * @throws ConfigurationException
      */
     protected InputStream loadConfig(String configResource) throws ConfigurationException {
-        InputStream is = ClassHelper.getResourceAsStream(configResource, getClass());
+        InputStream is = ClassUtils.getResourceAsStream(configResource, getClass());
         if (is == null) {
             File file = new File(configResource);
             if (file.exists()) {

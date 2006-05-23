@@ -16,7 +16,7 @@ public class ShortestNotationHandler extends TagProcessor {
     public void process(Graph graph, Element currentElement, GraphNode parent) {
         String inbound = currentElement.getAttributeValue(MuleTag.ATTRIBUTE_INBOUNDENDPOINT);
         if (inbound != null) {
-            GraphNode in = (GraphNode) environment.getEndpointRegistry().getEndpoint(inbound,
+            GraphNode in = environment.getEndpointRegistry().getEndpoint(inbound,
                     parent.getInfo().getHeader());
             if (in == null) {
                 in = graph.addNode();
@@ -27,8 +27,8 @@ public class ShortestNotationHandler extends TagProcessor {
         }
         String outbound = currentElement.getAttributeValue(MuleTag.ATTRIBUTE_OUTBOUNDENDPOINT);
         if (outbound != null) {
-            GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(outbound, parent.getInfo()
-                    .getHeader());
+            GraphNode out = environment.getEndpointRegistry().getEndpoint(outbound,
+                    parent.getInfo().getHeader());
             if (out == null) {
                 out = graph.addNode();
                 out.getInfo().setCaption(outbound);

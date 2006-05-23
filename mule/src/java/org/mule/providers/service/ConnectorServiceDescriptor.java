@@ -35,7 +35,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 import org.mule.util.ObjectFactory;
 
 import java.util.Properties;
@@ -270,8 +270,8 @@ public class ConnectorServiceDescriptor
         }
         if (connectorServiceFinder == null) {
             try {
-                connectorServiceFinder = (ConnectorServiceFinder) ClassHelper.instanciateClass(serviceFinder,
-                                                                                               ClassHelper.NO_ARGS);
+                connectorServiceFinder = (ConnectorServiceFinder) ClassUtils.instanciateClass(serviceFinder,
+                                                                                               ClassUtils.NO_ARGS);
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.CANT_INSTANCIATE_FINDER_X, serviceFinder), e);
             }
@@ -307,7 +307,7 @@ public class ConnectorServiceDescriptor
         }
         if (messageAdapter != null) {
             try {
-                return (UMOMessageAdapter) ClassHelper.instanciateClass(clazz, new Object[] { message });
+                return (UMOMessageAdapter) ClassUtils.instanciateClass(clazz, new Object[] { message });
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Message Adapter",
@@ -328,7 +328,7 @@ public class ConnectorServiceDescriptor
             }
         }
         try {
-            return (UMOSessionHandler)ClassHelper.instanciateClass(getSessionHandler(), ClassHelper.NO_ARGS, getClass());
+            return (UMOSessionHandler)ClassUtils.instanciateClass(getSessionHandler(), ClassUtils.NO_ARGS, getClass());
         } catch (Throwable e) {
             throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "SessionHandler", sessionHandler), e);
         }
@@ -370,7 +370,7 @@ public class ConnectorServiceDescriptor
             }
 
             try {
-                return (UMOMessageReceiver) ClassHelper.instanciateClass(receiverClass, newArgs);
+                return (UMOMessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs);
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Message Receiver",
@@ -388,8 +388,8 @@ public class ConnectorServiceDescriptor
     {
         if (dispatcherFactory != null) {
             try {
-                return (UMOMessageDispatcherFactory) ClassHelper.instanciateClass(dispatcherFactory,
-                                                                                  ClassHelper.NO_ARGS);
+                return (UMOMessageDispatcherFactory) ClassUtils.instanciateClass(dispatcherFactory,
+                                                                                  ClassUtils.NO_ARGS);
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Message Dispatcher Factory",
@@ -406,7 +406,7 @@ public class ConnectorServiceDescriptor
     {
         if (transactionFactory != null) {
             try {
-                return (UMOTransactionFactory) ClassHelper.instanciateClass(transactionFactory, ClassHelper.NO_ARGS);
+                return (UMOTransactionFactory) ClassUtils.instanciateClass(transactionFactory, ClassUtils.NO_ARGS);
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Transaction Factory",
@@ -429,12 +429,12 @@ public class ConnectorServiceDescriptor
         // if there is a factory, use it
         try {
             if (getConnectorFactory() != null) {
-                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(getConnectorFactory(),
+                ObjectFactory factory = (ObjectFactory) ClassUtils.loadClass(getConnectorFactory(),
                                                                               ConnectorFactory.class).newInstance();
                 connector = (UMOConnector) factory.create();
             } else {
                 if (getConnector() != null) {
-                    connector = (UMOConnector) ClassHelper.loadClass(getConnector(), ConnectorFactory.class)
+                    connector = (UMOConnector) ClassUtils.loadClass(getConnector(), ConnectorFactory.class)
                                                           .newInstance();
                 } else {
                     throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
@@ -465,8 +465,8 @@ public class ConnectorServiceDescriptor
         if (getDefaultInboundTransformer() != null) {
             logger.info("Loading default inbound transformer: " + getDefaultInboundTransformer());
             try {
-                inboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultInboundTransformer(),
-                                                                                   ClassHelper.NO_ARGS);
+                inboundTransformer = (UMOTransformer) ClassUtils.instanciateClass(getDefaultInboundTransformer(),
+                                                                                   ClassUtils.NO_ARGS);
                 return inboundTransformer;
             } catch (Exception e) {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
@@ -485,8 +485,8 @@ public class ConnectorServiceDescriptor
         if (getDefaultOutboundTransformer() != null) {
             logger.info("Loading default outbound transformer: " + getDefaultOutboundTransformer());
             try {
-                outboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultOutboundTransformer(),
-                                                                                    ClassHelper.NO_ARGS);
+                outboundTransformer = (UMOTransformer) ClassUtils.instanciateClass(getDefaultOutboundTransformer(),
+                                                                                    ClassUtils.NO_ARGS);
                 return outboundTransformer;
             } catch (Exception e) {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
@@ -505,8 +505,8 @@ public class ConnectorServiceDescriptor
         if (getDefaultResponseTransformer() != null) {
             logger.info("Loading default response transformer: " + getDefaultResponseTransformer());
             try {
-                responseTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultResponseTransformer(),
-                                                                                    ClassHelper.NO_ARGS);
+                responseTransformer = (UMOTransformer) ClassUtils.instanciateClass(getDefaultResponseTransformer(),
+                                                                                    ClassUtils.NO_ARGS);
                 return responseTransformer;
             } catch (Exception e) {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
@@ -525,7 +525,7 @@ public class ConnectorServiceDescriptor
         } else {
             logger.debug("Loading endpointUri resolver: " + getEndpointBuilder());
             try {
-                return (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
+                return (EndpointBuilder) ClassUtils.instanciateClass(getEndpointBuilder(), ClassUtils.NO_ARGS);
             } catch (Exception e) {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpoint Builder: "
                         + getEndpointBuilder()), e);

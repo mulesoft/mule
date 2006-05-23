@@ -22,7 +22,7 @@ import org.mule.providers.service.ConnectorFactoryException;
 import org.mule.providers.service.ConnectorServiceDescriptor;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -205,7 +205,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         // TODO fix this so that the query string properties are not lost.
         // not sure whats causing this at the moment
         if (params.size() == 0 && getQuery() != null) {
-            params = PropertiesHelper.getPropertiesFromQueryString(getQuery());
+            params = PropertiesUtils.getPropertiesFromQueryString(getQuery());
         }
         return params;
     }

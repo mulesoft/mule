@@ -18,7 +18,7 @@ package org.mule.model;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.model.ModelException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers
@@ -41,6 +41,6 @@ public class NoSatisfiableMethodsException extends ModelException
 
     public NoSatisfiableMethodsException(Object component, Exception cause)
     {
-        super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X, StringMessageHelper.getObjectValue(component)), cause);
+        super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X, StringMessageUtils.getObjectValue(component)), cause);
     }
 }

@@ -13,7 +13,7 @@
  */
 package org.mule.samples.rest;
 
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>RestTester</code> TODO
@@ -25,7 +25,7 @@ import org.mule.util.StringMessageHelper;
 public class RestTester
 {
     public String receiveMessage(String message) {
-        System.out.println(StringMessageHelper.getBoilerPlate("Received REST message: " + message));
+        System.out.println(StringMessageUtils.getBoilerPlate("Received REST message: " + message));
         return "Received: " + message;
     }
 }

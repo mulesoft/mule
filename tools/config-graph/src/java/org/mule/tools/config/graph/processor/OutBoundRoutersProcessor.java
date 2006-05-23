@@ -2,6 +2,7 @@ package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
@@ -94,8 +95,7 @@ public class OutBoundRoutersProcessor extends TagProcessor {
             String replyTo = replyToElement
                     .getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
             if (replyTo != null) {
-                GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(
-                        replyTo, componentName);
+                GraphNode out = environment.getEndpointRegistry().getEndpoint(replyTo, componentName);
                 addRelation(graph, routerNode, out, "sets");
             }
         }
@@ -112,8 +112,8 @@ public class OutBoundRoutersProcessor extends TagProcessor {
                 if ("replyTo".equals(propertyName)) {
                     String replyTo = property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE);
                     if (replyTo != null) {
-                        GraphNode out = (GraphNode) environment.getEndpointRegistry()
-                                .getEndpoint(replyTo, componentName);
+                        GraphNode out = environment.getEndpointRegistry().getEndpoint(replyTo,
+                                componentName);
                         addRelation(graph, routerNode, out, "sets");
                     }
                 }

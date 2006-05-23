@@ -23,7 +23,6 @@ public class ExceptionStrategyProcessor extends TagProcessor{
         }
 
         if (exceptionStrategy != null) {
-
             String className = exceptionStrategy.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
             GraphNode exceptionNode = graph.addNode();
             exceptionNode.getInfo().setHeader(className);
@@ -34,8 +33,8 @@ public class ExceptionStrategyProcessor extends TagProcessor{
             if (endpoint != null) {
                 String url = endpoint.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
                 if (url != null) {
-                    GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(url, parent.getInfo()
-                            .getHeader());
+                    GraphNode out = environment.getEndpointRegistry().getEndpoint(url,
+                            parent.getInfo().getHeader());
                     if (out == null) {
                         out = graph.addNode();
                         out.getInfo().setCaption(url);

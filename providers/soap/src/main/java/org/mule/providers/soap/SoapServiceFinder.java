@@ -20,8 +20,8 @@ import org.mule.providers.service.ConnectorFactoryException;
 import org.mule.providers.service.ConnectorServiceDescriptor;
 import org.mule.providers.service.ConnectorServiceException;
 import org.mule.providers.service.ConnectorServiceFinder;
-import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.ClassUtils;
+import org.mule.util.PropertiesUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -40,13 +40,13 @@ public class SoapServiceFinder implements ConnectorServiceFinder
     public ConnectorServiceDescriptor findService(String service, ConnectorServiceDescriptor csd) throws ConnectorFactoryException
     {
         Map finders = new TreeMap();
-        PropertiesHelper.getPropertiesWithPrefix(csd.getProperties(), "finder.class", finders);
+        PropertiesUtils.getPropertiesWithPrefix(csd.getProperties(), "finder.class", finders);
 
         StringBuffer buf = new StringBuffer();
         for (Iterator iterator = finders.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry entry = (Map.Entry) iterator.next();
             try {
-                ClassHelper.loadClass(entry.getValue().toString(), getClass());
+                ClassUtils.loadClass(entry.getValue().toString(), getClass());
                 String protocol = getProtocolFromKey(entry.getKey().toString());
                 return ConnectorFactory.getServiceDescriptor(protocol);
             } catch (ClassNotFoundException e1)

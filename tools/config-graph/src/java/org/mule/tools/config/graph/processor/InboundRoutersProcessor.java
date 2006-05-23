@@ -2,6 +2,7 @@ package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
@@ -35,16 +36,13 @@ public class InboundRoutersProcessor extends TagProcessor {
                 endpointsLink = routerNode;
             }
 
-            List inbounEndpoints = inboundRouter
-                    .getChildren(MuleTag.ELEMENT_ENDPOINT);
-            for (Iterator iterator = inbounEndpoints.iterator(); iterator
-                    .hasNext();) {
+            List inbounEndpoints = inboundRouter.getChildren(MuleTag.ELEMENT_ENDPOINT);
+            for (Iterator iterator = inbounEndpoints.iterator(); iterator.hasNext();) {
                 Element inEndpoint = (Element) iterator.next();
-                String url = inEndpoint
-                        .getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
+                String url = inEndpoint.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
                 if (url != null) {
-                    GraphNode in = (GraphNode) environment.getEndpointRegistry().getEndpoint(
-                            url, parent.getInfo().getHeader());
+                    GraphNode in = environment.getEndpointRegistry().getEndpoint(url,
+                            parent.getInfo().getHeader());
                     StringBuffer caption = new StringBuffer();
                     if (in == null) {
                         in = graph.addNode();

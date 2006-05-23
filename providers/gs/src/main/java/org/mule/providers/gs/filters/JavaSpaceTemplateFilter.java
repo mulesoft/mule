@@ -19,7 +19,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.providers.gs.JiniMessage;
 import org.mule.umo.UMOMessage;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -100,7 +100,7 @@ public class JavaSpaceTemplateFilter implements JavaSpaceFilter
             if (expectedType == null) {
                 return null; // Match all template
             }
-            Object entryType = ClassHelper.instanciateClass(expectedType, ClassHelper.NO_ARGS);
+            Object entryType = ClassUtils.instanciateClass(expectedType, ClassUtils.NO_ARGS);
             if (!(entryType instanceof Entry)) {
                 entry = new JiniMessage(null, entryType);
                 if (fields.size() > 0) {

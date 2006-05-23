@@ -125,13 +125,13 @@ public class MuleLogger implements Log {
     public void boilerPlate(String message, char c, int maxlength)
     {
         if(logger.isInfoEnabled()) {
-            logger.info("\n" + StringMessageHelper.getBoilerPlate(message, c, maxlength));
+            logger.info("\n" + StringMessageUtils.getBoilerPlate(message, c, maxlength));
         }
     }
 
     public void boilerPlate(List messages, char c, int maxlength) {
         if(logger.isInfoEnabled()) {
-            logger.info("\n" + StringMessageHelper.getBoilerPlate(messages, c, maxlength));
+            logger.info("\n" + StringMessageUtils.getBoilerPlate(messages, c, maxlength));
         }
     }
 

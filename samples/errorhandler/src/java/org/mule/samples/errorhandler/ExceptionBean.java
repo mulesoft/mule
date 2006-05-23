@@ -13,7 +13,7 @@
  */
 package org.mule.samples.errorhandler;
 
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 /**
  * 
@@ -80,14 +80,14 @@ public class ExceptionBean
             Throwable t = null;
             try
             {
-                Class aClass = ClassHelper.loadClass(exceptionClass, getClass());
+                Class aClass = ClassUtils.loadClass(exceptionClass, getClass());
                 if (cause == null)
                 {
-                    t = (Throwable)ClassHelper.instanciateClass(aClass, new Object[] { getDetailMessage()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[] { getDetailMessage()});
                 }
                 else
                 {
-                    t = (Throwable)ClassHelper.instanciateClass(aClass, new Object[] { getDetailMessage(), cause.toException()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[] { getDetailMessage(), cause.toException()});
                 }
                 if (getStackTrace() != null)
                 {

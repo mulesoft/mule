@@ -35,7 +35,7 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.TemplateParser;
 
 /**
@@ -107,7 +107,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             buf.append("ReplyTo: ").append(replyTo);
             buf.append("Content type: ").append(contentType);
             buf.append("Payload type: ").append(src.getClass().getName());
-            buf.append("Custom Headers: ").append(PropertiesHelper.propertiesToString(headers, false));
+            buf.append("Custom Headers: ").append(PropertiesUtils.propertiesToString(headers, false));
             logger.debug(buf.toString());
         }
 

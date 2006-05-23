@@ -68,8 +68,8 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.SpiHelper;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.SpiUtils;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.Utility;
 import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
@@ -261,7 +261,7 @@ public class MuleManager implements UMOManager
      */
     protected static synchronized UMOManager createInstance()
     {
-        Class clazz = SpiHelper.findService(UMOManager.class, MuleManager.class.getName(), MuleManager.class);
+        Class clazz = SpiUtils.findService(UMOManager.class, MuleManager.class.getName(), MuleManager.class);
         Object obj;
         try {
             obj = clazz.newInstance();
@@ -1046,7 +1046,7 @@ public class MuleManager implements UMOManager
                 message.add("  " + umoAgent.getDescription());
             }
         }
-        return StringMessageHelper.getBoilerPlate(message, '*', 70);
+        return StringMessageUtils.getBoilerPlate(message, '*', 70);
     }
 
     private String getEndSplash()
@@ -1061,7 +1061,7 @@ public class MuleManager implements UMOManager
         }
         message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, Utility.getFormattedDuration(duration)).getMessage());
 
-        return StringMessageHelper.getBoilerPlate(message, '*', 78);
+        return StringMessageUtils.getBoilerPlate(message, '*', 78);
     }
 
     /**

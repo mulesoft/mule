@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>LogComponent</code> Simply logs the content (or content length is it
@@ -35,9 +35,9 @@ public class LogComponent implements Callable, LogService
         String contents = context.getMessageAsString();
         String msg = "Message Received in component: " + context.getComponentDescriptor().getName();
         if (contents.length() > 100) {
-            msg = StringMessageHelper.getBoilerPlate(msg + ". Content length is: " + contents.length());
+            msg = StringMessageUtils.getBoilerPlate(msg + ". Content length is: " + contents.length());
         } else {
-            msg = StringMessageHelper.getBoilerPlate(msg + ". Content is: '" + contents + "'");
+            msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '" + contents + "'");
         }
         log(msg);
         return null;

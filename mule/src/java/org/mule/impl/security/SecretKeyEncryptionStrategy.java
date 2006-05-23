@@ -18,7 +18,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectFactory;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -82,7 +82,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy {
     }
 
     public void setkey(String rawKey) {
-        this.key = StringMessageHelper.getBytes(rawKey);
+        this.key = StringMessageUtils.getBytes(rawKey);
     }
 
     public ObjectFactory getKeyFactory() {

@@ -15,11 +15,10 @@ package org.mule.tools.benchmark;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Callable;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
 
 import java.util.HashMap;
 import java.util.Map;

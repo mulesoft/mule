@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Holger Hoffstaette
  */
 
-public class CollectionUtil
+public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
 
     /**

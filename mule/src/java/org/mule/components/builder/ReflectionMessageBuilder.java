@@ -16,7 +16,7 @@ package org.mule.components.builder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOMessage;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -35,7 +35,7 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder {
         Object property = response.getPayload();
         List methods = null;
         try {
-            methods = ClassHelper.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, true, false);
+            methods = ClassUtils.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, true, false);
         } catch (Exception e) {
             throw new MessageBuilderException(request, e);
         }

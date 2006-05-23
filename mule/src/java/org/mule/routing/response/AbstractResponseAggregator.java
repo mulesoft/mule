@@ -27,7 +27,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
-import org.mule.util.PropertiesHelper;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
@@ -176,7 +176,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             if(logger.isTraceEnabled()) {
                 synchronized(responseEvents) {
                     logger.trace("Current responses are: \n" +
-                    PropertiesHelper.propertiesToString(responseEvents, true));
+                    PropertiesUtils.propertiesToString(responseEvents, true));
                 }
             }
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,

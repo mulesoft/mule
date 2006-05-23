@@ -2,6 +2,7 @@ package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
@@ -28,7 +29,7 @@ public class OutBoundRouterEndpointsHandler extends TagProcessor{
             String url = outEndpoint
                     .getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
             if (url != null) {
-                GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(url, componentName);
+                GraphNode out = environment.getEndpointRegistry().getEndpoint(url, componentName);
                 if (out == null) {
                     out = graph.addNode();
                     StringBuffer caption = new StringBuffer();

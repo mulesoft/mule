@@ -18,7 +18,7 @@ import org.mule.routing.response.ResponseCorrelationAggregator;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -29,7 +29,7 @@ public class DummyResponseAggregator extends ResponseCorrelationAggregator
 
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
-        logger.info(StringMessageHelper.getBoilerPlate("Response Agregator aggregating: " + events));
+        logger.info(StringMessageUtils.getBoilerPlate("Response Agregator aggregating: " + events));
         return ((UMOEvent)events.iterator().next()).getMessage();
     }
 }

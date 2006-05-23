@@ -16,7 +16,7 @@ package org.mule.providers.soap;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.converters.QNameConverter;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -84,7 +84,7 @@ public class SoapMethod {
                         returnType = NamedParameter.createQName(type);
                     }
                 } else if(name.equalsIgnoreCase("returnClass")) {
-                    returnClass = ClassHelper.loadClass(type, getClass());
+                    returnClass = ClassUtils.loadClass(type, getClass());
                 } else {
                     String mode = tokenizer.nextToken();
                     QName paramName = null;

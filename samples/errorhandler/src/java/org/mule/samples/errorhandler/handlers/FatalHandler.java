@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.samples.errorhandler.ErrorMessage;
 import org.mule.samples.errorhandler.HandlerException;
 import org.mule.umo.lifecycle.FatalException;
-import org.mule.util.StringMessageHelper;
+import org.mule.util.StringMessageUtils;
 
 /**
  *  <code>FatalBehaviour</code> TODO (document class)
@@ -39,7 +39,7 @@ public class FatalHandler extends DefaultHandler
 
     public void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        System.out.println( StringMessageHelper.getBoilerPlate("Exception received in \n" +
+        System.out.println( StringMessageUtils.getBoilerPlate("Exception received in \n" +
                 " FATAL EXCEPTION HANDLER \n." +
                 " Logic could be put in here to enrich the message content"));
         logger.fatal("Exception is: " + t, t);
