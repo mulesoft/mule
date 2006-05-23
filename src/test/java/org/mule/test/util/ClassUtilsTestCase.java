@@ -22,7 +22,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -36,16 +36,16 @@ import junit.framework.TestCase;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ClassHelperTestCase extends TestCase
+public class ClassUtilsTestCase extends TestCase
 {
     public void testIsConcrete() throws Exception
     {
-        assertTrue(ClassHelper.isConcrete(Orange.class));
-        assertTrue(!ClassHelper.isConcrete(Fruit.class));
-        assertTrue(!ClassHelper.isConcrete(AbstractFruit.class));
+        assertTrue(ClassUtils.isConcrete(Orange.class));
+        assertTrue(!ClassUtils.isConcrete(Fruit.class));
+        assertTrue(!ClassUtils.isConcrete(AbstractFruit.class));
 
         try {
-            ClassHelper.isConcrete(null);
+            ClassUtils.isConcrete(null);
             fail("Class cannot be null, exception should be thrown");
         } catch (RuntimeException e) {
             // expected
@@ -54,13 +54,13 @@ public class ClassHelperTestCase extends TestCase
 
     public void testLoadClass() throws Exception
     {
-        Class clazz = ClassHelper.loadClass("java.lang.String", getClass());
+        Class clazz = ClassUtils.loadClass("java.lang.String", getClass());
         assertNotNull(clazz);
 
         assertEquals(clazz.getName(), "java.lang.String");
 
         try {
-            clazz = ClassHelper.loadClass("java.lang.Bing", getClass());
+            clazz = ClassUtils.loadClass("java.lang.Bing", getClass());
             fail("Class not found exception should be found");
         } catch (ClassNotFoundException e) {
             // expected
@@ -70,11 +70,11 @@ public class ClassHelperTestCase extends TestCase
 
     public void testInstanciateClass() throws Exception
     {
-        Object object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[] {});
+        Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[] {});
         assertNotNull(object);
         assertTrue(object instanceof Orange);
 
-        object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[] { new Apple(),
+        object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[] { new Apple(),
                 new Banana() });
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
@@ -85,7 +85,7 @@ public class ClassHelperTestCase extends TestCase
         assertTrue(bowl.hasBanana());
 
         try {
-            object = ClassHelper.instanciateClass("java.lang.Bing", new Object[] {});
+            object = ClassUtils.instanciateClass("java.lang.Bing", new Object[] {});
             fail("Class does not exist, exception should have been thrown");
         } catch (Exception e) {
             // expected
@@ -97,68 +97,68 @@ public class ClassHelperTestCase extends TestCase
     {
         FruitBowl bowl = new FruitBowl();
 
-        Class[] classes = ClassHelper.getParameterTypes(bowl, "apple");
+        Class[] classes = ClassUtils.getParameterTypes(bowl, "apple");
         assertNotNull(classes);
         assertEquals(1, classes.length);
         assertEquals(Apple.class, classes[0]);
 
-        classes = ClassHelper.getParameterTypes(bowl, "invalid");
+        classes = ClassUtils.getParameterTypes(bowl, "invalid");
         assertNotNull(classes);
         assertEquals(0, classes.length);
     }
 
     public void testLoadingResources() throws Exception
     {
-        URL resource = ClassHelper.getResource("test-dummy.properties", getClass());
+        URL resource = ClassUtils.getResource("test-dummy.properties", getClass());
         assertNotNull(resource);
 
-        resource = ClassHelper.getResource("test-dummyX.properties", getClass());
+        resource = ClassUtils.getResource("test-dummyX.properties", getClass());
         assertNull(resource);
     }
 
     public void testLoadingResourcesAsStream() throws Exception
     {
-        InputStream is = ClassHelper.getResourceAsStream("test-dummy.properties", getClass());
+        InputStream is = ClassUtils.getResourceAsStream("test-dummy.properties", getClass());
         assertNotNull(is);
 
-        is = ClassHelper.getResourceAsStream("test-dummyX.properties", getClass());
+        is = ClassUtils.getResourceAsStream("test-dummyX.properties", getClass());
         assertNull(is);
     }
 
     public void testLoadingResourceEnumeration() throws Exception
     {
 
-        Enumeration enumeration = ClassHelper.getResources("test-dummy.properties", getClass());
+        Enumeration enumeration = ClassUtils.getResources("test-dummy.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(enumeration.hasMoreElements());
 
-        enumeration = ClassHelper.getResources("test-dummyX.properties", getClass());
+        enumeration = ClassUtils.getResources("test-dummyX.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(!enumeration.hasMoreElements());
     }
 
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, true);
+        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, true);
         assertNotNull(methods);
         assertEquals(1, methods.size());
 
-        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, true);
+        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, true);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         //Test object param being unacceptible
-        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, false);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, false);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         //Test object param being acceptible
-        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, true);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, true);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         //Test object param being acceptible but not void
-        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, true);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, true);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());
