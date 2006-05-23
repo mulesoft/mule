@@ -10,7 +10,7 @@
     This loan broker example is modeled on the Enterprise integration Patterns book
     sample.
     This implementation differs in that this configuration uses an asynchronous
-    model where each component communicates messaging accordin to it's configuration
+    model where each component communicates messaging according to its configuration
     in this file.
     </description>
 
