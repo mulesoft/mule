@@ -16,11 +16,13 @@ package org.mule.providers.soap.glue;
 import electric.glue.context.ThreadContext;
 import electric.service.IService;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.IteratorAdapter;
+
+import java.util.Iterator;
 
 /**
  * <code>GlueMessageAdapter</code> wraps a Glue soap request
@@ -38,7 +40,7 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
         if (message instanceof GlueMessageHolder) {
             GlueMessageHolder holder = (GlueMessageHolder) message;
             this.message = holder.getMessage();
-            IteratorAdapter iter = new IteratorAdapter(holder.getService().getContext().getPropertyNames());
+            Iterator iter = IteratorUtils.asIterator(holder.getService().getContext().getPropertyNames());
             String key;
             while (iter.hasNext()) {
                 key = iter.next().toString();
