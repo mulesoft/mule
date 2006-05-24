@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.codehaus.mule</groupId>
         <artifactId>mule-project</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-extras</artifactId>
     <packaging>pom</packaging>
     <name>Mule Extras</name>
+    <description>These modules are not part of the Mule Core nor are they Mule Providers.</description>
 
     <modules>
         <module>acegi</module>
@@ -21,10 +21,6 @@
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
-        <!-- This one is complicated.
-        <module>pxe</module>
-        <module>ra</module>
-        -->
         <module>spring</module>
     </modules>
 
