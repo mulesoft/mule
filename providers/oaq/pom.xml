@@ -6,7 +6,6 @@
     <parent>
         <groupId>org.codehaus.mule</groupId>
         <artifactId>mule-providers</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-oracle-jms-provider</artifactId>
@@ -47,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
-            <artifactId>xmlparserv2</artifactId>
+            <artifactId>xmlparserv2-distilled</artifactId>
             <version>9i</version>
             <optional>true</optional>
         </dependency>
