@@ -15,8 +15,8 @@
     <dependencies>
         <dependency>
             <groupId>quartz</groupId>
-            <artifactId>quartz-all</artifactId>
-            <version>1.5.2</version>
+            <artifactId>quartz</artifactId>
+            <version>1.5.1</version>
         </dependency>
 
         <!-- The Mule client is needed for MuleClientReceiveJob and MuleClientDispatchJob -->
