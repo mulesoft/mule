@@ -44,33 +44,8 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-all</artifactId>
-            <version>1.1-beta-1</version>
-            <!-- These transitive dependencies are not found on ibiblio and cause
-            the build to fail. -->
-            <exclusions>
-                <!-- exclusion>
-                    <groupId>xmlbeans</groupId>
-                    <artifactId>xmlbeans-jsr173-api</artifactId>
-                </exclusion -->
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.activation</groupId>
-                    <artifactId>activation</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.1</version>
         </dependency>
-        <!-- TODO if the javax.mail transitive dependency for XFire ever gets
-              corrected, this can be removed. -->
-        <dependency>
-            <groupId>javamail</groupId>
-            <artifactId>javamail</artifactId>
-            <version>1.3.3</version>
-        </dependency>
-
-
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
