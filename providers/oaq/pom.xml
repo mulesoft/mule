@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
-            <artifactId>xmlparserv2-distilled</artifactId>
+            <artifactId>xmlparserv2</artifactId>
             <version>9i</version>
             <optional>true</optional>
         </dependency>
