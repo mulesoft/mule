@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.impl.endpoint;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,18 +30,17 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
- * <code>MuleEndpointURI</code> is used to determine how a message is sent of
- * received. The url defines the protocol, the endpointUri destination of the
- * message and optionally the endpoint to use when dispatching the event. Mule
- * urls take the form of -
+ * <code>MuleEndpointURI</code> is used to determine how a message is sent of received.
+ * The url defines the protocol, the endpointUri destination of the message and optionally
+ * the endpoint to use when dispatching the event. Mule urls take the form of -
  * 
- * protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e.
+ * protocol://[host]:[port]/[provider]/endpointUri or protocol://[host]:[port]/endpointUri
+ * i.e.
  * 
  * vm://localhost/vmProvider/my.object or vm://my.object
  * 
- * The protocol can be any of any conector registered with Mule. The endpoint
- * name if specified must be the name of a register global endpoint
+ * The protocol can be any of any connector registered with Mule. The endpoint name if
+ * specified must be the name of a register global endpoint
  * 
  * The endpointUri can be any endpointUri recognised by the endpoint type.
  * 
@@ -55,6 +55,11 @@ public class MuleEndpointURI implements UMOEndpointURI
      */
     protected static transient Log logger = LogFactory.getLog(MuleEndpointURI.class);
 
+    public static boolean isMuleUri(String url)
+    {
+        return url.indexOf(":/") != -1;
+    }
+
     private String address;
     private String filterAddress;
     private String endpointName;
@@ -64,6 +69,7 @@ public class MuleEndpointURI implements UMOEndpointURI
     private int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
+    private String uriString;
     private String userInfo;
     private String schemeMetaInfo;
     private String resourceInfo;
@@ -78,7 +84,8 @@ public class MuleEndpointURI implements UMOEndpointURI
                     URI uri,
                     String userInfo)
     {
-        this(address, endpointName, connectorName, transformers, responseTransformers, createConnector, properties, uri);
+        this(address, endpointName, connectorName, transformers, responseTransformers, createConnector,
+                properties, uri);
         if (userInfo != null) {
             this.userInfo = userInfo;
         }
@@ -101,9 +108,10 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.createConnector = createConnector;
         this.params = properties;
         this.uri = uri;
+        this.uriString = uri.toASCIIString();
         this.userInfo = uri.getUserInfo();
         if (properties != null) {
-            resourceInfo = (String) properties.remove("resourceInfo");
+            resourceInfo = (String)properties.remove("resourceInfo");
         }
     }
 
@@ -138,7 +146,8 @@ public class MuleEndpointURI implements UMOEndpointURI
             }
             this.uri = new URI(uri);
             this.userInfo = this.uri.getRawUserInfo();
-        } catch (URISyntaxException e) {
+        }
+        catch (URISyntaxException e) {
             throw new MalformedEndpointException(uri, e);
         }
 
@@ -148,20 +157,22 @@ public class MuleEndpointURI implements UMOEndpointURI
             EndpointBuilder builder = csd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
-        } catch (ConnectorFactoryException e) {
+        }
+        catch (ConnectorFactoryException e) {
             throw new MalformedEndpointException(e);
         }
     }
 
     private String retrieveSchemeMetaInfo(String url)
     {
-        int i = url.indexOf(":");
+        int i = url.indexOf(':');
         if (i == -1) {
             return null;
         }
         if (url.charAt(i + 1) == '/') {
             return null;
-        } else {
+        }
+        else {
             return url.substring(0, i);
         }
     }
@@ -174,13 +185,16 @@ public class MuleEndpointURI implements UMOEndpointURI
     private void initialise(UMOEndpointURI endpointUri)
     {
         this.address = endpointUri.getAddress();
-        if(this.endpointName==null) this.endpointName = endpointUri.getEndpointName();
+        if (this.endpointName == null) {
+            this.endpointName = endpointUri.getEndpointName();
+        }
         this.connectorName = endpointUri.getConnectorName();
         this.transformers = endpointUri.getTransformers();
         this.responseTransformers = endpointUri.getResponseTransformers();
         this.createConnector = endpointUri.getCreateConnector();
         this.params = endpointUri.getParams();
         this.uri = endpointUri.getUri();
+        this.uriString = this.uri.toASCIIString();
         this.resourceInfo = endpointUri.getResourceInfo();
         this.userInfo = endpointUri.getUserInfo();
     }
@@ -193,11 +207,6 @@ public class MuleEndpointURI implements UMOEndpointURI
     public String getEndpointName()
     {
         return (StringUtils.isEmpty(endpointName) ? null : endpointName);
-    }
-
-    public static boolean isMuleUri(String url)
-    {
-        return url.indexOf(":/") != -1;
     }
 
     public Properties getParams()
@@ -253,7 +262,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getFullScheme()
     {
-        return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo + ":" + uri.getScheme());
+        return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo + ':' + uri.getScheme());
 
     }
 
@@ -339,8 +348,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String toString()
     {
-        return uri.toASCIIString();
-        //return (schemeMetaInfo == null ? "" : schemeMetaInfo + ":") + uri.toASCIIString();
+        return uriString;
     }
 
     public String getTransformers()
@@ -386,24 +394,26 @@ public class MuleEndpointURI implements UMOEndpointURI
     public String getUsername()
     {
         if (StringUtils.isNotBlank(userInfo)) {
-            int i = userInfo.indexOf(":");
+            int i = userInfo.indexOf(':');
             if (i == -1) {
                 return userInfo;
-            } else {
+            }
+            else {
                 return userInfo.substring(0, i);
             }
         }
         return null;
     }
 
-    public String getResponseTransformers() {
+    public String getResponseTransformers()
+    {
         return responseTransformers;
     }
 
     public String getPassword()
     {
         if (StringUtils.isNotBlank(userInfo)) {
-            int i = userInfo.indexOf(":");
+            int i = userInfo.indexOf(':');
             if (i > -1) {
                 return userInfo.substring(i + 1);
             }
@@ -420,7 +430,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             return false;
         }
 
-        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
+        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI)o;
 
         if (createConnector != muleEndpointURI.createConnector) {
             return false;
@@ -428,34 +438,41 @@ public class MuleEndpointURI implements UMOEndpointURI
         if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null) {
             return false;
         }
-        if (connectorName != null ? !connectorName.equals(muleEndpointURI.connectorName)
+        if (connectorName != null
+                ? !connectorName.equals(muleEndpointURI.connectorName)
                 : muleEndpointURI.connectorName != null) {
             return false;
         }
-        if (endpointName != null ? !endpointName.equals(muleEndpointURI.endpointName)
+        if (endpointName != null
+                ? !endpointName.equals(muleEndpointURI.endpointName)
                 : muleEndpointURI.endpointName != null) {
             return false;
         }
-        if (filterAddress != null ? !filterAddress.equals(muleEndpointURI.filterAddress)
+        if (filterAddress != null
+                ? !filterAddress.equals(muleEndpointURI.filterAddress)
                 : muleEndpointURI.filterAddress != null) {
             return false;
         }
         if (params != null ? !params.equals(muleEndpointURI.params) : muleEndpointURI.params != null) {
             return false;
         }
-        if (resourceInfo != null ? !resourceInfo.equals(muleEndpointURI.resourceInfo)
+        if (resourceInfo != null
+                ? !resourceInfo.equals(muleEndpointURI.resourceInfo)
                 : muleEndpointURI.resourceInfo != null) {
             return false;
         }
-        if (schemeMetaInfo != null ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo)
+        if (schemeMetaInfo != null
+                ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo)
                 : muleEndpointURI.schemeMetaInfo != null) {
             return false;
         }
-        if (transformers != null ? !transformers.equals(muleEndpointURI.transformers)
+        if (transformers != null
+                ? !transformers.equals(muleEndpointURI.transformers)
                 : muleEndpointURI.transformers != null) {
             return false;
         }
-        if (responseTransformers != null ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
+        if (responseTransformers != null
+                ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
                 : muleEndpointURI.responseTransformers != null) {
             return false;
         }
