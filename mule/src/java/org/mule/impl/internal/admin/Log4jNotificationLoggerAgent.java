@@ -27,7 +27,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +96,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                 if (logFile != null) {
                     File f = new File(logFile);
                     if (!f.exists()) {
-                        Utility.createFile(logFile);
+                        FileUtils.createFile(logFile);
                     }
                     Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"), logFile, true);
                     eventLogger.addAppender(file);

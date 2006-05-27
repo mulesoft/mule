@@ -23,7 +23,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 /**
  * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
@@ -37,8 +37,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        srcData = Utility.loadResourceAsString("cdcatalog-utf-8.xml", getClass(), "UTF-8");
-        resultData = Utility.loadResourceAsString("cdcatalog-utf-8.html", getClass(), "UTF-8");
+        srcData = FileUtils.loadResourceAsString("cdcatalog-utf-8.xml", getClass(), "UTF-8");
+        resultData = FileUtils.loadResourceAsString("cdcatalog-utf-8.html", getClass(), "UTF-8");
     }
 
     public UMOTransformer getTransformer() throws Exception

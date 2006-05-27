@@ -17,7 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import javax.net.ssl.KeyManagerFactory;
 
@@ -83,7 +83,7 @@ public class SslConnector extends TcpConnector
                 Security.addProvider(getProvider());
                 // Create keyStore
                 keystore = KeyStore.getInstance(keyStoreType);
-                InputStream is = Utility.loadResource(getKeyStore(), getClass());
+                InputStream is = FileUtils.loadResource(getKeyStore(), getClass());
                 if (is == null) {
                     throw new FileNotFoundException("Failed to load keystore from classpath or local file: "
                             + getKeyStore());
@@ -112,7 +112,7 @@ public class SslConnector extends TcpConnector
         }
         if (clientKeyStore != null) {
             try {
-                String clientPath = Utility.getResourcePath(clientKeyStore, getClass());
+                String clientPath = FileUtils.getResourcePath(clientKeyStore, getClass());
                 System.setProperty("javax.net.ssl.keyStore", clientPath);
                 System.setProperty("javax.net.ssl.keyStorePassword", clientKeyStorePassword);
 
@@ -237,7 +237,7 @@ public class SslConnector extends TcpConnector
     {
         this.clientKeyStore = clientKeyStore;
         if (this.clientKeyStore != null) {
-            this.clientKeyStore = Utility.getResourcePath(clientKeyStore, getClass());
+            this.clientKeyStore = FileUtils.getResourcePath(clientKeyStore, getClass());
             logger.debug("Normalised clientKeyStore path to: " + getClientKeyStore());
         }
     }
@@ -261,7 +261,7 @@ public class SslConnector extends TcpConnector
     {
         this.trustStore = trustStore;
         if (this.trustStore != null) {
-            this.trustStore = Utility.getResourcePath(trustStore, getClass());
+            this.trustStore = FileUtils.getResourcePath(trustStore, getClass());
             logger.debug("Normalised trustStore path to: " + getTrustStore());
         }
     }

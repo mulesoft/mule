@@ -13,7 +13,7 @@
 package org.mule.test.integration.providers.jms.tools;
 
 import org.mule.util.ClassUtils;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -101,7 +101,7 @@ public class JmsTestUtils
     {
         String providerUrl = props.getProperty(Context.PROVIDER_URL);
         if (providerUrl != null && !providerUrl.startsWith("file:") && providerUrl.indexOf(':') < 0) {
-            providerUrl = "file:" + File.separator + Utility.getResourcePath(providerUrl, JmsTestUtils.class);
+            providerUrl = "file:" + File.separator + FileUtils.getResourcePath(providerUrl, JmsTestUtils.class);
             System.out.println("Setting provider url to: " + providerUrl);
             props.setProperty(Context.PROVIDER_URL, providerUrl);
         }

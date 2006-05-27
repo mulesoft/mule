@@ -30,8 +30,8 @@ import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.RoutingException;
+import org.mule.util.FileUtils;
 import org.mule.util.UUID;
-import org.mule.util.Utility;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -274,10 +274,10 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
             if (filename == null) {
                 filename = msg.getFrom()[0].toString() + "[" + UUID.getUUID() + "]";
             }
-            filename = Utility.prepareWinFilename(filename);
+            filename = FileUtils.prepareWinFilename(filename);
             filename = backupFolder + filename + ".msg";
             logger.debug("Writing message to: " + filename);
-            File f = Utility.createFile(filename);
+            File f = FileUtils.createFile(filename);
             FileWriter fw = new FileWriter(f);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             msg.writeTo(baos);

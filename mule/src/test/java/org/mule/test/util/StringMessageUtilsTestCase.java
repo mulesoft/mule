@@ -24,8 +24,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 /**
- * <code>StringMessageHelperTest</code> test the methods of the
- * StringMessageHelper formatting class
+ * <code>StringMessageUtilsTestCase</code> test the methods of the StringMessageUtils
+ * formatting class
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -33,9 +33,6 @@ import junit.framework.TestCase;
 public class StringMessageUtilsTestCase extends TestCase
 {
 
-    /**
-     * 
-     */
     public StringMessageUtilsTestCase()
     {
         super();

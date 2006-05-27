@@ -21,7 +21,7 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.SpiUtils;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -187,7 +187,7 @@ public class ExceptionHelper {
             errorMappings.put(protocol, p);
             String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
             if (applyTo != null) {
-                String[] protocols = Utility.split(applyTo, ",");
+                String[] protocols = StringUtils.split(applyTo, ",");
                 for (int i = 0; i < protocols.length; i++) {
                     errorMappings.put(protocols[i], p);
                 }

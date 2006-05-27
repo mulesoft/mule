@@ -29,8 +29,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.Utility;
 
 import java.io.File;
 import java.util.HashMap;
@@ -214,8 +214,8 @@ public abstract class AbstractMuleTestCase extends TestCase {
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
         }
-        Utility.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
-        Utility.deleteTree(new File("./ActiveMQ"));
+        FileUtils.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
+        FileUtils.deleteTree(new File("./ActiveMQ"));
         MuleManager.setConfiguration(new MuleConfiguration());
     }
 

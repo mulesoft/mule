@@ -17,7 +17,7 @@ package org.mule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.registry.Registry;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -196,7 +196,7 @@ public class ManagementContext {
     }
 
     public void deleteDir(File dir) {
-        Utility.deleteTree(dir);
+        FileUtils.deleteTree(dir);
         if (dir.isDirectory()) {
             try {
                 new File(dir, ".delete").createNewFile();
@@ -207,13 +207,13 @@ public class ManagementContext {
     }
 
     public void createDirectories(File rootDir) throws IOException {
-        Utility.createFile(rootDir.getAbsolutePath());
-        Utility.createFile(new File(rootDir, COMPONENTS_DIR).getAbsolutePath());
-        Utility.createFile(new File(rootDir, WORKSPACE_DIR).getAbsolutePath());
-        Utility.createFile(new File(rootDir, LIBRARIES_DIR).getAbsolutePath());
-        Utility.createFile(new File(rootDir, ASSEMBLIES_DIR).getAbsolutePath());
-        Utility.createFile(getAutoInstallDir(rootDir).getAbsolutePath());
-        Utility.createFile(getAutoDeployDir(rootDir).getAbsolutePath());
-        Utility.createFile(getAutoDeployProcessedDir(rootDir).getAbsolutePath());
+        FileUtils.createFile(rootDir.getAbsolutePath());
+        FileUtils.createFile(new File(rootDir, COMPONENTS_DIR).getAbsolutePath());
+        FileUtils.createFile(new File(rootDir, WORKSPACE_DIR).getAbsolutePath());
+        FileUtils.createFile(new File(rootDir, LIBRARIES_DIR).getAbsolutePath());
+        FileUtils.createFile(new File(rootDir, ASSEMBLIES_DIR).getAbsolutePath());
+        FileUtils.createFile(getAutoInstallDir(rootDir).getAbsolutePath());
+        FileUtils.createFile(getAutoDeployDir(rootDir).getAbsolutePath());
+        FileUtils.createFile(getAutoDeployProcessedDir(rootDir).getAbsolutePath());
     }
 }

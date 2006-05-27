@@ -19,8 +19,8 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.Utility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -163,7 +163,7 @@ public class LoanConsumer
                     }
                     System.out.println(StringMessageUtils.getBoilerPlate(output, '*', 80));
                     long cur = System.currentTimeMillis();
-                    System.out.println(Utility.getFormattedDuration(cur - start));
+                    System.out.println(DateUtils.getFormattedDuration(cur - start));
                     System.out.println("Avg request: " + ((cur - start) / x));
                 }
                 else {

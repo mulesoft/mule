@@ -31,7 +31,7 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation
@@ -71,7 +71,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         // security providers
         if (securityProviders != null) {
             UMOSecurityManager localManager = new MuleSecurityManager();
-            String[] sp = Utility.split(securityProviders, ",");
+            String[] sp = StringUtils.split(securityProviders, ",");
             for (int i = 0; i < sp.length; i++) {
                 UMOSecurityProvider provider = securityManager.getProvider(sp[i]);
                 if (provider != null) {

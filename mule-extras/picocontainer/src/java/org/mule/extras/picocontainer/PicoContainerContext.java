@@ -23,7 +23,7 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
@@ -172,7 +172,7 @@ public class PicoContainerContext extends AbstractContainerContext
         }
         try {
             String builderClassName = getBuilderClassName(configFile);
-            String configString = Utility.loadResourceAsString(configFile, getClass());
+            String configString = FileUtils.loadResourceAsString(configFile, getClass());
             StringReader configReader = new StringReader(configString);
             doConfigure(configReader, builderClassName);
 

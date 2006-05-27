@@ -27,7 +27,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -101,7 +101,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
                 throw new IOException("Filename is null");
             }
 
-            File file = Utility.createFile(address + "/" + filename);
+            File file = FileUtils.createFile(address + "/" + filename);
             if(logger.isInfoEnabled()) {
                 logger.info("Writing file to: " + file.getAbsolutePath());
             }

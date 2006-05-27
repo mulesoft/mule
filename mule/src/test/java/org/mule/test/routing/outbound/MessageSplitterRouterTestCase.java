@@ -24,7 +24,7 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
             protected void initialise(UMOMessage message)
             {
                 multimatch = false;
-                parts = Arrays.asList(Utility.split(message.getPayload().toString(), ","));
+                parts = Arrays.asList(StringUtils.split(message.getPayload().toString(), ","));
             }
 
             protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)

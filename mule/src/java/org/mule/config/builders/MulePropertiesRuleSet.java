@@ -25,7 +25,7 @@ import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PropertyFactory;
 import org.mule.util.ClassUtils;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 import org.xml.sax.Attributes;
 
 import java.io.FileNotFoundException;
@@ -228,7 +228,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String location = attributes.getValue("location");
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
-                InputStream is = Utility.loadResource(location, getClass());
+                InputStream is = FileUtils.loadResource(location, getClass());
                 if (is == null) {
                     throw new FileNotFoundException(location);
                 }

@@ -80,7 +80,7 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
 
@@ -183,7 +183,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     public UMOManager configure(String configResources) throws ConfigurationException
     {
         try {
-            String[] resources = Utility.split(configResources, ",");
+            String[] resources = StringUtils.split(configResources, ",");
             MuleManager.getConfiguration().setConfigResources(resources);
             ReaderResource[] readers = new ReaderResource[resources.length];
             for (int i = 0; i < resources.length; i++) {

@@ -19,7 +19,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ public class StaticComponent implements Callable, Initialisable {
         if(dataFile!=null)
         {
             try {
-                data = Utility.loadResourceAsString(dataFile, getClass());
+                data = FileUtils.loadResourceAsString(dataFile, getClass());
             } catch (IOException e) {
                 throw new InitialisationException(e, this);
             }

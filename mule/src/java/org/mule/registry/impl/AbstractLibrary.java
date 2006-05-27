@@ -18,7 +18,7 @@ import org.mule.registry.Registry;
 import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryDescriptor;
 import org.mule.registry.RegistryException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -102,7 +102,7 @@ public abstract class AbstractLibrary extends AbstractEntry implements Library {
         } catch (Exception e) {
             throw new RegistryException(e);
         }
-        Utility.deleteTree(new File(getInstallRoot()));
+        FileUtils.deleteTree(new File(getInstallRoot()));
         getRegistry().removeLibrary(this);
         setCurrentState(UNKNOWN);
     }

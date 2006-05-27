@@ -24,7 +24,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.Reader;
 import java.net.URL;
@@ -98,7 +98,7 @@ public class PlexusContainerContext extends AbstractContainerContext
             return;
         }
         try {
-            URL url = Utility.getResource(configFile, getClass());
+            URL url = FileUtils.getResource(configFile, getClass());
             if (url == null) {
                 throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
             }

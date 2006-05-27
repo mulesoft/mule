@@ -19,7 +19,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.routing.RoutingException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -127,7 +127,7 @@ public class IdempotentReceiver extends SelectiveConsumer
                     }
                 }
             } else {
-                idStore = Utility.createFile(idStore.getAbsolutePath());
+                idStore = FileUtils.createFile(idStore.getAbsolutePath());
             }
         } catch (IOException e) {
             throw new RoutingException(new Message(Messages.FAILED_TO_READ_FROM_STORE_X, idStore.getAbsolutePath()),
@@ -143,7 +143,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         if (disablePersistence) {
             return;
         }
-        Utility.stringToFile(idStore.getAbsolutePath(), id.toString(), true, true);
+        FileUtils.stringToFile(idStore.getAbsolutePath(), id.toString(), true, true);
     }
 
     public boolean isDisablePersistence()

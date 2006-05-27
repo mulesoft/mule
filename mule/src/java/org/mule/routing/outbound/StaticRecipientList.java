@@ -16,7 +16,7 @@ package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.mule.umo.UMOMessage;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class StaticRecipientList extends AbstractRecipientList
             return null;
         }
         if(list instanceof String) {
-            String[] temp = Utility.split(list.toString(), ",");
+            String[] temp = StringUtils.split(list.toString(), ",");
              return new CopyOnWriteArrayList(temp);
         } else {
             return new CopyOnWriteArrayList((List)list);

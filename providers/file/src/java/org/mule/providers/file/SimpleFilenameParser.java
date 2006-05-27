@@ -15,8 +15,8 @@ package org.mule.providers.file;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.DateUtils;
 import org.mule.util.UUID;
-import org.mule.util.Utility;
 
 /**
  * <code>SimpleFilenameParser</code> understands a limited set of tokens,
@@ -66,17 +66,17 @@ public class SimpleFilenameParser implements FilenameParser
             int index = pattern.indexOf("$" + left + "DATE" + right);
             if (index > -1) {
                 filename = filename.replaceAll("\\$\\" + left + "DATE\\" + right,
-                                               Utility.getTimeStamp(DEFAULT_DATE_FORMAT));
+                                               DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT));
             }
             index = pattern.indexOf("$" + left + "DATE:");
             if (index > -1) {
                 int curl = pattern.indexOf(right, index);
                 if (curl == -1) {
-                    filename = filename.replaceAll("\\$\\" + left + "DATE:", Utility.getTimeStamp(DEFAULT_DATE_FORMAT));
+                    filename = filename.replaceAll("\\$\\" + left + "DATE:", DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT));
                 } else {
                     String dateformat = pattern.substring(index + 7, curl);
                     filename = filename.replaceAll("\\$\\" + left + "DATE:" + dateformat + "\\" + right,
-                                                   Utility.getTimeStamp(dateformat));
+                                                   DateUtils.getTimeStamp(dateformat));
                 }
             }
             index = pattern.indexOf("$" + left + "UUID" + right);

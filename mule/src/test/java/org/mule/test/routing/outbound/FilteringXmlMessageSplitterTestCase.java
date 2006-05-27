@@ -27,7 +27,7 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,20 +73,20 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
     public void testStringPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        String payload = FileUtils.loadResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
 
     public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        String payload = FileUtils.loadResourceAsString("purchase-order.xml", getClass());
         Document doc = DocumentHelper.parseText(payload);
         internalTestSuccessfulXmlSplitter(doc);
     }
 
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        String payload = FileUtils.loadResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
@@ -127,7 +127,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);
 
-        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        String payload = FileUtils.loadResourceAsString("purchase-order.xml", getClass());
 
         UMOMessage message = new MuleMessage(payload);
 

@@ -16,7 +16,7 @@ package org.mule.providers.rmi;
 import org.mule.providers.AbstractJndiConnector;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.net.URL;
 import java.rmi.RMISecurityManager;
@@ -108,7 +108,7 @@ public class RmiConnector extends AbstractJndiConnector
     {
         // verify securityPolicy existence
         if (path != null) {
-            URL url = Utility.getResource(path, RmiConnector.class);
+            URL url = FileUtils.getResource(path, RmiConnector.class);
             if (url == null) {
                 throw new IllegalArgumentException("Error on initialization, RMI security policy does not exist");
             }

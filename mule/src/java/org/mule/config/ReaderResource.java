@@ -14,7 +14,8 @@
 package org.mule.config;
 
 import org.mule.MuleManager;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,11 +53,11 @@ public class ReaderResource
     }
 
     public static ReaderResource[] parseResources(String configResources, String encoding) throws IOException {
-        String[] resources = Utility.split(configResources, ",");
+        String[] resources = StringUtils.split(configResources, ",");
         MuleManager.getConfiguration().setConfigResources(resources);
         ReaderResource[] readers = new ReaderResource[resources.length];
         for (int i = 0; i < resources.length; i++) {
-            InputStream is = Utility.loadResource(resources[i].trim(), ReaderResource.class);
+            InputStream is = FileUtils.loadResource(resources[i].trim(), ReaderResource.class);
             if(is==null) {
                 throw new IOException("could not load resource: " + resources[i].trim());
             }

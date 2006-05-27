@@ -33,7 +33,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other XML-ish) object
@@ -157,7 +157,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
             source = new StreamSource(file);
         } else {
             try {
-                InputStream stream = Utility.loadResource(xslFile, getClass());
+                InputStream stream = FileUtils.loadResource(xslFile, getClass());
                 if(stream==null) {
                     throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, xslFile), this);
                 }

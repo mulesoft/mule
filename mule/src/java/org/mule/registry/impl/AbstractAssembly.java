@@ -18,7 +18,7 @@ import org.mule.registry.Registry;
 import org.mule.registry.RegistryDescriptor;
 import org.mule.registry.RegistryException;
 import org.mule.registry.Unit;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -147,7 +147,7 @@ public abstract class AbstractAssembly extends AbstractEntry implements Assembly
             String result = units[i].undeploy();
             // TODO: analyse result
         }
-        Utility.deleteTree(new File(getInstallRoot()));
+        FileUtils.deleteTree(new File(getInstallRoot()));
         getRegistry().removeAssembly(this);
         setCurrentState(UNKNOWN);
         // TODO: return info

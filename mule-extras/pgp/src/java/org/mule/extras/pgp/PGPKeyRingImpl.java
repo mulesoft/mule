@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.InputStream;
 import java.security.Principal;
@@ -85,7 +85,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
 
     private void readPrivateKeyBundle() throws Exception
     {
-        InputStream in = Utility.loadResource(secretKeyRingFileName, getClass());
+        InputStream in = FileUtils.loadResource(secretKeyRingFileName, getClass());
 
         ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);
@@ -141,7 +141,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
     private void readPublicKeyRing() throws Exception
     {
         logger.debug(System.getProperties().get("user.dir"));
-        InputStream in = Utility.loadResource(publicKeyRingFileName, getClass());
+        InputStream in = FileUtils.loadResource(publicKeyRingFileName, getClass());
 
         ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);

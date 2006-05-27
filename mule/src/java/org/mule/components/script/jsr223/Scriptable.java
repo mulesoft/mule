@@ -20,7 +20,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -88,7 +88,7 @@ public class Scriptable implements Initialisable {
                 } else {
                     InputStream is = null;
                     try {
-                        is = Utility.loadResource(scriptFile, getClass());
+                        is = FileUtils.loadResource(scriptFile, getClass());
                         script = new InputStreamReader(is);
                     } catch (IOException e) {
                         throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, scriptFile), e, this);

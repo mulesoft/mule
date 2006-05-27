@@ -26,7 +26,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -319,7 +319,7 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     public void setWriteToDirectory(String dir) throws IOException {
         this.writeToDirectoryName = dir;
         if (writeToDirectoryName != null) {
-            File writeToDirectory = Utility.openDirectory((writeToDirectoryName));
+            File writeToDirectory = FileUtils.openDirectory((writeToDirectoryName));
             if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite()) {
                 throw new IOException("Error on initialization, Write To directory does not exist or is not read/write");
             }

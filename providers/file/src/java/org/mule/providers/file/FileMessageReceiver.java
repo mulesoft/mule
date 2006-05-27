@@ -29,7 +29,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,7 +80,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
     public void doConnect() throws Exception
     {
         if (readDir != null) {
-            readDirectory = Utility.openDirectory(readDir);
+            readDirectory = FileUtils.openDirectory(readDir);
             if (!(readDirectory.canRead())) {
                 throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST,
                         readDirectory.getAbsolutePath()), this);
@@ -91,7 +91,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         }
 
         if (moveDir != null) {
-            moveDirectory = Utility.openDirectory((moveDir));
+            moveDirectory = FileUtils.openDirectory((moveDir));
             if (!(moveDirectory.canRead()) || !moveDirectory.canWrite()) {
                 throw new ConnectException(new Message("file", 5), this);
             }

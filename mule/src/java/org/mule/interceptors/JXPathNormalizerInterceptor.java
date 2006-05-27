@@ -18,7 +18,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
     public void setBeforeExpressions(String beforeExpressions)
     {
         this.beforeExpressions = beforeExpressions;
-        String[] exp = Utility.split(beforeExpressions, ",");
+        String[] exp = StringUtils.split(beforeExpressions, ",");
         this.beforeExpressionsList = new ArrayList(exp.length);
         for (int i = 0; i < exp.length; i++) {
             this.beforeExpressionsList.add(exp[i]);
