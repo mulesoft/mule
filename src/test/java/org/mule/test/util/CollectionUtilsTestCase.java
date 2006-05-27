@@ -11,15 +11,8 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.test.util;
-
-import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.mule.util.CollectionUtils;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -30,35 +23,9 @@ import junit.framework.TestCase;
 public class CollectionUtilsTestCase extends TestCase
 {
 
-    public void testMapCreationNullClass()
+    public void testDummy()
     {
-        try
-        {
-            CollectionUtils.mapWithKeysAndValues(null, (String[])null, (String[])null);
-            fail();
-        }
-        catch (IllegalArgumentException ex)
-        {
-            // expected
-        }
-    }
-
-    public void testMapCreationWithoutElements()
-    {
-        Map m = CollectionUtils.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
-        assertTrue(m.isEmpty());
-    }
-
-    public void testCaseInsensitiveMapCreation()
-    {
-        List strings = Arrays.asList(new String[]{"foo"});
-
-        Map m = CollectionUtils.mapWithKeysAndValues(CaseInsensitiveMap.class,
-                strings.iterator(), strings.iterator());
-
-        assertEquals("foo", m.get("foo"));
-        assertEquals("foo", m.get("Foo"));
-        assertEquals("foo", m.get("FOO"));
+        // this method only exists to silence the test runner
     }
 
 }
