@@ -16,8 +16,11 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -53,45 +56,41 @@ import org.mule.util.concurrent.WaitableBoolean;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
+
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * <code>AbstractConnector</code> provides base functionality for all
- * connectors provided with Mule. Connectors are the mechanism used to connect
- * to external systems and protocols in order to send and receive data. <p/> The
- * <code>AbstractConnector</code> provides getter and setter methods for
- * endpoint name, transport name and protocol. It also provides methods to stop
- * and start connecotors and sets up a dispatcher threadpool which allows
- * deriving connectors the possibility to dispatch work to separate threads.
- * This functionality is controlled with the <i> doThreading</i> property on
- * the threadingProfiles for dispachers and receivers.
- *
+ * <code>AbstractConnector</code> provides base functionality for all connectors
+ * provided with Mule. Connectors are the mechanism used to connect to external systems
+ * and protocols in order to send and receive data. <p/> The
+ * <code>AbstractConnector</code> provides getter and setter methods for endpoint name,
+ * transport name and protocol. It also provides methods to stop and start connecotors and
+ * sets up a dispatcher threadpool which allows deriving connectors the possibility to
+ * dispatch work to separate threads. This functionality is controlled with the <i>
+ * doThreading</i> property on the threadingProfiles for dispachers and receivers.
+ * 
  * The lifecycle for a connector is -
- *
- * 1. Create
- * 2. Initialise
- * 3. Connect
- * 3a. Connect receivers
- * 4. Start
- * 4a. Start Receivers
- * 5. Stop
- * 5a. Stop Receivers
- * 6. Disconnect
- * 6a. Disconnect Receivers
- * 7. Dispose
- * 7a. Dispose Receivers
- *
+ * 
+ * 1. Create 2. Initialise 3. Connect 3a. Connect receivers 4. Start 4a. Start Receivers
+ * 5. Stop 5a. Stop Receivers 6. Disconnect 6a. Disconnect Receivers 7. Dispose 7a.
+ * Dispose Receivers
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractConnector implements UMOConnector, ExceptionListener, UMOConnectable, WorkListener
-{    /**
+public abstract class AbstractConnector
+        implements
+            UMOConnector,
+            ExceptionListener,
+            UMOConnectable,
+            WorkListener
+{
+    /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -132,15 +131,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected UMOMessageDispatcherFactory dispatcherFactory;
 
     /**
-     * A pool of dispatchers for this connector, the pool is keyed on
-     * endpointUri
+     * A pool of dispatchers for this connector, the pool is keyed on endpointUri
      */
-    protected Map dispatchers;
+    protected ConcurrentMap dispatchers;
 
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
-    protected Map receivers;
+    protected ConcurrentMap receivers;
 
     /**
      * Defines the dispatcher threading model
@@ -153,34 +151,34 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     private ThreadingProfile receiverThreadingProfile = null;
 
     /**
-     * Determines whether dispatchers should be disposed straight away of
-     * after every request or cached
+     * Determines whether dispatchers should be disposed straight away of after every
+     * request or cached
      */
     protected boolean createDispatcherPerRequest = false;
 
     /**
-     * For better throughput when using TransactedMessageReceivers. This will create an number
-     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
-     * user by transports that support transactions, specifically MessageReceivers that extend the
-     * TransactedPollingMessageReceiver.
+     * For better throughput when using TransactedMessageReceivers. This will create an
+     * number of receiver threads based on the ThreadingProfile configured fro the
+     * receiver. This property is user by transports that support transactions,
+     * specifically MessageReceivers that extend the TransactedPollingMessageReceiver.
      */
     protected boolean createMultipleTransactedReceivers = true;
 
     /**
-     * The service descriptor can define a default inbound transformer to be
-     * used on an endpoint if no other is set
+     * The service descriptor can define a default inbound transformer to be used on an
+     * endpoint if no other is set
      */
     protected UMOTransformer defaultInboundTransformer = null;
 
     /**
-     * The service descriptor can define a default outbound transformer to be
-     * used on an endpoint if no other is set
+     * The service descriptor can define a default outbound transformer to be used on an
+     * endpoint if no other is set
      */
     protected UMOTransformer defaultOutboundTransformer = null;
 
     /**
-     * For some connectors such as http, a response transformer is required or
-     * where a replyTo needs a trnasformer
+     * For some connectors such as http, a response transformer is required or where a
+     * replyTo needs a trnasformer
      */
     protected UMOTransformer defaultResponseTransformer = null;
 
@@ -191,50 +189,54 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected WaitableBoolean connecting = new WaitableBoolean(false);
 
     /**
-     * If the connect method was called via the start method, this will be set so that when the connector comes on line
-     * it will be started
+     * If the connect method was called via the start method, this will be set so that
+     * when the connector comes on line it will be started
      */
     protected WaitableBoolean startOnConnect = new WaitableBoolean(false);
 
-    /** Whether to fire message notifications for every message that is sent or received from this connector */
+    /**
+     * Whether to fire message notifications for every message that is sent or received
+     * from this connector
+     */
     private boolean enableMessageEvents = false;
 
     private List supportedProtocols;
 
     /**
-     * A shared work manager for all receivers registered with this connector if <code>useSingleReceiverThreadPool</code>
-     * is set to true
+     * A shared work manager for all receivers registered with this connector if
+     * <code>useSingleReceiverThreadPool</code> is set to true
      */
     private UMOWorkManager receiverWorkManager = null;
 
     /**
-     * A shared work manager for all dispatchers created for this connector if <code>useSingleDispatcherThreadPool</code>
-     * is set to true
+     * A shared work manager for all dispatchers created for this connector if
+     * <code>useSingleDispatcherThreadPool</code> is set to true
      */
     private UMOWorkManager dispatcherWorkManager = null;
 
     /**
-     * Should a single receiver thread pool be created for all receivers
-     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
-     * to true
+     * Should a single receiver thread pool be created for all receivers It is recommended
+     * that if you have a lot of receivers being registered per connector that this should
+     * be set to true
      */
     private boolean useSingleReceiverThreadPool = false;
 
     /**
-     * Should a single dispatcher thread pool be created for all distachers
-     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
-     * to true i.e. many different outbound endpoints
+     * Should a single dispatcher thread pool be created for all distachers It is
+     * recommended that if you have a lot of dispatcher being created per connector that
+     * this should be set to true i.e. many different outbound endpoints
      */
     private boolean useSingleDispatcherThreadPool = false;
 
     /**
-     * The flag determines if the connector is being used on the server side or client.
-     * If true receiver threads will be given a slightly higher priority.
+     * The flag determines if the connector is being used on the server side or client. If
+     * true receiver threads will be given a slightly higher priority.
      */
     protected boolean serverSide = true;
 
     /**
-     * The strategy used for reading and writing session information to and fromt he transport
+     * The strategy used for reading and writing session information to and fromt he
+     * transport
      */
     protected UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
@@ -243,12 +245,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         // make sure we always have an exception strategy
         exceptionListener = new DefaultExceptionStrategy();
         dispatchers = new ConcurrentHashMap();
-        receivers = new HashMap();
+        receivers = new ConcurrentHashMap();
         connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
         enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
         supportedProtocols = new ArrayList();
 
-        //Always add the default protocol
+        // Always add the default protocol
         supportedProtocols.add(getProtocol().toLowerCase());
 
     }
@@ -271,7 +273,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public void setName(String newName)
     {
         if (newName == null) {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Connector name").toString());
+            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Connector name")
+                    .toString());
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Set UMOConnector name to: " + newName);
@@ -296,7 +299,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
         doInitialise();
         if (exceptionListener instanceof Initialisable) {
-            ((Initialisable) exceptionListener).initialise();
+            ((Initialisable)exceptionListener).initialise();
         }
         initialised.set(true);
     }
@@ -312,10 +315,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         checkDisposed();
         if (!started.get()) {
-            if(!isConnected()) {
+            if (!isConnected()) {
                 startOnConnect.set(true);
                 getConnectionStrategy().connect(this);
-                //Only start once we are connected
+                // Only start once we are connected
                 return;
             }
             if (logger.isInfoEnabled()) {
@@ -323,11 +326,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             }
             doStart();
             started.set(true);
-            if(receivers!=null) {
+            if (receivers != null) {
                 for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                    AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
+                    AbstractMessageReceiver amr = (AbstractMessageReceiver)iterator.next();
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Starting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                        logger.debug("Starting receiver on endpoint: "
+                                + amr.getEndpoint().getEndpointURI());
                     }
                     amr.start();
                 }
@@ -367,22 +371,25 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             doStop();
             started.set(false);
 
-            //Stop all the receivers on this connector (this will cause them to disconnect too)
-            if(receivers!=null) {
+            // Stop all the receivers on this connector (this will cause them to
+            // disconnect too)
+            if (receivers != null) {
                 for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                    UMOMessageReceiver mr = (UMOMessageReceiver) iterator.next();
+                    UMOMessageReceiver mr = (UMOMessageReceiver)iterator.next();
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                        logger.debug("Stopping receiver on endpoint: "
+                                + mr.getEndpoint().getEndpointURI());
                     }
                     mr.stop();
                 }
             }
         }
 
-        if(isConnected()) {
+        if (isConnected()) {
             try {
                 disconnect();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 logger.error("Failed to disconnect: " + e.getMessage(), e);
             }
         }
@@ -414,14 +421,16 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
     }
 
-    protected void disposeReceivers() {
+    protected void disposeReceivers()
+    {
         if (receivers != null) {
             UMOMessageReceiver receiver;
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                receiver = (UMOMessageReceiver) iterator.next();
+                receiver = (UMOMessageReceiver)iterator.next();
                 try {
                     destroyReceiver(receiver, receiver.getEndpoint());
-                } catch (Throwable e) {
+                }
+                catch (Throwable e) {
                     logger.error("Failed to destroy receiver: " + e.getMessage(), e);
                 }
             }
@@ -436,7 +445,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (dispatchers != null) {
             logger.debug("Disposing Dispatchers");
             for (Iterator iterator = dispatchers.values().iterator(); iterator.hasNext();) {
-                UMOMessageDispatcher umoMessageDispatcher = (UMOMessageDispatcher) iterator.next();
+                UMOMessageDispatcher umoMessageDispatcher = (UMOMessageDispatcher)iterator.next();
                 umoMessageDispatcher.dispose();
             }
             dispatchers.clear();
@@ -445,10 +454,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.umo.provider.UMOConnector#isAlive()
-    */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOConnector#isAlive()
+     */
     public boolean isDisposed()
     {
         return disposed.get();
@@ -463,9 +472,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public void handleException(Exception exception)
     {
         if (exceptionListener == null) {
-            throw new MuleRuntimeException(new Message(Messages.EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER,
-                                                       getName()), exception);
-        } else {
+            throw new MuleRuntimeException(new Message(
+                    Messages.EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER, getName()), exception);
+        }
+        else {
             exceptionListener.exceptionThrown(exception);
         }
     }
@@ -490,7 +500,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * @param listener the ExceptionStrategy to use with this endpoint
+     * @param listener
+     *            the ExceptionStrategy to use with this endpoint
      * @see ExceptionListener
      */
     public void setExceptionListener(ExceptionListener listener)
@@ -507,51 +518,40 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * @param dispatcerFactory The dispatcherFactory to set.
+     * @param dispatcherFactory
+     *            The dispatcherFactory to set.
      */
-    public void setDispatcherFactory(UMOMessageDispatcherFactory dispatcerFactory)
+    public void setDispatcherFactory(UMOMessageDispatcherFactory dispatcherFactory)
     {
-        this.dispatcherFactory = dispatcerFactory;
+        this.dispatcherFactory = dispatcherFactory;
     }
 
-    public synchronized UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
+    public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
     {
         checkDisposed();
-        UMOMessageDispatcher dispatcher = null;
 
-        if (endpoint==null && dispatchers.size() > 0) {
-            Map.Entry entry;
-            for (Iterator iterator = dispatchers.entrySet().iterator(); iterator.hasNext();) {
-                entry = (Map.Entry) iterator.next();
-                if (((UMOMessageDispatcher) entry.getValue()).isDisposed()) {
-                    dispatchers.remove(entry.getKey());
-                } else {
-                    dispatcher = (UMOMessageDispatcher) entry.getValue();
-                    break;
-                }
-            }
-        } else {
-            if (dispatchers == null) {
-                throw new NullPointerException("Dispatchers are null for connector: " + name);
-            }
-            dispatcher = (UMOMessageDispatcher) dispatchers.get(endpoint.getEndpointURI().toString());
-            if (dispatcher != null && dispatcher.isDisposed()) {
-                dispatchers.values().remove(dispatcher);
-                dispatcher = null;
-            }
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Endpoint must not be null");
         }
 
-        if(!supportsProtocol(endpoint.getConnector().getProtocol())) {
-            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
-                    getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
+        if (!supportsProtocol(endpoint.getConnector().getProtocol())) {
+            throw new IllegalArgumentException(new Message(
+                    Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, getProtocol(),
+                    endpoint.getEndpointURI().toString()).getMessage());
         }
-        if (dispatcher == null) {
+
+        if (dispatchers == null) {
+            throw new IllegalStateException("Dispatchers are null for connector: " + name);
+        }
+
+        String endpointUriKey = endpoint.getEndpointURI().toString();
+        UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
+
+        if (dispatcher == null || dispatcher.isDisposed()) {
             dispatcher = createDispatcher(endpoint);
-            dispatchers.put(endpoint.getEndpointURI().toString(), dispatcher);
+            dispatchers.put(endpointUriKey, dispatcher);
         }
-//        if(!dispatcher.isConnected()) {
-//            connectionStrategy.connect(dispatcher);
-//        }
+
         return dispatcher;
     }
 
@@ -567,14 +567,20 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (dispatcherFactory == null) {
             throw new ConnectorException(new Message(Messages.CONNECTOR_NOT_STARTED, name), this);
         }
-        UMOMessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
-        return dispatcher;
+
+        return dispatcherFactory.create(endpoint);
     }
 
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint)
+            throws Exception
     {
-        if (endpoint == null || component == null) {
-            throw new IllegalArgumentException("The endpoint and component cannot be null when registering a listener");
+        if (endpoint == null) {
+            throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
+        }
+
+        if (component == null) {
+            throw new IllegalArgumentException(
+                    "The component cannot be null when registering a listener");
         }
 
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
@@ -586,13 +592,15 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
         UMOMessageReceiver receiver = getReceiver(component, endpoint);
         if (receiver != null) {
-            throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri), this);
-        } else {
+            throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri),
+                    this);
+        }
+        else {
             receiver = createReceiver(component, endpoint);
             receivers.put(getReceiverKey(component, endpoint), receiver);
         }
         if (started.get() && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED)) {
-            ((AbstractMessageReceiver) receiver).start();
+            ((AbstractMessageReceiver)receiver).start();
         }
         return receiver;
     }
@@ -600,31 +608,42 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * The method determines the key used to store the receiver against.
      * 
-     * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param component
+     *            the component for which the endpoint is being registered
+     * @param endpoint
+     *            the endpoint being registered for the component
      * @return the key to store the newly created receiver against
      */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
-        if (endpoint.getEndpointURI().getFilterAddress() != null) {
-            return endpoint.getEndpointURI().getFilterAddress();
-        } else {
-            return endpoint.getEndpointURI().getAddress();
-        }
+        return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
+                .getEndpointURI().getAddress());
     }
 
     public final void unregisterListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        if (endpoint == null || component == null || endpoint.getEndpointURI() == null) {
-            throw new IllegalArgumentException("The endpoint and component and endpointUri cannot be null when you unregister a listener");
+        if (component == null) {
+            throw new IllegalArgumentException(
+                    "The component must not be null when you unregister a listener");
+        }
+
+        if (endpoint == null) {
+            throw new IllegalArgumentException(
+                    "The endpoint must not be null when you unregister a listener");
         }
 
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
+        if (endpointUri == null) {
+            throw new IllegalArgumentException(
+                    "The endpointUri must not be null when you unregister a listener");
+        }
+
         if (logger.isInfoEnabled()) {
             logger.info("removing listener on endpointUri: " + endpointUri);
         }
 
-        UMOMessageReceiver receiver = (UMOMessageReceiver) receivers.remove(getReceiverKey(component, endpoint));
+        UMOMessageReceiver receiver = (UMOMessageReceiver)receivers.remove(getReceiverKey(component,
+                endpoint));
         if (receiver != null) {
             destroyReceiver(receiver, endpoint);
             receiver.dispose();
@@ -634,7 +653,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public ThreadingProfile getDispatcherThreadingProfile()
     {
         if (dispatcherThreadingProfile == null) {
-            dispatcherThreadingProfile = MuleManager.getConfiguration().getMessageDispatcherThreadingProfile();
+            dispatcherThreadingProfile = MuleManager.getConfiguration()
+                    .getMessageDispatcherThreadingProfile();
 
         }
         return dispatcherThreadingProfile;
@@ -648,7 +668,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public ThreadingProfile getReceiverThreadingProfile()
     {
         if (receiverThreadingProfile == null) {
-            receiverThreadingProfile = MuleManager.getConfiguration().getMessageReceiverThreadingProfile();
+            receiverThreadingProfile = MuleManager.getConfiguration()
+                    .getMessageReceiverThreadingProfile();
         }
         return receiverThreadingProfile;
     }
@@ -658,7 +679,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         this.receiverThreadingProfile = receiverThreadingProfile;
     }
 
-    public abstract UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception;
+    public abstract UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint)
+            throws Exception;
 
     public void destroyReceiver(UMOMessageReceiver receiver, UMOEndpoint endpoint) throws Exception
     {
@@ -668,7 +690,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * Template method to perform any work when starting the connectoe
      * 
-     * @throws UMOException if the method fails
+     * @throws UMOException
+     *             if the method fails
      */
     protected void doStart() throws UMOException
     {
@@ -678,7 +701,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * Template method to perform any work when stopping the connectoe
      * 
-     * @throws UMOException if the method fails
+     * @throws UMOException
+     *             if the method fails
      */
     protected void doStop() throws UMOException
     {
@@ -693,7 +717,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         try {
             stopConnector();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e) {
             logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
         }
     }
@@ -707,12 +732,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (defaultInboundTransformer != null) {
             try {
-                return (UMOTransformer) defaultInboundTransformer.clone();
-            } catch (CloneNotSupportedException e) {
+                return (UMOTransformer)defaultInboundTransformer.clone();
+            }
+            catch (CloneNotSupportedException e) {
                 logger.error("Failed to clone default Inbound transformer");
                 return null;
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -726,12 +753,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (defaultResponseTransformer != null) {
             try {
-                return (UMOTransformer) defaultResponseTransformer.clone();
-            } catch (CloneNotSupportedException e) {
+                return (UMOTransformer)defaultResponseTransformer.clone();
+            }
+            catch (CloneNotSupportedException e) {
                 logger.error("Failed to clone default Outbound transformer");
                 return null;
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -740,12 +769,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (defaultOutboundTransformer != null) {
             try {
-                return (UMOTransformer) defaultOutboundTransformer.clone();
-            } catch (CloneNotSupportedException e) {
+                return (UMOTransformer)defaultOutboundTransformer.clone();
+            }
+            catch (CloneNotSupportedException e) {
                 logger.error("Failed to clone default Outbound transformer");
                 return null;
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -772,12 +803,15 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.impl.internal.notifications.CustomNotificationListener} eventManager.
+     * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
+     * eventManager.
      * 
-     * @param notification the notification to fire. This must be of type
-     *            {@link org.mule.impl.internal.notifications.CustomNotification} otherwise an
-     *            exception will be thrown.
-     * @throws UnsupportedOperationException if the notification fired is not a
+     * @param notification
+     *            the notification to fire. This must be of type
+     *            {@link org.mule.impl.internal.notifications.CustomNotification}
+     *            otherwise an exception will be thrown.
+     * @throws UnsupportedOperationException
+     *             if the notification fired is not a
      *             {@link org.mule.impl.internal.notifications.CustomNotification}
      */
     public void fireNotification(UMOServerNotification notification)
@@ -791,9 +825,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         // of the connection strategy and using a factory just introduces extra
         // implementation
         try {
-            return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
-        } catch (Exception e) {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "connectionStrategy"), e);
+            return (ConnectionStrategy)BeanUtils.cloneBean(connectionStrategy);
+        }
+        catch (Exception e) {
+            throw new MuleRuntimeException(
+                    new Message(Messages.FAILED_TO_CLONE_X, "connectionStrategy"), e);
         }
     }
 
@@ -809,40 +845,46 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         // in terms of connecting/disconnecting
         List beans = new ArrayList(receivers.size());
         for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-            UMOMessageReceiver receiver = (UMOMessageReceiver) iterator.next();
+            UMOMessageReceiver receiver = (UMOMessageReceiver)iterator.next();
             beans.add(new EndpointService(receiver));
         }
         return beans;
     }
 
-    public boolean isDisposing() {
+    public boolean isDisposing()
+    {
         return disposing.get();
     }
 
-    public boolean isRemoteSyncEnabled() {
+    public boolean isRemoteSyncEnabled()
+    {
         return false;
     }
 
-    public AbstractMessageReceiver getReceiver(UMOComponent component, UMOEndpoint endpoint) {
-        return (AbstractMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
+    public AbstractMessageReceiver getReceiver(UMOComponent component, UMOEndpoint endpoint)
+    {
+        return (AbstractMessageReceiver)receivers.get(getReceiverKey(component, endpoint));
     }
 
-    public Map getReceivers() {
+    public Map getReceivers()
+    {
         return Collections.unmodifiableMap(receivers);
     }
 
-    public AbstractMessageReceiver getReceiver(String key) {
-        return (AbstractMessageReceiver) receivers.get(key);
+    public AbstractMessageReceiver getReceiver(String key)
+    {
+        return (AbstractMessageReceiver)receivers.get(key);
     }
 
-    public AbstractMessageReceiver[] getReceivers(String wildcardExpression) {
+    public AbstractMessageReceiver[] getReceivers(String wildcardExpression)
+    {
 
         List temp = new ArrayList();
         WildcardFilter filter = new WildcardFilter(wildcardExpression);
         filter.setCaseSensitive(false);
         for (Iterator iterator = receivers.keySet().iterator(); iterator.hasNext();) {
-            Object o =  iterator.next();
-            if(filter.accept(o)) {
+            Object o = iterator.next();
+            if (filter.accept(o)) {
                 temp.add(receivers.get(o));
             }
         }
@@ -850,7 +892,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         return (AbstractMessageReceiver[])temp.toArray(result);
     }
 
-    public void connect() throws Exception {
+    public void connect() throws Exception
+    {
         if (connected.get()) {
             return;
         }
@@ -858,78 +901,95 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (connecting.commit(false, true)) {
             connectionStrategy.connect(this);
             logger.info("Connected: " + getConnectionDescription());
-            //This method calls itself so the the connecting vflag is set first, the the connection is made on the second call
+            // This method calls itself so the the connecting vflag is set first, the the
+            // connection is made on the second call
             return;
         }
 
         try {
             doConnect();
-            fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_CONNECTED));
-        } catch (Exception e) {
-            fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_FAILED));
+            fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                    ConnectionNotification.CONNECTION_CONNECTED));
+        }
+        catch (Exception e) {
+            fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                    ConnectionNotification.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
-                throw (ConnectException) e;
-            } else {
+                throw (ConnectException)e;
+            }
+            else {
                 throw new ConnectException(e, this);
             }
         }
         connected.set(true);
         connecting.set(false);
-        if(startOnConnect.get()) {
+        if (startOnConnect.get()) {
             startConnector();
-        } else {
+        }
+        else {
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
+                AbstractMessageReceiver amr = (AbstractMessageReceiver)iterator.next();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Connecting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                    logger.debug("Connecting receiver on endpoint: "
+                            + amr.getEndpoint().getEndpointURI());
                 }
                 amr.connect();
             }
         }
     }
 
-    public void disconnect() throws Exception {
+    public void disconnect() throws Exception
+    {
         startOnConnect.set(isStarted());
-        fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_DISCONNECTED));
+        fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
         try {
             doDisconnect();
-        } finally  {
+        }
+        finally {
             stopConnector();
 
         }
-        
+
         logger.info("Disconnected: " + getConnectionDescription());
     }
 
-    public String getConnectionDescription() {
+    public String getConnectionDescription()
+    {
         return toString();
     }
 
-    public final boolean isConnected() {
-       return connected.get();
+    public final boolean isConnected()
+    {
+        return connected.get();
     }
 
     /**
      * Template method where any connections should be made for the connector
+     * 
      * @throws Exception
      */
-    public void doConnect() throws Exception {
+    public void doConnect() throws Exception
+    {
         // template method
     }
 
     /**
-     * Template method where any connected resources used by the connector should
-     * be disconnected
+     * Template method where any connected resources used by the connector should be
+     * disconnected
+     * 
      * @throws Exception
      */
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
         // template method
     }
 
     /**
      * The resource id used when firing ConnectEvents from this connector
-     * @return the  resource id used when firing ConnectEvents from this connector
+     * 
+     * @return the resource id used when firing ConnectEvents from this connector
      */
     protected String getConnectEventId()
     {
@@ -937,106 +997,127 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * controls whether dispatchers or cached or created per request
-     * Note that if an exception occurs in the Dispatcher it is automatically disposed
-     * of and a new one is created for the next request.  This allows dispatchers to recover
-     * from loss of connection and other faults.
-     * @param createDispatcherPerRequest whether a new dispatcher is
-     * created for every request or not
+     * controls whether dispatchers or cached or created per request Note that if an
+     * exception occurs in the Dispatcher it is automatically disposed of and a new one is
+     * created for the next request. This allows dispatchers to recover from loss of
+     * connection and other faults.
+     * 
+     * @param createDispatcherPerRequest
+     *            whether a new dispatcher is created for every request or not
      */
-    public void setCreateDispatcherPerRequest(boolean createDispatcherPerRequest) {
+    public void setCreateDispatcherPerRequest(boolean createDispatcherPerRequest)
+    {
         this.createDispatcherPerRequest = createDispatcherPerRequest;
     }
 
     /**
-     * controls whether dispatchers or cached or created per request
-     * Note that if an exception occurs in the Dispatcher it is automatically disposed
-     * of and a new one is created for the next request.  This allows dispatchers to recover
-     * from loss of connection and other faults.
+     * controls whether dispatchers or cached or created per request Note that if an
+     * exception occurs in the Dispatcher it is automatically disposed of and a new one is
+     * created for the next request. This allows dispatchers to recover from loss of
+     * connection and other faults.
+     * 
      * @return true if a anew dispatcher is created for every request
      */
-    public boolean isCreateDispatcherPerRequest() {
+    public boolean isCreateDispatcherPerRequest()
+    {
         return createDispatcherPerRequest;
     }
 
     /**
-     * For better throughput when using TransactedMessageReceivers. This will create an number
-     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
-     * user by transports that support transactions, specifically MessageReceivers that extend the
-     * TransactedPollingMessageReceiver.
-     * @return true if multiple receiver threads will be created for receivers on this connection
+     * For better throughput when using TransactedMessageReceivers. This will create an
+     * number of receiver threads based on the ThreadingProfile configured fro the
+     * receiver. This property is user by transports that support transactions,
+     * specifically MessageReceivers that extend the TransactedPollingMessageReceiver.
+     * 
+     * @return true if multiple receiver threads will be created for receivers on this
+     *         connection
      */
-    public boolean isCreateMultipleTransactedReceivers() {
+    public boolean isCreateMultipleTransactedReceivers()
+    {
         return createMultipleTransactedReceivers;
     }
 
     /**
-     * For better throughput when using TransactedMessageReceivers. This will create an number
-     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
-     * user by transports that support transactions, specifically MessageReceivers that extend the
-     * TransactedPollingMessageReceiver.
-     * @param createMultipleTransactedReceivers true if multiple receiver threads will be created for
-     * receivers on this connection
+     * For better throughput when using TransactedMessageReceivers. This will create an
+     * number of receiver threads based on the ThreadingProfile configured fro the
+     * receiver. This property is user by transports that support transactions,
+     * specifically MessageReceivers that extend the TransactedPollingMessageReceiver.
+     * 
+     * @param createMultipleTransactedReceivers
+     *            true if multiple receiver threads will be created for receivers on this
+     *            connection
      */
-    public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers) {
+    public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers)
+    {
         this.createMultipleTransactedReceivers = createMultipleTransactedReceivers;
     }
 
     /**
-     * Whether to fire message notifications for every message that is sent or received from this connector
+     * Whether to fire message notifications for every message that is sent or received
+     * from this connector
      */
-    public boolean isEnableMessageEvents() {
+    public boolean isEnableMessageEvents()
+    {
         return enableMessageEvents;
     }
 
     /**
-     * Whether to fire message notifications for every message that is sent or received from this connector
+     * Whether to fire message notifications for every message that is sent or received
+     * from this connector
+     * 
      * @param enableMessageEvents
      */
-    public void setEnableMessageEvents(boolean enableMessageEvents) {
+    public void setEnableMessageEvents(boolean enableMessageEvents)
+    {
         this.enableMessageEvents = enableMessageEvents;
     }
 
     /**
-     * Registers other protocols 'understood' by this connector.
-     * These must contain scheme meta info. Any protocol registered
-     * must begin with the protocol of this connector, i.e. If the connector is axis
-     * the protocol for jms over axis will be axis:jms.  Here, 'axis' is the
-     * scheme meta info and 'jms' is the protocol.
-     * If the protocol argument does not start with the connector's protocol, it
-     * will be appended.
-     * @param protocol the supported protocol to register
+     * Registers other protocols 'understood' by this connector. These must contain scheme
+     * meta info. Any protocol registered must begin with the protocol of this connector,
+     * i.e. If the connector is axis the protocol for jms over axis will be axis:jms.
+     * Here, 'axis' is the scheme meta info and 'jms' is the protocol. If the protocol
+     * argument does not start with the connector's protocol, it will be appended.
+     * 
+     * @param protocol
+     *            the supported protocol to register
      */
-    public void registerSupportedProtocol(String protocol) {
+    public void registerSupportedProtocol(String protocol)
+    {
         protocol = protocol.toLowerCase();
-        if(protocol.startsWith(getProtocol().toLowerCase())) {
-           registerSupportedProtocolWithotPrefix(protocol);
-        } else {
+        if (protocol.startsWith(getProtocol().toLowerCase())) {
+            registerSupportedProtocolWithotPrefix(protocol);
+        }
+        else {
             supportedProtocols.add(getProtocol().toLowerCase() + ":" + protocol);
         }
     }
 
     /**
-     * Registers other protocols 'understood' by this connector.
-     * These must contain scheme meta info.
-     * Unlike the <code>registerSupportedProtolcol</code> method, this allows you
-     * to register protocols that are not prefixed with the connector protocol.
-     * This is useful where you use a Service Finder to discover which Transport implementation
-     * to use. For example the 'wsdl' transport is a generic 'finder' transport that will use
-     * Axis, Xfire or Glue to create the WSDL client.  These transport protocols would be
-     * wsdl-axis, wsdl-xfire and wsdl-glue, but they can all support 'wsdl' protocol too.
-     * @param protocol the supported protocol to register
+     * Registers other protocols 'understood' by this connector. These must contain scheme
+     * meta info. Unlike the <code>registerSupportedProtolcol</code> method, this allows
+     * you to register protocols that are not prefixed with the connector protocol. This
+     * is useful where you use a Service Finder to discover which Transport implementation
+     * to use. For example the 'wsdl' transport is a generic 'finder' transport that will
+     * use Axis, Xfire or Glue to create the WSDL client. These transport protocols would
+     * be wsdl-axis, wsdl-xfire and wsdl-glue, but they can all support 'wsdl' protocol
+     * too.
+     * 
+     * @param protocol
+     *            the supported protocol to register
      */
-    protected void registerSupportedProtocolWithotPrefix(String protocol) {
+    protected void registerSupportedProtocolWithotPrefix(String protocol)
+    {
         supportedProtocols.add(protocol.toLowerCase());
     }
 
-
-    public void unregisterSupportedProtocol(String protocol) {
+    public void unregisterSupportedProtocol(String protocol)
+    {
         protocol = protocol.toLowerCase();
-        if(protocol.startsWith(getProtocol().toLowerCase())) {
+        if (protocol.startsWith(getProtocol().toLowerCase())) {
             supportedProtocols.remove(protocol);
-        } else {
+        }
+        else {
             supportedProtocols.remove(getProtocol().toLowerCase() + ":" + protocol);
         }
     }
@@ -1044,47 +1125,57 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * @return true if the protocol is supported by this connector.
      */
-    public boolean supportsProtocol(String protocol) {
+    public boolean supportsProtocol(String protocol)
+    {
         return supportedProtocols.contains(protocol.toLowerCase());
     }
 
     /**
      * Returns an unmodifiable list of the protocols supported by this connector
+     * 
      * @return an unmodifiable list of the protocols supported by this connector
      */
-    public List getSupportedProtocols() {
+    public List getSupportedProtocols()
+    {
         return Collections.unmodifiableList(supportedProtocols);
     }
 
     /**
      * Sets A list of protocols that the connector can accept
+     * 
      * @param supportedProtocols
      */
-    public void setSupportedProtocols(List supportedProtocols) {
+    public void setSupportedProtocols(List supportedProtocols)
+    {
         for (Iterator iterator = supportedProtocols.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
+            String s = (String)iterator.next();
             registerSupportedProtocol(s);
         }
     }
 
     /**
-     * Creates a work manager for a Message receiver.  If <code>useSingleReceiverThreadPool</code> has been set the
-     * same workManager of all receivers will be used
-     * @param name The name to associate with the thread pool.  No that the connector name will be prepended and ".receiver"
-     * will be appended
+     * Creates a work manager for a Message receiver. If
+     * <code>useSingleReceiverThreadPool</code> has been set the same workManager of all
+     * receivers will be used
+     * 
+     * @param name
+     *            The name to associate with the thread pool. No that the connector name
+     *            will be prepended and ".receiver" will be appended
      * @return A new work manager of an existing one if the work manager is being shared
      */
-    UMOWorkManager createReceiverWorkManager(String name) {
+    UMOWorkManager createReceiverWorkManager(String name)
+    {
         UMOWorkManager wm;
-        if(useSingleReceiverThreadPool && receiverWorkManager!=null) {
+        if (useSingleReceiverThreadPool && receiverWorkManager != null) {
             wm = receiverWorkManager;
-        } else {
+        }
+        else {
             ThreadingProfile tp = getReceiverThreadingProfile();
             if (serverSide) {
                 tp.setThreadPriority(Thread.NORM_PRIORITY + 2);
             }
             wm = tp.createWorkManager(getName() + "." + name + ".receiver");
-            if(useSingleReceiverThreadPool) {
+            if (useSingleReceiverThreadPool) {
                 receiverWorkManager = wm;
             }
         }
@@ -1092,20 +1183,25 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Creates a work manager for a Message dispatcher.  If <code>useSingleDispatcherThreadPool</code> has been set the
-     * same workManager of all dispatchers will be used
-     * @param name The name to associate with the thread pool.  No that the connector name will be prepended and ".dispatcher"
-     * will be appended
+     * Creates a work manager for a Message dispatcher. If
+     * <code>useSingleDispatcherThreadPool</code> has been set the same workManager of
+     * all dispatchers will be used
+     * 
+     * @param name
+     *            The name to associate with the thread pool. No that the connector name
+     *            will be prepended and ".dispatcher" will be appended
      * @return A new work manager of an existing one if the work manager is being shared
      */
-    UMOWorkManager createDispatcherWorkManager(String name) {
+    UMOWorkManager createDispatcherWorkManager(String name)
+    {
         UMOWorkManager wm = null;
-        if(useSingleDispatcherThreadPool && dispatcherWorkManager!=null) {
+        if (useSingleDispatcherThreadPool && dispatcherWorkManager != null) {
             wm = dispatcherWorkManager;
-        } else {
+        }
+        else {
             ThreadingProfile tp = getReceiverThreadingProfile();
             wm = tp.createWorkManager(getName() + "." + name + ".dispatcher");
-            if(useSingleDispatcherThreadPool) {
+            if (useSingleDispatcherThreadPool) {
                 dispatcherWorkManager = wm;
             }
         }
@@ -1113,104 +1209,131 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Should a single receiver thread pool be created for all receivers
-     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
-     * to true
-     * @return true is a single thread pool is being used for all receivers on this connector
+     * Should a single receiver thread pool be created for all receivers It is recommended
+     * that if you have a lot of receivers being registered per connector that this should
+     * be set to true
+     * 
+     * @return true is a single thread pool is being used for all receivers on this
+     *         connector
      */
-    public boolean isUseSingleReceiverThreadPool() {
+    public boolean isUseSingleReceiverThreadPool()
+    {
         return useSingleReceiverThreadPool;
     }
 
     /**
-     * Should a single dispatcher thread pool be created for all recivers
-     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
-     * to true
-     * @param useSingleReceiverThreadPool true is a single thread pool is being used for all receivers on this connector
+     * Should a single dispatcher thread pool be created for all recivers It is
+     * recommended that if you have a lot of receivers being registered per connector that
+     * this should be set to true
+     * 
+     * @param useSingleReceiverThreadPool
+     *            true is a single thread pool is being used for all receivers on this
+     *            connector
      */
-    public void setUseSingleReceiverThreadPool(boolean useSingleReceiverThreadPool) {
+    public void setUseSingleReceiverThreadPool(boolean useSingleReceiverThreadPool)
+    {
         this.useSingleReceiverThreadPool = useSingleReceiverThreadPool;
     }
 
     /**
-     * Should a single dispatcher thread pool be created for all distachers
-     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
-     * to true i.e. many different outbound endpoints
-     * @return true is a single thread pool is being used for all dispatchers on this connector
+     * Should a single dispatcher thread pool be created for all distachers It is
+     * recommended that if you have a lot of dispatcher being created per connector that
+     * this should be set to true i.e. many different outbound endpoints
+     * 
+     * @return true is a single thread pool is being used for all dispatchers on this
+     *         connector
      */
-    public boolean isUseSingleDispatcherThreadPool() {
+    public boolean isUseSingleDispatcherThreadPool()
+    {
         return useSingleDispatcherThreadPool;
     }
 
     /**
-     * Should a single dispatcher thread pool be created for all distachers
-     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
-     * to true i.e. many different outbound endpoints
-     * @param useSingleDispatcherThreadPool true is a single thread pool is being used for all dispatchers on this connector
+     * Should a single dispatcher thread pool be created for all distachers It is
+     * recommended that if you have a lot of dispatcher being created per connector that
+     * this should be set to true i.e. many different outbound endpoints
+     * 
+     * @param useSingleDispatcherThreadPool
+     *            true is a single thread pool is being used for all dispatchers on this
+     *            connector
      */
-    public void setUseSingleDispatcherThreadPool(boolean useSingleDispatcherThreadPool) {
+    public void setUseSingleDispatcherThreadPool(boolean useSingleDispatcherThreadPool)
+    {
         this.useSingleDispatcherThreadPool = useSingleDispatcherThreadPool;
     }
 
     /**
-     * The flag determines if the connector is being used on the server side or client.
-     * If true receiver threads will be given a slightly higher priority.
+     * The flag determines if the connector is being used on the server side or client. If
+     * true receiver threads will be given a slightly higher priority.
+     * 
      * @return true if running on the server side (default)
      */
-    public boolean isServerSide() {
+    public boolean isServerSide()
+    {
         return serverSide;
     }
 
     /**
-     * The flag determines if the connector is being used on the server side or client.
-     * If true receiver threads will be given a slightly higher priority.
-     * @param serverSide true if running on the server side
+     * The flag determines if the connector is being used on the server side or client. If
+     * true receiver threads will be given a slightly higher priority.
+     * 
+     * @param serverSide
+     *            true if running on the server side
      */
-    public void setServerSide(boolean serverSide) {
+    public void setServerSide(boolean serverSide)
+    {
         this.serverSide = serverSide;
     }
 
-    public UMOSessionHandler getSessionHandler() {
+    public UMOSessionHandler getSessionHandler()
+    {
         return sessionHandler;
     }
 
-    public void setSessionHandler(UMOSessionHandler sessionHandler) {
+    public void setSessionHandler(UMOSessionHandler sessionHandler)
+    {
         this.sessionHandler = sessionHandler;
     }
 
-    public void workAccepted(WorkEvent event) {
+    public void workAccepted(WorkEvent event)
+    {
         handleWorkException(event, "workAccepted");
     }
 
-    public void workRejected(WorkEvent event) {
+    public void workRejected(WorkEvent event)
+    {
         handleWorkException(event, "workRejected");
     }
 
-    public void workStarted(WorkEvent event) {
+    public void workStarted(WorkEvent event)
+    {
         handleWorkException(event, "workStarted");
     }
 
-    public void workCompleted(WorkEvent event) {
+    public void workCompleted(WorkEvent event)
+    {
         handleWorkException(event, "workCompleted");
     }
 
-    protected void handleWorkException(WorkEvent event, String type) {
+    protected void handleWorkException(WorkEvent event, String type)
+    {
         Throwable e;
         if (event != null && event.getException() != null) {
             e = event.getException();
-        } else {
+        }
+        else {
             return;
         }
         if (event.getException().getCause() != null) {
             e = event.getException().getCause();
         }
-        logger.error("Work caused exception on '" + type +
-                     "'. Work being executed was: " + event.getWork().toString());
+        logger.error("Work caused exception on '" + type + "'. Work being executed was: "
+                + event.getWork().toString());
         if (e instanceof Exception) {
-            handleException((Exception) e);
-        } else {
-            throw new MuleRuntimeException(new Message(Messages.CONNECTOR_CAUSED_ERROR,
-                                                       getName()), e);
+            handleException((Exception)e);
+        }
+        else {
+            throw new MuleRuntimeException(new Message(Messages.CONNECTOR_CAUSED_ERROR, getName()), e);
         }
     }
 }
