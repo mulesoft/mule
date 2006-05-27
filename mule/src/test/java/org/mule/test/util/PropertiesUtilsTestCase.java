@@ -15,9 +15,8 @@
 
 package org.mule.test.util;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.mule.util.CollectionUtils;
+import org.mule.util.MapUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.util.HashMap;
@@ -101,7 +100,7 @@ public class PropertiesUtilsTestCase extends TestCase
 
     public void testMapSingleElement() throws Exception
     {
-        Map props = CollectionUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"},
+        Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"},
                 new Object[]{"bar"});
 
         assertEquals("{foo=bar}", PropertiesUtils.propertiesToString(props, false));
@@ -111,7 +110,7 @@ public class PropertiesUtilsTestCase extends TestCase
 
     public void testMapTwoElements() throws Exception
     {
-        Map props = CollectionUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo","foozle"},
+        Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo","foozle"},
                 new Object[]{"bar","doozle"});
 
         assertEquals("{foo=bar, foozle=doozle}", PropertiesUtils.propertiesToString(props, false));
