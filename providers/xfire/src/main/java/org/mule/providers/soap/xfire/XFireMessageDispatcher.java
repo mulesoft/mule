@@ -16,6 +16,9 @@
 package org.mule.providers.soap.xfire;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.pool.BasePoolableObjectFactory;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.StackObjectPool;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.OperationInfo;
@@ -36,13 +39,16 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 
 import javax.activation.DataHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 
 /**
- * The XfireMessageDispatcher is used for making Soap client requests to remote services using the Xfire soap stack
+ * The XfireMessageDispatcher is used for making Soap client requests to remote services
+ * using the Xfire soap stack
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -51,45 +57,63 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 {
 
     protected XFireConnector connector;
-    protected Client client;
+    protected ObjectPool clientPool;
 
     public XFireMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XFireConnector)endpoint.getConnector();
-
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        if(client==null)
-        {
-            String serviceName = getService(endpoint);
-            XFire xfire = connector.getXfire();
-            Service service = xfire.getServiceRegistry().getService(serviceName);
-            if(service==null) {
+    protected void doConnect(final UMOImmutableEndpoint endpoint) throws Exception
+    {
+        if (clientPool == null) {
+            final XFire xfire = connector.getXfire();
+            final String serviceName = getServiceName(endpoint);
+            final Service service = xfire.getServiceRegistry().getService(serviceName);
+
+            if (service == null) {
                 throw new FatalConnectException(new Message("xfire", 8, serviceName), this);
             }
-            client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
-            client.setXFire(xfire);
-            client.setEndpointUri(endpoint.getEndpointURI().toString());
-            client.addInHandler(new MuleHeadersInHandler());
-            client.addOutHandler(new MuleHeadersOutHandler());
+
+            try {
+                clientPool = new StackObjectPool(new BasePoolableObjectFactory()
+                {
+                    public Object makeObject() throws Exception
+                    {
+                        Client client = new Client(new MuleUniversalTransport(), service, endpoint
+                                .getEndpointURI().toString());
+                        client.setXFire(xfire);
+                        client.setEndpointUri(endpoint.getEndpointURI().toString());
+                        client.addInHandler(new MuleHeadersInHandler());
+                        client.addOutHandler(new MuleHeadersOutHandler());
+                        return client;
+                    }
+                });
+                clientPool.addObject();
+                clientPool.addObject();
+            }
+            catch (Exception ex) {
+                disconnect();
+                throw ex;
+            }
         }
     }
 
-    protected void doDisconnect() throws Exception {
-        client = null;
+    protected void doDisconnect() throws Exception
+    {
+        clientPool = null;
     }
 
     protected void doDispose()
     {
-        // template method
+        connector = null;
     }
 
     protected String getMethod(UMOEvent event) throws DispatchException
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        String method = (String)endpointUri.getParams().remove("method");
+        String method = (String)endpointUri.getParams().get("method");
 
         if (method == null) {
             method = (String)event.getEndpoint().getProperties().get("method");
@@ -105,74 +129,97 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getTransformedMessage();
         Object[] args;
+
         if (payload instanceof Object[]) {
             args = (Object[])payload;
         }
         else {
             args = new Object[]{payload};
         }
-        if (event.getMessage().getAttachmentNames() != null
-                && event.getMessage().getAttachmentNames().size() > 0) {
+
+        UMOMessage message = event.getMessage();
+        Set attachmentNames = message.getAttachmentNames();
+        if (attachmentNames != null && !attachmentNames.isEmpty()) {
             ArrayList attachments = new ArrayList();
-            Iterator i = event.getMessage().getAttachmentNames().iterator();
-            while (i.hasNext()) {
-                attachments.add(event.getMessage().getAttachment((String)i.next()));
+            for (Iterator i = attachmentNames.iterator(); i.hasNext();) {
+                attachments.add(message.getAttachment((String)i.next()));
             }
             ArrayList temp = new ArrayList(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[0]));
             args = temp.toArray();
         }
+
         return args;
     }
 
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
-        if (client.getTimeout() != event.getTimeout()) {
+        Client client = null;
+
+        try {
+            client = (Client)clientPool.borrowObject();
             client.setTimeout(event.getTimeout());
+            client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+            Object[] response = client.invoke(getMethod(event), getArgs(event));
+
+            UMOMessage result = null;
+            if (response != null && response.length <= 1) {
+                if (response.length == 1) {
+                    result = new MuleMessage(response[0], event.getMessage());
+                }
+            }
+            else {
+                result = new MuleMessage(response, event.getMessage());
+            }
+
+            return result;
         }
-        client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        String method = getMethod(event);
-        Object[] response = client.invoke(method, getArgs(event));
-        UMOMessage result = null;
-        if (response != null && response.length <= 1) {
-            if (response.length == 1) {
-                result = new MuleMessage(response[0], event.getMessage());
+        finally {
+            if (client != null) {
+                clientPool.returnObject(client);
             }
         }
-        else {
-            result = new MuleMessage(response, event.getMessage());
-        }
-        return result;
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        if (client.getTimeout() != event.getTimeout()) {
+        Client client = null;
+
+        try {
+            client = (Client)clientPool.borrowObject();
             client.setTimeout(event.getTimeout());
+            client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+            client.invoke(getMethod(event), getArgs(event));
         }
-        client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        String method = getMethod(event);
-        client.invoke(method, getArgs(event));
+        finally {
+            if (client != null) {
+                clientPool.returnObject(client);
+            }
+        }
     }
 
     /**
      * Make a specific request to the underlying transport
-     *
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout  the maximum time the operation should block before returning. The call should
-     *                 return immediately if there is data available. If no data becomes available before the timeout
-     *                 elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     *         avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     * 
+     * @param endpoint
+     *            the endpoint to use when connecting to the resource
+     * @param timeout
+     *            the maximum time the operation should block before returning. The call
+     *            should return immediately if there is data available. If no data becomes
+     *            available before the timeout elapses, null will be returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception
+     *             if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
-
-        String serviceName = getService(endpoint);
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
+        String serviceName = getServiceName(endpoint);
 
         XFire xfire = connector.getXfire();
         Service service = xfire.getServiceRegistry().getService(serviceName);
-        Client client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI().toString());
+        Client client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI()
+                .toString());
         client.setXFire(xfire);
         client.setTimeout((int)timeout);
         client.setEndpointUri(endpoint.getEndpointURI().toString());
@@ -205,7 +252,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Get the service that is mapped to the specified request.
      */
-    protected String getService(UMOImmutableEndpoint endpoint)
+    protected String getServiceName(UMOImmutableEndpoint endpoint)
     {
         String pathInfo = endpoint.getEndpointURI().getPath();
 
@@ -215,7 +262,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
         String serviceName;
 
-        int i = pathInfo.lastIndexOf("/");
+        int i = pathInfo.lastIndexOf('/');
 
         if (i > -1) {
             serviceName = pathInfo.substring(i + 1);
