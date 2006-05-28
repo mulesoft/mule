@@ -40,3 +40,4 @@ You can post on the mailing list - user@mule.codehaus.org or raise
 issues at http://jira.muleumo.org, or drop in to our IRC channel on irc.codehaus.org#mule
 
 Enjoy!
+ 
