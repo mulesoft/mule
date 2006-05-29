@@ -17,12 +17,15 @@ import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
+import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.util.BeanUtils;
+import org.mule.util.StringUtils;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -32,6 +35,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
@@ -62,6 +67,9 @@ public class Mx4jAgent implements UMOAgent
     private String pathInJar = null;
 
     private boolean cacheXsl = true;
+
+    // SSL/TLS socket factory config
+    private Map socketFactoryProperties = new HashMap();
 
 
     public String getLogin() {
@@ -116,39 +124,47 @@ public class Mx4jAgent implements UMOAgent
     {
         Object adaptor;
         Log.redirectTo(new CommonsLogger());
-        URI uri = new URI(jmxAdaptorUrl);
+        URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
         adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
 
         // Set the XSLT Processor with any local overrides
 
         XSLTProcessor processor = new XSLTProcessor();
 
-        if (xslFilePath != null) {
+        if (StringUtils.isNotBlank(xslFilePath)) {
 
-            processor.setFile(xslFilePath);
+            processor.setFile(xslFilePath.trim());
 
         }
 
-        if (pathInJar != null) {
+        if (StringUtils.isNotBlank(pathInJar)) {
 
-            processor.setPathInJar(pathInJar);
+            processor.setPathInJar(pathInJar.trim());
 
         }
 
         processor.setUseCache(cacheXsl);
 
-        ((HttpAdaptor) adaptor).setProcessor(processor);
+        final HttpAdaptor httpAdaptor = ((HttpAdaptor) adaptor);
+        httpAdaptor.setProcessor(processor);
 
         //Set endpoint authentication if required
 
         if (login != null) {
 
-            ((HttpAdaptor) adaptor).addAuthorization(login, password);
+            httpAdaptor.addAuthorization(login, password);
 
-            ((HttpAdaptor) adaptor).setAuthenticationMethod(authenticationMethod);
+            httpAdaptor.setAuthenticationMethod(authenticationMethod);
 
-            // will need to configure it with some keystore properties
-//            ((HttpAdaptor) adaptor).setSocketFactory(new SSLAdaptorServerSocketFactory());
+        }
+
+        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
+            // TODO mx4j's socket factory does not handle the IBM's security provider
+            // extend it to hadnle the case.
+            // See http://jira.symphonysoft.com/browse/MULE-809 for analogous patch
+            SSLAdaptorServerSocketFactory factory = new SSLAdaptorServerSocketFactory();
+            BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
+            httpAdaptor.setSocketFactory(factory);
         }
 
         return adaptor;
@@ -285,5 +301,14 @@ public class Mx4jAgent implements UMOAgent
     public void setJmxAdaptorUrl(String jmxAdaptorUrl)
     {
         this.jmxAdaptorUrl = jmxAdaptorUrl;
+    }
+
+
+    public Map getSocketFactoryProperties() {
+        return socketFactoryProperties;
+    }
+
+    public void setSocketFactoryProperties(Map socketFactoryProperties) {
+        this.socketFactoryProperties = socketFactoryProperties;
     }
 }
