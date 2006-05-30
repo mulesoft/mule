@@ -62,7 +62,7 @@ public class HttpSessionHandler implements UMOSessionHandler
         for (Iterator iterator = session.getPropertyNames(); iterator.hasNext();) {
             name = iterator.next();
             value = session.getProperty(name);
-            // Todo handle domain, path, secure and exiry
+            // TODO handle domain, path, secure (https) and expiry
             cookies.add(new Cookie(null, name.toString(), value.toString()));
         }
         if (cookies.size() > 0) {
