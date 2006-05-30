@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -52,9 +53,9 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.ConnectException;
 import java.util.Properties;
 
 /**
@@ -302,8 +303,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             ExceptionPayload ep = null;
             if (httpMethod.getStatusCode() >= 400) {
-//                String result = IOUtils.toString(httpMethod.getResponseBodyAsStream());
-//                logger.error(result);
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
                                 + " " + httpMethod.getStatusText())));
@@ -316,12 +315,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 sp.setResponse(httpMethod.getResponseBodyAsStream());
                 m = new MuleMessage(sp, h);
             }
-//            else if ((header != null) && header.getValue().startsWith("text/")) {
-//                m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
-//            }
             else {
-                Object body = httpMethod.getResponseBody();
-                if(body==null) {
+                Object body = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
+                if(body == null) {
                     body = StringUtils.EMPTY;
                 }
                 UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{body, h});

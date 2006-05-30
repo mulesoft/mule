@@ -76,7 +76,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
                 key = (String)e.nextElement();
                 realKey = key;
-                if(key.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+                if(key.startsWith(HttpConstants.X_PROPERTY_PREFIX)) {
                     realKey = key.substring(2);
                 }
                 setProperty(realKey, request.getHeader(key));
@@ -187,9 +187,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             else {
                 this.message = payload;
             }
-//            if(message==null || StringUtils.isBlank(this.message.toString())) {
-//                this.message = httpRequest;
-//            }
         }
         catch (IOException e) {
             throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()),
@@ -207,8 +204,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         HttpSession session = null;
 
         try {
-            // We wrap this call as on some App Servers (Websfear) It can cause
-            // a NPE
+            // We wrap this call as on some App Servers (Websfear) it can cause an NPE
             session = getRequest().getSession();
         }
         catch (Exception e) {

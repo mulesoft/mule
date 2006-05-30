@@ -16,7 +16,7 @@ package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
-import org.mule.config.MuleProperties;
+import org.apache.commons.io.IOUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractTransformer;
@@ -50,7 +50,8 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
         try {
             if (contentType != null && !contentType.getValue().startsWith("text/")) {
-                msg = httpMethod.getResponseBody();
+                // TODO properly do streaming
+                msg = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
             }
             else {
                 msg = httpMethod.getResponseBodyAsString();
@@ -65,10 +66,10 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         String name;
         for (int i = 0; i < headers.length; i++) {
             name = headers[i].getName();
-            if (name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+            if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX)) {
                 name = name.substring(2);
             }
-            headerProps.put(headers[i].getName(), headers[i].getValue());
+            headerProps.put(name, headers[i].getValue());
         }
         // Set Mule Properties
 

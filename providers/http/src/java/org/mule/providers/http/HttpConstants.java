@@ -15,6 +15,7 @@
 package org.mule.providers.http;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.mule.config.MuleProperties;
 import org.mule.util.MapUtils;
 
 import java.util.Collections;
@@ -108,6 +109,9 @@ public class HttpConstants
 
     // Chunked transfer encoding indicator
     public static final String TRANSFER_ENCODING_CHUNKED = "chunked";
+
+    // Key for X-MULE headers
+    public static final String X_PROPERTY_PREFIX = "X-" + MuleProperties.PROPERTY_PREFIX;
 
     // case-insenitive Maps of header names to their normalized representations
     public static final Map REQUEST_HEADER_NAMES;
