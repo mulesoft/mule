@@ -14,18 +14,9 @@
 
 package org.mule.providers.soap.xfire.wsdl;
 
-import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.StackObjectPool;
-import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.client.Client;
-import org.codehaus.xfire.service.Service;
 import org.mule.providers.soap.xfire.XFireMessageDispatcher;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
-import javax.xml.namespace.QName;
-
-import java.net.URL;
 
 /**
  * TODO document
@@ -44,31 +35,7 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
     protected void doConnect(final UMOImmutableEndpoint endpoint) throws Exception
     {
         try {
-            clientPool = new StackObjectPool(new BasePoolableObjectFactory()
-            {
-                public Object makeObject() throws Exception
-                {
-                    XFire xfire = connector.getXfire();
-                    String wsdlUrl = endpoint.getEndpointURI().getAddress();
-                    String serviceName = wsdlUrl.substring(0, wsdlUrl.lastIndexOf('?'));
-                    Service service = xfire.getServiceRegistry().getService(new QName(serviceName));
-                    Client client;
-
-                    if (service != null) {
-                        client = new Client(new MuleUniversalTransport(), service, wsdlUrl);
-                    }
-                    else {
-                        client = new Client(new URL(wsdlUrl));
-                        client.getService().setName(new QName(serviceName));
-                        xfire.getServiceRegistry().register(client.getService());
-                    }
-
-                    client.setXFire(xfire);
-                    client.setEndpointUri(endpoint.getEndpointURI().toString());
-                    return client;
-                }
-            });
-            clientPool.addObject();
+            clientPool = new StackObjectPool(new XFireWsdlClientPoolFactory(endpoint, connector.getXfire()));
             clientPool.addObject();
         }
         catch (Exception ex) {

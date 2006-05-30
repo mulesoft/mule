@@ -16,7 +16,6 @@
 package org.mule.providers.soap.xfire;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
 import org.codehaus.xfire.XFire;
@@ -77,20 +76,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             }
 
             try {
-                clientPool = new StackObjectPool(new BasePoolableObjectFactory()
-                {
-                    public Object makeObject() throws Exception
-                    {
-                        Client client = new Client(new MuleUniversalTransport(), service, endpoint
-                                .getEndpointURI().toString());
-                        client.setXFire(xfire);
-                        client.setEndpointUri(endpoint.getEndpointURI().toString());
-                        client.addInHandler(new MuleHeadersInHandler());
-                        client.addOutHandler(new MuleHeadersOutHandler());
-                        return client;
-                    }
-                });
-                clientPool.addObject();
+                clientPool = new StackObjectPool(new XFireClientPoolFactory(endpoint, service, xfire));
                 clientPool.addObject();
             }
             catch (Exception ex) {
@@ -102,7 +88,10 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDisconnect() throws Exception
     {
-        clientPool = null;
+        if (clientPool != null) {
+            clientPool.clear();
+            clientPool = null;
+        }
     }
 
     protected void doDispose()
@@ -119,7 +108,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             method = (String)event.getEndpoint().getProperties().get("method");
             if (method == null) {
                 throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event
-                        .getMessage(), event.getEndpoint());
+                                .getMessage(), event.getEndpoint());
             }
         }
         return method;
@@ -212,14 +201,15 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
      * @throws Exception
      *             if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout)
+                    throws Exception
     {
         String serviceName = getServiceName(endpoint);
 
         XFire xfire = connector.getXfire();
         Service service = xfire.getServiceRegistry().getService(serviceName);
-        Client client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI()
-                .toString());
+        Client client = new Client(new MuleUniversalTransport(), service, endpoint
+                        .getEndpointURI().toString());
         client.setXFire(xfire);
         client.setTimeout((int)timeout);
         client.setEndpointUri(endpoint.getEndpointURI().toString());
