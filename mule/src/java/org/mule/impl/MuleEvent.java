@@ -244,17 +244,19 @@ public class MuleEvent extends EventObject implements UMOEvent
         setCredentials();
     }
 
+    // TODO this method is pretty confusing and could need some documentation.
+    // value is not used at all, instead the value for the passed key is looked up twice.
     protected boolean ignoreProperty(String key, Object value) {
-        if(value==null || key==null) {
+        if (key == null || value == null) {
             return true;
         }
 
-        if(key.toString().startsWith(MuleProperties.PROPERTY_PREFIX) && message.getProperty(key) != null) {
+        if (key.startsWith(MuleProperties.PROPERTY_PREFIX) && message.getProperty(key) != null) {
             return true;
         }
 
         for (int i = 0; i < ignorredPropertyOverides.length; i++) {
-            if(key.equals(ignorredPropertyOverides[i])) {
+            if (key.equals(ignorredPropertyOverides[i])) {
                 return false;
             }
         }
