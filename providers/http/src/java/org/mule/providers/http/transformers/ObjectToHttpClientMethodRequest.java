@@ -199,7 +199,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             headerValue = msg.getStringProperty(headerName, null);
             if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null) {
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
-                    headerName = "X-" + headerName;
+                    headerName = new StringBuffer(30).append("X-").append(headerName).toString();
                 }
                 // Make sure we have a valid header name otherwise we will
                 // corrupt the request
@@ -208,6 +208,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     httpMethod.addRequestHeader(headerName, headerValue);
                 }
                 else {
+                    // TODO why is this the same code as the previous branch?
                     httpMethod.addRequestHeader(headerName, headerValue);
                 }
             }
