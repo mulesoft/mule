@@ -21,35 +21,19 @@ import org.mule.providers.soap.xfire.XFireClientPoolFactory;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import javax.xml.namespace.QName;
-
-import java.net.URL;
-
 public class XFireWsdlClientPoolFactory extends XFireClientPoolFactory
 {
 
-    public XFireWsdlClientPoolFactory(UMOImmutableEndpoint endpoint, XFire xfire)
+    public XFireWsdlClientPoolFactory(UMOImmutableEndpoint endpoint,
+                                      Service service,
+                                      XFire xfire)
     {
-        super(endpoint, null, xfire);
+        super(endpoint, service, xfire);
     }
 
     public Object makeObject() throws Exception
     {
-        String wsdlUrl = _uri.getAddress();
-        String serviceName = wsdlUrl.substring(0, wsdlUrl.lastIndexOf('?'));
-        Service service = _xfire.getServiceRegistry().getService(new QName(serviceName));
-        Client client;
-
-        if (service != null) {
-            client = new Client(new MuleUniversalTransport(), service, wsdlUrl);
-        }
-        else {
-            client = new Client(new URL(wsdlUrl));
-            Service newService = client.getService();
-            newService.setName(new QName(serviceName));
-            _xfire.getServiceRegistry().register(newService);
-        }
-
+        Client client = new Client(new MuleUniversalTransport(), _service, _uri.getAddress());
         client.setXFire(_xfire);
         client.setEndpointUri(_uri.toString());
         return client;
