@@ -17,6 +17,8 @@ package org.mule.providers.soap.xfire;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.annotations.AnnotationServiceFactory;
+import org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
@@ -53,6 +55,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     private ServiceFactory serviceFactory;
 
+    private boolean enableJSR181Annotations = false;
+
     public XFireConnector()
     {
         super();
@@ -85,8 +89,13 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         if (xfire == null) {
             xfire = new DefaultXFire();
         }
+
         if (serviceFactory == null) {
-            serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
+            if(enableJSR181Annotations) {
+                serviceFactory = new AnnotationServiceFactory(new Jsr181WebAnnotations(), xfire.getTransportManager());
+            } else {
+                serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
+            }
         }
         if (serviceFactory instanceof ObjectServiceFactory) {
             ObjectServiceFactory osf = (ObjectServiceFactory)serviceFactory;
@@ -213,6 +222,14 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         } else {
             return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
         }
+    }
+
+    public boolean isEnableJSR181Annotations() {
+        return enableJSR181Annotations;
+    }
+
+    public void setEnableJSR181Annotations(boolean enableJSR181Annotations) {
+        this.enableJSR181Annotations = enableJSR181Annotations;
     }
 
     public void onNotification(UMOServerNotification event)
