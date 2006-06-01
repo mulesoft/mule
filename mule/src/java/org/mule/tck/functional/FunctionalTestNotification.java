@@ -14,6 +14,8 @@
 package org.mule.tck.functional;
 
 import org.mule.impl.internal.notifications.CustomNotification;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * todo document
@@ -25,14 +27,20 @@ public class FunctionalTestNotification extends CustomNotification {
 
     public static final int EVENT_RECEIVED = -999999;
     private Object replyMessage = null;
+    private UMOEventContext eventContext;
 
-    public FunctionalTestNotification(String componentName, Object message, Object replyMessage, int action) {
-        super(message, action);
-        resourceIdentifier = componentName;
+    public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action) throws TransformerException {
+        super(context.getTransformedMessage(), action);
+        resourceIdentifier = context.getComponentDescriptor().getName();
         this.replyMessage = replyMessage;
+        this.eventContext = context;
     }
 
     public Object getReplyMessage() {
         return replyMessage;
+    }
+
+    public UMOEventContext getEventContext() {
+        return eventContext;
     }
 }

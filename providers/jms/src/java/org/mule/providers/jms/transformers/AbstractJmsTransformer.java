@@ -23,8 +23,8 @@ import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
@@ -34,7 +34,6 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
 import java.util.Iterator;
 
 /**
@@ -157,7 +156,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
      * Encode a string so that is is a valid java identifier
      * 
      * @param name
-     * @return
+     * @return A valid Jms header name
      */
     public static String encodeHeader(String name)
     {

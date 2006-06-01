@@ -21,7 +21,7 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.util.StringMessageUtils;
+import org.mule.util.StringMessageHelper;
 
 /**
  * <code>FunctionalTestComponent</code> is a component that can be used by
@@ -45,9 +45,9 @@ public class FunctionalTestComponent implements Callable
     {
         String contents = context.getTransformedMessageAsString();
         String msg = null;
-        msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
+        msg = StringMessageHelper.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                + StringMessageHelper.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
 
@@ -61,7 +61,7 @@ public class FunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context.getComponentDescriptor().getName(), contents, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if(throwException) {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));

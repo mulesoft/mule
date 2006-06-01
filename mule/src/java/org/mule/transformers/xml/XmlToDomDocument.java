@@ -13,13 +13,13 @@
  */
 package org.mule.transformers.xml;
 
+import org.mule.umo.transformer.TransformerException;
+import org.w3c.dom.Document;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
-
-import org.mule.umo.transformer.TransformerException;
-import org.w3c.dom.Document;
 
 /**
  * <code>XmlToDomDocument</code> Transform a XML String to
@@ -47,9 +47,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
             ResultHolder holder = getResultHolder(returnClass);
-            if (holder == null) holder = getResultHolder(Document.class); 
-
-            assert(holder != null);
+            if (holder == null) holder = getResultHolder(Document.class);
 
             Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
             idTransformer.setOutputProperty(OutputKeys.ENCODING,encoding);

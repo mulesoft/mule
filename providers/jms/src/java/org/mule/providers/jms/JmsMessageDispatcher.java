@@ -15,7 +15,6 @@
 package org.mule.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.MapUtils;
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
