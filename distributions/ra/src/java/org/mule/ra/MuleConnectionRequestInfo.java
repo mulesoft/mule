@@ -15,7 +15,7 @@ package org.mule.ra;
 
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.UMOManager;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import javax.resource.spi.ConnectionRequestInfo;
 
@@ -52,7 +52,7 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
 
     public String[] getConfigurationsAsArray()
     {
-        return Utility.split(configurations, ",");
+        return StringUtils.split(configurations, ",");
     }
 
     public void setConfigurations(String configurations)

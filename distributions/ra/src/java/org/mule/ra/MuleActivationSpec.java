@@ -16,7 +16,7 @@ package org.mule.ra;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
@@ -56,7 +56,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
 
     public void setPropertiesMap(String properties)
     {
-        String[] pairs = Utility.split(properties, ",");
+        String[] pairs = StringUtils.split(properties, ",");
         propertiesMap = new Properties();
         for (int i = 0; i < pairs.length; i++) {
             String pair = pairs[i];
