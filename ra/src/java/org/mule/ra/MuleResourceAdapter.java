@@ -29,7 +29,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.ClassHelper;
+import org.mule.util.ClassUtils;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
@@ -83,8 +83,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             } else {
                 ConfigurationBuilder builder = null;
                 try {
-                    builder = (ConfigurationBuilder) ClassHelper.instanciateClass(info.getConfigurationBuilder(),
-                                                                                  ClassHelper.NO_ARGS);
+                    builder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
+                                                                                  ClassUtils.NO_ARGS);
 
                 } catch (Exception e) {
                     throw new ResourceAdapterInternalException("Failed to instanciate configurationBuilder class: "
