@@ -33,7 +33,7 @@ import org.mule.umo.transformer.TransformerException;
  * that can be set on the router. If the event does not match the filter a
  * <code>UMOROutnerCatchAllStrategy</code> can be set on this router to route
  * unwanted events. If a catch strategy is not set the router just returns null.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -52,6 +52,7 @@ public class SelectiveConsumer implements UMOInboundRouter
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
+        logger.debug("Attempting to route event");
         if (filter == null) {
             return true;
         }
@@ -69,7 +70,12 @@ public class SelectiveConsumer implements UMOInboundRouter
         } else {
             message = event.getMessage();
         }
-        return filter.accept(message);
+        boolean result = filter.accept(message);
+        if (logger.isDebugEnabled()) {
+            logger.debug((result ? "Event passed filter " : "Event did not pass filter ")
+                           + filter.getClass().getName());
+        }
+        return result;
     }
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException

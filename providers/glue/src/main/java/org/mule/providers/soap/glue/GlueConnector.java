@@ -27,9 +27,9 @@ import java.util.Map;
 
 /**
  * <code>GlueConnector</code> instanciates a Glue soap server and allows beans
- * to be dynamically exposed a swebservices simply by registering with the
- * connector
- * 
+ * to be dynamically exposed via web services simply by registering with the
+ * connector.
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -68,7 +68,7 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
     }
-    
+
     private boolean shouldCreateServer(String endpoint) throws URISyntaxException
     {
         URI uri = new URI(endpoint);

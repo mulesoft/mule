@@ -40,7 +40,7 @@ public class OracleJmsMessageReceiver extends TransactedJmsMessageReceiver {
     }
 
     public void poll() throws Exception {
-        log.debug("Polling...");
+        log.trace("Polling...");
         super.poll();
     }
 

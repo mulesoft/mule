@@ -87,12 +87,12 @@ import java.util.Set;
  * &lt;/property&gt;
  * &lt;/bean&gt;
  * </code>
- * <p/> Enpoints are specified as a Mule Url which is used to register a
- * listener for the subscription In the pervious version of the
+ * <p/> Endpoints are specified as a Mule Url which is used to register a
+ * listener for the subscription In the previous version of the
  * MuleEventMulticaster it was possible to specify wildcard endpoints. This is
  * still possible but you need to tell the multicaster which specific endpoints
  * to listen on and then your subscription listeners can use wildcards. To
- * register the specific endpoints on the Evnet Multicaster you use the
+ * register the specific endpoints on the Event Multicaster you use the
  * <i>subscriptions</i> property. <p/> <code>
  * &lt;bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster"&gt;
  * &lt;property name="subscriptions"&gt;
@@ -242,11 +242,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * If the event is a Mule event and there is no source event attached to it,
      * it is assumed that the event was dispatched by an object in the context
      * using context.publishEvent() and will be dispatched by Mule. If the event
-     * does have za source event attached to it, it is assumed that the event
+     * does have a source event attached to it, it is assumed that the event
      * was dispatched by Mule and will be delivered to any listeners subscribed
      * to the event.
      * 
-     * @param e the application event received by the context
+     * @param the application event received by the context
      */
     public void multicastEvent(ApplicationEvent e)
     {
@@ -264,10 +264,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             } else {
                 initMule();
             }
-        } else if(e instanceof ContextClosedEvent) {
+        } else if (e instanceof ContextClosedEvent) {
             MuleManager.getInstance().dispose();
             return;
-        }else if (e instanceof MuleApplicationEvent) {
+        } else if (e instanceof MuleApplicationEvent) {
             muleEvent = (MuleApplicationEvent) e;
             // If there is no Mule event the event didn't originate from Mule
             // so its an outbound event

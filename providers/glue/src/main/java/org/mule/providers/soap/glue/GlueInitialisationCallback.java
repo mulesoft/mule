@@ -27,7 +27,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 /**
  * <code>GlueInitialisationCallback</code> is invoked when an Glue service
  * component is created from its descriptor.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -60,13 +60,12 @@ public class GlueInitialisationCallback implements InitialisationCallback
             return;
         }
         if (component instanceof GlueInitialisable) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
-            }
+            logger.debug("Calling Glue initialisation for component: " + component.getClass().getName());
             ((GlueInitialisable) component).initialise(service, context);
         }
         invoked = true;
         try {
+            logger.debug("Publishing service " + servicePath + " to Glue registry.");
             Registry.publish(servicePath, service, context);
         } catch (RegistryException e) {
             throw new InitialisationException(new Message("soap", 3, component.getClass().getName()), e, this);

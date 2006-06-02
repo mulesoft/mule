@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -20,9 +20,9 @@ import org.mule.umo.UMOEventContext;
 /**
  * <code>Callable</code> is used to provide UMOs with an interface
  * that supports event calls. UMO components do not have to implement this
- * interface, though the onCall method provides an example lifecycle method that
- * is executed when a event is received for the implementing component.
- * 
+ * interface, though the <code>onCall</code> method provides an example lifecycle method that
+ * is executed when an event is received for the implementing component.
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,7 +30,7 @@ public interface Callable extends UMOEventListener
 {
     /**
      * Passes the event to the listener
-     * 
+     *
      * @param eventContext the context of the current event being process
      * @return Object this object can be anything. When the
      *         <code>UMOLifecycleAdapter</code> for the component receives
@@ -49,5 +49,4 @@ public interface Callable extends UMOEventListener
      *             the exceptionListener associated with the component
      */
     Object onCall(UMOEventContext eventContext) throws Exception;
-
 }
