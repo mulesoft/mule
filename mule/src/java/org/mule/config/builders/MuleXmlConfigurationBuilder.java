@@ -1,15 +1,15 @@
 /*
  * $Header$
- * $Revision$ 
+ * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- *  
+ *
  */
 
 package org.mule.config.builders;
@@ -96,7 +96,7 @@ import java.util.Map;
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
  * builds a MuleManager instance based on a mule xml configration file defined
  * in the mule-configuration.dtd.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -214,7 +214,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     /**
      * Indicate whether this ConfigurationBulder has been configured yet
-     * 
+     *
      * @return <code>true</code> if this ConfigurationBulder has been
      *         configured
      */
@@ -359,7 +359,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         // Create container Context
         path += "/security-manager";
         addObjectCreateOrGetFromContainer(path, DEFAULT_SECURITY_MANAGER, "className", "ref", false);
-        
+
         // Add propviders
         digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
         addSetPropertiesRule(path + "/security-provider", digester);
@@ -553,20 +553,22 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
         digester.addRule(path, new Rule() {
             public void begin(String string, String string1, Attributes attributes) throws Exception {
-                String modelType = attributes.getValue("type");
-                if(modelType==null) {
-                    modelType = MuleManager.getConfiguration().getModelType();
-                }
-                UMOModel model = null;
-                if(modelType.equalsIgnoreCase("custom")) {
-                    String className = attributes.getValue("className");
-                    if(className==null) {
-                        throw new IllegalArgumentException("Cannot use 'custom' model type without setting the 'className' for the model");
-                    } else {
-                        model = (UMOModel)ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, getClass());
+                UMOModel model = manager.getModel();
+                if (model == null) {
+                    String modelType = attributes.getValue("type");
+                    if(modelType==null) {
+                        modelType = MuleManager.getConfiguration().getModelType();
                     }
-                } else {
-                    model = ModelFactory.createModel(modelType);
+                    if(modelType.equalsIgnoreCase("custom")) {
+                        String className = attributes.getValue("className");
+                        if(className==null) {
+                            throw new IllegalArgumentException("Cannot use 'custom' model type without setting the 'className' for the model");
+                        } else {
+                            model = (UMOModel) ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, getClass());
+                        }
+                    } else {
+                        model = ModelFactory.createModel(modelType);
+                    }
                 }
                 digester.push(model);
             }
