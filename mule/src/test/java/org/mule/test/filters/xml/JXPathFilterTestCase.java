@@ -13,23 +13,25 @@
  */
 package org.mule.test.filters.xml;
 
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
+import org.dom4j.InvalidXPathException;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
 
-import java.io.InputStream;
-
 /**
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
+ * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe St?phane</a>
+ * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @version $Revision$
  */
-public class JXPathFilterTestCase extends AbstractMuleTestCase
-{
+public class JXPathFilterTestCase extends AbstractMuleTestCase {
     private String xmlData = null;
 
     private JXPathFilter myFilter = null;
+
     private XmlToDomDocument transformer = null;
 
     protected void doSetUp() throws Exception {
@@ -37,52 +39,44 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
         final InputStream is = currentClassLoader.getResourceAsStream("cdcatalog.xml");
         assertNotNull("Test resource not found.", is);
-
         xmlData = IOUtils.toString(is);
 
-        // new UMOFilter
         myFilter = new JXPathFilter();
         transformer = new XmlToDomDocument();
     }
 
-    public void testFilter1() throws Exception
-    {
-        Object obj = transformer.transform(xmlData);
-
+    public void testFilter1() throws Exception {
         myFilter.setExpression("catalog/cd[3]/title");
-        myFilter.setValue("Greatest Hits");
-        boolean res = myFilter.accept(new MuleMessage(obj));
-        assertTrue(res);
-
+        myFilter.setExpectedValue("Greatest Hits");
+        assertTrue(myFilter.accept(new MuleMessage(xmlData)));
     }
 
-    public void testFilter2() throws Exception
-    {
-        Object obj = transformer.transform(xmlData);
+    public void testFilter2() throws Exception {
         myFilter.setExpression("(catalog/cd[3]/title) ='Greatest Hits'");
-        boolean res = myFilter.accept(new MuleMessage(obj));
-        assertTrue(res);
-
+        assertTrue(myFilter.accept(new MuleMessage(xmlData)));
     }
 
-    public void testFilter3() throws Exception
-    {
-        Object obj = transformer.transform(xmlData);
+    public void testFilter3() throws Exception {
         myFilter.setExpression("count(catalog/cd) = 26");
-        boolean res = myFilter.accept(new MuleMessage(obj));
-        assertTrue(res);
-
+        assertTrue(myFilter.accept(new MuleMessage(xmlData)));
     }
 
-    public void testFilter4() throws Exception
-    {
+    public void testFilter4() throws Exception {
         Dummy d = new Dummy();
         d.setId(10);
         d.setContent("hello");
 
         myFilter.setExpression("id=10 and content='hello'");
-        boolean res = myFilter.accept(new MuleMessage(d));
-        assertTrue(res);
+        assertTrue(myFilter.accept(new MuleMessage(d)));
+    }
 
+    public void testBogusExpression() throws Exception {
+        try {
+            myFilter.setExpression("catalog/cd[3]/banana");
+            myFilter.accept(new MuleMessage(xmlData));
+            // fail("Invalid XPath should have thrown an exception");
+        } catch (InvalidXPathException e) {
+            // expected
+        }
     }
 }
