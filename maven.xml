@@ -450,6 +450,28 @@
         <!-- copies src to one directory  -->
         <j:set var="goal" value="mule:src-copy"/>
         <attainGoal name="multiproject:goal"/>
+        
+        <!-- now clean up & create a zip. what a mess.. =:( -->
+
+        <!-- first delete non-java files -->
+        <delete dir="${mule.release.src.dir}/conf"/>
+        <delete dir="${mule.release.src.dir}/rar"/>
+        <delete dir="${mule.release.src.dir}/resources"/>
+        <delete file="${mule.release.src.dir}/java/readme.txt"/>
+
+        <!-- copy offbeat directory contents into the proper place -->
+        <copy todir="${mule.release.src.dir}/java/">
+            <fileset dir="${mule.release.src.dir}/test/java"/>
+        </copy>
+
+        <!-- create a zip for attaching the source in an IDE -->        
+        <zip zipfile="${mule.release.src.dir}/src.zip">
+            <zipfileset dir="${mule.release.src.dir}/java"/>
+        </zip>
+
+        <!-- final cleanup -->
+        <delete dir="${mule.release.src.dir}/java"/>
+        <delete dir="${mule.release.src.dir}/test"/>
     </goal>
 
     <goal name="mule:src-copy">
@@ -462,8 +484,8 @@
                     </copy>
                 </u:available>
             </j:if>
-            <j:if test="${pom.artifactId!='mule-core'}">
 
+            <j:if test="${pom.artifactId!='mule-core'}">
                 <u:available file="${maven.src.dir}">
                     <j:set var="src" value="${maven.src.dir}"/>
                     <u:available file="${src}/main">
