@@ -13,7 +13,8 @@
  */
 package org.mule.routing.response;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,14 +29,13 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMORouter;
 
-import java.util.Iterator;
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>ResponseMessageRouter</code> is a router that can be used to control
  * how the response in a request/response message flow is created. Main usecase
  * is to aggregate a set of asynchonous events into a single response
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -115,13 +115,12 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
-    {
+    public void addEndpoint(UMOEndpoint endpoint) {
         if (endpoint != null) {
             endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
             endpoints.add(endpoint);
         } else {
-            throw new NullPointerException("Endpoint cannot be null");
+            throw new NullPointerException("endpoint = null");
         }
     }
 
@@ -135,11 +134,17 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints)
-    {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
-            UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
-            addEndpoint(endpoint);
+    public void setEndpoints(List endpoints) {
+        if (endpoints != null) {
+            this.endpoints.clear();
+            this.endpoints.addAll(endpoints);
+
+            // Force all endpoints' type to RESPONSE just in case.
+            for (Iterator it = this.endpoints.iterator(); it.hasNext();) {
+                ((UMOEndpoint) it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
+            }
+        } else {
+            throw new NullPointerException("List of endpoints = null");
         }
     }
 

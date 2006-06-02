@@ -13,7 +13,8 @@
  */
 package org.mule.routing.inbound;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,15 +30,14 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.util.StringMessageUtils;
 
-import java.util.Iterator;
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>InboundMessageRouter</code> is a collection of routers that will be
  * invoked when an event is received It is responsible for manageing a
  * collection of routers and also executing the routing logic. Each router must
  * match against the current event for the event to be routed.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
@@ -168,13 +168,12 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
-    {
+    public void addEndpoint(UMOEndpoint endpoint) {
         if (endpoint != null) {
             endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
             endpoints.add(endpoint);
         } else {
-            throw new NullPointerException("Endpoint cannot be null");
+            throw new NullPointerException("endpoint = null");
         }
     }
 
@@ -188,14 +187,17 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints)
-    {
-        this.endpoints = endpoints;
+    public void setEndpoints(List endpoints) {
         if (endpoints != null) {
-            for (Iterator it = endpoints.iterator(); it.hasNext();) {
-                UMOEndpoint endpoint = (UMOEndpoint) it.next();
-                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+            this.endpoints.clear();
+            this.endpoints.addAll(endpoints);
+
+            // Force all endpoints' type to RECEIVER just in case.
+            for (Iterator it = this.endpoints.iterator(); it.hasNext();) {
+                ((UMOEndpoint) it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
             }
+        } else {
+            throw new NullPointerException("List of endpoints = null");
         }
     }
 
