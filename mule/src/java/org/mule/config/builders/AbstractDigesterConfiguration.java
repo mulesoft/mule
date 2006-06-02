@@ -1,18 +1,24 @@
-/* 
+/*
 * $Header$
 * $Revision$
 * $Date$
 * ------------------------------------------------------------------------------------------------------
-* 
+*
 * Copyright (c) SymphonySoft Limited. All rights reserved.
 * http://www.symphonysoft.com
-* 
+*
 * The software in this package is published under the terms of the BSD
 * style license a copy of which has been included with this distribution in
-* the LICENSE.txt file. 
+* the LICENSE.txt file.
 *
 */
 package org.mule.config.builders;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.logging.Log;
@@ -30,15 +36,6 @@ import org.mule.util.ClassUtils;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A base classs for configuration schemes that use digester to parse the
@@ -127,37 +124,23 @@ public abstract class AbstractDigesterConfiguration
     }
 
     /**
-     * ConfigResource can be a url, a path on the local file system or a
-     * resource name on the classpath Finds and loads the configuration resource
-     * by doing the following - 1. load it form the classpath 2. load it from
-     * from the local file system 3. load it as a url
+     * Attempt to load a configuration resource from the classpath, file
+     * sytem, or as a URL.
      *
      * @param configResource
-     * @return an inputstream to the resource
-     * @throws ConfigurationException
+     * @return an InputStream to the resource
+     * @throws ConfigurationException if the resource could not be loaded by any means
      */
     protected InputStream loadConfig(String configResource) throws ConfigurationException {
-        InputStream is = ClassUtils.getResourceAsStream(configResource, getClass());
-        if (is == null) {
-            File file = new File(configResource);
-            if (file.exists()) {
-                try {
-                    is = new FileInputStream(file);
-                } catch (FileNotFoundException e) {
-                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                            configResource), e);
-                }
-            } else {
-                try {
-                    URL url = new URL(configResource);
-                    is = url.openStream();
-                } catch (Exception e) {
-                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                            configResource));
-                }
-            }
+    	InputStream is;
+        try {
+            is = ClassUtils.getResourceAsStream(configResource, getClass(),
+                    							/*tryAsFile*/true, /*tryAsUrl*/true);
+            return is;
+        } catch (IOException e) {
+            throw new ConfigurationException(new Message(
+                    Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource), e);
         }
-        return is;
     }
 
     public abstract String getRootName();
