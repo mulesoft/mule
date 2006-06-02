@@ -1,4 +1,4 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
@@ -45,6 +45,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.io.OutputStream;
@@ -134,7 +135,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageReceiver#getEndpointName()
      */
     public UMOEndpoint getEndpoint() {
@@ -143,7 +144,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageReceiver#getExceptionListener()
      */
     public void handleException(Exception exception) {
@@ -248,7 +249,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         }
         if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Message Payload: \n" + message.getPayloadAsString());
+                logger.trace("Message Payload: \n" + StringMessageUtils.truncate(message.getPayloadAsString(), 200, false));
             } catch (Exception e) {
                 // ignore
             }
@@ -278,7 +279,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageReceiver#setEndpoint(org.mule.umo.endpoint.UMOEndpoint)
      */
     public void setEndpoint(UMOEndpoint endpoint) {
@@ -290,7 +291,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOMessageReceiver#setSession(org.mule.umo.UMOSession)
      */
     public void setComponent(UMOComponent component) {

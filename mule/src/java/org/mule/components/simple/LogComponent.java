@@ -20,9 +20,9 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;
 
 /**
- * <code>LogComponent</code> Simply logs the content (or content length is it
+ * <code>LogComponent</code> Simply logs the content (or content length if it
  * is a large message)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,12 +33,8 @@ public class LogComponent implements Callable, LogService
     public Object onCall(UMOEventContext context) throws Exception
     {
         String contents = context.getMessageAsString();
-        String msg = "Message Received in component: " + context.getComponentDescriptor().getName();
-        if (contents.length() > 100) {
-            msg = StringMessageUtils.getBoilerPlate(msg + ". Content length is: " + contents.length());
-        } else {
-            msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '" + contents + "'");
-        }
+        String msg = "Message received in component: " + context.getComponentDescriptor().getName();
+        msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '" + StringMessageUtils.truncate(contents, 100, true) + "'");
         log(msg);
         return null;
     }
