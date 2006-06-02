@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="endpoint_test" version="1.0">
+
+    <container-context className="org.mule.extras.plexus.PlexusContainerContext">
+        <properties>
+            <property name="configFile" value="org/mule/test/integration/config/plexus-config.xml"/>
+        </properties>
+    </container-context>
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="org/mule/test/integration/config/spring-config.xml"/>
+        </properties>
+    </container-context>
+</mule-configuration>

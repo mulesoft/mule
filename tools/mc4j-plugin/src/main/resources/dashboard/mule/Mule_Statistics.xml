@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Dashboard PUBLIC "-//MC4J//DTD Dashboard 1.0//EN" "http://mc4j.sourceforge.net/Dashboard_1_0.dtd">
+
+<!--
+    Created on : January 16, 2006, 10:01 PM
+    Author     : Ross Mason
+-->
+
+<Dashboard version="1.0" name="Mule Statistics">
+  <Description>Displays message processing statistics for all components for this Mule instance.</Description>
+
+    <DashboardMatch type="Global" location="/Mule">
+
+        <BeanMatch id="MuleStats" type="Single">
+            <Condition type="BeanObjectNameCondition" filter="name=AllStatistics"/>
+        </BeanMatch>
+
+    </DashboardMatch>
+
+
+  <LayoutManager type="java.awt.BorderLayout"/>
+  <Content>
+      <Component type="org.mc4j.console.dashboard.components.html.HtmlDashboardComponent">
+          <Attribute name="htmlDocumentName" value="(Literal)mule/Mule_AllStatistics.html"/>
+
+        <Content>
+
+            <Component id="version" type="org.mc4j.console.dashboard.components.AttributeComponent">
+                <Attribute name="beanNode" value="MuleStats"/>
+                <Attribute name="attributeName" value="(Literal)HtmlSummary"/>
+            </Component>
+
+        </Content>
+
+      </Component>
+
+  </Content>
+</Dashboard>

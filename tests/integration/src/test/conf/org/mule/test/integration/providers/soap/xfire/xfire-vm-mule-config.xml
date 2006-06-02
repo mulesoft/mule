@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="xfire_test" version="1.0">
+
+    <mule-environment-properties synchronous="true"/>
+    
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.test.integration.service.TestServiceComponent"
+            inboundEndpoint="xfire:vm://mycomponent">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent2"
+            implementation="org.mule.test.integration.service.TestServiceComponent"
+            inboundEndpoint="xfire:vm://mycomponent2">
+            <properties>
+                <list name="serviceInterfaces">
+                    <entry value="org.mule.components.simple.EchoService"/>
+                    <entry value="org.mule.test.integration.service.DateService"/>
+                </list>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent3"
+            implementation="org.mule.test.integration.service.TestServiceComponent"
+            inboundEndpoint="xfire:vm://mycomponent3">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent4"
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

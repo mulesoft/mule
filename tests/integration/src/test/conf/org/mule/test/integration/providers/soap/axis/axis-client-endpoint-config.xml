@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_client_endpoint" version="1.0">
+
+    <global-endpoints>
+        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:8080/axis/Calculator.jws?method=add">
+            <properties>
+                <property name="style" value="wrapped"/>
+                <property name="use" value="literal"/>
+                <map name="soapMethods">
+                    <list name="qname{add:http://muleumo.org/Calc}">
+                        <entry value="Number1;int;in"/>
+                        <entry value="Number2;int;in"/>
+                        <entry value="return;int"/>
+                    </list>
+                </map>
+            </properties>
+        </endpoint>
+    </global-endpoints>
+</mule-configuration>

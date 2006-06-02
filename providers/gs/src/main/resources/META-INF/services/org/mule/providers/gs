@@ -1,0 +1,8 @@
+connector=org.mule.providers.gs.GSConnector
+dispatcher.factory=org.mule.providers.space.SpaceMessageDispatcherFactory
+message.receiver=org.mule.providers.space.SpaceMessageReceiver
+transacted.message.receiver=org.mule.providers.space.TransactedSpaceMessageReceiver
+message.adapter=org.mule.providers.gs.JiniMessageAdapter
+inbound.transformer=
+outbound.transformer=org.mule.providers.gs.transformers.UMOMessageToJavaSpaceEntry
+endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder

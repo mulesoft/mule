@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-jbi-provider</artifactId>
+    <name>Mule Jbi Provider</name>
+    <description>Allows JBI components to interact with Mule.  Note this is different to Mule-JBI, which is a JBI (JSR-208) implementation that is  based on the Mule framework.
+    </description>
+    <shortDescription>jbi</shortDescription>
+    <url>http://www.muleumo.org/docs/providers/jbi/</url>
+    <dependencies>
+         <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-jbi-spec</artifactId>
+            <version>${mule_jbi_spec_version}</version>
+            <url>http://www.mulejbi.org</url>
+        </dependency>
+    </dependencies>
+</project>

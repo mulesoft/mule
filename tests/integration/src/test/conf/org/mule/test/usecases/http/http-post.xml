@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <!-- Mule properties -->
+    <mule-environment-properties synchronous="false" remoteSync="false" serverUrl=""  />
+
+    <transformers>
+        <transformer name="ByteArrayToString"
+            className="org.mule.transformers.simple.ByteArrayToString" />
+        <transformer name="ByteArrayToSerializable"
+            className="org.mule.transformers.simple.ByteArrayToSerializable" />
+        <transformer name="SerializableToByteArray"
+            className="org.mule.transformers.simple.SerializableToByteArray" />
+        <transformer name="ObjectToXml"
+            className="org.mule.transformers.xml.ObjectToXml"
+            returnClass="java.lang.String" />
+        <transformer name="Compress"
+            className="org.mule.transformers.compression.GZipCompressTransformer" />
+        <transformer name="ToHttpResponse"
+            className="org.mule.providers.http.transformers.UMOMessageToHttpResponse" />
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="httpRequest"
+                  address="http://localhost:18080/RemoteService"
+                  synchronous="true">
+            <properties>
+                <property name="method" value="post" />
+                <property name="http.post.body.param" value="IncidentData"/>
+            </properties>
+        </endpoint>
+        <endpoint name="httpService"
+                  address="http://localhost:18080/RemoteService"
+                  synchronous="true">
+        </endpoint>
+    </global-endpoints>
+
+    <model name="model">
+        <mule-descriptor name="HttpService"
+            implementation="org.mule.components.simple.EchoComponent"
+            inboundEndpoint="httpService">
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

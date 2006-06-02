@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="fileConnector1" className="org.mule.providers.file.FileConnector"/>
+
+    <connector name="fileConnector2" className="org.mule.providers.file.FileConnector">
+        <properties>
+            <map name="serviceOverrides">
+                <property name="outbound.transformer" value="org.mule.transformers.simple.SerializableToByteArray"/>
+                <property name="inbound.transformer" value="org.mule.transformers.simple.ByteArrayToSerializable"/>
+            </map>
+        </properties>
+ </connector>
+
+ <connector name="fileConnector3" className="org.mule.providers.file.FileConnector"/>
+</mule-configuration>

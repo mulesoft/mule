@@ -1,0 +1,13 @@
+<org.mule.samples.errorhandler.ExceptionBean>
+  <detailMessage>BUSINESS EXCEPTION: Some business exception</detailMessage>
+  <exceptionClass>org.mule.samples.errorhandler.exceptions.BusinessException</exceptionClass>
+  <stackTrace>
+    <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.generateTestData(ErrorHandlerTestCase.java:47)</string>
+    <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.main(ErrorHandlerTestCase.java:69)</string>
+    <string>sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</string>
+    <string>sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)</string>
+    <string>sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)</string>
+    <string>java.lang.reflect.Method.invoke(Method.java:324)</string>
+    <string>com.intellij.rt.execution.application.AppMain.main(AppMain.java:78)</string>
+  </stackTrace>
+</org.mule.samples.errorhandler.ExceptionBean>

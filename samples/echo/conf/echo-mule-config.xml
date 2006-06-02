@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Echo_Sample" version="1.0">
+
+    <description>
+    This is a simple component example that demostrates how to expose a component over multiple transports.
+
+    To invoke the EchoUMO component as a webservice hit the following URL -
+    http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+    (remember to replace the '&amp;' with an ampersand)
+
+    To view the WSDL for the EchoUMO service go to -
+    http://localhost:8081/services/EchoUMO?wsdl
+    </description>
+
+    <!--
+        The system stream connector is used to send and receive information via the
+        System.in and System.out. Note this connector is only really useful for testing
+        purposes.
+        promptMessage - is what is written to the console
+        messageDelayTime - is the time in milliseconds before the user is prompted again.
+        These properties are set as bean properties on the connector.
+    -->
+    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
+        <properties>
+            <property name="promptMessage" value="Please enter something: "/>
+            <property name="messageDelayTime" value="1000"/>
+        </properties>
+    </connector>
+
+     <transformers>
+        <transformer name="HttpRequestToSoapRequest" className="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
+    </transformers>
+
+    <!--
+        The Mule model initialises and manages your UMO components
+    -->
+    <model name="echoSample">
+        <!--
+            A Mule descriptor defines all the necessary information about how your components will
+            interact with the framework, other components in the system and external sources.
+            Please refer to the Configuration Guide for a full description of all the parameters.
+        -->
+        <mule-descriptor name="EchoUMO" implementation="org.mule.components.simple.EchoComponent">
+            <!-- any number of endpoints can be added to an inbound router -->
+            <inbound-router>
+                <endpoint address="stream://System.in"/>
+                <endpoint address="xfire:http://localhost:8081/services" transformers="HttpRequestToSoapRequest" />                
+            </inbound-router>
+            <!-- An outbound router can have one or more router configurations
+            that can be invoked depending on business rules, message contents, headers
+            or ant other criteria.
+            The OutboundPassthroughRouter is a router that automically sends every
+            message it receives -->
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

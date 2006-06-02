@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-project</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>buildtools</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule's build tools</name>
+    <!-- <version>2.0</version> -->
+    <description>
+      These are the tools used by the Mule's build procedure
+    </description>
+
+        <!-- Directory layout
+        <sourceDirectory>src/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/conf</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/conf</directory>
+            </testResource>
+        </testResources>
+        -->
+
+    <build>
+        <!--
+           Directory layout
+           These are here to override the parent project layout and
+           should go away when the whole project structure
+           will conform to the standard maven2 projects layout
+        -->
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+
+</project>

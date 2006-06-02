@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-spring-configuration.dtd">
+
+
+<mule-configuration id="Test_Mule_Properties_with_beans" version="1.0">
+
+    <mule-descriptor name="appleComponent3"
+        implementation="org.mule.tck.testmodels.fruit.Apple">
+        <inbound-router>
+            <endpoint name="inboundEndpoint3" type="receiver" address="test://endpoint.in33">
+                <properties>
+                    <property name="testEndpointProperty" value="Prop1"/>
+                    <bean name="testEndpointBeanProperty" class="java.lang.String">
+                        <constructor-arg index="0" type="java.lang.String">
+                            <value>Prop2</value>
+                        </constructor-arg>
+                    </bean>
+                </properties>
+            </endpoint>
+        </inbound-router>
+
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/>
+        <pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>
+        <queue-profile maxOutstandingMessages="102"/>
+        <properties>
+            <spring-property name="springMap">
+                <spring-map>
+                    <spring-entry key="Entry1">
+                        <value>Value1</value>
+                    </spring-entry>
+                    <spring-entry key="Entry2">
+                        <value>Value2</value>
+                    </spring-entry>
+                </spring-map>
+            </spring-property>
+            <spring-property name="springList">
+                <spring-list>
+                    <value>Value1</value>
+                    <value>Value2</value>
+                </spring-list>
+            </spring-property>
+            <bean name="springBean" class="java.lang.String"/>
+            <spring-property name="springSet">
+                <set>
+                    <value>Value1</value>
+                    <value>Value2</value>
+                </set>
+            </spring-property>
+        </properties>
+        <bean name="exceptionListener" class="org.mule.impl.DefaultExceptionStrategy"/>
+
+        <bean name="version" class="java.lang.String">
+            <constructor-arg index="0" type="java.lang.String">
+                <value>1.1</value>
+            </constructor-arg>
+        </bean>
+
+    </mule-descriptor>
+
+    <bean id="beanConnector" class="org.mule.providers.vm.VMConnector">
+        <spring-property name="queueEvents">
+            <value>true</value>
+        </spring-property>
+    </bean>
+</mule-configuration>

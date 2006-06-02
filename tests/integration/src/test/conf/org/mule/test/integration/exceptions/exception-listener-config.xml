@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="exception-listener_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="vm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.components.simple.NullComponent"
+            inboundEndpoint="vm://mycomponent">
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://mycomponent.out"/>
+                </router>
+            </outbound-router>
+
+            <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
+                <endpoint address="vm://error.queue"/>
+            </exception-strategy>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

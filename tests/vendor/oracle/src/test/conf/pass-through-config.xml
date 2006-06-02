@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="TestConfiguration" version="1.0">
+    <mule-environment-properties serverUrl=""/>
+
+    <model name="TestModel">
+        <mule-descriptor name="PassThrough" implementation="org.mule.components.simple.PassThroughComponent"
+                         initialState="stopped" >
+            <inbound-router>
+                <endpoint address="jms://TEST_TEXT" />
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="jms://TEST_TEXT2" />
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

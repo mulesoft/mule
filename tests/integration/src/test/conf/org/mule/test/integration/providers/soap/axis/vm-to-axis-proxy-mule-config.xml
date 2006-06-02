@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+
+    
+
+    <model name="test">
+        <mule-descriptor name="proxy" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://proxy" synchronous="true"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote">
+                        <properties>
+                            <property name="soapAction" value="${methodNamespace}${method}"/>
+                            <map name="soapMethods">
+                                <property name="qname{GetQuote:http://www.webserviceX.NET/}" value="symbol;string;in,GetQuoteResult;string;out,return;string"/>
+                            </map>
+                        </properties>
+                    </endpoint>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

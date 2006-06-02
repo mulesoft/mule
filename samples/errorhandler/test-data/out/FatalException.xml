@@ -1,0 +1,21 @@
+<org.mule.samples.errorhandler.ExceptionBean>
+  <cause>
+    <detailMessage>Some IO exception</detailMessage>
+    <exceptionClass>java.io.IOException</exceptionClass>
+    <stackTrace>
+      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.generateTestData(ErrorHandlerTestCase.java:46)</string>
+      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.main(ErrorHandlerTestCase.java:69)</string>
+      <string>sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</string>
+      <string>sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)</string>
+      <string>sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)</string>
+      <string>java.lang.reflect.Method.invoke(Method.java:324)</string>
+      <string>com.intellij.rt.execution.application.AppMain.main(AppMain.java:78)</string>
+    </stackTrace>
+  </cause>
+  <detailMessage>Some fatal exception</detailMessage>
+  <exceptionClass>org.mule.umo.lifecycle.FatalException</exceptionClass>
+  <originalException class="org.mule.umo.lifecycle.FatalException">
+    <cause class="java.io.IOException" reference="../../cause/originalException"/>
+    <detailMessage>Some fatal exception</detailMessage>
+  </originalException>
+</org.mule.samples.errorhandler.ExceptionBean>

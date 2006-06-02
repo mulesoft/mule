@@ -1,0 +1,65 @@
+Copyright ? 2002, Oracle Corporation. All rights reserved.
+
+The Programs (which include both the software and documentation) contain
+proprietary information of Oracle Corporation; they are provided under a
+license agreement containing restrictions on use and disclosure and are
+also protected by copyright, patent and other intellectual and
+industrial property laws. Reverse engineering, disassembly or
+decompilation of the Programs, except to the extent required to obtain
+interoperability with other independently created software or as
+specified by law, is prohibited.
+
+The information contained in this document is subject to change without
+notice. If you find any problems in the documentation, please report
+them to us in writing. Oracle Corporation does not warrant that this
+document is error free. Except as may be expressly permitted in your
+license agreement for these Programs, no part of these Programs may be
+reproduced or transmitted in any form or by any means, electronic or
+mechanical, for any purpose, without the express written permission of
+Oracle Corporation.
+
+*RESTRICTED RIGHTS LEGEND:*
+
+If the Programs are delivered to the US Government or anyone licensing
+or using the Programs on behalf of the US Government, the following
+notice is applicable:
+
+ 
+*RESTRICTED RIGHTS NOTICE*
+
+Programs delivered subject to the DOD FAR Supplement are commercial
+computer software and use, duplication and disclosure of the Programs
+including documentation, shall be subject to the licensing restrictions
+set forth in the applicable Oracle license agreement. Otherwise,
+Programs delivered subject to the Federal Acquisition Regulations are
+'restricted computer software' and use, duplication, and disclosure of
+the Programs shall be subject to the restrictions in FAR 52.227-19,
+Commercial Computer Software - Restricted Rights (June, 1987). Oracle
+Corporation, 500 Oracle Parkway, Redwood City, CA 94065.
+
+The Programs are not intended for use in any nuclear, aviation, mass
+transit, medical, or other inherently dangerous applications. It shall
+be licensee's responsibility to take all appropriate fail-safe, back up,
+redundancy and other measures to ensure the safe use of such
+applications if the Programs are used for such purposes, and Oracle
+Corporation disclaims liability for any damages caused by such use of
+the Programs.
+
+ 
+*TRADEMARKS*
+
+Oracle is a registered trademark, and SQL*Plus, Oracle9i, Pro*C,
+Pro*C/C++, Pro*COBOL, Pro*FORTRAN and PL/SQL are trademarks or
+registered trademarks of Oracle Corporation. Other names may be
+trademarks of their respective owners.
+
+All trade names referenced are the service mark, trademark, or
+registered trademark of the respective manufacturer.
+
+This documentation may contain links to Web sites of other companies or
+organizations that Oracle Corporation does not own or control. Oracle
+Corporation neither evaluates nor makes any representations regarding
+the accessibility of these Web sites.
+
+Copyright ? 2002 Oracle Corporation.
+All Rights Reserved. 

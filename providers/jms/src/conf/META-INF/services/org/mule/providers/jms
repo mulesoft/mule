@@ -1,0 +1,10 @@
+connector=org.mule.providers.jms.JmsConnector
+dispatcher.factory=org.mule.providers.jms.JmsMessageDispatcherFactory
+message.receiver=org.mule.providers.jms.JmsMessageReceiver
+transacted.message.receiver=org.mule.providers.jms.TransactedJmsMessageReceiver
+message.adapter=org.mule.providers.jms.JmsMessageAdapter
+inbound.transformer=org.mule.providers.jms.transformers.JMSMessageToObject
+response.transformer=org.mule.providers.jms.transformers.ObjectToJMSMessage
+outbound.transformer=org.mule.providers.jms.transformers.ObjectToJMSMessage
+#service.error=Cannot create Jms connector using current service descriptor
+endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder

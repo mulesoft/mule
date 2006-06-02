@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="ExceptionStrategyTest" version="1.0">
+
+    <connector name="fileConnector" className="org.mule.providers.file.FileConnector ">
+        <properties>
+            <property name="outputPattern" value="test-${COUNT}.out"/>
+        </properties>
+        <exception-strategy className=" org.mule.impl.DefaultExceptionStrategy">
+            <endpoint address="file://./.mule/errors"/>
+        </exception-strategy>
+    </connector>
+
+    <transformers>
+        <transformer name="failPoint" className="org.mule.test.transformers.FailingTransformer"/>
+    </transformers>
+
+    <model name="ESTest">
+
+        <mule-descriptor name="FolderToVM"
+                         implementation="org.mule.components.simple.BridgeComponent">
+
+            <inbound-router>
+                <endpoint address="file://./.mule/in" transformers="failPoint"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <!--<endpoint address="stream://System.out"/>-->
+                    <endpoint address="file://./.mule/out"/>
+                </router>
+            </outbound-router>
+
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

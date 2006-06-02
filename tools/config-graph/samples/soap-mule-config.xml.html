@@ -1,0 +1,85 @@
+
+<html>
+ <head>
+    <link rel="stylesheet" href="./css/codehaus-style.css" type="text/css">
+    <link rel="stylesheet" href="./css/mule.css" type="text/css">
+
+    <title>MuleDocs - Home</title>
+  </head>
+<body>
+    <table width="100%" id="layout" style="padding:0px;margin0px;border-collapse:collapse;">
+      <tr>
+        <td colspan="3" style="padding:8px;">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr id="header_row">
+              <td align="left" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><img align="absmiddle" border=0 src="./images/logo-with-title-small.gif"></span></span>
+              </td>
+              <td align="right" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><span class="nobr"><a href="http://symphonysoft.com" rel="nofollow"><img align="absmiddle" border=0 src="./images/logo_250.gif"></a></span></span></span>
+
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" id="breadcrumbs">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr>
+              <td align="left">
+                <a href="index.html">Home</a> <b>|</b> <a href="gallery.html">Gallery</a>
+              </td>
+              <td align="right">
+                  <span id="Content"><span><a href="http://mule.codehaus.org/docs/apidocs/index.html" title="Mule Javadoc">Mule Javadoc</a> <b>|</b> <span class="nobr"><a href="http://mule.codehaus.org/docs/mail-lists.html" rel="nofollow">Mailing Lists</a></span> <b>|</b> <span class="nobr"><a href="http://jira.muleumo.org" rel="nofollow">Issue Tracker</a></span> <b>|</b> <span class="nobr"><a href="http://docs.codehaus.org/dosearchsite.action" rel="nofollow">Search</a></span></span></span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+ </table>
+  <div id="Content">
+      <h1>Description :</h1>
+          <br><br><br>    The StockQuote SOAP example uses the Mule RestServiceWrapper to invoke a remote .Net service<br>    Using SOAP RPC style invocation and displays the result.<br>    The example demostrates how to set named parameters for Web Service invocations and how to invoke a<br>    non-java web service using Mule.<br><br>    The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml string that<br>    Mule converts to a StockQuote object by first running the result through an Xslt transformer and then<br>    using the XmlToObject transformer.<br>    <br>
+      <h1>Graph :</h1>
+      <ul>
+      <p> click on mule component to navigate the javadoc or java code</b>
+      </p>
+      </ul>
+    <img src="soap-mule-config.xml.gif" usemap="#LinguineMap" border="0" class="mulegraph">
+    <map id="LinguineMap" name="LinguineMap">
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/components/simple/BridgeComponent.html" title="{serviceProxy\l|implementation\ \:org\.mule\.components\.simple\.BridgeComponent\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{serviceProxy\l|implementation\ \:org\.mule\.components\.simple\.BridgeComponent\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="177,164,556,249" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/ChainingRouter.html" title="{org\.mule\.routing\.outbound\.ChainingRouter\l|}" alt="{org\.mule\.routing\.outbound\.ChainingRouter\l|}" coords="241,327,492,380" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{stream\:\/\/System\.in\l}" alt="{stream\:\/\/System\.in\l}" coords="308,36,425,84" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{axis\:http\:\/\/www\.webservicex\.net\/stockquote\.asmx\?method\=GetQuote\lsoapAction\ \:\$\{methodNamespace\}\$\{method\}\l}" alt="{axis\:http\:\/\/www\.webservicex\.net\/stockquote\.asmx\?method\=GetQuote\lsoapAction\ \:\$\{methodNamespace\}\$\{method\}\l}" coords="16,476,426,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{stream\:\/\/System\.out\l}" alt="{stream\:\/\/System\.out\l}" coords="450,476,576,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/stream/SystemStreamConnector.html" title="{SystemStreamConnector\l|className\ \:org\.mule\.providers\.stream\.SystemStreamConnector\lpromptMessage\ \:Please\ enter\ a\ stock\ symbol\:\ \lmessageDelayTime\ \:1000\l}" alt="{SystemStreamConnector\l|className\ \:org\.mule\.providers\.stream\.SystemStreamConnector\lpromptMessage\ \:Please\ enter\ a\ stock\ symbol\:\ \lmessageDelayTime\ \:1000\l}" coords="449,17,830,103" />
+<area shape="rect" href="http\:\/\/www\.softwaresecretweapons\.com\l" alt="LinguineMap" coords="6,7,840,769" />
+</map>
+  </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<table>
+    <tr>
+        <td colspan="3" id="footer">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td align="center" valign="top">Mule ESB rocks !
+                    </td>
+
+                    <td align="right" valign="top"><a
+                        style="color: rgb(153, 153, 153);"
+                        href="http://mule.codehaus.org/Config+Graph">[with MuleDocs]</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </tr>
+</table>
+</body>
+</html>  

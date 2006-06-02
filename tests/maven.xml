@@ -1,0 +1,45 @@
+<project default="test:test"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven">
+
+    <preGoal name="test:test">
+        <sysproperty key="org.activemq.home" value="${org.activemq.home}"/>
+        <echo>ActiveMQ home is at ${org.activemq.home}</echo>
+    </preGoal>
+
+    <goal name="startActiveMQ" prereqs="setClasspath">
+        <!--Runs the ActiveMQ server"-->
+        <j:set var="url" value="tcp://localhost:61616"/>
+
+        <echo>Running an ActiveMQ server at $$url = ${url}</echo>
+        <java classname="org.activemq.broker.impl.Main" fork="yes" maxmemory="512M">
+            <classpath refid="test.classpath"/>
+            <arg value="${url}"/>
+
+            <j:if test="${!empty(debug)}">
+                <jvmarg value="-Xdebug"/>
+                <jvmarg value="-Xnoagent"/>
+                <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
+                <jvmarg value="-Djava.compiler=NONE"/>
+            </j:if>
+            <j:if test="${empty(ignoreServer) || !empty(debug)}">
+                <jvmarg value="-server"/>
+            </j:if>
+            <sysproperty key="derby.system.home" value="target/derby"/>
+            <sysproperty key="derby.storage.fileSyncTransactionLog" value="true"/>
+            <!--<sysproperty key="activemq.persistenceAdapterFactory" value="${activemq.persistenceAdapterFactory}"/>-->
+        </java>
+    </goal>
+
+    <goal name="setClasspath">
+        <path id="test.classpath">
+            <pathelement path="src/test/conf"/>
+            <pathelement path="${maven.build.dest}"/>
+            <pathelement path="${maven.build.dest}/classes"/>
+            <pathelement path="${maven.build.dest}/test-classes"/>
+            <path refid="maven.dependency.classpath"/>
+        </path>
+    </goal>
+</project>

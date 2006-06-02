@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-distributions</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-ra</artifactId>
+    <name>Resource Adapter</name>
+    <packaging>rar</packaging>
+    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.</description>   
+
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-ejb-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-file-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-http-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-jms-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-multicast-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-rmi-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-ssl-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-stream-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-udp-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-vm-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+</project>

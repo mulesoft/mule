@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="endpoint_test" version="1.0">
+    <mule-environment-properties serverUrl=""/>
+    
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                    <bean name="Apple" class="org.mule.tck.testmodels.fruit.Apple">
+                    </bean>
+                    <bean name="Banana" class="org.mule.tck.testmodels.fruit.Banana">
+                    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+</mule-configuration>

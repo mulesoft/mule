@@ -1,0 +1,7 @@
+connector=org.mule.providers.http.HttpConnector
+dispatcher.factory=org.mule.providers.http.HttpClientMessageDispatcherFactory
+message.receiver=org.mule.providers.http.HttpMessageReceiver
+message.adapter=org.mule.providers.http.HttpMessageAdapter
+outbound.transformer=org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest
+response.transformer=org.mule.providers.http.transformers.UMOMessageToHttpResponse
+session.handler=org.mule.providers.http.HttpSessionHandler

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <id>mule-extras-jotm</id>
+    <artifactId>mule-extras-jotm</artifactId>
+    <name>Jotm Support</name>
+    <shortDescription>jotm</shortDescription>
+    <description>Provides access to the Jotm transaction manager for User and Xa transactions.</description>
+    <url>http://www.muleumo.org/docs/modules/mule-extras-jotm/</url>
+    <dependencies>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm</artifactId>
+            <version>${jotm_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-carol</artifactId>
+            <version>${jotm_carol_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-jrmp-stubs</artifactId>
+            <version>${jotm_jrmp_stubs_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+    </dependencies>
+</project>
+

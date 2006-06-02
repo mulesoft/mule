@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration version="1.0">
+    <global-endpoints>
+        <endpoint name="inbound" createConnector="ALWAYS_CREATE"
+            address="xmpp://mule1:mule@jabber.org.au/mule">
+            <filter className="org.mule.providers.xmpp.filters.XmppPacketTypeFilter"
+                expectedType="org.jivesoftware.smack.packet.Message"/>
+        </endpoint>
+        <endpoint name="outbound" address="xmpp://mule2:mule@jabber.org.au/mule"
+            createConnector="ALWAYS_CREATE"/>
+    </global-endpoints>
+
+    <model name="Dual XMPP Test">
+        <mule-descriptor name="Inbound Listener"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://relay.queue"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        <mule-descriptor name="Outbound Sender"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://relay.queue"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="outbound"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

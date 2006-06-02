@@ -1,0 +1,32 @@
+#include( "./src/resources/template/header.html" )
+
+<h1>MuleDoc index</h1>
+<ul>
+<p>
+find below the generated graph for the given mule configuration files :
+<ul>
+   <li>click on graph to see the orginal image</li>
+   <li>click on the link to see the generated documentation</li>
+<ul>
+</p>
+<br/>
+<ul>
+<table> 
+    <tr> 
+       <td>Graph</td>
+       <td>Documentation</td>
+    </th>
+#foreach( $file in $fileList ) 
+    <tr>
+      <td>
+       <a href="$file.Name"><img width="250" src="$file.Name" border="0"/></a>
+      </td>	
+      <td>
+      <a href="${file.Name.substring(0,$file.Name.lastIndexOf("."))}.html">${file.Name.substring(0,$file.Name.lastIndexOf("."))}.html</a>
+      </td>
+   </tr> 
+#end 
+</table>
+</ul>
+</ul>
+#include( "./src/resources/template/footer.html" )

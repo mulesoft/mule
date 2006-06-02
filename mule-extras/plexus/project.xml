@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-plexus</id>
+    <artifactId>mule-extras-plexus</artifactId>
+    <name>Plexus Extensions</name>
+    <description>Provides extensions to use Plexus with Mule, such as using the container as a factory for Mule managed objects. It's good for you!</description>
+    <url>http://www.muleumo.org/docs/modules/mule-extras-plexus/</url>
+    <dependencies>
+        <dependency>
+            <groupId>plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+            <version>${plexus_container_default_version}</version>
+            <url>http://plexus.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <groupId>plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>${plexus_utils_version}</version>
+            <url>http://plexus.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <groupId>classworlds</groupId>
+            <artifactId>classworlds</artifactId>
+            <version>${classworlds_version}</version>
+            <url>http://classworlds.codehaus.org</url>
+        </dependency>
+    </dependencies>
+</project>

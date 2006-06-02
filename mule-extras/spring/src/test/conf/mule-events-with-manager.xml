@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="helloSampleProperties" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+    
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
+        </properties>
+    </container-context>
+
+    <connector name="TestConnector"
+        className="org.mule.extras.spring.events.TestConnectorWithContainerDependents">
+        <properties>
+            <container-property name="containerProp"
+                reference="apple"/>
+        </properties>
+    </connector>
+
+    <model name="echoSample">
+        <mule-descriptor name="EchoUMO"
+            inboundEndpoint="test://in"
+            outboundEndpoint="test://out"
+            implementation="org.mule.components.simple.EchoComponent">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,22 @@
+<module id="org.mule.tck.testmodels.fruit" version="1.0.0">
+    <service-point id="Apple"/>
+    <service-point id="Banana"/>
+    <service-point id="FruitBowl"/>
+
+    <implementation service-id="Apple">
+     <invoke-factory>
+      <construct class="Apple"/>
+     </invoke-factory>
+    </implementation>
+    <implementation service-id="Banana">
+     <invoke-factory>
+      <construct class="Banana"/>
+     </invoke-factory>
+    </implementation>
+    <implementation service-id="FruitBowl">
+      <invoke-factory>
+        <construct class="FruitBowl"/>
+      </invoke-factory>
+    </implementation>
+
+</module>

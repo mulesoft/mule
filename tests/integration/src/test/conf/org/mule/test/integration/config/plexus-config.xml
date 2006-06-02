@@ -1,0 +1,16 @@
+<plexus>
+    <components>
+        <component>
+            <role>plexus-Apple</role>
+            <implementation>org.mule.tck.testmodels.fruit.Apple</implementation>
+        </component>
+        <component>
+            <role>plexus-Banana</role>
+            <implementation>org.mule.tck.testmodels.fruit.Banana</implementation>
+        </component>
+        <component>
+            <role>Orange</role>
+            <implementation>org.mule.tck.testmodels.fruit.Orange</implementation>
+        </component>
+    </components>
+</plexus>

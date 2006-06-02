@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Spring_Invoker_Sample" version="1.0">
+
+    <!--
+        Define a Spring context and we can have our POJOs come from there
+        -->
+    <container-context className='org.mule.extras.spring.SpringContainerContext'>
+        <properties>
+            <property name='configFile' value='remoting-applicationContext.xml'/>
+        </properties>
+    </container-context>
+
+    <transformers>
+        <!--
+            Transform a byte[] from an Http request into a Spring RemoteInvocation instance.
+            -->
+        <transformer name="springInputXform"
+            className="org.mule.extras.spring.remoting.ObjectToRemoteInvocationTransformer"/>
+        <!--
+            Convert an Object to a Spring RemoteInvocationResult and then into a byte[]
+            for return to the caller via Http.
+            -->
+        <transformer name="springOutputXform"
+            className="org.mule.extras.spring.remoting.ObjectToRemoteInvocationResultTransformer"/>
+    </transformers>
+
+    <model name="main">
+
+        <!--
+            SpringHttpInvokerComponent will receive a RemoteInvocation and execute
+            the requested method on a POJO specified by "serviceClass".
+            -->
+        <mule-descriptor name="doSomeWorkViaSpring"
+            implementation="org.mule.extras.spring.remoting.SpringRemoteInvokerComponent">
+
+            <!--
+                Listen on 8003 for Http requests.
+                Use springInputXform to convert a byte[] from Http into a RemoteInvocation.
+                Use springOutputXform to convert a Object from the Mule pipeline into a
+                    RemoteInvocationResult and then into a byte[].
+            -->
+            <inbound-router>
+                <endpoint
+                    address="http://localhost:8003/springService"
+                    transformers="springInputXform"
+                    responseTransformers="springOutputXform"
+                    synchronous="true"/>
+            </inbound-router>
+
+            <properties>
+                <!--
+                    Set the classname of the POJO service bean.
+                    This is consumed by SpringHttpInvokerComponent.
+                    -->
+                <!--                <property name="serviceClass" value="jcej.httpInvoker.DoSomeWork"/>-->
+                <!--
+                    Instead of setting the class, provide SpringHttpInvokerComponent
+                    with a Spring managed bean instead.
+
+                    (This doesn't work yet because I don't know how to teach
+                     SpringHttpInvokerComponent to find Spring beans.)
+                -->
+                <container-property name="serviceBean" reference="doSpringWork"/>
+                <!--
+                    Set the serviceInterface property of Spring's RemoteInvocationBasedExporter
+                    -->
+                <property name="serviceInterface" value="org.mule.extras.spring.remoting.WorkInterface"/>
+                <!--
+                    Set other properties of Spring's RemoteInvocationBasedExporter
+                    i.e. registerTraceInterceptor and remoteInvocationExecutor
+                -->
+            </properties>
+
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

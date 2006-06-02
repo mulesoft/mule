@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule MC4J Plugin</name>
+    <groupId>mule</groupId>
+    <id>mule-tools-mc4j</id>
+    <inceptionYear>2005</inceptionYear>
+    <package>org.mule.tools.mc4j</package>
+    <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
+    <shortDescription>mule-tools-mc4j</shortDescription>
+    <description>
+        An MC4J JMX plugin allowing for remote administration of one or more Mule instances. 
+    </description>
+    <url>http://mule.codehaus.org/MC4J</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+    <dependencies>
+        <dependency>
+            <groupId>mc4j</groupId>
+            <artifactId>mc4j_common</artifactId>
+            <version>1.2b9</version>
+        </dependency>
+        <dependency>
+            <groupId>mc4j</groupId>
+            <artifactId>openide</artifactId>
+            <jar>openide.jar</jar>
+        </dependency>
+     </dependencies>
+     <build>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+         <unitTest>
+            <includes>
+                <include>**/*TestCase.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+            </excludes>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/resources</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+          <resources>
+                <resource>
+                    <directory>${basedir}/src/main/resources</directory>
+<!--                    <includes>-->
+<!--                        <include>**/*</include>-->
+<!--                    </includes>-->
+                    <excludes>
+                        <exclude>dashboard/**</exclude>
+                    </excludes>
+                </resource>
+            </resources>
+    </build>
+</project>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Samples" version="1.0">
+
+    <global-endpoints>
+        <endpoint name="restFileEndpoint" address="file://./temp/mule"/>
+    </global-endpoints>
+
+    <mule-descriptor name="RestTesterUMO"
+        inboundEndpoint="servlet://restPUTTest"
+        outboundEndpoint="restFileEndpoint" 
+        implementation="org.mule.samples.rest.RestTester">
+    </mule-descriptor>
+</mule-configuration>

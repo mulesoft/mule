@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="client_test" version="1.0">
+
+    <mule-environment-properties synchronous="true" serverUrl="tcp://localhost:60504" synchronousEventTimeout="100000000"/>
+
+    <!-- this connector/provider simulates an existing endpoint on a remote server -->
+    <connector name="vmRemoteQueueConnector" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+
+    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
+    </connector>
+    
+    <model name="model">
+        <mule-descriptor name="TestReceiverUMO"
+            implementation="org.mule.extras.client.TestReceiver">
+            <inbound-router>
+                <endpoint address="vm://test.queue" connector="vmRemoteQueueConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="remoteUMO"
+            implementation="org.mule.components.simple.StaticComponent">
+            <inbound-router>
+                <endpoint address="vm://remote.endpoint" connector="vmRemoteConnector" remoteSync="true"/>
+            </inbound-router>
+            <properties>
+                <property name="data" value="received from remote"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-quartz-provider</artifactId>
+    <name>Mule Quartz Provider</name>
+    <description>A Mule provider for Quartz. This provider supplies a receiver for jobs scheduled with Quartz.
+    </description>
+    <shortDescription>quartz</shortDescription>
+    <url>http://www.muleumo.org/docs/modules/mule-quartz-provider/</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>quartz</groupId>
+            <artifactId>quartz-all</artifactId>
+            <version>${quartz_version}</version>
+            <url>http://www.opensymphony.com/quartz/</url>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    </dependencies>
+
+</project>

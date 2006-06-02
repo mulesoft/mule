@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+    http://java.sun.com/xml/ns/j2ee/connector_1_5.xsd"
+    version="1.5">
+
+    <description>Mule Universal Resource Adapter</description>
+    <display-name>Mule Universal Resource Adapter</display-name>
+    <vendor-name>SymphonySoft Ltd</vendor-name>
+    <eis-type>MULE</eis-type>
+    <resourceadapter-version>1.3</resourceadapter-version>
+    <license>
+        <description>
+            Copyright (c) SymphonySoft Limited. All rights reserved.
+            http://www.symphonysoft.com
+
+            The software in this package is published under the terms of the BSD
+            style license a copy of which has been included with this distribution in
+            the LICENSE.txt file.
+        </description>
+        <license-required>true</license-required>
+    </license>
+    <resourceadapter>
+        <resourceadapter-class>org.mule.ra.MuleResourceAdapter</resourceadapter-class>
+
+        <config-property>
+            <description>
+            A comma separated list of configuration resources to configure a Mule Manager instance.
+            These can be a list of files on the classpath or filesystem.  And the type of file
+            referenced depends on the configurationBuilder set on this Adapter.
+            </description>
+            <config-property-name>Configurations</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>mule-config.xml</config-property-value>
+        </config-property>
+        <config-property>
+            <description>
+            A fully qualified classname of the configuration builder.
+            Mule has Xml, Spring and Groovy configuration builders. By default This
+            ResourceAdapter will use org.mule.config.builders.MuleXmlConfigurationBuilder.
+            If there is a Mule instance already available to this ResourceAdapter this
+            property will be ignored.
+            </description>
+            <config-property-name>ConfigurationBuilder</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>org.mule.config.builders.MuleXmlConfigurationBuilder</config-property-value>
+        </config-property>
+        <config-property>
+            <description>The default user name that will be used to log on to the Mule server.</description>
+            <config-property-name>UserName</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value></config-property-value>
+        </config-property>
+        <config-property>
+            <description>The password for the default User.</description>
+            <config-property-name>Password</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value></config-property-value>
+        </config-property>
+        <outbound-resourceadapter>
+            <connection-definition>
+                <managedconnectionfactory-class>org.mule.ra.MuleManagedConnectionFactory</managedconnectionfactory-class>
+                <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
+                <connectionfactory-impl-class>org.mule.ra.DefaultMuleConnectionFactory</connectionfactory-impl-class>
+                <connection-interface>org.mule.ra.MuleConnection</connection-interface>
+                <connection-impl-class>org.mule.ra.DefaultMuleConnection</connection-impl-class>
+            </connection-definition>
+            <transaction-support>NoTransaction</transaction-support>
+            <authentication-mechanism>
+                <authentication-mechanism-type>BasicPassword</authentication-mechanism-type>
+                <credential-interface>javax.resource.spi.security.PasswordCredential</credential-interface>
+            </authentication-mechanism>
+            <reauthentication-support>false</reauthentication-support>
+        </outbound-resourceadapter>
+
+        <inbound-resourceadapter>
+            <messageadapter>
+                <messagelistener>
+                    <messagelistener-type>org.mule.umo.lifecycle.Callable</messagelistener-type>
+                    <activationspec>
+                        <activationspec-class>org.mule.ra.MuleActivationSpec</activationspec-class>
+                        <required-config-property>
+                            <description>
+                            A valid Mule endpoint URI such as,
+                            pop3://user:password@mail.host.com or
+                            vm://test.component
+                            </description>
+                            <config-property-name>endpoint</config-property-name>
+                        </required-config-property>
+<!--                        <required-config-property>-->
+<!--                            <description>-->
+<!--                            A comma-separated list of key/value property pairs that can be used-->
+<!--                            to pass transport-specific properties to an endpoint. Note this can be done-->
+<!--                            by setting params on the endpoint property itself.-->
+<!--                            </description>-->
+<!--                            <config-property-name>propertiesMap</config-property-name>-->
+<!--                        </required-config-property>-->
+                    </activationspec>
+                </messagelistener>
+            </messageadapter>
+        </inbound-resourceadapter>
+    </resourceadapter>
+</connector>

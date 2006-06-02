@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Stock Quotes Sample</name>
+    <id>mule-samples-stockquotes</id>
+    <groupId>mule</groupId>
+    <dependencies/>
+</project>

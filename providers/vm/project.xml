@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-vm-provider</artifactId>
+    <name>Mule VM Provider</name>
+    <description>A Mule provider that enables event sending and receiving over VM or embedded memory queues. These queues can be persistent or transient.
+    </description>
+    <shortDescription>vm</shortDescription>
+    <url>http://www.muleumo.org/docs/modules/mule-vm-provider/</url>
+    <dependencies/>
+</project>

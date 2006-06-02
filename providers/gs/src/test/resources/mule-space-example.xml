@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="gigaspaces_test" version="1.0">
+
+    <model name="main">
+        <mule-descriptor name="unprocessedOrders" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="gs:java://localhost/mule-space_container/mule-space?schema=cache">
+                    <filter className="org.mule.providers.gs.filters.JavaSpaceTemplateFilter" expectedType="org.mule.providers.gs.Order" >
+                        <properties>
+                            <map name="fields">
+                                <property name="processed" value="false"/>
+                            </map>
+                        </properties>
+                    </filter>
+                </endpoint>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://processed"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="processedOrders" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="jms://processed"/>
+                <endpoint address="gs:java://localhost/mule-space_container/mule-space?schema=cache">
+                    <transaction factory="org.mule.providers.gs.JiniTransactionFactory"/>
+                    <filter className="org.mule.providers.gs.filters.JavaSpaceTemplateFilter" expectedType="org.mule.providers.gs.Order" >
+                        <properties>
+                            <map name="fields">
+                                <property name="processed" value="true"/>
+                            </map>
+                        </properties>
+                    </filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

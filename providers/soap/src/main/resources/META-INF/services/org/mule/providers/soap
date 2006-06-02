@@ -1,0 +1,6 @@
+service.finder=org.mule.providers.soap.SoapServiceFinder
+
+finder.class.1.xfire=org.codehaus.xfire.fault.XFireFault
+finder.class.2.axis=org.apache.axis.AxisFault
+finder.class.3.axis2=org.apache.axis2.AxisFault
+finder.class.4.glue=electric.soap.SOAPException

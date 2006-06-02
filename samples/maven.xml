@@ -1,0 +1,91 @@
+<project default="dist-samples"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven"
+    xmlns:deploy="deploy">
+
+    <goal name="setvars">
+        <j:if test="${samples.vars.overriden!='true'}">
+            <echo>Samples vars are not overriden</echo>
+            <j:set var="root.dir" value="${basedir}/.."/>
+            <j:set var="samples.release.dir" value="${root.dir}/target/release"/>
+            <j:set var="samples.release.lib.dir" value="${samples.release.dir}/lib"/>
+            <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
+        </j:if>
+        <echo>Root dir is ${root.dir}</echo>
+        <echo>Base dir is ${basedir}</echo>
+        <echo>Release dir is ${samples.release.dir}</echo>
+        <echo>Release lib dir is ${samples.release.lib.dir}</echo>
+        <echo>Samples release dir is ${samples.dist}</echo>
+    </goal>
+
+    <!--=================================================-->
+    <!--                SAMPLES TARGETS                  -->
+    <!--=================================================-->
+    
+    <goal name="distro" prereqs="setvars">
+         <maven:reactor
+            basedir="${basedir}"
+            postProcessing="false"
+            includes="/*/project.xml"
+            goals="distro"
+            banner="Dist Samples"
+            ignoreFailures="false"/>
+
+    </goal>
+
+    <goal name="dist-sample">
+        <j:set var="mule.samples.dist.dir" value="${samples.dist}/${mule.sample.name}"/>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/src"/>
+        <mkdir dir="${mule.samples.dist.dir}/conf"/>
+
+        <j:if test="mule.samples.class.root==null">
+            <j:set var="mule.samples.class.root" value="${mule.samples.name}"/>
+        </j:if>
+
+        <copy todir="${mule.samples.dist.dir}/conf" file="${root.dir}/../mule/src/conf/log4j.properties"/>
+
+        <echo>Looking for src in ${basedir}/src/java</echo>
+        <u:available file="${basedir}/src/java">
+            <copy todir="${mule.samples.dist.dir}/src">
+                <fileset dir="${basedir}/src/java"/>
+            </copy>
+        </u:available>
+
+        <mkdir dir="${mule.samples.dist.dir}/bin"/>
+        <copy todir="${mule.samples.dist.dir}/bin">
+            <fileset dir="bin"/>
+        </copy>
+
+        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
+        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="lf" eof="unix" includes="*" excludes="*.bat *.jar"/>
+
+        <ant:chmod perm="ugo+rx">
+          <ant:fileset dir="${mule.samples.dist.dir}/bin">
+            <ant:include name="*"/>
+          </ant:fileset>
+        </ant:chmod>
+
+        <u:available file="${basedir}/target/classes/org/mule/samples/${mule.samples.class.root}">
+            <mkdir dir="${mule.samples.dist.dir}/classes"/>
+            <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.samples.class.root}">
+                <fileset dir="${basedir}/target/classes/org/mule/samples/${mule.samples.class.root}">
+                    <include name="**/*.class"/>
+                </fileset>
+            </copy>
+        </u:available>
+        <copy todir="${mule.samples.dist.dir}/conf">
+            <fileset dir="${basedir}/conf">
+                <exclude name="test-*.*"/>
+            </fileset>
+        </copy>
+        <j:if test="${mule.sample.testdata}">
+            <copy todir="${mule.samples.dist.dir}/test-data">
+                <fileset dir="${basedir}/test-data"/>
+            </copy>
+        </j:if>
+
+    </goal>
+</project>

@@ -1,0 +1,86 @@
+
+<html>
+ <head>
+    <link rel="stylesheet" href="./css/codehaus-style.css" type="text/css">
+    <link rel="stylesheet" href="./css/mule.css" type="text/css">
+
+    <title>MuleDocs - Home</title>
+  </head>
+<body>
+    <table width="100%" id="layout" style="padding:0px;margin0px;border-collapse:collapse;">
+      <tr>
+        <td colspan="3" style="padding:8px;">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr id="header_row">
+              <td align="left" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><img align="absmiddle" border=0 src="./images/logo-with-title-small.gif"></span></span>
+              </td>
+              <td align="right" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><span class="nobr"><a href="http://symphonysoft.com" rel="nofollow"><img align="absmiddle" border=0 src="./images/logo_250.gif"></a></span></span></span>
+
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" id="breadcrumbs">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr>
+              <td align="left">
+                <a href="index.html">Home</a> <b>|</b> <a href="gallery.html">Gallery</a>
+              </td>
+              <td align="right">
+                  <span id="Content"><span><a href="http://mule.codehaus.org/docs/apidocs/index.html" title="Mule Javadoc">Mule Javadoc</a> <b>|</b> <span class="nobr"><a href="http://mule.codehaus.org/docs/mail-lists.html" rel="nofollow">Mailing Lists</a></span> <b>|</b> <span class="nobr"><a href="http://jira.muleumo.org" rel="nofollow">Issue Tracker</a></span> <b>|</b> <span class="nobr"><a href="http://docs.codehaus.org/dosearchsite.action" rel="nofollow">Search</a></span></span></span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+ </table>
+  <div id="Content">
+      <h1>Description :</h1>
+          <br><br><br>    This example uses http as the transport. The configuration is identical to the other<br>    helllo world example, except that an Http connector is used rather than the System<br>    stream connector.  Aslo 2 other transformers are used to convert to and from http.<br><br>    To invoke the hello component over http, hit the following URL<br><br>    http://localhost:8888?name=Ross<br><br>    The example demonstrates how easy it is to swap out different transports while never<br>    affecting the application.<br><br>    This file defines the configuration for the hello sample application.  The application<br>    has two components -<br>    1. The Greeter component that adds a greeting to the event it receives<br>    2. The ChitChater component that adds some additional conversation to the event it receives<br>    An event is triggered by input through the system console and the outbound event is<br>    aslo written out through the system console.<br>    <br>
+      <h1>Graph :</h1>
+      <ul>
+      <p> click on mule component to navigate the javadoc or java code</b>
+      </p>
+      </ul>
+    <img src="hello-http-mule-config.xml.gif" usemap="#LinguineMap" border="0" class="mulegraph">
+    <map id="LinguineMap" name="LinguineMap">
+<area shape="rect" href="../../../samples/hello/src/java/org/mule/samples/hello/Greeter.java" title="{GreeterUMO\l|implementation\ \:org\.mule\.samples\.hello\.Greeter\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{GreeterUMO\l|implementation\ \:org\.mule\.samples\.hello\.Greeter\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="224,439,509,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/OutboundPassThroughRouter.html" title="{org\.mule\.routing\.outbound\.OutboundPassThroughRouter\l|}" alt="{org\.mule\.routing\.outbound\.OutboundPassThroughRouter\l|}" coords="200,601,533,655" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{http\:\/\/localhost\:8888\lContent\-Type\ \:text\/plain\l}" alt="{http\:\/\/localhost\:8888\lContent\-Type\ \:text\/plain\l}" coords="295,17,439,65" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/filters/logic/NotFilter.html" title="{org\.mule\.routing\.filters\.logic\.NotFilter\l|}" alt="{org\.mule\.routing\.filters\.logic\.NotFilter\l|}" coords="256,161,477,215" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/http/filters/HttpRequestWildcardFilter.html" title="{org\.mule\.providers\.http\.filters\.HttpRequestWildcardFilter\l|pattern\ \:\/favicon\.ico\l}" alt="{org\.mule\.providers\.http\.filters\.HttpRequestWildcardFilter\l|pattern\ \:\/favicon\.ico\l}" coords="201,308,532,361" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{vm\:\/\/chitchatter\lresponseTransformers\ \:ChatStringToString\l}" alt="{vm\:\/\/chitchatter\lresponseTransformers\ \:ChatStringToString\l}" coords="241,751,492,799" />
+<area shape="rect" href="../../../samples/hello/src/java/org/mule/samples/hello/ChitChatter.java" title="{ChitChatUMO\l|implementation\ \:org\.mule\.samples\.hello\.ChitChatter\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{ChitChatUMO\l|implementation\ \:org\.mule\.samples\.hello\.ChitChatter\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="213,879,520,964" />
+<area shape="rect" href="http\:\/\/www\.softwaresecretweapons\.com\l" alt="LinguineMap" coords="7,7,727,1353" />
+</map>
+  </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<table>
+    <tr>
+        <td colspan="3" id="footer">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td align="center" valign="top">Mule ESB rocks !
+                    </td>
+
+                    <td align="right" valign="top"><a
+                        style="color: rgb(153, 153, 153);"
+                        href="http://mule.codehaus.org/Config+Graph">[with MuleDocs]</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </tr>
+</table>
+</body>
+</html>  

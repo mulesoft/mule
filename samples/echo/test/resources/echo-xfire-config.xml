@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Echo_XFire_Sample" version="1.0">
+
+    <transformers>
+        <transformer name="HttpRequestToSoapRequest" className="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
+    </transformers>
+
+    <model name="echoSample">
+        <mule-descriptor name="EchoUMO" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:8081/services" transformers="HttpRequestToSoapRequest" />
+                <endpoint address="xfire:http://localhost:8082/services"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

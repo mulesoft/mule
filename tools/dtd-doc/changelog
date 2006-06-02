@@ -1,0 +1,19 @@
+0.0.5
+
+Automated publishing of the website on SourceForge
+Added display of element/attribute parent
+A lot more comments in the code
+Now it's possible to configure the title that is displayed on top of the index.
+
+0.0.4 : Added support for titles and head comments
+        Fixed some tiny bugs
+        Added preliminary support for include/exclude list
+        Added GPL
+        Added regexp 1.2 in the package for easier deploying.
+        Better support for attributes
+        Improved documentation a bit
+    Improved buil funtionalities (mrproper, javadoc)
+0.0.3
+    Added support for multiple depth of directories in DTD inclusion
+    Added changelog !
+

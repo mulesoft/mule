@@ -1,0 +1,11 @@
+<project default="distro" xmlns:j="jelly:core">
+
+    <goal name="distro" prereqs="setvars,java:compile">
+        <mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="hello"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+    </goal>
+
+</project>

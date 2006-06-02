@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-providers</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-space-provider</artifactId>
+    <packaging>jar</packaging>
+    <name>Space Provider</name>
+    <description>Allows Mule to send and receive events via the Mule Space API.  This enables interation with JCache, Jini, Rio or other 'space' types using a common interface.</description>
+
+    <build>
+        <!-- m2 Standard directory layout 
+            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+        <!-- Needed for unit tests only -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

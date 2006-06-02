@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-xmpp-provider</artifactId>
+    <name>Mule XMPP Provider</name>
+    <description>A Mule provider that enables sending and receiving of events over XMPP (Jabber).
+    </description>
+    <shortDescription>xmpp</shortDescription>
+    <url>http://www.muleumo.org/docs/modules/mule-xmpp-provider/</url>
+    <dependencies>
+        <dependency>
+            <groupId>jivesoftware</groupId>
+            <artifactId>smack</artifactId>
+            <version>${smack_version}</version>
+            <url>http://www.jivesoftware.org/smack/</url>
+        </dependency>
+        <dependency>
+            <groupId>jivesoftware</groupId>
+            <artifactId>smackx</artifactId>
+            <version>${smackx_version}</version>
+            <url>http://www.jivesoftware.org/smack/</url>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,5 @@
+<container>
+    <component class='org.mule.tck.testmodels.fruit.FruitBowl'/>
+    <component class='org.mule.tck.testmodels.fruit.Apple'/>
+    <component class='org.mule.tck.testmodels.fruit.Banana'/>
+</container>

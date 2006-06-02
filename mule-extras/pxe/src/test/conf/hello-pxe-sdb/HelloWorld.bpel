@@ -1,0 +1,43 @@
+<process name="HelloWorld" 
+    targetNamespace="http://jlo/bpel/unit-test" 
+    xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns:tns="http://jlo/bpel/unit-test"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:test="http://jlo/bpel/unit-test.wsdl">
+   <partnerLinks>
+      <partnerLink name="helloPartnerLink" 
+         partnerLinkType="test:HelloPartnerLinkType" 
+         myRole="me" />
+   </partnerLinks>
+    
+   <variables>
+     <variable name="myVar" messageType="test:HelloMessage"/>
+     <variable name="tmpVar" type="xsd:string"/>
+   </variables>
+        
+   <sequence>   
+       <receive 
+          name="start"
+          partnerLink="helloPartnerLink"
+          portType="test:HelloPortType"
+          operation="hello"
+          variable="myVar"
+          createInstance="yes"/>
+      <assign name="assign1">
+         <copy>
+            <from variable="myVar" part="TestPart"/>
+            <to variable="tmpVar"/>
+         </copy>
+         <copy>
+             <from expression="concat(bpws:getVariableData('tmpVar'),' World')"/>
+             <to variable="myVar" part="TestPart"/>
+         </copy>
+      </assign>
+       <reply name="end"  
+              partnerLink="helloPartnerLink"
+              portType="test:HelloPortType" 
+              operation="hello"
+              variable="myVar"/>
+   </sequence>
+</process>

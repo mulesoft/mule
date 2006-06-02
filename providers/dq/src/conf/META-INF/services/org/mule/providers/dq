@@ -1,0 +1,7 @@
+connector=org.mule.providers.dq.DQConnector
+dispatcher.factory=org.mule.providers.dq.DQMessageDispatcherFactory
+message.receiver=org.mule.providers.dq.DQMessageReceiver
+message.adapter=org.mule.providers.dq.DQMessageAdapter
+inbound.transformer=org.mule.providers.dq.transformers.XmlToDQMessage
+outbound.transformer=org.mule.providers.dq.transformers.DQMessageToXml
+endpoint.builder=org.mule.providers.dq.DQEndpointBuilder

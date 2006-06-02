@@ -1,0 +1,101 @@
+
+<html>
+ <head>
+    <link rel="stylesheet" href="./css/codehaus-style.css" type="text/css">
+    <link rel="stylesheet" href="./css/mule.css" type="text/css">
+
+    <title>MuleDocs - Home</title>
+  </head>
+<body>
+    <table width="100%" id="layout" style="padding:0px;margin0px;border-collapse:collapse;">
+      <tr>
+        <td colspan="3" style="padding:8px;">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr id="header_row">
+              <td align="left" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><img align="absmiddle" border=0 src="./images/logo-with-title-small.gif"></span></span>
+              </td>
+              <td align="right" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><span class="nobr"><a href="http://symphonysoft.com" rel="nofollow"><img align="absmiddle" border=0 src="./images/logo_250.gif"></a></span></span></span>
+
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" id="breadcrumbs">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr>
+              <td align="left">
+                <a href="index.html">Home</a> <b>|</b> <a href="gallery.html">Gallery</a>
+              </td>
+              <td align="right">
+                  <span id="Content"><span><a href="http://mule.codehaus.org/docs/apidocs/index.html" title="Mule Javadoc">Mule Javadoc</a> <b>|</b> <span class="nobr"><a href="http://mule.codehaus.org/docs/mail-lists.html" rel="nofollow">Mailing Lists</a></span> <b>|</b> <span class="nobr"><a href="http://jira.muleumo.org" rel="nofollow">Issue Tracker</a></span> <b>|</b> <span class="nobr"><a href="http://docs.codehaus.org/dosearchsite.action" rel="nofollow">Search</a></span></span></span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+ </table>
+  <div id="Content">
+      <h1>Description :</h1>
+          <br><br><br>    This loan broker example is modeled on the Enterprise integration Patterns book<br>    sample.<br>    This implementation differs in that this configuration uses an synchronous<br>    model where each component is invoked from the LoanBroker component.<br>    <br>
+      <h1>Graph :</h1>
+      <ul>
+      <p> click on mule component to navigate the javadoc or java code</b>
+      </p>
+      </ul>
+    <img src="loan-broker-sync-config.xml.gif" usemap="#LinguineMap" border="0" class="mulegraph">
+    <map id="LinguineMap" name="LinguineMap">
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/LoanBrokerRequests.html" title="{LoanBrokerRequests\l|LoanBrokerRequests\l}" alt="{LoanBrokerRequests\l|LoanBrokerRequests\l}" coords="1304,17,1432,70" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/SyncLoanBroker.java" title="{LoanBroker\l|implementation\ \:org\.mule\.samples\.loanbroker\.SyncLoanBroker\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{LoanBroker\l|implementation\ \:org\.mule\.samples\.loanbroker\.SyncLoanBroker\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="1182,148,1553,233" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/LoanBrokerQuotes.html" title="{LoanBrokerQuotes\l|vm\:\/\/LoanQuotes\l}" alt="{LoanBrokerQuotes\l|vm\:\/\/LoanQuotes\l}" coords="852,1190,966,1244" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/routers/BankQuotesResponseAggregator.java" title="{org\.mule\.samples\.loanbroker\.routers\.BankQuotesResponseAggregator\l|}" alt="{org\.mule\.samples\.loanbroker\.routers\.BankQuotesResponseAggregator\l|}" coords="1324,1337,1740,1390" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/CreditAgency.html" title="{CreditAgency\l|axis\:http\:\/\/localhost\:18080\/mule\/CreditAgencyService\?method\=getCreditProfile\l}" alt="{CreditAgency\l|axis\:http\:\/\/localhost\:18080\/mule\/CreditAgencyService\?method\=getCreditProfile\l}" coords="713,457,1174,510" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/DefaultCreditAgencyService.java" title="{CreditAgencyService\l|implementation\ \:org\.mule\.samples\.loanbroker\.DefaultCreditAgencyService\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{CreditAgencyService\l|implementation\ \:org\.mule\.samples\.loanbroker\.DefaultCreditAgencyService\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="712,588,1146,673" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/LenderService.html" title="{LenderService\l|vm\:\/\/localhost\/LenderService\?method\=setLenderList\l}" alt="{LenderService\l|vm\:\/\/localhost\/LenderService\?method\=setLenderList\l}" coords="1213,457,1522,510" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/DefaultLenderService.java" title="{LenderService\l|implementation\ \:org\.mule\.samples\.loanbroker\.DefaultLenderService\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{LenderService\l|implementation\ \:org\.mule\.samples\.loanbroker\.DefaultLenderService\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="1170,588,1565,673" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/Bank1.html" title="{Bank1\l|axis\:http\:\/\/localhost\:10080\/mule\l}" alt="{Bank1\l|axis\:http\:\/\/localhost\:10080\/mule\l}" coords="282,897,474,950" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/Bank.java" title="{Bank1\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{Bank1\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="101,1028,405,1113" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/Bank2.html" title="{Bank2\l|axis\:http\:\/\/localhost\:20080\/mule\l}" alt="{Bank2\l|axis\:http\:\/\/localhost\:20080\/mule\l}" coords="569,897,761,950" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/Bank.java" title="{Bank2\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{Bank2\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="429,1028,733,1113" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/Bank3.html" title="{Bank3\l|axis\:http\:\/\/localhost\:30080\/mule\l}" alt="{Bank3\l|axis\:http\:\/\/localhost\:30080\/mule\l}" coords="813,897,1005,950" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/Bank.java" title="{Bank3\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{Bank3\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="757,1028,1061,1113" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/Bank4.html" title="{Bank4\l|axis\:http\:\/\/localhost\:40080\/mule\l}" alt="{Bank4\l|axis\:http\:\/\/localhost\:40080\/mule\l}" coords="1061,897,1253,950" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/Bank.java" title="{Bank4\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{Bank4\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="1085,1028,1389,1113" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/Bank5.html" title="{Bank5\l|axis\:http\:\/\/localhost\:50080\/mule\l}" alt="{Bank5\l|axis\:http\:\/\/localhost\:50080\/mule\l}" coords="1389,897,1581,950" />
+<area shape="rect" href="../../../loanbroker/src/java/org/mule/samples/loanbroker/Bank.java" title="{Bank5\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" alt="{Bank5\l|implementation\ \:org\.mule\.samples\.loanbroker\.Bank\lcontainerManaged\ \:true\linitialState\ \:started\l}" coords="1413,1028,1717,1113" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/FilteringOutboundRouter.html" title="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" alt="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" coords="868,310,1169,364" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/FilteringOutboundRouter.html" title="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" alt="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" coords="1217,310,1518,364" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/StaticRecipientList.html" title="{org\.mule\.routing\.outbound\.StaticRecipientList\l|}" alt="{org\.mule\.routing\.outbound\.StaticRecipientList\l|}" coords="774,750,1044,804" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/soap/axis/AxisConnector.html" title="{axisConnector\l|className\ \:org\.mule\.providers\.soap\.axis\.AxisConnector\l}" alt="{axisConnector\l|className\ \:org\.mule\.providers\.soap\.axis\.AxisConnector\l}" coords="1456,17,1792,70" />
+<area shape="rect" href="http\:\/\/www\.softwaresecretweapons\.com\l" alt="LinguineMap" coords="6,6,1832,1572" />
+</map>
+  </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<table>
+    <tr>
+        <td colspan="3" id="footer">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td align="center" valign="top">Mule ESB rocks !
+                    </td>
+
+                    <td align="right" valign="top"><a
+                        style="color: rgb(153, 153, 153);"
+                        href="http://mule.codehaus.org/Config+Graph">[with MuleDocs]</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </tr>
+</table>
+</body>
+</html>  

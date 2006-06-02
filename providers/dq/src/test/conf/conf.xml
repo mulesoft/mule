@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="helloSampleProperties" version="1.0">
+    <connector name="AS400DataQueueConnector" className="org.mule.provider.AS400DataQueue.DQConnector">
+        <properties>
+            <property name="hostname" value="10.198.10.11"/>
+            <property name="username" value="xxx"/>
+            <property name="password" value="xxx"/>
+            <property name="pollingFrequency" value="1000"/>
+            <property name="recordFormat" value="conf/DQ_recordFormat.xml"/>
+        </properties>
+    </connector>
+
+    <model name="helloSample">
+        <mule-descriptor name="TestUMO"
+            inboundEndpoint="dq://L701QUEUE.DTAQ?lib=/QSYS.LIB"
+            outboundEndpoint="dq://MYQUEUE.DTAQ?transformer=XmlToDQMessage&amp;lib=/QSYS.LIB"
+            implementation="org.mule.components.simple.LogComponent">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

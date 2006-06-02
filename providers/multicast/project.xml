@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-multicast-provider</artifactId>
+    <name>Mule Multicast Provider</name>
+    <description>A Mule provider for Udp Multicasting. This provider supplies a Multicast Data Packet dispatcher and client implementation.
+    </description>
+    <shortDescription>multicast</shortDescription>
+    <url>http://www.muleumo.org/docs/modules/mule-multicast-provider/</url>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-udp-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>

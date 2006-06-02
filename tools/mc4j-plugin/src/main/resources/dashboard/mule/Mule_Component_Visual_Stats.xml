@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Dashboard PUBLIC "-//MC4J//DTD Dashboard 1.0//EN" "http://mc4j.sourceforge.net/Dashboard_1_0.dtd">
+
+<Dashboard version="1.0" name="Mule Component Visual Stats">
+
+    <Description>This dashboard shows the statistics of mule components.</Description>
+
+    <DashboardMatch type="Bean">
+        <BeanMatch id="Component" type="Single">
+            <Condition type="BeanObjectNameCondition" filter="type=org.mule.Component"/>
+        </BeanMatch>
+    </DashboardMatch>
+
+    <LayoutManager type="java.awt.BorderLayout"/>
+    <Content>
+
+        <!-- *** The header section displays title and a refresh control *** -->
+        <Component type="javax.swing.JPanel">
+            <Constraint type="BorderConstraints" direction="NORTH"/>
+            <LayoutManager type="java.awt.BorderLayout"/>
+            <Border type="javax.swing.border.EmptyBorder" top="(Literal)2" left="(Literal)5" bottom="(Literal)2" right="(Literal)5"/>
+            <Content>
+                <Component type="javax.swing.JPanel">
+                    <Constraint type="BorderConstraints" direction="CENTER"/>
+                    <LayoutManager type="java.awt.BorderLayout"/>
+                    <Content>
+                        <Component type="javax.swing.JLabel" id="titleLable">
+                            <Constraint type="BorderConstraints" direction="CENTER"/>
+                            <Attribute name="text" value="DashboardName"/>
+                            <Attribute name="font" value="(Literal)SansSerif bold 20"/>
+                            <Attribute name="foreground" value="(Literal)0x666666"/>
+                        </Component>
+                        <Component type="javax.swing.JTextArea">
+                            <Constraint type="BorderConstraints" direction="SOUTH"/>
+                            <Attribute name="text" value="DashboardDescription"/>
+                            <Attribute name="font" value="(Literal)DialogInput bold 14"/>
+                            <Attribute name="opaque" value="(Literal)false"/>
+                            <Attribute name="editable" value="(Literal)false"/>
+                        </Component>
+                    </Content>
+                </Component>
+            </Content>
+        </Component>
+
+
+        <!-- *** Scroll pane of info *** -->
+        <Component type="javax.swing.JScrollPane">
+            <Attribute name="background" value="(Literal)0xFFFFFF"/>
+            <Content>
+                <Component type="javax.swing.JPanel">
+                    <Attribute name="background" value="(Literal)0xFFFFFF"/>
+                    <Constraint type="BorderConstraints" direction="CENTER"/>
+                    <Attribute name="preferredSize" value="100,100"/>
+                    <LayoutManager type="java.awt.BoxLayout" axis="Y_AXIS"/>
+                    <Content>
+
+                        <Component type="org.mc4j.console.swing.SectionHolder">
+                            <Attribute name="title" value="(Literal)Event Processing"/>
+                            <Attribute name="background" value="(Literal)0xFFFFFF"/>
+                            <LayoutManager type="java.awt.GridLayout" rows="1" cols="1"/>
+                            <Content>
+                                <Component type="org.mc4j.console.dashboard.components.NumericAttributeGraph">
+                                    <Attribute name="beanNode" value="Component"/>
+
+                                    <Attribute name="preferredSize" value="(Literal)400,150"/>
+                                    <Attribute name="AttributeName" value="(Literal)ExecutedEvents"/>
+                                    <Attribute name="AttributeName" value="(Literal)ExecutionErrors"/>
+                                    <Attribute name="AttributeName" value="(Literal)FatalErrors"/>
+                                </Component>
+                            </Content>
+                        </Component>
+
+                        <Component type="org.mc4j.console.swing.SectionHolder">
+                            <Attribute name="title" value="(Literal)Execution Speed"/>
+                            <Attribute name="background" value="(Literal)0xFFFFFF"/>
+                            <LayoutManager type="java.awt.GridLayout" rows="1" cols="1"/>
+                            <Content>
+                                <Component type="org.mc4j.console.dashboard.components.NumericAttributeGraph">
+                                    <Attribute name="beanNode" value="Component"/>
+                                    <Attribute name="preferredSize" value="(Literal)400,150"/>
+                                    <Attribute name="attributeName" value="(Literal)MinExecutionTime"/>
+                                    <Attribute name="attributeName" value="(Literal)MaxExecutionTime"/>
+                                    <Attribute name="attributeName" value="(Literal)AverageExecutionTime"/>
+                                </Component>
+                            </Content>
+                        </Component>
+
+                        <Component type="org.mc4j.console.swing.SectionHolder">
+                            <Attribute name="title" value="(Literal)Queue Size (Async)"/>
+                            <Attribute name="background" value="(Literal)0xFFFFFF"/>
+                            <LayoutManager type="java.awt.GridLayout" rows="1" cols="1"/>
+                            <Content>
+                                <Component type="org.mc4j.console.dashboard.components.NumericAttributeGraph">
+                                    <Attribute name="beanNode" value="Component"/>
+
+                                    <Attribute name="preferredSize" value="(Literal)400,150"/>
+                                    <Attribute name="AttributeName" value="(Literal)QueueSize"/>
+                                    <Attribute name="AttributeName" value="(Literal)MaxQueueSize"/>
+                                </Component>
+                            </Content>
+                        </Component>
+
+                        <Component type="org.mc4j.console.dashboard.components.FillerComponent">
+                            <Attribute name="type" value="(Literal)VERTICAL_GLUE_SHAPE"/>
+                        </Component>
+                    </Content>
+
+                </Component>
+            </Content>
+        </Component>
+    </Content>
+    <!--              <Attribute name="AttributeName" value="(Literal)Name"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)QueueSize"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)MaxQueueSize"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)AverageExecutionTime"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)MaxExecutionTime"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)TotalEventsReceived"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)TotalEventsSent"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)ExecutedEvents"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)ExectionErrors"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)FatalErrors"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)Stopped"/>-->
+    <!--              <Attribute name="AttributeName" value="(Literal)Paused"/>-->
+
+
+</Dashboard>

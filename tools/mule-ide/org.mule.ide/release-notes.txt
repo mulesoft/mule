@@ -1,0 +1,28 @@
+--------------
+Mule IDE 1.2.1
+--------------
+
+JIRA ticket http://jira.symphonysoft.com/browse/MULETOOLS-8
+
+* When creating a Mule project, the wizard now gives you a per-project choice 
+  of whether to copy the libraries from the plugin or an external installation. 
+* The preferences now specify the default values when creating a project rather 
+  than applying to all projects. 
+* When creating a project from an external install, the wizard attempts to 
+  create source and javadoc attachments pointing into the distribution.
+  
+JIRA ticket http://jira.symphonysoft.com/browse/MULETOOLS-14
+
+* Adds support for creating a project based on a sample. Copies the source code 
+  and configuration files, then sets up configs/config sets for the files.
+  NOTE: For the loanbroker sample, you have to manually copy the Axis libs into
+  the project after it is created. Hopefully, the next version will allow for
+  auto-inclusion of the optional libs.
+* Adds option for creating an empty project including all the jars and a 
+  basic config file.
+  
+--------------
+Mule IDE 1.2.0
+--------------
+
+* Initial release

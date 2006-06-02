@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="securityContext.xml"/>
+        </properties>
+    </container-context>
+
+    <security-manager>
+        <security-provider className="org.mule.extras.pgp.PGPSecurityProvider" name="PgpProvider">
+            <properties>
+                <container-property name="keyManager" reference="pgpKeyManager" />
+            </properties>
+        </security-provider>
+        <encryption-strategy className="org.mule.extras.pgp.KeyBasedEncryptionStrategy" name="KBE">
+            <properties>
+                <container-property name="keyManager" reference="pgpKeyManager" />
+            </properties>
+        </encryption-strategy>
+    </security-manager>
+
+    <model name="test">
+        <mule-descriptor name="echo" implementation="org.mule.extras.pgp.EchoMsg">
+            <inbound-router>
+                <endpoint address="vm://localhost/echo">
+                    <security-filter className="org.mule.extras.pgp.filters.PGPSecurityFilter">
+                        <properties>
+                            <property name="strategyName" value="KBE"/>
+                            <property name="signRequired" value="true"/>
+                            <container-property name="credentialsAccessor" reference="fakeCredentialAccessor"/>
+                            <container-property name="keyManager" reference="pgpKeyManager" />
+                        </properties>
+                    </security-filter>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                <endpoint address="file:///WuTemp" >
+                    <security-filter className="org.mule.extras.pgp.filters.PGPSecurityFilter">
+                        <properties>
+                            <property name="strategyName" value="KBE"/>
+                            <property name="authenticate" value="true"/>
+                            <container-property name="credentialsAccessor" reference="fakeCredentialAccessor"/>
+                            <container-property name="keyManager" reference="pgpKeyManager" />
+                        </properties>
+                    </security-filter>
+                </endpoint>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

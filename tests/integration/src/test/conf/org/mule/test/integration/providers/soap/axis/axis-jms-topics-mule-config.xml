@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+        class="org.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost</value></property>
+        <property name="useEmbeddedBroker"><value>true</value></property>
+        <property name="brokerContainerFactory">
+            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
+                <constructor-arg index="0">
+                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+    <!--
+    JmsConnector is used to send and receive information via the Jms channel
+    -->
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+<!--    <global-endpoints>-->
+<!--        <endpoint name="receiveEndpoint" address="axis:jms://mycomponent2?method=getDate">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="receiveComplex" address="axis:jms://mycomponent3?method=getPerson">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="sendReceiveComplexEndpoint1" address="axis:jms://mycomponent3?method=addPerson">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="sendReceiveComplexEndpoint2" address="axis:jms://mycomponent3?method=getPerson&amp;param=Ross">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="receiveComplexCollectionEndpoint" address="axis:jms://mycomponent3?method=getPeople">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="dispatchAsyncComplexEndpoint1" address="axis:jms://mycomponent4?method=addPerson">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="dispatchAsyncComplexEndpoint2" address="axis:jms://mycomponent3?method=getPerson&amp;param=Joe">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--        <endpoint name="testExceptionEndpoint" address="axis:jms://mycomponent3?method=addPerson">-->
+<!--            <properties>-->
+<!--                <property name="topic" value="true"/>-->
+<!--            </properties>-->
+<!--        </endpoint>-->
+<!--    </global-endpoints>-->
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent">
+                    <properties>
+                        <property name="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent2"
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent2">
+                    <properties>
+                        <property name="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+            <properties>
+                <list name="serviceInterfaces">
+                    <entry value="org.mule.components.simple.EchoService"/>
+                    <entry value="org.mule.test.integration.service.DateService"/>
+                </list>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent3"
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent3">
+                    <properties>
+                        <property name="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent4"
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent4" synchronous="false" >
+                    <properties>
+                        <property name="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule.tests</groupId>
+        <artifactId>mule-tests-vendor</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-tests-oracle</artifactId>
+    <packaging>jar</packaging>
+    <name>Oracle Integration Tests</name>
+    <description>Functional and integration tests for the Mule Oracle JMS provider.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-oracle-jms-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>9i</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>jmscommon</artifactId>
+            <version>9i</version>
+        </dependency>
+
+        <!-- For XMLType only -->
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>xdb</artifactId>
+            <version>9i</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>xmlparserv2-distilled</artifactId>
+            <version>9i</version>
+        </dependency>
+
+        <!-- The native AQ (i.e., non-JMS) API is only needed for administrative functions
+        (creating/deleting queues, etc.) -->
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>aqapi13</artifactId>
+            <version>9i</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

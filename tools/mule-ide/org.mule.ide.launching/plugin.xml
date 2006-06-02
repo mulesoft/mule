@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+ * $Header$
+ * $Revision$
+ * $Date$
+ *
+ * Copyright (c) Jesper Steen Møller. All rights reserved.
+ * http://www.selskabet.org/jesper/
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+-->
+
+<plugin>
+     <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.mule.ide.launching.MuleLaunchConfigurationDelegate"
+            id="org.mule.ide.launching.localMuleServer"
+            modes="run, debug"
+            name="Local Mule Server"
+            sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+         <fileExtension
+               default="true"
+               extension="xml"/>
+      </launchConfigurationType>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="org.mule.ide.launching.RouteBreakpoint"
+            id="org.mule.ide.launching.routeBreakpoint"
+            markerType="org.mule.ide.launching.routeBreakpointMarker"
+            name="Message Route Breakpoint"/>
+
+      <breakpoint
+            class="org.mule.ide.launching.EndpointBreakpoint"
+            id="org.mule.ide.launching.endpointBreakpoint"
+            markerType="org.mule.ide.launching.endpointBreakpointMarker"
+            name="Message Endpoint Breakpoint"/>
+
+      <breakpoint
+            class="org.mule.ide.launching.ExceptionBreakpoint"
+            id="org.mule.ide.launching.exceptionBreakpoint"
+            markerType="org.mule.ide.launching.exceptionBreakpointMarker"
+            name="Message Exception Breakpoint"/>
+   </extension>
+   <extension
+         id="org.mule.ide.launching.flowBreakpointMarker"
+         name="Breakpoint type"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.debug.core.breakpointMarker"/>
+      <persistent value="true"/>
+   </extension>
+   <extension
+         id="org.mule.ide.launching.endpointBreakpointMarker"
+         name="Message Endpoint Breakpoint"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.mule.ide.launching.flowBreakpointMarker"/>
+      <attribute name="org.mule.ide.launching.breakBefore"/>
+      <attribute name="org.mule.ide.launching.breakAfter"/>
+   </extension>
+   <extension
+         id="org.mule.ide.launching.routeBreakpointMarker"
+         name="Message Route Breakpoint"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.mule.ide.launching.flowBreakpointMarker"/>
+      <attribute name="org.mule.ide.launching.filter"/>
+   </extension>
+   <extension
+         id="org.mule.ide.launching.exceptionBreakpointMarker"
+         name="Flow Exception Breakpoint"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.mule.ide.launching.flowBreakpointMarker"/>
+      <attribute name="org.mule.ide.launching.uncaught"/>
+      <attribute name="org.mule.ide.launching.caught"/>
+   </extension>
+
+</plugin>

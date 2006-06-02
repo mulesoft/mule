@@ -1,0 +1,154 @@
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<!--
+This loan broker example is modeled on the Enterprise integration Patterns book
+sample.
+This implementation differs in that this configuration uses an asynchronous
+model where each component communicates messaging accordin to it's configuration
+in this file.
+There is a synchronous version of this in the loan-broker-sync-config.xml where calls to
+the different components are made from the loan broker component (a la hub and spoke).
+-->
+
+<mule-configuration id="Loan_broker_Async" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+    <!--
+    Setting global endpoints can help simplify configuration by defining an actual
+    url endpointUri in one place. The endpointUri name can be used in place of the url.
+    -->
+    <endpoint-identifiers>
+        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>
+        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService/getCreditProfile"/>
+        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>
+        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
+        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>
+        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>
+        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>
+        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>
+        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>
+    </endpoint-identifiers>
+
+     <!--
+        The Mule model initialises and manages your UMO components
+    -->
+    <model name="loan-broker">
+        <!--
+        The loan broker is used to receive loan requests
+        -->
+        <mule-descriptor name="LoanBroker"
+            outboundEndpoint="CreditAgency"
+            implementation="org.mule.samples.loanbroker.AsyncLoanBroker">
+
+            <!--
+            This router uses the BankQuoteAggregator for events of type BankQuote, for all other
+            types the catch all strategy is invoked, which simply passes the event to the component
+            -->
+            <inbound-router>
+                <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
+                <endpoint address="vm://LoanBrokerRequests" name="LoanRequests"/>
+                <endpoint address="LoanBroker"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
+                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </inbound-router>
+        </mule-descriptor>
+
+        <!--
+        The credit agency service will get the credit profile for a customer
+        -->
+        <mule-descriptor name="CreditAgencyService"
+            inboundEndpoint="CreditAgencyReceiver"
+            outboundEndpoint="LenderService"
+            implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+        <!--
+            This interceptor normalises the BankQuoteRequest into something the Credit agency understands.
+            It  basically acts as a two way transformer.
+            The BankQuoteRequest object contains a loanReqest and a lenders list.
+            'beforeExpressions' are executed before the component receives an event and extracts
+            one or more method parameters to invoke the component with.
+            'afterExpression' is used to set the return object, in this case a CreditProfile back on the message.
+            -->
+            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">
+                <properties>
+                    <property name="beforeExpressions" value="loanRequest/customer"/>
+                    <property name="afterExpression" value="loanRequest/creditProfile"/>
+                </properties>
+            </interceptor>
+        </mule-descriptor>
+
+        <!--
+        The Lender service is used to determine which banks to contact for a quote
+        -->
+        <mule-descriptor name="LenderService"
+            inboundEndpoint="LenderService"
+            implementation="org.mule.samples.loanbroker.DefaultLenderService">
+            <!--
+            this router will send an outbound event to none or more recipients which
+            are set as a property on the event itelf.  A replyTo property is also set
+            which tells the recipients of the event where to send the resulting event
+            -->
+            <outbound-router>
+                <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <properties>
+                        <property name="replyTo" value="LoanBroker"/>
+                    </properties>
+                </router>
+            </outbound-router>
+            <!--
+            This interceptor normalises the BankQuoteRequest into something the Lender Service understands.
+            It  basically acts as a two way transformer.
+            The BankQuoteRequest object contains a loanReqest and a lenders list.
+            'beforeExpressions' are executed before the component receives an event and extracts
+            one or more method parameters to invoke the component with. In this case there are two expressions that
+            evaluate to a CreditProfile object and a loanAmount value (Double).
+            'afterExpression' is used to set the return object, in this case the lenders list back on the message.
+            -->
+            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">
+                <properties>
+                    <property name="beforeExpressions" value="loanRequest/creditProfile,loanRequest/loanAmount"/>
+                    <property name="afterExpression" value="lenders"/>
+                </properties>
+            </interceptor>
+        </mule-descriptor>
+
+        <!--
+        These are mock bank services that represent remote bank loan services
+        One or more of these are selected by the LenderService and a request
+        is routed to them.   The lenderService outbound router also defines a
+        replyTo property which will be used by Mule to route the responses back
+        to the LoanBroker
+        -->
+        <mule-descriptor name="Bank1"
+            inboundEndpoint="Bank1"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2"
+            inboundEndpoint="Bank2"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3"
+            inboundEndpoint="Bank3"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4"
+            inboundEndpoint="Bank4"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5"
+            inboundEndpoint="Bank5"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

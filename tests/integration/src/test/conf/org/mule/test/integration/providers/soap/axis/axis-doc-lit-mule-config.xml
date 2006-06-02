@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_doclit_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.test.integration.service.TestServiceComponent"
+            inboundEndpoint="axis:http://localhost:38008/mule">
+            <properties>
+                <property name="style" value="Document"/>
+                <property name="use" value="Literal"/>
+                <list name="beanTypes">
+                    <entry value="java.lang.Exception"/>
+                </list>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

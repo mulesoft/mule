@@ -1,0 +1,48 @@
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+
+<mule-configuration id="Think_External_Gateway" version="1.0">
+
+    <!--
+    Endpoint identifiers provider a logical name to a physiscal endpoint name.  Here we are using
+    properties from the 'endpoint.properties' file so its not strictly necessary to use loggical identifiers here
+    -->
+    <endpoint-identifiers>
+        <endpoint-identifier name="thinkProxyEndpoint" value="${think.proxy.endpoint}"/>
+        <endpoint-identifier name="externalGWMQReceiveEndpoint" value="${dmz.gateway.receive.endpoint}"/>
+        <endpoint-identifier name="externalGWMQResponseEndpoint" value="${dmz.gateway.response.endpoint}"/>
+        <endpoint-identifier name="externalGWDLQEndpoint" value="${dmz.gateway.dlq.endpoint}"/>
+    </endpoint-identifiers>
+
+    <!-- The main execution model -->
+    <model name="main">
+
+        <!-- External gateway service component -->
+        <mule-descriptor name="ExternalServiceGW" implementation="com.ss.framegroup.mule.gateways.ExternalGateway">
+            <!-- the endpoint on which this component will receive events -->
+            <inbound-router>
+                <endpoint address="thinkProxyEndpoint"
+                    transformers="ByteArrayToString FieldEncrypter"
+                    responseTransformers="MQMessageToString FieldDecrypter StringToHttpResponse"
+                    synchronous="true" />
+            </inbound-router>
+
+            <!-- The outbound endpoint that the component proxies to -->
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="externalGWMQReceiveEndpoint"/>
+                </router>
+            </outbound-router>
+
+            <!-- The endpoint on which a response from the internal gateway will be received -->
+            <response-router timeout="10000">
+                <endpoint address="externalGWMQResponseEndpoint" />
+                <router className="org.mule.routing.response.SingleResponseRouter"/>
+            </response-router>
+            <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
+                <endpoint address="externalGWDLQEndpoint"/>
+            </exception-strategy>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

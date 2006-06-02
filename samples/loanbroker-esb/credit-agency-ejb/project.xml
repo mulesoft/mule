@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <name>Credit Agency EJB App</name>
+    <extend>${basedir}/../project.xml</extend>
+    <id>credit-agency-ejb-sample</id>
+    <groupId>mule</groupId>
+    <currentVersion>1.0</currentVersion>
+    <description>Example EJB app for the Loan Broker ESB example</description>
+    <dependencies>
+        <dependency>
+            <groupId>openejb</groupId>
+            <artifactId>openejb-core</artifactId>
+            <version>1.0-beta1</version>
+        </dependency>
+        <dependency>
+            <id>log4j</id>
+            <version>1.2.8</version>
+            <url>http://jakarta.apache.org/log4j</url>
+            <properties>
+                <runtime>true</runtime>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.6.0</version>
+            <url>http://xml.apache.org</url>
+            <properties>
+                <runtime>true</runtime>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>xml-apis</id>
+            <version>1.0.b2</version>
+            <properties>
+                <runtime>true</runtime>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>castor</id>
+            <version>0.9.5.3</version>
+            <url>http://www.castor.org</url>
+            <properties>
+                <runtime>true</runtime>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>oro</id>
+            <version>2.0.8</version>
+            <properties>
+                <runtime>true</runtime>
+            </properties>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/src/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/ejb</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+        </unitTest>
+    </build>
+</project>

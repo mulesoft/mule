@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+ * $Header$
+ * $Revision$
+ * $Date$
+ *
+ * Copyright (c) Jesper Steen Møller. All rights reserved.
+ * http://www.selskabet.org/jesper/
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+-->
+
+<plugin>
+   <extension-point id="samples" name="Mule Sample Projects" schema="schema/samples.exsd"/>
+     <extension
+         id="xmlProblem"
+         name="Mule Configuration File Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+
+   <extension
+         id="muleConfig"
+         name="Mule UMO Configuration File Verifier"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="org.mule.ide.core.builder.MuleConfigBuilder">
+         </run>
+      </builder>
+   </extension>
+   
+   <extension
+         id="muleConfigNature"
+         name="Mule UMO Configuration Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.mule.ide.core.nature.MuleNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.mule.ide.core.muleConfig">
+      </builder>
+   </extension>
+   
+
+   <extension point="org.eclipse.core.runtime.contentTypes"> 
+      <content-type id="org.mule.ide.core.muleConfigXml"
+       base-type="org.eclipse.core.runtime.xml"      
+       name="Mule UMO Configuration Type"
+       file-extensions="xml">
+       <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+        <parameter name="element" value="mule-configuration"/>
+        <parameter
+              name="dtd"
+              value="http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd"/>
+       </describer>
+       <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+        <parameter name="element" value="mule-configuration"/>
+        <parameter
+              name="dtd"
+              value="http://www.symphonysoft.com/dtds/mule/mule-spring-configuration.dtd"/>
+       </describer>
+      </content-type>
+   </extension>
+
+
+</plugin>

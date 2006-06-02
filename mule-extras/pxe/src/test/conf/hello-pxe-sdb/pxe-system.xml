@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<system-descriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.fivesight.com/pxe/system-descriptor/ http://www.fivesight.com/pxe/system-descriptor/"
+ xmlns:hw="http://pxe/bpel/unit-test.wsdl"
+ xmlns="http://www.fivesight.com/pxe/system-descriptor/"
+ name="HelloWorld"
+ wsdlUri="file:examples/HelloWorld/HelloWorld.wsdl">
+    <channels>
+    <channel name="channel1" />
+  </channels>
+  <services>
+        <service name="HelloService" 
+            provider="uri:protocoladapter.mule">
+            <imports>
+                <port name="HelloPort" type="hw:HelloPortType" channel-ref="channel1" />
+            </imports>
+        </service>
+        <service name="helloWorld.BpelService" provider="uri:bpelProvider">
+            <exports>
+                <port name="helloPartnerLink.me" type="hw:HelloPortType" channel-ref="channel1" />
+            </exports>
+        </service>
+  </services>
+</system-descriptor>

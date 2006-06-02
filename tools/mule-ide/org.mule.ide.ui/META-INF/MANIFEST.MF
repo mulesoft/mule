@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mule IDE UI Plugin
+Bundle-SymbolicName: org.mule.ide.ui; singleton:=true
+Bundle-Version: 1.2.1
+Bundle-ClassPath: mule-ui.jar
+Bundle-Activator: org.mule.ide.ui.MulePlugin
+Bundle-Vendor: Mule UMO
+Bundle-Localization: plugin
+Export-Package: org.mule.ide.ui,
+ org.mule.ide.ui.dialogs,
+ org.mule.ide.ui.model,
+ org.mule.ide.ui.preferences,
+ org.mule.ide.ui.properties,
+ org.mule.ide.ui.wizards
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.ui,
+ org.eclipse.jdt.core,
+ org.mule.ide.core
+Eclipse-AutoStart: true

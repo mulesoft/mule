@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-spring-configuration.dtd">
+
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <mule-descriptor name="appleComponent2"
+        implementation="org.mule.tck.testmodels.fruit.Apple">
+
+
+        <inbound-router>
+            <endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
+            <endpoint name="transactedInboundEndpoint" type="receiver" createConnector="ALWAYS_CREATE" address="test://endpoint.in2">
+                <transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
+                <properties>
+                    <property name="testEndpointProperty" value="Prop1"/>
+                </properties>
+            </endpoint>
+        </inbound-router>
+
+        <outbound-router>
+            <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                <endpoint name="transactedOutboundEndpoint" type="sender" address="test://endpoint.out"/>
+            </router>
+        </outbound-router>
+
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/>
+        <pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>
+        <queue-profile maxOutstandingMessages="102"/>
+    </mule-descriptor>
+</mule-configuration>

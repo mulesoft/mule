@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="quartz_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="vmQueueConnector" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <global-endpoints>
+        <endpoint name="schedulerEndpoint" address="quartz:/myService">
+            <properties>
+                <property name="repeatInterval" value="1000"/>
+            </properties>
+        </endpoint>
+    </global-endpoints>
+
+    <model name="quartz-dispatcher">
+
+        <mule-descriptor name="quartzSchedulingService" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://quartz.scheduler"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="schedulerEndpoint"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="scheduledService" implementation="org.mule.test.integration.providers.quartz.TestComponent">
+            <inbound-router>
+                <endpoint address="vm://quartz.in"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

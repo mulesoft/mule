@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="quartz_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <global-endpoints>
+        <endpoint name="quartz.in" address="quartz:/myService">
+            <properties>
+                <property name="repeatInterval" value="1000" />
+                <property name="payload" value="quartz test" />
+            </properties>
+        </endpoint>
+    </global-endpoints>
+
+    <model name="quartz">
+
+        <mule-descriptor
+            name="quartzService"
+            implementation="org.mule.providers.quartz.TestComponent"
+            inboundEndpoint="quartz.in">
+
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

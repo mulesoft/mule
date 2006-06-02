@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tests-oracle-integration</artifactId>
+    <name>Mule Oracle Vendor Integration Tests</name>
+    <description>Functional and integration tests for the Mule Oracle JMS provider.
+    </description>
+    <shortDescription>mule-tests-vendor-oracle-integration</shortDescription>
+    <url>http://mule.codehaus.org/Oracle+Integration</url>
+    <dependencies> 
+        <dependency>
+            <artifactId>mule-tests-integration-shared</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>mule-oracle-jms-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://mule.codehaus.org/Oracle+Integration</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <jar>ojdbc14.jar</jar>
+            <url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>aqapi</artifactId>
+            <jar>aqapi13.jar</jar>
+            <url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>jmscommon</artifactId>
+            <jar>jmscommon.jar</jar>
+            <url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xdb</artifactId>
+            <jar>xdb.jar</jar>
+            <url>http://www.oracle.com</url>
+        </dependency>
+
+        <!-- Xalan is included to override Oracle's javax.xml.transform classes
+         (part of xmlparserv2.jar).  The Oracle implementation of these classes create 
+         all kinds of conflicts and are better off not being used. -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <jar>xmlparserv2.jar</jar>
+            <url>http://www.oracle.com</url>
+        </dependency>
+
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <url>http://xmlunit.sourceforge.net</url>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" serverUrl="" />
+
+   <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+        class="org.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost</value></property>
+        <property name="useEmbeddedBroker"><value>true</value></property>
+    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+    <!-- Transaction manager -->
+    <transaction-manager
+        factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+    <model name="model">
+
+        <mule-descriptor name="component1"
+            implementation="org.mule.test.integration.service.TestReceiver">
+            <inbound-router>
+                <endpoint address="vm://component1"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <endpoint address="jms://my.queue1">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    </endpoint>
+                    <endpoint address="jms://my.queue2">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    </endpoint>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="component2"
+            implementation="org.mule.test.integration.service.TestReceiver">
+            <inbound-router>
+                <endpoint address="jms://component2">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <endpoint address="jms://my.queue3"/>
+                    <endpoint address="jms://my.queue4"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

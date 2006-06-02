@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Samples" version="1.0">
+
+    <transformers>
+        <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
+        <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
+        <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
+            <properties>
+                <property name="xslFile" value="rest-stock.xsl"/>
+            </properties>
+        </transformer>
+    </transformers>
+
+    <mule-descriptor name="HTTPPostSample"
+            inboundEndpoint="vm://stockquote"
+            responseTransformer="SgmlDecoder Xslt XmlToObject"
+            implementation="org.mule.components.rest.RestServiceWrapper">
+
+            <properties>
+                <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                <property name="payloadParameterName" value="symbol"/>
+                <property name="httpMethod" value="POST"/>
+            </properties>
+
+        </mule-descriptor>
+
+</mule-configuration>

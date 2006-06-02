@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+    <globalConfiguration>
+        <requestFlow>
+            <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler"/>
+        </requestFlow>
+        <responseFlow>
+            <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler"/>
+        </responseFlow>
+    </globalConfiguration>
+
+    <transport name="http" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="https" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="tcp" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="ssl" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="vm" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="jms" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="xmpp" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="smtp" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="smtps" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="pop3" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="pop3s" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="imap" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="imaps" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+
+</deployment>

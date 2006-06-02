@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Loan_broker_Sync" version="1.0">
+
+    <mule-environment-properties synchronous="true" serverUrl="" remoteSync="true"/>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+    <!--Testing with ActiveMq-->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="specification" value="1.1"/>
+            <map name="connectionFactoryProperties">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </map>
+        </properties>
+    </connector>
+
+
+    <!-- testing with OpenJms -->
+    <!--<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+    <!--<properties>-->
+    <!--<property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>-->
+    <!--<property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>-->
+    <!--<property name="jndiProviderUrl" value="tcp://localhost:3035"/>-->
+    <!--</properties>-->
+    <!--</connector>-->
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerRequests"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="jms://LoanQuotes"/>
+        <endpoint-identifier name="CreditAgency" value="jms://CreditAgencyService"/>
+        <endpoint-identifier name="LenderService" value="jms://LenderService"/>
+        <endpoint-identifier name="Bank1" value="jms://Bank1"/>
+        <endpoint-identifier name="Bank2" value="jms://Bank2"/>
+        <endpoint-identifier name="Bank3" value="jms://Bank3"/>
+        <endpoint-identifier name="Bank4" value="jms://Bank4"/>
+        <endpoint-identifier name="Bank5" value="jms://Bank5"/>
+    </endpoint-identifiers>
+
+    <model name="loan-broker">
+        <mule-descriptor name="LoanBroker"
+                         implementation="org.mule.samples.loanbroker.SyncLoanBroker">
+            <inbound-router>
+                <endpoint address="LoanBrokerRequests"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="CreditAgency"/>
+                    <filter expectedType="org.mule.samples.loanbroker.Customer"
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="LenderService"/>
+                    <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest"
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </outbound-router>
+
+            <response-router>
+                <endpoint address="LoanBrokerQuotes"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="CreditAgencyService"
+                         inboundEndpoint="CreditAgencyReceiver"
+                         implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+        </mule-descriptor>
+
+        <mule-descriptor name="LenderService"
+                         inboundEndpoint="LenderService"
+                         implementation="org.mule.samples.loanbroker.DefaultLenderService">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank1"
+                         inboundEndpoint="Bank1"
+                         implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2"
+                         inboundEndpoint="Bank2"
+                         implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3"
+                         inboundEndpoint="Bank3"
+                         implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4"
+                         inboundEndpoint="Bank4"
+                         implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5"
+                         inboundEndpoint="Bank5"
+                         implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

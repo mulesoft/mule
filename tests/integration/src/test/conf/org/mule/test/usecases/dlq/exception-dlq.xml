@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="jms_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+     <!-- embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+        class="org.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost</value></property>
+        <property name="useEmbeddedBroker"><value>true</value></property>
+        <property name="brokerContainerFactory">
+            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
+                <constructor-arg index="0">
+                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+    <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+            <!-- how many times to try and deliver a redelivered message -->
+            <property name="maxRedelivery" value="2"/>
+        </properties>
+        <!-- this exception strategy will forward the current message to a jms queue
+        and will do so in the current transaction if it is available
+        -->
+        <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
+            <endpoint address="jms://DLQ">
+                <transaction action="JOIN_IF_POSSIBLE"/>
+            </endpoint>
+        </exception-strategy>
+    </connector>
+
+    <model name="dev">
+        <mule-descriptor name="RollbackComponent"
+            implementation="org.mule.components.simple.NullComponent">
+            <inbound-router>
+                <endpoint type="receiver" address="jms://request.queue">
+                    <transaction action="BEGIN_OR_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <!-- this endpoint should never be invoked because the NullComponent will always
+                throw an exception if invoked
+            -->
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://out.queue"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

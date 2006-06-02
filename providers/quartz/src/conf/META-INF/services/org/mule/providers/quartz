@@ -1,0 +1,4 @@
+connector=org.mule.providers.quartz.QuartzConnector
+message.receiver=org.mule.providers.quartz.QuartzMessageReceiver
+message.adapter=org.mule.providers.DefaultMessageAdapter
+dispatcher.factory=org.mule.providers.quartz.QuartzMessageDispatcherFactory

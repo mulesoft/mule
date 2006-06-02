@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule Launcher</name>
+    <groupId>mule</groupId>
+    <id>mule-tools-launcher</id>
+    <inceptionYear>2005</inceptionYear>
+    <package>org.mule.tools.launcher</package>
+    <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
+    <shortDescription>mule-launcher</shortDescription>
+    <description>
+        Application hook to allow eaiser launching of a Mule server
+    </description>
+    <url>http://mule.codehaus.org/Launcher</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+     <build>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+         <unitTest>
+            <includes>
+                <include>**/*TestCase.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+            </excludes>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
+</project>

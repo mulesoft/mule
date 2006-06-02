@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="client_test" version="1.0">
+
+    <mule-environment-properties
+        synchronous="true"
+        serverUrl="http://localhost:60504"
+        />
+
+    <!-- this connector simulates an existing endpoint on a remote server -->
+    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <global-endpoints>
+        <endpoint name="vmRemoteEndpoint" connector="vmRemoteConnector" address="vm://remote.endpoint"/>
+    </global-endpoints>
+
+    <model name="model">
+        <mule-descriptor name="remoteUMO" implementation="org.mule.components.simple.StaticComponent">
+            <inbound-router>
+                <global-endpoint name="vmRemoteEndpoint" remoteSync="true"/>
+            </inbound-router>
+            <properties>
+                <property name="data" value="received from remote"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

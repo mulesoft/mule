@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-extras</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-extras-hivemind</artifactId>
+    <packaging>jar</packaging>
+    <name>HiveMind Extensions</name>
+    <description>Provides extensions to use HiveMind with Mule, such as using the container as a factory for Mule managed objects.</description>
+    <dependencies>
+        <dependency>
+            <groupId>hivemind</groupId>
+            <artifactId>hivemind</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>hivemind</groupId>
+            <artifactId>hivemind-lib</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+    </dependencies>
+</project>
+

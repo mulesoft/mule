@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="TestConfiguration" version="1.0">
+
+    <transformers>
+        <transformer name="StringToXMLMessage" className="org.mule.providers.oracle.jms.transformers.StringToXMLMessage"
+            returnClass="oracle.jms.AdtMessage" />
+    </transformers>
+</mule-configuration>

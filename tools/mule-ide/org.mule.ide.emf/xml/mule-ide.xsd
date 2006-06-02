@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 4 U (http://www.xmlspy.com) by Derek A Adams (Derek Adams Consulting Inc.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="mule-ide-config" type="mule-ide-config-type">
+		<xs:annotation>
+			<xs:documentation>Configuration settings for Mule IDE.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="mule-ide-config-type">
+		<xs:annotation>
+			<xs:documentation>Holds all configuration info.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="config-file" type="config-file-type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="config-set" type="config-set-type" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="config-file-type">
+		<xs:annotation>
+			<xs:documentation>A single configuration file.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="path" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="config-set-type">
+		<xs:annotation>
+			<xs:documentation>An ordered set of related config files.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"/>
+			<xs:element name="config-file-ref" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:schema>

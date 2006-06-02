@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="xfire_test" version="1.0">
+
+    <mule-environment-properties serverUrl="">
+        <threading-profile maxThreadsActive="2"/>
+    </mule-environment-properties>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+                         implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:38008/mule"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent2"
+                         implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:38009/mule/services"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent3"
+                         implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:38009"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent4"
+                         implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:38010" synchronous="false"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,27 @@
+<project default="distro" xmlns:j="jelly:core" xmlns:ant="jelly:ant"  xmlns:maven="jelly:maven">
+
+    <goal name="distro" prereqs="setvars,java:compile">
+        <ant:mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="loanbroker-esb"/>
+        <j:set var="mule.samples.class.root" value="loanbroker/esb"/>
+
+        <j:set var="mule.sample.main" value="org.mule.samples.loanbroker.esb.Main"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- copy the Credit Agency EJB app over -->
+        <ant:mkdir dir="${samples.dist}/${mule.sample.name}/credit-agency-ejb"/>
+        <ant:delete dir="${basedir}/credit-agency-ejb/target"/>
+        <ant:echo>Copying Credit Agency App from ${basedir}/credit-agency-ejb to ${samples.dist}/${mule.sample.name}/credit-agency-ejb</ant:echo>
+
+        <ant:copy todir="${samples.dist}/${mule.sample.name}/credit-agency-ejb">
+            <ant:fileset dir="${basedir}/credit-agency-ejb"/>
+        </ant:copy>
+
+        <!-- copy over maven build for running the application -->
+        <!-- these scripts download other dependencies such as open ejb, build the ejb app and run ActiveMQ -->
+        <ant:copy file="${basedir}/maven-dist.xml" tofile="${samples.dist}/${mule.sample.name}/maven.xml"/>
+        <ant:copy file="${basedir}/project-dist.xml" tofile="${samples.dist}/${mule.sample.name}/project.xml"/>
+    </goal>
+
+</project>

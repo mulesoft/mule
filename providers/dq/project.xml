@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <artifactId>mule-dq-provider</artifactId>
+    <name>Mule AS400 Data Queue Provider</name>
+    <shortDescription>dq</shortDescription>
+    <description>Mule AS400 Data Queue Provider
+    </description>
+    <dependencies>
+        <dependency>
+            <artifactId>as400dq</artifactId>
+            <groupId>as400dq</groupId>
+            <jar>jt400-1.jar</jar>
+            <properties>
+                <!-- I don't know what the license is for this jar but I'm pretty
+                sure we can distribute it -->
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>

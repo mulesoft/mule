@@ -1,0 +1,7 @@
+connector=org.mule.providers.soap.axis.AxisConnector
+dispatcher.factory=org.mule.providers.soap.axis.AxisMessageDispatcherFactory
+message.receiver=org.mule.providers.soap.axis.AxisMessageReceiver
+message.adapter=org.mule.providers.soap.axis.AxisMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder

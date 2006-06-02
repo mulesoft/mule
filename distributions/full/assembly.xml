@@ -1,0 +1,136 @@
+<!-- 
+Assembly descriptor for the full Mule distribution. 
+-->
+<assembly>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  
+  <!-- Once http://jira.codehaus.org/browse/MNG-1734 is fixed, paths in this file 
+  should be relative to _this_ project (e.g., "../resources/bin").  Currently the path is 
+  relative to the current directory (i.e., the directory from which the build is 
+  executed.  Since we usually build from the root directory, we'll base the path
+  on the root directory for now. -->
+  <fileSets>
+
+    <!-- Copy resources -->
+    <fileSet>
+      <directory>distributions/full/../resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <!-- Make the scripts executable -->
+    <fileSet>
+      <directory>distributions/full/../resources/bin</directory>
+      <includes>
+          <include>mule</include>
+          <include>*.sh</include>
+          <include>*.bat</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+
+    <!-- The composite jar file -->
+    <fileSet>
+      <directory>distributions/full/target</directory>
+      <includes>
+          <include>*.jar</include>
+      </includes>
+      <outputDirectory>lib</outputDirectory>
+    </fileSet>
+
+    <!-- The launcher tool -->
+    <fileSet>
+      <directory>distributions/launcher/target</directory>
+      <includes>
+          <include>*.jar</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+    </fileSet> 
+
+    <!-- The source code -->
+    <fileSet> 
+      <directory>mule</directory>
+      <outputDirectory>src/mule</outputDirectory>
+      <includes>
+          <include>src/java/**/*</include>
+          <include>src/conf/**/*</include>
+          <include>src/main/java/**/*</include>
+          <include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>providers</directory>
+      <outputDirectory>src/providers</outputDirectory>
+      <includes>
+          <include>**/src/java/**/*</include>
+          <include>**/src/conf/**/*</include>
+          <include>src/main/java/**/*</include>
+          <include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>mule-extras</directory>
+      <outputDirectory>src/mule-extras</outputDirectory>
+      <includes>
+          <include>**/src/java/**/*</include>
+          <include>**/src/conf/**/*</include>
+          <include>src/main/java/**/*</include>
+          <include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  
+  <dependencySets>
+      <!-- Include all the transitive dependencies in lib/opt but none of the primary dependencies
+           (the primary dependencies are all in the composite jar). -->
+    <dependencySet>
+      <!-- Once http://jira.codehaus.org/browse/MNG-1473 is fixed we should be able to
+      replace this with something like:
+          <excludes>
+              <exclude>org.codehaus.mule:*</exclude>
+          </excludes>
+       Until then, we have to list all of the dependencies explicitly. :-(
+       -->
+      <excludes>
+        <exclude>org.codehaus.mule:mule-tools-launcher</exclude>
+
+        <exclude>org.codehaus.mule:mule-core</exclude>
+
+        <exclude>org.codehaus.mule:mule-dq-provider</exclude>
+        <exclude>org.codehaus.mule:mule-ejb-provider</exclude>
+        <exclude>org.codehaus.mule:mule-email-provider</exclude>
+        <exclude>org.codehaus.mule:mule-file-provider</exclude>
+        <exclude>org.codehaus.mule:mule-ftp-provider</exclude>
+        <exclude>org.codehaus.mule:mule-http-provider</exclude>
+        <exclude>org.codehaus.mule:mule-jbi-provider</exclude>
+        <exclude>org.codehaus.mule:mule-jdbc-provider</exclude>
+        <exclude>org.codehaus.mule:mule-jms-provider</exclude>
+        <exclude>org.codehaus.mule:mule-multicast-provider</exclude>
+        <exclude>org.codehaus.mule:mule-oaq-provider</exclude>
+        <exclude>org.codehaus.mule:mule-quartz-provider</exclude>
+        <exclude>org.codehaus.mule:mule-rmi-provider</exclude>
+        <exclude>org.codehaus.mule:mule-soap-provider</exclude>
+        <exclude>org.codehaus.mule:mule-ssl-provider</exclude>
+        <exclude>org.codehaus.mule:mule-stream-provider</exclude>
+        <exclude>org.codehaus.mule:mule-tcp-provider</exclude>
+        <exclude>org.codehaus.mule:mule-udp-provider</exclude>
+        <exclude>org.codehaus.mule:mule-vm-provider</exclude>
+        <exclude>org.codehaus.mule:mule-xmpp-provider</exclude>
+
+        <exclude>org.codehaus.mule:mule-extras-acegi</exclude>
+        <exclude>org.codehaus.mule:mule-extras-client</exclude>
+        <exclude>org.codehaus.mule:mule-extras-hivemind</exclude>
+        <exclude>org.codehaus.mule:mule-extras-jotm</exclude>
+        <exclude>org.codehaus.mule:mule-extras-pgp</exclude>
+        <exclude>org.codehaus.mule:mule-extras-picocontainer</exclude>
+        <exclude>org.codehaus.mule:mule-extras-plexus</exclude>
+        <!-- <exclude>org.codehaus.mule:mule-extras-pxe</exclude> -->
+        <exclude>org.codehaus.mule:mule-extras-spring</exclude>
+      </excludes>
+      <outputDirectory>lib/opt</outputDirectory>
+    </dependencySet>
+  </dependencySets>
+</assembly>

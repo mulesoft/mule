@@ -1,0 +1,7 @@
+connector=org.mule.providers.soap.axis.wsdl.AxisWsdlConnector
+dispatcher.factory=org.mule.providers.soap.axis.wsdl.AxisWsdlMessageDispatcherFactory
+message.adapter=org.mule.providers.soap.axis.AxisMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.providers.soap.WsdlUrlEndpointBuilder
+service.error=The Axis WSDL client transport is currently disabled due to issues with the way the parser handles named parameters. please use the xfire implementaiton instead for now (wsdl-xfire)

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-providers</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-multicast-provider</artifactId>
+    <packaging>jar</packaging>
+    <name>Multicast Provider</name>
+    <description>A Mule provider for Udp Multicasting. This provider supplies a Multicast Data Packet dispatcher and client implementation.</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-udp-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Disable Multicast tests unless configured -->
+                        <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

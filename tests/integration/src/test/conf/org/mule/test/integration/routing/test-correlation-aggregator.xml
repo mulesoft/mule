@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="CollationErrorProperties" version="1.0">
+
+    <mule-environment-properties synchronous="true"/>
+
+    <connector name="vm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+    <!--
+        The Mule model initialises and manages your UMO components
+    -->
+    <model name="CollationError">
+        <mule-descriptor name="Distributor"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://distributor.queue"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="vm://Aggregator.queue"/>
+                    <properties>
+                        <list name="recipients">
+                            <entry value="vm://quoteprovider1.queue"/>
+                            <entry value="vm://quoteprovider2.queue"/>
+                        </list>
+                    </properties>
+                </router>
+            </outbound-router>
+            <response-router>
+                <endpoint address="vm://Aggregator.queue"/>
+                <router className="org.mule.test.integration.routing.TestAggregator"/>
+            </response-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="QuoteProviderOne"
+            inboundEndpoint="vm://quoteprovider1.queue"
+            implementation="org.mule.components.simple.EchoComponent">
+        </mule-descriptor>
+
+        <!-- This is a quotation system -->
+        <mule-descriptor name="QuoteProviderTwo"
+            inboundEndpoint="vm://quoteprovider2.queue"
+            implementation="org.mule.components.simple.EchoComponent">
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

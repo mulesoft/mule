@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-oracle-jms-provider</id>
+    <artifactId>mule-oracle-jms-provider</artifactId>
+    <name>Mule Oracle Advanced Queuing Provider</name>
+    <shortDescription>mule-oracle-jms-provider</shortDescription>
+    <description>Adds Oracle-specific functionality to the standard Mule JMS provider.</description>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-jms-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://mule.codehaus.org/docs/modules/mule-jms-provider/</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <jar>ojdbc14.jar</jar>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>aqapi</artifactId>
+            <jar>aqapi13.jar</jar>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>jmscommon</artifactId>
+            <jar>jmscommon.jar</jar>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+
+        <!-- For XMLType support only -->
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xdb</artifactId>
+            <jar>xdb.jar</jar>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <jar>xmlparserv2.jar</jar>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+    </dependencies>
+    <build>
+        <unitTest>
+            <excludes>
+                <!-- TODO How can we unit test this without a real AQjmsSession? -->
+                <exclude>**/OracleJmsTransformersTestCase.*</exclude>
+                <!-- This fails because org.mule.tck.providers.AbstractConnectorTestCase.testConnectorLifecycle()
+                ends up trying to open a JDBC connection. -->
+                <exclude>**/OracleJmsConnectorTestCase.*</exclude>
+            </excludes>
+        </unitTest>
+    </build>
+</project>

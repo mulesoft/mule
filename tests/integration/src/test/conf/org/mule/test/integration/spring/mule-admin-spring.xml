@@ -1,0 +1,20 @@
+<beans>
+    <bean name="muleConfiguration" class="org.mule.config.MuleConfiguration">
+        <property name="serverUrl">
+            <value type="java.lang.String">tcp://localhost:60504?synchronous=true</value>
+        </property>
+    </bean>
+
+    <bean id="muleManager"
+        class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean">
+    </bean>
+
+    <bean id="muleNameProcessor"
+        class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
+
+    <bean id="test" class="org.mule.impl.MuleDescriptor">
+        <property name="name"><value>appleComponent</value></property>
+        <property name="implementation"><value>org.mule.components.simple.EchoComponent</value></property>
+    </bean>
+
+</beans>

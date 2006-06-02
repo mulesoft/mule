@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+
+    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:8081/services"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.test.integration.service.TestServiceComponent"
+            inboundEndpoint="axis:servlet://mycomponent">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

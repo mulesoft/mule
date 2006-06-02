@@ -1,274 +1,218 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.codehaus.mule</groupId>
-        <artifactId>mule-project</artifactId>
-        <relativePath>../pom.xml</relativePath>
-        <version>2.0-SNAPSHOT</version>
-    </parent>
-    <artifactId>mule-core</artifactId>
-    <packaging>jar</packaging>
-    <name>Mule Core</name>
-    <description>Mule server and core classes</description>
-    <profiles>
-        <profile>
-            <!--
-                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                Unfortunately, it doesn't support validation against a
-                XML Schema. Detect 1.4.x and add xerces to the classpath.
-                5.x and above come with xerces pre-bundled.
-            -->
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                    <version>1.3.03</version>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                    <!--
-                        Explicitly fixing on a dependency version (those square brackets)
-                        does not seem to work completely as expected at the moment.
-                        As a workaround, dependency excludes are sprinkled throughout the project.
-                        Keep an eye on:
-                            http://jira.codehaus.org/browse/MNG-1577
-                    -->
-                    <version>[2.8.0]</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <groupId>org.codehaus.mule</groupId>
+    <artifactId>mule-project</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0-SNAPSHOT</version>
+
+    <!-- Organization -->
+    <organization>
+        <name>SymphonySoft Limited</name>
+        <url>http://www.symphonysoft.com</url>
+    </organization>
+
+    <!-- Project -->
+    <name>Mule</name>
+    <description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
+    <url>http://mule.codehaus.org</url>
+    <inceptionYear>2003</inceptionYear>
+    <mailingLists>
+        <mailingList>
+            <name>Mule User List</name>
+            <subscribe>user-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+            <name>Mule Developer List</name>
+            <subscribe>dev-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+            <name>Mule SCM List</name>
+            <subscribe>scm-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <!-- Refer to http://mule.codehaus.org/Team -->
+    </developers>
+    <contributors>
+        <!-- Refer to http://mule.codehaus.org/Team -->
+    </contributors>
+    <issueManagement>
+        <url>http://jira.symphonysoft.com</url>
+    </issueManagement>
+
+    <!-- Build -->
+    <scm>
+        <connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
+        <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
+        <url>http://cvs.mule.codehaus.org/</url>
+    </scm>
+    <distributionManagement>
+        <downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
+        <repository>
+            <id>default</id>
+            <name>Default Repository</name>
+            <url>dist.codehaus.org/dist</url>
+        </repository>
+        <site>
+            <id>default</id>
+            <name>Default Site</name>
+            <url>scp://mule.codehaus.org//home/projects/mule/public_html</url>
+        </site>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>mule</id>
+            <name>Mule Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies</url>
+        </repository>
+        
+        <repository>
+            <id>codehaus</id>
+            <name>Codehaus</name>
+            <url>http://dist.codehaus.org</url>
+            <layout>legacy</layout>
+        </repository>
+        
+    </repositories>
+    <pluginRepositories>
+        <!--
+        <pluginRepository>
+            <id>Maven Snapshots</id>
+            <url>http://snapshots.maven.codehaus.org/maven2</url>
+        </pluginRepository>
+        -->
+    </pluginRepositories>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <!-- Fails if the project doesn't have this file, need to push it down? -->
+        <!-- Project version filters -->
+        <!-- filters>
+            <filter>project.properties</filter>
+        </filters -->
+
+        <!-- Directory layout -->
+        <sourceDirectory>src/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/conf</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/conf</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.4</source>
+                    <target>1.4</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
+                        <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
+                        <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>changes-maven-plugin</artifactId>
+                <configuration>
+                    <toAddresses>
+                        <toAddress implementation="java.lang.String">tcarlson@codehaus.org</toAddress>
+                    </toAddresses>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mule</groupId>
+                        <artifactId>buildtools</artifactId>
+                        <version>2.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- Reports -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>changes-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jira-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                  <configLocation>codecheck/checkstyle.xml</configLocation>
+                  <headerLocation>codecheck/LICENSE.txt</headerLocation>
+                </configuration>
+           </plugin>
+        </plugins>
+    </reporting>
+
+    <!-- Subprojects -->
+    <modules>
+        <module>buildtools</module>
+        <module>mule</module>
+        <module>providers</module>
+        <module>mule-extras</module>
+        <!--
+        <module>samples</module>
+        <module>tools</module>
+        -->
+        <module>distributions</module>
+        <module>tests</module>
+    </modules>
 
     <dependencies>
-        <!--
-        ****************************************************************
-        Required Dependencies
-        ******************************************************************
-        -->
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jaxrpc</artifactId>
-            <version>1.1-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-qname</artifactId>
-            <version>1.1-rc4</version>
-        </dependency>
-        <!-- Used by Xml based filters and transformers -->
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- UUID generator -->
-        <dependency>
-            <groupId>jug</groupId>
-            <artifactId>jug</artifactId>
-            <version>2.0.0</version>
-        </dependency>
-        <!-- Used for de/serialising objects -->
-        <dependency>
-            <groupId>xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>xpp3</groupId>
-            <artifactId>xpp3_min</artifactId>
-            <version>1.1.3.4.O</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jta</artifactId>
-            <version>1.0.1B-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-management</artifactId>
-            <version>1.0-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-connector</artifactId>
-            <version>1.5-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-servlet</artifactId>
-            <version>2.4-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-ejb</artifactId>
-            <version>2.1-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>1.0.2-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>ognl</groupId>
-            <artifactId>ognl</artifactId>
-            <version>2.6.7</version>
-        </dependency>
-
-        <!--
-        ****************************************************************
-        Optional Dependencies
-        ******************************************************************
-        -->
-        <!-- Used by mules default component pooling mechanism -->
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.3</version>
-            <!-- TODO get rid of duplication in the top-level providers pom.xml -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- For MuleXmlConfigurationBuilder -->
-        <dependency>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-            <version>1.5</version>
-        </dependency>
-
-        <!-- JXPath filtering of events -->
-        <dependency>
-            <groupId>commons-jxpath</groupId>
-            <artifactId>commons-jxpath</artifactId>
-            <version>1.2</version>
-            <!-- TODO get rid of duplication in the top-level providers pom.xml -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xerces</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Used for script component support -->
-        <dependency>
-            <groupId>script</groupId>
-            <artifactId>jsr223</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
-        </dependency>
-
-        <!-- Management deps -->
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxri</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxtools</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxremoting</artifactId>
-            <version>1.2</version>
-        </dependency>
-
-        <!-- mx4j Agent support  -->
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-jmx</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-tools</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-remote</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <!-- Transactions logging system -->
-        <dependency>
-            <groupId>activeio</groupId>
-            <artifactId>activeio</artifactId>
-            <version>2.1</version>
-        </dependency>
-
-        <!--
-        ****************************************************************
-        Testing Dependencies
-        ****************************************************************** 
-        -->
-        <!-- These dependencies need scope="compile" for the org.mule.tck classes. -->
+        <!-- Testing Dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <version>0.09</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
@@ -278,3 +222,4 @@
         </dependency>
     </dependencies>
 </project>
+

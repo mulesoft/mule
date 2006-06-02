@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://foo.com" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://simple.components.mule.org" xmlns:intf="http://simple.components.mule.org" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:message name="logRequest">
+    <wsdl:part name="in0" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="echoRequest">
+    <wsdl:part name="in0" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="echoResponse">
+    <wsdl:part name="echoReturn" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="logResponse">
+  </wsdl:message>
+  <wsdl:portType name="mulePortType1">
+    <wsdl:operation name="log" parameterOrder="in0">
+      <wsdl:input message="impl:logRequest" name="logRequest"/>
+      <wsdl:output message="impl:logResponse" name="logResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="echo" parameterOrder="in0">
+      <wsdl:input message="impl:echoRequest" name="echoRequest"/>
+      <wsdl:output message="impl:echoResponse" name="echoResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="muleServicePortSoapBinding" type="impl:mulePortType">
+    <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="log">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="logRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://foo.com" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="logResponse">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://foo.com" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="echoRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://foo.com" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="echoResponse">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://foo.com" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="muleService1">
+    <wsdl:port binding="impl:muleServicePortSoapBinding" name="muleServicePort1">
+      <wsdlsoap:address location="http://localhost:8083/services/EchoService3"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

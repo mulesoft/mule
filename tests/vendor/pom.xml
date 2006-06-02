@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule.tests</groupId>
+        <artifactId>mule-tests</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-tests-vendor</artifactId>
+    <name>Integration Tests (external dependencies)</name>
+    <description>Tests which require a third-party resource (database, app server, etc.) to run properly</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <!--
+        <module>activemq</module>
+        <module>joram</module>
+        <module>openjms</module>
+        -->
+        <module>oracle</module>
+        <!--
+        <module>spiritwave</module>
+        -->
+    </modules>
+</project>

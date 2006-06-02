@@ -1,0 +1,7 @@
+connector=org.mule.providers.udp.UdpConnector
+dispatcher.factory=org.mule.providers.udp.UdpMessageDispatcherFactory
+message.receiver=org.mule.providers.udp.UdpMessageReceiver
+message.adapter=org.mule.providers.udp.UdpMessageAdapter
+inbound.transformer=org.mule.transformers.simple.ByteArrayToString
+outbound.transformer=org.mule.transformers.simple.StringToByteArray
+endpoint.builder=org.mule.impl.endpoint.SocketEndpointBuilder

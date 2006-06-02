@@ -1,0 +1,92 @@
+
+<html>
+ <head>
+    <link rel="stylesheet" href="./css/codehaus-style.css" type="text/css">
+    <link rel="stylesheet" href="./css/mule.css" type="text/css">
+
+    <title>MuleDocs - Home</title>
+  </head>
+<body>
+    <table width="100%" id="layout" style="padding:0px;margin0px;border-collapse:collapse;">
+      <tr>
+        <td colspan="3" style="padding:8px;">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr id="header_row">
+              <td align="left" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><img align="absmiddle" border=0 src="./images/logo-with-title-small.gif"></span></span>
+              </td>
+              <td align="right" valign="middle" style="padding:0px;margin:0px;">
+                <span id="Content"><span><span class="nobr"><a href="http://symphonysoft.com" rel="nofollow"><img align="absmiddle" border=0 src="./images/logo_250.gif"></a></span></span></span>
+
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" id="breadcrumbs">
+          <table width="100%" id="banner" style="padding:0px;margin:0px">
+            <tr>
+              <td align="left">
+                <a href="index.html">Home</a> <b>|</b> <a href="gallery.html">Gallery</a>
+              </td>
+              <td align="right">
+                  <span id="Content"><span><a href="http://mule.codehaus.org/docs/apidocs/index.html" title="Mule Javadoc">Mule Javadoc</a> <b>|</b> <span class="nobr"><a href="http://mule.codehaus.org/docs/mail-lists.html" rel="nofollow">Mailing Lists</a></span> <b>|</b> <span class="nobr"><a href="http://jira.muleumo.org" rel="nofollow">Issue Tracker</a></span> <b>|</b> <span class="nobr"><a href="http://docs.codehaus.org/dosearchsite.action" rel="nofollow">Search</a></span></span></span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+ </table>
+  <div id="Content">
+      <h1>Description :</h1>
+          <br><br><br>    Demonstrates using Spring as the external container to provide the objects managed by Mule and<br>    how to publish events to multiple outbound endpoints. The sample consists of two components;<br>    ExecptionManager and BusinessErrorManager.<br>    <br>
+      <h1>Graph :</h1>
+      <ul>
+      <p> click on mule component to navigate the javadoc or java code</b>
+      </p>
+      </ul>
+    <img src="eh-mule-config.xml.gif" usemap="#LinguineMap" border="0" class="mulegraph">
+    <map id="LinguineMap" name="LinguineMap">
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/errorManager.html" title="{Error\ Manager\l|implementation\ \:errorManager\lcontainerManaged\ \:true\linitialState\ \:started\l\ltransformer\ 0\ \:\ FileMessageToObject\ltransformer\ 1\ \:\ XMLToExceptionBean\ltransformer\ 2\ \:\ ExceptionBeanToErrorMessage\l}" alt="{Error\ Manager\l|implementation\ \:errorManager\lcontainerManaged\ \:true\linitialState\ \:started\l\ltransformer\ 0\ \:\ FileMessageToObject\ltransformer\ 1\ \:\ XMLToExceptionBean\ltransformer\ 2\ \:\ ExceptionBeanToErrorMessage\l}" coords="453,212,731,361" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/LoggingCatchAllStrategy.html" title="{org\.mule\.routing\.LoggingCatchAllStrategy\l|}" alt="{org\.mule\.routing\.LoggingCatchAllStrategy\l|}" coords="7,471,255,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/FilteringOutboundRouter.html" title="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" alt="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" coords="279,471,580,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/FilteringOutboundRouter.html" title="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" alt="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" coords="604,471,905,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/routing/outbound/FilteringOutboundRouter.html" title="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" alt="{org\.mule\.routing\.outbound\.FilteringOutboundRouter\l|}" coords="929,471,1231,524" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{file\:\/\/\.\.\/test\-data\/in\l}" alt="{file\:\/\/\.\.\/test\-data\/in\l}" coords="535,52,649,100" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{file\:\/\/\.\.\/test\-data\/samples\/errorhandler\/exceptions\loutputPattern\ \:Exception\-\$\{UUID\}\.xml\l}" alt="{file\:\/\/\.\.\/test\-data\/samples\/errorhandler\/exceptions\loutputPattern\ \:Exception\-\$\{UUID\}\.xml\l}" coords="284,684,575,732" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{smtp\:\/\/exceptions\@symphonysoft\.com\lccAddresses\ \:anotheremail\@symphonysoft\.com\l}" alt="{smtp\:\/\/exceptions\@symphonysoft\.com\lccAddresses\ \:anotheremail\@symphonysoft\.com\l}" coords="611,684,899,732" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/.html" title="{jms\:\/\/exception\.queue\l}" alt="{jms\:\/\/exception\.queue\l}" coords="1011,684,1149,732" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/businessErrorManager.html" title="{Business\ Error\ Manager\l|implementation\ \:businessErrorManager\lcontainerManaged\ \:true\linitialState\ \:started\l\ltransformer\ 0\ \:\ JMSMessageToObject\ltransformer\ 1\ \:\ XMLToExceptionBean\ltransformer\ 2\ \:\ ExceptionBeanToErrorMessage\l}" alt="{Business\ Error\ Manager\l|implementation\ \:businessErrorManager\lcontainerManaged\ \:true\linitialState\ \:started\l\ltransformer\ 0\ \:\ JMSMessageToObject\ltransformer\ 1\ \:\ XMLToExceptionBean\ltransformer\ 2\ \:\ ExceptionBeanToErrorMessage\l}" coords="941,844,1219,993" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/file/FileConnector.html" title="{FileConnector\l|className\ \:org\.mule\.providers\.file\.FileConnector\lpollingFrequency\ \:1000\lmoveToDirectory\ \:\.\.\/test\-data\/out\loutputPattern\ \:\$\{DATE\}\.xml\lbinaryMode\ \:false\l}" alt="{FileConnector\l|className\ \:org\.mule\.providers\.file\.FileConnector\lpollingFrequency\ \:1000\lmoveToDirectory\ \:\.\.\/test\-data\/out\loutputPattern\ \:\$\{DATE\}\.xml\lbinaryMode\ \:false\l}" coords="673,17,964,135" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/email/SmtpConnector.html" title="{EmailConnector\l|className\ \:org\.mule\.providers\.email\.SmtpConnector\lfromAddress\ \:\[\%\ Your\ Email\ Address\ \%\]\lhostname\ \:\[\%\ Your\ Smtp\ Server\ Name\ \%\]\l}" alt="{EmailConnector\l|className\ \:org\.mule\.providers\.email\.SmtpConnector\lfromAddress\ \:\[\%\ Your\ Email\ Address\ \%\]\lhostname\ \:\[\%\ Your\ Smtp\ Server\ Name\ \%\]\l}" coords="988,33,1303,119" />
+<area shape="rect" href="http://mule.codehaus.org/docs/apidocs/org/mule/providers/jms/JmsConnector.html" title="{JMSConnector\l|className\ \:org\.mule\.providers\.jms\.JmsConnector\lacknowledgeMode\ \:1\lconnectionFactoryJndiName\ \:\[\%\ Your\ Connection\ Factory\ Name\ \%\]\l}" alt="{JMSConnector\l|className\ \:org\.mule\.providers\.jms\.JmsConnector\lacknowledgeMode\ \:1\lconnectionFactoryJndiName\ \:\[\%\ Your\ Connection\ Factory\ Name\ \%\]\l}" coords="1327,33,1727,119" />
+<area shape="rect" href="http\:\/\/www\.softwaresecretweapons\.com\l" alt="LinguineMap" coords="7,7,1727,1159" />
+</map>
+  </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<table>
+    <tr>
+        <td colspan="3" id="footer">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td align="center" valign="top">Mule ESB rocks !
+                    </td>
+
+                    <td align="right" valign="top"><a
+                        style="color: rgb(153, 153, 153);"
+                        href="http://mule.codehaus.org/Config+Graph">[with MuleDocs]</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </tr>
+</table>
+</body>
+</html>  
