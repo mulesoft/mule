@@ -321,14 +321,6 @@
             </fileset>
         </copy>
 
-        <mkdir dir="${mule.release.tools.dir}/mule-ide"/>
-        <copy todir="${mule.release.tools.dir}/mule-ide">
-            <fileset dir="${basedir}/tools/mule-ide">
-                <exclude name="target/"/>
-                <exclude name="*.iml"/>
-            </fileset>
-        </copy>
-
         <mkdir dir="${mule.release.tools.dir}/launcher"/>
         <copy todir="${mule.release.tools.dir}/launcher">
             <fileset dir="${basedir}/tools/launcher">
