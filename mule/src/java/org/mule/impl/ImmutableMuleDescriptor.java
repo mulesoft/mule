@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -52,7 +52,7 @@ import java.util.Map;
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
  * New Mule UMOs can be initialised as needed from their descriptor.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -100,7 +100,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected UMOTransformer outboundTransformer = null;
 
     /**
-     * The properties for the Mule UMO. 
+     * The properties for the Mule UMO.
      */
     protected Map properties = new HashMap();
 
@@ -178,7 +178,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * Default constructor. Initalises common properties for the
      * MuleConfiguration object
-     * 
+     *
      * @see org.mule.config.MuleConfiguration
      */
     public ImmutableMuleDescriptor(ImmutableMuleDescriptor descriptor)
@@ -307,7 +307,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         }
         //Is a referenc of an implementation object?
         if(implementationReference instanceof String) {
-            if(DescriptorContainerContext.DESCRIPTOR_CONTIANER_NAME.equals(container)) {
+            if(DescriptorContainerContext.DESCRIPTOR_CONTAINER_NAME.equals(container)) {
                 implementationReference = new DescriptorContainerKeyPair(name, implementationReference);
             } else {
                 implementationReference = new ContainerKeyPair(container, implementationReference);
@@ -318,7 +318,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getExceptionListener()
      */
     public ExceptionListener getExceptionListener()
@@ -328,7 +328,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.transformers.HasTransformer#getInboundTransformer()
      */
     public UMOTransformer getInboundTransformer()
@@ -338,7 +338,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getName()
      */
     public String getName()
@@ -348,7 +348,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.impl.MuleDescriptor#getOutboundTransformer()
      */
     public UMOTransformer getOutboundTransformer()
@@ -358,7 +358,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.impl.MuleDescriptor#getResponseTransformer()
      */
     public UMOTransformer getResponseTransformer()
@@ -368,7 +368,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getParams() Not HashMap is used instead
      *      of Map due to a Spring quirk where the property is not found if
      *      specified as a map
@@ -380,7 +380,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getVersion()
      */
     public String getVersion()
@@ -390,14 +390,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getinteceptorList()
      */
     public List getInterceptors()
     {
         return intecerptorList;
     }
-    
+
     public String getEncoding()
     {
         return encoding;
@@ -405,7 +405,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -422,7 +422,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getImplementation()
      */
     public Object getImplementation()
@@ -483,7 +483,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * For example, for a component declared in a Spring Application context the
      * id would be the bean id, in Pico the id would be a fully qualified class
      * name.
-     * 
+     *
      * @param reference the reference to use when resolving the component
      * @return the Implementation of the component
      */
@@ -506,7 +506,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * The inbound Provider to use when receiveing an event. This may get
      * overidden by the configured behaviour of the inbound router on this
      * component
-     * 
+     *
      * @return the inbound endpoint or null if one is not set
      * @see org.mule.umo.endpoint.UMOEndpoint
      */
@@ -519,7 +519,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * The outbound Provider to use when sending an event. This may get
      * overidden by the configured behaviour of the outbound router on this
      * component
-     * 
+     *
      * @return the outbound endpoint or null if one is not set
      * @see org.mule.umo.endpoint.UMOEndpoint
      */
