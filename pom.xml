@@ -73,7 +73,7 @@
         <repository>
             <id>mule</id>
             <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies</url>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </repository>
         
         <repository>
