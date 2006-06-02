@@ -30,10 +30,10 @@ import java.io.Reader;
  */
 public class DescriptorContainerContext extends AbstractContainerContext
 {
-    public static final String DESCRIPTOR_CONTIANER_NAME = "descriptor";
+    public static final String DESCRIPTOR_CONTAINER_NAME = "descriptor";
 
     public DescriptorContainerContext() {
-        super(DESCRIPTOR_CONTIANER_NAME);
+        super(DESCRIPTOR_CONTAINER_NAME);
     }
 
     public void configure(Reader configuration) throws ContainerException {

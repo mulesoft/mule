@@ -14,10 +14,10 @@
 package org.mule.impl.container;
 
 /**
- * <code>ContainerKeyPair</code> is a key strategy that binds a contrainer
+ * <code>ContainerKeyPair</code> is a key strategy that binds a container
  * reference with a container name. This object isn't used directly by users,
- * but it is used when the the Mule xml configuration is processed
- * 
+ * but it is used when the the Mule XML configuration is processed.
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

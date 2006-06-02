@@ -14,9 +14,7 @@
 package org.mule.impl.container;
 
 /**
- * <code>ContainerKeyPair</code> is a key strategy that binds a contrainer
- * reference with a container name. This object isn't used directly by users,
- * but it is used when the the Mule xml configuration is processed
+ * @inheritDoc
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: 432 $
@@ -27,7 +25,7 @@ public class DescriptorContainerKeyPair extends ContainerKeyPair
 
     public DescriptorContainerKeyPair(String descriptorName, Object key)
     {
-        super(DescriptorContainerContext.DESCRIPTOR_CONTIANER_NAME, key);
+        super(DescriptorContainerContext.DESCRIPTOR_CONTAINER_NAME, key);
         this.descriptorName = descriptorName;
     }
 
