@@ -1,8 +1,0 @@
-<domain>
-  <name>TestManagerFromFile</name>
-  <!-- Limit to 50 concurrent transactions -->
-  <maximum>50</maximum>
-  <!-- Default transaction timeout: 2 minutes -->
-  <timeout>120</timeout>
-    <!-- Lots more config can go here, see the tyrex docco -->
-</domain>
