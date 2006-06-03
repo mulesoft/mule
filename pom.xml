@@ -84,6 +84,12 @@
             <url>http://repository.codehaus.org</url>
         </repository>
         -->
+        <repository>
+            <id>java.net</id>
+            <name>Java.net Maven Repository</name>
+            <url>https://maven-repository.dev.java.net/nonav/repository</url>
+            <layout>legacy</layout>
+        </repository>
     </repositories>
     <pluginRepositories>
         <!--
