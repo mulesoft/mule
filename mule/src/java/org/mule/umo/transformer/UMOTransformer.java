@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -24,7 +24,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  * data. When a component is rolled back a cached copy of the source data will
  * be returned. When the component is committed the caches are cleared. Starting
  * a component will simply put the transfromer in component mode.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,10 +39,6 @@ public interface UMOTransformer extends UMOSimpleTransformer
      * @param endpoint sets the endpoint associated with the transfromer
      */
     void setEndpoint(UMOImmutableEndpoint endpoint);
-
-    void setTransformer(UMOTransformer transformer);
-
-    UMOTransformer getTransformer();
 
     boolean isSourceTypeSupported(Class aClass);
 
