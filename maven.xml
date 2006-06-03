@@ -246,6 +246,9 @@
                 <exclude name="org/mule/tck/testmodels/**"/>
             </packageset>
         </ant:javadoc>
+
+        <!-- finally clean up source directory, see mule:src -->
+        <delete dir="${mule.release.dir}/src/java"/>
     </goal>
 
 
@@ -472,9 +475,13 @@
                 <zipfileset dir="${mule.release.src.dir}/java"/>
             </zip>
 
-            <!-- final cleanup -->
-            <delete dir="${mule.release.src.dir}/java"/>
+            <!-- (almost) final cleanup -->
             <delete dir="${mule.release.src.dir}/test"/>
+            
+            <!--
+                the "java" directory with the sources is now zipped,
+                but we cannot delete it yet since it is required for javadocs. ?!?!
+            -->
         </u:available>
     </goal>
 
