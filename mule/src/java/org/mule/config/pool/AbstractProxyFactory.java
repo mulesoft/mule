@@ -13,20 +13,18 @@
  */
 package org.mule.config.pool;
 
-import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.container.ContainerKeyPair;
+import org.mule.impl.model.ComponentUtil;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
 /**
  * <code>AbstractProxyFactory</code> provides common behaviour for creating
  * proxy objects
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +40,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
     /**
      * Creates a pool factory using the descriptor as the basis for creating its
      * objects
-     * 
+     *
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see org.mule.umo.UMODescriptor
      */
@@ -51,28 +49,8 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         this.descriptor = descriptor;
     }
 
-    public Object create() throws UMOException
-    {
-        UMOManager manager = MuleManager.getInstance();
-        Object impl = descriptor.getImplementation();
-        Object component = null;
-
-        if(impl instanceof String) {
-            impl = new ContainerKeyPair(null, impl);
-        }
-        if (impl instanceof ContainerKeyPair) {
-            component = manager.getContainerContext().getComponent(impl);
-
-            if(descriptor.isSingleton()) {
-                descriptor.setImplementation(component);
-            }
-        } else {
-            component = impl;
-        }
-
-        // Call any custom initialisers
-        descriptor.fireInitialisationCallbacks(component);
-
+    public Object create() throws UMOException {
+        Object component = ComponentUtil.createComponent(descriptor);
         afterComponentCreate(component);
         return createProxy(component);
     }

@@ -1,21 +1,22 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.impl;
 
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.impl.model.ComponentUtil;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.ComponentException;
@@ -40,7 +41,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
         final UMOComponent comp = session.getComponent();
         assertTrue(comp.isStarted());
-        comp.pause();
+        ComponentUtil.pause(comp);
         new Thread(new Runnable() {
             public void run()
             {
@@ -50,7 +51,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
                     // ignore
                 }
                 try {
-                    comp.resume();
+                    ComponentUtil.resume(comp);
                 } catch (UMOException e) {
                     fail(e.getMessage());
                 }

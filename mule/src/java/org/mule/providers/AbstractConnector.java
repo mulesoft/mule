@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -73,13 +73,13 @@ import java.util.Map;
  * sets up a dispatcher threadpool which allows deriving connectors the possibility to
  * dispatch work to separate threads. This functionality is controlled with the <i>
  * doThreading</i> property on the threadingProfiles for dispachers and receivers.
- * 
+ *
  * The lifecycle for a connector is -
- * 
+ *
  * 1. Create 2. Initialise 3. Connect 3a. Connect receivers 4. Start 4a. Start Receivers
  * 5. Stop 5a. Stop Receivers 6. Disconnect 6a. Disconnect Receivers 7. Dispose 7a.
  * Dispose Receivers
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -257,7 +257,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#getName()
      */
     public String getName()
@@ -267,7 +267,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#setName(java.lang.String)
      */
     public void setName(String newName)
@@ -284,7 +284,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
     public final synchronized void initialise() throws InitialisationException
@@ -308,13 +308,13 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#start()
      */
     public final void startConnector() throws UMOException
     {
         checkDisposed();
-        if (!started.get()) {
+        if (!isStarted()) {
             if (!isConnected()) {
                 startOnConnect.set(true);
                 getConnectionStrategy().connect(this);
@@ -345,7 +345,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#isStarted()
      */
     public boolean isStarted()
@@ -355,7 +355,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#stop()
      */
     public final void stopConnector() throws UMOException
@@ -364,7 +364,7 @@ public abstract class AbstractConnector
             return;
         }
 
-        if (started.get()) {
+        if (isStarted()) {
             if (logger.isInfoEnabled()) {
                 logger.info("Stopping Connector: " + getClass().getName());
             }
@@ -400,7 +400,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#shutdown()
      */
     public final synchronized void dispose()
@@ -455,7 +455,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#isAlive()
      */
     public boolean isDisposed()
@@ -465,7 +465,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#handleException(java.lang.Object,
      *      java.lang.Throwable)
      */
@@ -482,7 +482,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.util.ExceptionListener#onException(java.lang.Throwable)
      */
     public void exceptionThrown(Exception e)
@@ -599,15 +599,12 @@ public abstract class AbstractConnector
             receiver = createReceiver(component, endpoint);
             receivers.put(getReceiverKey(component, endpoint), receiver);
         }
-        if (started.get() && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED)) {
-            ((AbstractMessageReceiver)receiver).start();
-        }
         return receiver;
     }
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param component
      *            the component for which the endpoint is being registered
      * @param endpoint
@@ -689,7 +686,7 @@ public abstract class AbstractConnector
 
     /**
      * Template method to perform any work when starting the connectoe
-     * 
+     *
      * @throws UMOException
      *             if the method fails
      */
@@ -700,7 +697,7 @@ public abstract class AbstractConnector
 
     /**
      * Template method to perform any work when stopping the connectoe
-     * 
+     *
      * @throws UMOException
      *             if the method fails
      */
@@ -711,7 +708,7 @@ public abstract class AbstractConnector
 
     /**
      * Template method to perform any work when destroying the connectoe
-     * 
+     *
      */
     protected void doDispose()
     {
@@ -805,7 +802,7 @@ public abstract class AbstractConnector
      * Fires a server notification to all registered
      * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
      * eventManager.
-     * 
+     *
      * @param notification
      *            the notification to fire. This must be of type
      *            {@link org.mule.impl.internal.notifications.CustomNotification}
@@ -967,7 +964,7 @@ public abstract class AbstractConnector
 
     /**
      * Template method where any connections should be made for the connector
-     * 
+     *
      * @throws Exception
      */
     public void doConnect() throws Exception
@@ -978,7 +975,7 @@ public abstract class AbstractConnector
     /**
      * Template method where any connected resources used by the connector should be
      * disconnected
-     * 
+     *
      * @throws Exception
      */
     public void doDisconnect() throws Exception
@@ -988,7 +985,7 @@ public abstract class AbstractConnector
 
     /**
      * The resource id used when firing ConnectEvents from this connector
-     * 
+     *
      * @return the resource id used when firing ConnectEvents from this connector
      */
     protected String getConnectEventId()
@@ -1001,7 +998,7 @@ public abstract class AbstractConnector
      * exception occurs in the Dispatcher it is automatically disposed of and a new one is
      * created for the next request. This allows dispatchers to recover from loss of
      * connection and other faults.
-     * 
+     *
      * @param createDispatcherPerRequest
      *            whether a new dispatcher is created for every request or not
      */
@@ -1015,7 +1012,7 @@ public abstract class AbstractConnector
      * exception occurs in the Dispatcher it is automatically disposed of and a new one is
      * created for the next request. This allows dispatchers to recover from loss of
      * connection and other faults.
-     * 
+     *
      * @return true if a anew dispatcher is created for every request
      */
     public boolean isCreateDispatcherPerRequest()
@@ -1028,7 +1025,7 @@ public abstract class AbstractConnector
      * number of receiver threads based on the ThreadingProfile configured fro the
      * receiver. This property is user by transports that support transactions,
      * specifically MessageReceivers that extend the TransactedPollingMessageReceiver.
-     * 
+     *
      * @return true if multiple receiver threads will be created for receivers on this
      *         connection
      */
@@ -1042,7 +1039,7 @@ public abstract class AbstractConnector
      * number of receiver threads based on the ThreadingProfile configured fro the
      * receiver. This property is user by transports that support transactions,
      * specifically MessageReceivers that extend the TransactedPollingMessageReceiver.
-     * 
+     *
      * @param createMultipleTransactedReceivers
      *            true if multiple receiver threads will be created for receivers on this
      *            connection
@@ -1064,7 +1061,7 @@ public abstract class AbstractConnector
     /**
      * Whether to fire message notifications for every message that is sent or received
      * from this connector
-     * 
+     *
      * @param enableMessageEvents
      */
     public void setEnableMessageEvents(boolean enableMessageEvents)
@@ -1078,7 +1075,7 @@ public abstract class AbstractConnector
      * i.e. If the connector is axis the protocol for jms over axis will be axis:jms.
      * Here, 'axis' is the scheme meta info and 'jms' is the protocol. If the protocol
      * argument does not start with the connector's protocol, it will be appended.
-     * 
+     *
      * @param protocol
      *            the supported protocol to register
      */
@@ -1102,7 +1099,7 @@ public abstract class AbstractConnector
      * use Axis, Xfire or Glue to create the WSDL client. These transport protocols would
      * be wsdl-axis, wsdl-xfire and wsdl-glue, but they can all support 'wsdl' protocol
      * too.
-     * 
+     *
      * @param protocol
      *            the supported protocol to register
      */
@@ -1132,7 +1129,7 @@ public abstract class AbstractConnector
 
     /**
      * Returns an unmodifiable list of the protocols supported by this connector
-     * 
+     *
      * @return an unmodifiable list of the protocols supported by this connector
      */
     public List getSupportedProtocols()
@@ -1142,7 +1139,7 @@ public abstract class AbstractConnector
 
     /**
      * Sets A list of protocols that the connector can accept
-     * 
+     *
      * @param supportedProtocols
      */
     public void setSupportedProtocols(List supportedProtocols)
@@ -1157,7 +1154,7 @@ public abstract class AbstractConnector
      * Creates a work manager for a Message receiver. If
      * <code>useSingleReceiverThreadPool</code> has been set the same workManager of all
      * receivers will be used
-     * 
+     *
      * @param name
      *            The name to associate with the thread pool. No that the connector name
      *            will be prepended and ".receiver" will be appended
@@ -1186,7 +1183,7 @@ public abstract class AbstractConnector
      * Creates a work manager for a Message dispatcher. If
      * <code>useSingleDispatcherThreadPool</code> has been set the same workManager of
      * all dispatchers will be used
-     * 
+     *
      * @param name
      *            The name to associate with the thread pool. No that the connector name
      *            will be prepended and ".dispatcher" will be appended
@@ -1212,7 +1209,7 @@ public abstract class AbstractConnector
      * Should a single receiver thread pool be created for all receivers It is recommended
      * that if you have a lot of receivers being registered per connector that this should
      * be set to true
-     * 
+     *
      * @return true is a single thread pool is being used for all receivers on this
      *         connector
      */
@@ -1225,7 +1222,7 @@ public abstract class AbstractConnector
      * Should a single dispatcher thread pool be created for all recivers It is
      * recommended that if you have a lot of receivers being registered per connector that
      * this should be set to true
-     * 
+     *
      * @param useSingleReceiverThreadPool
      *            true is a single thread pool is being used for all receivers on this
      *            connector
@@ -1239,7 +1236,7 @@ public abstract class AbstractConnector
      * Should a single dispatcher thread pool be created for all distachers It is
      * recommended that if you have a lot of dispatcher being created per connector that
      * this should be set to true i.e. many different outbound endpoints
-     * 
+     *
      * @return true is a single thread pool is being used for all dispatchers on this
      *         connector
      */
@@ -1252,7 +1249,7 @@ public abstract class AbstractConnector
      * Should a single dispatcher thread pool be created for all distachers It is
      * recommended that if you have a lot of dispatcher being created per connector that
      * this should be set to true i.e. many different outbound endpoints
-     * 
+     *
      * @param useSingleDispatcherThreadPool
      *            true is a single thread pool is being used for all dispatchers on this
      *            connector
@@ -1265,7 +1262,7 @@ public abstract class AbstractConnector
     /**
      * The flag determines if the connector is being used on the server side or client. If
      * true receiver threads will be given a slightly higher priority.
-     * 
+     *
      * @return true if running on the server side (default)
      */
     public boolean isServerSide()
@@ -1276,7 +1273,7 @@ public abstract class AbstractConnector
     /**
      * The flag determines if the connector is being used on the server side or client. If
      * true receiver threads will be given a slightly higher priority.
-     * 
+     *
      * @param serverSide
      *            true if running on the server side
      */

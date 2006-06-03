@@ -13,24 +13,26 @@
  */
 package org.mule.management.mbeans;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.seda.SedaComponent;
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOSession;
-
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.ComponentUtil;
+import org.mule.impl.model.seda.SedaComponent;
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.umo.UMOAsynchronousComponent;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOSession;
+
 /**
  * <code>ComponentService</code> exposes service information about a Mule
  * Managed component
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -76,29 +78,31 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      * order to persist these queued messages you can set the 'recoverableMode'
      * property on the Muleconfiguration to true. this causes all internal
      * queues to store their state.
-     * 
+     *
      * @throws org.mule.umo.UMOException if the component failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
-    public void pause() throws UMOException
-    {
-        getComponent().pause();
+    public void pause() throws UMOException {
+        ComponentUtil.pause(getComponent());
     }
 
     /**
      * Resumes the Component that has been paused. If the component is not
      * paused nothing is executed.
-     * 
+     *
      * @throws org.mule.umo.UMOException if the component failed to resume
      */
-    public void resume() throws UMOException
-    {
-        getComponent().resume();
+    public void resume() throws UMOException {
+        ComponentUtil.resume(getComponent());
     }
 
-    public boolean isPaused()
-    {
-        return getComponent().isPaused();
+    public boolean isPaused() {
+        if (UMOAsynchronousComponent.class.isAssignableFrom(getComponent().getClass())) {
+            return ((UMOAsynchronousComponent) getComponent()).isPaused();
+        } else {
+            LOGGER.warn("Attempting to query 'paused' status for component " + getComponent() + " which does not implement UMOAsynchronousComponent.");
+            return false;
+        }
     }
 
     public boolean isStopped()
@@ -131,7 +135,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.management.mbeans.ComponentServiceMBean#getStatistics()
      */
     public ObjectName getStatistics()
@@ -141,7 +145,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.management.MBeanRegistration#preRegister(javax.management.MBeanServer,
      *      javax.management.ObjectName)
      */
@@ -154,7 +158,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
      */
     public void postRegister(Boolean registrationDone) {
@@ -177,7 +181,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.management.MBeanRegistration#preDeregister()
      */
     public void preDeregister() throws Exception
@@ -194,7 +198,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.management.MBeanRegistration#postDeregister()
      */
     public void postDeregister()

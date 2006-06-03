@@ -1,21 +1,21 @@
-/* 
+/*
 * $Header$
 * $Revision$
 * $Date$
 * ------------------------------------------------------------------------------------------------------
-* 
+*
 * Copyright (c) SymphonySoft Limited. All rights reserved.
 * http://www.symphonysoft.com
-* 
+*
 * The software in this package is published under the terms of the BSD
 * style license a copy of which has been included with this distribution in
-* the LICENSE.txt file. 
+* the LICENSE.txt file.
 *
 */
 package org.mule.impl.model;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.beanutils.BeanUtils;
+import java.beans.ExceptionListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -24,7 +24,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
-import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.ComponentException;
@@ -34,13 +33,12 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import java.beans.ExceptionListener;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A base implementation for all UMOComponents in Mule
@@ -70,11 +68,6 @@ public abstract class AbstractComponent implements UMOComponent {
      * Determines whether stop has been called and is still in progress
      */
     protected WaitableBoolean stopping = new WaitableBoolean(false);
-
-    /**
-     * Determines if the component has been paused
-     */
-    protected WaitableBoolean paused = new WaitableBoolean(false);
 
     /**
      * determines if the proxy pool has been initialised
@@ -187,18 +180,6 @@ public abstract class AbstractComponent implements UMOComponent {
         fireComponentNotification(ComponentNotification.COMPONENT_STARTED);
     }
 
-    public final void pause() {
-        doPause();
-        paused.set(true);
-        fireComponentNotification(ComponentNotification.COMPONENT_PAUSED);
-    }
-
-    public final void resume() {
-        doResume();
-        paused.set(false);
-        fireComponentNotification(ComponentNotification.COMPONENT_RESUMED);
-    }
-
     public final void dispose() {
         try {
             if (!stopped.get()) {
@@ -218,7 +199,7 @@ public abstract class AbstractComponent implements UMOComponent {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#getDescriptor()
      */
     public UMODescriptor getDescriptor() {
@@ -257,14 +238,6 @@ public abstract class AbstractComponent implements UMOComponent {
         if (stopping.get() || stopped.get()) {
             throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
         }
-        if (logger.isDebugEnabled() && paused.get()) {
-            logger.debug("Component: " + descriptor.getName() + " is paused. Blocking call until resume is called");
-        }
-        try {
-            paused.whenFalse(null);
-        } catch (InterruptedException e) {
-            throw new ComponentException(event.getMessage(), this, e);
-        }
 
         if (stats.isEnabled()) {
             stats.incReceivedEventSync();
@@ -286,7 +259,7 @@ public abstract class AbstractComponent implements UMOComponent {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -299,10 +272,6 @@ public abstract class AbstractComponent implements UMOComponent {
 
     public boolean isStopping() {
         return stopping.get();
-    }
-
-    public boolean isPaused() {
-        return paused.get();
     }
 
     protected void handleException(Exception e) {
@@ -319,32 +288,8 @@ public abstract class AbstractComponent implements UMOComponent {
      * @return
      * @throws UMOException
      */
-    protected Object lookupComponent() throws UMOException
-    {
-        UMOManager manager = MuleManager.getInstance();
-        Object impl = descriptor.getImplementation();
-        Object component = null;
-
-        if (impl instanceof ContainerKeyPair) {
-            component = manager.getContainerContext().getComponent(impl);
-
-            if(descriptor.isSingleton()) {
-                descriptor.setImplementation(component);
-            }
-        } else {
-            component = impl;
-        }
-
-        try {
-            BeanUtils.populate(component, descriptor.getProperties());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '"
-                    + descriptor.getName() + "'"), e, descriptor);
-        }
-        // Call any custom initialisers
-        descriptor.fireInitialisationCallbacks(component);
-
-        return component;
+    protected Object lookupComponent() throws UMOException {
+        return ComponentUtil.createComponent(descriptor);
     }
 
     protected void doForceStop() throws UMOException {
@@ -356,14 +301,6 @@ public abstract class AbstractComponent implements UMOComponent {
     }
 
     protected void doStart()  throws UMOException {
-        // template method
-    }
-
-    protected void doPause() {
-        // template method
-    }
-
-    protected void doResume() {
         // template method
     }
 
