@@ -14,6 +14,11 @@
  */
 package org.mule.transformers;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -25,12 +30,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>AbstractTransformer</code> Is a base class for all transformers.
@@ -61,7 +62,10 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     private List sourceTypes = new ArrayList();
 
-    protected UMOTransformer transformer;
+    /**
+     * This is the following transformer in the chain of transformers.
+     */
+    protected UMOTransformer nextTransformer;
 
     private boolean ignoreBadInput = false;
 
@@ -199,14 +203,25 @@ public abstract class AbstractTransformer implements UMOTransformer
             if(encoding==null) {
                 encoding = MuleManager.getConfiguration().getEncoding();
             }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Applying transformer " + getName() + " (" + getClass().getName() + ")");
+                logger.debug("Object before transform: " + StringMessageUtils.truncate(src.toString(), 200, false));
+            }
+
             result = doTransform(src, encoding);
             if (result == null) {
                 result = new NullPayload();
             }
 
+            if (logger.isDebugEnabled()) {
+                logger.debug("Object after transform: " + StringMessageUtils.truncate(result.toString(), 200, false));
+            }
+
             result = checkReturnClass(result);
-            if (transformer != null) {
-                result = transformer.transform(result);
+            if (nextTransformer != null) {
+                logger.debug("Following transformer in the chain is " + nextTransformer.getName() + " (" + nextTransformer.getClass().getName() + ")");
+                result = nextTransformer.transform(result);
             }
         }
         return result;
@@ -225,10 +240,10 @@ public abstract class AbstractTransformer implements UMOTransformer
     public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
-        UMOTransformer trans = transformer;
+        UMOTransformer trans = nextTransformer;
         while (trans != null && endpoint != null) {
             trans.setEndpoint(endpoint);
-            trans = trans.getTransformer();
+            trans = trans.getNextTransformer();
         }
 
     }
@@ -238,21 +253,21 @@ public abstract class AbstractTransformer implements UMOTransformer
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.transformer.UMOTransformer#getTransformer()
+     * @see org.mule.umo.transformer.UMOTransformer#getNextTransformer()
      */
-    public UMOTransformer getTransformer()
+    public UMOTransformer getNextTransformer()
     {
-        return transformer;
+        return nextTransformer;
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.transformer.UMOTransformer#setTransformer(org.mule.umo.transformer.UMOTransformer)
+     * @see org.mule.umo.transformer.UMOTransformer#setNextTransformer(org.mule.umo.transformer.UMOTransformer)
      */
-    public void setTransformer(UMOTransformer transformer)
+    public void setNextTransformer(UMOTransformer nextTransformer)
     {
-        this.transformer = transformer;
+        this.nextTransformer = nextTransformer;
     }
 
     /*
@@ -281,7 +296,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         UMOTransformer returnTrans = this;
         while (tempTrans != null) {
             returnTrans = tempTrans;
-            tempTrans = tempTrans.getTransformer();
+            tempTrans = tempTrans.getNextTransformer();
         }
         return returnTrans.getReturnClass();
     }

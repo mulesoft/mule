@@ -35,12 +35,13 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
 
+
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other XML-ish) object
  *
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe St?phane</a>
+ * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stephane</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
+ * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Moller</a>
  * @version $Revision$
  */
 
@@ -59,7 +60,6 @@ public class XsltTransformer extends AbstractXmlTransformer {
     /**
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-
     public void initialise() throws InitialisationException {
         try {
             transformerPool = new StackObjectPool(new BasePoolableObjectFactory() {
@@ -85,37 +85,31 @@ public class XsltTransformer extends AbstractXmlTransformer {
         try {
             Source sourceDoc = getXmlSource(src);
             if (sourceDoc == null) return null;
-            
+
             ResultHolder holder = getResultHolder(returnClass);
-            if (holder == null) holder = getResultHolder(src.getClass()); 
-           
+            if (holder == null) holder = getResultHolder(src.getClass());
+
             DefaultErrorListener errorListener = new DefaultErrorListener(this);
             Transformer transformer = null;
+            Object result;
             try {
                 transformer = (Transformer)transformerPool.borrowObject();
-                
+
                 transformer.setErrorListener(errorListener);
                 transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
-    
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Before transform: " + convertToText(src));
-                }
-    
+
                 transformer.transform(sourceDoc, holder.getResult());
-                Object result = holder.getResultObject(); 
-    
-                if (logger.isDebugEnabled()) {
-                    logger.debug("After transform: " + convertToText(result));
-                }
-                
-                if(errorListener.isError()) {
+                result = holder.getResultObject();
+
+                if (errorListener.isError()) {
                     throw errorListener.getException();
                 }
-                return result;
             } finally {
                 if (transformer != null) transformerPool.returnObject(transformer);
             }
-        } catch (Exception e) {
+            return result;
+        }
+        catch (Exception e) {
             throw new TransformerException(this, e);
         }
     }
@@ -141,11 +135,11 @@ public class XsltTransformer extends AbstractXmlTransformer {
      * @throws InitialisationException
      */
     private StreamSource getStreamSource() throws InitialisationException {
-        
+
         if (xslt != null) {
             return new StreamSource(new StringReader(xslt));
         }
-        
+
         if (xslFile == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xslFile"), this);
         }
@@ -172,9 +166,8 @@ public class XsltTransformer extends AbstractXmlTransformer {
 
     public Object clone() throws CloneNotSupportedException {
         XsltTransformer x = (XsltTransformer) super.clone();
-
         try {
-            if (x.transformer == null) {
+            if (x.nextTransformer == null) {
                 x.initialise();
             }
         } catch (Exception e) {
@@ -220,11 +213,10 @@ public class XsltTransformer extends AbstractXmlTransformer {
      */
     public int getMaxIdleTransformers() {
         return maxIdleTransformers;
-    }
-
+}
     /**
      * Sets the the current maximum number of idle transformer objects allowed in the pool
-     * 
+     *
      * @param maxIdleTransformers New maximum size to set
      */
     public void setMaxIdleTransformers(int maxIdleTransformers) {

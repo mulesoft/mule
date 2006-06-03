@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -40,12 +40,12 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     protected  String normalizeString(String rawString) {
         return rawString.replaceAll("\r\n", "\n");
     }
-    
+
     public void testTransform() throws Exception
     {
         Object result = getTransformer().transform(getTestData());
         assertNotNull(result);
-        
+
         Object expectedResult = getResultData();
         // Special case for string results
         if (result instanceof String && expectedResult instanceof String ) {
@@ -82,7 +82,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     {
         if (getRoundTripTransformer() != null) {
             UMOTransformer trans = getTransformer();
-            trans.setTransformer(getRoundTripTransformer());
+            trans.setNextTransformer(getRoundTripTransformer());
             Object result = trans.transform(getTestData());
             compareRoundtripResults(getTestData(), result);
         }

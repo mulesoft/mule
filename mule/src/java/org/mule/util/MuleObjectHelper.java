@@ -13,6 +13,10 @@
  */
 package org.mule.util;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -28,14 +32,10 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 /**
  * <code>MuleObjectHelper</code> is a helper class to assist in finding mule
  * server objects, such as endpoint and transformers
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,8 +47,14 @@ public class MuleObjectHelper
      */
     protected static transient Log logger = LogFactory.getLog(MuleObjectHelper.class);
 
-    public static UMOTransformer getTransformer(String list, String delim) throws MuleException
-    {
+    /**
+     * Builds a linked list of UMOTransformers.
+     * @param list - a list of transformers separated by "delim"
+     * @param delim - the character used to delimit the transformers in the list
+     * @return an UMOTransformer whose method getNextTransformer() will return the next transformer in the list.
+     * @throws MuleException
+     */
+    public static UMOTransformer getTransformer(String list, String delim) throws MuleException {
         StringTokenizer st = new StringTokenizer(list, delim);
 
         UMOTransformer tempTrans = null;
@@ -66,7 +72,7 @@ public class MuleObjectHelper
                 currentTrans = tempTrans;
                 returnTrans = tempTrans;
             } else {
-                currentTrans.setTransformer(tempTrans);
+                currentTrans.setNextTransformer(tempTrans);
                 currentTrans = tempTrans;
             }
 
