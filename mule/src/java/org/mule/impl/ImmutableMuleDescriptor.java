@@ -15,7 +15,13 @@
 
 package org.mule.impl;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
@@ -42,12 +48,7 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
@@ -65,7 +66,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
-
     /**
      * Property that allows for a property file to be used to load properties
      * instead of listing them directly in the mule-configuration file
@@ -78,16 +78,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ExceptionListener exceptionListener = null;
 
     /**
-     * The implementationReference used to create the Object UMO instance Can
+     * The implementationReference used to create the Object UMO instance.  Can
      * either be a string such as a container reference or classname or can be
-     * an instance of the implementation
+     * an instance of the implementation.
      */
     protected Object implementationReference = null;
-
-    /**
-     * The transformer for the default receive endpoint
-     */
-    protected UMOTransformer inboundTransformer = null;
 
     /**
      * The descriptor name
@@ -95,19 +90,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected String name;
 
     /**
-     * The transformer for the default send Endpoint
-     */
-    protected UMOTransformer outboundTransformer = null;
-
-    /**
      * The properties for the Mule UMO.
      */
     protected Map properties = new HashMap();
-
-    /**
-     * The transformer for the response
-     */
-    protected UMOTransformer responseTransformer = null;
 
     /**
      * The descriptors version
@@ -125,8 +110,40 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected UMOResponseMessageRouter responseRouter = null;
 
+    /**
+     * The default receive endpoint.
+     * @deprecated Please use <code>inboundRouter</code> instead.
+     * @see MULE-506
+     */
     protected UMOEndpoint inboundEndpoint;
+
+    /**
+     * The transformer for the default receive endpoint.
+     * @deprecated Please use <code>inboundRouter</code> instead.
+     * @see MULE-506
+     */
+    protected UMOTransformer inboundTransformer = null;
+
+    /**
+     * The default send endpoint.
+     * @deprecated Please use <code>outboundRouter</code> instead.
+     * @see MULE-506
+     */
     protected UMOEndpoint outboundEndpoint;
+
+    /**
+     * The transformer for the default send Endpoint
+     * @deprecated Please use <code>outboundRouter</code> instead.
+     * @see MULE-506
+     */
+    protected UMOTransformer outboundTransformer = null;
+
+    /**
+     * The transformer for the response
+     * @deprecated Please use <code>responseRouter</code> instead.
+     * @see MULE-506
+     */
+    protected UMOTransformer responseTransformer = null;
 
     /**
      * The threading profile to use for this component. If this is not set a
@@ -147,8 +164,10 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /**
      * Determines whether the component described by this descriptor is hosted
-     * in a container. if the value is false the component will not be pooled by
-     * Mule
+     * in a container.  If the value is false the component will not be pooled by
+     * Mule.
+     * @deprecated Use <code>container</code> instead.
+     * @see MULE-812
      */
     protected boolean containerManaged = true;
 
@@ -165,13 +184,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected List initialisationCallbacks = new ArrayList();
 
-
     protected String encoding = null;
 
     /**
      * The name of the container that the component implementation resides in
-     * If null, the containe ris not known, if 'none' the component is instanciated from
-     * its implementaiton class name
+     * If null, the container is not known, if 'none' the component is instanciated from
+     * its implementation class name.
      */
     protected String container = null;
 
@@ -305,9 +323,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                 }
             }
         }
-        //Is a referenc of an implementation object?
+        // Is a reference of an implementation object?
         if(implementationReference instanceof String) {
-            if(DescriptorContainerContext.DESCRIPTOR_CONTAINER_NAME.equals(container)) {
+            if (DescriptorContainerContext.DESCRIPTOR_CONTAINER_NAME.equals(container)) {
                 implementationReference = new DescriptorContainerKeyPair(name, implementationReference);
             } else {
                 implementationReference = new ContainerKeyPair(container, implementationReference);
@@ -489,9 +507,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected Class getImplementationForReference(String reference) throws ContainerException
     {
-        Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
+            Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
         return object.getClass();
-    }
+        }
 
     public void fireInitialisationCallbacks(Object component) throws InitialisationException
     {
@@ -551,5 +569,5 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     public String getContainer() {
         return container;
-    }
+}
 }
