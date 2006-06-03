@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+
+    <!--
+    The following profiles are enabled by default for building the project.
+    (see http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
+    -->
+    <activeProfiles>
+        <!-- Enable this profile to run all integration tests. -->
+        <activeProfile>tests</activeProfile>
+
+        <!-- Enable this profile to build the Mule distributions (.tar.gz, .zip, .rar) -->
+        <!--
+        <activeProfile>distributions</activeProfile>
+        -->
+
+        <!-- Enable this profile to skip all tests which require a network connection. -->
+        <!--
+        <activeProfile>offline</activeProfile>
+        -->
+
+        <!-- Enable this profile to run integration tests with an Oracle database. -->
+        <!--
+        <activeProfile>oracle</activeProfile>
+        -->
+
+        <!-- Enable this profile to run integration tests with IBM AS400 Data Queue messaging server. -->
+        <!--
+        <activeProfile>as400</activeProfile>
+        -->
+
+        <!-- Enable this profile to run integration tests with SAP. -->
+        <!--
+        <activeProfile>sap</activeProfile>
+        -->
+    </activeProfiles>
+
+</settings>
