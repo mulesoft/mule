@@ -94,12 +94,12 @@ public class BaseMessage implements Serializable
         return context;
     }
 
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Object value)
     {
         context.put(key, value);
     }
 
-    public Object getProperty(Object key)
+    public Object getProperty(String key)
     {
         return context.get(key);
     }
