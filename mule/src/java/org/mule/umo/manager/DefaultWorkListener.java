@@ -50,14 +50,18 @@ public class DefaultWorkListener implements WorkListener {
 
      protected void handleWorkException(WorkEvent event, String type) {
         Throwable e = null;
-        if(event!=null && event.getException()!=null) {
+
+        if (event != null && event.getException() != null) {
             e = event.getException();
-        } else {
+        }
+        else {
             return;
         }
-        if(event.getException().getCause()!=null) {
-            e = (Throwable)event.getException().getCause();
+
+        if (event.getException().getCause() != null) {
+            e = event.getException().getCause();
         }
+
         logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
         logger.error(e);
     }

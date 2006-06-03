@@ -15,6 +15,9 @@
 
 package org.mule.util;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,9 +34,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * This class is useful for loading resources and classes in a fault
@@ -171,9 +171,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         // Try to load the resource as a URL.
         if ((is == null) && tryAsUrl) {
             URL url = new URL(resourceName);
-            if (url != null) {
-                is = url.openStream();
-            }
+            is = url.openStream();
         }
         return is;
     }
