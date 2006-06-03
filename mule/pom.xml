@@ -40,6 +40,10 @@
                         As a workaround, dependency excludes are sprinkled throughout the project.
                         Keep an eye on:
                             http://jira.codehaus.org/browse/MNG-1577
+
+                        m2 IDEA plugin has a bug http://jira.codehaus.org/browse/MIDEA-54 which
+                        prevents it from generaing a module file properly (no libraries).
+                        Remove square braces temporarily and run 'mvn idea:idea'.
                     -->
                     <version>[2.8.0]</version>
                 </dependency>
