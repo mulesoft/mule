@@ -150,15 +150,19 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         if (serverConnector != null) {
             manager.registerConnector(serverConnector);
         }
-        // set the connector on th endpointUri
-        int param = serverUrl.indexOf("?");
-        if (param == -1) {
-            serverUrl += "?";
-        } else {
-            serverUrl += "&";
+        else {
+            throw new IllegalArgumentException("Cannot create started manager from null serverConnector");
         }
-        serverUrl += UMOEndpointURI.PROPERTY_CREATE_CONNECTOR + "=" + serverConnector.getName();
 
+        // set the connector on the endpointUri
+        int param = serverUrl.indexOf('?');
+        if (param == -1) {
+            serverUrl += '?';
+        } else {
+            serverUrl += '&';
+        }
+
+        serverUrl += UMOEndpointURI.PROPERTY_CREATE_CONNECTOR + "=" + serverConnector.getName();
         return createStartedManager(synchronous, serverUrl);
     }
 
