@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.umo.transformer;
@@ -24,7 +24,7 @@ import java.io.Serializable;
  * processed and returned via the <code>transform()</code> method. <p/> The
  * return Class is specifed so that the return message is validated defore it is
  * returned.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +39,7 @@ public interface UMOSimpleTransformer extends Initialisable, Serializable, Clone
 
     /**
      * Thransforms the supllied data and returns the result
-     * 
+     *
      * @param src the data to transform
      * @return the transformed data
      * @throws TransformerException if a error occurs transforming the data or
@@ -62,7 +62,7 @@ public interface UMOSimpleTransformer extends Initialisable, Serializable, Clone
      * Sets the expected return type for the transformed data. If the
      * transformed data is not of this class type a
      * <code>TransformerException</code> will be thrown.
-     * 
+     *
      * @param theClass the expected return type class
      */
     void setReturnClass(Class theClass);
@@ -72,16 +72,10 @@ public interface UMOSimpleTransformer extends Initialisable, Serializable, Clone
      */
     Class getReturnClass();
 
-    // FIX shouldn't have to declare this but eclipse?? throws an error
+    // TODO shouldn't have to declare this but eclipse?? throws an error
     Object clone() throws CloneNotSupportedException;
 
-    UMOTransformer getTransformer();
+    UMOTransformer getNextTransformer();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.transformer.UMOTransformer#setTransformer(org.mule.umo.transformer.UMOTransformer)
-     */
-    void setTransformer(UMOTransformer transformer);
-
+    void setNextTransformer(UMOTransformer nextTransformer);
 }
