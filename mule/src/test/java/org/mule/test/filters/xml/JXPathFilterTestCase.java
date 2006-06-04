@@ -20,7 +20,6 @@ import org.dom4j.InvalidXPathException;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.xml.XmlToDomDocument;
 
 /**
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe St?phane</a>
@@ -32,8 +31,6 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase {
 
     private JXPathFilter myFilter = null;
 
-    private XmlToDomDocument transformer = null;
-
     protected void doSetUp() throws Exception {
         // Read Xml file
         final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
@@ -42,7 +39,6 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase {
         xmlData = IOUtils.toString(is);
 
         myFilter = new JXPathFilter();
-        transformer = new XmlToDomDocument();
     }
 
     public void testFilter1() throws Exception {
