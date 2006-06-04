@@ -6,7 +6,6 @@ import java.io.File;
 
 /**
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
- * @version $Revision: 630 $
  */
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
