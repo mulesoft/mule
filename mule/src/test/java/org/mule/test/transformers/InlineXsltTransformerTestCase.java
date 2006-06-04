@@ -17,7 +17,7 @@ import org.mule.util.FileUtils;
 
 /**
  * @author <a href="mailto:jesper@selskabet.org">Jesper S. Møller</a>
- * @version $Revision: 1983 $
+ * @version $Revision$
  */
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {

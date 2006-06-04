@@ -24,7 +24,7 @@ import java.util.Date;
  * formatting etc.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2085 $
+ * @version $Revision$
  */
 
 public class DateUtils extends org.apache.commons.lang.time.DateUtils

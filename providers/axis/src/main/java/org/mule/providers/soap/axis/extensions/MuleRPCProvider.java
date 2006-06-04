@@ -45,7 +45,7 @@ import java.util.Iterator;
  * from Mule managed components
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1763 $
+ * @version $Revision$
  */
 public class MuleRPCProvider extends RPCProvider
 {

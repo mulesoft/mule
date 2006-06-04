@@ -38,7 +38,7 @@ import java.util.zip.ZipFile;
  * <code>FileUtils</code> contains useful methods for dealing with files & directories.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2085 $
+ * @version $Revision$
  */
 
 public class FileUtils extends org.apache.commons.io.FileUtils

@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 /**
  * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {

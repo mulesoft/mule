@@ -22,7 +22,7 @@ import junit.framework.TestCase;
  * <p/> <code>DateUtilsTestCase</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1665 $
+ * @version $Revision$
  */
 public class DateUtilsTestCase extends TestCase
 {
