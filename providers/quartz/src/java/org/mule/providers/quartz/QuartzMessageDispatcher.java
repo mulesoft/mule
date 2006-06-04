@@ -154,7 +154,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         trigger.setJobName(jobDetail.getName());
         trigger.setJobGroup(jobGroupName);
 
-        Scheduler scheduler = ((QuartzConnector)connector).getScheduler();
+        Scheduler scheduler = ((QuartzConnector)this.getConnector()).getScheduler();
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
