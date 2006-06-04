@@ -248,16 +248,18 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
-        //TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
+        // TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
         // TypeMappingImpl tm = (TypeMappingImpl) registry.();
-        // Handle complex bean type automatically
-         //registry.setDoAutoTypes( true );
-        // Axis 1.2 fix to handle autotypes properly
-       // AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
 
-        // Load any explicitly defined bean types
-        List types = (List) descriptor.getProperties().get("beanTypes");
-        //todo connector.registerTypes(registry, types);
+        // Handle complex bean type automatically
+        // registry.setDoAutoTypes( true );
+
+        // Axis 1.2 fix to handle autotypes properly
+        // AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
+
+        // TODO Load any explicitly defined bean types
+        // List types = (List) descriptor.getProperties().get("beanTypes");
+        // connector.registerTypes(registry, types);
 
         service.setName(serviceName);
 
