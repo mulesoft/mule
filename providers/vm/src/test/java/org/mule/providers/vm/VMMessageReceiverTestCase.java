@@ -1,5 +1,4 @@
 /*
- * $Header$ $Revision$ $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
