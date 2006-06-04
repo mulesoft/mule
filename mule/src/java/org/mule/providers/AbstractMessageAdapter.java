@@ -16,6 +16,15 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
+import javax.activation.DataHandler;
+
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
@@ -31,14 +40,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
-
-import javax.activation.DataHandler;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
@@ -56,8 +57,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected Map properties = new ConcurrentHashMap();
-    protected Map attachments = new ConcurrentHashMap();
+    protected ConcurrentMap properties = new ConcurrentHashMap();
+    protected ConcurrentMap attachments = new ConcurrentHashMap();
     protected String encoding = MuleManager.getConfiguration().getEncoding();
 
     protected UMOExceptionPayload exceptionPayload;
@@ -86,11 +87,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
             synchronized(props) {
                 for (Iterator iter = props.entrySet().iterator(); iter.hasNext();) {
                     Map.Entry entry = (Map.Entry) iter.next();
-                    String key = (String)entry.getKey();
-                    Object value = entry.getValue();
-                    if (value != null) {
-                        setProperty(key, value);
-                    }
+                    setProperty((String)entry.getKey(), entry.getValue());
                 }
             }
         }
