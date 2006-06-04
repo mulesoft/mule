@@ -126,7 +126,7 @@
         </dependency>
 
         <dependency>
-            <groupId>xfire</groupId>
+            <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-all</artifactId>
             <version>${xfire_all_version}</version>
             <url>http://xfire.codehaus.org</url>
