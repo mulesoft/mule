@@ -1,9 +1,7 @@
 package util;
 
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
