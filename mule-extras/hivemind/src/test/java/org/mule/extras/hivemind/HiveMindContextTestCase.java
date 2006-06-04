@@ -1,7 +1,5 @@
 /* 
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) Massimo Lusetti. All rights reserved.

@@ -1,9 +1,7 @@
 package org.mule.extras.spring.config;
 
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
