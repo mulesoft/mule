@@ -1,7 +1,6 @@
 /*
- * $Header:
+ * $Id:
  * /cvsroot/mule/mule/src/test/org/mule/test/mule/commonspool/CommonsPoolTestCase.java,v
- * 1.2 2003/11/28 15:32:40 rossmason Exp $ $Revision$ $Date: 2003/11/28
  * 15:32:40 $
  * ------------------------------------------------------------------------------------------------------
  * 

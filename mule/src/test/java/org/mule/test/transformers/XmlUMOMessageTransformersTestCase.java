@@ -1,7 +1,5 @@
 /*
- * $Header$
- * $Revision: 1665 $
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.

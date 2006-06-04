@@ -1,7 +1,6 @@
 /*
- * $Header:
+ * $Id:
  * /cvsroot/mule/mule/src/test/org/mule/test/mule/AbstractMuleTestCase.java,v
- * 1.7 2003/11/24 09:58:47 rossmason Exp $ $Revision$ $Date: 2003/11/24
  * 09:58:47 $
  * ------------------------------------------------------------------------------------------------------
  * 

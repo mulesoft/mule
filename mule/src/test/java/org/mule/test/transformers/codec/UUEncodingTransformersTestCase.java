@@ -1,7 +1,6 @@
 /*
- * $Header:
+ * $Id:
  * /cvsroot/mule/mule/src/test/org/mule/test/transformers/DefaultTransformersTestCase.java,v
- * 1.3 2003/11/26 06:45:02 rossmason Exp $ $Revision$ $Date: 2003/11/26
  * 06:45:02 $
  * ------------------------------------------------------------------------------------------------------
  * 

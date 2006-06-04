@@ -1,5 +1,4 @@
 /*
- * $Header$ $Revision: 1665 $ $Date: 2006-03-22 12:37:29 +0100 (Mi, 22 Mrz 2006) $
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com

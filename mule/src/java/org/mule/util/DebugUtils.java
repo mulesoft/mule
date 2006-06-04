@@ -1,7 +1,5 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -11,6 +9,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.util;
 
 import java.security.Provider;

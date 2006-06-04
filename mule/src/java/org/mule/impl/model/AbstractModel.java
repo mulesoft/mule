@@ -1,6 +1,5 @@
 /*
- * $Header: /cvsroot/mule/mule/src/java/org/mule/model/MuleModel.java,v 1.5
- * 2004/01/18 12:06:05 rossmason Exp $ $Revision$ $Date: 2004/01/18
+ * $Id: /cvsroot/mule/mule/src/java/org/mule/model/MuleModel.java,v 1.5
  * 12:06:05 $
  * ------------------------------------------------------------------------------------------------------
  *

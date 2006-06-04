@@ -1,9 +1,7 @@
 /*
- * $Header:
+ * $Id:
  * /cvsroot/mule/mule/src/test/org/mule/test/tck/providers/AbstractConnectorTestCase.java,v
- * 1.2 2003/11/25 21:45:05 rossmason Exp $ $Revision$ $Date: 2003/11/25
  * 21:45:05 $
- * $Header$ $Revision$ $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com

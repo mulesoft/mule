@@ -1,6 +1,5 @@
 /*
- * $Header: /cvsroot/mule/mule/src/java/org/mule/umo/UMOEvent.java,v 1.9
- * 2003/12/02 22:43:27 rossmason Exp $ $Revision$ $Date: 2003/12/02
+ * $Id: /cvsroot/mule/mule/src/java/org/mule/umo/UMOEvent.java,v 1.9
  * 22:43:27 $
  * ------------------------------------------------------------------------------------------------------
  * 
