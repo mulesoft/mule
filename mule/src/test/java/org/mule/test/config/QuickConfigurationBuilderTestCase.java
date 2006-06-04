@@ -111,7 +111,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             //Register endpoints
             JXPathFilter filter = new JXPathFilter("name");
-            filter.setValue("bar");
+            filter.setExpectedValue("bar");
             Map ns = new HashMap();
             ns.put("foo", "http://foo.com");
             filter.setNamespaces(ns);
