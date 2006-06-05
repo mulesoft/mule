@@ -17,28 +17,39 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class FunctionalTestNotification extends CustomNotification {
+public class FunctionalTestNotification extends CustomNotification
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3435373745940904597L;
 
     public static final int EVENT_RECEIVED = -999999;
+
     private Object replyMessage = null;
+
     private UMOEventContext eventContext;
 
-    public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action) throws TransformerException {
+    public FunctionalTestNotification(UMOEventContext context,
+            Object replyMessage, int action) throws TransformerException
+    {
         super(context.getTransformedMessage(), action);
         resourceIdentifier = context.getComponentDescriptor().getName();
         this.replyMessage = replyMessage;
         this.eventContext = context;
     }
 
-    public Object getReplyMessage() {
+    public Object getReplyMessage()
+    {
         return replyMessage;
     }
 
-    public UMOEventContext getEventContext() {
+    public UMOEventContext getEventContext()
+    {
         return eventContext;
     }
 }

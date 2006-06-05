@@ -1,15 +1,15 @@
 /*
-* $Id$
-* ------------------------------------------------------------------------------------------------------
-*
-* Copyright (c) SymphonySoft Limited. All rights reserved.
-* http://www.symphonysoft.com
-*
-* The software in this package is published under the terms of the BSD
-* style license a copy of which has been included with this distribution in
-* the LICENSE.txt file.
-*
-*/
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ *
+ */
 package org.mule.impl.model.seda;
 
 import java.util.NoSuchElementException;
@@ -42,25 +42,32 @@ import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
 /**
- * A Seda component runs inside a Seda Model and is responsible for managing
- * a Seda Queue and thread pool for a Mule sevice component.  In Seda terms
- * this is equivilent to a stage.
- *
+ * A Seda component runs inside a Seda Model and is responsible for managing a
+ * Seda Queue and thread pool for a Mule sevice component. In Seda terms this is
+ * equivilent to a stage.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SedaComponent extends AbstractAsynchronousComponent implements Work, WorkListener {
+public class SedaComponent extends AbstractAsynchronousComponent implements
+        Work, WorkListener
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7711976708670893015L;
 
     /**
-     * A pool of available Mule Proxies. Component pooling has been disabled on the
-     * SEDAModel, this pool will be null anf the 'componentProxy' will be used.
+     * A pool of available Mule Proxies. Component pooling has been disabled on
+     * the SEDAModel, this pool will be null anf the 'componentProxy' will be
+     * used.
      */
     protected ObjectPool proxyPool = null;
 
     /**
-     * Is created only if component pooling is turned off on the SEDAModel.  in this
-     * scenario all requests are serviced by this component, unless 'componentPerRequest'
-     * flag is set on the model
+     * Is created only if component pooling is turned off on the SEDAModel. in
+     * this scenario all requests are serviced by this component, unless
+     * 'componentPerRequest' flag is set on the model
      */
     protected MuleProxy componentProxy = null;
 
@@ -74,7 +81,8 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
     protected int queueTimeout = 0;
 
     /**
-     * Whether component objects should be pooled or a single instance should be used
+     * Whether component objects should be pooled or a single instance should be
+     * used
      */
     protected boolean enablePooling = true;
 
@@ -86,7 +94,8 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
     /**
      * Default constructor
      */
-    public SedaComponent(MuleDescriptor descriptor, SedaModel model) {
+    public SedaComponent(MuleDescriptor descriptor, SedaModel model)
+    {
         super(descriptor, model);
         descriptorQueueName = descriptor.getName() + ".component";
         queueTimeout = model.getQueueTimeout();
@@ -98,115 +107,157 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
      * Initialise the component. The component will first create a Mule UMO from
      * the UMODescriptor and then initialise a pool based on the attributes in
      * the UMODescriptor.
-     *
+     * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     *          if the component fails to initialise
+     *             if the component fails to initialise
      * @see org.mule.umo.UMODescriptor
      */
-    public synchronized void doInitialise() throws InitialisationException {
+    public synchronized void doInitialise() throws InitialisationException
+    {
 
         // Create thread pool
         ThreadingProfile tp = descriptor.getThreadingProfile();
         workManager = tp.createWorkManager(descriptor.getName());
-        try {
+        try
+        {
             // Setup event Queue (used for VM execution)
             descriptor.getQueueProfile().configureQueue(descriptor.getName());
-        } catch (InitialisationException e) {
+        } catch (InitialisationException e)
+        {
             throw e;
-        } catch (Throwable e) {
-            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component Queue"), e, this);
+        } catch (Throwable e)
+        {
+            throw new InitialisationException(new Message(
+                    Messages.X_FAILED_TO_INITIALISE, "Component Queue"), e,
+                    this);
         }
     }
 
-    protected void initialisePool() throws InitialisationException {
-        try {
+    protected void initialisePool() throws InitialisationException
+    {
+        try
+        {
             // Initialise the proxy pool
-            proxyPool = descriptor.getPoolingProfile().getPoolFactory().createPool(descriptor);
+            proxyPool = descriptor.getPoolingProfile().getPoolFactory()
+                    .createPool(descriptor);
 
-            if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS) {
+            if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
+            {
                 int threads = descriptor.getPoolingProfile().getMaxActive();
-                for (int i = 0; i < threads; i++) {
+                for (int i = 0; i < threads; i++)
+                {
                     proxyPool.returnObject(proxyPool.borrowObject());
                 }
-            } else if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT) {
+            }
+            else if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT)
+            {
                 proxyPool.returnObject(proxyPool.borrowObject());
             }
             poolInitialised.set(true);
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"), e, this);
+        } catch (Exception e)
+        {
+            throw new InitialisationException(new Message(
+                    Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"), e, this);
         }
     }
 
-    protected MuleProxy createComponentProxy() throws InitialisationException {
+    protected MuleProxy createComponentProxy() throws InitialisationException
+    {
 
-        try {
+        try
+        {
             Object component = lookupComponent();
-            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
+            MuleProxy componentProxy = new DefaultMuleProxy(component,
+                    descriptor, null);
             getStatistics().setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());
             componentProxy.start();
             return componentProxy;
-        } catch (UMOException e) {
+        } catch (UMOException e)
+        {
             throw new InitialisationException(e, this);
         }
     }
 
-    public void doForceStop() throws UMOException {
+    public void doForceStop() throws UMOException
+    {
         doStop();
     }
 
-    public void doStop() throws UMOException {
+    public void doStop() throws UMOException
+    {
         workManager.stop();
-        if(proxyPool!=null) {
-            try {
+        if (proxyPool != null)
+        {
+            try
+            {
                 proxyPool.stop();
                 proxyPool.clearPool();
-            } catch (Exception e) {
-                logger.error("Failed to stop compoent pool: " + e.getMessage(), e);
+            } catch (Exception e)
+            {
+                logger.error("Failed to stop compoent pool: " + e.getMessage(),
+                        e);
             }
             poolInitialised.set(false);
-        } else if(componentProxy!=null) {
+        }
+        else if (componentProxy != null)
+        {
             componentProxy.stop();
         }
     }
 
-    public void doStart() throws UMOException {
+    public void doStart() throws UMOException
+    {
 
-        try {
+        try
+        {
             // Need to initialise the pool only after all listerner have
             // been registered and initialised so we need to delay until now
-            if (!poolInitialised.get() && enablePooling) {
+            if (!poolInitialised.get() && enablePooling)
+            {
                 initialisePool();
                 proxyPool.start();
-            } else if (!componentPerRequest) {
+            }
+            else if (!componentPerRequest)
+            {
                 componentProxy = createComponentProxy();
             }
             workManager.start();
             workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
-        } catch (Exception e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Component: "
-                    + descriptor.getName()), e, this);
+        } catch (Exception e)
+        {
+            throw new LifecycleException(new Message(
+                    Messages.FAILED_TO_START_X, "Component: "
+                            + descriptor.getName()), e, this);
         }
     }
 
+    protected void doDispose()
+    {
 
-    protected void doDispose() {
-
-        try {
+        try
+        {
             // threadPool.awaitTerminationAfterShutdown();
-            if (workManager != null) {
+            if (workManager != null)
+            {
                 workManager.dispose();
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             logger.error("Component Thread Pool did not close properly: " + e);
         }
-        try {
-            if (proxyPool != null) {
+        try
+        {
+            if (proxyPool != null)
+            {
                 proxyPool.clearPool();
-            } else if (componentProxy!=null) {
+            }
+            else if (componentProxy != null)
+            {
                 componentProxy.dispose();
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             logger.error("Proxy Pool did not close properly: " + e);
         }
     }
@@ -214,74 +265,96 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
     protected void doDispatch(UMOEvent event) throws UMOException
     {
         // Dispatching event to the component
-        if (stats.isEnabled()) {
+        if (stats.isEnabled())
+        {
             stats.incReceivedEventASync();
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Component: " + descriptor.getName() + " has received asynchronous event on: "
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Component: " + descriptor.getName()
+                    + " has received asynchronous event on: "
                     + event.getEndpoint().getEndpointURI());
         }
 
         // Block until we can queue the next event
-        try {
+        try
+        {
             enqueue(event);
-            if (stats.isEnabled()) {
+            if (stats.isEnabled())
+            {
                 stats.incQueuedEvent();
             }
-        } catch (Exception e) {
-            FailedToQueueEventException e1 = new FailedToQueueEventException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X,
-                    getName()),
-                    event.getMessage(),
-                    this,
-                    e);
+        } catch (Exception e)
+        {
+            FailedToQueueEventException e1 = new FailedToQueueEventException(
+                    new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X,
+                            getName()), event.getMessage(), this, e);
             handleException(e1);
         }
 
-        if (logger.isTraceEnabled()) {
+        if (logger.isTraceEnabled())
+        {
             logger.trace("Event added to queue for: " + descriptor.getName());
         }
     }
 
-    public UMOMessage doSend(UMOEvent event) throws UMOException {
+    public UMOMessage doSend(UMOEvent event) throws UMOException
+    {
 
         UMOMessage result = null;
         MuleProxy proxy = null;
-        try {
-            if(proxyPool!=null) {
+        try
+        {
+            if (proxyPool != null)
+            {
                 proxy = (MuleProxy) proxyPool.borrowObject();
                 getStatistics().setComponentPoolSize(proxyPool.getSize());
-            } else if (componentPerRequest) {
+            }
+            else if (componentPerRequest)
+            {
                 proxy = createComponentProxy();
-            } else {
+            }
+            else
+            {
                 proxy = componentProxy;
             }
 
             proxy.setStatistics(getStatistics());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(this + " : got proxy for " + event.getId() + " = " + proxy);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(this + " : got proxy for " + event.getId() + " = "
+                        + proxy);
             }
             result = (UMOMessage) proxy.onCall(event);
-        } catch (UMOException e) {
+        } catch (UMOException e)
+        {
             throw e;
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             throw new ComponentException(event.getMessage(), this, e);
-        } finally {
-            try {
-                if (proxy != null) {
-                    if (proxyPool != null) {
+        } finally
+        {
+            try
+            {
+                if (proxy != null)
+                {
+                    if (proxyPool != null)
+                    {
                         proxyPool.returnObject(proxy);
                     }
-                    else if (componentPerRequest) {
+                    else if (componentPerRequest)
+                    {
                         proxy.dispose();
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e)
+            {
                 throw new ComponentException(event.getMessage(), this, e);
             }
 
-            if (proxyPool != null) {
+            if (proxyPool != null)
+            {
                 getStatistics().setComponentPoolSize(proxyPool.getSize());
             }
         }
@@ -291,13 +364,15 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
     /**
      * @return the pool of Mule UMOs initialised in this component
      */
-    ObjectPool getProxyPool() {
+    ObjectPool getProxyPool()
+    {
         return proxyPool;
     }
 
-
-    public int getQueueSize() {
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
+    public int getQueueSize()
+    {
+        QueueSession queueSession = MuleManager.getInstance().getQueueManager()
+                .getQueueSession();
         return queueSession.getQueue(descriptor.getName()).size();
     }
 
@@ -305,130 +380,179 @@ public class SedaComponent extends AbstractAsynchronousComponent implements Work
      * While the component isn't stopped this runs a continuous loop checking
      * for new events in the queue
      */
-    public void run() {
+    public void run()
+    {
         MuleEvent event = null;
         MuleProxy proxy = null;
         QueueSession queueSession = null;
 
-        while (!stopped.get()) {
-            try {
+        while (!stopped.get())
+        {
+            try
+            {
                 // Wait if the component is paused
                 paused.whenFalse(null);
 
-                //If we're doing a draining stop, read all events from the queue
-                //before stopping
-                if (stopping.get()) {
-                    if (queueSession==null || queueSession.getQueue(descriptor.getName() + ".component").size() == 0) {
+                // If we're doing a draining stop, read all events from the
+                // queue
+                // before stopping
+                if (stopping.get())
+                {
+                    if (queueSession == null
+                            || queueSession.getQueue(
+                                    descriptor.getName() + ".component").size() == 0)
+                    {
                         stopping.set(false);
                         break;
                     }
                 }
                 event = (MuleEvent) dequeue();
-                if(event!=null) {
-                    if (stats.isEnabled()) {
+                if (event != null)
+                {
+                    if (stats.isEnabled())
+                    {
                         stats.decQueuedEvent();
                     }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Component: " + descriptor.getName() + " dequeued event on: "
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Component: " + descriptor.getName()
+                                + " dequeued event on: "
                                 + event.getEndpoint().getEndpointURI());
                     }
 
-                    if(proxyPool!=null) {
+                    if (proxyPool != null)
+                    {
                         proxy = (MuleProxy) proxyPool.borrowObject();
-                        getStatistics().setComponentPoolSize(proxyPool.getSize());
-                    } else if(componentPerRequest) {
+                        getStatistics().setComponentPoolSize(
+                                proxyPool.getSize());
+                    }
+                    else if (componentPerRequest)
+                    {
                         proxy = createComponentProxy();
-                    } else {
+                    }
+                    else
+                    {
                         proxy = componentProxy;
                     }
 
                     proxy.setStatistics(getStatistics());
                     proxy.start();
                     proxy.onEvent(queueSession, event);
-                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, this);
+                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE,
+                            null, this);
                 }
-            } catch (Exception e) {
-                if (proxy != null && proxyPool != null) {
-                    try {
+            } catch (Exception e)
+            {
+                if (proxy != null && proxyPool != null)
+                {
+                    try
+                    {
                         proxyPool.returnObject(proxy);
-                    } catch (Exception e2) {
+                    } catch (Exception e2)
+                    {
                         logger.info("Failed to return proxy to pool", e2);
                     }
                 }
 
-                if (e instanceof InterruptedException) {
+                if (e instanceof InterruptedException)
+                {
                     stopping.set(false);
                     break;
-                } else if (e instanceof NoSuchElementException) {
-                    handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT),
-                            (event==null ? null : event.getMessage()),
-                            this,
-                            e));
-                } else if (e instanceof UMOException) {
-                    handleException(e);
-                } else if (e instanceof WorkException) {
-                    handleException(new ComponentException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
-                            descriptor.getName()),
-                            (event==null ? null : event.getMessage()),
-                            this,
-                            e));
-                } else {
-                    handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT),
-                            (event==null ? null : event.getMessage()),
-                            this,
+                }
+                else if (e instanceof NoSuchElementException)
+                {
+                    handleException(new ComponentException(new Message(
+                            Messages.PROXY_POOL_TIMED_OUT),
+                            (event == null ? null : event.getMessage()), this,
                             e));
                 }
-            } finally {
+                else if (e instanceof UMOException)
+                {
+                    handleException(e);
+                }
+                else if (e instanceof WorkException)
+                {
+                    handleException(new ComponentException(new Message(
+                            Messages.EVENT_PROCESSING_FAILED_FOR_X, descriptor
+                                    .getName()), (event == null ? null : event
+                            .getMessage()), this, e));
+                }
+                else
+                {
+                    handleException(new ComponentException(new Message(
+                            Messages.FAILED_TO_GET_POOLED_OBJECT),
+                            (event == null ? null : event.getMessage()), this,
+                            e));
+                }
+            } finally
+            {
                 stopping.set(false);
-                if (proxy != null && componentPerRequest) {
+                if (proxy != null && componentPerRequest)
+                {
                     proxy.dispose();
                 }
             }
         }
     }
 
-    public void release() {
+    public void release()
+    {
         stopping.set(false);
     }
 
-    protected void enqueue(UMOEvent event) throws Exception {
-        QueueSession session = MuleManager.getInstance().getQueueManager().getQueueSession();
+    protected void enqueue(UMOEvent event) throws Exception
+    {
+        QueueSession session = MuleManager.getInstance().getQueueManager()
+                .getQueueSession();
         session.getQueue(descriptorQueueName).put(event);
     }
 
-    protected UMOEvent dequeue() throws Exception {
+    protected UMOEvent dequeue() throws Exception
+    {
         // Wait until an event is available
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
-        return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
+        QueueSession queueSession = MuleManager.getInstance().getQueueManager()
+                .getQueueSession();
+        return (UMOEvent) queueSession.getQueue(descriptorQueueName).poll(
+                queueTimeout);
     }
 
-    public void workAccepted(WorkEvent event) {
+    public void workAccepted(WorkEvent event)
+    {
         handleWorkException(event, "workAccepted");
     }
 
-    public void workRejected(WorkEvent event) {
+    public void workRejected(WorkEvent event)
+    {
         handleWorkException(event, "workRejected");
     }
 
-    public void workStarted(WorkEvent event) {
+    public void workStarted(WorkEvent event)
+    {
         handleWorkException(event, "workStarted");
     }
 
-    public void workCompleted(WorkEvent event) {
+    public void workCompleted(WorkEvent event)
+    {
         handleWorkException(event, "workCompleted");
     }
 
-     protected void handleWorkException(WorkEvent event, String type) {
+    protected void handleWorkException(WorkEvent event, String type)
+    {
         Exception e = null;
-        if(event!=null && event.getException()!=null) {
+        if (event != null && event.getException() != null)
+        {
             e = event.getException();
-        } else {
+        }
+        else
+        {
             return;
         }
-        if(event.getException().getCause()!=null) {
-            e = (Exception)event.getException().getCause();
+        if (event.getException().getCause() != null)
+        {
+            e = (Exception) event.getException().getCause();
         }
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+        logger.error("Work caused exception on '" + type
+                + "'. Work being executed was: " + event.getWork().toString());
         handleException(e);
     }
 }
