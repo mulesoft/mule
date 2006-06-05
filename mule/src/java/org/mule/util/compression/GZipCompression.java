@@ -13,21 +13,20 @@
 
 package org.mule.util.compression;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * <code>GZipCompression</code> a CompressionStrategy implementation using the
- * GZip library included in the JDK java.util.zip. This is the default
- * CompressionStrategy used by the CompressionHelper discovery when no other
- * implementation is discovered
+ * <code>GZipCompression</code> a CompressionStrategy implementation using the GZip
+ * library included in the JDK java.util.zip. This is the default CompressionStrategy used
+ * by the CompressionHelper discovery when no other implementation is discovered
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -40,9 +39,9 @@ public class GZipCompression implements CompressionStrategy
     private static final transient Log logger = LogFactory.getLog(GZipCompression.class);
 
     /**
-     * Determines if a byte array is compressed. The java.util.zip GZip
-     * implementaiton does not expose the GZip header so it is difficult to
-     * determine if a string is compressed.
+     * Determines if a byte array is compressed. The java.util.zip GZip implementaiton
+     * does not expose the GZip header so it is difficult to determine if a string is
+     * compressed.
      * 
      * @param bytes
      *            an array of bytes
@@ -72,8 +71,12 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] compressByteArray(byte[] bytes) throws IOException
     {
+        // TODO add strict behaviour as option
         if (bytes == null || isCompressed(bytes)) {
             // nothing to compress
+            if (logger.isDebugEnabled()) {
+                logger.debug("Data already compressed; doing nothing");
+            }
             return bytes;
         }
 
@@ -81,25 +84,37 @@ public class GZipCompression implements CompressionStrategy
             logger.debug("Compressing message of size: " + bytes.length);
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        GZIPOutputStream gos = new GZIPOutputStream(baos);
+        ByteArrayOutputStream baos = null;
+        GZIPOutputStream gzos = null;
 
-        gos.write(bytes, 0, bytes.length);
-        gos.finish();
-        gos.close();
+        try {
+            baos = new ByteArrayOutputStream(32768);
+            gzos = new GZIPOutputStream(baos);
 
-        byte[] compressedByteArray = baos.toByteArray();
+            gzos.write(bytes, 0, bytes.length);
+            gzos.finish();
+            gzos.close();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Compressed message to size: " + compressedByteArray.length);
+            byte[] compressedByteArray = baos.toByteArray();
+            baos.close();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Compressed message to size: " + compressedByteArray.length);
+            }
+
+            return compressedByteArray;
         }
-
-        return compressedByteArray;
+        catch (IOException ioex) {
+            throw ioex;
+        }
+        finally {
+            IOUtils.closeQuietly(gzos);
+            IOUtils.closeQuietly(baos);
+        }
     }
 
     /**
-     * Used for uncompressing a byte array into a uncompressed byte array using
-     * GZIP
+     * Used for uncompressing a byte array into a uncompressed byte array using GZIP
      * 
      * @param bytes
      *            An array of bytes to uncompress
@@ -110,8 +125,22 @@ public class GZipCompression implements CompressionStrategy
      */
     public byte[] uncompressByteArray(byte[] bytes) throws IOException
     {
+        // TODO add strict behaviour as option
         if (!isCompressed(bytes)) {
+            /*
+            if (strict) {
+                // throw a specific exception here to allow users of this method to
+                // diffientiate between general IOExceptions and an invalid format
+                logger.warn("Data is not of type GZIP compressed."
+                                + " The data may not have been compressed in the first place.");
+                throw new CompressionException("Not in GZIP format");
+            }
+            */
+
             // nothing to uncompress
+            if (logger.isDebugEnabled()) {
+                logger.debug("Data already uncompressed; doing nothing");
+            }
             return bytes;
         }
 
@@ -119,26 +148,36 @@ public class GZipCompression implements CompressionStrategy
             logger.debug("Uncompressing message of size: " + bytes.length);
         }
 
-        if (!isCompressed(bytes)) {
-            // throw a specific exception here to allow users of this method to
-            // diffientiate between general IOExceptions and an invalid format
-            logger.warn("Data is not of type GZIP compressed."
-                    + " The data may not have been compressed in the first place.");
-            throw new CompressionException("Not in GZIP format");
+        ByteArrayInputStream bais = null;
+        GZIPInputStream gzis = null;
+        ByteArrayOutputStream baos = null;
+
+        try {
+            bais = new ByteArrayInputStream(bytes);
+            gzis = new GZIPInputStream(bais);
+            baos = new ByteArrayOutputStream(32768);
+
+            IOUtils.copy(gzis, baos);
+            gzis.close();
+            bais.close();
+
+            byte[] uncompressedByteArray = baos.toByteArray();
+            baos.close();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Uncompressed message to size: " + uncompressedByteArray.length);
+            }
+
+            return uncompressedByteArray;
         }
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        GZIPInputStream gis = new GZIPInputStream(bais);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length * 4);
-
-        IOUtils.copy(gis, baos);
-        byte[] uncompressedByteArray = baos.toByteArray();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Uncompressed message to size: " + uncompressedByteArray.length);
+        catch (IOException ioex) {
+            throw ioex;
         }
-
-        return uncompressedByteArray;
+        finally {
+            IOUtils.closeQuietly(gzis);
+            IOUtils.closeQuietly(bais);
+            IOUtils.closeQuietly(baos);
+        }
     }
 
 }
