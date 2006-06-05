@@ -58,8 +58,8 @@ public class ClassUtilsTestCase extends TestCase
         assertEquals(clazz.getName(), "java.lang.String");
 
         try {
-            clazz = ClassUtils.loadClass("java.lang.Bing", getClass());
-            fail("Class not found exception should be found");
+            ClassUtils.loadClass("java.lang.Bing", getClass());
+            fail("ClassNotFoundException should be thrown");
         } catch (ClassNotFoundException e) {
             // expected
         }
@@ -83,7 +83,7 @@ public class ClassUtilsTestCase extends TestCase
         assertTrue(bowl.hasBanana());
 
         try {
-            object = ClassUtils.instanciateClass("java.lang.Bing", new Object[] {});
+            ClassUtils.instanciateClass("java.lang.Bing", new Object[] {});
             fail("Class does not exist, exception should have been thrown");
         } catch (Exception e) {
             // expected
@@ -162,7 +162,7 @@ public class ClassUtilsTestCase extends TestCase
         assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());
     }
 
-    private class DummyObject {
+    private static class DummyObject {
 
         public void doSomething(Object object) {
             //do nothing
