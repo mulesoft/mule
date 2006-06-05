@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -40,8 +42,12 @@ import java.util.Map;
  */
 public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 {
-
-    public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";
+    /**
+	 * Serial version 
+	 */
+	private static final long serialVersionUID = 2028442057178326047L;
+	
+	public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";
     public static final String NEVER_CREATE_STRING = "NEVER_CREATE";
     /**
      * Default constructor This is required right now for the Mule digester to

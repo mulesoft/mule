@@ -7,7 +7,7 @@
  * the LICENSE.txt file.
  * 
  * ------------------------------------------------------------------------------------------------------
- * $Id$
+ * $Header$
  * $Revision$
  * $Date$
  */
@@ -144,8 +144,8 @@ public abstract class AbstractAssembly extends AbstractEntry implements Assembly
         }
         Unit[] units = getUnits();
         for (int i = 0; i < units.length; i++) {
-            String result = units[i].undeploy();
-            // TODO: analyse result
+            units[i].undeploy();
+            // TODO: read output from undeploy() to analyse result
         }
         FileUtils.deleteTree(new File(getInstallRoot()));
         getRegistry().removeAssembly(this);

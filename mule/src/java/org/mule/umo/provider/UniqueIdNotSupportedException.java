@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.config.i18n.Messages;
 
 public class UniqueIdNotSupportedException extends MuleRuntimeException
 {
-    public UniqueIdNotSupportedException(UMOMessageAdapter adapter)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6719055482076081111L;
+
+	public UniqueIdNotSupportedException(UMOMessageAdapter adapter)
     {
         super(new Message(Messages.UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X, adapter.getClass().getName()));
     }

@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -21,8 +23,14 @@ import org.mule.umo.model.ModelException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ModelServiceNotFoundException extends ModelException {
+public class ModelServiceNotFoundException extends ModelException
+{
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -5306713972201495210L;
+
+	/**
      * @param location the path of the service
      */
     public ModelServiceNotFoundException(String location)

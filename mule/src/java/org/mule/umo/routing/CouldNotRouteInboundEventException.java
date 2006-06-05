@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 public class CouldNotRouteInboundEventException extends RoutingException
 {
-    public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 2736231899561051615L;
+
+	public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
     {
         super(message, endpoint);
     }

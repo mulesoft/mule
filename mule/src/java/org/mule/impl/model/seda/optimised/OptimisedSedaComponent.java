@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -27,9 +29,14 @@ import org.mule.umo.lifecycle.InitialisationException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class OptimisedSedaComponent extends SedaComponent {
-
+public class OptimisedSedaComponent extends SedaComponent
+{
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 4710126404530397113L;
+
+	/**
      * Default constructor
      */
     public OptimisedSedaComponent(MuleDescriptor descriptor, OptimisedSedaModel model) {

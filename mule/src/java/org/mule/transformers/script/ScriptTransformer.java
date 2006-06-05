@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -29,8 +31,14 @@ import javax.script.ScriptException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ScriptTransformer extends AbstractEventAwareTransformer {
-    protected Scriptable scriptable;
+public class ScriptTransformer extends AbstractEventAwareTransformer
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -2384663903730064892L;
+	
+	protected Scriptable scriptable;
 
     public ScriptTransformer() {
         scriptable = new Scriptable();

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.umo.UMOMessage;
 
 public class FailedToQueueEventException extends ComponentException
 {
-    public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -8368283988424746098L;
+
+	public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component)
     {
         super(message, umoMessage, component);
     }

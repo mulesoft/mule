@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.umo.manager.UMOServerNotification;
  */
 public class SecurityNotification extends UMOServerNotification
 {
-    public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 5951835321289699941L;
+
+	public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
     private static final transient String[] ACTIONS = new String[] { "authentication failed" };
 

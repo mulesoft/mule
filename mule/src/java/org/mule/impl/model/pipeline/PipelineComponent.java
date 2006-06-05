@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -34,9 +36,14 @@ import org.mule.umo.provider.DispatchException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PipelineComponent extends DirectComponent {
-
-    private Callable callable;
+public class PipelineComponent extends DirectComponent
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -2788210157354765190L;
+	
+	private Callable callable;
 
     public PipelineComponent(MuleDescriptor descriptor, UMOModel model) {
         super(descriptor, model);

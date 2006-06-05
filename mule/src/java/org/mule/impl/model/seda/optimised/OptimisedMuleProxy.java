@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -71,7 +73,8 @@ public class OptimisedMuleProxy implements MuleProxy
 
     private ComponentStatistics stat = null;
 
-    private QueueSession queueSession = null;
+    // Never read locally
+    // private QueueSession queueSession = null;
 
     private Callable umo;
 
@@ -151,7 +154,7 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     public void onEvent(QueueSession session, UMOEvent event)
     {
-        this.queueSession = session;
+        // this.queueSession = session;
         this.event = event;
     }
 

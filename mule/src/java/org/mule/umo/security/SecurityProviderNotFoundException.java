@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.UMOException;
  */
 public class SecurityProviderNotFoundException extends UMOException
 {
-    public SecurityProviderNotFoundException(String providerName)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 124630897095610595L;
+
+	public SecurityProviderNotFoundException(String providerName)
     {
         super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName));
     }

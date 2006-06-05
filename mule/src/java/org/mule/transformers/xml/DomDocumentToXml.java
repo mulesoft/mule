@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -22,7 +24,12 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class DomDocumentToXml extends AbstractXmlTransformer
 {
-    public DomDocumentToXml()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6452312203102491187L;
+
+	public DomDocumentToXml()
     {
         setReturnClass(String.class);
     }

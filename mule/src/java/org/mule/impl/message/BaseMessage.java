@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import java.util.Map;
  */
 public class BaseMessage implements Serializable
 {
-    protected Object message;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6105691921086093748L;
+
+	protected Object message;
 
     protected Map context;
 
@@ -92,12 +99,12 @@ public class BaseMessage implements Serializable
         return context;
     }
 
-    public void setProperty(String key, Object value)
+    public void setProperty(Object key, Object value)
     {
         context.put(key, value);
     }
 
-    public Object getProperty(String key)
+    public Object getProperty(Object key)
     {
         return context.get(key);
     }

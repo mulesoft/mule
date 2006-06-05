@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,6 +28,11 @@ import org.mule.config.i18n.Message;
 public class TransactionException extends UMOException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3470229644235978820L;
+
+	/**
      * @param message the exception message
      */
     public TransactionException(Message message)

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -31,7 +33,12 @@ import org.mule.umo.transformer.TransformerException;
 
 public class ObjectToXml extends AbstractXStreamTransformer
 {
-    public ObjectToXml()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 2231326110980980434L;
+
+	public ObjectToXml()
     {
         registerSourceType(Object.class);
     }

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,6 +27,11 @@ import org.mule.umo.UMOException;
 public class EndpointException extends UMOException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3219403251233216800L;
+
+	/**
      * @param message the exception message
      */
     public EndpointException(Message message)

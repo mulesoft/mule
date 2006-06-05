@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.UMOException;
 
 public class UnknownAuthenticationTypeException extends UMOException
 {
-    public UnknownAuthenticationTypeException(UMOAuthentication authentication)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 6275865761357999175L;
+
+	public UnknownAuthenticationTypeException(UMOAuthentication authentication)
     {
         super(new Message(Messages.AUTH_TYPE_NOT_RECOGNISED, (authentication == null ? "null"
                 : authentication.getClass().getName())));

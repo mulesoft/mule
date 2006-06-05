@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) Lajos Moczar. All rights reserved.
@@ -29,7 +31,12 @@ import java.util.Map;
  */
 public class ObjectToString extends AbstractTransformer
 {
-    public ObjectToString()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 1784548784479765795L;
+
+	public ObjectToString()
     {
         registerSourceType(Object.class);
         setReturnClass(String.class);

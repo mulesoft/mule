@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -23,7 +25,12 @@ import org.mule.umo.UMOException;
  */
 public class ConnectorException extends UMOException
 {
-    private transient UMOConnector connector;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 4729481487016346035L;
+	
+	private transient UMOConnector connector;
 
     /**
      * @param message the exception message

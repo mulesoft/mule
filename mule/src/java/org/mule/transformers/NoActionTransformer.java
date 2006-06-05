@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,8 +28,12 @@ import org.mule.umo.transformer.TransformerException;
  */
 public final class NoActionTransformer extends AbstractTransformer
 {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3777682742145612394L;
 
-    public NoActionTransformer()
+	public NoActionTransformer()
     {
         registerSourceType(Object.class);
         setReturnClass(Object.class);

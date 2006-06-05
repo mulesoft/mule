@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -21,7 +23,12 @@ package org.mule.tck.testmodels.fruit;
  */
 public class InvalidSatsuma implements Fruit
 {
-    private boolean bitten = false;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6328691504772842584L;
+	
+	private boolean bitten = false;
 
     /*
      * (non-Javadoc)

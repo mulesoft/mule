@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class ByteArrayToSerializable extends AbstractTransformer
 {
-    public ByteArrayToSerializable()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 5305641786345530597L;
+
+	public ByteArrayToSerializable()
     {
         registerSourceType(byte[].class);
     }

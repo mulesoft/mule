@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -20,8 +22,14 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class NotificationException extends UMOException {
+public class NotificationException extends UMOException
+{
     /**
+	 * Serial version 
+	 */
+	private static final long serialVersionUID = -5998352122311445746L;
+
+	/**
      * @param message the exception message
      */
     public NotificationException(Message message) {

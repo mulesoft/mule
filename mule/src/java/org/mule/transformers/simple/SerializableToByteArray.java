@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -32,7 +34,12 @@ import java.io.Serializable;
  */
 public class SerializableToByteArray extends AbstractEventAwareTransformer
 {
-    public SerializableToByteArray()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 8899970312989435192L;
+
+	public SerializableToByteArray()
     {
         registerSourceType(Serializable.class);
         registerSourceType(byte[].class);

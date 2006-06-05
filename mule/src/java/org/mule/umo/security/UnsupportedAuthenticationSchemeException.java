@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import org.mule.umo.UMOMessage;
  */
 public class UnsupportedAuthenticationSchemeException extends SecurityException
 {
-    public UnsupportedAuthenticationSchemeException(Message message, UMOMessage umoMessage)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3281021140543598680L;
+
+	public UnsupportedAuthenticationSchemeException(Message message, UMOMessage umoMessage)
     {
         super(message, umoMessage);
     }

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import java.io.Writer;
  */
 public class WriterMessageAdapter extends AbstractMessageAdapter
 {
-    private StringWriter writer;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1065602752454818625L;
+	
+	private StringWriter writer;
 
     public WriterMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

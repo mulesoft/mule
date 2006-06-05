@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,6 +28,11 @@ import org.mule.umo.endpoint.EndpointException;
 public class NoReceiverForEndpointException extends EndpointException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3954838511333933643L;
+
+	/**
      * @param endpoint the endpoint that could not be located
      */
     public NoReceiverForEndpointException(String endpoint)

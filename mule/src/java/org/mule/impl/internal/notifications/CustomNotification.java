@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -28,6 +30,11 @@ import org.mule.umo.manager.UMOServerNotification;
 public class CustomNotification extends UMOServerNotification
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 762448139858484536L;
+
+	/**
      * Creates a custom action event
      * 
      * @param message the message to associate with the event

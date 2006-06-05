@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import java.util.Map;
 
 public class ExceptionPayload implements UMOExceptionPayload
 {
-    private int code = 0;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -7114836033686599024L;
+	
+	private int code = 0;
     private String message = null;
     private Map info = null;
     private Throwable exception;

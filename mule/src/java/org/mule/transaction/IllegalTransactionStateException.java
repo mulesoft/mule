@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,6 +27,11 @@ import org.mule.config.i18n.Message;
 public class IllegalTransactionStateException extends TransactionStatusException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1062247038945694389L;
+
+	/**
      * @param message the exception message
      */
     public IllegalTransactionStateException(Message message)

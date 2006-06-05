@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,11 @@ import org.mule.umo.provider.UMOConnectable;
  */
 public class ConnectionNotification extends UMOServerNotification
 {
-    public static final int CONNECTION_CONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 1;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6455441938378523145L;
+	public static final int CONNECTION_CONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 1;
     public static final int CONNECTION_FAILED = CONNECTION_EVENT_ACTION_START_RANGE + 2;
     public static final int CONNECTION_DISCONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 3;
 

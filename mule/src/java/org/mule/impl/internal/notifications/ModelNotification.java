@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import org.mule.umo.model.UMOModel;
  */
 public class ModelNotification extends UMOServerNotification implements BlockingServerEvent
 {
-    public static final int MODEL_INITIALISING = MODEL_EVENT_ACTION_START_RANGE + 1;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1954880336427554435L;
+	
+	public static final int MODEL_INITIALISING = MODEL_EVENT_ACTION_START_RANGE + 1;
     public static final int MODEL_INITIALISED = MODEL_EVENT_ACTION_START_RANGE + 2;
     public static final int MODEL_INITIALISING_LISTENERS = MODEL_EVENT_ACTION_START_RANGE + 3;
     public static final int MODEL_INITIALISED_LISTENERS = MODEL_EVENT_ACTION_START_RANGE + 4;

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -11,13 +13,13 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.TransformerException;
-import org.w3c.dom.Document;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+
+import org.mule.umo.transformer.TransformerException;
+import org.w3c.dom.Document;
 
 /**
  * <code>XmlToDomDocument</code> Transform a XML String to
@@ -29,8 +31,12 @@ import javax.xml.transform.TransformerFactory;
  */
 public class XmlToDomDocument extends AbstractXmlTransformer
 {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 5056464684549099908L;
 
-    public XmlToDomDocument()
+	public XmlToDomDocument()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
@@ -45,7 +51,9 @@ public class XmlToDomDocument extends AbstractXmlTransformer
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
             ResultHolder holder = getResultHolder(returnClass);
-            if (holder == null) holder = getResultHolder(Document.class);
+            if (holder == null) holder = getResultHolder(Document.class); 
+
+            assert(holder != null);
 
             Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
             idTransformer.setOutputProperty(OutputKeys.ENCODING,encoding);

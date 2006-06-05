@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -23,7 +25,12 @@ import org.mule.umo.lifecycle.FatalException;
  */
 public class FatalConnectException extends FatalException
 {
-    public FatalConnectException(Message message, Object component)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3300563235465630595L;
+
+	public FatalConnectException(Message message, Object component)
     {
         super(message, component);
     }

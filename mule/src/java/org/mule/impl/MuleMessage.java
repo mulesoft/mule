@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -34,7 +36,12 @@ import java.util.Set;
 
 public class MuleMessage implements UMOMessage
 {
-    private UMOMessageAdapter adapter;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 1541720810851984842L;
+
+	private UMOMessageAdapter adapter;
 
     protected UMOExceptionPayload exceptionPayload;
 

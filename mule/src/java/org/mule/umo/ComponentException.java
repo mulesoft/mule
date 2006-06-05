@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -23,7 +25,12 @@ import org.mule.config.i18n.Messages;
  */
 public class ComponentException extends MessagingException
 {
-    private transient UMOComponent component;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 56178344205041599L;
+	
+	private transient UMOComponent component;
 
     /**
      * @param message the exception message

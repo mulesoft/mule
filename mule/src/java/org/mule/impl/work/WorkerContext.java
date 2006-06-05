@@ -71,7 +71,8 @@ public class WorkerContext implements Work
     /**
      * Indicates if this work has been accepted.
      */
-    private boolean isAccepted;
+    // Never read locally
+    // private boolean isAccepted;
 
     /**
      * System.currentTimeMillis() when the wrapped Work has been accepted.
@@ -192,7 +193,7 @@ public class WorkerContext implements Work
      */
     public synchronized void workAccepted(Object anObject)
     {
-        isAccepted = true;
+        // isAccepted = true;
         acceptedTime = System.currentTimeMillis();
         workListener.workAccepted(new WorkEvent(anObject, WorkEvent.WORK_ACCEPTED, worker, null));
     }

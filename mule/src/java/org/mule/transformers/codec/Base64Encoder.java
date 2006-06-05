@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -27,8 +29,12 @@ import org.mule.util.Base64;
  */
 public class Base64Encoder extends AbstractTransformer
 {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 7742396053840854720L;
 
-    public Base64Encoder()
+	public Base64Encoder()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -20,13 +22,20 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class UMOSpaceException extends UMOException {
+public class UMOSpaceException extends UMOException
+{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6618481719989683929L;
 
-    public UMOSpaceException(Message message) {
+	public UMOSpaceException(Message message)
+    {
         super(message);
     }
 
-    public UMOSpaceException(Message message, Throwable cause) {
+    public UMOSpaceException(Message message, Throwable cause)
+    {
         super(message, cause);
     }
 }

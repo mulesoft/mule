@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -178,7 +180,12 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
     private class TestEventTransformer extends AbstractTransformer
     {
-        /*
+        /**
+		 * Serial version
+		 */
+		private static final long serialVersionUID = -5380460875991797254L;
+
+		/*
          * (non-Javadoc)
          * 
          * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)

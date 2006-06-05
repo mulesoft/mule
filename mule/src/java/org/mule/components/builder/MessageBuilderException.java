@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,13 @@ import org.mule.umo.UMOMessage;
  */
 public class MessageBuilderException extends MessagingException
 {
-    public MessageBuilderException(Message message, UMOMessage umoMessage) {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 1144140732378649625L;
+
+
+	public MessageBuilderException(Message message, UMOMessage umoMessage) {
         super(message, umoMessage);
     }
 

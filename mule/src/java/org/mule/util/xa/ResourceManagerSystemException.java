@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -22,6 +24,11 @@ public class ResourceManagerSystemException extends ResourceManagerException
 {
 
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 1202058044460490597L;
+
+	/**
      * 
      */
     public ResourceManagerSystemException()

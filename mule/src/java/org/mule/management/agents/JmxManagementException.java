@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import javax.management.ObjectName;
  */
 public class JmxManagementException extends ManagementException
 {
-    private ObjectName objectName;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 7912469454512394420L;
+	
+	private ObjectName objectName;
 
     /**
      * @param message the exception message

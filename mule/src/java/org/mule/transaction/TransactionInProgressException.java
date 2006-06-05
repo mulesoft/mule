@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,8 +27,12 @@ import org.mule.config.i18n.Message;
  */
 public class TransactionInProgressException extends TransactionStatusException
 {
-
     /**
+	 * Serial version 
+	 */
+	private static final long serialVersionUID = -6041127507191183323L;
+
+	/**
      * @param message the exception message
      */
     public TransactionInProgressException(Message message)

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -30,7 +32,12 @@ import java.rmi.RemoteException;
  */
 public class DummyEjbBean implements SessionBean, DummyEjb
 {
-    public void ejbActivate() throws EJBException
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1521532107372250896L;
+
+	public void ejbActivate() throws EJBException
     {
         // nothing to do
     }

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -21,7 +23,12 @@ import java.io.Serializable;
  */
 public class Message implements Serializable
 {
-    public static final int STATIC_ERROR_CODE = -1;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6109760447384477924L;
+
+	public static final int STATIC_ERROR_CODE = -1;
 
     private static final transient Object[] EMPTY_ARGS = new Object[] {};
 

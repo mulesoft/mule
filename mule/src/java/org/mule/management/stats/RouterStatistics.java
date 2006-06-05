@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -31,7 +33,12 @@ import java.util.Map;
 public class RouterStatistics implements Statistics
 {
 
-    public static final int TYPE_INBOUND = 1;
+    /**
+	 * Serial version 
+	 */
+	private static final long serialVersionUID = 4540482357430845065L;
+	
+	public static final int TYPE_INBOUND = 1;
     public static final int TYPE_OUTBOUND = 2;
     public static final int TYPE_RESPONSE = 3;
 

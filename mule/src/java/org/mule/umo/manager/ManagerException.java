@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,6 +26,11 @@ import org.mule.umo.UMOException;
 public class ManagerException extends UMOException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1526680893293714180L;
+
+	/**
      * @param message the exception message
      */
     public ManagerException(Message message)

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -28,7 +30,12 @@ import java.io.OutputStream;
  */
 public class OutStreamMessageAdapter extends AbstractMessageAdapter
 {
-    private OutputStream out;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -299373598028203772L;
+	
+	private OutputStream out;
 
     public OutStreamMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

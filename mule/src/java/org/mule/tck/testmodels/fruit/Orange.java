@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,6 +28,11 @@ import java.util.Map;
 public class Orange implements Fruit, Callable
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 2556604671068150589L;
+
+	/**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(Orange.class);

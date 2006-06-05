@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
  */
 public class ResponseTimeoutException extends RoutingException
 {
-    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 6882278747922113239L;
+
+	public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }

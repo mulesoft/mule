@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.UMOException;
  */
 public class EncryptionStrategyNotFoundException extends UMOException
 {
-    public EncryptionStrategyNotFoundException(String strategyName)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3916371211189075139L;
+
+	public EncryptionStrategyNotFoundException(String strategyName)
     {
         super(new Message(Messages.AUTH_NO_ENCRYPTION_STRATEGY_X, strategyName));
     }

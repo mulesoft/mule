@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -28,7 +30,12 @@ import java.io.UnsupportedEncodingException;
  */
 public class UUDecoder extends AbstractTransformer
 {
-    private sun.misc.UUDecoder decoder;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3570019318835185793L;
+	
+	private sun.misc.UUDecoder decoder;
 
     public UUDecoder()
     {

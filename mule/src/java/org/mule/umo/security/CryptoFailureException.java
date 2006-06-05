@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -29,7 +31,12 @@ import org.mule.umo.UMOEncryptionStrategy;
  */
 public class CryptoFailureException extends MuleException
 {
-    private transient UMOEncryptionStrategy encryptionStrategy;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 1336343718508294379L;
+	
+	private transient UMOEncryptionStrategy encryptionStrategy;
 
     public CryptoFailureException(Message message, UMOEncryptionStrategy strategy)
     {

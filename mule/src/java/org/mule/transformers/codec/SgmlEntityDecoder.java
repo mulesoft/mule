@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import java.io.UnsupportedEncodingException;
  */
 public class SgmlEntityDecoder extends AbstractTransformer
 {
-    public SgmlEntityDecoder()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 7958646035249197129L;
+
+	public SgmlEntityDecoder()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

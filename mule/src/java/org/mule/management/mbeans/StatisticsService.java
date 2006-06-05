@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -31,6 +33,11 @@ import java.util.Collection;
 public class StatisticsService implements StatisticsServiceMBean
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -4949499389883146363L;
+
+	/**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(StatisticsService.class);

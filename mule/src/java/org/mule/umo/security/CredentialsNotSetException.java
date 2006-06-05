@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  */
 public class CredentialsNotSetException extends UnauthorisedException
 {
-    public CredentialsNotSetException(Message message, UMOMessage umoMessage)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6271648179641734579L;
+
+	public CredentialsNotSetException(Message message, UMOMessage umoMessage)
     {
         super(message, umoMessage);
     }

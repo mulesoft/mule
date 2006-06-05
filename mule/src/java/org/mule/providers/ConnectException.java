@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -23,7 +25,12 @@ import org.mule.umo.lifecycle.InitialisationException;
  */
 public class ConnectException extends InitialisationException
 {
-    public ConnectException(Message message, Object component)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -7802483584780922653L;
+
+	public ConnectException(Message message, Object component)
     {
         super(message, component);
     }

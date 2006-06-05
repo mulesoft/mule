@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import org.mule.util.StringMessageUtils;
 
 public class StringToByteArray extends AbstractTransformer
 {
-    public StringToByteArray()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3993746463869846673L;
+
+	public StringToByteArray()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

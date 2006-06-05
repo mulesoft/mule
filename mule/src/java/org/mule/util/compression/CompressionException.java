@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -22,8 +24,12 @@ import java.io.IOException;
  */
 public class CompressionException extends IOException
 {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 8587532237749889185L;
 
-    public CompressionException(String message)
+	public CompressionException(String message)
     {
         super(message);
     }

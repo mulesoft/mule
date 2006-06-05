@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -21,8 +23,14 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class RegistryException extends UMOException {
-    public RegistryException(Message message) {
+public class RegistryException extends UMOException
+{
+    /**
+	 * Serial version 
+	 */
+	private static final long serialVersionUID = 7362073316934744362L;
+
+	public RegistryException(Message message) {
         super(message);
     }
 

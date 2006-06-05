@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.UMOMessage;
 
 public class EncryptionNotSupportedException extends SecurityException
 {
-    public EncryptionNotSupportedException(Message message, UMOMessage umoMessage)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1661059380853528623L;
+
+	public EncryptionNotSupportedException(Message message, UMOMessage umoMessage)
     {
         super(message, umoMessage);
     }

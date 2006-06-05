@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,6 +28,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 public class AlreadyInitialisedException extends InitialisationException
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3121894155097428317L;
+
+	/**
      * @param object the object that has been initialised and cannot be
      *            initialised again
      */

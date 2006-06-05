@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -32,9 +34,14 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DirectComponent extends AbstractComponent {
-
-    protected List interceptorList = null;
+public class DirectComponent extends AbstractComponent
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -8590955440156945732L;
+	
+	protected List interceptorList = null;
     protected MuleProxy proxy;
 
     public DirectComponent(MuleDescriptor descriptor, UMOModel model) {

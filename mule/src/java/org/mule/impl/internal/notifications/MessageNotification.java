@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -29,6 +31,11 @@ import org.mule.umo.provider.UMOConnectable;
 public class MessageNotification extends UMOServerNotification
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -5118299601117624094L;
+
+	/**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(MessageNotification.class);

@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -18,7 +20,12 @@ import org.mule.umo.transformer.TransformerException;
 
 public class ObjectToFruitLover extends AbstractTransformer
 {
-    public ObjectToFruitLover()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6760497986912711312L;
+
+	public ObjectToFruitLover()
     {
         this.setReturnClass(FruitLover.class);
         this.registerSourceType(String.class);

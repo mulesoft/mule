@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import java.io.IOException;
  */
 public class GZipUncompressTransformer extends GZipCompressTransformer
 {
-    public GZipUncompressTransformer()
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -861180612454404077L;
+
+	public GZipUncompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());

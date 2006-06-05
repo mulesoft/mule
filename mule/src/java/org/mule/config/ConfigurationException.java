@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
@@ -21,7 +23,12 @@ import org.mule.config.i18n.Message;
  */
 public class ConfigurationException extends MuleException
 {
-    public ConfigurationException(Message message)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 3658822340943734960L;
+
+	public ConfigurationException(Message message)
     {
         super(message);
     }

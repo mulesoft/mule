@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -22,7 +24,12 @@ import org.mule.umo.security.CryptoFailureException;
  */
 public class DecryptionTransformer extends AbstractEncryptionTransformer
 {
-    protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3691559476636732445L;
+
+	protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
     {
         return getStrategy().decrypt(buffer, null);
     }

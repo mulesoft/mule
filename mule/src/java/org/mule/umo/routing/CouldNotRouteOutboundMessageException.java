@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,7 +27,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 public class CouldNotRouteOutboundMessageException extends RoutingException
 {
-    public CouldNotRouteOutboundMessageException(UMOMessage message, UMOEndpoint endpoint)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 4609966704030524482L;
+
+	public CouldNotRouteOutboundMessageException(UMOMessage message, UMOEndpoint endpoint)
     {
         super(message, endpoint);
     }

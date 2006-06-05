@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -22,9 +24,15 @@ import org.mule.umo.space.UMOSpaceException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SpaceActionInteruptedException extends UMOSpaceException {
+public class SpaceActionInteruptedException extends UMOSpaceException
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -3326367296473936593L;
 
-    public SpaceActionInteruptedException(String action, InterruptedException cause) {
+	public SpaceActionInteruptedException(String action, InterruptedException cause)
+    {
         super(new Message(Messages.SPACE_ACTION_X_INTERRUPTED, action), cause);
     }
 }

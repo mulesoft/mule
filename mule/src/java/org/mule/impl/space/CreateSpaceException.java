@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -21,8 +23,15 @@ import org.mule.umo.space.UMOSpaceException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CreateSpaceException extends UMOSpaceException {
-    public CreateSpaceException(Throwable cause) {
+public class CreateSpaceException extends UMOSpaceException
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 6138791159382128699L;
+
+	public CreateSpaceException(Throwable cause)
+    {
         super(new Message(Messages.SPACE_FAILED_TO_CREATE), cause);
     }
 }

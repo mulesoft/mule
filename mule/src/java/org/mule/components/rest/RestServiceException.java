@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,7 +26,12 @@ import org.mule.umo.UMOMessage;
  */
 public class RestServiceException extends MessagingException
 {
-    public RestServiceException(Message message, UMOMessage umoMessage) {
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -1026055907767407433L;
+
+	public RestServiceException(Message message, UMOMessage umoMessage) {
         super(message, umoMessage);
     }
 

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -25,9 +27,13 @@ import java.io.OutputStream;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StreamMessageAdapter extends AbstractMessageAdapter {
-
-    protected InputStream in;
+public class StreamMessageAdapter extends AbstractMessageAdapter
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 6794965828515586752L;
+	protected InputStream in;
     protected InputStream response;
     protected OutputStream out;
     protected OutputHandler handler;

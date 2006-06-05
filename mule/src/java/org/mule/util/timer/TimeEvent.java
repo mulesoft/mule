@@ -1,5 +1,7 @@
 /* 
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,6 +26,11 @@ import java.util.EventObject;
 public class TimeEvent extends EventObject
 {
     /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -7540426406525372393L;
+
+	/**
      * The event name
      */
     private String name;

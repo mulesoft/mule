@@ -1,5 +1,7 @@
 /* 
-* $Id$
+* $Header$
+* $Revision$
+* $Date$
 * ------------------------------------------------------------------------------------------------------
 * 
 * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,8 +26,14 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ValidationException extends RegistryException {
-    public ValidationException(String vaildationError) {
+public class ValidationException extends RegistryException
+{
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -8798792301579785598L;
+
+	public ValidationException(String vaildationError) {
         super(Message.createStaticMessage(vaildationError));
     }
 

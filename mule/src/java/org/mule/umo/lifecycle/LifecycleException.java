@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.umo.UMOException;
 
 public class LifecycleException extends UMOException
 {
-    private transient Object component;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = 2909614055858287394L;
+	
+	private transient Object component;
 
     /**
      * @param message

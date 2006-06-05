@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -159,11 +161,17 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         // no methods
     }
 
-    public class DummyNotification extends CustomNotification {
+    public class DummyNotification extends CustomNotification
+    {
+        /**
+		 * Serial version 
+		 */
+		private static final long serialVersionUID = -1117307108932589331L;
+		
+		public static final int EVENT_RECEIVED = -999999;
 
-        public static final int EVENT_RECEIVED = -999999;
-
-        public DummyNotification(String message, int action) {
+        public DummyNotification(String message, int action)
+        {
             super(message, action);
             resourceIdentifier = message;
         }

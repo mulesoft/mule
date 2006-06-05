@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,11 @@ import java.util.Map;
 
 public class AdminNotification extends UMOServerNotification
 {
-    public static final int ACTION_RECEIVE = ADMIN_EVENT_ACTION_START_RANGE + 1;
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -53091546441476249L;
+	public static final int ACTION_RECEIVE = ADMIN_EVENT_ACTION_START_RANGE + 1;
     public static final int ACTION_DISPATCH = ADMIN_EVENT_ACTION_START_RANGE + 2;
     public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
     public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;

@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -26,7 +28,12 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class UnauthorisedException extends SecurityException
 {
-    public UnauthorisedException(Message message)
+    /**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -6664384216189042672L;
+
+	public UnauthorisedException(Message message)
     {
         super(message, RequestContext.getEventContext().getMessage());
     }
