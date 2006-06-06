@@ -543,14 +543,17 @@ public abstract class AbstractConnector
         }
 
         String endpointUriKey = endpoint.getEndpointURI().toString();
-        UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
 
-        if (dispatcher == null || dispatcher.isDisposed()) {
-            dispatcher = createDispatcher(endpoint);
-            dispatchers.put(endpointUriKey, dispatcher);
+        synchronized (endpointUriKey) {
+            UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
+    
+            if (dispatcher == null || dispatcher.isDisposed()) {
+                dispatcher = createDispatcher(endpoint);
+                dispatchers.put(endpointUriKey, dispatcher);
+            }
+
+            return dispatcher;
         }
-
-        return dispatcher;
     }
 
     protected void checkDisposed() throws DisposeException
