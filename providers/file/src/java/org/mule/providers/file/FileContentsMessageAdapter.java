@@ -21,16 +21,20 @@ import org.mule.umo.MessagingException;
 import java.io.File;
 
 /**
- * <code>FileContentsMessageAdapter</code> provides a wrapper for file data. Users
- * can obtain the contents of the message through the payload property and can get
- * the filename and directory in the properties using PROPERTY_FILENAME and
- * PROPERTY_DIRECTORY.
+ * <code>FileContentsMessageAdapter</code> provides a wrapper for file data.
+ * Users can obtain the contents of the message through the payload property and
+ * can get the filename and directory in the properties using PROPERTY_FILENAME
+ * and PROPERTY_DIRECTORY.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class FileContentsMessageAdapter extends FileMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7368719494535568721L;
 
     public FileContentsMessageAdapter(Object message) throws MessagingException
     {
@@ -40,7 +44,8 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
     protected void setMessage(File message) throws MessagingException
     {
         super.setMessage(message);
-        // force reading of file (lazy loading would be really, really complicated)
+        // force reading of file (lazy loading would be really, really
+        // complicated)
         this.getPayload();
     }
 
@@ -51,13 +56,15 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
      */
     public Object getPayload()
     {
-        synchronized (this) {
-            try {
+        synchronized (this)
+        {
+            try
+            {
                 return this.getPayloadAsBytes();
-            }
-            catch (Exception noPayloadException) {
-                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
-                        noPayloadException);
+            } catch (Exception noPayloadException)
+            {
+                throw new MuleRuntimeException(new Message(
+                        Messages.FAILED_TO_READ_PAYLOAD), noPayloadException);
             }
         }
     }

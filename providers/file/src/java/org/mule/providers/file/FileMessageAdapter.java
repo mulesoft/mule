@@ -35,19 +35,27 @@ import java.io.File;
  */
 public class FileMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -7537351654335754190L;
+
     private FileToByteArray transformer = new FileToByteArray();
 
     private File file = null;
+
     private byte[] contents = null;
 
     public FileMessageAdapter(Object message) throws MessagingException
     {
         super();
 
-        if (message instanceof File) {
-            this.setMessage((File)message);
+        if (message instanceof File)
+        {
+            this.setMessage((File) message);
         }
-        else {
+        else
+        {
             throw new MessageTypeNotSupportedException(message, this.getClass());
         }
     }
@@ -69,15 +77,20 @@ public class FileMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        synchronized (this) {
-            if (contents == null) {
-                try {
+        synchronized (this)
+        {
+            if (contents == null)
+            {
+                try
+                {
                     // TODO unfortunately reading the file here is required,
-                    // since otherwise the FileMessageReceiver might delete the file
-                    this.contents = (byte[])transformer.transform(file);
-                }
-                catch (Exception noPayloadException) {
-                    throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
+                    // since otherwise the FileMessageReceiver might delete the
+                    // file
+                    this.contents = (byte[]) transformer.transform(file);
+                } catch (Exception noPayloadException)
+                {
+                    throw new MuleException(new Message(
+                            Messages.FAILED_TO_READ_PAYLOAD),
                             noPayloadException);
                 }
             }
@@ -98,7 +111,8 @@ public class FileMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        synchronized (this) {
+        synchronized (this)
+        {
             return new String(this.getPayloadAsBytes(), encoding);
         }
     }
@@ -113,39 +127,46 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         boolean fileIsValid;
         Exception fileInvalidException;
 
-        try {
+        try
+        {
             fileIsValid = (message != null && message.isFile());
             fileInvalidException = null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex)
+        {
             // save any file access exceptions
             fileInvalidException = ex;
             fileIsValid = false;
         }
 
-        if (!fileIsValid) {
+        if (!fileIsValid)
+        {
             Object exceptionArg;
 
-            if (fileInvalidException != null) {
+            if (fileInvalidException != null)
+            {
                 exceptionArg = fileInvalidException;
             }
-            else {
+            else
+            {
                 exceptionArg = ObjectUtils.toString(message, "null");
             }
 
-            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST, ObjectUtils.toString(message,
-                    "null"));
+            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST,
+                    ObjectUtils.toString(message, "null"));
 
             throw new MessagingException(msg, exceptionArg);
         }
 
         this.file = message;
         this.contents = null;
-        this.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
-        this.setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
+        this.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file
+                .getName());
+        this.setProperty(FileConnector.PROPERTY_DIRECTORY, this.file
+                .getParent());
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
         return file.getAbsolutePath();
     }
 

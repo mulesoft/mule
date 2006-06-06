@@ -30,25 +30,36 @@ import java.io.IOException;
  */
 public class FileToByteArray extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2836878450595052607L;
+
     public FileToByteArray()
     {
         registerSourceType(File.class);
         setReturnClass(byte[].class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String encoding)
+            throws TransformerException
     {
-        File file = (File)src;
+        File file = (File) src;
 
-        if (file == null) {
-            throw new TransformerException(this, new IllegalArgumentException("null file"));
+        if (file == null)
+        {
+            throw new TransformerException(this, new IllegalArgumentException(
+                    "null file"));
         }
 
-        if (!file.exists()) {
-            throw new TransformerException(this, new FileNotFoundException(file.getPath()));
+        if (!file.exists())
+        {
+            throw new TransformerException(this, new FileNotFoundException(file
+                    .getPath()));
         }
 
-        if (file.length() == 0) {
+        if (file.length() == 0)
+        {
             logger.warn("File is empty: " + file.getAbsolutePath());
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
@@ -56,22 +67,25 @@ public class FileToByteArray extends AbstractTransformer
         FileInputStream fis = null;
         byte[] bytes = null;
 
-        try {
+        try
+        {
             fis = new FileInputStream(file);
-            // TODO Attention: arbitrary 4GB limit & also a great way to reap OOMs
+            // TODO Attention: arbitrary 4GB limit & also a great way to reap
+            // OOMs
             int length = new Long(file.length()).intValue();
             bytes = new byte[length];
             fis.read(bytes);
             return bytes;
         }
         // at least try..
-        catch (OutOfMemoryError oom) {
+        catch (OutOfMemoryError oom)
+        {
             throw new TransformerException(this, oom);
-        }
-        catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new TransformerException(this, e);
-        }
-        finally {
+        } finally
+        {
             IOUtils.closeQuietly(fis);
         }
     }

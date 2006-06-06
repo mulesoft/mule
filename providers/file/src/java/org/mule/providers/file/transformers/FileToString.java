@@ -27,6 +27,11 @@ import java.io.UnsupportedEncodingException;
  */
 public class FileToString extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5376852963195290731L;
+
     public FileToString()
     {
         registerSourceType(File.class);
@@ -35,41 +40,58 @@ public class FileToString extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String encoding)
+            throws TransformerException
     {
-        if (src instanceof byte[]) {
-            if (encoding != null) {
-                try {
-                  return new String((byte[]) src, encoding);
-                } catch (UnsupportedEncodingException ex){
-                  return new String((byte[]) src);
+        if (src instanceof byte[])
+        {
+            if (encoding != null)
+            {
+                try
+                {
+                    return new String((byte[]) src, encoding);
+                } catch (UnsupportedEncodingException ex)
+                {
+                    return new String((byte[]) src);
                 }
-              } else {
+            }
+            else
+            {
                 return new String((byte[]) src);
-              }
+            }
         }
-        if (src instanceof String) {
+        if (src instanceof String)
+        {
             return src.toString();
         }
 
-        StringBuffer sb = new StringBuffer(new Long(((File) src).length()).intValue());
+        StringBuffer sb = new StringBuffer(new Long(((File) src).length())
+                .intValue());
         char[] buf = new char[1024 * 8];
         FileReader fr = null;
-        try {
+        try
+        {
             fr = new FileReader((File) src);
             int read = 0;
-            while ((read = fr.read(buf)) >= 0) {
+            while ((read = fr.read(buf)) >= 0)
+            {
                 sb.append(buf, 0, read);
             }
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new TransformerException(this, e);
-        } finally {
-            try {
-                if (fr != null) {
+        } finally
+        {
+            try
+            {
+                if (fr != null)
+                {
                     fr.close();
                 }
-            } catch (IOException e) {
-                logger.debug("Failed to close reader in transformer: " + e.getMessage());
+            } catch (IOException e)
+            {
+                logger.debug("Failed to close reader in transformer: "
+                        + e.getMessage());
             }
         }
 
