@@ -542,9 +542,8 @@ public abstract class AbstractConnector
             throw new IllegalStateException("Dispatchers are null for connector: " + name);
         }
 
-        String endpointUriKey = endpoint.getEndpointURI().toString();
-
-        synchronized (endpointUriKey) {
+        synchronized (endpoint) {
+            String endpointUriKey = endpoint.getEndpointURI().toString();
             UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
     
             if (dispatcher == null || dispatcher.isDisposed()) {
