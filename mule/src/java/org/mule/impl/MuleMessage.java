@@ -35,11 +35,11 @@ import java.util.Set;
 public class MuleMessage implements UMOMessage
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 1541720810851984842L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1541720810851984842L;
 
-	private UMOMessageAdapter adapter;
+    private UMOMessageAdapter adapter;
 
     protected UMOExceptionPayload exceptionPayload;
 
