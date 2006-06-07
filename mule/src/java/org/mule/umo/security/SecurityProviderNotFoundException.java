@@ -26,11 +26,11 @@ import org.mule.umo.UMOException;
 public class SecurityProviderNotFoundException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 124630897095610595L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 124630897095610595L;
 
-	public SecurityProviderNotFoundException(String providerName)
+    public SecurityProviderNotFoundException(String providerName)
     {
         super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName));
     }
