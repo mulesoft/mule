@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * <code>Multicaster</code> is a utility that can call a given method on a
- * collection of objects that implement one or more common interfaces. Thecreate
+ * collection of objects that implement one or more common interfaces. The create
  * method returns a proxy that can be cast to any of the the interfaces passed
  * and be used like a single object.
  * 
@@ -76,7 +76,7 @@ public class Multicaster
         {
             List results = new ArrayList();
             Object item = null;
-            Object result = null;
+            Object result;
             for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
                 try {
                     item = iterator.next();
