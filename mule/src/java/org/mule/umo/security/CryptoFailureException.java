@@ -30,11 +30,11 @@ import org.mule.umo.UMOEncryptionStrategy;
 public class CryptoFailureException extends MuleException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 1336343718508294379L;
-	
-	private transient UMOEncryptionStrategy encryptionStrategy;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1336343718508294379L;
+
+    private transient UMOEncryptionStrategy encryptionStrategy;
 
     public CryptoFailureException(Message message, UMOEncryptionStrategy strategy)
     {
