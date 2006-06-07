@@ -17,6 +17,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
@@ -332,7 +333,7 @@ public class ThreadingProfile
     {
         private String name;
         private int priority;
-        private int counter = 1;
+        private AtomicLong counter = new AtomicLong(1);
 
         public NamedThreadFactory(String name, int priority)
         {
@@ -342,7 +343,7 @@ public class ThreadingProfile
 
         public Thread newThread(Runnable runnable)
         {
-            Thread t = new Thread(runnable, name + "." + counter++);
+            Thread t = new Thread(runnable, name + '.' + counter.getAndIncrement());
             t.setPriority(priority);
             return t;
         }
