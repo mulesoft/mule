@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -74,7 +76,7 @@ import java.util.Properties;
  * <li>Currently there is no HttpSession support. This will be fixed when
  * Session support is added to the Http Connector</li>
  * </ol>
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -86,6 +88,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     protected static transient Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
 
+    private static Log tlog = LogFactory.getLog("org.apache.axis.TIME");
     private static Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
     public static final String INIT_PROPERTY_TRANSPORT_NAME = "transport.name";
     public static final String INIT_PROPERTY_USE_SECURITY = "use-servlet-security";
@@ -106,7 +109,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     /**
      * Passes the context to the listener
-     * 
+     *
      * @param context the context to process
      * @return Object this object can be anything. When the
      *         <code>UMOLifecycleAdapter</code> for the component receives
@@ -493,8 +496,13 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
 
             Object request = context.getTransformedMessage();
-            Message requestMsg = new Message((request instanceof File) ? new FileInputStream((File) request) :
-                                             request,
+            if(request instanceof File) {
+                request = new FileInputStream((File) request);
+            } else if(request instanceof byte[]) {
+                request = new ByteArrayInputStream((byte[])request);
+            }
+
+            Message requestMsg = new Message(request,
                                              false,
                                              context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_TYPE, null),
                                              context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_LOCATION, null));
@@ -658,7 +666,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             String servicePath = (String) service.getOption("servicePath");
             if(StringUtils.isEmpty(endpointUri.getPath())) {
                 if(!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName)) {
-                    throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());                    
+                    throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());
                 }
             } else if (!endpointUri.getPath().startsWith(servicePath + serviceName)) {
                 throw new AxisFault("Failed to find service: " + endpointUri.getPath());
@@ -782,5 +790,6 @@ public class AxisServiceComponent implements Initialisable, Callable
     public void setAxisServer(AxisServer axisServer)
     {
         this.axisServer = axisServer;
+     
     }
 }

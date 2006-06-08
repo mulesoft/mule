@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -16,6 +18,7 @@ import org.apache.axis.AxisProperties;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.configuration.FileProvider;
@@ -157,6 +160,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         Object method = event.getMessage().getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
         if (method == null) {
+            method = event.getEndpoint().getEndpointURI().getParams().getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+        }
+        if (method == null) {
             throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
                     event.getEndpoint());
         } else if(method instanceof SoapMethod) {
@@ -295,6 +301,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         else {
             call.setSOAPActionURI(endpointUri.getAddress());
         }
+
+        //Add any attachments to the call
+        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();) {
+            String name = (String)iterator.next();
+            DataHandler dh = event.getMessage().getAttachment(name);
+            AttachmentPart part = new AttachmentPart(dh);
+            call.addAttachmentPart(part);
+        }
         return call;
     }
 
@@ -322,7 +336,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return args;
     }
 
-    private void setMessageContextProperties(UMOMessage message, MessageContext ctx)
+    protected void setMessageContextProperties(UMOMessage message, MessageContext ctx)
     {
         String temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         if (StringUtils.isNotBlank(temp)) {
@@ -342,9 +356,16 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    protected void setMessageContextAttachments(UMOMessage message, MessageContext ctx) throws Exception {
+        int x=0;
+        for (Iterator iterator = ctx.getMessage().getAttachments(); iterator.hasNext();x++) {
+            message.addAttachment(String.valueOf(x), ((AttachmentPart)iterator.next()).getActivationDataHandler());
+        }
+    }
+
     /**
      * Make a specific request to the underlying transport
-     * 
+     *
      * @param endpoint
      *            the endpoint to use when connecting to the resource
      * @param timeout

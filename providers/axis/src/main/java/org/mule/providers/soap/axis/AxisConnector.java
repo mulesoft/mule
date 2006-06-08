@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -46,7 +48,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 
 import javax.xml.namespace.QName;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -332,36 +333,38 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
         }
 
-        boolean sync = receiver.getEndpoint().isSynchronous();
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
-            // if we are using a socket based endpointUri make sure it is
-            // running synchronously by default unless the user has specifically set it
-            if(!receiver.getEndpoint().isSynchronousSet()) {
+        //Default to using synchronous for socket based protocols unless the
+        //synchronous property has been set explicitly
+        boolean sync = false;
+        if(!receiver.getEndpoint().isSynchronousSet()) {
+            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
                 sync = true;
             }
+        } else {
+            sync = receiver.getEndpoint().isSynchronous();
         }
 
-            UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
-            serviceEndpoint.setSynchronous(sync);
-            serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
-            // set the filter on the axis endpoint on the real receiver endpoint
-            serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
-            //Remove the Axis filter now
-            receiver.getEndpoint().setFilter(null);
+        UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
+        serviceEndpoint.setSynchronous(sync);
+        serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
+        // set the filter on the axis endpoint on the real receiver endpoint
+        serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
+        //Remove the Axis filter now
+        receiver.getEndpoint().setFilter(null);
 
-            // set the Security filter on the axis endpoint on the real receiver endpoint
-            serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
-            //Remove the Axis Receiver Security filter now
-            receiver.getEndpoint().setSecurityFilter(null);
+        // set the Security filter on the axis endpoint on the real receiver endpoint
+        serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        //Remove the Axis Receiver Security filter now
+        receiver.getEndpoint().setSecurityFilter(null);
 
-            if(receiver.getEndpoint().getTransformer()!=null) {
-                serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-                receiver.getEndpoint().setTransformer(null);
-            }
-            //propagate properties to the service endpoint
-            serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
+        if(receiver.getEndpoint().getTransformer()!=null) {
+            serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+            receiver.getEndpoint().setTransformer(null);
+        }
+        //propagate properties to the service endpoint
+        serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
 
-            axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
+        axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
 
     }
 

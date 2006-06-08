@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -24,13 +26,12 @@ import org.mule.umo.transformer.UMOTransformer;
 import javax.activation.DataHandler;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-
 import java.util.Iterator;
 
 /**
  * <code>AxisMessageAdapter</code> wraps a soap message.  The payload of the adapter is the raw message received
  * from the transport, but you also have access to the SOAPMessage object by using <code>adapter.getSOAPMessage()</code>
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -74,7 +75,8 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
                     logger.fatal("Failed to read attachments", e);
                 }
             } else {
-                // TODO handle null Axis MessageContext
+                // should never happen
+                throw new NullPointerException("Axis MessageContext");
             }
         } catch (SOAPException e) {
             throw new MessagingException(new Message("soap", 5), message, e);
@@ -90,12 +92,12 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
      * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception {
-        return new String(getPayloadAsBytes(), encoding);        
+        return new String(getPayloadAsBytes(), encoding);
     }
 
     /**
      * Converts the payload implementation into a String representation
-     * 
+     *
      * @return String representation of the payload
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
