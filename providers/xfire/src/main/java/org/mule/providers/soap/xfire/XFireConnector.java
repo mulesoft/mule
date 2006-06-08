@@ -1,7 +1,5 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -18,10 +16,12 @@ package org.mule.providers.soap.xfire;
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
-import org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations;
+import org.codehaus.xfire.annotations.WebAnnotations;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
+import org.mule.util.ClassUtils;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
@@ -37,9 +37,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.apache.commons.lang.SystemUtils;
 
 /**
- * todo document
+ * Configures Xfire to provide STaX-based Web Servies support to Mule.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -48,6 +49,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
+
+    private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
 
     protected MuleDescriptor xfireDescriptor;
 
@@ -92,7 +95,17 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
         if (serviceFactory == null) {
             if(enableJSR181Annotations) {
-                serviceFactory = new AnnotationServiceFactory(new Jsr181WebAnnotations(), xfire.getTransportManager());
+                // are we running under Java 5 (at least)?
+                if (!SystemUtils.isJavaVersionAtLeast(150)) {
+                    throw new InitialisationException(new Message("xfire", 9), this);
+                }
+                try {
+                    WebAnnotations wa = (WebAnnotations)
+                            ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS, null, this.getClass());
+                    serviceFactory = new AnnotationServiceFactory(wa, xfire.getTransportManager());
+                } catch (Exception ex) {
+                    throw new InitialisationException(new Message("xfire", 10, CLASSNAME_ANNOTATIONS), ex, this);
+                }
             } else {
                 serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
             }
