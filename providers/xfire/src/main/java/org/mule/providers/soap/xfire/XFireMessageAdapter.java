@@ -1,7 +1,5 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -27,7 +25,6 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 
 import javax.activation.DataHandler;
-
 import java.util.Iterator;
 
 /**
