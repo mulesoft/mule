@@ -1,5 +1,7 @@
-/* 
- * $Id$
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -16,12 +18,10 @@ package org.mule.providers.soap.xfire;
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
-import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
-import org.mule.util.ClassUtils;
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
@@ -37,7 +37,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.apache.commons.lang.SystemUtils;
 
 /**
  * todo document
@@ -49,8 +48,6 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
-
-    private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
 
     protected MuleDescriptor xfireDescriptor;
 
@@ -95,17 +92,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
         if (serviceFactory == null) {
             if(enableJSR181Annotations) {
-                // are we running under Java 5 (at least)?
-                if (!SystemUtils.isJavaVersionAtLeast(150)) {
-                    throw new InitialisationException(new Message("xfire", 9), this);
-                }
-                try {
-                    WebAnnotations wa = (WebAnnotations)
-                            ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS, null, this.getClass());
-                    serviceFactory = new AnnotationServiceFactory(wa, xfire.getTransportManager());
-                } catch (Exception ex) {
-                    throw new InitialisationException(new Message("xfire", 10, CLASSNAME_ANNOTATIONS), ex, this);
-                }
+                serviceFactory = new AnnotationServiceFactory(new Jsr181WebAnnotations(), xfire.getTransportManager());
             } else {
                 serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
             }
@@ -160,19 +147,27 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new
-        // endpointUri if
-        // the port is different
+        // endpointUri if the port is different
         String endpoint = receiver.getEndpointURI().getAddress();
-
         String scheme = ep.getScheme().toLowerCase();
-        boolean sync = receiver.getEndpoint().isSynchronous();
-        if (scheme.equals("http") || scheme.equals("tcp")) {
-            // if we are using a socket based endpointUri make sure it is
-            // running synchronously by default
-            sync = true;
+
+        //Default to using synchronous for socket based protocols unless the
+        //synchronous property has been set explicitly
+        boolean sync = false;
+        if(!receiver.getEndpoint().isSynchronousSet()) {
+            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
+                sync = true;
+            }
+        } else {
+            sync = receiver.getEndpoint().isSynchronous();
+        }
+
+        //If we are using sockets then we need to set the endpoint name appropiately and if using http/https
+        //we need to default to POSt and set the Content-Type
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
+            endpoint += "/" + serviceName;
             receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-            endpoint += "/" + serviceName;
         }
 
         UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);

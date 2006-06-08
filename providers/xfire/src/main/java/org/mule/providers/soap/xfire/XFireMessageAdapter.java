@@ -1,5 +1,7 @@
 /*
- * $Id$
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -31,7 +33,7 @@ import java.util.Iterator;
 /**
  * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
  * attahcments and Mule headers
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,7 +51,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @param encoding
      *            The encoding to use when transforming the message (if
      *            necessary). The parameter is used when converting from a byte
@@ -65,7 +67,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the payload implementation into a String representation
-     * 
+     *
      * @return String representation of the payload
      * @throws Exception
      *             Implemetation may throw an endpoint specific exception
@@ -105,7 +107,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
         this.messageContext = messageContext;
         initHeaders();
         // TODO what is the expense of reading attachments??
-        // initAttachments();
+        initAttachments();
     }
 
     protected void initHeaders()

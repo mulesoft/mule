@@ -1,13 +1,15 @@
-/* 
- * $Id$
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -70,7 +72,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * The Xfire service component receives requests for Xfire services it manages
  * and marshalls requests and responses
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -223,7 +225,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
      * @param service
      * @throws IOException
      * @throws java.io.UnsupportedEncodingException
-     * 
+     *
      */
     protected void invoke(UMOEventContext eventContext,
             UMOEndpointURI endpointURI,
@@ -275,6 +277,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         if (contentType.toLowerCase().indexOf("multipart/related") != -1) {
             try {
+                //Todo use  streamed attachments
                 Attachments atts = new JavaMailAttachments(getMessageStream(eventContext), contentType);
 
                 XMLStreamReader reader = STAXUtils.createXMLStreamReader(atts.getSoapMessage()
