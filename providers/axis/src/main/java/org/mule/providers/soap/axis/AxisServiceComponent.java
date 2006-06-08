@@ -1,7 +1,5 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -790,6 +788,6 @@ public class AxisServiceComponent implements Initialisable, Callable
     public void setAxisServer(AxisServer axisServer)
     {
         this.axisServer = axisServer;
-     
+
     }
 }
