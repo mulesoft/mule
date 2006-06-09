@@ -36,6 +36,11 @@ import java.util.Iterator;
  */
 public class XFireMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 419878758858206446L;
+
     private Object payload;
     private MessageContext messageContext;
 
