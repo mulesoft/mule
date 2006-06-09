@@ -127,6 +127,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 // need this since setMessage is protected and we're in a different package
 class AccessibleFCMAdapter extends FileContentsMessageAdapter
 {
+    private static final long serialVersionUID = -985644721173808557L;
 
     public AccessibleFCMAdapter(Object message) throws MessagingException
     {
