@@ -28,6 +28,11 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 public class VMMessageAdapter extends AbstractMessageAdapter
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 4037066880189053665L;
+
+    /**
      * The message itself in this case an UMOEvent
      */
     private UMOMessage message = null;
