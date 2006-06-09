@@ -24,6 +24,10 @@ import org.mule.util.UUID;
  */
 public class SpaceMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2984429022763795361L;
 
     private String id;
     private Object message;

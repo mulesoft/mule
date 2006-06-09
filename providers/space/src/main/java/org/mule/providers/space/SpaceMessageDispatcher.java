@@ -105,7 +105,7 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
         if (result == null) {
             return null;
         }
-        return (UMOMessage)new MuleMessage(connector.getMessageAdapter(result));
+        return new MuleMessage(connector.getMessageAdapter(result));
     }
 
     public Object getDelegateSession() throws UMOException
