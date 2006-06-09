@@ -35,6 +35,10 @@ import java.util.Enumeration;
  */
 public class JmsMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5979930419887129835L;
 
     private Message message = null;
 

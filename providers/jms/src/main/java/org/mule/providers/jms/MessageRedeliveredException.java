@@ -21,6 +21,11 @@ import org.mule.umo.MessagingException;
  */
 public class MessageRedeliveredException extends MessagingException
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 9013890402770563931L;
+
     public MessageRedeliveredException(JmsMessageAdapter jmsMessage)
     {
         super(new org.mule.config.i18n.Message("jms", 7, (jmsMessage == null ? "[null message]"

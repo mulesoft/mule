@@ -37,6 +37,11 @@ import javax.jms.Message;
 
 public class JMSMessageToObject extends AbstractJmsTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4458860619942940372L;
+
     public JMSMessageToObject()
     {
         super();

@@ -37,6 +37,11 @@ import org.mule.umo.transformer.TransformerException;
 public class ObjectToJMSMessage extends AbstractJmsTransformer
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6900208781863624801L;
+
+    /**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(ObjectToJMSMessage.class);
