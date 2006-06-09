@@ -18,7 +18,12 @@ import java.util.List;
 /**
  * @author Binildas Christudas
  */
-public class CreditCardTO implements Serializable, Cloneable {
+public class CreditCardTO implements Serializable, Cloneable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7743847846905485620L;
 
     private String cardNumber;
     private String validTill;

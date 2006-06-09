@@ -16,7 +16,12 @@ import java.io.Serializable;
 /**
  * @author Binildas Christudas
  */
-public class ServiceParamTO implements Serializable {
+public class ServiceParamTO implements Serializable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4807303917627749519L;
 
     private CustomerTO customerTO;
     private CreditCardTO creditCardTO;

@@ -16,7 +16,12 @@ import java.io.Serializable;
 /**
  * @author Binildas Christudas
  */
-public class CreditProfileTO implements Serializable {
+public class CreditProfileTO implements Serializable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 629990262350300037L;
 
     public static final int CREDIT_NOT_AUTHORISED = -1;
     public static final int CREDIT_AUTHORISED = 1;

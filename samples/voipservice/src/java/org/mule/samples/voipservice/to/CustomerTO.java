@@ -18,7 +18,12 @@ import java.util.List;
 /**
  * @author Binildas Christudas
  */
-public class CustomerTO implements Serializable, Cloneable {
+public class CustomerTO implements Serializable, Cloneable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -7760891283901332894L;
 
     private String firstName;
     private String lastName;

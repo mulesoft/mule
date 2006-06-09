@@ -18,7 +18,12 @@ import java.util.List;
 /**
  * @author Binildas Christudas
  */
-public class AddressTO implements Serializable, Cloneable {
+public class AddressTO implements Serializable, Cloneable
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6721555269589989794L;
 
     private String houseNumber;
     private String street;
