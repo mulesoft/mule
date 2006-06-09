@@ -187,6 +187,11 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
      */
     class NullUMOComponent implements UMOComponent
     {
+        /**
+         * Serial version
+         */
+        private static final long serialVersionUID = 6446394166371870045L;
+
         private UMODescriptor descriptor;
 
         public NullUMOComponent(String name) {
