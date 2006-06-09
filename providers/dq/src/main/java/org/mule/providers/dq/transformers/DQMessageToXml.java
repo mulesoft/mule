@@ -27,6 +27,10 @@ import java.util.Iterator;
  */
 public class DQMessageToXml extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7383276830788153575L;
 
     /**
      * Constructor

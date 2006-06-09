@@ -16,6 +16,10 @@ import java.util.Iterator;
  */
 public class XmlToDQMessage extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6677408209819658768L;
 
     /**
      * The contructor
@@ -32,7 +36,6 @@ public class XmlToDQMessage extends AbstractTransformer
      */
     public final Object doTransform(final Object src, String encoding) throws TransformerException
     {
-
         String xml = (String) src;
         DQMessage msg;
 

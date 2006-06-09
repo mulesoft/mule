@@ -23,6 +23,10 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  */
 public class DQMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -6632611786578024078L;
 
     private DQMessage message;
     

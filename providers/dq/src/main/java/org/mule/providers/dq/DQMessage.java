@@ -27,6 +27,10 @@ import java.util.Map;
  */
 public class DQMessage implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 5819476148531491540L;
 
     public static final String XML_ROOT = "DQMessage";
     public static final String XML_ENTRY = "entry";
