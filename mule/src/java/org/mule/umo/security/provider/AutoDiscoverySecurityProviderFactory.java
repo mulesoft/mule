@@ -76,7 +76,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
             return (Provider) ClassUtils.instanciateClass(info.getProviderClass(), null);
         } catch (Exception ex) {
             throw new MuleRuntimeException(
-                    new Message(CoreMessageConstants.FAILED_TO_INITIALIZE_SECURITY_PROVIDER,
+                    new Message("core", CoreMessageConstants.FAILED_TO_INITIALIZE_SECURITY_PROVIDER,
                                 info.getProviderClass()),
                     ex);
         }
