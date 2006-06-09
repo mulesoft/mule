@@ -41,11 +41,15 @@ import java.util.Properties;
 
 public class MuleReceiverServlet extends AbstractReceiverServlet
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6631307373079767439L;
+
     protected ServletConnector connector = null;
 
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-
         connector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
         if (connector == null) {
             throw new ServletException("No servlet connector found using protocol: servlet");
@@ -54,14 +58,12 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected void doInit() throws ServletException
     {
-        super.doInit(); // To change body of overridden methods use File |
-                        // Settings | File Templates.
+        super.doInit();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-
         try {
             AbstractMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage = null;
@@ -69,7 +71,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
             responseMessage = receiver.routeMessage(requestMessage, true);
             writeResponse(response, responseMessage);
-
         }
         catch (Exception e) {
             handleException(e, e.getMessage(), response);

@@ -42,6 +42,11 @@ import java.util.Map;
 
 public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4238448252206941125L;
+
     private Object message = null;
 
     private HttpServletRequest request;

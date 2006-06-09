@@ -47,8 +47,13 @@ import java.util.Map;
 
 public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 9137870668198309755L;
 
     public static final String CUSTOM_HEADER_PREFIX = "";
+
     private SimpleDateFormat format = null;
     private String server = null;
     private SerializableToByteArray serializableToByteArray;

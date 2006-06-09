@@ -51,6 +51,11 @@ import java.io.IOException;
 
 public class MuleRESTReceiverServlet extends MuleReceiverServlet
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2395763805839859649L;
+
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException
     {

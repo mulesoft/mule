@@ -35,6 +35,11 @@ import java.util.Map;
  */
 public class HttpMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 8594774572236357598L;
+
     private Object message = null;
     private UMOTransformer trans = new SerializableToByteArray();
 

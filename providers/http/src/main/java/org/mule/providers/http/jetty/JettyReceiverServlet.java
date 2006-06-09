@@ -30,6 +30,11 @@ import javax.servlet.http.HttpServletRequest;
 
 public class JettyReceiverServlet extends MuleReceiverServlet
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 238326861089137293L;
+
     private AbstractMessageReceiver receiver;
 
     protected void doInit(ServletConfig servletConfig) throws ServletException

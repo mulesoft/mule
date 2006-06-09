@@ -36,6 +36,10 @@ import java.util.Iterator;
  */
 public class HttpResponseToString extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -6700649887307138101L;
 
     public HttpResponseToString()
     {

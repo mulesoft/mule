@@ -35,6 +35,11 @@ import java.util.Map;
 
 public class HttpClientMethodResponseToObject extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7699394620081967116L;
+
     public HttpClientMethodResponseToObject()
     {
         registerSourceType(HttpMethod.class);

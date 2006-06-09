@@ -46,6 +46,11 @@ import org.mule.umo.transformer.TransformerException;
 
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5726306151419912371L;
+
     private SerializableToByteArray serializableToByteArray;
 
     public ObjectToHttpClientMethodRequest()
