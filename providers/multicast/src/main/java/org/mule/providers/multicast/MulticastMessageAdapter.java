@@ -23,6 +23,11 @@ import org.mule.umo.MessagingException;
 
 public class MulticastMessageAdapter extends UdpMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 4515594269344311534L;
+
     public MulticastMessageAdapter(Object message) throws MessagingException
     {
         super(message);
