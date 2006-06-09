@@ -21,6 +21,10 @@ import java.util.Map;
  */
 public class JdbcMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6770314376258549559L;
 
     private Map map;
 
