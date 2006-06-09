@@ -23,6 +23,11 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 public class RmiMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -1765089871661318129L;
+
     private Object message;
 
     public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException
