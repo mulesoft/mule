@@ -28,6 +28,10 @@ import javax.resource.spi.ConnectionManager;
  */
 public class DefaultMuleConnectionFactory implements MuleConnectionFactory
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1552386015565975623L;
 
     /**
      * logger used by this class

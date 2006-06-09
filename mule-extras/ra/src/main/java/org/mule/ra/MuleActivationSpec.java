@@ -34,6 +34,11 @@ import java.util.Properties;
  */
 public class MuleActivationSpec implements ActivationSpec, Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 735353511874563914L;
+
     private Properties propertiesMap;
     private String endpointName;
     private String connectorName;

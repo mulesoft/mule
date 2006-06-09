@@ -45,6 +45,11 @@ import org.mule.umo.model.UMOEntryPoint;
 public class JcaComponent implements UMOComponent
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7883378699629557289L;
+
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(JcaComponent.class);

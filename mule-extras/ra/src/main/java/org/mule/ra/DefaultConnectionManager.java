@@ -31,6 +31,10 @@ import javax.security.auth.Subject;
  */
 public class DefaultConnectionManager implements ConnectionManager, ConnectionEventListener
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1967602190602154760L;
 
     private static final Log log = LogFactory.getLog(DefaultConnectionManager.class);
 

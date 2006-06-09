@@ -41,6 +41,11 @@ import java.util.Set;
 
 public class MuleManagedConnectionFactory implements ManagedConnectionFactory, Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -1460847590293644271L;
+
     private transient PrintWriter out;
     private transient PropertyChangeSupport changes = new PropertyChangeSupport(this);
 

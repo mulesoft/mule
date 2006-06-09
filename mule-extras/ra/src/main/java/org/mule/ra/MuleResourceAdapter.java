@@ -52,6 +52,11 @@ import java.util.Map;
 public class MuleResourceAdapter implements ResourceAdapter, Serializable
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 5120977744950180203L;
+
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(MuleResourceAdapter.class);

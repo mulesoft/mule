@@ -27,6 +27,11 @@ import java.io.Serializable;
  */
 public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -122686675425629280L;
+
     private String configurationBuilder = MuleXmlConfigurationBuilder.class.getName();
     private String configurations;
     private String username;
