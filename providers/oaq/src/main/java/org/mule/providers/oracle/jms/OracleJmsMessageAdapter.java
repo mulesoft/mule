@@ -28,6 +28,11 @@ import org.mule.umo.MessagingException;
  */
 public class OracleJmsMessageAdapter extends JmsMessageAdapter {
 
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5304537031626649816L;
+
     public OracleJmsMessageAdapter(Object message) throws MessagingException {
         super(message);
     }

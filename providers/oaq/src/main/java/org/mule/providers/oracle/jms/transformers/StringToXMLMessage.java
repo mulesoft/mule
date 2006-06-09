@@ -36,6 +36,11 @@ import javax.jms.Session;
  */
 public class StringToXMLMessage extends AbstractTransformer {
 
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 8476470235704172556L;
+
     public StringToXMLMessage() {
         super();
         registerSourceType(String.class);
