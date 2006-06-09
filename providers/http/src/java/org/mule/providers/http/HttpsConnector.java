@@ -15,6 +15,9 @@ package org.mule.providers.http;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.provider.SecurityProviderFactory;
+import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -27,7 +30,7 @@ import java.security.Security;
 
 /**
  * <code>HttpsConnector</code> provides Https connectivity
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,17 +39,18 @@ public class HttpsConnector extends HttpConnector
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_SSL_TYPE = "SSLv3";
-    public static final String DEFAULT_MANAGER_ALGORITHM = "SunX509";
-    public static final String DEFAULT_PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
+
+    private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
+    private SecurityProviderInfo spInfo = spFactory.getSecurityProviderInfo();
 
     private String keyStore = DEFAULT_KEYSTORE;
     private String keyPassword = null;
     private String storePassword = null;
     private String keystoreType = KeyStore.getDefaultType();
-    private String keyManagerAlgorithm = DEFAULT_MANAGER_ALGORITHM;
+    private String keyManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
     private String sslType = DEFAULT_SSL_TYPE;
-    private Provider provider = new com.sun.net.ssl.internal.ssl.Provider();
-    private String protocolHandler = DEFAULT_PROTOCOL_HANDLER;
+    private Provider provider = spFactory.getProvider();
+    private String protocolHandler = spInfo.getProtocolHandler();
     private String clientKeyStore = null;
     private String clientKeyStorePassword = null;
     private String trustStore = null;
@@ -74,7 +78,7 @@ public class HttpsConnector extends HttpConnector
             throw new NullPointerException("The Key Manager Algorithm cannot be null");
         }
 
-        KeyStore keystore = null;
+        KeyStore keystore;
         try {
             Security.addProvider(getProvider());
             // Create keyStore
@@ -300,5 +304,14 @@ public class HttpsConnector extends HttpConnector
     public void setExplicitTrustStoreOnly(boolean explicitTrustStoreOnly)
     {
         this.explicitTrustStoreOnly = explicitTrustStoreOnly;
+    }
+
+
+    public SecurityProviderFactory getSecurityProviderFactory() {
+        return spFactory;
+    }
+
+    public void setSecurityProviderFactory(SecurityProviderFactory spFactory) {
+        this.spFactory = spFactory;
     }
 }
