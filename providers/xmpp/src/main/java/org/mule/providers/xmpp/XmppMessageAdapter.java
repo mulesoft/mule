@@ -27,6 +27,11 @@ import java.util.Iterator;
  */
 public class XmppMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4003299444661664762L;
+
     private Packet message;
 
     public XmppMessageAdapter(Object message) throws MessagingException
