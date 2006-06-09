@@ -254,6 +254,9 @@ public class ExceptionHelper {
             s += ".html";
             url += s;
         }
+
+        /* If the exception is actually expected to occur by the calling code, the
+         * following output becomes misleading when reading the logs.
         if (logger.isDebugEnabled()) {
             if ("javadoc".equalsIgnoreCase(prefix)) {
                 logger.debug("Javadoc Url for package '" + packageName + "' is: " + url);
@@ -262,7 +265,7 @@ public class ExceptionHelper {
             } else {
                 logger.debug(prefix + " Url for package '" + packageName + "' is: " + url);
             }
-        }
+        } */
         return url;
     }
 
