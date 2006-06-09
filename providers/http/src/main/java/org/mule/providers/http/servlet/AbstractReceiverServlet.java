@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
  *
@@ -135,7 +135,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 // Encoding: this method will check the charset on the content type
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
-            servletResponse.setStatus(HttpServletResponse.SC_OK);
+            if (!servletResponse.isCommitted()) {
+                servletResponse.setStatus(HttpServletResponse.SC_OK);
+            }
         }
         servletResponse.flushBuffer();
     }
