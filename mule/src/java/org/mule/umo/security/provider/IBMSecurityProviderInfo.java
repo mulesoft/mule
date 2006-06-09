@@ -15,7 +15,7 @@
 package org.mule.umo.security.provider;
 
 /**
- * Sun JDK-specific security provider information.
+ * IBM JDK-specific security provider information.
  */
 public class IBMSecurityProviderInfo implements SecurityProviderInfo {
 
