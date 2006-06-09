@@ -34,7 +34,12 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ObjectToMimeMessage extends StringToEmailMessage {
+public class ObjectToMimeMessage extends StringToEmailMessage
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7225142214620572674L;
 
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
             throws Exception {

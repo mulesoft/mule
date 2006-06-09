@@ -28,6 +28,11 @@ import javax.mail.internet.MimeMultipart;
  */
 public class EmailMessageToString extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 8940364998861971795L;
+
     public EmailMessageToString()
     {
         registerSourceType(Message.class);

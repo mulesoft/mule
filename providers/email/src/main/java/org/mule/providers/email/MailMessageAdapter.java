@@ -39,7 +39,12 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MailMessageAdapter extends AbstractMessageAdapter {
+public class MailMessageAdapter extends AbstractMessageAdapter
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -6013198455030918360L;
 
     public static final String ATTACHMENT_HEADERS_PROPERTY_POSTFIX = "Headers";
 

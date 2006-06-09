@@ -47,6 +47,11 @@ import org.mule.util.TemplateParser;
 public class StringToEmailMessage extends AbstractEventAwareTransformer
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -2687301871292220521L;
+
+    /**
      * logger used by this class
      */
     protected final transient Log logger = LogFactory.getLog(getClass());
