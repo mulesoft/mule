@@ -49,6 +49,11 @@ import java.util.Iterator;
  */
 public class MuleRPCProvider extends RPCProvider
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4987111047650933518L;
+
     private AxisConnector connector;
 
     public MuleRPCProvider(AxisConnector connector)

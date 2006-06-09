@@ -66,27 +66,26 @@ import java.util.Iterator;
  */
 public class MuleHttpSender extends BasicHandler
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -1730816323289419500L;
 
     protected static Log log = LogFactory.getLog(HTTPSender.class.getName());
 
-    private static final String ACCEPT_HEADERS = HTTPConstants.HEADER_ACCEPT + // Limit
-                                                                                // to
-                                                                                // the
-                                                                                // types
-                                                                                // that
-                                                                                // are
-            // meaningful to us.
-            ": " + HTTPConstants.HEADER_ACCEPT_APPL_SOAP + ", " + HTTPConstants.HEADER_ACCEPT_APPLICATION_DIME + ", "
-            + HTTPConstants.HEADER_ACCEPT_MULTIPART_RELATED + ", " + HTTPConstants.HEADER_ACCEPT_TEXT_ALL + "\r\n"
-            + HTTPConstants.HEADER_USER_AGENT + // Tell who we are.
-            ": " + Messages.getMessage("axisUserAgent") + "\r\n";
+    private static final String ACCEPT_HEADERS = HTTPConstants.HEADER_ACCEPT
+                    // limit to the types that are meaningful to us.
+                    + ": " + HTTPConstants.HEADER_ACCEPT_APPL_SOAP + ", "
+                    + HTTPConstants.HEADER_ACCEPT_APPLICATION_DIME + ", "
+                    + HTTPConstants.HEADER_ACCEPT_MULTIPART_RELATED + ", "
+                    + HTTPConstants.HEADER_ACCEPT_TEXT_ALL + "\r\n"
+                    + HTTPConstants.HEADER_USER_AGENT // Tell who we are.
+                    + ": " + Messages.getMessage("axisUserAgent") + "\r\n";
 
-    private static final String CACHE_HEADERS = HTTPConstants.HEADER_CACHE_CONTROL + // Stop
-                                                                                        // caching
-                                                                                        // proxies
-                                                                                        // from
-            // caching SOAP reqeuest.
-            ": " + HTTPConstants.HEADER_CACHE_CONTROL_NOCACHE + "\r\n" + HTTPConstants.HEADER_PRAGMA + ": "
+    private static final String CACHE_HEADERS = HTTPConstants.HEADER_CACHE_CONTROL
+            // stop caching proxies from caching SOAP request.
+            + ": " + HTTPConstants.HEADER_CACHE_CONTROL_NOCACHE + "\r\n"
+            + HTTPConstants.HEADER_PRAGMA + ": "
             + HTTPConstants.HEADER_CACHE_CONTROL_NOCACHE + "\r\n";
 
     private static final String CHUNKED_HEADER = HTTPConstants.HEADER_TRANSFER_ENCODING + ": "

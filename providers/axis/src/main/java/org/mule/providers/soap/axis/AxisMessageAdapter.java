@@ -35,6 +35,11 @@ import java.util.Iterator;
  */
 public class AxisMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -923205879581370143L;
+
     private Object payload;
     private SOAPMessage message;
     private UMOTransformer trans = new SerializableToByteArray();

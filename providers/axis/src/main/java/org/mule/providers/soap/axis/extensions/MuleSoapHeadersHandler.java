@@ -33,6 +33,11 @@ import javax.xml.soap.SOAPMessage;
 public class MuleSoapHeadersHandler extends BasicHandler
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1813393257662701953L;
+
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);

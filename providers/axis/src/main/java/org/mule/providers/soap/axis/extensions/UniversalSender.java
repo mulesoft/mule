@@ -56,12 +56,18 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class UniversalSender extends BasicHandler {
+public class UniversalSender extends BasicHandler
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7943380365092172940L;
 
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
+
     protected Map endpointsCache = new ConcurrentHashMap();
 
     public void invoke(MessageContext msgContext) throws AxisFault {

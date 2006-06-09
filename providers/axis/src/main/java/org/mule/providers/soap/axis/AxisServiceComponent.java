@@ -86,8 +86,8 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     protected static transient Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
 
-    private static Log tlog = LogFactory.getLog("org.apache.axis.TIME");
     private static Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
+
     public static final String INIT_PROPERTY_TRANSPORT_NAME = "transport.name";
     public static final String INIT_PROPERTY_USE_SECURITY = "use-servlet-security";
     public static final String INIT_PROPERTY_ENABLE_LIST = "axis.enableListQuery";

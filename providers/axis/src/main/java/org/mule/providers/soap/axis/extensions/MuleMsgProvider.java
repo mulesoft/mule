@@ -38,6 +38,11 @@ import java.lang.reflect.Proxy;
  */
 public class MuleMsgProvider extends MsgProvider
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4399291846942449361L;
+
     private AxisConnector connector;
 
     private static transient Log logger = LogFactory.getLog(MuleMsgProvider.class);
