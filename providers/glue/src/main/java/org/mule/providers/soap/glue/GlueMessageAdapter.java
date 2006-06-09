@@ -30,6 +30,11 @@ import java.util.Iterator;
  */
 public class GlueMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1813666286228639967L;
+
     private Object message;
     private UMOTransformer trans = new SerializableToByteArray();
 
