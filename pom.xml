@@ -18,7 +18,7 @@
     <!-- Project -->
     <name>Mule</name>
     <description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
-    <url>http://mule.codehaus.org</url>
+    <url>http://muleumo.org</url>
     <inceptionYear>2003</inceptionYear>
     <mailingLists>
         <mailingList>
@@ -39,6 +39,12 @@
             <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
             <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
         </mailingList>
+        <mailingList>
+            <name>Mule Issues List</name>
+            <subscribe>issues-subscribe@mule.codehaus.org</subscribe>
+            <unsubscribe>issues-unsubscribe@mule.codehaus.org</unsubscribe>
+            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
     </mailingLists>
     <developers>
         <!-- Refer to http://mule.codehaus.org/Team -->
@@ -47,15 +53,28 @@
         <!-- Refer to http://mule.codehaus.org/Team -->
     </contributors>
     <issueManagement>
+        <system>jira</system>
         <url>http://jira.symphonysoft.com</url>
     </issueManagement>
 
     <!-- Build -->
     <scm>
-        <connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
-        <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
-        <url>http://cvs.mule.codehaus.org/</url>
+        <connection>scm:svn:http://svn.codehaus.org/mule/trunk/mule</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mule/trunk/mule</developerConnection>
+        <url>http://svn.mule.codehaus.org/</url>
     </scm>
+    <ciManagement>
+        <system>continuum</system>
+        <url>http://localhost:8080/continuum</url>
+        <notifiers>
+            <notifier>
+                <type>mail</type>
+                <configuration>
+                    <address>tcarlson@impsat.com</address>
+                </configuration>
+            </notifier>
+        </notifiers>
+    </ciManagement>
     <distributionManagement>
         <downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
         <repository>
