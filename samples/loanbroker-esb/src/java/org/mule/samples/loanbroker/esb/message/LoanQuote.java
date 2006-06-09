@@ -22,6 +22,11 @@ import java.io.Serializable;
 
 public class LoanQuote implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -8432932027217141564L;
+
     private String bankName;
     private double interestRate = 0;
 

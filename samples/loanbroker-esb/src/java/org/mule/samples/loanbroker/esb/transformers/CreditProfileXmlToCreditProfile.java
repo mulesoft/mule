@@ -13,7 +13,13 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CreditProfileXmlToCreditProfile extends AbstractTransformer {
+public class CreditProfileXmlToCreditProfile extends AbstractTransformer
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -8349744705446470225L;
+
     public CreditProfileXmlToCreditProfile() {
         registerSourceType(String.class);
         registerSourceType(Document.class);

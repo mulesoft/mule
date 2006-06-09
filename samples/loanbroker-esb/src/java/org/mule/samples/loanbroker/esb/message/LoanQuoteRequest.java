@@ -17,13 +17,18 @@ import java.io.Serializable;
 
 /**
  * <code>LoanQuoteRequest</code> represents customer a request for a loan broker
- * thriugh a loan broker
+ * through a loan broker
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class LoanQuoteRequest implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 46866005259682607L;
+
     /** The customer request */
     private CustomerQuoteRequest customerRequest;
 

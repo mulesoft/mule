@@ -22,7 +22,12 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class LoanQuoteRequestToCustomer extends AbstractTransformer {
+public class LoanQuoteRequestToCustomer extends AbstractTransformer
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 3989958201499427076L;
 
     public LoanQuoteRequestToCustomer() {
         registerSourceType(LoanQuoteRequest.class);

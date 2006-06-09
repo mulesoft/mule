@@ -21,6 +21,11 @@ import java.io.Serializable;
  */
 public class CreditProfile implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5924690191061177417L;
+
     private int creditScore;
     private int creditHistory;
 

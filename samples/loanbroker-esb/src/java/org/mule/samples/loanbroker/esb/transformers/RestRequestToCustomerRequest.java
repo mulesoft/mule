@@ -24,7 +24,12 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer {
+public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5017931788994993161L;
 
     public RestRequestToCustomerRequest() {
         setReturnClass(CustomerQuoteRequest.class);

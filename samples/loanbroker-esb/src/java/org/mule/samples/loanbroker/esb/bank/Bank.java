@@ -32,6 +32,11 @@ import java.io.Serializable;
 public class Bank implements UMODescriptorAware, Serializable, BankService
 {
     /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 4108271137166107769L;
+
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(Bank.class);
