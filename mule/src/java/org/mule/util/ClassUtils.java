@@ -69,9 +69,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param callingClass The Class object of the calling object
      */
     public static URL getResource(final String resourceName, final Class callingClass) {
-        URL url = null;
 
-        url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
+        URL url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 return Thread.currentThread().getContextClassLoader().getResource(resourceName);
             }
@@ -98,7 +97,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     public static Enumeration getResources(final String resourceName, final Class callingClass) {
-        Enumeration enumeration = null;
+        Enumeration enumeration;
 
         enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
@@ -213,7 +212,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
     public static Class loadClass(final String className, final Class callingClass) throws ClassNotFoundException {
-        Class clazz = null;
+        Class clazz;
         clazz = (Class) AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 try {
@@ -288,7 +287,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     public static Object instanciateClass(Class clazz, Object[] constructorArgs) throws SecurityException,
             NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        Class[] args = null;
+        Class[] args;
         if (constructorArgs != null) {
             args = new Class[constructorArgs.length];
             for (int i = 0; i < constructorArgs.length; i++) {
@@ -303,9 +302,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         Constructor ctor = getConstructor(clazz, args);
         if (ctor == null) {
-            String argsString = new String();
+            StringBuffer argsString = new StringBuffer(100);
             for (int i = 0; i < args.length; i++) {
-                argsString += args[i].getName() + ", ";
+                argsString.append(args[i].getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor with matching arg params: " + argsString);
         }
