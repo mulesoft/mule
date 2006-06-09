@@ -23,7 +23,13 @@ import org.mule.umo.space.UMOSpaceException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class GSSpaceException extends UMOSpaceException {
+public class GSSpaceException extends UMOSpaceException
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3282831931874122222L;
+
     public GSSpaceException(Throwable cause) {
         super(Message.createStaticMessage(cause.getMessage()), cause);
     }

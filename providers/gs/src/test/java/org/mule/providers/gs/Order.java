@@ -19,7 +19,12 @@ import net.jini.core.entry.Entry;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Order implements Entry {
+public class Order implements Entry
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 249560212078823881L;
 
     public String orderId;
     public Boolean processed = Boolean.FALSE;

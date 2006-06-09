@@ -29,10 +29,14 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer {
+public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer
+{
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -6852740125237850362L;
 
     public UMOMessageToJavaSpaceEntry() {
-
         setReturnClass(Entry.class);
     }
 

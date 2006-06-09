@@ -26,6 +26,11 @@ import java.util.Map;
  */
 public class JiniMessage implements Entry
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 2373851288156547780L;
+
     public Object destination;
     public Object payload;
     public String correlationId;

@@ -32,6 +32,11 @@ import org.mule.util.UUID;
 
 public class JiniMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 3480872474322069206L;
+
     protected Entry message;
     protected String id;
 
