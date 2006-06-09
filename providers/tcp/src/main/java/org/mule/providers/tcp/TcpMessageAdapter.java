@@ -24,6 +24,11 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 public class TcpMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7229837140160407794L;
+
     private byte[] message;
 
     public TcpMessageAdapter(Object message) throws MessagingException
