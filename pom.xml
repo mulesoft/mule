@@ -128,23 +128,6 @@
             <filter>project.properties</filter>
         </filters 
         -->
-
-        <!-- 
-        Directory layout 
-        TODO Migrate all modules to the standard Maven directory layout and remove these settings. 
-        -->
-        <sourceDirectory>src/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/conf</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/conf</directory>
-            </testResource>
-        </testResources>
         
         <plugins>
             <!-- Compile to JDK 1.4 -->
