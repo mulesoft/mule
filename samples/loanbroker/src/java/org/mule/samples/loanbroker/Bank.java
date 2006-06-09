@@ -20,7 +20,7 @@ import org.mule.umo.UMODescriptor;
 import java.io.Serializable;
 
 /**
- * <code>Bank</code> is a representation of a bank form which to obtain loan
+ * <code>Bank</code> is a representation of a bank from which to obtain loan
  * quotes.
  *
  * @author Gregor Hohpe, Bobby Wolfe, et al. EI Patterns
@@ -30,6 +30,11 @@ import java.io.Serializable;
 
 public class Bank implements BankService, UMODescriptorAware, Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 2576893239001689631L;
+
     /**
      * logger used by this class
      */

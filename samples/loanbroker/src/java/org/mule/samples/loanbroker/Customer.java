@@ -21,6 +21,11 @@ import java.io.Serializable;
  */
 public class Customer implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4831762346946636795L;
+
     private String name;
 
     private int ssn;

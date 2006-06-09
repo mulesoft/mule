@@ -21,6 +21,11 @@ import java.io.Serializable;
  */
 public class LoanRequest implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3148402182454459673L;
+
     /** The customer that requested the quote */
     private Customer customer;
 
