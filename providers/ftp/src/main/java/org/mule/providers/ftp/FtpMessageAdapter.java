@@ -22,6 +22,10 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  */
 public class FtpMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7268290145485349941L;
 
     private byte[] message;
 
