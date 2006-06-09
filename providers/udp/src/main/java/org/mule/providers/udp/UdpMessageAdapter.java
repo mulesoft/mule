@@ -26,9 +26,14 @@ import java.net.DatagramPacket;
 
 public class UdpMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -7767141617682012504L;
+
     public static final String ADDRESS_PROPERTY = "packet.address";
     public static final String PORT_PROPERTY = "packet.port";
-
+    
     private byte[] message;
 
     public UdpMessageAdapter(Object message) throws MessagingException
