@@ -23,6 +23,11 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  */
 public class StreamMessageAdapter extends AbstractMessageAdapter
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 3094357859680956607L;
+
     private String message = null;
 
     public StreamMessageAdapter(Object message) throws MessageTypeNotSupportedException
