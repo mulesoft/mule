@@ -457,21 +457,10 @@
 
     <build>
         <nagEmailAddress>scm@mule.codehaus.org</nagEmailAddress>
-        <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
-        <unitTest>
-            <resources>
-                <resource>
-                    <directory>${basedir}/src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <resources>
             <resource>
-                <directory>${basedir}/src/conf</directory>
+                <directory>${basedir}/src/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
@@ -485,6 +474,17 @@
                 </excludes>
             </resource>
         </resources>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+        <unitTest>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/resources</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
     </build>
     <reports>
         <!--report>maven-pmd-plugin</report>
