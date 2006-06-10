@@ -25,7 +25,7 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreate() throws Exception
     {
-        MuleEndpointURI url = new MuleEndpointURI("ssl://7877");
+        MuleEndpointURI url = new MuleEndpointURI("ssl://localhost:7877");
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
