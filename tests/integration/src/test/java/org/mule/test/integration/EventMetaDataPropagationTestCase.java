@@ -41,7 +41,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EventMetaDataProporgationTestCase extends FunctionalTestCase implements Callable
+public class EventMetaDataPropagationTestCase extends FunctionalTestCase implements Callable
 {
     private Apple testObjectProperty = new Apple();
 
