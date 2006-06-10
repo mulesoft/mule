@@ -32,6 +32,11 @@ import java.util.EventObject;
 
 public class EventObjectTransformer extends AbstractEventTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4724017409704797007L;
+
     public EventObjectTransformer()
     {
         registerSourceType(EventObject.class);
