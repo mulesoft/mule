@@ -9,11 +9,12 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.extras.client;
+package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;

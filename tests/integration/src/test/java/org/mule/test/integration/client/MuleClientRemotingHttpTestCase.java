@@ -9,27 +9,20 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.extras.client;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+package org.mule.test.integration.client;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TestReceiver
+public class MuleClientRemotingHttpTestCase extends MuleClientRemotingTestCase
 {
-    private AtomicInteger count = new AtomicInteger(0);
-
-    public String receive(String message) throws Exception
-    {
-        System.out.println("Received: " + message + " Number: " + inc() + " in thread: "
-                + Thread.currentThread().getName());
-        return "Received: " + message;
+    protected String getConfigResources() {
+        return "test-client-mule-config-remote-http.xml";
     }
 
-    protected int inc()
+    public String getServerUrl()
     {
-        return count.incrementAndGet();
+        return "http://localhost:60504";
     }
 }
