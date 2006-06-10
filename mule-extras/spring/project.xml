@@ -109,7 +109,7 @@
     <build>
         <resources>
             <resource>
-                <directory>${basedir}/src/conf</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
@@ -118,7 +118,7 @@
         <unitTest>
             <resources>
                 <resource>
-                    <directory>${basedir}/src/test/conf</directory>
+                    <directory>${basedir}/src/test/resources</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
