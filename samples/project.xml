@@ -157,21 +157,10 @@
   </dependencies>
     <build>
         <nagEmailAddress>scm@mule.codehaus.org</nagEmailAddress>
-        <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/test/java</unitTestSourceDirectory>
-        <unitTest>
-            <resources>
-                <resource>
-                    <directory>${basedir}/test/resources</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <resources>
             <resource>
-                <directory>${basedir}/src/conf</directory>
+                <directory>${basedir}/conf</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
@@ -185,5 +174,16 @@
                 </excludes>
             </resource>
         </resources>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+        <unitTest>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/resources</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
     </build>
 </project>
