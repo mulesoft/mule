@@ -1052,7 +1052,7 @@ public class MuleManager implements UMOManager
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL);
-        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, df.format(new Date()).toString()).getMessage());
+        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, df.format(new Date())).getMessage());
         long duration = 10;
         if (startDate > 0) {
             duration = currentTime - startDate;
