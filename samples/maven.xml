@@ -83,7 +83,7 @@
         </copy>
         <j:if test="${mule.sample.testdata}">
             <copy todir="${mule.samples.dist.dir}/test-data">
-                <fileset dir="${basedir}/test-data"/>
+                <fileset dir="${basedir}/src/test/test-data"/>
             </copy>
         </j:if>
 
