@@ -35,7 +35,7 @@
 
     <goal name="setClasspath">
         <path id="test.classpath">
-            <pathelement path="src/test/conf"/>
+            <pathelement path="src/test/resources"/>
             <pathelement path="${maven.build.dest}"/>
             <pathelement path="${maven.build.dest}/classes"/>
             <pathelement path="${maven.build.dest}/test-classes"/>

@@ -608,7 +608,7 @@
         </dependency>
     </dependencies>
      <build>
-        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
          <unitTest>
             <includes>
@@ -618,9 +618,8 @@
                 <exclude>**/Abstract*.*</exclude>
             </excludes>
             <resources>
-                
                 <resource>
-                    <directory>${basedir}/src/test/conf</directory>
+                    <directory>${basedir}/src/test/resources</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>

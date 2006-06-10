@@ -56,7 +56,7 @@
                     </includes>
                 </resource>
                 <resource>
-                    <directory>${basedir}/src/test/conf</directory>
+                    <directory>${basedir}/src/test/resources</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
