@@ -14,7 +14,7 @@ package org.mule.test.integration.spring.events;
 import java.io.Serializable;
 
 /**
- * <code>Order</code> TODO
+ * <code>Order</code> TODO document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -22,6 +22,8 @@ import java.io.Serializable;
 
 public class Order implements Serializable
 {
+    private static final long serialVersionUID = -5384677758697949102L;
+
     private String order;
 
     public Order()

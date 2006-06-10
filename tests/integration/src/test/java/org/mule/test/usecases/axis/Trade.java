@@ -13,12 +13,14 @@
 package org.mule.test.usecases.axis;
 
 /**
- * todo document
+ * TODO document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class Trade implements java.io.Serializable {
+    private static final long serialVersionUID = -1225935545079750532L;
+
     private int accountID;
     private java.lang.String cusip;
     private int currency;

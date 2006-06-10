@@ -23,6 +23,8 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class StringToOrder extends AbstractTransformer
 {
+    private static final long serialVersionUID = 2714112901219720960L;
+
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return null;

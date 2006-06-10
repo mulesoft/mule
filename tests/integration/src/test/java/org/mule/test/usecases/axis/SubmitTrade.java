@@ -8,6 +8,8 @@
 package  org.mule.test.usecases.axis;
 
 public class SubmitTrade  implements java.io.Serializable {
+    private static final long serialVersionUID = 6724911620302616166L;
+
     private  org.mule.test.usecases.axis.Trade arg0;
 
     public SubmitTrade()

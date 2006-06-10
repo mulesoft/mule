@@ -9,6 +9,8 @@
 package org.mule.test.usecases.axis;
 
 public class TradeStatus  implements java.io.Serializable {
+    private static final long serialVersionUID = 414517174955602939L;
+
     private java.lang.String status;
     private int tradeID;
 

@@ -19,6 +19,8 @@ package org.mule.test.usecases.axis;
  * @version $Revision$
  */
 public class InvalidTradeException extends Exception {
+    private static final long serialVersionUID = -997233549872918131L;
+
     public InvalidTradeException() {
         super();
     }
