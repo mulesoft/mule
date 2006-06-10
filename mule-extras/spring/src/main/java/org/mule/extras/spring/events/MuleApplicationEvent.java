@@ -29,6 +29,11 @@ import java.util.Map;
 
 public class MuleApplicationEvent extends ApplicationEvent
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 5297176859050194632L;
+
     private UMOEventContext context;
     private String endpoint;
     private ApplicationContext applicationContext;

@@ -20,6 +20,11 @@ package org.mule.extras.spring.events;
 
 public class ApplicationEventException extends Exception
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 718759087364948708L;
+
     public ApplicationEventException(String message)
     {
         super(message);
