@@ -195,7 +195,7 @@
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
-            <fileset file="${basedir}/mule/src/conf/mule-configuration.dtd"/>
+            <fileset file="${basedir}/mule/src/main/resources/mule-configuration.dtd"/>
             <fileset file="${basedir}/mule-extras/spring/src/main/resources/mule-spring-configuration.dtd"/>
         </copy>
 
@@ -750,10 +750,5 @@
         <j:set var="goal" value="eclipse"/>
         <attainGoal name="multiproject:goal"/>
     </preGoal>
-
-    <postGoal name="eclipse">
-        <mkdir dir="${basedir}/src/conf"/>
-        <mkdir dir="${basedir}/src/test/conf"/>
-    </postGoal>
 
 </project>

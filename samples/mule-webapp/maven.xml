@@ -54,7 +54,7 @@
         <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/lib"/>
 
         <copy todir="${mule.samples.dist.dir}" file="maven.xml"/>
-        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="../../mule/src/conf/log4j.properties"/>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="../../mule/src/main/resources/log4j.properties"/>
 
         <copy todir="${mule.samples.dist.dir}/webapp">
             <fileset dir="webapp">

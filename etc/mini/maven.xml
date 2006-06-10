@@ -58,7 +58,7 @@
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
-            <fileset file="${basedir}/../../mule/src/conf/mule-configuration.dtd"/>
+            <fileset file="${basedir}/../../mule/src/main/resources/mule-configuration.dtd"/>
         </copy>
 
         <copy todir="${mule.release.dir}" file="${basedir}/../../LICENSE.txt"/>

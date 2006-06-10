@@ -45,7 +45,7 @@
             <j:set var="mule.samples.class.root" value="${mule.samples.name}"/>
         </j:if>
 
-        <copy todir="${mule.samples.dist.dir}/conf" file="${root.dir}/../mule/src/conf/log4j.properties"/>
+        <copy todir="${mule.samples.dist.dir}/conf" file="${root.dir}/../mule/src/main/resources/log4j.properties"/>
 
         <echo>Looking for src in ${basedir}/src/java</echo>
         <u:available file="${basedir}/src/java">
