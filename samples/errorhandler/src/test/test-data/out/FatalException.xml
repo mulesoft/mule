@@ -3,8 +3,8 @@
     <detailMessage>Some IO exception</detailMessage>
     <exceptionClass>java.io.IOException</exceptionClass>
     <stackTrace>
-      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.generateTestData(ErrorHandlerTestCase.java:46)</string>
-      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestCase.main(ErrorHandlerTestCase.java:69)</string>
+      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestDataGenerator.generateTestData(ErrorHandlerTestCase.java:46)</string>
+      <string>org.mule.test.samples.errorhandler.ErrorHandlerTestDataGenerator.main(ErrorHandlerTestCase.java:69)</string>
       <string>sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</string>
       <string>sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)</string>
       <string>sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)</string>

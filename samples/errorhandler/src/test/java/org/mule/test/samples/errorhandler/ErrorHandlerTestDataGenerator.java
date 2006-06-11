@@ -26,7 +26,7 @@ import java.io.IOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ErrorHandlerTestCase {
+public class ErrorHandlerTestDataGenerator {
 
     
     public static void generateTestData(String targetDir) throws IOException, TransformerException
@@ -59,10 +59,16 @@ public class ErrorHandlerTestCase {
     public static void main(String[] args)
     {
 
-        String path = (args.length >= 1 ? args[0] : "C:\\dev\\projects\\mule\\test-data\\samples\\errorhandler\\exceptions");
+        if(args.length == 0)
+        {
+            System.out.println("You must specifiy a target directory for the output files");
+            System.exit(1);
+        }
+        String path = args[0];
         try
         {
-            generateTestData(path); }
+            generateTestData(path);
+        }
         catch (Exception e)
         {
             e.printStackTrace(); 
