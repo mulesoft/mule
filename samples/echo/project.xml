@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/3.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/3.0.0 http://maven.apache.org/maven-v3_0_0.xsd">
     <extend>${basedir}/../project.xml</extend>
     <name>Mule Echo Sample</name>
     <id>mule-samples-echo</id>
@@ -141,7 +141,7 @@
             <groupId>woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>${wstx_asl_version}</version>
-             <url>http://woodstox.codehaus.org</url>
+            <url>http://woodstox.codehaus.org</url>
             <properties>
                 <ignore>true</ignore>
             </properties>
@@ -177,9 +177,9 @@
 
         <!-- needed for WSDL client -->
         <dependency>
-          <groupId>xfire</groupId>
-          <artifactId>XmlSchema</artifactId>
-          <version>20060128-patched</version>
+            <groupId>org.apache.ws.commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema_version}</version>
             <properties>
                 <ignore>true</ignore>
             </properties>

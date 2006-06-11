@@ -142,9 +142,9 @@
 
         <!-- needed for WSDL client -->
         <dependency>
-          <groupId>xfire</groupId>
+          <groupId>org.apache.ws.commons</groupId>
           <artifactId>XmlSchema</artifactId>
-          <version>20060128-patched</version>
+          <version>${XmlSchema_version}</version>
         </dependency>
    </dependencies>
 </project>

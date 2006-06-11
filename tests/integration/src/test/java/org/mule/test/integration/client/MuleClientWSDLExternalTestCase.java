@@ -26,7 +26,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
+public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
 {
     public void testRequestResponse() throws Throwable
     {

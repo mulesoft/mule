@@ -73,6 +73,6 @@ public class AdminNotification extends UMOServerNotification
         if (i - 1 > ACTIONS.length) {
             return String.valueOf(action);
         }
-        return ACTIONS[i];
+        return ACTIONS[i-1];
     }
 }

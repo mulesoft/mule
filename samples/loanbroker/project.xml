@@ -173,11 +173,11 @@
             </properties>
         </dependency>
 
-        <!-- needed for WSDL client -->
+       <!-- needed for WSDL client -->
         <dependency>
-          <groupId>xfire</groupId>
-          <artifactId>XmlSchema</artifactId>
-          <version>20060128-patched</version>
+            <groupId>org.apache.ws.commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema_version}</version>
             <properties>
                 <ignore>true</ignore>
             </properties>

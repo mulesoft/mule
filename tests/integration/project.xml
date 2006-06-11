@@ -10,13 +10,7 @@
     </description>
     <shortDescription>integration-tests</shortDescription>
     <url>http://www.muleumo.org/</url>
-    <dependencies>
-        <dependency>
-          <groupId>xfire</groupId>
-          <artifactId>XmlSchema</artifactId>
-          <version>20060128-patched</version>
-        </dependency>
-    </dependencies>
+
     <build>
         <unitTest>
             <includes>
@@ -30,7 +24,6 @@
                 <exclude>**/XmppFunctionalTestCase.*</exclude>
                 <!-- TODO Fix -->
                 <exclude>**/JmsPipelineTestCase.*</exclude>
-                <!-- TODO requires a server -->
 
                 <!-- TODO on my box fails if alternate network adapters as Glue starts using my local IP and cannot resolve localhost -->
                 <exclude>**/GlueConnectorHttpFunctionalTestCase.*</exclude>

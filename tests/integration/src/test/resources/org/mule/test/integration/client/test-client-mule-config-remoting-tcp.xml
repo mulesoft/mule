@@ -20,7 +20,7 @@
     
     <model name="model">
         <mule-descriptor name="TestReceiverUMO"
-            implementation="org.mule.extras.client.TestReceiver">
+            implementation="org.mule.tck.functional.FunctionalTestComponent">
             <inbound-router>
                 <endpoint address="vm://test.queue" connector="vmRemoteQueueConnector"/>
             </inbound-router>

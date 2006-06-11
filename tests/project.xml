@@ -304,6 +304,13 @@
             <version>${jaxen_version}</version>
         </dependency>
 
+        <!-- needed for WSDL client -->
+        <dependency>
+            <groupId>org.apache.ws.commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema_version}</version>
+        </dependency>
+
         <dependency>
             <groupId>javamail</groupId>
             <artifactId>javamail</artifactId>
