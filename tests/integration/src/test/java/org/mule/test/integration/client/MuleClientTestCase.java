@@ -24,7 +24,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {
-        return "test-client-mule-config.xml";
+        return "org/mule/test/integration/client/test-client-mule-config.xml";
     }
 
     public void testClientSendDirect() throws Exception

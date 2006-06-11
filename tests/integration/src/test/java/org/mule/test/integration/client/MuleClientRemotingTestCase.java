@@ -25,7 +25,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {
-        return "test-client-mule-config-remoting-tcp.xml";
+        return "org/mule/test/integration/client/test-client-mule-config-remoting-tcp.xml";
     }
 
     public String getServerUrl()

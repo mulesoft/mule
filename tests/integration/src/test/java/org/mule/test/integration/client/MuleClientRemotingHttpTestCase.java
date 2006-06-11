@@ -18,7 +18,7 @@ package org.mule.test.integration.client;
 public class MuleClientRemotingHttpTestCase extends MuleClientRemotingTestCase
 {
     protected String getConfigResources() {
-        return "test-client-mule-config-remote-http.xml";
+        return "org/mule/test/integration/client/test-client-mule-config-remote-http.xml";
     }
 
     public String getServerUrl()
