@@ -18,14 +18,11 @@ import org.mule.samples.errorhandler.exceptions.BusinessException;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 
 /**
- * 
- * <code>ErrorHandlerTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,15 +44,15 @@ public class ErrorHandlerTestCase {
         
         ExceptionBean bean = new ExceptionBean(exception);
         String xml = (String) trans.transform(bean);
-        Utility.stringToFile(targetDir + "MuleException.xml", xml);
+        FileUtils.stringToFile(targetDir + "MuleException.xml", xml);
         
         bean = new ExceptionBean(fatal);
         xml = (String) trans.transform(bean);
-        Utility.stringToFile(targetDir + "FatalException.xml", xml);
+        FileUtils.stringToFile(targetDir + "FatalException.xml", xml);
         
         bean = new ExceptionBean(business);
         xml = (String) trans.transform(bean);
-        Utility.stringToFile(targetDir + "BusinesException.xml", xml);
+        FileUtils.stringToFile(targetDir + "BusinesException.xml", xml);
        }
 
 

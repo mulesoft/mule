@@ -11,7 +11,7 @@
  */
 package org.mule.tools.benchmark;
 
-import org.mule.util.Utility;
+import org.mule.util.StringUtils;
 
 /**
  * <code>RunnerConfig</code> configuration options for the Benchmark runner
@@ -136,7 +136,7 @@ public class RunnerConfig
     {
         this.endpoints = endpoints;
         if(endpoints!=null) {
-            endpointsArray = Utility.split(endpoints,  ",");
+            endpointsArray = StringUtils.split(endpoints,  ",");
         } else {
             throw new IllegalArgumentException("you must specify at least one endpoint");
         }
