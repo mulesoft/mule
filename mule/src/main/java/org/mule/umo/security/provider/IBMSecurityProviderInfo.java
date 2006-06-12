@@ -19,7 +19,7 @@ package org.mule.umo.security.provider;
  */
 public class IBMSecurityProviderInfo implements SecurityProviderInfo {
 
-    private static final String KEY_MANAGER_ALGORITHM = "IBMX509";
+    private static final String KEY_MANAGER_ALGORITHM = "IbmX509";
 
     private static final String PROTOCOL_HANDLER = "com.ibm.net.ssl.internal.www.protocol";
 
