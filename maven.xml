@@ -460,6 +460,7 @@
 
             <!-- copy offbeat directory contents into the proper place -->
             <copy todir="${mule.release.src.dir}/java/">
+                <fileset dir="${mule.release.src.dir}/main/java"/>
                 <fileset dir="${mule.release.src.dir}/test/java"/>
             </copy>
 
@@ -469,6 +470,7 @@
             </zip>
 
             <!-- (almost) final cleanup -->
+            <delete dir="${mule.release.src.dir}/main"/>
             <delete dir="${mule.release.src.dir}/test"/>
             
             <!--
