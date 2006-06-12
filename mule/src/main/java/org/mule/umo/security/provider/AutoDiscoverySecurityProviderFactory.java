@@ -46,7 +46,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
     /**
      * Security provider properties for IBM JDK.
      */
-    private static final IBMSecurityProviderInfo IBM_SECURITY_PROVIDER = new IBMSecurityProviderInfo();
+    private static final SecurityProviderInfo IBM_SECURITY_PROVIDER = new IBMSecurityProviderInfo();
 
 
     public SecurityProviderInfo getSecurityProviderInfo() {
