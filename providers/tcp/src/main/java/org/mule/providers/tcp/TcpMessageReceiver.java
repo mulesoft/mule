@@ -44,6 +44,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.SocketAddress;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
@@ -207,7 +208,14 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
             try {
                 if (socket != null && !socket.isClosed()) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Closing listener: " + socket.getLocalSocketAddress().toString());
+                        // some dirty workaround for IBM JSSE's SSL implementation,
+                        // which closes sockets asynchronously by that point.
+                        final SocketAddress socketAddress = socket.getLocalSocketAddress();
+                        if (socketAddress == null) {
+                            logger.debug("Listener has already been closed by other process.");
+                        } else {
+                            logger.debug("Closing listener: " + socketAddress);
+                        }
                     }
                     socket.close();
                 }
@@ -226,7 +234,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
 
                 while (!socket.isClosed() && !disposing.get()) {
 
-                    byte[] b = null;
+                    byte[] b;
                     try {
                         b = protocol.read(dataIn);
                             // end of stream
