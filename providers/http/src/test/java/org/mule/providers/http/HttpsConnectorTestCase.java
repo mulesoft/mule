@@ -47,6 +47,8 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.setKeyPassword("mulepassword");
         cnn.setStorePassword("mulepassword");
+        cnn.setTrustStore("trustStore");
+        cnn.setTrustStorePassword("mulepassword");
         cnn.setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
         if (initialised) {

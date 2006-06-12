@@ -29,11 +29,11 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
         HttpsConnector connector = new HttpsConnector();
         connector.setName("testHttps");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        connector.setKeyStore("muletest.keystore");
-        connector.setStorePassword("password");
-        connector.setKeyPassword("keypassword");
-        connector.setTrustStorePassword("password");
-        connector.setTrustStore("muletest.truststore");
+        connector.setKeyStore("serverKeystore");
+        connector.setStorePassword("mulepassword");
+        connector.setKeyPassword("mulepassword");
+        connector.setTrustStore("trustStore");
+        connector.setTrustStorePassword("mulepassword");
         return connector;
     }
 
