@@ -19,7 +19,7 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTe
         f.createNewFile();
 
         // try a couple of times with backoff strategy, then fail
-        File errorFile = new File("./.mule/errors/test-1.out");
+        File errorFile = new File("./.mule/errors/test-0.out");
         boolean testSucceded = false;
         int timesTried = 0;
         while (timesTried <= 3) {
@@ -31,7 +31,7 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTe
         }
 
         if (!testSucceded) {
-            fail("Exception strategy didn't move the file to the error folder.");
+            fail("Exception strategy hasn't moved the file to the error folder.");
         }
     }
 
