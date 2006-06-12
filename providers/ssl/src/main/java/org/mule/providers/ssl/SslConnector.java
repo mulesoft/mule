@@ -15,6 +15,9 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.provider.SecurityProviderFactory;
+import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -29,23 +32,24 @@ import java.security.Security;
 /**
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
  * host.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SslConnector extends TcpConnector
 {
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
-    public static final String DEFAULT_MANAGER_ALGORITHM = "SunX509";
-    public static final String DEFAULT_PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
+
+    private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
+    private SecurityProviderInfo spInfo = spFactory.getSecurityProviderInfo();
 
     private String keyStore = null;
     private String keyPassword = null;
     private String storePassword = null;
     private String keyStoreType = DEFAULT_KEYSTORE_TYPE;
-    private String keyManagerAlgorithm = DEFAULT_MANAGER_ALGORITHM;
-    private Provider provider = new com.sun.net.ssl.internal.ssl.Provider();
-    private String protocolHandler = DEFAULT_PROTOCOL_HANDLER;
+    private String keyManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
+    private Provider provider = spFactory.getProvider();
+    private String protocolHandler = spInfo.getProtocolHandler();
     private String clientKeyStore = null;
     private String clientKeyStorePassword = null;
     private String trustStore = null;
@@ -76,7 +80,7 @@ public class SslConnector extends TcpConnector
         }
 
         if (getKeyStore() != null) {
-            KeyStore keystore = null;
+            KeyStore keystore;
             try {
                 Security.addProvider(getProvider());
                 // Create keyStore
