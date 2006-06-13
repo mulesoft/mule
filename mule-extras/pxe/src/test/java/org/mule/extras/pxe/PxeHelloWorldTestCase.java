@@ -11,21 +11,21 @@
  */
 package org.mule.extras.pxe;
 
-import org.dom4j.io.XMLWriter;
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
-import org.mule.util.ClassHelper;
-import org.w3c.dom.Document;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dom4j.io.XMLWriter;
+import org.mule.MuleManager;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOMessage;
+import org.mule.util.ClassUtils;
+import org.w3c.dom.Document;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -53,8 +53,7 @@ public class PxeHelloWorldTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document soap = dbf.newDocumentBuilder().parse(
-                ClassHelper.getResourceAsStream("helloRequest.soap", getClass()));
+        Document soap = dbf.newDocumentBuilder().parse(ClassUtils.getResourceAsStream("helloRequest.soap", getClass()));
         Map props = new HashMap();
         UMOMessage result = client.send("vm://pxe.in", new DOMSource(soap.getDocumentElement()), props);
         assertNotNull(result);

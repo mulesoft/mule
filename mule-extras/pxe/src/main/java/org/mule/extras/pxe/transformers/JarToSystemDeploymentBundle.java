@@ -12,12 +12,12 @@
  */
 package org.mule.extras.pxe.transformers;
 
-import org.mule.util.IteratorAdapter;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.collections.IteratorUtils;
 
 /**
  * todo document
@@ -51,7 +51,7 @@ public class JarToSystemDeploymentBundle extends AbstractSDBTransformer
             zip = new ZipFile((File) src);
         }
 
-        return new IteratorAdapter(zip.entries());
+        return IteratorUtils.asIterator(zip.entries());
     }
 
     protected BundleEntry getBundleEntry(Object source, Object artifact)

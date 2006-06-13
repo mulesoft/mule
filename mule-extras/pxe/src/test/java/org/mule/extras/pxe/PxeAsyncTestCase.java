@@ -13,20 +13,20 @@ package org.mule.extras.pxe;
 
 import com.fs.utils.DOMUtils;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
-import org.mule.util.ClassHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.mule.MuleManager;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOMessage;
+import org.mule.util.ClassUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -54,14 +54,13 @@ public class PxeAsyncTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document soap = dbf.newDocumentBuilder().parse(
-                ClassHelper.getResourceAsStream("asyncRequest.xml", getClass()));
+        Document soap = dbf.newDocumentBuilder().parse(ClassUtils.getResourceAsStream("asyncRequest.xml", getClass()));
         Map props = new HashMap();
         UMOMessage result = client.sendDirect("pxe", null, new DOMSource(soap.getDocumentElement()), props);
         assertNotNull(result);
         String xml = DOMUtils.domToString(((Element)result.getPayload()));
         System.out.println(xml);
-        //todo apart from there being no exception how do I verify the result??
+        //TODO apart from there being no exception how do I verify the result??
     }
 
     public void testMessageAsyncSend() throws Exception
@@ -69,10 +68,9 @@ public class PxeAsyncTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document soap = dbf.newDocumentBuilder().parse(
-                ClassHelper.getResourceAsStream("asyncRequest.xml", getClass()));
+        Document soap = dbf.newDocumentBuilder().parse(ClassUtils.getResourceAsStream("asyncRequest.xml", getClass()));
         Map props = new HashMap();
         client.dispatchDirect("pxe", new DOMSource(soap.getDocumentElement()), props);
-        //todo apart from there being no exception how do I verify the result??
+        //TODO apart from there being no exception how do I verify the result??
     }
 }

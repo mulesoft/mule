@@ -32,32 +32,6 @@ import com.fs.pxe.sfwk.spi.ServiceProviderException;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.i18n.Messages;
-import org.mule.extras.pxe.transformers.DirectoryToSystemDeploymentBundle;
-import org.mule.extras.pxe.transformers.JarToSystemDeploymentBundle;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.UMODescriptorAware;
-import org.mule.impl.message.ExceptionPayload;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.LifecycleException;
-import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.concurrent.Latch;
-import org.w3c.dom.Document;
-
 import javax.management.Attribute;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -80,6 +54,32 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.config.i18n.Messages;
+import org.mule.extras.pxe.transformers.DirectoryToSystemDeploymentBundle;
+import org.mule.extras.pxe.transformers.JarToSystemDeploymentBundle;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.UMODescriptorAware;
+import org.mule.impl.message.ExceptionPayload;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.ClassUtils;
+import org.mule.util.PropertiesUtils;
+import org.mule.util.concurrent.Latch;
+import org.w3c.dom.Document;
 
 /**
  * <code>PxeComponent</code> embeds the PXE runtime engineas a a Mule component so that
@@ -189,7 +189,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             this.server.setAttribute(modDAO, new Attribute("TransactionManager", daoAttributes.get("TransactionManager")));
             this.server.setAttribute(modDAO, new Attribute("DataSource", daoAttributes.get("DataSource")));
 
-            URL hibernateProps = ClassHelper.getResource("hibernate.properties", getClass());
+            URL hibernateProps = ClassUtils.getResource("hibernate.properties", getClass());
             String temp = "Not Found";
             if (hibernateProps != null) {
                 temp = hibernateProps.toString();
@@ -444,7 +444,6 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             }
             return result;
         }
-
     }
 
 
@@ -500,12 +499,12 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
 
     protected void logConfig() {
         logger.debug("Default Pxe Database attributes are:");
-        logger.debug(PropertiesHelper.propertiesToString(dbAttributes, true));
+        logger.debug(PropertiesUtils.propertiesToString(dbAttributes, true));
 
         logger.debug("Default Pxe DAO attributes are:");
-        logger.debug(PropertiesHelper.propertiesToString(daoAttributes, true));
+        logger.debug(PropertiesUtils.propertiesToString(daoAttributes, true));
 
         logger.debug("Default Pxe Bpel attributes are:");
-        logger.debug(PropertiesHelper.propertiesToString(bpelAttributes, true));
+        logger.debug(PropertiesUtils.propertiesToString(bpelAttributes, true));
     }
 }
