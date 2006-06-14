@@ -421,9 +421,9 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>${geronimo_spec_activation_version}</version>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>${activation_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>

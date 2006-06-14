@@ -14,8 +14,8 @@
     <siteDirectory>/home/http/symphonysoft.com/html/mule/reference/providers/email/</siteDirectory>
     <dependencies>
         <dependency>
-            <groupId>javamail</groupId>
-            <artifactId>javamail</artifactId>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
             <version>${javamail_version}</version>
             <url>http://java.sun.com/products/javamail/</url>
         </dependency>
