@@ -99,7 +99,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         descriptor.setProperties(props);
         MuleManager.getInstance().registerConnector(connector);
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
-        ((MuleDescriptor) descriptor).initialise();
+        descriptor.initialise();
         return component;
     }
 
@@ -108,7 +108,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * @return
      */
     protected UMOEndpoint createOutboundEndpoint() {
-        if(getOutDest()!=null) {
+        if(getOutDest() != null) {
             return new MuleEndpoint("testOut", getOutDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
         } else {
             return null;
