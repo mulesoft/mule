@@ -30,11 +30,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 public class OptimisedSedaComponent extends SedaComponent
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 4710126404530397113L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 4710126404530397113L;
 
-	/**
+    /**
      * Default constructor
      */
     public OptimisedSedaComponent(MuleDescriptor descriptor, OptimisedSedaModel model) {

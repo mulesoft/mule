@@ -37,11 +37,11 @@ import org.mule.umo.provider.DispatchException;
 public class PipelineComponent extends DirectComponent
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -2788210157354765190L;
-	
-	private Callable callable;
+     * Serial version
+     */
+    private static final long serialVersionUID = -2788210157354765190L;
+
+    private Callable callable;
 
     public PipelineComponent(MuleDescriptor descriptor, UMOModel model) {
         super(descriptor, model);

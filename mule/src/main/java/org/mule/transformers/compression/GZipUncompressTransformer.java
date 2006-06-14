@@ -27,11 +27,11 @@ import java.io.IOException;
 public class GZipUncompressTransformer extends GZipCompressTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -861180612454404077L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -861180612454404077L;
 
-	public GZipUncompressTransformer()
+    public GZipUncompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());

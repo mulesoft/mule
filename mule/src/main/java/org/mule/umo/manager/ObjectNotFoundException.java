@@ -25,11 +25,11 @@ import org.mule.config.i18n.Messages;
 public class ObjectNotFoundException extends ContainerException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 5012452325639544484L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 5012452325639544484L;
 
-	/**
+    /**
      * @param componentName the name of the component that could not be found
      */
     public ObjectNotFoundException(String componentName)

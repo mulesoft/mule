@@ -26,11 +26,11 @@ import org.mule.umo.UMOMessage;
 public class EncryptionNotSupportedException extends SecurityException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1661059380853528623L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1661059380853528623L;
 
-	public EncryptionNotSupportedException(Message message, UMOMessage umoMessage)
+    public EncryptionNotSupportedException(Message message, UMOMessage umoMessage)
     {
         super(message, umoMessage);
     }

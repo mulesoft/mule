@@ -22,11 +22,11 @@ import org.mule.umo.lifecycle.Callable;
 public class Apple implements Fruit, Callable
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -7631993371500076921L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -7631993371500076921L;
 
-	/**
+    /**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(Apple.class);

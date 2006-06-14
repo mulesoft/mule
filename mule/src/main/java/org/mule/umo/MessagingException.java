@@ -31,10 +31,10 @@ import java.util.Map;
 public class MessagingException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6941498759267936649L;
-	/**
+     * Serial version
+     */
+    private static final long serialVersionUID = 6941498759267936649L;
+    /**
      * The UMOMessage being processed when the error occurred
      */
     protected transient UMOMessage umoMessage = null;

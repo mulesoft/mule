@@ -27,11 +27,11 @@ import org.mule.umo.routing.RoutingException;
 public class DispatchException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8204621943732496605L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8204621943732496605L;
 
-	public DispatchException(UMOMessage message, UMOImmutableEndpoint endpoint)
+    public DispatchException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         super(message, endpoint);
     }

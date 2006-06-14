@@ -32,11 +32,11 @@ import javax.script.ScriptException;
 public class ScriptTransformer extends AbstractEventAwareTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -2384663903730064892L;
-	
-	protected Scriptable scriptable;
+     * Serial version
+     */
+    private static final long serialVersionUID = -2384663903730064892L;
+
+    protected Scriptable scriptable;
 
     public ScriptTransformer() {
         scriptable = new Scriptable();

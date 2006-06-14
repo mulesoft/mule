@@ -22,11 +22,11 @@ import org.mule.config.i18n.Message;
 public class ConfigurationException extends MuleException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 3658822340943734960L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 3658822340943734960L;
 
-	public ConfigurationException(Message message)
+    public ConfigurationException(Message message)
     {
         super(message);
     }

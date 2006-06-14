@@ -32,11 +32,11 @@ import org.mule.umo.transformer.TransformerException;
 public class ObjectToXml extends AbstractXStreamTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2231326110980980434L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2231326110980980434L;
 
-	public ObjectToXml()
+    public ObjectToXml()
     {
         registerSourceType(Object.class);
     }

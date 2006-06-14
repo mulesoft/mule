@@ -26,11 +26,11 @@ import org.mule.config.i18n.Messages;
 public class EndpointNotFoundException extends EndpointException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 790450139906970837L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 790450139906970837L;
 
-	public EndpointNotFoundException(String endpoint)
+    public EndpointNotFoundException(String endpoint)
     {
         super(new Message(Messages.ENDPOINT_X_NOT_FOUND, endpoint));
     }

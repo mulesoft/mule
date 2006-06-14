@@ -28,11 +28,11 @@ import org.mule.util.Base64;
 public class Base64Decoder extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3297461704379793293L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3297461704379793293L;
 
-	public Base64Decoder()
+    public Base64Decoder()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

@@ -25,11 +25,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class CredentialsNotSetException extends UnauthorisedException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6271648179641734579L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6271648179641734579L;
 
-	public CredentialsNotSetException(Message message, UMOMessage umoMessage)
+    public CredentialsNotSetException(Message message, UMOMessage umoMessage)
     {
         super(message, umoMessage);
     }

@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 public class CouldNotRouteOutboundMessageException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 4609966704030524482L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 4609966704030524482L;
 
-	public CouldNotRouteOutboundMessageException(UMOMessage message, UMOEndpoint endpoint)
+    public CouldNotRouteOutboundMessageException(UMOMessage message, UMOEndpoint endpoint)
     {
         super(message, endpoint);
     }

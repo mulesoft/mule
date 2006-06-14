@@ -23,11 +23,11 @@ import java.io.IOException;
 public class MuleXmlBuilderContextServlet extends HttpServlet
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = -2446689032349402434L;
-	
-	public static final String CONFIG_INIT_PARAMETER = "org.mule.config";
+     * Serial version
+     */
+    private static final long serialVersionUID = -2446689032349402434L;
+
+    public static final String CONFIG_INIT_PARAMETER = "org.mule.config";
 
     public void init() throws ServletException
     {

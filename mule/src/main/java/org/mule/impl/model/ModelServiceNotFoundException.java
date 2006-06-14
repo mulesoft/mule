@@ -24,11 +24,11 @@ import org.mule.umo.model.ModelException;
 public class ModelServiceNotFoundException extends ModelException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -5306713972201495210L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -5306713972201495210L;
 
-	/**
+    /**
      * @param location the path of the service
      */
     public ModelServiceNotFoundException(String location)

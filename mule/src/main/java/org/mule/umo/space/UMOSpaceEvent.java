@@ -22,10 +22,10 @@ import java.util.EventObject;
 public class UMOSpaceEvent extends EventObject
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 4575516735778744922L;
-	private UMOSpace space;
+     * Serial version
+     */
+    private static final long serialVersionUID = 4575516735778744922L;
+    private UMOSpace space;
 
     public UMOSpaceEvent(Object item, UMOSpace space)
     {

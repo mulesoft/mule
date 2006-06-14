@@ -27,10 +27,10 @@ import org.mule.umo.manager.UMOServerNotification;
 public class ManagerNotification extends UMOServerNotification implements BlockingServerEvent
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3246036188011581121L;
-	public static final int MANAGER_INITIALISNG = MANAGER_EVENT_ACTION_START_RANGE + 1;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3246036188011581121L;
+    public static final int MANAGER_INITIALISNG = MANAGER_EVENT_ACTION_START_RANGE + 1;
     public static final int MANAGER_INITIALISED = MANAGER_EVENT_ACTION_START_RANGE + 2;
     public static final int MANAGER_STARTING = MANAGER_EVENT_ACTION_START_RANGE + 3;
     public static final int MANAGER_STARTED = MANAGER_EVENT_ACTION_START_RANGE + 4;

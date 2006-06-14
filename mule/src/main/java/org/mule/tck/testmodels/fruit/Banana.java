@@ -21,11 +21,11 @@ import java.util.EventObject;
 public class Banana implements Fruit
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1371515374040436874L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1371515374040436874L;
 
-	/**
+    /**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(Banana.class);

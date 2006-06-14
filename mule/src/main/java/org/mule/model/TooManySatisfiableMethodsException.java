@@ -30,11 +30,11 @@ import org.mule.util.StringMessageUtils;
 public class TooManySatisfiableMethodsException extends ModelException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 7856775581858822364L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 7856775581858822364L;
 
-	/**
+    /**
      * @param component
      */
     public TooManySatisfiableMethodsException(Object component)

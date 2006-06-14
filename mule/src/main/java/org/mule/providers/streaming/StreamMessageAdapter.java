@@ -28,10 +28,10 @@ import java.io.OutputStream;
 public class StreamMessageAdapter extends AbstractMessageAdapter
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6794965828515586752L;
-	protected InputStream in;
+     * Serial version
+     */
+    private static final long serialVersionUID = 6794965828515586752L;
+    protected InputStream in;
     protected InputStream response;
     protected OutputStream out;
     protected OutputHandler handler;

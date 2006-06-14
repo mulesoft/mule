@@ -130,10 +130,10 @@ public abstract class AbstractDigesterConfiguration
      * @throws ConfigurationException if the resource could not be loaded by any means
      */
     protected InputStream loadConfig(String configResource) throws ConfigurationException {
-    	InputStream is;
+        InputStream is;
         try {
             is = ClassUtils.getResourceAsStream(configResource, getClass(),
-                    							/*tryAsFile*/true, /*tryAsUrl*/true);
+                                                /*tryAsFile*/true, /*tryAsUrl*/true);
             return is;
         } catch (IOException e) {
             throw new ConfigurationException(new Message(

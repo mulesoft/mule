@@ -30,11 +30,11 @@ import java.util.Iterator;
 public class ExceptionMessage extends BaseMessage
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -538516243574950621L;
-	
-	private Throwable exception;
+     * Serial version
+     */
+    private static final long serialVersionUID = -538516243574950621L;
+
+    private Throwable exception;
     private String componentName;
     private UMOEndpointURI endpointUri;
     private Date timeStamp;

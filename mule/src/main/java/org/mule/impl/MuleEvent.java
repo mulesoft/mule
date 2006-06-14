@@ -59,10 +59,10 @@ import java.util.Iterator;
 public class MuleEvent extends EventObject implements UMOEvent
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 7568207722883309919L;
-	/**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7568207722883309919L;
+    /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());

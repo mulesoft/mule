@@ -27,11 +27,11 @@ import org.mule.umo.routing.RoutingException;
 public class AggregationException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 1276049971165761454L;
-	
-	private EventGroup eventGroup = null;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1276049971165761454L;
+
+    private EventGroup eventGroup = null;
 
     public AggregationException(EventGroup eventGroup, UMOImmutableEndpoint endpoint) {
         super(new MuleMessage(new NullPayload()), endpoint);

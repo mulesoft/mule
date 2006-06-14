@@ -22,11 +22,11 @@ import org.mule.umo.UMOEventContext;
 public class Kiwi implements Fruit
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1468423665948468954L;
-	
-	private boolean bitten;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1468423665948468954L;
+
+    private boolean bitten;
 
     public void handle(UMOEventContext eventContext) throws Exception {
         final Object payload = eventContext.getTransformedMessage();

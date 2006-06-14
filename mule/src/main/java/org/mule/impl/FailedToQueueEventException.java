@@ -27,11 +27,11 @@ import org.mule.umo.UMOMessage;
 public class FailedToQueueEventException extends ComponentException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8368283988424746098L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8368283988424746098L;
 
-	public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component)
+    public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component)
     {
         super(message, umoMessage, component);
     }

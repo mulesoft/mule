@@ -31,11 +31,11 @@ import java.rmi.RemoteException;
 public class DummyEjbBean implements SessionBean, DummyEjb
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1521532107372250896L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1521532107372250896L;
 
-	public void ejbActivate() throws EJBException
+    public void ejbActivate() throws EJBException
     {
         // nothing to do
     }

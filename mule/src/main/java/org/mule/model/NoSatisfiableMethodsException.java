@@ -30,11 +30,11 @@ import org.mule.util.StringMessageUtils;
 public class NoSatisfiableMethodsException extends ModelException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -4703387041767867189L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -4703387041767867189L;
 
-	/**
+    /**
      * @param component
      */
     public NoSatisfiableMethodsException(Object component)

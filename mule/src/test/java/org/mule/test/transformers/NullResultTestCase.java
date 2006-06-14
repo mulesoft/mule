@@ -54,12 +54,12 @@ public class NullResultTestCase extends AbstractTransformerTestCase {
     public final class NullResultTransformer extends AbstractTransformer
     {
         /**
-		 * Serial version
-		 */
-		private static final long serialVersionUID = -6677554849756349271L;
+         * Serial version
+         */
+        private static final long serialVersionUID = -6677554849756349271L;
 
-		public NullResultTransformer()
-		{
+        public NullResultTransformer()
+        {
             registerSourceType(Object.class);
             setReturnClass(NullPayload.class);
         }

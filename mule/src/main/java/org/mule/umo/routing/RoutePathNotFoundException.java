@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 public class RoutePathNotFoundException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8481434966594513065L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8481434966594513065L;
 
-	public RoutePathNotFoundException(UMOMessage message, UMOEndpoint endpoint)
+    public RoutePathNotFoundException(UMOMessage message, UMOEndpoint endpoint)
     {
         super(message, endpoint);
     }

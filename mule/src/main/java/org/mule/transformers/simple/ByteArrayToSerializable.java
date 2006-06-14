@@ -27,11 +27,11 @@ import org.mule.umo.transformer.TransformerException;
 public class ByteArrayToSerializable extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 5305641786345530597L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 5305641786345530597L;
 
-	public ByteArrayToSerializable()
+    public ByteArrayToSerializable()
     {
         registerSourceType(byte[].class);
     }

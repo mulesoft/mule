@@ -24,11 +24,11 @@ import org.mule.util.compression.GZipCompression;
 public class TestCompressionTransformer extends AbstractCompressionTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1742674557192926869L;
-	
-	private String beanProperty1;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1742674557192926869L;
+
+    private String beanProperty1;
     private String containerProperty;
 
     private int beanProperty2;

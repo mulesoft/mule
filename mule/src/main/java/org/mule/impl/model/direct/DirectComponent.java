@@ -35,11 +35,11 @@ import java.util.List;
 public class DirectComponent extends AbstractComponent
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8590955440156945732L;
-	
-	protected List interceptorList = null;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8590955440156945732L;
+
+    protected List interceptorList = null;
     protected MuleProxy proxy;
 
     public DirectComponent(MuleDescriptor descriptor, UMOModel model) {

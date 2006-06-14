@@ -25,11 +25,11 @@ import org.mule.umo.space.UMOSpaceException;
 public class SpaceActionInteruptedException extends UMOSpaceException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3326367296473936593L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3326367296473936593L;
 
-	public SpaceActionInteruptedException(String action, InterruptedException cause)
+    public SpaceActionInteruptedException(String action, InterruptedException cause)
     {
         super(new Message(Messages.SPACE_ACTION_X_INTERRUPTED, action), cause);
     }

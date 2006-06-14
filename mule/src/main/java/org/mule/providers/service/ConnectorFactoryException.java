@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.EndpointException;
 public class ConnectorFactoryException extends EndpointException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -4166766364690837213L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -4166766364690837213L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public ConnectorFactoryException(Message message)

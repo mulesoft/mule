@@ -25,11 +25,11 @@ import java.util.Map;
 public class BaseMessage implements Serializable
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6105691921086093748L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6105691921086093748L;
 
-	protected Object message;
+    protected Object message;
 
     protected Map context;
 

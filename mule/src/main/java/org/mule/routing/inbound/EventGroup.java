@@ -28,11 +28,11 @@ import java.util.List;
 public class EventGroup implements Serializable
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -7337182983687406403L;
-	
-	private Object groupId;
+     * Serial version
+     */
+    private static final long serialVersionUID = -7337182983687406403L;
+
+    private Object groupId;
     private List events;
     private long created;
     private int expectedSize = -1;

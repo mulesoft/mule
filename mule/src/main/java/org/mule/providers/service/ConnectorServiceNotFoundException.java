@@ -24,11 +24,11 @@ import org.mule.config.i18n.Message;
 public class ConnectorServiceNotFoundException extends ConnectorFactoryException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8321406750213654479L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8321406750213654479L;
 
-	/**
+    /**
      * @param location the path of the service
      */
     public ConnectorServiceNotFoundException(String location)

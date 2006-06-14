@@ -24,11 +24,11 @@ import org.mule.config.i18n.Message;
 public class ContainerException extends ManagerException
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = 5024452108618986265L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 5024452108618986265L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public ContainerException(Message message)

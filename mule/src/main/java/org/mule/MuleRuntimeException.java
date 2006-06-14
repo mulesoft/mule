@@ -26,11 +26,11 @@ import org.mule.config.i18n.Message;
 public class MuleRuntimeException extends RuntimeException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6728041560892553159L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 6728041560892553159L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public MuleRuntimeException(Message message)

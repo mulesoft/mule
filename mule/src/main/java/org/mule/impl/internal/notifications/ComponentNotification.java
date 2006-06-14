@@ -28,10 +28,10 @@ import org.mule.umo.manager.UMOServerNotification;
 public class ComponentNotification extends UMOServerNotification
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8575741816897936674L;
-	public static final int COMPONENT_INITIALISED = COMPONENT_EVENT_ACTION_START_RANGE + 1;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8575741816897936674L;
+    public static final int COMPONENT_INITIALISED = COMPONENT_EVENT_ACTION_START_RANGE + 1;
     public static final int COMPONENT_STARTED = COMPONENT_EVENT_ACTION_START_RANGE + 2;
     public static final int COMPONENT_STOPPED = COMPONENT_EVENT_ACTION_START_RANGE + 3;
     public static final int COMPONENT_PAUSED = COMPONENT_EVENT_ACTION_START_RANGE + 4;

@@ -23,11 +23,11 @@ import org.mule.umo.UMOException;
 public class UMOSpaceException extends UMOException
 {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6618481719989683929L;
+     *
+     */
+    private static final long serialVersionUID = 6618481719989683929L;
 
-	public UMOSpaceException(Message message)
+    public UMOSpaceException(Message message)
     {
         super(message);
     }

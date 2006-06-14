@@ -24,11 +24,11 @@ import org.mule.umo.transformer.TransformerException;
 public class UCEncoder extends AbstractTransformer
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = 1120873588501386458L;
-	
-	private sun.misc.UCEncoder encoder;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1120873588501386458L;
+
+    private sun.misc.UCEncoder encoder;
 
     public UCEncoder()
     {

@@ -22,11 +22,11 @@ import java.io.Serializable;
 public class Message implements Serializable
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6109760447384477924L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6109760447384477924L;
 
-	public static final int STATIC_ERROR_CODE = -1;
+    public static final int STATIC_ERROR_CODE = -1;
 
     private static final transient Object[] EMPTY_ARGS = new Object[] {};
 

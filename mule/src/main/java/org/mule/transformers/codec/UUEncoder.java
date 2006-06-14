@@ -24,11 +24,11 @@ import org.mule.umo.transformer.TransformerException;
 public class UUEncoder extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 4074142466316499186L;
-	
-	private sun.misc.UUEncoder encoder;
+     * Serial version
+     */
+    private static final long serialVersionUID = 4074142466316499186L;
+
+    private sun.misc.UUEncoder encoder;
 
     public UUEncoder()
     {

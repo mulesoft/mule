@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.EndpointException;
 public class TransformerException extends EndpointException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2943589828020763649L;
-	
-	private transient UMOTransformer transformer;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2943589828020763649L;
+
+    private transient UMOTransformer transformer;
 
     /**
      * @param message the exception message

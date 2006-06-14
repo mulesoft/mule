@@ -149,11 +149,11 @@ public class TestConnector extends AbstractConnector
     public class DummyMessageAdapter extends AbstractMessageAdapter
     {
         /**
-		 * Serial version
-		 */
-		private static final long serialVersionUID = -2304322766342059136L;
-		
-		private Object message = new String("DummyMessage");
+         * Serial version
+         */
+        private static final long serialVersionUID = -2304322766342059136L;
+
+        private Object message = new String("DummyMessage");
 
         public DummyMessageAdapter(Object message)
         {

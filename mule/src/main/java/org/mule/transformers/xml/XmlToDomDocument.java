@@ -30,11 +30,11 @@ import javax.xml.transform.TransformerFactory;
 public class XmlToDomDocument extends AbstractXmlTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 5056464684549099908L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 5056464684549099908L;
 
-	public XmlToDomDocument()
+    public XmlToDomDocument()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

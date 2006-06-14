@@ -30,11 +30,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class RoutingException extends MessagingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2478458847072048645L;
-	
-	protected transient UMOImmutableEndpoint endpoint;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2478458847072048645L;
+
+    protected transient UMOImmutableEndpoint endpoint;
 
     public RoutingException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {

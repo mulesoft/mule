@@ -31,11 +31,11 @@ import org.mule.umo.transformer.TransformerException;
 public class XmlToObject extends AbstractXStreamTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -2804761502812600068L;
-	
-	private DomDocumentToXml domTransformer = new DomDocumentToXml();
+     * Serial version
+     */
+    private static final long serialVersionUID = -2804761502812600068L;
+
+    private DomDocumentToXml domTransformer = new DomDocumentToXml();
 
     public XmlToObject()
     {

@@ -24,11 +24,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 public class ConnectException extends InitialisationException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -7802483584780922653L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -7802483584780922653L;
 
-	public ConnectException(Message message, Object component)
+    public ConnectException(Message message, Object component)
     {
         super(message, component);
     }

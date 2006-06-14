@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 public class CouldNotRouteInboundEventException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2736231899561051615L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2736231899561051615L;
 
-	public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
+    public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
     {
         super(message, endpoint);
     }

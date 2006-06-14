@@ -23,11 +23,11 @@ import org.mule.umo.UMOException;
 public class NotificationException extends UMOException
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = -5998352122311445746L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -5998352122311445746L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public NotificationException(Message message) {

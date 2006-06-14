@@ -24,11 +24,11 @@ import org.mule.umo.UMOException;
 public class RegistryException extends UMOException
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = 7362073316934744362L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 7362073316934744362L;
 
-	public RegistryException(Message message) {
+    public RegistryException(Message message) {
         super(message);
     }
 

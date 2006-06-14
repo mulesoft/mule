@@ -19,11 +19,11 @@ import org.mule.umo.transformer.TransformerException;
 public class ObjectToFruitLover extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6760497986912711312L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6760497986912711312L;
 
-	public ObjectToFruitLover()
+    public ObjectToFruitLover()
     {
         this.setReturnClass(FruitLover.class);
         this.registerSourceType(String.class);

@@ -27,11 +27,11 @@ import java.io.UnsupportedEncodingException;
 public class SgmlEntityEncoder extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 4229616539951956886L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 4229616539951956886L;
 
-	public SgmlEntityEncoder()
+    public SgmlEntityEncoder()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);

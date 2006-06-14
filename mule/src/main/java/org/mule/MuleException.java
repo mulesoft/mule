@@ -25,11 +25,11 @@ import org.mule.umo.UMOException;
 public class MuleException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2554735072826262515L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2554735072826262515L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public MuleException(Message message)

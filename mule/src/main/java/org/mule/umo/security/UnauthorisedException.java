@@ -27,11 +27,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class UnauthorisedException extends SecurityException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6664384216189042672L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6664384216189042672L;
 
-	public UnauthorisedException(Message message)
+    public UnauthorisedException(Message message)
     {
         super(message, RequestContext.getEventContext().getMessage());
     }

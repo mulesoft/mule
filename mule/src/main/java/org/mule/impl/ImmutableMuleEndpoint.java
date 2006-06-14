@@ -53,11 +53,11 @@ import java.util.Map;
 public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -2431378111247771909L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -2431378111247771909L;
 
-	/**
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(ImmutableMuleEndpoint.class);

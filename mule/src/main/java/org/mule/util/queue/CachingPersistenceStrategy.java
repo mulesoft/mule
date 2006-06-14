@@ -32,7 +32,7 @@ public class CachingPersistenceStrategy implements QueuePersistenceStrategy
 
     public Object load(String queue, Object id) throws IOException
     {
-    	    // XXX: is this something wanted as a check?
+            // XXX: is this something wanted as a check?
         // Object obj = objects.get(id);
         return ps.load(queue, id);
     }

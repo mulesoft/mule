@@ -29,11 +29,11 @@ import java.io.OutputStream;
 public class OutStreamMessageAdapter extends AbstractMessageAdapter
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -299373598028203772L;
-	
-	private OutputStream out;
+     * Serial version
+     */
+    private static final long serialVersionUID = -299373598028203772L;
+
+    private OutputStream out;
 
     public OutStreamMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

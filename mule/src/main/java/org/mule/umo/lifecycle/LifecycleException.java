@@ -27,11 +27,11 @@ import org.mule.umo.UMOException;
 public class LifecycleException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 2909614055858287394L;
-	
-	private transient Object component;
+     * Serial version
+     */
+    private static final long serialVersionUID = 2909614055858287394L;
+
+    private transient Object component;
 
     /**
      * @param message

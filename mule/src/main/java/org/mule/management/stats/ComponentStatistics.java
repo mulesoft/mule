@@ -16,11 +16,11 @@ import java.io.PrintWriter;
 public class ComponentStatistics implements Statistics
 {
     /**
-	 * Serial version 
-	 */
-	private static final long serialVersionUID = -2086999226732861674L;
-	
-	private String name;
+     * Serial version
+     */
+    private static final long serialVersionUID = -2086999226732861674L;
+
+    private String name;
     private long totalExecTime = 0;
     private long receivedEventSync = 0;
     private long receivedEventASync = 0;

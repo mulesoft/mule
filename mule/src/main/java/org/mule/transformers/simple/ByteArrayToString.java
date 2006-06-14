@@ -25,11 +25,11 @@ import org.mule.util.StringMessageUtils;
 public class ByteArrayToString extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -9033005899991305308L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -9033005899991305308L;
 
-	public ByteArrayToString()
+    public ByteArrayToString()
     {
         registerSourceType(byte[].class);
         registerSourceType(String.class);

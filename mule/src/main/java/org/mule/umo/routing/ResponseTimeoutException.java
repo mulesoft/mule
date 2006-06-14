@@ -26,11 +26,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 public class ResponseTimeoutException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6882278747922113239L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 6882278747922113239L;
 
-	public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }

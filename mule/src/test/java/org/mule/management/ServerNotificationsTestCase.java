@@ -162,11 +162,11 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public class DummyNotification extends CustomNotification
     {
         /**
-		 * Serial version 
-		 */
-		private static final long serialVersionUID = -1117307108932589331L;
-		
-		public static final int EVENT_RECEIVED = -999999;
+         * Serial version
+         */
+        private static final long serialVersionUID = -1117307108932589331L;
+
+        public static final int EVENT_RECEIVED = -999999;
 
         public DummyNotification(String message, int action)
         {

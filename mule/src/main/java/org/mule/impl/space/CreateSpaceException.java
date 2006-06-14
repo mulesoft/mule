@@ -24,11 +24,11 @@ import org.mule.umo.space.UMOSpaceException;
 public class CreateSpaceException extends UMOSpaceException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6138791159382128699L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 6138791159382128699L;
 
-	public CreateSpaceException(Throwable cause)
+    public CreateSpaceException(Throwable cause)
     {
         super(new Message(Messages.SPACE_FAILED_TO_CREATE), cause);
     }

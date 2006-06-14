@@ -28,11 +28,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class ComponentRoutingException extends RoutingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -113944443831267318L;
-	
-	private transient UMOComponent component;
+     * Serial version
+     */
+    private static final long serialVersionUID = -113944443831267318L;
+
+    private transient UMOComponent component;
 
     public ComponentRoutingException(Message message,
                                      UMOMessage umoMessage,

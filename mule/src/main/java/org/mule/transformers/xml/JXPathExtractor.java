@@ -27,11 +27,11 @@ import org.mule.umo.transformer.TransformerException;
 public class JXPathExtractor extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 8252278715641253900L;
-	
-	private String expression;
+     * Serial version
+     */
+    private static final long serialVersionUID = 8252278715641253900L;
+
+    private String expression;
 
     /**
      * Evaluate the expression in the context of the given object and returns

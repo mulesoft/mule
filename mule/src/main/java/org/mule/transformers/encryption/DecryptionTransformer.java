@@ -23,11 +23,11 @@ import org.mule.umo.security.CryptoFailureException;
 public class DecryptionTransformer extends AbstractEncryptionTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3691559476636732445L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3691559476636732445L;
 
-	protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
+    protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
     {
         return getStrategy().decrypt(buffer, null);
     }

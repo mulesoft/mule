@@ -27,11 +27,11 @@ import java.util.List;
 public class ValidationException extends RegistryException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8798792301579785598L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8798792301579785598L;
 
-	public ValidationException(String vaildationError) {
+    public ValidationException(String vaildationError) {
         super(Message.createStaticMessage(vaildationError));
     }
 

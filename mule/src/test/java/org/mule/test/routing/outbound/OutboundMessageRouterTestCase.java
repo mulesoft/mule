@@ -177,11 +177,11 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     private static class TestMessageAdapter extends DefaultMessageAdapter
     {
         /**
-		 * Serial version
-		 */
-		private static final long serialVersionUID = 6964754557016604536L;
-		
-		public TestMessageAdapter(Object message)
+         * Serial version
+         */
+        private static final long serialVersionUID = 6964754557016604536L;
+
+        public TestMessageAdapter(Object message)
         {
             super(message);
         }

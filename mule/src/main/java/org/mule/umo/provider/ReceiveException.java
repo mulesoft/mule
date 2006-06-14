@@ -28,11 +28,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class ReceiveException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 1960304517882133951L;
-	
-	private UMOImmutableEndpoint endpoint;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1960304517882133951L;
+
+    private UMOImmutableEndpoint endpoint;
 
     /**
      * @param message

@@ -49,10 +49,10 @@ import java.util.Properties;
 public class MuleEndpointURI implements UMOEndpointURI
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 3906735768171252877L;
-	/**
+     * Serial version
+     */
+    private static final long serialVersionUID = 3906735768171252877L;
+    /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(MuleEndpointURI.class);

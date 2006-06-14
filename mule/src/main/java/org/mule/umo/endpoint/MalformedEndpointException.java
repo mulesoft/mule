@@ -27,11 +27,11 @@ import org.mule.config.i18n.Messages;
 public class MalformedEndpointException extends EndpointException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3179045414716505094L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3179045414716505094L;
 
-	/**
+    /**
      * @param endpoint the endpoint that could not be parsed
      */
     public MalformedEndpointException(String endpoint)

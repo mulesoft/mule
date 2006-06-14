@@ -26,11 +26,11 @@ import org.mule.umo.UMOException;
 public class UnknownAuthenticationTypeException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 6275865761357999175L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 6275865761357999175L;
 
-	public UnknownAuthenticationTypeException(UMOAuthentication authentication)
+    public UnknownAuthenticationTypeException(UMOAuthentication authentication)
     {
         super(new Message(Messages.AUTH_TYPE_NOT_RECOGNISED, (authentication == null ? "null"
                 : authentication.getClass().getName())));

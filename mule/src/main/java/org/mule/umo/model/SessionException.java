@@ -25,11 +25,11 @@ import org.mule.config.i18n.Message;
 public class SessionException extends ModelException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -6751481096543965553L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -6751481096543965553L;
 
-	/**
+    /**
      * @param message the exception message
      */
     public SessionException(Message message)

@@ -22,11 +22,11 @@ import org.mule.umo.UMOException;
 public class ResourceManagerException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -2710661653314559260L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -2710661653314559260L;
 
-	/**
+    /**
      * 
      */
     public ResourceManagerException()

@@ -25,11 +25,11 @@ import org.mule.umo.space.UMOSpaceException;
 public class SpaceTransactionException extends UMOSpaceException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8131578773037713193L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8131578773037713193L;
 
-	public SpaceTransactionException(Throwable cause) {
+    public SpaceTransactionException(Throwable cause) {
         //todo better message
         super(new Message(Messages.FAILED_TO_INVOKE_X, "transaction"), cause);
     }

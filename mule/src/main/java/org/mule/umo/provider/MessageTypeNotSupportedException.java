@@ -27,11 +27,11 @@ import org.mule.umo.MessagingException;
 public class MessageTypeNotSupportedException extends MessagingException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -3954838511333933643L;
+     * Serial version
+     */
+    private static final long serialVersionUID = -3954838511333933643L;
 
-	public MessageTypeNotSupportedException(Object message, Class adapterClass)
+    public MessageTypeNotSupportedException(Object message, Class adapterClass)
     {
         super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
                           (message != null ? message.getClass().getName() : "null"),

@@ -23,10 +23,10 @@ import org.mule.umo.space.UMOSpace;
 public class SpaceMonitorNotification extends UMOServerNotification
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -8723048757928555644L;
-	public static final int SPACE_CREATED = SPACE_EVENT_ACTION_START_RANGE + 1;
+     * Serial version
+     */
+    private static final long serialVersionUID = -8723048757928555644L;
+    public static final int SPACE_CREATED = SPACE_EVENT_ACTION_START_RANGE + 1;
     public static final int SPACE_ITEM_ADDED = SPACE_EVENT_ACTION_START_RANGE + 2;
     public static final int SPACE_ITEM_REMOVED = SPACE_EVENT_ACTION_START_RANGE + 3;
     public static final int SPACE_ITEM_EXPIRED = SPACE_EVENT_ACTION_START_RANGE + 4;

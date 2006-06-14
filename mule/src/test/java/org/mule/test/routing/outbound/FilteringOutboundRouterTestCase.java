@@ -80,18 +80,18 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(!router.isMatch(message));
 
         router.setTransformer(new AbstractTransformer()
-        		{
-        		
-                    /**
-					 * Serial version
-					 */
-					private static final long serialVersionUID = 9051843541762963831L;
+                {
 
-			        public Object doTransform(Object src, String encoding) throws TransformerException
-			        {
-			            return ((Exception) src).getMessage();
-			            }
-			});
+                    /**
+                     * Serial version
+                     */
+                    private static final long serialVersionUID = 9051843541762963831L;
+
+                    public Object doTransform(Object src, String encoding) throws TransformerException
+                    {
+                        return ((Exception) src).getMessage();
+                        }
+            });
 
         assertTrue(router.isMatch(message));
     }

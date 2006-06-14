@@ -30,11 +30,11 @@ import java.util.Map;
 public class ObjectToString extends AbstractTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 1784548784479765795L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 1784548784479765795L;
 
-	public ObjectToString()
+    public ObjectToString()
     {
         registerSourceType(Object.class);
         setReturnClass(String.class);

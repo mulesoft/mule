@@ -24,11 +24,11 @@ import org.mule.umo.lifecycle.FatalException;
 public class FatalConnectException extends FatalException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 3300563235465630595L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 3300563235465630595L;
 
-	public FatalConnectException(Message message, Object component)
+    public FatalConnectException(Message message, Object component)
     {
         super(message, component);
     }

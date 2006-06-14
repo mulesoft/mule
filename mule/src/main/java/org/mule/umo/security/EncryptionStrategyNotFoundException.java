@@ -26,11 +26,11 @@ import org.mule.umo.UMOException;
 public class EncryptionStrategyNotFoundException extends UMOException
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 3916371211189075139L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 3916371211189075139L;
 
-	public EncryptionStrategyNotFoundException(String strategyName)
+    public EncryptionStrategyNotFoundException(String strategyName)
     {
         super(new Message(Messages.AUTH_NO_ENCRYPTION_STRATEGY_X, strategyName));
     }

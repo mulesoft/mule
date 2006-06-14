@@ -27,11 +27,11 @@ import java.io.Writer;
 public class WriterMessageAdapter extends AbstractMessageAdapter
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = -1065602752454818625L;
-	
-	private StringWriter writer;
+     * Serial version
+     */
+    private static final long serialVersionUID = -1065602752454818625L;
+
+    private StringWriter writer;
 
     public WriterMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

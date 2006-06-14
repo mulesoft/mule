@@ -84,11 +84,11 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
     private class TestEventTransformer extends AbstractTransformer
     {
         /**
-		 * Serial version
-		 */
-		private static final long serialVersionUID = -7426488200086024584L;
+         * Serial version
+         */
+        private static final long serialVersionUID = -7426488200086024584L;
 
-		/*
+        /*
          * (non-Javadoc)
          * 
          * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)

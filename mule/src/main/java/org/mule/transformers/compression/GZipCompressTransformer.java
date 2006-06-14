@@ -29,11 +29,11 @@ import java.io.Serializable;
 public class GZipCompressTransformer extends AbstractCompressionTransformer
 {
     /**
-	 * Serial version
-	 */
-	private static final long serialVersionUID = 5841897266012659925L;
+     * Serial version
+     */
+    private static final long serialVersionUID = 5841897266012659925L;
 
-	public GZipCompressTransformer()
+    public GZipCompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());
