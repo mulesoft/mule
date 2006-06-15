@@ -49,8 +49,7 @@ public class SedaComponentTestCase extends AbstractMuleTestCase {
                                         new WorkException(new Throwable("testThrowable")));
     }
 
-    private Work getTestWork
-            () {
+    private Work getTestWork() {
         return new Work() {
             public void release() {
                 // noop
