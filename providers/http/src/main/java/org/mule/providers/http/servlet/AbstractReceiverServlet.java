@@ -112,7 +112,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         else {
             HttpResponse httpResponse;
             if (message.getAdapter() instanceof WriterMessageAdapter) {
-                WriterMessageAdapter adapter = (WriterMessageAdapter)message.getAdapter();
+                WriterMessageAdapter adapter = (WriterMessageAdapter) message.getAdapter();
                 httpResponse = new HttpResponse();
                 httpResponse.setBodyString(adapter.getPayloadAsString());
             }
@@ -136,7 +136,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
             if (!servletResponse.isCommitted()) {
-                servletResponse.setStatus(HttpServletResponse.SC_OK);
+                servletResponse.setStatus(httpResponse.getStatusCode());
             }
         }
         servletResponse.flushBuffer();

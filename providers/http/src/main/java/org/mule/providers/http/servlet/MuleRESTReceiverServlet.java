@@ -65,7 +65,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 String timeoutString = httpServletRequest.getParameter("timeout");
                 long to = timeout;
                 if (timeoutString != null) {
-                    to = new Long(timeoutString).longValue();
+                    to = Long.parseLong(timeoutString);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("Making request using endpoint: " + endpoint.toString()

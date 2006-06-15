@@ -40,7 +40,7 @@ public class HttpResponse
     public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
 
     private HttpVersion ver = HttpVersion.HTTP_1_1;
-    private int statuscode = HttpStatus.SC_OK;
+    private int statusCode = HttpStatus.SC_OK;
     private String phrase = HttpStatus.getStatusText(HttpStatus.SC_OK);
     private HeaderGroup headers = new HeaderGroup();
     private InputStream entity = null;
@@ -93,7 +93,7 @@ public class HttpResponse
             throw new IllegalArgumentException("Status code may not be negative or zero");
         }
         this.ver = ver;
-        this.statuscode = statuscode;
+        this.statusCode = statuscode;
         if (phrase != null) {
             this.phrase = phrase;
         }
@@ -112,9 +112,17 @@ public class HttpResponse
         return this.phrase;
     }
 
+    /**
+     * @deprecated use {@link #getStatusCode()} instead
+     * @return HTTP status code
+     */
     public int getStatuscode()
     {
-        return this.statuscode;
+        return this.getStatusCode();
+    }
+
+    public int getStatusCode() {
+        return this.statusCode;
     }
 
     public HttpVersion getHttpVersion()
@@ -127,7 +135,7 @@ public class HttpResponse
         StringBuffer buffer = new StringBuffer(64);
         buffer.append(this.ver);
         buffer.append(' ');
-        buffer.append(this.statuscode);
+        buffer.append(this.statusCode);
         if (this.phrase != null) {
             buffer.append(' ');
             buffer.append(this.phrase);
