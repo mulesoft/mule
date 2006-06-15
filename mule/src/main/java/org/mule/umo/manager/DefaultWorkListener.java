@@ -47,7 +47,7 @@ public class DefaultWorkListener implements WorkListener {
     }
 
      protected void handleWorkException(WorkEvent event, String type) {
-        Throwable e = null;
+        Throwable e;
 
         if (event != null && event.getException() != null) {
             e = event.getException();
