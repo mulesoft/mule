@@ -21,6 +21,7 @@ import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
 import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
 import org.mule.config.PoolingProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
@@ -538,7 +539,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
 
     protected void handleWorkException(WorkEvent event, String type)
     {
-        Exception e = null;
+        Throwable e;
         if (event != null && event.getException() != null)
         {
             e = event.getException();
@@ -549,10 +550,14 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
         }
         if (event.getException().getCause() != null)
         {
-            e = (Exception) event.getException().getCause();
+            e = event.getException().getCause();
         }
         logger.error("Work caused exception on '" + type
                 + "'. Work being executed was: " + event.getWork().toString());
-        handleException(e);
+        if (e instanceof Exception) {
+            handleException((Exception) e);
+        } else {
+            throw new MuleRuntimeException(new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, getName()), e);
+        }
     }
 }
