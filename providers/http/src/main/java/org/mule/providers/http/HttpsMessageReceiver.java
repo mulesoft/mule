@@ -48,8 +48,8 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException,
             KeyManagementException
     {
-        HttpsConnector cnn = null;
-        ServerSocketFactory ssf = null;
+        HttpsConnector cnn;
+        ServerSocketFactory ssf;
         cnn = (HttpsConnector)connector;
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
@@ -62,7 +62,7 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
 
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         int backlog = cnn.getBacklog();
-        SSLServerSocket serverSocket = null;
+        SSLServerSocket serverSocket;
 
         InetAddress inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
