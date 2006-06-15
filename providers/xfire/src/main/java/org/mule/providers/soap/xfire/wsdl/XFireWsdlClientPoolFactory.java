@@ -31,9 +31,9 @@ public class XFireWsdlClientPoolFactory extends XFireClientPoolFactory
 
     public Object makeObject() throws Exception
     {
-        Client client = new Client(new MuleUniversalTransport(), _service, _uri.getAddress());
-        client.setXFire(_xfire);
-        client.setEndpointUri(_uri.toString());
+        Client client = new Client(new MuleUniversalTransport(), service, uri.getAddress());
+        client.setXFire(xfire);
+        client.setEndpointUri(uri.toString());
         return client;
     }
 

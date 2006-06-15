@@ -54,6 +54,8 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -247,6 +249,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod = (HttpMethod)body;
             }
             else if (body instanceof StreamMessageAdapter) {
+                 StreamMessageAdapter sma = (StreamMessageAdapter)body;
+                Map headers = sma.getOutputHandler().getHeaders(event);
+                for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
+                    Map.Entry entry = (Map.Entry) iterator.next();
+                    postMethod.addRequestHeader((String)entry.getKey(), (String)entry.getValue());
+                }
                 postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body,
                         event));
                 postMethod.setContentChunked(true);

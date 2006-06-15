@@ -23,4 +23,6 @@ public interface SoapConstants {
     public static final String WSDL_PROPERTY = "wsdl";
     public static final String LIST_PROPERTY = "list";
     public static final String SOAP_ENDPOINT_PREFIX = "soap:";
+    public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
+    public static final String SOAP_ACTION_PROPERTY = "soapAction";
 }

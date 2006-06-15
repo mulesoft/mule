@@ -27,6 +27,7 @@ import org.codehaus.xfire.exchange.InMessage;
 import org.codehaus.xfire.exchange.OutMessage;
 import org.codehaus.xfire.soap.Soap11;
 import org.codehaus.xfire.soap.Soap12;
+import org.codehaus.xfire.soap.SoapConstants;
 import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
@@ -42,13 +43,15 @@ import javax.activation.DataHandler;
 import javax.mail.MessagingException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * todo document
+ * Provides a
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -172,11 +175,9 @@ public class MuleUniversalChannel extends AbstractChannel
     private void sendViaClient(final MessageContext context, final OutMessage message) throws Exception
     {
         MuleClient client = new MuleClient();
-
         OutputHandler handler = new OutputHandler() {
             public void write(UMOEvent event, OutputStream out) throws IOException
             {
-
                 try {
                     Attachments atts = message.getAttachments();
                     if (atts != null && atts.size() > 0) {
@@ -200,16 +201,27 @@ public class MuleUniversalChannel extends AbstractChannel
                     throw new IOException(e.getMessage());
                 }
             }
+
+            public Map getHeaders(UMOEvent event) {
+                Map headers = new HashMap();
+                headers.put(HttpConstants.HEADER_CONTENT_TYPE, getSoapMimeType(message));
+                headers.put(SoapConstants.SOAP_ACTION, message.getProperty(SoapConstants.SOAP_ACTION));
+                for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
+                    String headerName = (String)iterator.next();
+                    Object headerValue = event.getMessage().getStringProperty(headerName, null);
+                    if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) != null) {
+                            headers.put(headerName, headerValue);
+                    }
+                }
+                return headers;
+            }
         };
 
-        // sender.open();
-
-        // sender.send();
         StreamMessageAdapter sp = new StreamMessageAdapter(handler);
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
 
         client.sendStream(getUri(), sp);
-        // sender.hasResponse()
+
         if (sp.hasResponse()) {
             InMessage inMessage;
             String ct = (String)sp.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");

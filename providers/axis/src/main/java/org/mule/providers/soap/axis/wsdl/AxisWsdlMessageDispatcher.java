@@ -16,13 +16,12 @@ import org.apache.axis.client.Service;
 import org.apache.axis.wsdl.gen.Parser;
 import org.apache.axis.wsdl.symbolTable.ServiceEntry;
 import org.apache.axis.wsdl.symbolTable.SymTabEntry;
-import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.xml.namespace.QName;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -74,7 +73,7 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher {
         service.setEngine(new AxisClient(clientConfig));
 
         //Really the Axis Client service should set this stuff
-        event.getMessage().setProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY, parser.getCurrentDefinition().getTargetNamespace());
+        event.getMessage().setProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY, parser.getCurrentDefinition().getTargetNamespace());
         //Todo how can we autogenerate the named params from the WSDL?
         return service;
     }

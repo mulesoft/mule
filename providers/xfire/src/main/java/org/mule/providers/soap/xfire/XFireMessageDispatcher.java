@@ -34,12 +34,15 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.TemplateParser;
 
 import javax.activation.DataHandler;
-
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -147,7 +150,16 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             client = (Client)clientPool.borrowObject();
             client.setTimeout(event.getTimeout());
             client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-            Object[] response = client.invoke(getMethod(event), getArgs(event));
+            String method = getMethod(event);
+            // Set custom soap action if set on the event or endpoint
+            String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+            if (soapAction != null) {
+                soapAction = parseSoapAction(soapAction, new QName(method), event);
+                client.setProperty(org.codehaus.xfire.soap.SoapConstants.SOAP_ACTION, soapAction);
+            }
+
+
+            Object[] response = client.invoke(method, getArgs(event));
 
             UMOMessage result = null;
             if (response != null && response.length <= 1) {
@@ -260,5 +272,37 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
 
         return serviceName;
+    }
+
+    public String parseSoapAction(String soapAction, QName method, UMOEvent event)
+    {
+
+        UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
+        Map properties = new HashMap();
+        UMOMessage msg = event.getMessage();
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            String propertyKey = (String)iterator.next();
+            properties.put(propertyKey, msg.getProperty(propertyKey));
+        }
+        properties.put("method", method.getLocalPart());
+        properties.put("methodNamespace", method.getNamespaceURI());
+        properties.put("address", endpointURI.getAddress());
+        properties.put("scheme", endpointURI.getScheme());
+        properties.put("host", endpointURI.getHost());
+        properties.put("port", String.valueOf(endpointURI.getPort()));
+        properties.put("path", endpointURI.getPath());
+        properties.put("hostInfo", endpointURI.getScheme() + "://" + endpointURI.getHost()
+                + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+        if (event.getComponent() != null) {
+            properties.put("serviceName", event.getComponent().getDescriptor().getName());
+        }
+
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        soapAction = tp.parse(properties, soapAction);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("SoapAction for this call is: " + soapAction);
+        }
+        return soapAction;
     }
 }

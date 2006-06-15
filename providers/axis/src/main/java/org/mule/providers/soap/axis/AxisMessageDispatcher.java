@@ -207,7 +207,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         String methodNamespace = null;
         if(method instanceof String) {
             //Set a custome method namespace if one is set.  This will be used forthe parameters too
-            methodNamespace = (String) event.getMessage().getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
+            methodNamespace = (String) event.getMessage().getProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY);
             if (methodNamespace != null) {
                 call.setOperationName(new QName(methodNamespace, method.toString()));
             } else {
@@ -290,7 +290,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         setCallParams(call, event, call.getOperationName());
 
         // Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getMessage().getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
+        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null) {
             soapAction = parseSoapAction(soapAction, call.getOperationName(), event);
             call.setSOAPActionURI(soapAction);

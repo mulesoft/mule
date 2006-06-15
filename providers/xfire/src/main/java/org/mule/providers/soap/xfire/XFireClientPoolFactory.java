@@ -23,23 +23,23 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class XFireClientPoolFactory extends BasePoolableObjectFactory
 {
 
-    protected UMOEndpointURI _uri;
-    protected Service _service;
-    protected XFire _xfire;
+    protected UMOEndpointURI uri;
+    protected Service service;
+    protected XFire xfire;
 
     public XFireClientPoolFactory(UMOImmutableEndpoint endpoint, Service service, XFire xfire)
     {
         super();
-        _uri = endpoint.getEndpointURI();
-        _service = service;
-        _xfire = xfire;
+        uri = endpoint.getEndpointURI();
+        this.service = service;
+        this.xfire = xfire;
     }
 
     public Object makeObject() throws Exception
     {
-        Client client = new Client(new MuleUniversalTransport(), _service, _uri.toString());
-        client.setXFire(_xfire);
-        client.setEndpointUri(_uri.toString());
+        Client client = new Client(new MuleUniversalTransport(), service, uri.toString());
+        client.setXFire(xfire);
+        client.setEndpointUri(uri.toString());
         client.addInHandler(new MuleHeadersInHandler());
         client.addOutHandler(new MuleHeadersOutHandler());
         return client;

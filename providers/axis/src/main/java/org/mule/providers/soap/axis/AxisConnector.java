@@ -76,8 +76,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String DEFAULT_MULE_AXIS_SERVER_CONFIG = "mule-axis-server-config.wsdd";
     public static final String DEFAULT_MULE_AXIS_CLIENT_CONFIG = "mule-axis-client-config.wsdd";
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
-    public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
-    public static final String SOAP_ACTION_PROPERTY = "soapAction";
     public static final String AXIS_SERVICE_PROPERTY = "_axisService";
     public static final String AXIS_CLIENT_CONFIG_PROPERTY = "clientConfig";
 

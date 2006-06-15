@@ -15,14 +15,31 @@ import org.mule.umo.UMOEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 /**
- * todo document
+ * The OutputHandler is a strategy class that is set on the StreamingMessageAdapter to defer the writing
+ * o fthe message payload until there is a stream available to write it to.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface OutputHandler {
 
+    /**
+     * Write the event payload to the stream. Depending on the underlying transport, attachements and message
+     * properties may be written to the stream here too.
+     * @param event the current event
+     * @param out the output strewam to write to
+     * @throws IOException
+     */
     public void write(UMOEvent event, OutputStream out) throws IOException;
+
+    /**
+     * Used to obtain a set of headers that will be sent with this stream payload.  Headers are typically
+     * Set independently from a stream payload.
+     * @param event the current event
+     * @return a Map of headers or an empty map if there are no headers
+     */
+    public Map getHeaders(UMOEvent event);
 }
