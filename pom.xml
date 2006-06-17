@@ -4,7 +4,7 @@
 
     <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.codehaus.mule</groupId>
+    <groupId>org.mule</groupId>
     <artifactId>mule-project</artifactId>
     <packaging>pom</packaging>
     <version>2.0-SNAPSHOT</version>
@@ -82,6 +82,11 @@
             <name>Codehaus</name>
             <url>https://dav.codehaus.org/dist/mule</url>
         </repository>
+        <snapshotRepository>
+          <id>mule-snapshots</id>
+          <name>Mule Snapshot Repository</name>
+          <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
+        </snapshotRepository>
         <!--
         <site>
             <id>default</id>
@@ -109,6 +114,11 @@
             <url>https://maven-repository.dev.java.net/nonav/repository</url>
             <layout>legacy</layout>
         </repository>
+        <repository>
+          <id>apache-snapshots</id>
+          <name>Snapshot repository</name>
+          <url>http://people.apache.org/maven-snapshot-repository/</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <!--
@@ -122,6 +132,15 @@
     <build>
         <defaultGoal>install</defaultGoal>
 
+        <!-- WebDAV for remote deployment -->
+        <extensions>
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-webdav</artifactId>
+            <version>1.0-beta-1-SNAPSHOT</version>
+          </extension>
+        </extensions>
+    
         <!-- Project version filters -->
         <!-- Fails if the project doesn't have this file, need to push it down?  Use settings.xml instead. 
         <filters>
@@ -137,6 +156,17 @@
                 <configuration>
                     <source>1.4</source>
                     <target>1.4</target>
+                </configuration>
+            </plugin>
+
+            <!-- Add index to generated JARs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                  <archive>
+                    <index>true</index>
+                  </archive>
                 </configuration>
             </plugin>
 
@@ -216,8 +246,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
-                	<configLocation>codecheck/checkstyle.xml</configLocation>
-                 	<headerLocation>codecheck/LICENSE.txt</headerLocation>
+                    <configLocation>codecheck/checkstyle.xml</configLocation>
+                    <headerLocation>codecheck/LICENSE.txt</headerLocation>
                 </configuration>
            </plugin>
         </plugins>
