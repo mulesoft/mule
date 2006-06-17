@@ -795,8 +795,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
         addSetPropertiesRule(path,
                              digester,
-                             new String[] { "enableCorrelation" },
-                             new String[] { "enableCorrelationAsString" });
+                             new String[] { "enableCorrelation", "propertyExtractor" },
+                             new String[] { "enableCorrelationAsString", "propertyExtractorAsString" });
         addMulePropertiesRule(path, digester);
         if ("outbound".equals(type)) {
             addEndpointRules(digester, path, "addEndpoint");

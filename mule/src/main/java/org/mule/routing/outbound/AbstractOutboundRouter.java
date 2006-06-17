@@ -16,6 +16,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.util.ClassUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
@@ -155,7 +156,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 }
             }
 
-            String correlation = null;
+            String correlation;
             Object o = propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             if (logger.isDebugEnabled()) {
                 logger.debug("Extracted correlation Id as: " + o);
@@ -259,6 +260,16 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public void setPropertyExtractor(PropertyExtractor propertyExtractor)
     {
         this.propertyExtractor = propertyExtractor;
+    }
+
+    public void setPropertyExtractorAsString(String className) {
+        try {
+            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(
+                                                                    className, null, getClass());
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Couldn't instanciate property extractor class " +
+                                               className);
+        }
     }
 
     public UMOTransactionConfig getTransactionConfig()

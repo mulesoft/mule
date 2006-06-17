@@ -188,5 +188,20 @@
 
             <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
         </mule-descriptor>
+
+        <mule-descriptor name="propertyExtractorTestComponent"
+                         implementation="org.mule.tck.testmodels.fruit.Apple">
+            <inbound-router>
+            </inbound-router>
+
+            <outbound-router>
+                <!-- Change property extractor to some non-default one for testing -->
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter"
+                        propertyExtractor="org.mule.config.JXPathPropertyExtractor">
+                </router>
+            </outbound-router>
+
+        </mule-descriptor>
+
     </model>
 </mule-configuration>
