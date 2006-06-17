@@ -16,7 +16,7 @@ import org.mule.config.SimplePropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>DefaultPropertiesExtractor</code> is a default implementation used
+ * <code>CorrelationPropertiesExtractor</code> is a default implementation used
  * for getting the Correlation information from a message. This object is only
  * used when getting a specific property to be set on the message. When reading
  * the property the getProperty(...) or the direct property accessor will be
@@ -30,7 +30,7 @@ public class CorrelationPropertiesExtractor extends SimplePropertyExtractor
 {
     public final Object getProperty(String name, UMOMessage message)
     {
-        Object result = null;
+        Object result;
         if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name)) {
             result = getCorrelationId(message);
         } else if (MuleProperties.MULE_MESSAGE_ID_PROPERTY.equals(name)) {
