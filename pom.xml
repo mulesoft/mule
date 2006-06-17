@@ -189,7 +189,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <dependencies>
                     <dependency>
-                        <groupId>org.codehaus.mule</groupId>
+                        <groupId>org.mule</groupId>
                         <artifactId>buildtools</artifactId>
                         <version>${version}</version>
                     </dependency>
