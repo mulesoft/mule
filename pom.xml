@@ -101,6 +101,14 @@
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </repository>
+        <repository>
+            <id>codehaus-snapshots</id>
+            <name>Codehaus Snapshot Repository</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <!--
         <repository>
             <id>codehaus</id>
