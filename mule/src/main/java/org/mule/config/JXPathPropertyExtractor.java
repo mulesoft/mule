@@ -44,7 +44,7 @@ public class JXPathPropertyExtractor extends SimplePropertyExtractor {
         Object obj = message.getPayload();
 
         if (obj instanceof String) {
-            Document doc = null;
+            Document doc;
             try {
                 doc = DocumentHelper.parseText((String) obj);
             } catch (DocumentException e) {
