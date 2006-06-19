@@ -16,6 +16,7 @@ import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
+import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -24,6 +25,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -157,10 +159,13 @@ public class Mx4jAgent implements UMOAgent
         }
 
         if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
-            // TODO mx4j's socket factory does not handle the IBM's security provider
-            // extend it to hadnle the case.
-            // See http://jira.symphonysoft.com/browse/MULE-809 for analogous patch
-            SSLAdaptorServerSocketFactory factory = new SSLAdaptorServerSocketFactory();
+            SSLAdaptorServerSocketFactoryMBean factory;
+            if (SystemUtils.isIbmJDK()) {
+                factory = new IBMSslAdapterServerSocketFactory();
+            } else {
+                // BEA are using Sun's JSSE, so no extra checks necessary
+                factory = new SSLAdaptorServerSocketFactory();
+            }
             BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
             httpAdaptor.setSocketFactory(factory);
         }
