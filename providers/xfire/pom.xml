@@ -13,22 +13,6 @@
     <name>Xfire Provider</name>
     <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
 
-    <build>
-        <!-- m2 Standard directory layout 
-            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
