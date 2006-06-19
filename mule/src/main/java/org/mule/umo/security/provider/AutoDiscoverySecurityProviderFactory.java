@@ -13,13 +13,13 @@
 
 package org.mule.umo.security.provider;
 
-import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
 import org.mule.util.ClassUtils;
+import org.mule.util.SystemUtils;
 
 import java.security.Provider;
 
@@ -57,7 +57,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
     public SecurityProviderInfo getSecurityProviderInfo() {
         SecurityProviderInfo info;
 
-        if (SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1) {
+        if (SystemUtils.isIbmJDK()) {
             // TODO test IBM JDK 1.4.2 more thoroughly and decide if
             // it's worth including this newer provider support.
             // switch to IBM's security provider
