@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
 
+  <mirrors>
+    <!-- A much faster replica of ibiblio -->
+    <mirror>
+      <mirrorOf>central</mirrorOf>
+      <name>Mergere Mirror Repository</name>
+      <url>http://repo.mergere.com/maven2</url>
+      <id>central-mirror</id>
+    </mirror>
+  </mirrors>
+
     <!--
     The following profiles are enabled by default for building the project.
     (see http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
