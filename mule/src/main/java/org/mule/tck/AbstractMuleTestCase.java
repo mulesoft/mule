@@ -3,13 +3,13 @@
  * /cvsroot/mule/mule/src/test/org/mule/test/mule/AbstractMuleTestCase.java,v
  * 09:58:47 $
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- *  
+ *
  */
 
 package org.mule.tck;
@@ -85,15 +85,14 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     private void clearAllCounters() {
-        if(testCounters!=null) {
+        if(testCounters != null) {
             testCounters.clear();
-            testCounters=null;
         }
         log("Cleared all counters");
     }
 
     private void clearCounter() {
-        if(testCounters!=null) {
+        if(testCounters != null) {
             testCounters.remove(getClass().getName());
         }
         log("Cleared counter: " + getClass().getName());
