@@ -39,6 +39,10 @@
                     <groupId>xfire</groupId>
                     <artifactId>saaj-impl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>xfire</groupId>
+                    <artifactId>jaxws-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
