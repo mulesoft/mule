@@ -193,6 +193,7 @@ public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketF
                 keyStoreStream.close();
             }
             catch (IOException x) {
+                // ignore
             }
 
             KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(m_keyManagerAlgorithm);
