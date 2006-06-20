@@ -134,6 +134,16 @@
                 <rar.bundle>true</rar.bundle>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>${activation_version}</version>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+                <mule.core.jar>false</mule.core.jar>
+                <rar.bundle>true</rar.bundle>
+            </properties>
+        </dependency>
 
         <dependency>
             <artifactId>mule-http-provider</artifactId>
