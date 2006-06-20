@@ -13,6 +13,19 @@
     <name>Xfire Provider</name>
     <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
 
+    <repositories>
+        <repository>
+            <id>xfire</id>
+            <name>XFire Dependencies</name>
+            <url>http://dist.codehaus.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <layout>legacy</layout>
+        </repository>
+    </repositories>
+
+    
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -29,21 +42,6 @@
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-all</artifactId>
             <version>1.1.1</version>
-            <!-- See http://jira.codehaus.org/browse/XFIRE-466 for details on these exclusions -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xfire</groupId>
-                    <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xfire</groupId>
-                    <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xfire</groupId>
-                    <artifactId>jaxws-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>jdom</groupId>
