@@ -138,6 +138,7 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>${activation_version}</version>
+            <jar>activation.jar</jar>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
                 <mule.core.jar>false</mule.core.jar>
