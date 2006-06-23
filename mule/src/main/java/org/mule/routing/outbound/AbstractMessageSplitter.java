@@ -41,7 +41,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     // flag which, if true, makes the splitter honour settings such as remoteSync and
     // synchronous on the endpoint
-    protected boolean honorSynchronisity = false;
+    protected boolean honorSynchronicity = false;
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
@@ -65,7 +65,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             // before moving to the next endpoint
             // This can be turned off by setting the multimatch flag to false
             while (message != null) {
-                if(honorSynchronisity) {
+                if(honorSynchronicity) {
                     synchronous = endpoint.isSynchronous();
                 }
                 try {
@@ -82,7 +82,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                         message.setCorrelationGroupSize(groupSize);
                         message.setCorrelationSequence(correlationSequence++);
                     }
-                    if (honorSynchronisity) {
+                    if (honorSynchronicity) {
                         message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,endpoint.isRemoteSync());
                     }
                     if (synchronous) {
@@ -105,7 +105,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     /**
      * Template method that can be used to split the message up before the
      * getMessagePart method is called .
-     * 
+     *
      * @param message the message being routed
      */
     protected void initialise(UMOMessage message)
@@ -113,16 +113,16 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         // nothing to do
     }
 
-    public boolean isHonorSynchronisity() {
-        return honorSynchronisity;
+    public boolean isHonorSynchronicity() {
+        return honorSynchronicity;
     }
 
     /**
      * Sets the flag indicating whether the splitter honurs endpoint settings
-     * @param honorSynchronisity flag setting
+     * @param honorSynchronicity flag setting
      */
-    public void setHonorSynchronisity(boolean honorSynchronisity) {
-        this.honorSynchronisity = honorSynchronisity;
+    public void setHonorSynchronicity(boolean honorSynchronicity) {
+        this.honorSynchronicity = honorSynchronicity;
     }
 
     /**
