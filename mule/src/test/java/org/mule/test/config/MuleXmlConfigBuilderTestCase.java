@@ -3,6 +3,7 @@ package org.mule.test.config;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.PoolingProfile;
@@ -19,6 +20,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
@@ -59,6 +61,21 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals(1, routers.size());
         AbstractOutboundRouter theRouter = (AbstractOutboundRouter) routers.get(0);
         PropertyExtractor pe = theRouter.getPropertyExtractor();
+        assertNotNull(pe);
+        // the one we put in the config
+        assertTrue(pe instanceof JXPathPropertyExtractor);
+    }
+
+    public void testPropertyExtractorResponseRouterConfig() throws Exception {
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("propertyExtractorResponseRouterTestComponent");
+        assertNotNull(d);
+        UMOResponseMessageRouter router = d.getResponseRouter();
+        assertNotNull(router);
+        List routers = router.getRouters();
+        assertNotNull(routers);
+        assertEquals(1, routers.size());
+        AbstractResponseRouter theRouter = (AbstractResponseRouter) routers.get(0);
+        PropertyExtractor pe = theRouter.getCorrelationExtractor();
         assertNotNull(pe);
         // the one we put in the config
         assertTrue(pe instanceof JXPathPropertyExtractor);

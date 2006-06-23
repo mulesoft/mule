@@ -203,5 +203,18 @@
 
         </mule-descriptor>
 
+        <mule-descriptor name="propertyExtractorResponseRouterTestComponent"
+                         implementation="org.mule.tck.testmodels.fruit.Apple">
+            <inbound-router>
+            </inbound-router>
+
+            <response-router>
+                <!-- Change property extractor to some non-default one for testing -->
+                <router className="org.mule.routing.response.SingleResponseRouter"
+                        propertyExtractor="org.mule.config.JXPathPropertyExtractor"/>
+            </response-router>
+
+        </mule-descriptor>
+
     </model>
 </mule-configuration>

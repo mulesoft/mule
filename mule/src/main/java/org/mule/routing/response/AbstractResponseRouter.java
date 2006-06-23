@@ -18,6 +18,7 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.UMOResponseRouter;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>AbstractResponseRouter</code> is a base class for all Response
@@ -54,6 +55,21 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
     {
         this.correlationExtractor = correlationExtractor;
     }
+
+    /**
+     * A digester callback to configure a custom correlation extractor.
+     * @param className correlation extractor fully qualified class name
+     */
+    public void setPropertyExtractorAsString(String className) {
+        try {
+            this.correlationExtractor = (PropertyExtractor) ClassUtils.instanciateClass(
+                                className, null, getClass());
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Couldn't instanciate property extractor class " +
+                                               className);
+        }
+    }
+
 
     public int getTimeout() {
         return timeout;
