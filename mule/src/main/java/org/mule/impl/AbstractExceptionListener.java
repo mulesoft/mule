@@ -55,6 +55,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     protected List endpoints = new CopyOnWriteArrayList();
 
+    protected boolean initialised = false;
+
     public List getEndpoints()
     {
         return endpoints;
@@ -118,14 +120,28 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         return null;
     }
 
-    public void initialise() throws InitialisationException
+    /**
+     * The initialise method is call every time the Exception stategy is assigned to a component or connector.
+     * This implementation ensures that initialise is called only once.
+     * The actual initialisation code is contained in the <code>doInitialise()</code> method.
+     * @throws InitialisationException
+     */
+    public final void initialise() throws InitialisationException
     {
-        logger.info("Initialising exception listener: " + toString());
+        if(!initialised) {
+            doInitialise();
+            initialised = true;
+        }
+    }
+
+   protected void doInitialise() throws InitialisationException {
+       logger.info("Initialising exception listener: " + toString());
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
             UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
             umoEndpoint.initialise();
         }
-    }
+   }
+
 
     /**
      * If there is a current transaction this method will mark it for rollback
@@ -264,6 +280,10 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         logger.fatal("Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
                              + (message == null ? "" : "Logging Message here: \n" + message.toString()),
                      t);
+    }
+
+    public boolean isInitialised() {
+        return initialised;
     }
 
     /**
