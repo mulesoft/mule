@@ -58,7 +58,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
 
     private FilenameParser filenameParser = new SimpleFilenameParser();
 
-    private boolean passive = false;
+    private boolean passive = true;
 
     private boolean binary = true;
 
