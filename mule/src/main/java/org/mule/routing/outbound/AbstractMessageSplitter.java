@@ -28,7 +28,7 @@ import java.util.List;
  * processed by other components.
  * Each Part is fired as a separate event to each endpoint on the router.  The endpoints can
  * have filters on them to receive only certain message parts
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +39,8 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     // match is not found. This should be set by overriding classes.
     protected boolean multimatch = true;
 
-    // flag which, if true, makes the splitter honour settings such as remoteSync and synchronous on the endpoint
+    // flag which, if true, makes the splitter honour settings such as remoteSync and
+    // synchronous on the endpoint
     protected boolean honorSynchronisity = false;
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
@@ -116,6 +117,10 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         return honorSynchronisity;
     }
 
+    /**
+     * Sets the flag indicating whether the splitter honurs endpoint settings
+     * @param honorSynchronisity flag setting
+     */
     public void setHonorSynchronisity(boolean honorSynchronisity) {
         this.honorSynchronisity = honorSynchronisity;
     }
