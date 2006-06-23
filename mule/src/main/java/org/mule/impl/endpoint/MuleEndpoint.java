@@ -13,6 +13,8 @@
 
 package org.mule.impl.endpoint;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
@@ -26,8 +28,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import java.util.Map;
 
@@ -73,9 +73,9 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         super(endpoint);
     }
 
-    public MuleEndpoint(String endpointName, boolean receiver) throws UMOException
+    public MuleEndpoint(String uri, boolean receiver) throws UMOException
     {
-        super(endpointName, receiver);
+        super(uri, receiver);
     }
 
     public Object clone()

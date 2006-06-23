@@ -15,8 +15,10 @@ package org.mule.test.mule.model;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.model.TooManySatisfiableMethodsException;
+import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -28,10 +30,10 @@ import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;
 
@@ -56,10 +58,12 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     */
     public ComponentMethodMapping[] getComponentMappings()
     {
-        ComponentMethodMapping[] mappings = new ComponentMethodMapping[3];
+        ComponentMethodMapping[] mappings = new ComponentMethodMapping[4];
         mappings[0] = new ComponentMethodMapping(WaterMelon.class, "myEventHandler", UMOEvent.class);
         mappings[1] = new ComponentMethodMapping(FruitBowl.class, "consumeFruit", FruitLover.class);
         mappings[2] = new ComponentMethodMapping(Banana.class, "peelEvent", EventObject.class);
+        //test proxy objects
+        mappings[3] = new ComponentMethodMapping(InvocationHandler.class, "invoke", FruitLover.class);
         return mappings;
     }
 
@@ -71,11 +75,15 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     public UMODescriptor getDescriptorToResolve(String className) throws Exception
     {
         UMODescriptor descriptor = super.getDescriptorToResolve(className);
+        descriptor.setInboundRouter(new InboundMessageRouter());
+        UMOEndpoint endpoint = new MuleEndpoint("test://foo", true);
+
         if (className.equals(FruitBowl.class.getName())) {
-            UMOEndpoint endpoint = descriptor.getOutboundEndpoint();
-            endpoint.setType(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
             endpoint.setTransformer(new ObjectToFruitLover());
-            descriptor.setInboundEndpoint(endpoint);
+            descriptor.getInboundRouter().addEndpoint(endpoint);
+        } else if (className.equals(InvocationHandler.class.getName())) {
+            endpoint.setTransformer(new ObjectToFruitLover());
+            descriptor.getInboundRouter().addEndpoint(endpoint);
         }
         return descriptor;
     }
