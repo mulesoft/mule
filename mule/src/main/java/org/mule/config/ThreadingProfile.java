@@ -244,30 +244,36 @@ public class ThreadingProfile
 
     public ThreadPoolExecutor createPool()
     {
-        return configurePool();
+        return createPool(null);
     }
 
     public ThreadPoolExecutor createPool(String name)
     {
-        threadFactory = new NamedThreadFactory(name, threadPriority);
-        return configurePool();
-    }
+        ThreadPoolExecutor pool;
 
-    public void configurePool(ThreadPoolExecutor pool)
-    {
-        if(maxThreadsActive < maxThreadsIdle) {
+        if (maxBufferSize > 0) {
+            pool = new ThreadPoolExecutor(0, maxBufferSize, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue(maxBufferSize));
+        } else {
+            pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue());
+        }
+
+        if (maxThreadsActive < maxThreadsIdle) {
             maxThreadsIdle = maxThreadsActive;
         }
+
         pool.setCorePoolSize(maxThreadsIdle);
         pool.setMaximumPoolSize(maxThreadsActive);
         pool.setKeepAliveTime(threadTTL, TimeUnit.MILLISECONDS);
+
         if (rejectedExecutionHandler != null) {
             pool.setRejectedExecutionHandler(rejectedExecutionHandler);
         }
-        if (threadFactory != null) {
+
+        if (name != null) {
+            threadFactory = new NamedThreadFactory(name, threadPriority);
             pool.setThreadFactory(threadFactory);
         }
-
+        
         switch (poolExhaustPolicy) {
             case WHEN_EXHAUSTED_DISCARD_OLDEST: {
                 pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
@@ -294,17 +300,7 @@ public class ThreadingProfile
                 break;
             }
         }
-    }
 
-    private ThreadPoolExecutor configurePool()
-    {
-        ThreadPoolExecutor pool;
-        if (maxBufferSize > 0) {
-            pool = new ThreadPoolExecutor(0, maxBufferSize, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue(maxBufferSize));
-        } else {
-            pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue());
-        }
-        configurePool(pool);
         return pool;
     }
 
