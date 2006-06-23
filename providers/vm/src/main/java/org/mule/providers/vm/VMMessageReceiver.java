@@ -102,7 +102,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-        UMOEvent event = (UMOEvent) queue.take();
+        UMOEvent event = (UMOEvent) queue.poll(1000);
         if(event!=null) {
             routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
         }
