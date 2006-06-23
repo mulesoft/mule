@@ -39,6 +39,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     // match is not found. This should be set by overriding classes.
     protected boolean multimatch = true;
 
+    // flag which, if true, makes the splitter honour settings such as remoteSync and synchronous on the endpoint
+    protected boolean honorSynchronisity = false;
+
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
@@ -61,6 +64,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             // before moving to the next endpoint
             // This can be turned off by setting the multimatch flag to false
             while (message != null) {
+                if(honorSynchronisity) {
+                    synchronous = endpoint.isSynchronous();
+                }
                 try {
                     if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
                         boolean correlationSet = message.getCorrelationId() != null;
@@ -74,6 +80,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                         final int groupSize = message.getCorrelationGroupSize();
                         message.setCorrelationGroupSize(groupSize);
                         message.setCorrelationSequence(correlationSequence++);
+                    }
+                    if (honorSynchronisity) {
+                        message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,endpoint.isRemoteSync());
                     }
                     if (synchronous) {
                         result = send(session, message, endpoint);
@@ -101,6 +110,14 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     protected void initialise(UMOMessage message)
     {
         // nothing to do
+    }
+
+    public boolean isHonorSynchronisity() {
+        return honorSynchronisity;
+    }
+
+    public void setHonorSynchronisity(boolean honorSynchronisity) {
+        this.honorSynchronisity = honorSynchronisity;
     }
 
     /**
