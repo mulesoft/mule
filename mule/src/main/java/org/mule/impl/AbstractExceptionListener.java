@@ -12,6 +12,12 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.beans.ExceptionListener;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -32,10 +38,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.routing.RoutingException;
 
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
  * Exception Listeners can override. It provides template methods for handling
@@ -55,7 +57,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     protected List endpoints = new CopyOnWriteArrayList();
 
-    protected boolean initialised = false;
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     public List getEndpoints()
     {
@@ -126,11 +128,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * The actual initialisation code is contained in the <code>doInitialise()</code> method.
      * @throws InitialisationException
      */
-    public final void initialise() throws InitialisationException
+    public synchronized final void initialise() throws InitialisationException
     {
-        if(!initialised) {
+        if (!initialised.get()) {
             doInitialise();
-            initialised = true;
+            initialised.set(true);
         }
     }
 
@@ -283,7 +285,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     }
 
     public boolean isInitialised() {
-        return initialised;
+        return initialised.get();
     }
 
     /**
