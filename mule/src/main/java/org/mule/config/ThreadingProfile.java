@@ -12,6 +12,7 @@
 package org.mule.config;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
@@ -44,11 +45,11 @@ public class ThreadingProfile
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    public static final int DEFAULT_MAX_THREADS_ACTIVE = 10;
+    public static final int DEFAULT_MAX_THREADS_ACTIVE = 8;
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    public static final int DEFAULT_MAX_THREADS_IDLE = 10;
+    public static final int DEFAULT_MAX_THREADS_IDLE = 4;
     /**
      * Default value for MAX_BUFFER_SIZE
      */
@@ -66,7 +67,7 @@ public class ThreadingProfile
      */
     public static final boolean DEFAULT_DO_THREADING = true;
     /**
-     * Default value for POOL_INITIALISATION_POLICY
+     * Default value for DEFAULT_POOL_EXHAUST_ACTION
      */
     public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
@@ -249,21 +250,20 @@ public class ThreadingProfile
 
     public ThreadPoolExecutor createPool(String name)
     {
-        ThreadPoolExecutor pool;
+        BlockingQueue buffer;
 
         if (maxBufferSize > 0) {
-            pool = new ThreadPoolExecutor(0, maxBufferSize, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue(maxBufferSize));
+            buffer = new ArrayBlockingQueue(maxBufferSize);
         } else {
-            pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue());
+            buffer = new SynchronousQueue();
         }
 
         if (maxThreadsActive < maxThreadsIdle) {
             maxThreadsIdle = maxThreadsActive;
         }
 
-        pool.setCorePoolSize(maxThreadsIdle);
-        pool.setMaximumPoolSize(maxThreadsActive);
-        pool.setKeepAliveTime(threadTTL, TimeUnit.MILLISECONDS);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive,
+                        threadTTL, TimeUnit.MILLISECONDS, buffer);
 
         if (rejectedExecutionHandler != null) {
             pool.setRejectedExecutionHandler(rejectedExecutionHandler);
