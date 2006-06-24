@@ -1,16 +1,30 @@
+/*
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
+import java.util.Iterator;
+import java.util.List;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-import java.util.Iterator;
-import java.util.List;
-
-public class DescriptorProcessor extends TagProcessor {
+public class DescriptorProcessor extends TagProcessor
+{
 
     private final ExceptionStrategyProcessor exceptionStrategyProcessor;
 
@@ -22,7 +36,8 @@ public class DescriptorProcessor extends TagProcessor {
 
     private final OutBoundRoutersProcessor outBoundRoutersProcessor;
 
-    public DescriptorProcessor( GraphEnvironment environment) {
+    public DescriptorProcessor(GraphEnvironment environment)
+    {
         super(environment);
         this.shortestNotationHandler = new ShortestNotationHandler(environment);
         this.inboundRoutersProcessor = new InboundRoutersProcessor(environment);
@@ -33,7 +48,8 @@ public class DescriptorProcessor extends TagProcessor {
 
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
         if (currentElement == null) {
             System.err.println("model is null");
             return;
@@ -41,7 +57,7 @@ public class DescriptorProcessor extends TagProcessor {
 
         List descriptors = currentElement.getChildren(MuleTag.ELEMENT_MULE_DESCRIPTOR);
         for (Iterator iter = descriptors.iterator(); iter.hasNext();) {
-            Element descriptor = (Element) iter.next();
+            Element descriptor = (Element)iter.next();
             String name = descriptor.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
             GraphNode node = graph.addNode();
             node.getInfo().setHeader(name);
@@ -49,8 +65,10 @@ public class DescriptorProcessor extends TagProcessor {
 
             StringBuffer caption = new StringBuffer();
 
-        /*    caption.append("implementation : "+descriptor.getAttributeValue("implementation")
-                    + "\n");*/
+            /*
+             * caption.append("implementation :
+             * "+descriptor.getAttributeValue("implementation") + "\n");
+             */
 
             appendProfiles(descriptor, caption);
             appendProperties(descriptor, caption);

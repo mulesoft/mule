@@ -1,3 +1,15 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.postgraphers;
 
 import org.apache.velocity.Template;
@@ -13,15 +25,21 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 
-public abstract class AbstractIndexer extends VelocitySupport  implements PostGrapher {
+public abstract class AbstractIndexer extends VelocitySupport implements PostGrapher
+{
 
-    protected AbstractIndexer(GraphEnvironment env) throws Exception {
+    protected AbstractIndexer(GraphEnvironment env) throws Exception
+    {
         super(env);
     }
 
-    protected void doRendering(GraphEnvironment env, File[] htmlFiles, String template, String targetFile) {
+    protected void doRendering(GraphEnvironment env,
+                    File[] htmlFiles,
+                    String template,
+                    String targetFile)
+    {
         try {
-        this.env = env;
+            this.env = env;
             VelocityContext velocityContext = new VelocityContext();
 
             velocityContext.put("fileList", Arrays.asList(htmlFiles));
@@ -35,34 +53,38 @@ public abstract class AbstractIndexer extends VelocitySupport  implements PostGr
             t.merge(velocityContext, writer);
             writer.flush();
             writer.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    protected File[] getFiles(final GraphConfig config, final String extension) {
-        File[] htmlFiles = config.getOutputDirectory().listFiles(
-                new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        if (name.toLowerCase().equals("index.html"))
-                            return false;
-                        else if (name.toLowerCase().equals("gallery.html"))
-                            return false;
-                        else
-                            return name.endsWith(extension);
-                    }
-                });
+    protected File[] getFiles(final GraphConfig config, final String extension)
+    {
+        File[] htmlFiles = config.getOutputDirectory().listFiles(new FilenameFilter()
+        {
+            public boolean accept(File dir, String name)
+            {
+                if (name.toLowerCase().equals("index.html"))
+                    return false;
+                else if (name.toLowerCase().equals("gallery.html"))
+                    return false;
+                else
+                    return name.endsWith(extension);
+            }
+        });
         return htmlFiles;
     }
 
-    public void init(RuntimeServices arg0) throws Exception {
+    public void init(RuntimeServices arg0) throws Exception
+    {
         // TODO Auto-generated method stub
 
     }
 
+    public void logVelocityMessage(int arg0, String arg1)
+    {
+        if (env != null) env.log(arg1);
 
-public void logVelocityMessage(int arg0, String arg1) {
-    if(env !=null) env.log(arg1);
-
-}
+    }
 }

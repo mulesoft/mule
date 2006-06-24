@@ -1,6 +1,25 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.components;
 
 import com.oy.shared.lm.graph.Graph;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -18,20 +37,16 @@ import org.mule.tools.config.graph.processor.MuleModelProcessor;
 import org.mule.tools.config.graph.processor.TagProcessor;
 import org.mule.tools.config.graph.processor.TransformerProcessor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-public class MuleParser {
+public class MuleParser
+{
 
     private final SAXBuilder builder;
     private final List processors = new ArrayList();
     private final List postProcessors = new ArrayList();
     private GraphEnvironment env;
 
-    public MuleParser(GraphEnvironment env, SAXBuilder builder) {
+    public MuleParser(GraphEnvironment env, SAXBuilder builder)
+    {
         this.env = env;
         this.builder = builder;
         processors.add(new MuleConfigProcessor(env));
@@ -42,41 +57,41 @@ public class MuleParser {
         processors.add(new TransformerProcessor(env));
         processors.add(new AgentProcessor(env));
 
-
         postProcessors.add(new UrlAssignerPostProcessor());
         postProcessors.add(new ExternalSystemPostProcessor());
-    //Always set this to last as deleting nodes earlier seems to have adverse affects when adding nodes
+        // Always set this to last as deleting nodes earlier seems to have adverse affects
+        // when adding nodes
         postProcessors.add(new NodeHiderPostProcessor());
 
     }
 
-    public void parseMuleConfig(File myFile, Graph graph) throws JDOMException,
-            IOException {
+    public void parseMuleConfig(File myFile, Graph graph) throws JDOMException, IOException
+    {
         Document doc = builder.build(myFile);
-        String caption = "";
         Element root = doc.getRootElement();
-        if (caption == null) {
-            caption = root.getAttribute("id").getValue();
-            if (caption != null) {
-                caption = caption.replaceAll("_", " ");
-            } else {
-                caption = "Mule Configuration";
-            }
+        String caption = root.getAttribute("id").getValue();
+        if (caption != null) {
+            caption = caption.replaceAll("_", " ");
         }
+        else {
+            caption = "Mule Configuration";
+        }
+
         StringBuffer captionBuffer = new StringBuffer();
         captionBuffer.append(caption);
         TagProcessor.appendDescription(root, captionBuffer);
         graph.getInfo().setCaption(captionBuffer.toString());
 
         for (Iterator iterator = processors.iterator(); iterator.hasNext();) {
-            TagProcessor tagProcessor = (TagProcessor) iterator.next();
+            TagProcessor tagProcessor = (TagProcessor)iterator.next();
             tagProcessor.process(graph, root, null);
         }
     }
 
-    public void finalise(Graph graph) {
+    public void finalise(Graph graph)
+    {
         for (Iterator iter = postProcessors.iterator(); iter.hasNext();) {
-            PostProcessor postProcessor = (PostProcessor) iter.next();
+            PostProcessor postProcessor = (PostProcessor)iter.next();
             postProcessor.postProcess(graph, env);
         }
     }

@@ -1,14 +1,19 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 
 package org.mule.tools.config.graph.components;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
-import org.apache.commons.io.FileUtils;
-import org.mule.tools.config.graph.config.GraphEnvironment;
-import org.mule.tools.config.graph.postrenderers.FileCleanerPostRenderer;
-import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
-import org.mule.tools.config.graph.util.DOTtoMAP;
-import org.mule.util.EnvironmentUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,27 +23,35 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-public class GraphRenderer {
+import org.apache.commons.io.FileUtils;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+import org.mule.tools.config.graph.postrenderers.FileCleanerPostRenderer;
+import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
+import org.mule.tools.config.graph.util.DOTtoMAP;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
+
+public class GraphRenderer
+{
 
     private GraphEnvironment env;
-    private List postRenderers= new ArrayList();
+    private List postRenderers = new ArrayList();
 
-    public GraphRenderer(GraphEnvironment env) throws Exception {
+    public GraphRenderer(GraphEnvironment env) throws Exception
+    {
         this.env = env;
         postRenderers.add(new MuleDocPostRenderer(env));
         postRenderers.add(new FileCleanerPostRenderer());
 
     }
 
-    public void saveGraph(Graph graph, String filename, File outFolder)
-            throws IOException {
+    public void saveGraph(Graph graph, String filename, File outFolder) throws IOException
+    {
         // output graph to *.gif
         final String dotFileName = new File(outFolder, filename + ".dot").getAbsolutePath();
         final String mapFileName = new File(outFolder, filename + ".cmapx").getAbsolutePath();
         final String gifFileName = new File(outFolder, filename + ".gif").getAbsolutePath();
-
 
         final String exeFile = getSaveExecutable();
         env.log("Executing: " + exeFile);
@@ -57,38 +70,38 @@ public class GraphRenderer {
         context.put("outFolder", outFolder.getAbsolutePath());
 
         for (Iterator iter = postRenderers.iterator(); iter.hasNext();) {
-            PostRenderer element = (PostRenderer) iter.next();
+            PostRenderer element = (PostRenderer)iter.next();
             element.postRender(env, context, graph);
         }
     }
 
-
-    private String getSaveExecutable() throws FileNotFoundException {
+    private String getSaveExecutable() throws FileNotFoundException
+    {
         if (env.getConfig().getExecuteCommand() == null) {
             String osName = System.getProperty("os.name").toLowerCase();
             if (osName.startsWith("windows")) {
                 File f = new File("win32/dot.exe");
-                if(f.exists()) {
-
+                if (f.exists()) {
                     env.getConfig().setExecuteCommand(f.getAbsolutePath());
-                } else {
-
-                    Properties p = EnvironmentUtils.getEnvironment();
-                    String home = p.getProperty("MULE_HOME");
-                    if(home!=null) {
+                }
+                else {
+                    String home = SystemUtils.getenv("MULE_HOME");
+                    if (StringUtils.isNotBlank(home)) {
                         f = new File(home + "/tools/config-graph/win32/dot.exe");
                     }
-
                 }
-            } else {
+            }
+            else {
                 throw new UnsupportedOperationException(
-                        "Mule Graph currently only works on Windows");
+                                "Mule Graph currently only works on Windows");
             }
         }
+
         File f = new File(env.getConfig().getExecuteCommand());
         if (!f.exists()) {
             throw new FileNotFoundException(f.getAbsolutePath());
         }
+
         return env.getConfig().getExecuteCommand();
     }
 }

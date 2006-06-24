@@ -1,3 +1,15 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
@@ -10,56 +22,63 @@ import org.mule.tools.config.graph.util.MuleTag;
 import java.util.Iterator;
 import java.util.List;
 
-public class OutBoundRouterEndpointsHandler extends TagProcessor{
+public class OutBoundRouterEndpointsHandler extends TagProcessor
+{
 
     private String componentName;
 
-    public OutBoundRouterEndpointsHandler( GraphEnvironment environment, String componentName) {
+    public OutBoundRouterEndpointsHandler(GraphEnvironment environment, String componentName)
+    {
         super(environment);
         this.componentName = componentName;
 
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
         List epList = currentElement.getChildren(MuleTag.ELEMENT_ENDPOINT);
-        int x=1;
+        int x = 1;
         for (Iterator iterator = epList.iterator(); iterator.hasNext(); x++) {
-            Element outEndpoint = (Element) iterator.next();
+            Element outEndpoint = (Element)iterator.next();
 
-            String url = outEndpoint
-                    .getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
+            String url = outEndpoint.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
             if (url != null) {
                 GraphNode out = environment.getEndpointRegistry().getEndpoint(url, componentName);
                 if (out == null) {
                     out = graph.addNode();
                     StringBuffer caption = new StringBuffer();
-                    //caption.append(url).append("\n");
+                    // caption.append(url).append("\n");
                     appendProperties(outEndpoint, caption);
                     appendDescription(outEndpoint, caption);
                     out.getInfo().setCaption(caption.toString());
                     environment.getEndpointRegistry().addEndpoint(url, out);
                     processOutboundFilter(graph, outEndpoint, out, parent);
-                } else {
+                }
+                else {
                     String caption = "out";
-                    if(epList.size()>1) {
-                        caption +=" (" + x + " of " + epList.size() + ")";
+                    if (epList.size() > 1) {
+                        caption += " (" + x + " of " + epList.size() + ")";
                     }
                     addEdge(graph, parent, out, caption, isTwoWay(outEndpoint));
 
                 }
             }
 
-            GraphNode[] virtual = environment.getEndpointRegistry().getVirtualEndpoint(componentName);
+            GraphNode[] virtual = environment.getEndpointRegistry().getVirtualEndpoint(
+                            componentName);
             if (virtual.length > 0) {
                 for (int i = 0; i < virtual.length; i++) {
-                     addEdge(graph, parent, virtual[i], "out (dynamic)", isTwoWay(outEndpoint));
+                    addEdge(graph, parent, virtual[i], "out (dynamic)", isTwoWay(outEndpoint));
                 }
             }
         }
     }
 
-    private void processOutboundFilter(Graph graph, Element outEndpoint,
-            GraphNode out, GraphNode routerNode) {
+    private void processOutboundFilter(Graph graph,
+                    Element outEndpoint,
+                    GraphNode out,
+                    GraphNode routerNode)
+    {
 
         OutboundFilterProcessor processor = new OutboundFilterProcessor(environment, out);
         processor.process(graph, outEndpoint, routerNode);

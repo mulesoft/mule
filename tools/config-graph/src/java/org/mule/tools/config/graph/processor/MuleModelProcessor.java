@@ -1,3 +1,15 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
@@ -10,23 +22,24 @@ import org.mule.tools.config.graph.util.MuleTag;
 import java.util.Iterator;
 import java.util.List;
 
-public class MuleModelProcessor extends TagProcessor {
-
+public class MuleModelProcessor extends TagProcessor
+{
 
     private DescriptorProcessor descriptorProcessor;
 
-
-    public MuleModelProcessor( GraphEnvironment environment ) {
+    public MuleModelProcessor(GraphEnvironment environment)
+    {
         super(environment);
         descriptorProcessor = new DescriptorProcessor(environment);
 
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
 
         List models = currentElement.getChildren(MuleTag.ELEMENT_MODEL);
         for (Iterator iter = models.iterator(); iter.hasNext();) {
-            Element modelElement = (Element) iter.next();
+            Element modelElement = (Element)iter.next();
             if (environment.getConfig().isShowModels()) {
                 String name = modelElement.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
                 String type = modelElement.getAttributeValue(MuleTag.ATTRIBUTE_TYPE);
@@ -34,7 +47,8 @@ public class MuleModelProcessor extends TagProcessor {
                 if (type != null) {
                     if (type.equals("custom")) {
                         name += " (custom: " + className + ")";
-                    } else {
+                    }
+                    else {
                         name += " (" + type + ")";
                     }
                 }

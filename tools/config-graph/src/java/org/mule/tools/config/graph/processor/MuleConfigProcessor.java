@@ -1,3 +1,15 @@
+/*
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
@@ -7,20 +19,24 @@ import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-public class MuleConfigProcessor extends TagProcessor {
+public class MuleConfigProcessor extends TagProcessor
+{
 
-    public MuleConfigProcessor( GraphEnvironment environment) {
+    public MuleConfigProcessor(GraphEnvironment environment)
+    {
         super(environment);
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
 
         Element muleConfig = currentElement.getChild(MuleTag.ELEMENT_MULE_ENVIRONMENT_PROPERTIES);
-        if(muleConfig!=null) {
-            //Set whether the event flows are synchronous or not by default. This controls the style of arrows created
+        if (muleConfig != null) {
+            // Set whether the event flows are synchronous or not by default. This
+            // controls the style of arrows created
             String twoway = muleConfig.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS);
             environment.setDefaultTwoWay("true".equalsIgnoreCase(twoway));
-            if(!environment.getConfig().isShowConfig()) return;
+            if (!environment.getConfig().isShowConfig()) return;
 
             GraphNode configNode = graph.addNode();
             configNode.getInfo().setFillColor(ColorRegistry.COLOR_CONFIG);
@@ -39,7 +55,6 @@ public class MuleConfigProcessor extends TagProcessor {
             appendAttribute(muleConfig, "synchronousEventTimeout", caption);
             appendAttribute(muleConfig, "transactionTimeout", caption);
             appendAttribute(muleConfig, "workingDirectory", caption);
-
 
             ConnectionStrategyProcessor processor = new ConnectionStrategyProcessor(environment);
             processor.process(graph, muleConfig, configNode);

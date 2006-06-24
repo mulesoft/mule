@@ -1,22 +1,38 @@
+/*
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-public class ConnectionStrategyProcessor extends TagProcessor {
+public class ConnectionStrategyProcessor extends TagProcessor
+{
 
-    public ConnectionStrategyProcessor( GraphEnvironment environment ) {
+    public ConnectionStrategyProcessor(GraphEnvironment environment)
+    {
         super(environment);
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
-        //Process connection strategy
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
+        // Process connection strategy
         Element cs = currentElement.getChild(MuleTag.ELEMENT_CONNECTION_STRATEGY);
-        if(cs!=null) {
+        if (cs != null) {
             GraphNode csNode = graph.addNode();
             csNode.getInfo().setFillColor(ColorRegistry.COLOR_CONNECTION_STRATEGY);
             csNode.getInfo().setHeader(cs.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));

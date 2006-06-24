@@ -1,24 +1,39 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
+import java.util.Iterator;
+import java.util.List;
 
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-import java.util.Iterator;
-import java.util.List;
+public class InboundRoutersProcessor extends TagProcessor
+{
 
-public class InboundRoutersProcessor extends TagProcessor {
-
-    public InboundRoutersProcessor( GraphEnvironment environment) {
+    public InboundRoutersProcessor(GraphEnvironment environment)
+    {
         super(environment);
 
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
         Element inboundRouter = currentElement.getChild(MuleTag.ELEMENT_INBOUND_ROUTER);
 
         if (inboundRouter != null) {
@@ -29,7 +44,7 @@ public class InboundRoutersProcessor extends TagProcessor {
             if (router != null) {
                 GraphNode routerNode = graph.addNode();
                 routerNode.getInfo().setHeader(
-                        router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
+                                router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
                 routerNode.getInfo().setFillColor(ColorRegistry.COLOR_ROUTER);
 
                 addEdge(graph, routerNode, parent, "inbound router", isTwoWay(router));
@@ -38,11 +53,11 @@ public class InboundRoutersProcessor extends TagProcessor {
 
             List inbounEndpoints = inboundRouter.getChildren(MuleTag.ELEMENT_ENDPOINT);
             for (Iterator iterator = inbounEndpoints.iterator(); iterator.hasNext();) {
-                Element inEndpoint = (Element) iterator.next();
+                Element inEndpoint = (Element)iterator.next();
                 String url = inEndpoint.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
                 if (url != null) {
                     GraphNode in = environment.getEndpointRegistry().getEndpoint(url,
-                            parent.getInfo().getHeader());
+                                    parent.getInfo().getHeader());
                     StringBuffer caption = new StringBuffer();
                     if (in == null) {
                         in = graph.addNode();
@@ -51,7 +66,8 @@ public class InboundRoutersProcessor extends TagProcessor {
                         appendProperties(inEndpoint, caption);
                         appendDescription(inEndpoint, caption);
                         in.getInfo().setCaption(caption.toString());
-                    } else {
+                    }
+                    else {
                         // rewrite the properties
                         // TODO really we need a cleaner way of handling in/out
                         // endpoints between components
@@ -59,14 +75,15 @@ public class InboundRoutersProcessor extends TagProcessor {
                         appendProperties(inEndpoint, caption);
                         appendDescription(inEndpoint, caption);
                         in.getInfo().setCaption(caption.toString());
-                        //Mark boundary endpoints between configurations
-//                        if(environment.getConfig().isCombineFiles()) {
-//                            in.getInfo().setLineColor("red");
-//                        }
+                        // Mark boundary endpoints between configurations
+                        // if(environment.getConfig().isCombineFiles()) {
+                        // in.getInfo().setLineColor("red");
+                        // }
                     }
 
                     if (in != null) {
-                        InboundFilterProcessor processor = new InboundFilterProcessor(environment, endpointsLink);
+                        InboundFilterProcessor processor = new InboundFilterProcessor(environment,
+                                        endpointsLink);
                         processor.processInboundFilter(graph, inEndpoint, in, endpointsLink);
                     }
                 }

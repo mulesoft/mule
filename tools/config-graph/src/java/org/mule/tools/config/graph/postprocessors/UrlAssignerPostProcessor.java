@@ -1,7 +1,25 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.postprocessors;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -11,50 +29,51 @@ import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.springframework.util.AntPathMatcher;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+public class UrlAssignerPostProcessor implements PostProcessor
+{
 
-public class UrlAssignerPostProcessor implements PostProcessor {
+    private static Logger log = Logger.getLogger(UrlAssignerPostProcessor.class);
 
-    private static Logger log = Logger
-            .getLogger(UrlAssignerPostProcessor.class);
-
-    private class Pattern implements Comparable {
+    private class Pattern implements Comparable
+    {
         String pattern;
 
         String url;
 
         private AntPathMatcher matcher = new AntPathMatcher();
 
-        Pattern(String pattern, String url) {
+        Pattern(String pattern, String url)
+        {
             this.pattern = pattern;
             this.url = url;
         }
 
-        public boolean match(String className) {
+        public boolean match(String className)
+        {
             return matcher.match(this.pattern, className);
         }
 
-        public boolean equals(Object obj) {
+        public boolean equals(Object obj)
+        {
             if (obj instanceof Pattern == false) {
                 return false;
             }
             if (this == obj) {
                 return true;
             }
-            Pattern rhs = (Pattern) obj;
-            return new EqualsBuilder().appendSuper(super.equals(obj)).append(
-                    pattern, rhs.pattern).isEquals();
+            Pattern rhs = (Pattern)obj;
+            return new EqualsBuilder().appendSuper(super.equals(obj)).append(pattern, rhs.pattern)
+                            .isEquals();
         }
 
-        public String toString() {
+        public String toString()
+        {
             return ToStringBuilder.reflectionToString(this) + "\n";
         }
 
-        public int compareTo(Object arg) {
-            Pattern rhs = (Pattern) arg;
+        public int compareTo(Object arg)
+        {
+            Pattern rhs = (Pattern)arg;
             return -this.pattern.compareTo(rhs.pattern);
 
         }
@@ -62,7 +81,8 @@ public class UrlAssignerPostProcessor implements PostProcessor {
 
     private List packagePatterns = null;
 
-    public void postProcess(Graph graph, GraphEnvironment env) {
+    public void postProcess(Graph graph, GraphEnvironment env)
+    {
 
         initPatterns(env.getConfig());
 
@@ -80,31 +100,34 @@ public class UrlAssignerPostProcessor implements PostProcessor {
             url = StringUtils.replace(url, "${classname}", classNameUrl);
             url = StringUtils.replace(url, "${header}", header);
 
-            node.getInfo().setAttributes(
-                    node.getInfo().getAttributes() + "\n URL=\"" + url + "\" ");
+            node.getInfo()
+                            .setAttributes(
+                                            node.getInfo().getAttributes() + "\n URL=\"" + url
+                                                            + "\" ");
         }
     }
 
-    private void initPatterns(GraphConfig config) {
+    private void initPatterns(GraphConfig config)
+    {
 
         if (packagePatterns == null) {
-            packagePatterns= new ArrayList();
-            for (Iterator iter = config.getUrls().keySet().iterator(); iter
-                    .hasNext();) {
-                String pattern = (String) iter.next();
+            packagePatterns = new ArrayList();
+            for (Iterator iter = config.getUrls().keySet().iterator(); iter.hasNext();) {
+                String pattern = (String)iter.next();
                 String url = config.getUrls().getProperty(pattern);
                 packagePatterns.add(new Pattern(pattern, url));
             }
             Collections.sort(packagePatterns);
-            log.info("patterns : "+packagePatterns);
+            log.info("patterns : " + packagePatterns);
         }
 
     }
 
-    private String getUrlPatternForClass(String className) {
+    private String getUrlPatternForClass(String className)
+    {
 
         for (Iterator iter = packagePatterns.iterator(); iter.hasNext();) {
-            Pattern element = (Pattern) iter.next();
+            Pattern element = (Pattern)iter.next();
             if (element.match(className)) {
                 log.info(className + " match pattern " + element);
                 return element.url;
@@ -114,7 +137,8 @@ public class UrlAssignerPostProcessor implements PostProcessor {
         return "http://mule.codehaus.org/docs/apidocs/${classname}.html";
     }
 
-    private String extractFullClassName(String caption, String header) {
+    private String extractFullClassName(String caption, String header)
+    {
         String className = "";
         className = getAttribute(caption, "className");
         if (className == null) {
@@ -130,7 +154,8 @@ public class UrlAssignerPostProcessor implements PostProcessor {
         return className;
     }
 
-    private String getAttribute(String caption, String attrib) {
+    private String getAttribute(String caption, String attrib)
+    {
         String result = null;
         String toSearch = attrib + " :";
         int index = caption.indexOf(toSearch);

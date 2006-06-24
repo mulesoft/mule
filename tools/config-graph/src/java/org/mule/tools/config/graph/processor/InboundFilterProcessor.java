@@ -1,26 +1,46 @@
+/*
+ * $Id: $
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-public class InboundFilterProcessor extends TagProcessor {
+public class InboundFilterProcessor extends TagProcessor
+{
 
     private GraphNode endpointNode;
 
-    public InboundFilterProcessor(GraphEnvironment environment, GraphNode endpointNode) {
+    public InboundFilterProcessor(GraphEnvironment environment, GraphNode endpointNode)
+    {
         super(environment);
         this.endpointNode = endpointNode;
     }
 
-    public void process(Graph graph, Element currentElement, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent)
+    {
         processInboundFilter(graph, currentElement, endpointNode, parent);
     }
 
-    public void processInboundFilter(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
+    public void processInboundFilter(Graph graph,
+                    Element endpoint,
+                    GraphNode endpointNode,
+                    GraphNode parent)
+    {
         Element filter = endpoint.getChild(MuleTag.ELEMENT_FILTER);
         boolean conditional = false;
 
@@ -32,8 +52,7 @@ public class InboundFilterProcessor extends TagProcessor {
         if (filter != null) {
 
             GraphNode filterNode = graph.addNode();
-            filterNode.getInfo().setHeader(
-                    filter.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
+            filterNode.getInfo().setHeader(filter.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
             filterNode.getInfo().setFillColor(ColorRegistry.COLOR_FILTER);
             StringBuffer caption = new StringBuffer();
             appendProperties(filter, caption);
@@ -44,7 +63,7 @@ public class InboundFilterProcessor extends TagProcessor {
                 filter = endpoint.getChild(MuleTag.ELEMENT_RIGHT_FILTER);
                 GraphNode filterNode2 = graph.addNode();
                 filterNode2.getInfo().setHeader(
-                        filter.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
+                                filter.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
                 filterNode2.getInfo().setFillColor(ColorRegistry.COLOR_FILTER);
                 StringBuffer caption2 = new StringBuffer();
                 appendProperties(filter, caption2);
@@ -54,7 +73,8 @@ public class InboundFilterProcessor extends TagProcessor {
             processInboundFilter(graph, filter, filterNode, parent);
 
             addEdge(graph, endpointNode, filterNode, "filters on", isTwoWay(endpoint));
-        } else {
+        }
+        else {
             addEdge(graph, endpointNode, parent, "in", isTwoWay(endpoint));
         }
     }
