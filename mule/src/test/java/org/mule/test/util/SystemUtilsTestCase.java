@@ -12,25 +12,25 @@
 
 package org.mule.test.util;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.EnvironmentUtils;
+import java.util.Map;
 
-import java.util.Properties;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.SystemUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EnvironmentUtilsTestCase extends AbstractMuleTestCase
+public class SystemUtilsTestCase extends AbstractMuleTestCase
 {
 
     public void testEnvironment() throws Exception
     {
-        Properties p = EnvironmentUtils.getEnvironment();
-        assertNotNull(p);
-        p.list(System.out);
-        assertFalse(p.isEmpty());
-        assertNotNull(p.getProperty("JAVA_HOME"));
+        Map env = SystemUtils.getenv();
+        assertNotNull(env);
+        assertFalse(env.isEmpty());
+        assertNotNull(env.get("JAVA_HOME"));
+        assertEquals(env.get("JAVA_HOME"), SystemUtils.getenv("JAVA_HOME"));
     }
 
 }
