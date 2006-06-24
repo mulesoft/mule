@@ -20,7 +20,7 @@ import java.util.Properties;
  * todo document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 2394 $
  */
 public class GraphEnvironment
 {

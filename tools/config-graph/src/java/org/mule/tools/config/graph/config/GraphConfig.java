@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
  * TODO - document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision: 2394 $
  */
 public class GraphConfig
 {
