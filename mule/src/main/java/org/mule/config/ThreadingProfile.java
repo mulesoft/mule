@@ -252,7 +252,7 @@ public class ThreadingProfile
     {
         BlockingQueue buffer;
 
-        if (maxBufferSize > 0) {
+        if (maxBufferSize > 0 && maxThreadsActive > 1) {
             buffer = new ArrayBlockingQueue(maxBufferSize);
         } else {
             buffer = new SynchronousQueue();
