@@ -201,7 +201,11 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             sma.setResponse(new ByteArrayInputStream((byte[])serializableToByteArray.transform(retMessage.getPayload())));
             retMessage = new MuleMessage(sma, retMessage);
         }
-        logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());
+        }
+
         return retMessage;
     }
 
