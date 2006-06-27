@@ -21,40 +21,17 @@
     <url>http://muleumo.org</url>
     <inceptionYear>2003</inceptionYear>
     <mailingLists>
-        <mailingList>
-            <name>Mule User List</name>
-            <subscribe>user-subscribe@mule.codehaus.org</subscribe>
-            <unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
-            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-        </mailingList>
-        <mailingList>
-            <name>Mule Developer List</name>
-            <subscribe>dev-subscribe@mule.codehaus.org</subscribe>
-            <unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
-            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-        </mailingList>
-        <mailingList>
-            <name>Mule SCM List</name>
-            <subscribe>scm-subscribe@mule.codehaus.org</subscribe>
-            <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
-            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-        </mailingList>
-        <mailingList>
-            <name>Mule Issues List</name>
-            <subscribe>issues-subscribe@mule.codehaus.org</subscribe>
-            <unsubscribe>issues-unsubscribe@mule.codehaus.org</unsubscribe>
-            <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
-        </mailingList>
+        <!-- Refer to http://muleumo.org/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://mule.codehaus.org/Team -->
+        <!-- Refer to http://muleumo.org/Team -->
     </developers>
     <contributors>
-        <!-- Refer to http://mule.codehaus.org/Team -->
+        <!-- Refer to http://muleumo.org/Team -->
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://jira.symphonysoft.com</url>
+        <url>http://jira.muleumo.org/browse/MULE</url>
     </issueManagement>
 
     <!-- Build -->
@@ -76,27 +53,24 @@
         </notifiers>
     </ciManagement>
     <distributionManagement>
-        <downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
+        <downloadUrl>http://muleumo.org/Download</downloadUrl>
         <repository>
-            <id>codehaus</id>
-            <name>Codehaus</name>
-            <url>https://dav.codehaus.org/dist/mule</url>
+          <id>mule-releases</id>
+          <name>Mule Release Repository</name>
+          <url>dav:https://dav.codehaus.org/repository/mule/</url>
         </repository>
         <snapshotRepository>
           <id>mule-snapshots</id>
           <name>Mule Snapshot Repository</name>
           <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
         </snapshotRepository>
-        <!--
         <site>
-            <id>default</id>
-            <name>Default Site</name>
-            <url>scp://mule.codehaus.org//home/projects/mule/public_html</url>
+          <id>mule-site</id>
+          <name>Mule Website</name>
+          <url>dav:https://dav.codehaus.org/mule/</url>
         </site>
-        -->
     </distributionManagement>
-    <repositories>
-        
+    <repositories>      
         <repository>
             <id>codehaus</id>
             <name>Codehaus Maven 2.x Release Repository</name>
@@ -105,7 +79,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        
         <repository>
             <id>codehaus-snapshots</id>
             <name>Codehaus Maven 2.x Snapshots Repository</name>
@@ -117,7 +90,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        
         <repository>
             <id>mule</id>
             <name>Mule Dependencies</name>
@@ -126,7 +98,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        
         <repository>
             <id>java.net</id>
             <name>Java.net Maven Repository</name>
