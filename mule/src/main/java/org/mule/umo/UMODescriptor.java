@@ -67,8 +67,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @throws MuleException if the Provider is not valid i.e. the proivder is
      *             not a receiver
      * @see org.mule.umo.endpoint.UMOEndpoint
-     * @deprecated Please use <code>inboundRouter</code> instead.
-     * @see MULE-506
+     * @deprecated use setInboundRouter() instead (see MULE-506)
      */
     void setInboundEndpoint(UMOEndpoint endpoint) throws MuleException;
 
@@ -87,8 +86,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @throws MuleException if the Provider is not valid i.e. the proivder is a
      *             receiver
      * @see UMOEndpoint
-     * @deprecated Please use <code>outboundRouter</code> instead.
-     * @see MULE-506
+     * @deprecated use setOutboundRouter() instead (see MULE-506)
      */
     void setOutboundEndpoint(UMOEndpoint endpoint) throws MuleException;
 
@@ -151,8 +149,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @param transformer the transformer to use.
      * @see UMOTransformer
      * @see org.mule.transformers.AbstractTransformer
-     * @deprecated Please use <code>inboundRouter</code> instead.
-     * @see MULE-506
+     * @deprecated use setInboundRouter() instead (see MULE-506)
      */
     void setInboundTransformer(UMOTransformer transformer);
 
@@ -162,8 +159,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @param transformer the transformer to use.
      * @see UMOTransformer
      * @see org.mule.transformers.AbstractTransformer
-     * @deprecated Please use <code>outboundRouter</code> instead.
-     * @see MULE-506
+     * @deprecated use setOutboundRouter() instead (see MULE-506)
      */
     void setOutboundTransformer(UMOTransformer transformer);
 
