@@ -11,22 +11,21 @@
  */
 package org.mule.transformers.simple;
 
+import java.io.UnsupportedEncodingException;
+
+import org.mule.config.i18n.Message;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.StringMessageUtils;
 
 /**
  * <code>StringToByteArray</code> converts a string into a byte array
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class StringToByteArray extends AbstractTransformer
-{
-    /**
-     * Serial version
-     */
+public class StringToByteArray extends AbstractTransformer {
+
     private static final long serialVersionUID = 3993746463869846673L;
 
     public StringToByteArray()
@@ -41,6 +40,13 @@ public class StringToByteArray extends AbstractTransformer
         if (src instanceof byte[]) {
             return src;
         }
-        return StringMessageUtils.getBytes((String) src);
+        else {
+            try {
+                return ((String) src).getBytes(encoding);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new TransformerException(Message.createStaticMessage("Unable to convert String to byte[]."), e);
+            }
+        }
     }
 }
