@@ -27,13 +27,14 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.util.StringMessageUtils;
 
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
- * statics about message processing through the router.
+ * statistics about message processing through the router.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -65,14 +66,10 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         setMessageProperties(session, message, endpoint);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Message being sent to: " + endpoint.getEndpointURI());
-            logger.debug(message);
-        }
-        if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Message payload: \n" + message.getPayloadAsString());
+                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n" + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false));
             } catch (Exception e) {
-                // ignore
+                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n(unable to retrieve payload: " + e.getMessage());
             }
         }
 
