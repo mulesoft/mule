@@ -1,0 +1,88 @@
+<!--
+    This file is a template for creating your local (user-specific) Maven settings.
+    It should be copied to the appropriate location for your user's settings file
+    (~/.m2/settings.xml by default)
+
+    Refer to http://maven.apache.org/ref/current/maven-settings/settings.html for the
+    things which can be specified in this file.
+-->
+<settings>
+    <!-- Enable this if your machine is behind a firewall.
+    <proxies>
+        <proxy>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>myproxy</host>
+            <port>myproxyport</port>
+            <nonProxyHosts>localmachine1,localmachine2</nonProxyHosts>
+        </proxy>
+    </proxies>
+    -->
+
+    <!-- Set your Codehaus credentials here in order to be able to upload to the Mule
+         distribution area using "mvn deploy". -->
+    <servers>
+        <server>
+            <id>mule-releases</id>
+            <username>myuser</username>
+            <password>mypassword</password>
+        </server>
+        <server>
+            <id>mule-snapshots</id>
+            <username>myuser</username>
+            <password>mypassword</password>
+        </server>
+        <server>
+            <id>mule-site</id>
+            <username>myuser</username>
+            <password>mypassword</password>
+        </server>
+    </servers>
+
+    <!-- Set your preferences for downloading new snapshots.  Note the default setting
+         is "daily".  Setting updatePolicy="never" will only download a snapshot if one
+         doesn't already exist.  -->
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault />
+            </activation>
+            <repositories>
+                <repository>
+                    <id>codehaus-snapshots</id>
+                    <snapshots>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <snapshots>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <!--
+        Set the default build profiles for your user.
+        (see http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
+    -->
+    <activeProfiles>
+        <!-- Enable this profile to always build the Mule distributions (.tar.gz, .zip, .rar)
+            <activeProfile>distributions</activeProfile>
+        -->
+        <!-- Enable this profile to skip all tests which require a network connection.
+            <activeProfile>offline</activeProfile>
+        -->
+        <!-- Enable this profile to run integration tests with an Oracle database.
+            <activeProfile>oracle</activeProfile>
+        -->
+        <!-- Enable this profile to run integration tests with IBM AS400 Data Queue messaging server.
+            <activeProfile>as400</activeProfile>
+        -->
+        <!-- Enable this profile to run integration tests with SAP.
+            <activeProfile>sap</activeProfile>
+        -->
+    </activeProfiles>
+</settings>
