@@ -115,7 +115,6 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
      */
     public synchronized void doInitialise() throws InitialisationException
     {
-
         // Create thread pool
         ThreadingProfile tp = descriptor.getThreadingProfile();
         workManager = tp.createWorkManager(descriptor.getName());
@@ -139,8 +138,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
         try
         {
             // Initialise the proxy pool
-            proxyPool = descriptor.getPoolingProfile().getPoolFactory()
-                    .createPool(descriptor);
+            proxyPool = descriptor.getPoolingProfile().getPoolFactory().createPool(descriptor);
 
             if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
             {
@@ -154,6 +152,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
             {
                 proxyPool.returnObject(proxyPool.borrowObject());
             }
+
             poolInitialised.set(true);
         } catch (Exception e)
         {
@@ -164,12 +163,10 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
 
     protected MuleProxy createComponentProxy() throws InitialisationException
     {
-
         try
         {
             Object component = lookupComponent();
-            MuleProxy componentProxy = new DefaultMuleProxy(component,
-                    descriptor, null);
+            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
             getStatistics().setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());
             componentProxy.start();
@@ -196,7 +193,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                 proxyPool.clearPool();
             } catch (Exception e)
             {
-                logger.error("Failed to stop compoent pool: " + e.getMessage(),
+                logger.error("Failed to stop component pool: " + e.getMessage(),
                         e);
             }
             poolInitialised.set(false);
@@ -372,8 +369,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
 
     public int getQueueSize()
     {
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager()
-                .getQueueSession();
+        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
         return queueSession.getQueue(descriptor.getName()).size();
     }
 
@@ -385,7 +381,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
     {
         MuleEvent event = null;
         MuleProxy proxy = null;
-        QueueSession queueSession = null;
+        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
 
         while (!stopped.get())
         {
@@ -394,19 +390,16 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                 // Wait if the component is paused
                 paused.whenFalse(null);
 
-                // If we're doing a draining stop, read all events from the
-                // queue
-                // before stopping
+                // If we're doing a draining stop, read all events from the queue before stopping
                 if (stopping.get())
                 {
-                    if (queueSession == null
-                            || queueSession.getQueue(
-                                    descriptor.getName() + ".component").size() == 0)
+                    if (queueSession == null || queueSession.getQueue(descriptorQueueName).size() == 0)
                     {
                         stopping.set(false);
                         break;
                     }
                 }
+
                 event = (MuleEvent) dequeue();
                 if (event != null)
                 {
@@ -414,6 +407,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                     {
                         stats.decQueuedEvent();
                     }
+
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Component: " + descriptor.getName()
@@ -424,8 +418,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                     if (proxyPool != null)
                     {
                         proxy = (MuleProxy) proxyPool.borrowObject();
-                        getStatistics().setComponentPoolSize(
-                                proxyPool.getSize());
+                        getStatistics().setComponentPoolSize(proxyPool.getSize());
                     }
                     else if (componentPerRequest)
                     {
@@ -439,8 +432,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                     proxy.setStatistics(getStatistics());
                     proxy.start();
                     proxy.onEvent(queueSession, event);
-                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE,
-                            null, this);
+                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, this);
                 }
             } catch (Exception e)
             {
@@ -464,7 +456,8 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                 {
                     handleException(new ComponentException(new Message(
                             Messages.PROXY_POOL_TIMED_OUT),
-                            (event == null ? null : event.getMessage()), this,
+                            (event == null ? null : event.getMessage()),
+                            this,
                             e));
                 }
                 else if (e instanceof UMOException)
@@ -474,9 +467,10 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                 else if (e instanceof WorkException)
                 {
                     handleException(new ComponentException(new Message(
-                            Messages.EVENT_PROCESSING_FAILED_FOR_X, descriptor
-                                    .getName()), (event == null ? null : event
-                            .getMessage()), this, e));
+                            Messages.EVENT_PROCESSING_FAILED_FOR_X, descriptor.getName()),
+                            (event == null ? null : event.getMessage()),
+                            this,
+                            e));
                 }
                 else
                 {
@@ -503,18 +497,15 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
 
     protected void enqueue(UMOEvent event) throws Exception
     {
-        QueueSession session = MuleManager.getInstance().getQueueManager()
-                .getQueueSession();
+        QueueSession session = MuleManager.getInstance().getQueueManager().getQueueSession();
         session.getQueue(descriptorQueueName).put(event);
     }
 
     protected UMOEvent dequeue() throws Exception
     {
         // Wait until an event is available
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager()
-                .getQueueSession();
-        return (UMOEvent) queueSession.getQueue(descriptorQueueName).poll(
-                queueTimeout);
+        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
+        return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
     }
 
     public void workAccepted(WorkEvent event)
@@ -540,6 +531,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
     protected void handleWorkException(WorkEvent event, String type)
     {
         Throwable e;
+
         if (event != null && event.getException() != null)
         {
             e = event.getException();
@@ -548,16 +540,20 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
         {
             return;
         }
+
         if (event.getException().getCause() != null)
         {
             e = event.getException().getCause();
         }
+
         logger.error("Work caused exception on '" + type
                 + "'. Work being executed was: " + event.getWork().toString());
+
         if (e instanceof Exception) {
             handleException((Exception) e);
         } else {
             throw new MuleRuntimeException(new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, getName()), e);
         }
     }
+
 }
