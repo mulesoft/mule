@@ -1,0 +1,28 @@
+<!--
+Assembly descriptor for the minimal Mule distribution.
+-->
+<assembly>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+
+  <fileSets>
+    <fileSet>
+      <directory>../src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <!-- Make binary directories executable. -->
+    <fileSet>
+      <directory>../src/main/resources/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../src/main/resources/sbin</directory>
+      <outputDirectory>sbin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+  </fileSets>
+</assembly>

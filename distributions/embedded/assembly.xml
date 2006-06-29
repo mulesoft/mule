@@ -1,0 +1,37 @@
+<!-- 
+Assembly descriptor for the composite Mule library (jar). 
+-->
+<assembly>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet> 
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+          <include>org/mule/**/*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  
+  <!-- 
+  Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to do something like
+  the following in order to unpack just the Mule libraries.  
+  For the time being, we use the dependency-maven-plugin as a workaround (see pom.xml).  Note that the 
+  dependency-maven-plugin unpacks _all_ the dependencies (including the transitive ones) and then the 
+  maven-assembly-plugin includes only the classes in "org/mule/**/*" (above).
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.mule:*</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+    -->
+</assembly>

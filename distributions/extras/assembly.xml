@@ -1,0 +1,43 @@
+<!--
+Assembly descriptor for the Extras distribution.
+-->
+<assembly>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+
+  <fileSets>
+    <fileSet>
+      <directory>examples</directory>
+      <outputDirectory>examples</outputDirectory>
+    </fileSet>
+
+    <!-- Javadocs -->
+    <fileSet>
+      <directory>api</directory>
+      <outputDirectory>api</outputDirectory>
+    </fileSet>
+
+    <!-- HTML export of the on-line docs -->
+    <fileSet>
+      <directory>docs</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>tools</directory>
+      <outputDirectory>tools</outputDirectory>
+    </fileSet>
+
+    <!-- Source code -->
+    <fileSet>
+      <directory>../..</directory>
+      <outputDirectory>src</outputDirectory>
+      <includes>
+          <include>**/src/main/java/**/*</include>
+          <include>**/src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
