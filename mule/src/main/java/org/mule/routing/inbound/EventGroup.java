@@ -25,6 +25,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
+//@ThreadSafe
 public class EventGroup implements Serializable
 {
     /**
@@ -32,22 +33,23 @@ public class EventGroup implements Serializable
      */
     private static final long serialVersionUID = -7337182983687406403L;
 
-    private Object groupId;
-    private List events;
-    private long created;
-    private int expectedSize = -1;
-
-    public EventGroup(Object groupId, int expectedSize)
-    {
-        this(groupId);
-        this.expectedSize = expectedSize;
-    }
+    private final Object groupId;
+    private final List events;
+    private final long created;
+    private final int expectedSize;
 
     public EventGroup(Object groupId)
     {
+        this(groupId, -1);
+    }
+
+    public EventGroup(Object groupId, int expectedSize)
+    {
+        super();
+        this.created = System.currentTimeMillis();
+        this.events = new CopyOnWriteArrayList();
+        this.expectedSize = expectedSize;
         this.groupId = groupId;
-        events = new CopyOnWriteArrayList();
-        created = System.currentTimeMillis();
     }
 
     public Object getGroupId()
