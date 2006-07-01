@@ -11,12 +11,11 @@
  */
 package org.mule.config;
 
-import org.mule.umo.UMOMessage;
-
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.mule.umo.UMOMessage;
+import org.mule.util.PropertiesUtils;
 
 /**
  * Looks up the property on the message using the name given.
@@ -30,11 +29,6 @@ public class SimplePropertyExtractor implements PropertyExtractor {
     }
 
     public Map getProperties(List names, UMOMessage message) {
-        Map props = new HashMap();
-        for (Iterator iterator = names.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
-            props.put(s, getProperty(s, message));
-        }
-        return props;
+        return PropertiesUtils.getMessageProperties(names, message);
     }
 }

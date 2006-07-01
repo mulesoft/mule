@@ -1,24 +1,21 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
 package org.mule.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
-
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,10 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
+import org.mule.umo.UMOMessage;
+
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and
  * filtering property Maps.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -100,7 +101,7 @@ public class PropertiesUtils
 
     /**
      * Will create a map of properties where the names have a prefix
-     * 
+     *
      * @param props
      *            the source set of properties
      * @param prefix
@@ -127,7 +128,7 @@ public class PropertiesUtils
     /**
      * Will create a map of properties where the names have a prefix Allows the
      * callee to supply the target map so a comarator can be set
-     * 
+     *
      * @param props
      *            the source set of properties
      * @param prefix
@@ -256,4 +257,22 @@ public class PropertiesUtils
         }
     }
 
+    /**
+     * Returns a map of property names/values for the given message.
+     */
+    public static Map getMessageProperties(UMOMessage message) {
+        return getMessageProperties(new ArrayList(message.getPropertyNames()), message);
+    }
+
+    /**
+     * Returns a map of property names/values for the given message.
+     */
+    public static Map getMessageProperties(List propertyNames, UMOMessage message) {
+        Map props = new HashMap();
+        for (Iterator iterator = propertyNames.iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            props.put(s, message.getProperty(s));
+        }
+        return props;
+    }
 }
