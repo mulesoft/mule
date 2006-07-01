@@ -21,13 +21,13 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
-import java.util.Set;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -513,7 +513,7 @@ public class MuleEvent extends EventObject implements UMOEvent
             // Search the connector
             if (property == null) {
                 try {
-                    property = BeanUtils.getProperty(getEndpoint().getConnector(), name);
+                    property = PropertyUtils.getProperty(getEndpoint().getConnector(), name);
                 } catch (Exception e) {
                     // Ignore this exception, it just means that the connector has no such property.
                 }
@@ -623,10 +623,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         if (message != null ? !message.equals(event.message) : event.message != null) {
             return false;
         }
-        if (!id.equals(event.id)) {
-            return false;
-        }
-        return true;
+        return id.equals(event.id);
     }
 
     public int hashCode()
@@ -838,5 +835,4 @@ public class MuleEvent extends EventObject implements UMOEvent
         return encoding;
     }
 
-    private static Log log = LogFactory.getLog(MuleEvent.class);
 }
