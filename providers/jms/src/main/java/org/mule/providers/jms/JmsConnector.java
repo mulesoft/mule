@@ -80,6 +80,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     private ConnectionFactory connectionFactory;
 
+    private String connectionFactoryClass;
+
     private String jndiInitialFactory;
 
     private String jndiProviderUrl;
@@ -252,9 +254,17 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void doConnect() throws ConnectException
     {
         try {
+            // have to instanciate it here, and not earlier in MuleXmlConfigurationBuilder, as
+            // native factory may initiate immediate connections, and that is not what we
+            // want if the descriptor's initial state is paused.
+            if (connectionFactoryClass != null) {
+                connectionFactory = (ConnectionFactory) ClassUtils.instanciateClass(connectionFactoryClass,
+                                                                                    ClassUtils.NO_ARGS);
+            }
+
             // If we have a connection factory, there is no need to initialise
             // the JndiContext
-            if (connectionFactory == null || (connectionFactory != null && jndiInitialFactory != null)) {
+            if (connectionFactory == null || jndiInitialFactory != null) {
                 initJndiContext();
             } else {
                 // Set these to false so that the jndiContext
@@ -564,6 +574,15 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void setConnectionFactory(ConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
+    }
+
+
+    public String getConnectionFactoryClass() {
+        return connectionFactoryClass;
+    }
+
+    public void setConnectionFactoryClass(String connectionFactoryClass) {
+        this.connectionFactoryClass = connectionFactoryClass;
     }
 
     public JmsSupport getJmsSupport()
