@@ -702,7 +702,7 @@ public class MuleManager implements UMOManager
             throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "osEncoding", config.getOSEncoding()), this);
         }
     }
-    
+
     protected void registerAdminAgent() throws UMOException {
         // Allows users to disable all server components and connections
         // this can be useful for testing
@@ -968,7 +968,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Determines if the server is currently initialising
-     * 
+     *
      * @return true if if the server is currently initialising, false otherwise
      */
     public boolean isInitialising()
@@ -996,13 +996,14 @@ public class MuleManager implements UMOManager
      * Returns a formatted string that is a summary of the configuration of the
      * server. This is the brock of information that gets displayed when the
      * server starts
-     * 
+     *
      * @return a string summary of the server information
      */
     protected String getStartSplash()
     {
         String notset = new Message(Messages.NOT_SET).getMessage();
 
+        // Mule Version, Timestamp, and Server ID
         List message = new ArrayList();
         Manifest mf = config.getManifest();
         Map att = mf.getMainAttributes();
@@ -1017,12 +1018,14 @@ public class MuleManager implements UMOManager
             message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }
         message.add(" ");
-        String patch = System.getProperty("sun.os.patch.level", null);
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL);
         message.add(new Message(Messages.SERVER_STARTED_AT_X, df.format(new Date(getStartDate())).toString()).getMessage());
-        message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
-        message.add("OS: " + System.getProperty("os.name") + (patch!=null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+        message.add("Server ID: " + id);
 
+        // JDK, OS, and Host
+        message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
+        String patch = System.getProperty("sun.os.patch.level", null);
+        message.add("OS: " + System.getProperty("os.name") + (patch!=null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
         try {
             InetAddress host = InetAddress.getLocalHost();
             message.add("Host: " + host.getCanonicalHostName() + " (" + host.getHostAddress() + ")");
@@ -1030,8 +1033,7 @@ public class MuleManager implements UMOManager
             // ignore
         }
 
-        message.add("ID: " + id);
-
+        // Mule Agents
         message.add(" ");
         if (agents.size() == 0) {
             message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + " "
@@ -1100,7 +1102,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Initialises all registered agents
-     * 
+     *
      * @throws InitialisationException
      */
     protected void initialiseAgents() throws InitialisationException
@@ -1163,7 +1165,7 @@ public class MuleManager implements UMOManager
     /**
      * associates a Dependency Injector container or Jndi container with Mule. This can be used to
      * integrate container managed resources with Mule resources
-     * 
+     *
      * @param container a Container context to use. By default, there is a
      *            default Mule container <code>MuleContainerContext</code>
      *            that will assume that the reference key for an oblect is a
@@ -1185,7 +1187,7 @@ public class MuleManager implements UMOManager
     /**
      * associates a Dependency Injector container with Mule. This can be used to
      * integrate container managed resources with Mule resources
-     * 
+     *
      * @return the container associated with the Manager
      */
     public UMOContainerContext getContainerContext()
@@ -1221,7 +1223,7 @@ public class MuleManager implements UMOManager
      * Fires a mule 'system' event. These are notifications that are fired because
      * something within the Mule instance happened such as the Model started or
      * the server is being disposed.
-     * 
+     *
      * @param e the event that occurred
      */
     protected void fireSystemEvent(UMOServerNotification e)
@@ -1236,7 +1238,7 @@ public class MuleManager implements UMOManager
     /**
      * Fires a server notification to all registered
      * {@link org.mule.impl.internal.notifications.CustomNotificationListener} notificationManager.
-     * 
+     *
      * @param notification the notification to fire. This must be of type
      *            {@link org.mule.impl.internal.notifications.CustomNotification} otherwise an
      *            exception will be thrown.
@@ -1272,7 +1274,7 @@ public class MuleManager implements UMOManager
     /**
      * Sets the security manager used by this Mule instance to authenticate and
      * authorise incoming and outgoing event traffic and service invocations
-     * 
+     *
      * @param securityManager the security manager used by this Mule instance to
      *            authenticate and authorise incoming and outgoing event traffic
      *            and service invocations
@@ -1288,7 +1290,7 @@ public class MuleManager implements UMOManager
     /**
      * Gets the security manager used by this Mule instance to authenticate and
      * authorise incoming and outgoing event traffic and service invocations
-     * 
+     *
      * @return he security manager used by this Mule instance to authenticate
      *         and authorise incoming and outgoing event traffic and service
      *         invocations
@@ -1304,13 +1306,13 @@ public class MuleManager implements UMOManager
      * schedule work. This work Manager must <b>never</b> be used by provider
      * implementations as they have their own workManager accible on the
      * connector.
-     * 
+     *
      * If a workManager has not been set by the time the
      * <code>initialise()</code> method has been called a default
      * <code>MuleWorkManager</code> will be created using the
      * <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
      * object.
-     * 
+     *
      * @return a workManager instance used by the current MuleManager
      * @see org.mule.config.ThreadingProfile
      * @see MuleConfiguration
@@ -1326,17 +1328,17 @@ public class MuleManager implements UMOManager
      * schedule work. This work Manager must <b>never</b> be used by provider
      * implementations as they have their own workManager accible on the
      * connector.
-     * 
+     *
      * If a workManager has not been set by the time the
      * <code>initialise()</code> method has been called a default
      * <code>MuleWorkManager</code> will be created using the
      * <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
      * object.
-     * 
+     *
      * @param workManager the workManager instance used by the current
      *            MuleManager
      * @throws IllegalStateException if the workManager has already been set.
-     * 
+     *
      * @see org.mule.config.ThreadingProfile
      * @see MuleConfiguration
      * @see MuleWorkManager
