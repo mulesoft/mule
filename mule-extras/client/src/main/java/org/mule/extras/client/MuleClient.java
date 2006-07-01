@@ -74,7 +74,7 @@ import java.util.Map;
  * endpoint is used. <p/> <p/> Note that there must be a configured MuleManager
  * for this client to work. It will use the one available using
  * <code>MuleManager.getInstance()</code>
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: 2179 $
  * @see org.mule.impl.endpoint.MuleEndpointURI
@@ -101,18 +101,30 @@ public class MuleClient implements Disposable
     /**
      * Creates a default Mule client that will use the default serverEndpoint to
      * connect to a remote server instance.
-     * 
+     *
      * @throws UMOException
      */
     public MuleClient() throws UMOException
     {
-        init();
+        init(/*startManager*/true);
+    }
+
+    /**
+     * Creates a default Mule client that will use the default serverEndpoint to
+     * connect to a remote server instance.
+     *
+     * @param startManager start the Mule Manager if it has not yet been initialised
+     * @throws UMOException
+     */
+    public MuleClient(boolean startManager) throws UMOException
+    {
+        init(startManager);
     }
 
     /**
      * Configures a Mule CLient instance using the the default
      * MuleXmlConfigurationBuilder to parse the config resources
-     * 
+     *
      * @param configResources a config resource location to configure this
      *            client with
      * @throws ConfigurationException is there is a MuleManager instance already
@@ -127,7 +139,7 @@ public class MuleClient implements Disposable
     /**
      * Configures a new MuleClient and either uses an existing Manager running
      * in this JVM or creates a new empty manager
-     * 
+     *
      * @param user the username to use when connecting to a remote server
      *            instance
      * @param password the password for the user
@@ -135,13 +147,13 @@ public class MuleClient implements Disposable
      */
     public MuleClient(String user, String password) throws UMOException
     {
-        init();
+        init(/*startManager*/true);
         this.user = new MuleCredentials(user, password.toCharArray());
     }
 
     /**
-     * Configures a Mule CLient instance
-     * 
+     * Configures a Mule Client instance
+     *
      * @param configResources a config resource location to configure this
      *            client with
      * @param builder the configuration builder to use
@@ -163,8 +175,8 @@ public class MuleClient implements Disposable
     }
 
     /**
-     * Configures a Mule CLient instance
-     * 
+     * Configures a Mule Client instance
+     *
      * @param configResources a config resource location to configure this
      *            client with
      * @param builder the configuration builder to use
@@ -184,10 +196,11 @@ public class MuleClient implements Disposable
 
     /**
      * Initialises a default MuleManager for use by the client.
-     * 
+     *
+     * @param startManager start the Mule Manager if it has not yet been initialised
      * @throws UMOException
      */
-    private void init() throws UMOException
+    private void init(boolean startManager) throws UMOException
     {
         // if we are creating a server for this client then set client mode
         // this will disable Admin connections by default;
@@ -196,7 +209,7 @@ public class MuleClient implements Disposable
         manager = MuleManager.getInstance();
         builder = new QuickConfigurationBuilder();
         // If there is no local manager present create a default manager
-        if (!manager.isInitialised()) {
+        if (!manager.isInitialised() && startManager == true) {
             logger.info("Initialising a new Mule Manager");
             ((MuleManager) manager).start();
         }
@@ -206,7 +219,7 @@ public class MuleClient implements Disposable
      * Dispatches an event asynchronously to a endpointUri via a mule server.
      * the Url determines where to dispathc the event to, this can be in the
      * form of
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param payload the object that is the payload of the event
@@ -293,7 +306,7 @@ public class MuleClient implements Disposable
     }
     /**
      * sends an event synchronously to a components
-     * 
+     *
      * @param component the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to
      *            the result message
@@ -361,7 +374,7 @@ public class MuleClient implements Disposable
 
     /**
      * dispatches an event asynchronously to the components
-     * 
+     *
      * @param component the name of the Mule components to dispatch to
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the
@@ -404,7 +417,7 @@ public class MuleClient implements Disposable
     /**
      * sends an event request to a Url, making the result of the event trigger
      * available as a Future result that can be accessed later by client code.
-     * 
+     *
      * @param url the url to make a request on
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the
@@ -438,7 +451,7 @@ public class MuleClient implements Disposable
     /**
      * sends an event request to a Url, making the result of the event trigger
      * available as a Future result that can be accessed later by client code.
-     * 
+     *
      * @param url the url to make a request on
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the
@@ -491,7 +504,7 @@ public class MuleClient implements Disposable
      * a remote server. Users can endpoint a url to a remote Mule server in the
      * constructor of a Mule client, by default the default Mule server url
      * tcp://localhost:60504 is used.
-     * 
+     *
      * @param component the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to
      *            the result message
@@ -590,7 +603,7 @@ public class MuleClient implements Disposable
     /**
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param payload the object that is the payload of the event
@@ -648,7 +661,7 @@ public class MuleClient implements Disposable
 
     /**
      * Will receive an event from an endpointUri determined by the url
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param timeout how long to block waiting to receive the event, if set to
@@ -675,7 +688,7 @@ public class MuleClient implements Disposable
 
     /**
      * Will receive an event from an endpointUri determined by the url
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param transformers A comma separated list of transformers used to apply
@@ -693,7 +706,7 @@ public class MuleClient implements Disposable
 
     /**
      * Will receive an event from an endpointUri determined by the url
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param transformer A transformer used to apply to the result message
@@ -715,7 +728,7 @@ public class MuleClient implements Disposable
 
     /**
      * Packages a mule event for the current request
-     * 
+     *
      * @param message the event payload
      * @param uri the destination endpointUri
      * @param synchronous whether the event will be synchronously processed
@@ -790,7 +803,7 @@ public class MuleClient implements Disposable
     /**
      * Sends an event synchronously to a endpointUri via a mule server without
      * waiting for the result.
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param payload the object that is the payload of the event
@@ -818,7 +831,7 @@ public class MuleClient implements Disposable
 
     /**
      * Overriding methods may want to return a custom manager here
-     * 
+     *
      * @return the UMOManager to use
      */
     public UMOManager getManager()
@@ -830,7 +843,7 @@ public class MuleClient implements Disposable
      * Registers a java object as a Umo pcomponent that listens for events on
      * the given url. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
-     * 
+     *
      * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload
      *            type
@@ -849,7 +862,7 @@ public class MuleClient implements Disposable
      * events on the given urls. By default the ThreadingProfile for the
      * components will be set so that there will only be one thread of
      * execution.
-     * 
+     *
      * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload
      *            type
@@ -878,7 +891,7 @@ public class MuleClient implements Disposable
      * </code>
      * Calling this method is equivilent to calling
      * UMOModel.registerComponent(..)
-     * 
+     *
      * @param descriptor the componet descriptor to register
      * @throws UMOException the descriptor is invalid or cannot be initialised
      *             or started
@@ -893,7 +906,7 @@ public class MuleClient implements Disposable
      * Unregisters a previously register components. This will also unregister
      * any listeners for the components Calling this method is equivilent to
      * calling UMOModel.unregisterComponent(..)
-     * 
+     *
      * @param name the name of the componet to unregister
      * @throws UMOException if unregistering the components fails, i.e. The
      *             underlying transport fails to unregister a listener. If the
