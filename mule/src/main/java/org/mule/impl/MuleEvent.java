@@ -1,26 +1,38 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
 package org.mule.impl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.EventObject;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
@@ -35,15 +47,6 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.UUID;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.EventObject;
-import java.util.Iterator;
-
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
  * environment. All data sent or received within the mule environment will be
@@ -51,7 +54,7 @@ import java.util.Iterator;
  * and provides helper methods for obtaining the data in a format that the
  * receiving Mule UMO understands. The event can also maintain any number of
  * properties that can be set and retrieved by Mule UMO components.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -126,7 +129,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Contructor.
-     * 
+     *
      * @param message
      *            the event payload
      * @param endpoint
@@ -153,7 +156,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Contructor.
-     * 
+     *
      * @param message
      *            the event payload
      * @param endpoint
@@ -179,7 +182,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * A helper constructor used to rewrite an event payload
-     * 
+     *
      * @param message
      * @param rewriteEvent
      */
@@ -258,7 +261,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
 
         for (int i = 0; i < ignorredPropertyOverides.length; i++) {
-            if (key.equals(ignorredPropertyOverides[i])) {
+            if(key.equals(ignorredPropertyOverides[i])) {
                 return false;
             }
         }
@@ -293,7 +296,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getPayload()
      */
     public UMOMessage getMessage()
@@ -303,7 +306,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getPayloadAsBytes()
      */
     public byte[] getMessageAsBytes() throws MuleException
@@ -319,7 +322,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getTransformedMessage()
      */
     public Object getTransformedMessage() throws TransformerException
@@ -346,7 +349,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * will serialized the CONTENTS of the string not the String object. finally
      * it will check if the result is a Serializable object and convert that to
      * an array of bytes.
-     * 
+     *
      * @return a byte[] representation of the message
      * @throws TransformerException
      *             if an unsupported encoding is being used or if the result
@@ -386,7 +389,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * Returns the message transformed into it's recognised or expected format
      * and then into a String. The transformer used is the one configured on the
      * endpoint through which this event was received.
-     * 
+     *
      * @return the message transformed into it's recognised or expected format
      *         as a Strings.
      * @throws org.mule.umo.transformer.TransformerException
@@ -400,7 +403,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getPayloadAsString()
      */
     public String getMessageAsString() throws UMOException
@@ -412,7 +415,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * Returns the message transformed into it's recognised or expected format
      * and then into a String. The transformer used is the one configured on the
      * endpoint through which this event was received.
-     * 
+     *
      * @param encoding
      *            the encoding to use when converting the message to string
      * @return the message transformed into it's recognised or expected format
@@ -433,7 +436,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Returns the message contents as a string
-     * 
+     *
      * @param encoding
      *            the encoding to use when converting the message to string
      * @return the message contents as a string
@@ -453,7 +456,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getId()
      */
     public String getId()
@@ -462,7 +465,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * 
+     *
      * @param name
      * @return
      */
@@ -472,7 +475,18 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * 
+     *
+     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, boolean)
+     */
+    public Object getProperty(String name, boolean exhaustiveSearch) {
+        return getProperty(name, /*defaultValue*/null, exhaustiveSearch);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String,
+     *      java.lang.Object)
      * @param name
      * @param defaultValue
      * @return
@@ -484,7 +498,33 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
+     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, java.lang.Object, boolean)
+     */
+    public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch) {
+        Object property = getProperty(name);
+
+        if (exhaustiveSearch) {
+            // Search the endpoint
+            if (property == null) {
+                property = MapUtils.getObject(getEndpoint().getEndpointURI().getParams(), name, null);
+            }
+
+            // Search the connector
+            if (property == null) {
+                try {
+                    property = BeanUtils.getProperty(getEndpoint().getConnector(), name);
+                } catch (Exception e) {
+                    // Ignore this exception, it just means that the connector has no such property.
+                }
+            }
+        }
+        return (property == null ? defaultValue : property);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see org.mule.umo.UMOEvent#setProperty(java.lang.String,
      *      java.lang.Object)
      */
@@ -495,7 +535,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getEndpoint()
      */
     public UMOImmutableEndpoint getEndpoint()
@@ -505,7 +545,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -544,7 +584,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the default processing for this event will be executed
-     * 
+     *
      * @return Returns the stopFurtherProcessing.
      */
     public boolean isStopFurtherProcessing()
@@ -560,7 +600,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * prviders programatically by using the component on the current event 2.
      * The UMO doesn't send the current event out through a endpoint. i.e. the
      * processing of the event stops in the uMO.
-     * 
+     *
      * @param stopFurtherProcessing
      *            The stopFurtherProcessing to set.
      */
@@ -623,7 +663,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets an int property on the nessage
-     * 
+     *
      * @param name
      */
     public int getIntProperty(String name, int defaultValue)
@@ -633,7 +673,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a long property on the nessage
-     * 
+     *
      * @param name
      */
     public long getLongProperty(String name, long defaultValue)
@@ -643,7 +683,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a double property on the nessage
-     * 
+     *
      * @param name
      */
     public double getDoubleProperty(String name, double defaultValue)
@@ -653,7 +693,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a boolean property on the nessage
-     * 
+     *
      * @param name
      */
     public boolean getBooleanProperty(String name, boolean defaultValue)
@@ -663,7 +703,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a boolean property on the nessage
-     * 
+     *
      * @param name
      * @param value
      */
@@ -674,7 +714,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets an int property on the nessage
-     * 
+     *
      * @param name
      * @param value
      */
@@ -685,7 +725,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a long property on the nessage
-     * 
+     *
      * @param name
      * @param value
      */
@@ -696,7 +736,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a double property on the nessage
-     * 
+     *
      * @param name
      * @param value
      */
@@ -708,7 +748,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * An outputstream the can optionally be used write response data to an
      * incoming message.
-     * 
+     *
      * @return an output strem if one has been made available by the message
      *         receiver that received the message
      */
@@ -719,7 +759,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Removes a property from the event
-     * 
+     *
      * @param key
      *            the property key to remove
      * @return the removed property or null if the property was not found or if
@@ -751,7 +791,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * Will retrieve a string proerty form the event. If the property does not
      * exist it will be substituted with the default value
-     * 
+     *
      * @param name
      *            the name of the proerty to get
      * @param defaultValue
@@ -770,7 +810,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the event flow is being streamed
-     * 
+     *
      * @return true if the request should be streamed
      */
     public boolean isStreaming()
@@ -783,7 +823,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * been set on the endpoint, if not it will check the message itself and
      * finally it will fall back to the Mule global configuration for encoding
      * which cannot be null.
-     * 
+     *
      * @return the encoding for the event
      */
     public String getEncoding()
@@ -798,4 +838,5 @@ public class MuleEvent extends EventObject implements UMOEvent
         return encoding;
     }
 
+    private static Log log = LogFactory.getLog(MuleEvent.class);
 }
