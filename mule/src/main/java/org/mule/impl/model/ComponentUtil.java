@@ -81,7 +81,7 @@ public class ComponentUtil {
      */
     public static void pause(UMOComponent component) throws UMOException {
         // Is the component "pausable"?
-        if (UMOAsynchronousComponent.class.isAssignableFrom(component.getClass())) {
+        if (component instanceof UMOAsynchronousComponent) {
             ((UMOAsynchronousComponent) component).pause();
         } else {
             throw new ComponentException(Message.createStaticMessage("Component " + component + " cannot be paused because it does not implement UMOAsynchronousComponent."), null, component);
@@ -96,7 +96,7 @@ public class ComponentUtil {
      */
     public static void resume(UMOComponent component) throws UMOException {
         // Is the component "pausable"?
-        if (UMOAsynchronousComponent.class.isAssignableFrom(component.getClass())) {
+        if (component instanceof UMOAsynchronousComponent) {
             ((UMOAsynchronousComponent) component).resume();
         } else {
             throw new ComponentException(Message.createStaticMessage("Component " + component + " cannot be resumed because it does not implement UMOAsynchronousComponent."), null, component);

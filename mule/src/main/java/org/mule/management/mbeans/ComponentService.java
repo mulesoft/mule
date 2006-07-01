@@ -95,7 +95,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     }
 
     public boolean isPaused() {
-        if (UMOAsynchronousComponent.class.isAssignableFrom(getComponent().getClass())) {
+        if (getComponent() instanceof UMOAsynchronousComponent) {
             return ((UMOAsynchronousComponent) getComponent()).isPaused();
         } else {
             LOGGER.warn("Attempting to query 'paused' status for component " + getComponent() + " which does not implement UMOAsynchronousComponent.");
