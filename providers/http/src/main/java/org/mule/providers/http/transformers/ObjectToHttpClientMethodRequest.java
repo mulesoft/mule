@@ -206,9 +206,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 }
                 // Make sure we have a valid header name otherwise we will
                 // corrupt the request
-                //If it is Content-Length we shold check the Response Headers before setting it
+                // If it is Content-Length we should check the Response Headers before setting it
                 if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH)) {
-                    if(httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
+                    if (httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
                         httpMethod.addRequestHeader(headerName, headerValue);
                     }
                 }
