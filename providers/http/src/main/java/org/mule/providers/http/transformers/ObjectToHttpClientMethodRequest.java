@@ -12,10 +12,6 @@
 
 package org.mule.providers.http.transformers;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Iterator;
-
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -35,6 +31,10 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Iterator;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -206,12 +206,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 }
                 // Make sure we have a valid header name otherwise we will
                 // corrupt the request
-                if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH)
-                        && httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
-                    httpMethod.addRequestHeader(headerName, headerValue);
+                //If it is Content-Length we shold check the Response Headers before setting it
+                if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH)) {
+                    if(httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
+                        httpMethod.addRequestHeader(headerName, headerValue);
+                    }
                 }
                 else {
-                    // TODO why is this the same code as the previous branch?
                     httpMethod.addRequestHeader(headerName, headerValue);
                 }
             }
