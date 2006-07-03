@@ -15,16 +15,16 @@
     <distributionManagement>
         <repository>
             <id>mule-dist-releases</id>
-            <name>Mule Release Repository</name>
+            <name>Mule Distributions Release Repository</name>
             <url>dav:https://dav.codehaus.org/dist/mule</url>
         </repository>
         <snapshotRepository>
             <id>mule-dist-snapshots</id>
-            <name>Mule Snapshot Repository</name>
+            <name>Mule Distributions Snapshot Repository</name>
             <url>dav:https://dav.codehaus.org/snapshots.dist/mule</url>
         </snapshotRepository>
     </distributionManagement>
-            
+
     <build>
         <plugins>
             <plugin>
