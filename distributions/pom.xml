@@ -12,23 +12,30 @@
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
-    <!-- 
-    Directory layout - override the non-standard layout defined in the top-level pom.xml with the 
-                        standard Maven directory layout.
-    TODO Once the entire project has been migrated to the standard layout this can be removed.
-    -->
+    <distributionManagement>
+        <repository>
+            <id>mule-dist-releases</id>
+            <name>Mule Release Repository</name>
+            <url>dav:https://dav.codehaus.org/dist/mule</url>
+        </repository>
+        <snapshotRepository>
+            <id>mule-dist-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>dav:https://dav.codehaus.org/snapshots.dist/mule</url>
+        </snapshotRepository>
+    </distributionManagement>
+            
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <repositoryId>mule-dist-releases</repositoryId>
+                    <snapshotRepositoryId>mule-dist-snapshots</snapshotRepositoryId>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 	<modules>
