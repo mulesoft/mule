@@ -80,21 +80,21 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         String from = eventMsg.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
         String replyTo = eventMsg.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
         String subject = eventMsg.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
-
         String contentType = eventMsg.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
 
         Properties headers = new Properties();
         Properties customHeaders = connector.getCustomHeaders();
-        if(customHeaders != null && !customHeaders.isEmpty()) {
+
+        if (customHeaders != null && !customHeaders.isEmpty()) {
             headers.putAll(customHeaders);
         }
+
         Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
-        if(otherHeaders != null && !otherHeaders.isEmpty()) {
+        if (otherHeaders != null && !otherHeaders.isEmpty()) {
             Map props = new HashMap(MuleManager.getInstance().getProperties());
-            UMOMessage msg = context.getMessage();
-            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();) {
                 String propertyKey = (String)iterator.next();
-                props.put(propertyKey, context.getMessage().getProperty(propertyKey));
+                props.put(propertyKey, eventMsg.getProperty(propertyKey));
             }
             headers.putAll(templateParser.parse(props, otherHeaders));
         }
@@ -115,40 +115,39 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         }
 
         try {
-            Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpoint).getDelegateSession());
+            Message email = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpoint).getDelegateSession());
 
-            msg.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
+            email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 
             // sent date
-            msg.setSentDate(Calendar.getInstance().getTime());
+            email.setSentDate(Calendar.getInstance().getTime());
 
             if (StringUtils.isNotBlank(from)) {
-                msg.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
+                email.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
             }
 
             if (StringUtils.isNotBlank(cc)) {
-                msg.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
+                email.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
             }
 
             if (StringUtils.isNotBlank(bcc)) {
-                msg.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
+                email.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
             }
 
             if (StringUtils.isNotBlank(replyTo)) {
-                eventMsg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
+                email.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 
-            msg.setSubject(subject);
+            email.setSubject(subject);
 
-            Map.Entry entry;
             for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
-                entry = (Map.Entry)iterator.next();
-                msg.setHeader(entry.getKey().toString(), entry.getValue().toString());
+                Map.Entry entry = (Map.Entry)iterator.next();
+                email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
 
-            setContent(src, msg, contentType, context);
+            setContent(src, email, contentType, context);
 
-            return msg;
+            return email;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
