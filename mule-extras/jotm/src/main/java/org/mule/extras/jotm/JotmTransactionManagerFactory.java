@@ -43,7 +43,7 @@ public class JotmTransactionManagerFactory implements UMOTransactionManagerFacto
      * 
      * @see org.mule.umo.manager.UMOTransactionManagerFactory#create()
      */
-    public TransactionManager create() throws Exception
+    public synchronized TransactionManager create() throws Exception
     {
         if (jotmCurrent == null) {
             // check for already active JOTM instance
