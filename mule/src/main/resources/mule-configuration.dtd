@@ -556,7 +556,7 @@ Jndi
     named must match the protocol of the endpoint address.  If this value is not set
     the first connector found with the correct protocol will be used
 -->
-<!ATTLIST endpoint connector    IDREF           #IMPLIED>
+<!ATTLIST endpoint connector    CDATA           #IMPLIED>
 <!--
     Determines whether the endpoint provider is a sender, receiver or a senderAndReceiver.
     An endpoint can be senderAndReceiver meaning that there is no difference for the endpoint
@@ -633,7 +633,7 @@ Jndi
     name
     The name of the global referene to use
 -->
-<!ATTLIST global-endpoint name    IDREF            #REQUIRED>
+<!ATTLIST global-endpoint name    CDATA            #REQUIRED>
 
 <!--
     address
@@ -691,7 +691,7 @@ authenticated against.  However a space separated list of provider names can
 be specified to change the order or the restrict the list of security
 providers used.
 -->
-<!ATTLIST security-filter useProviders    IDREFS            #IMPLIED>
+<!ATTLIST security-filter useProviders    CDATA            #IMPLIED>
 
 <!--
 A fully qualified classname of the security filter to use on this endpoint
@@ -1052,7 +1052,7 @@ Whether every configured router will be matched
    Jms will be done automatically.
 -->
 <!-- This has been removed as you can now set the response router on the endpoint -->
-<!--<!ATTLIST response-router transformers              IDREFS           #IMPLIED>-->
+<!--<!ATTLIST response-router transformers              CDATA           #IMPLIED>-->
 
 <!--
     Defines the timeout for routers configure on this response-router
