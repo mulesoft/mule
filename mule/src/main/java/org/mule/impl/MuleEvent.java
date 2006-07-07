@@ -49,7 +49,7 @@ import org.mule.util.UUID;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
- * environment. All data sent or received within the mule environment will be
+ * environment. All data sent or received within the Mule environment will be
  * passed between components as an UMOEvent. <p/> The UMOEvent holds some data
  * and provides helper methods for obtaining the data in a format that the
  * receiving Mule UMO understands. The event can also maintain any number of
@@ -80,7 +80,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     private String id = null;
 
     /**
-     * The payload message used to read the payload payload of the event
+     * The payload message used to read the payload of the event
      */
     private UMOMessage message = null;
 
@@ -98,7 +98,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     private UMOCredentials credentials = null;
 
-    protected String[] ignorredPropertyOverides = new String[]{"method"};
+    protected String[] ignoredPropertyOverrides = new String[]{"method"};
 
     /**
      * Properties cache that only reads properties once from the inbound message
@@ -260,8 +260,8 @@ public class MuleEvent extends EventObject implements UMOEvent
             return true;
         }
 
-        for (int i = 0; i < ignorredPropertyOverides.length; i++) {
-            if(key.equals(ignorredPropertyOverides[i])) {
+        for (int i = 0; i < ignoredPropertyOverrides.length; i++) {
+            if(key.equals(ignoredPropertyOverrides[i])) {
                 return false;
             }
         }
