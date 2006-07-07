@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * Will read and write Http Cookie information to and from the Mule Session
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,8 +38,7 @@ public class HttpSessionHandler implements UMOSessionHandler
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void populateSession(UMOMessage message, UMOSession session) throws UMOException
-    {
+    public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException {
         Cookie[] cookies = (Cookie[])message.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
@@ -52,8 +51,7 @@ public class HttpSessionHandler implements UMOSessionHandler
         }
     }
 
-    public void writeSession(UMOMessage message, UMOSession session) throws UMOException
-    {
+    public void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException {
         Object name;
         Object value;
         List cookies = new ArrayList();
