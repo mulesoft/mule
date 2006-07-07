@@ -1,16 +1,20 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.impl;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,14 +41,10 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * <code>MuleSession</code> manages the interaction and distribution of events
  * for Mule UMOs.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -62,7 +62,7 @@ public final class MuleSession implements UMOSession
     private static transient Log logger = LogFactory.getLog(MuleSession.class);
 
     /**
-     * The Mule Component associated with the component
+     * The Mule component associated with the session
      */
     private UMOComponent component = null;
 
@@ -105,7 +105,7 @@ public final class MuleSession implements UMOSession
         }
 
         properties = new HashMap();
-        requestSessionHandler.populateSession(message, this);
+        requestSessionHandler.retrieveSessionInfoFromMessage(message, this);
         id = (String)getProperty(requestSessionHandler.getSessionIDKey());
         if (id == null) {
             id = UUID.getUUID();
@@ -171,8 +171,10 @@ public final class MuleSession implements UMOSession
     {
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
-        } else if (endpoint == null) {
-            endpoint = component.getDescriptor().getOutboundEndpoint();
+        }
+        if (endpoint == null) {
+            logger.warn("Endpoint argument is null, using outbound router to determine endpoint.");
+            return sendEvent(message);
         }
 
         if (logger.isDebugEnabled()) {
@@ -198,7 +200,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#dispatchEvent(org.mule.umo.UMOEvent)
      */
     public void dispatchEvent(UMOEvent event) throws UMOException
@@ -213,11 +215,11 @@ public final class MuleSession implements UMOSession
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
                 if(connector instanceof AbstractConnector) {
-                    ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
+                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 } else {
-                    //Todo in Mule20 we'll flatten the Connector hierachy
+                    // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using  default");
-                    new MuleSessionHandler().writeSession(event.getMessage(), this);
+                    new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 }
                 dispatcher.dispatch(event);
             } catch (Exception e) {
@@ -243,9 +245,11 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#sendEvent(org.mule.umo.UMOEvent)
      */
+    // TODO This method is practically the same as dispatchEvent(UMOEvent event),
+    // so we could use some refactoring here.
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
         int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
@@ -263,11 +267,11 @@ public final class MuleSession implements UMOSession
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
                 if(connector instanceof AbstractConnector) {
-                    ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
+                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 } else {
-                    //Todo in Mule20 we'll flatten the Connector hierachy
+                    // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using default.");
-                    new MuleSessionHandler().writeSession(event.getMessage(), this);
+                    new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 }
                 return dispatcher.send(event);
             } catch (UMOException e) {
@@ -292,7 +296,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#isValid()
      */
     public boolean isValid()
@@ -302,7 +306,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#setValid(boolean)
      */
     public void setValid(boolean value)
@@ -312,7 +316,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
@@ -324,7 +328,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
@@ -386,7 +390,7 @@ public final class MuleSession implements UMOSession
     /**
      * The security context for this session. If not null outbound, inbound
      * and/or method invocations will be authenticated using this context
-     * 
+     *
      * @param context the context for this session or null if the request is not
      *            secure.
      */
@@ -398,7 +402,7 @@ public final class MuleSession implements UMOSession
     /**
      * The security context for this session. If not null outbound, inbound
      * and/or method invocations will be authenticated using this context
-     * 
+     *
      * @return the context for this session or null if the request is not
      *         secure.
      */

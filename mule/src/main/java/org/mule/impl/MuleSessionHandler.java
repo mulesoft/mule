@@ -11,6 +11,10 @@
  */
 package org.mule.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -24,18 +28,15 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.io.UnsupportedEncodingException;
-
 /**
  * A default session handler used to store and retrieve session information on an event.
- * The MuleSession information is stored as a header on the message (does not support Tcp, Udp, etc
- * unless the UMOMessage object is serialised across the wire)
- * The session is stored in the "MULE_SESSION" property and is stored as String key/value pairs that are
- * Base64 encoded i.e.
+ * The MuleSession information is stored as a header on the message
+ * (does not support Tcp, Udp, etc. unless the UMOMessage object is serialised across
+ * the wire).
+ * The session is stored in the "MULE_SESSION" property as String key/value pairs that
+ * are Base64 encoded, for example:
  *
- * ID=dfokokdf-3ek3oke-dkfokd;MySessionProp1=Value1;MySessionProp2=Value2
+ *     ID=dfokokdf-3ek3oke-dkfokd;MySessionProp1=Value1;MySessionProp2=Value2
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -50,22 +51,22 @@ public class MuleSessionHandler implements UMOSessionHandler {
     private static UMOTransformer encoder = new Base64Encoder();
     private static UMOTransformer decoder = new Base64Decoder();
 
-    public void populateSession(UMOMessage message, UMOSession session) throws UMOException {
+    public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException {
         String sessionId = (String)message.removeProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
         Object sessionHeader = message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
-        if(sessionId!=null) {
-            //TODO Mule 20 grab session fromt he context
+        if (sessionId != null) {
+            //TODO Mule 2.0 grab session from the context
             throw new IllegalStateException("This session handler does not know how to look up session information for session id: " + sessionId);
         }
-        if(sessionHeader!=null) {
+        if (sessionHeader != null) {
             String sessionString = null;
             try {
                 sessionString = new String((byte[])decoder.transform(sessionHeader), message.getEncoding());
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Parsing session header: " + sessionString);
             }
             String pair;
@@ -88,7 +89,7 @@ public class MuleSessionHandler implements UMOSessionHandler {
         }
     }
 
-    public void writeSession(UMOMessage message, UMOSession session) throws UMOException {
+    public void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException {
         StringBuffer buf = new StringBuffer();
         buf.append(getSessionIDKey()).append("=").append(session.getId());
         for (Iterator iterator = session.getPropertyNames(); iterator.hasNext();) {
@@ -96,8 +97,8 @@ public class MuleSessionHandler implements UMOSessionHandler {
             buf.append(";");
             buf.append(o).append("=").append(session.getProperty(o));
             if(logger.isDebugEnabled()) {
-            logger.debug("Adding property to session header: " + o + "=" + session.getProperty(o));
-        }
+                logger.debug("Adding property to session header: " + o + "=" + session.getProperty(o));
+            }
         }
         String sessionString = buf.toString();
         if(logger.isDebugEnabled()) {

@@ -23,9 +23,9 @@ import org.mule.umo.UMOSession;
  */
 public interface UMOSessionHandler {
 
-    public void populateSession(UMOMessage message, UMOSession session) throws UMOException;
+    public void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException;
 
-    public void writeSession(UMOMessage message, UMOSession session) throws UMOException;
+    public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException;
 
     /**
      * The property name of the session id to use when creating the Mule session.

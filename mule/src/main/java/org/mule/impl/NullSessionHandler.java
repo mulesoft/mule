@@ -23,11 +23,11 @@ import org.mule.umo.provider.UMOSessionHandler;
  * @version $Revision$
  */
 public class NullSessionHandler implements UMOSessionHandler {
-    public void populateSession(UMOMessage message, UMOSession session) throws UMOException {
+    public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException {
         //noop
     }
 
-    public void writeSession(UMOMessage message, UMOSession session) throws UMOException {
+    public void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException {
         //noop
     }
 
