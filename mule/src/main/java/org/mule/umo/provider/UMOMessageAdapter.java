@@ -1,13 +1,13 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.umo.provider;
@@ -30,7 +30,7 @@ public interface UMOMessageAdapter extends Serializable {
 
     /**
      * Adds a map of properties to be associated with this message
-     * 
+     *
      * @param properties the properties add to this message
      */
     void addProperties(Map properties);
@@ -300,7 +300,7 @@ public interface UMOMessageAdapter extends Serializable {
     /**
      * If an error occurred during the processing of this message this will
      * return a ErrorPayload that contains the root exception and Mule error
-     * code, plus any otherr releated info
+     * code, plus any other releated info
      *
      * @return The exception payload (if any) attached to this message
      */
@@ -309,7 +309,7 @@ public interface UMOMessageAdapter extends Serializable {
     /**
      * If an error occurs while processing this message, a ErrorPayload is
      * attached which contains the root exception and Mule error code, plus any
-     * otherr releated info
+     * other releated info
      *
      * @param payload The exception payloaad to attach to this message
      */
@@ -325,8 +325,9 @@ public interface UMOMessageAdapter extends Serializable {
 
     /**
      * Gets the encoding for the current message. For potocols that send encoding
-     * Information with the message, this method should be overriden to expose the
-     * transport encoding, otherwise the default encoding in the Mule configuration will be used
+     * information with the message, this method should be overriden to expose the
+     * transport encoding, otherwise the default encoding in the Mule configuration
+     * will be used.
      * @return the encoding for this message.  This method must never return null
      */
     String getEncoding();

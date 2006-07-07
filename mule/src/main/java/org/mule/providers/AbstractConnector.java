@@ -545,7 +545,7 @@ public abstract class AbstractConnector
         synchronized (endpoint) {
             String endpointUriKey = endpoint.getEndpointURI().toString();
             UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
-    
+
             if (dispatcher == null || dispatcher.isDisposed()) {
                 dispatcher = createDispatcher(endpoint);
                 dispatchers.put(endpointUriKey, dispatcher);
@@ -613,8 +613,8 @@ public abstract class AbstractConnector
      */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
-        return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
-                .getEndpointURI().getAddress());
+        return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(),
+                                          endpoint.getEndpointURI().getAddress());
     }
 
     public final void unregisterListener(UMOComponent component, UMOEndpoint endpoint) throws Exception

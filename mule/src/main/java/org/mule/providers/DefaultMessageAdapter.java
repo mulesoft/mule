@@ -21,9 +21,9 @@ import java.util.Map;
 
 /**
  * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object
- * where no special 'apapting' is needed. The adpapter allows for a set of
+ * where no special 'apapting' is needed. The adapter allows for a set of
  * properties to be associated with an object.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +42,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Creates a default message adapter with properties and attachments
-     * 
+     *
      * @param message
      *            the message to wrap. If this is null and NullPayload object
      *            will be used
@@ -109,7 +109,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Creates a default message adapter with properties and attachments
-     * 
+     *
      * @param message
      *            the message to wrap. If this is null and NullPayload object
      *            will be used
@@ -136,7 +136,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @param encoding
      *            The encoding to use when transforming the message (if
      *            necessary). The parameter is used when converting from a byte
@@ -166,7 +166,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @return String representation of the message
      * @throws Exception
      *             Implemetation may throw an endpoint specific exception
