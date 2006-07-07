@@ -12,9 +12,19 @@
  */
 package org.mule.providers.jms;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
+
 import org.apache.commons.collections.MapUtils;
 import org.mule.MuleException;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -30,15 +40,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TemporaryQueue;
-import javax.jms.TemporaryTopic;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages
@@ -55,7 +57,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     private JmsConnector connector;
     private Session delegateSession;
     private Session cachedSession;
-    private boolean cacheJmsSession = false;
 
     public JmsMessageDispatcher(UMOImmutableEndpoint endpoint) {
         super(endpoint);
@@ -81,50 +82,54 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI() + ". Event id is: "
-                         + event.getId());
-        }
-        Session txSession = null;
         Session session = null;
         MessageProducer producer = null;
         MessageConsumer consumer = null;
-
-        // will need this reference for any temporary destinations cleanup
         Destination replyTo = null;
+        boolean transacted = false;
+        boolean cached = false;
+        boolean remoteSync = useRemoteSync(event);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI() + ". Event id is: " + event.getId());
+        }
 
         try {
-            // Retrieve the session for the current transaction
-            // If there is one, this is up to the transaction to close the
-            // session
-            txSession = connector.getCurrentSession();
+            // Retrieve the session from the current transaction.
+            session = connector.getSessionFromTransaction();
+            if (session != null) {
+                transacted = true;
 
-            //Should we be caching sessions. Note this is not part of the Jms spec and is turned off by default
-            cacheJmsSession = event.getMessage().getBooleanProperty(
-                    JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions());
-            if(txSession!=null) {
-                cacheJmsSession = false;
-            }
-            if(cacheJmsSession) {
-                if(cachedSession==null) {
-                    cachedSession = connector.getSession(event.getEndpoint());
+                // If a transaction is running, we can not receive any messages
+                // in the same transaction.
+                if (remoteSync) {
+                    throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
                 }
-                session = cachedSession;
-            } else if(txSession!=null) {
-                session = txSession;
-            } else {
+            }
+            // Should we be caching sessions?  Note this is not part of the JMS spec.
+            // and is turned off by default.
+            else if (event.getMessage().getBooleanProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY,
+                                                           connector.isCacheJmsSessions())) {
+                cached = true;
+                if (cachedSession != null) {
+                    session = cachedSession;
+                } else {
+                    // Retrieve a session from the connector
+                    session = connector.getSession(event.getEndpoint());
+                    cachedSession = session;
+                }
+            }
+            else {
                 // Retrieve a session from the connector
                 session = connector.getSession(event.getEndpoint());
             }
 
-            // If a transaction is running, we can not receive any messages
-            // in the same transaction
-            boolean remoteSync = useRemoteSync(event);
-            if (txSession != null && remoteSync) {
-                throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
-            }
+            // Add a reference to the JMS session used so that an EventAwareTransformer
+            // can later retrieve it.
+            event.getMessage().setProperty(MuleProperties.MULE_JMS_SESSION, session);
 
             UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+
             // determine if endpointUri is a queue or topic
             // the format is topic:destination
             boolean topic = false;
@@ -208,6 +213,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
             }
 
+            logger.debug("Sending message of type " + msg.getClass().getName());
             if (consumer != null && topic) {
                 //need to register a listener for a topic
                 Latch l = new Latch();
@@ -261,7 +267,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                 }
             }
 
-            if (session != null && !cacheJmsSession && txSession==null) {
+            // If the session is from the current transaction, it is up to the
+            // transaction to close it.
+            if (session != null && !cached && !transacted) {
                 connector.closeQuietly(session);
             }
         }
@@ -338,7 +346,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         try {
             // Return the session bound to the current transaction
             // if possible
-            Session session = connector.getCurrentSession();
+            Session session = connector.getSessionFromTransaction();
             if (session != null) {
                 return session;
             }

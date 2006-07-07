@@ -12,7 +12,24 @@
 
 package org.mule.providers.jms;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import org.apache.commons.lang.UnhandledException;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
@@ -41,22 +58,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TemporaryQueue;
-import javax.jms.TemporaryTopic;
-import javax.jms.XAConnectionFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Hashtable;
-import java.util.Map;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be
@@ -335,7 +337,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         }
     }
 
-    public Session getCurrentSession()
+    public Session getSessionFromTransaction()
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null) {
@@ -352,7 +354,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             throw new JMSException("Not connected");
         }
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        Session session = getCurrentSession();
+        Session session = getSessionFromTransaction();
         if (session != null) {
             logger.debug("Retrieving jms session from current transaction");
             return session;
@@ -754,71 +756,104 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         return message;
     }
 
-    public void close(MessageProducer producer) throws JMSException
-    {
+    /**
+     * Closes the MessageProducer
+     * @param producer
+     * @throws JMSException
+     */
+    public void close(MessageProducer producer) throws JMSException {
         if (producer != null) {
             producer.close();
         }
     }
 
-    public void closeQuietly(MessageProducer producer)
-    {
-        if (producer != null) {
-            try {
-                producer.close();
-            } catch (JMSException e) {
-                logger.error("Failed to close jms message producer", e);
-            }
+    /**
+     * Closes the MessageProducer without throwing an exception
+     * (an error message is logged instead).
+     * @param producer
+     */
+    public void closeQuietly(MessageProducer producer) {
+        try {
+            close(producer);
+        }
+        catch (JMSException e) {
+            logger.error("Failed to close jms message producer", e);
         }
     }
 
-    public void close(MessageConsumer consumer) throws JMSException
-    {
+    /**
+     * Closes the MessageConsumer
+     * @param consumer
+     * @throws JMSException
+     */
+    public void close(MessageConsumer consumer) throws JMSException {
         if (consumer != null) {
             consumer.close();
         }
     }
 
-    public void closeQuietly(MessageConsumer consumer)
-    {
-        if (consumer != null) {
-            try {
-                consumer.close();
-            } catch (JMSException e) {
-                logger.error("Failed to close jms message consumer", e);
-            }
+    /**
+     * Closes the MessageConsumer without throwing an exception
+     * (an error message is logged instead).
+     * @param consumer
+     */
+    public void closeQuietly(MessageConsumer consumer) {
+        try {
+            close(consumer);
+        }
+        catch (JMSException e) {
+            logger.error("Failed to close jms message consumer", e);
         }
     }
 
-    public void close(Session session) throws JMSException
-    {
+    /**
+     * Closes the Session
+     * @param session
+     * @throws JMSException
+     */
+    public void close(Session session) throws JMSException {
         if (session != null) {
             session.close();
         }
     }
 
-    public void closeQuietly(Session session)
-    {
-        if (session != null) {
-            try {
-                session.close();
-            } catch (JMSException e) {
-                logger.error("Failed to close jms session consumer", e);
-            }
+    /**
+     * Closes the Session without throwing an exception
+     * (an error message is logged instead).
+     * @param session
+     */
+    public void closeQuietly(Session session) {
+        try {
+            close(session);
+        }
+        catch (JMSException e) {
+            logger.error("Failed to close jms session consumer", e);
         }
     }
 
-    public void closeQuietly(TemporaryQueue tempQueue)
-    {
-        if (tempQueue == null) {
-            return;
-        }
-
-        String queueName = "";
-        try {
+    /**
+     * Closes the TemporaryQueue
+     * @param tempQueue
+     * @throws JMSException
+     */
+    public void close(TemporaryQueue tempQueue) throws JMSException {
+        if (tempQueue != null) {
             tempQueue.delete();
-        } catch (JMSException e) {
+        }
+    }
+
+    /**
+     * Closes the TemporaryQueue without throwing an exception
+     * (an error message is logged instead).
+     * @param tempQueue
+     */
+    public void closeQuietly(TemporaryQueue tempQueue) {
+        try {
+            close(tempQueue);
+        }
+        catch (JMSException e) {
             if (logger.isErrorEnabled()) {
+                String queueName = "";
                 try {
                     queueName = tempQueue.getQueueName();
                 } catch (JMSException innerEx) {
@@ -829,16 +864,29 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         }
     }
 
-    public void closeQuietly(TemporaryTopic tempTopic) {
-        if (tempTopic == null) {
-            return;
-        }
-
-        String topicName = "";
-        try {
+    /**
+     * Closes the TemporaryTopic
+     * @param tempTopic
+     * @throws JMSException
+     */
+    public void close(TemporaryTopic tempTopic) throws JMSException {
+        if (tempTopic != null) {
             tempTopic.delete();
-        } catch (JMSException e) {
+        }
+    }
+
+    /**
+     * Closes the TemporaryTopic without throwing an exception
+     * (an error message is logged instead).
+     * @param tempTopic
+     */
+    public void closeQuietly(TemporaryTopic tempTopic) {
+        try {
+            close(tempTopic);
+        }
+        catch (JMSException e) {
             if (logger.isErrorEnabled()) {
+                String topicName = "";
                 try {
                     topicName = tempTopic.getTopicName();
                 } catch (JMSException innerEx) {
@@ -848,5 +896,4 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             }
         }
     }
-
 }

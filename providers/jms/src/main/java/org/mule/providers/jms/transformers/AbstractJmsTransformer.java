@@ -1,13 +1,13 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.jms.transformers;
@@ -35,11 +35,11 @@ import javax.jms.Session;
 import java.util.Iterator;
 
 /**
- * <code>AbstractJmsTransformer</code> is an abstract class the should be used
- * for all transformers where a JMS message <p/> will be the transformed or
+ * <code>AbstractJmsTransformer</code> is an abstract class that should be used
+ * for all transformers where a JMS message will be the transformed or
  * transformee object. It provides services for compressing and uncompressing
  * messages.
- * 
+ *
  * @author Ross Mason
  * @version 1.2
  */
@@ -59,11 +59,12 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
 
     /**
      * Transforms the object.
-     * 
+     *
      * @param src The source object to transform.
      * @param session
      * @return The transformed object as an XMLMessage
      */
+    // TODO This method never seems to get called by anyone...
     public Object transform(Object src, Session session) throws TransformerException
     {
         if (session == null && this.session == null) {
@@ -152,7 +153,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
     }
     /**
      * Encode a string so that is is a valid java identifier
-     * 
+     *
      * @param name
      * @return A valid Jms header name
      */
