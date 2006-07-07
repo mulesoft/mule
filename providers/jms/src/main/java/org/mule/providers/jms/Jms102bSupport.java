@@ -89,7 +89,7 @@ public class Jms102bSupport extends Jms11Support
         } else if (connection instanceof QueueConnection) {
             return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
         } else {
-            throw new IllegalArgumentException("Unknown Jms connection: " + connection.getClass().getName());
+            throw new IllegalArgumentException("Connection and domain type do not match");
         }
     }
 
@@ -125,6 +125,34 @@ public class Jms102bSupport extends Jms11Support
             return ((QueueSession) session).createSender((Queue) dest);
         } else {
             throw new IllegalArgumentException("Session and domain type do not match");
+        }
+    }
+
+    public Destination createDestination(Session session, String name, boolean topic) throws JMSException
+    {
+        if (session == null) {
+            throw new IllegalArgumentException("Session cannot be null when creating a destination");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
+        }
+
+        if (jndiDestinations) {
+            if (context == null) {
+                throw new IllegalArgumentException("Jndi Context name cannot be null when looking up a destination");
+            }
+            Destination dest = getJndiDestination(name);
+            if (dest != null) {
+                return dest;
+            } else if (forceJndiDestinations) {
+                throw new JMSException("JNDI destination not found with name: " + name);
+            }
+        }
+
+        if (topic) {
+            return ((TopicSession) session).createTopic(name);
+        } else {
+            return ((QueueSession) session).createQueue(name);
         }
     }
 
