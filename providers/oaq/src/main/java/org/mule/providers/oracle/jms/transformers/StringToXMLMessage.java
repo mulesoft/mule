@@ -12,17 +12,25 @@
  */
 package org.mule.providers.oracle.jms.transformers;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.sql.SQLException;
+
+import javax.jms.JMSException;
+import javax.jms.Session;
+
 import oracle.jms.AQjmsSession;
 import oracle.jms.AdtMessage;
+import oracle.sql.CLOB;
 import oracle.xdb.XMLType;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.UMOException;
+import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
-
-import javax.jms.Session;
+import org.mule.util.StringMessageUtils;
 
 /**
  * Transformer for use with the Oracle Jms Connector.
@@ -32,13 +40,10 @@ import javax.jms.Session;
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @see XMLMessageToString
  * @see OracleJmsConnector
- * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96620/toc.htm">Oracle9i XML Database Developer's Guide - Oracle XML DB</a>
+ * @see <a href="http://otn.oracle.com/pls/db102/">XML DB Developer's Guide</a>
  */
-public class StringToXMLMessage extends AbstractTransformer {
+public class StringToXMLMessage extends AbstractEventAwareTransformer {
 
-    /**
-     * Serial version
-     */
     private static final long serialVersionUID = 8476470235704172556L;
 
     public StringToXMLMessage() {
@@ -49,43 +54,61 @@ public class StringToXMLMessage extends AbstractTransformer {
     }
 
     /**
-     * @param xml - String containing properly-formed XML.
+     * @param src - String or byte[] containing properly-formed XML.
      * @return JMS message whose payload is Oracle's native XML data type
      */
-    public Object doTransform(Object xml, String encoding) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
         Session session = null;
         AdtMessage message = null;
         XMLType xmltype = null;
 
-        // Get the (already open) OracleAQ session.
-        try { session = (Session) getEndpoint().getConnector().getDispatcher(getEndpoint()).getDelegateSession();
-        } catch (UMOException e) { throw new TransformerException(this, e); }
-        if (!(session instanceof AQjmsSession)) {
-            throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);
-        }
-
         try {
-            // Make sure the object to transform is one of the supported types for this
-            // transformer.
-            if (xml instanceof String) {
-                logger.debug("Converting string to XMLType: " + xml);
-                xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
-                                              (String) xml);
-            } else if (xml instanceof byte[]) {
-                logger.debug("Converting bytes to XMLType: " + xml);
-                xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
-                                              new String((byte[]) xml, encoding));
-            } else {
-                throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
+            // Get the Oracle AQ session for this event.
+            session = (Session) context.getMessage().getProperty(MuleProperties.MULE_JMS_SESSION);
+            if (session == null) {
+                throw new TransformerException(Message.createStaticMessage("The current JMS session should have been stored as a property for this event."), this);
+            }
+            if ((session instanceof AQjmsSession) == false) {
+                throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);
             }
 
-            // Create the JMS message.
-            message = ((AQjmsSession) session).createAdtMessage();
-            message.setAdtPayload(xmltype);
+            // Prepare the XML string.
+            String xml;
+            if (src instanceof byte[]) {
+                xml = new String((byte[]) src, encoding);
+            }
+            else if (src instanceof String) {
+                xml = (String) src;
+            }
+            else throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
 
-        } catch (Exception e) {
-            throw new TransformerException(this, e);
+            logger.debug("Creating an Oracle XMLType based on the following XML:\n" + StringMessageUtils.truncate(xml, 200, false));
+
+            // Create a temporary CLOB and pass this to the XMLType.createXML() factory.
+            // Note: if we pass the xml string directly to XMLType.createXML() as a
+            // parameter, the character set is not preserved properly (probably a bug
+            // in the Oracle library).
+            CLOB clob = CLOB.createTemporary(((AQjmsSession) session).getDBConnection(), true, CLOB.DURATION_SESSION);
+            try {
+                Writer clobStream = clob.getCharacterOutputStream();
+                try {
+                    clobStream.write(xml);
+                } finally {
+                    clobStream.close();
+                }
+                xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(), clob);
+
+                // Create the JMS message.
+                message = ((AQjmsSession) session).createAdtMessage();
+                message.setAdtPayload(xmltype);
+                return message;
+            } finally {
+                // TODO Need to put this somewhere but apparently not here...
+                //clob.freeTemporary();
+            }
         }
-        return message;
+        catch (JMSException e) { throw new TransformerException(this, e); }
+        catch (SQLException e) { throw new TransformerException(this, e); }
+        catch (IOException e) { throw new TransformerException(this, e); }
     }
 }
