@@ -21,13 +21,13 @@ import org.mule.umo.UMOMessage;
  * <code>RequestContext</code> is a thread context where components can get
  * the current event or set response properties that will be sent on the
  * outgoing message.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class RequestContext
 {
-    private static ThreadLocal events = new ThreadLocal();
+    private static ThreadLocal currentEvent = new ThreadLocal();
 
     public static UMOEventContext getEventContext()
     {
@@ -42,14 +42,20 @@ public class RequestContext
 
     public static UMOEvent getEvent()
     {
-        return (UMOEvent)events.get();
+        return (UMOEvent) currentEvent.get();
     }
 
     public static void setEvent(UMOEvent event)
     {
-        events.set(event);
+        currentEvent.set(event);
     }
 
+    /**
+     * Sets a new message payload in the RequestContext but maintains all other
+     * properties (session, endpoint, synchronous, etc.) from the previous event.
+     *
+     * @param message - current message payload
+     */
     public static void rewriteEvent(UMOMessage message)
     {
         if (message != null) {
@@ -61,6 +67,9 @@ public class RequestContext
         }
     }
 
+    /**
+     * Resets the current request context (clears all information).
+     */
     public static void clear()
     {
         setEvent(null);
