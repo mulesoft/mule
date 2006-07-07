@@ -2,7 +2,7 @@ package org.mule.test.integration.providers.jms.oracle;
 
 /**
  * Contains the settings used for testing against a live Oracle database.
- * 
+ *
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public abstract class TestConfig {
@@ -17,5 +17,6 @@ public abstract class TestConfig {
 
     public static String TEXT_MESSAGE = "This is a text message.";
     public static String XML_MESSAGE = "<msg attrib=\"attribute\">This is an XML message.</msg>";
-    public static String XML_MESSAGE_FILE = "message.xml"; 
+    public static String XML_MESSAGE_FILE = "message.xml";
+    public static String I18N_MESSAGE = "<msg>\u00E1\u00E9\u00ED\u00F3\u00FA</msg>";
 }
