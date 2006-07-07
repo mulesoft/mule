@@ -5,8 +5,6 @@ import javax.jms.JMSException;
 import oracle.AQ.AQException;
 
 import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
-import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
-import org.mule.umo.UMOException;
 
 /**
  * Tests the connector against a live Oracle database using standard JMS messages.
@@ -28,7 +26,16 @@ public class StandardPayloadIntegrationTestCase extends AbstractIntegrationTestC
         AQUtil.createOrReplaceTextQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_TEXT, false);
 
         muleClient.dispatch("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE, null);
-        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT, "JMSMessageToObject", MuleUtil.MULE_RECEIVE_TIMEOUT).getPayloadAsString());
+        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT, 2000).getPayloadAsString());
+
+        AQUtil.dropQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_TEXT, /*force*/false);
+    }
+
+    public void testI18NMessage() throws Exception {
+        AQUtil.createOrReplaceTextQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_TEXT, false);
+
+        muleClient.dispatch("jms://" + TestConfig.QUEUE_TEXT, TestConfig.I18N_MESSAGE, null);
+        assertEquals(TestConfig.I18N_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT, 2000).getPayloadAsString());
 
         AQUtil.dropQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_TEXT, /*force*/false);
     }

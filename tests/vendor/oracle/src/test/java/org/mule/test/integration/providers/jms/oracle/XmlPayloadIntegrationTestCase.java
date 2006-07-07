@@ -23,7 +23,7 @@ public class XmlPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
 
         MuleUtil.sendXmlMessageToQueue(muleClient, TestConfig.QUEUE_XML, TestConfig.XML_MESSAGE);
         assertXMLEqual(TestConfig.XML_MESSAGE,
-                     MuleUtil.receiveXmlMessageAsString(muleClient, TestConfig.QUEUE_XML));
+                     MuleUtil.receiveXmlMessageAsString(muleClient, TestConfig.QUEUE_XML, 2000));
 
         AQUtil.dropQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_XML, /*force*/false);
     }
@@ -38,7 +38,17 @@ public class XmlPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
 
         MuleUtil.sendXmlMessageToQueue(muleClient, TestConfig.QUEUE_XML, xml);
 
-        assertXMLEqual(xml, MuleUtil.receiveXmlMessageAsString(muleClient, TestConfig.QUEUE_XML));
+        assertXMLEqual(xml, MuleUtil.receiveXmlMessageAsString(muleClient, TestConfig.QUEUE_XML, 2000));
+
+        AQUtil.dropQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_XML, /*force*/false);
+    }
+
+    public void testI18NXmlMessage() throws Exception {
+        AQUtil.createOrReplaceXmlQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_XML, false);
+
+        MuleUtil.sendXmlMessageToQueue(muleClient, TestConfig.QUEUE_XML, TestConfig.I18N_MESSAGE);
+        assertXMLEqual(TestConfig.I18N_MESSAGE,
+                     MuleUtil.receiveXmlMessageAsString(muleClient, TestConfig.QUEUE_XML, 2000));
 
         AQUtil.dropQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_XML, /*force*/false);
     }
