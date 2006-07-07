@@ -13,11 +13,9 @@
 package org.mule.providers.oracle.jms;
 
 import java.io.Serializable;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -40,10 +38,8 @@ import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's
@@ -53,7 +49,7 @@ import org.mule.umo.lifecycle.LifecycleException;
  * @author henks
  * @see OracleJmsSupport
  * @see org.mule.providers.jms.JmsConnector
- * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96587/toc.htm">Oracle9i Application Developer's Guide - Advanced Queueing</a>
+ * @see <a href="http://otn.oracle.com/pls/db102/">Streams Advanced Queuing</a>
  */
 public class OracleJmsConnector extends JmsConnector {
 
@@ -73,11 +69,6 @@ public class OracleJmsConnector extends JmsConnector {
      * get the following error:
      * {@code JMS-106: Cannot have more than one open Session on a JMSConnection.} */
     private boolean multipleSessionsPerConnection = false;
-
-    /** Instead of a single JMS Connection, the Oracle JMS Connector maintains a list of
-     * open connections.
-     * @see #multipleSessionsPerConnection  */
-    private List connections = new ArrayList();
 
     /** Since many connections are opened and closed, we use a connection pool to
      * obtain the JDBC connection. */
@@ -117,7 +108,11 @@ public class OracleJmsConnector extends JmsConnector {
 
     public void doInitialise() throws InitialisationException {
         try {
-            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            // Register the Oracle JDBC driver.
+            Driver oracleDriver = new oracle.jdbc.driver.OracleDriver();
+            // Deregister first just in case the driver has already been registered.
+            DriverManager.deregisterDriver(oracleDriver);
+            DriverManager.registerDriver(oracleDriver);
 
             jdbcConnectionPool = new OracleDataSource();
             jdbcConnectionPool.setDataSourceName("Mule Oracle AQ Provider");
@@ -139,50 +134,14 @@ public class OracleJmsConnector extends JmsConnector {
             setForceJndiDestinations(false);
 
             setJmsSupport(new OracleJmsSupport(this, null, false, false));
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Oracle Jms Connector"), e, this);
         }
-    }
 
-    /** Iterate through the open connections and close them one by one. */
-//    protected void doDispose() {
-//        // From AbstractConnector.doDispose()
-//        try {
-//            stopConnector();
-//        } catch (UMOException e) {
-//            logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
-//        }
-//
-//        try {
-//            // Iterate through the open connections and close them one by one.
-//            Connection jmsConnection = null;
-//            for (Iterator i = connections.iterator(); i.hasNext(); ) {
-//                jmsConnection = (Connection) i.next();
-//                if (jmsConnection != null) {
-//                    jmsConnection.close();
-//                    jmsConnection = null;
-//                }
-//            }
-//        } catch (JMSException e) {
-//            logger.error("Unable to close Oracle JMS connection: " + e);
-//        }
-//    }
-
-    /** Iterate through the open connections and start them one by one. */
-    public void doStart() throws UMOException {
-        Connection jmsConnection = null;
-        try {
-            // Iterate through the open connections and start them one by one.
-            for (Iterator i = connections.iterator(); i.hasNext(); ) {
-                jmsConnection = (Connection) i.next();
-                if (jmsConnection != null) {
-                    jmsConnection.start();
-                }
-            }
-        } catch (JMSException e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
-        }
+        // Note it doesn't make sense to start a connection at this point
+        // (as the standard JMS Provider does) because a connection will be created for
+        // each session.
     }
 
     /** Some versions of Oracle do not support more than one JMS session per connection.
@@ -200,7 +159,7 @@ public class OracleJmsConnector extends JmsConnector {
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 
             // Check to see if we are already in a session.
-            Session session = getCurrentSession();
+            Session session = getSessionFromTransaction();
             if (session != null) {
                 logger.debug("Retrieving jms session from current transaction");
                 return session;
@@ -211,9 +170,9 @@ public class OracleJmsConnector extends JmsConnector {
             try {
                 connection = createConnection();
             } catch (NamingException e) {
-                throw new JMSException("Unable to open new database connection.", e.getMessage());
+                throw new JMSException("Unable to open new database connection: " + e.getMessage());
             } catch (InitialisationException e) {
-                throw new JMSException("Unable to open new database connection.", e.getMessage());
+                throw new JMSException("Unable to open new database connection: " + e.getMessage());
             }
 
             // Create a new session.
@@ -229,35 +188,6 @@ public class OracleJmsConnector extends JmsConnector {
             }
             return session;
         }
-    }
-
-    /** If {@code multipleSessionsPerConnection} is false, the Oracle JMS Connector
-     * should not access the generic JMSConnector {@code connection} property.
-     * @see #connections */
-    public Connection getConnection() {
-        if (multipleSessionsPerConnection) {
-            return super.getConnection();
-        }
-        else {
-            log.error("Oracle JMS Connector should not access the generic JMSConnector connection property.");
-            return null;
-        }
-    }
-
-    /** If {@code multipleSessionsPerConnection} is false, the Oracle JMS Connector
-     * should not access the generic JMSConnector {@code connection} property.
-     * @see #connections */
-    protected void setConnection(Connection connection) {
-        if (multipleSessionsPerConnection) {
-            super.setConnection(connection);
-        }
-        else {
-            log.error("Oracle JMS Connector should not access the generic JMSConnector connection property.");
-        }
-    }
-
-    public List getConnections() {
-        return connections;
     }
 
     /**
@@ -281,7 +211,7 @@ public class OracleJmsConnector extends JmsConnector {
             payload = ((AdtMessage) message).getAdtPayload();
 
             if (payload instanceof XMLType) {
-                newMessage = session.createTextMessage(((XMLType) payload).getStringVal());
+                newMessage = session.createTextMessage(((XMLType) payload).getStringVal().trim());
             }
             else if (payload instanceof Serializable) {
                 newMessage = session.createObjectMessage((Serializable) payload);
@@ -298,34 +228,33 @@ public class OracleJmsConnector extends JmsConnector {
     }
 
     /**
-     * Close the underlying JDBC connection before closing the JMS session.
+     * Attempts to close the underlying JDBC connection before closing the JMS session.
+     * @see JmsConnector.close(Session)
      */
     public void close(Session session) throws JMSException {
         if (session != null) {
+            java.sql.Connection conn = ((AQjmsSession) session).getDBConnection();
             try {
-                ((AQjmsSession) session).getDBConnection().close();
+                if (conn != null && conn.isClosed() == false) {
+                    conn.commit();
+                    conn.close();
+                }
             } catch (SQLException e) {
-                throw new JMSException("Failed to close the Oracle JMS session's underlying JDBC connection: " + e.getMessage());
+                JMSException ex = new JMSException(e.getMessage());
+                ex.setLinkedException(e);
+                throw ex;
             }
         }
-        super.close(session);
     }
 
-    /**
-     * Close the underlying JDBC connection before closing the JMS session.
-     */
-    public void closeQuietly(Session session) {
-        if (session != null) {
-            try {
-                ((AQjmsSession) session).getDBConnection().close();
-                session.close();
-            } catch (SQLException e) {
-                log.error("Failed to close the Oracle JMS session's underlying JDBC connection", e);
-            } catch (JMSException e) {
-                log.error("Failed to close the Oracle JMS session's underlying JDBC connection", e);
-            }
+    public java.sql.Connection getJdbcConnection() throws JMSException {
+        try {
+            logger.debug("Getting queue/topic connection from pool, URL = " + getJdbcConnectionPool().getURL()
+                        + ", user = " + getJdbcConnectionPool().getUser());
+            return getJdbcConnectionPool().getConnection();
+        } catch (SQLException e) {
+            throw new JMSException("Unable to open JDBC connection: " + e.getMessage());
         }
-        super.closeQuietly(session);
     }
 
     public String getUrl() {

@@ -12,7 +12,6 @@
  */
 package org.mule.providers.oracle.jms;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -21,17 +20,13 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
-import javax.jms.QueueConnection;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.TopicConnection;
 import javax.jms.TopicSession;
 import javax.naming.Context;
 
-import oracle.jms.AQjmsQueueConnectionFactory;
 import oracle.jms.AQjmsSession;
-import oracle.jms.AQjmsTopicConnectionFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,13 +37,13 @@ import org.mule.providers.jms.JmsConnector;
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's
  * JMS implementation based on Advanced Queueing (Oracle AQ).
  *
- * As of Oracle 9i, only the JMS 1.0.2b specification is supported.
+ * Oracle 9i supports the JMS 1.0.2b specification while Oracle 10g supports JMS 1.1
  *
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @author henks
  * @see OracleJmsConnector
  * @see org.mule.providers.jms.Jms102bSupport
- * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96587/toc.htm">Oracle9i Application Developer's Guide - Advanced Queueing</a>
+ * @see <a href="http://otn.oracle.com/pls/db102/">Streams Advanced Queuing</a>
  * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96587/jcreate.htm#103729">Oracle9i J2EE Compliance</a>
  */
 public class OracleJmsSupport extends Jms102bSupport {
@@ -63,53 +58,21 @@ public class OracleJmsSupport extends Jms102bSupport {
         super(connector, context, jndiDestinations, forceJndiDestinations);
     }
 
-    /** The Oracle JMS implementation requires a JDBC Connection to be created prior to
-     * creating the JMS Connection.
-     * This method assumes the username and password are included in the JDBC URL.
-     * @see OracleJmsConnector#url */
+    /** Returns an OracleJmsConnection to masquerade the fact that there might be several
+     *  javax.jms.Connections open (one per session).
+     * @see OracleJmsConnection
+     */
     public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
         return createConnection(connectionFactory, /*username*/null, /*password*/null);
     }
 
-    /** The Oracle JMS implementation requires a JDBC Connection to be created prior to
-     * creating the JMS Connection.
-     * @see OracleJmsConnector#url */
+    /** Returns an OracleJmsConnection to masquerade the fact that there might be several
+     *  javax.jms.Connections open (one per session).
+     * @see OracleJmsConnection
+     */
     public javax.jms.Connection createConnection(ConnectionFactory connectionFactory,
                                                     String username, String password) throws JMSException {
-        return null;
-    }
-
-    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal) throws JMSException {
-        java.sql.Connection jdbcConnection = null;
-        try {
-            log.debug("Creating queue/topic connection, URL = " + ((OracleJmsConnector) connector).getJdbcConnectionPool().getURL()
-                        + ", user = " + ((OracleJmsConnector) connector).getJdbcConnectionPool().getUser());
-            jdbcConnection = ((OracleJmsConnector) connector).getJdbcConnectionPool().getConnection();
-        } catch (SQLException e) {
-            throw new JMSException("Unable to open JDBC connection", e.getMessage());
-        }
-
-        if (topic) {
-            TopicConnection topicConnection = AQjmsTopicConnectionFactory.createTopicConnection(jdbcConnection);
-
-            // Add the connection to the list of open JMS connections maintained by the connector.
-            // @see org.mule.providers.oracle.jms.OracleJmsConnector#connections */
-            ((OracleJmsConnector) connector).getConnections().add(topicConnection);
-
-            // TODO Is this necessary here?
-            topicConnection.start();
-            return topicConnection.createTopicSession(transacted, ackMode);
-        } else {
-            QueueConnection queueConnection = AQjmsQueueConnectionFactory.createQueueConnection(jdbcConnection);
-
-            // Add the connection to the list of open JMS connections maintained by the connector.
-            // @see org.mule.providers.oracle.jms.OracleJmsConnector#connections */
-            ((OracleJmsConnector) connector).getConnections().add(queueConnection);
-
-            // TODO Is this necessary here?
-            queueConnection.start();
-            return queueConnection.createQueueSession(transacted, ackMode);
-        }
+        return new OracleJmsConnection((OracleJmsConnector) connector);
     }
 
     /** In order to receive messages from a queue whose payload is an ADT (Oracle
@@ -201,7 +164,7 @@ public class OracleJmsSupport extends Jms102bSupport {
             } catch (ClassNotFoundException e) { ex = e;
             } catch (IllegalAccessException e) { ex = e;
             } catch (InstantiationException e) { ex = e;
-            } if (ex != null) throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass);
+            } if (ex != null) throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass + ": " + ex.getMessage());
         }
         return payloadFactory;
     }

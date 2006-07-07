@@ -18,12 +18,12 @@ import oracle.xdb.XMLType;
 import org.mule.providers.jms.JmsMessageAdapter;
 import org.mule.umo.MessagingException;
 
-/** 
+/**
  * If the message payload is XML, returns the XML as a string.
- * If the message payload is an ADT, simply returns {@code Object.toString()} in 
- * order to avoid a null pointer exception.  
+ * If the message payload is an ADT, simply returns {@code Object.toString()} in
+ * order to avoid a null pointer exception.
  * Any other message is handled by the standard {@code JmsMessageAdapter}
- * 
+ *
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class OracleJmsMessageAdapter extends JmsMessageAdapter {
@@ -38,10 +38,10 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
     }
 
     /** If the message payload is XML, returns the XML as an array of bytes.
-     * If the message payload is an ADT, simply returns {@code Object.toString().getBytes()} 
-     * in order to avoid a null pointer exception.  
+     * If the message payload is an ADT, simply returns {@code Object.toString().getBytes()}
+     * in order to avoid a null pointer exception.
      * Any other message is handled by the standard {@code JmsMessageAdapter}
-     * 
+     *
      * @see JmsMessageAdapter#getPayloadAsBytes */
     public byte[] getPayloadAsBytes() throws Exception {
         Object jmsMessage = getPayload();
@@ -51,7 +51,7 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
                 return ((XMLType) adtMessage).getBytesValue();
             }
             else {
-                return adtMessage.toString().getBytes();
+                return adtMessage.toString().getBytes(getEncoding());
             }
         }
         else {
@@ -60,10 +60,10 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
     }
 
     /** If the message payload is XML, returns the XML as a string.
-     * If the message payload is an ADT, simply returns {@code Object.toString()} in 
-     * order to avoid a null pointer exception.  
+     * If the message payload is an ADT, simply returns {@code Object.toString()} in
+     * order to avoid a null pointer exception.
      * Any other message is handled by the standard {@code JmsMessageAdapter}
-     * 
+     *
      * @see JmsMessageAdapter#getPayloadAsString */
 
     /**
