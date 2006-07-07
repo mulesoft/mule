@@ -14,7 +14,7 @@ package org.mule.config;
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule system
  * properties.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -75,6 +75,7 @@ public interface MuleProperties
     public final String MULE_CORRELATION_SEQUENCE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_SEQUENCE";
     public final String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     public final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
+    public final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
     //End Event Level properties
 
     /***************************************************
