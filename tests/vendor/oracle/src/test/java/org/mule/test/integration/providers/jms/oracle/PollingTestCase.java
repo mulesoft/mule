@@ -41,12 +41,12 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     public synchronized void testTextMessage() throws Exception {
         muleClient.dispatch("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE, null);
         wait(1000);
-        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, "JMSMessageToObject", MuleUtil.MULE_RECEIVE_TIMEOUT).getPayloadAsString());
+        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, 2000).getPayloadAsString());
         muleClient.dispatch("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE, null);
         wait(1000);
-        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, "JMSMessageToObject", MuleUtil.MULE_RECEIVE_TIMEOUT).getPayloadAsString());
+        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, 2000).getPayloadAsString());
         muleClient.dispatch("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE, null);
         wait(1000);
-        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, "JMSMessageToObject", MuleUtil.MULE_RECEIVE_TIMEOUT).getPayloadAsString());
+        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT2, 2000).getPayloadAsString());
     }
 }

@@ -27,6 +27,6 @@ public class SynchronousTestCase extends AbstractIntegrationTestCase {
 
     public void testTextMessage() throws Exception {
         muleClient.send("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE, null);
-        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT, "JMSMessageToObject", MuleUtil.MULE_RECEIVE_TIMEOUT).getPayloadAsString());
+        assertEquals(TestConfig.TEXT_MESSAGE, muleClient.receive("jms://" + TestConfig.QUEUE_TEXT, 2000).getPayloadAsString());
     }
 }
