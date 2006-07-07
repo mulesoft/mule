@@ -13,23 +13,38 @@
     <name>Oracle Advanced Queuing Provider</name>
     <description>Adds Oracle-specific functionality to the standard Mule JMS provider.</description>
     <dependencies>
+        <!-- The standard JMS provider for Mule -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-jms-provider</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <!-- Don't include the JMS 1.1 spec. -->
+                <exclusion>
+                    <groupId>geronimo-spec</groupId>
+                    <artifactId>geronimo-spec-jms</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>9i</version>
-            <optional>true</optional>
-        </dependency>
+
+        <!-- The JMS 1.0.2 spec (javax.jms.*) -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>jmscommon</artifactId>
             <version>9i</version>
             <optional>true</optional>
         </dependency>
+
+        <!-- The Oracle JDBC driver. -->
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <!-- <version>10.2.0.2</version> -->
+            <version>9.2.0.5</version> 
+            <optional>true</optional>
+        </dependency>
+
+	    <!-- The Oracle JMS implementation (oracle.jms.*) -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>aqapi13</artifactId>
@@ -44,9 +59,12 @@
             <version>9i</version>
             <optional>true</optional>
         </dependency>
+        <!-- This is the xmlparserv2.jar with all non-Oracle classes removed 
+             (javax.xml.*, org.w3c.dom.*, org.xml.sax.*) so as to avoid version conflicts with 
+             other libraries that might be in the classpath. -->
         <dependency>
             <groupId>oracle</groupId>
-            <artifactId>xmlparserv2</artifactId>
+            <artifactId>xmlparserv2-distilled</artifactId>
             <version>9i</version>
             <optional>true</optional>
         </dependency>
