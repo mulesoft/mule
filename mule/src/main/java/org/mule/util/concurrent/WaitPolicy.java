@@ -29,10 +29,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * <a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java"></a>.
  * 
  */
+// @Immutable
 public class WaitPolicy implements RejectedExecutionHandler
 {
-    private long _time;
-    private TimeUnit _timeUnit;
+    private final long _time;
+    private final TimeUnit _timeUnit;
 
     /**
      * Constructs a <tt>WaitPolicy</tt> which waits (almost) forever.

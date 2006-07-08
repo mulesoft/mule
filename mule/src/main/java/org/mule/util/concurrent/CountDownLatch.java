@@ -19,7 +19,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 /**
  * @author Holger Hoffstaette
  */
-
+// @ThreadSafe
 public class CountDownLatch extends edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch
     implements Lock
 {

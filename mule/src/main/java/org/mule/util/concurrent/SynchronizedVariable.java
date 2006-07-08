@@ -17,9 +17,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 /**
  * @author Holger Hoffstaette
  */
-
+// @ThreadSafe
 public abstract class SynchronizedVariable implements Executor
 {
+    // @GuardedBy(itself)
     protected final Object _lock;
 
     public SynchronizedVariable()

@@ -15,7 +15,7 @@ package org.mule.util.concurrent;
 /**
  * @author Holger Hoffstaette
  */
-
+// @ThreadSafe
 public class Latch extends CountDownLatch
 {
 

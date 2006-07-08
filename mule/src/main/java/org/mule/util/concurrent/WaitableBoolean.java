@@ -15,21 +15,28 @@ package org.mule.util.concurrent;
 /**
  * @author Holger Hoffstaette
  */
-
+// @ThreadSafe
 public class WaitableBoolean extends SynchronizedVariable
 {
+    // @GuardedBy(_lock)
     private boolean _value;
 
     public WaitableBoolean(boolean initialValue)
     {
         super();
-        _value = initialValue;
+        synchronized (_lock)
+        {
+            _value = initialValue;
+        }
     }
 
     public WaitableBoolean(boolean initialValue, Object lock)
     {
         super(lock);
-        _value = initialValue;
+        synchronized (_lock)
+        {
+            _value = initialValue;
+        }
     }
 
     public int compareTo(boolean other)
@@ -76,7 +83,7 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public String toString()
     {
-        return Boolean.toString(_value);
+        return Boolean.toString(this.get());
     }
 
     public boolean get()
