@@ -103,7 +103,7 @@ public class MuleServer implements Runnable
 
         if (config == null) {
             Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
-            logger.fatal(message.toString());
+            System.out.println(message.toString());
             System.exit(1);
         }
 
