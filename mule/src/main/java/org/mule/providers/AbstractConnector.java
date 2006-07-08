@@ -922,8 +922,7 @@ public abstract class AbstractConnector
         connecting.set(false);
         if (startOnConnect.get()) {
             startConnector();
-        }
-        else {
+        } else {
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
                 AbstractMessageReceiver amr = (AbstractMessageReceiver)iterator.next();
                 if (logger.isDebugEnabled()) {

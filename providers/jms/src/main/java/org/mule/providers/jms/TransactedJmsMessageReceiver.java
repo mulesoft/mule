@@ -12,8 +12,20 @@
  */
 package org.mule.providers.jms;
 
+import java.util.List;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+import javax.jms.Topic;
+
 import org.apache.commons.collections.MapUtils;
+
+import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.providers.ConnectException;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.providers.TransactedPollingMessageReceiver;
@@ -23,17 +35,9 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.Topic;
-
-import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -42,7 +46,7 @@ import java.util.List;
  *
  */
 public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
-{
+                                          implements ConnectionNotificationListener {
 
     protected JmsConnector connector;
     protected boolean reuseConsumer;
@@ -112,18 +116,25 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         try {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);
+
+            // in case we've been disconnected in some unnatural way
+            // do a proper cleanup
+            MuleManager.getInstance().registerListener(this, connector.getName());
         } catch (Exception e) {
             throw new InitialisationException(e, this);
         }
+
     }
 
     public void doConnect() throws Exception
     {
         connector.connect();
+        createConsumer();
     }
 
     public void doDisconnect() throws Exception
     {
+        closeConsumer(true);
         connector.disconnect();
     }
 
@@ -147,6 +158,13 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         } finally {
             // Close consumer if necessary
             closeConsumer(false);
+        }
+    }
+
+    public void onNotification(UMOServerNotification notification) {
+        if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED ||
+                notification.getAction() == ConnectionNotification.CONNECTION_FAILED) {
+            closeConsumer(true);
         }
     }
 

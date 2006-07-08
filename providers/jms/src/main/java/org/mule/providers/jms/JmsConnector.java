@@ -725,9 +725,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     }
 
     public void onNotification(UMOServerNotification notification) {
-        if(notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
+        if(notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED ||
+                notification.getAction() == ConnectionNotification.CONNECTION_FAILED) {
             //Remove all dispatchers as any cached session will be invalidated
             disposeDispatchers();
+            // TODO should we dispose receivers here as well (in case they are transactional)
+            // gives a harmless NPE at AbstractConnector.connect(AbstractConnector.java:927)
+            //disposeReceivers();
         }
     }
 
