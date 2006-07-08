@@ -434,7 +434,7 @@ public class MuleConfiguration
         if (manifest == null) {
             manifest = new Manifest();
             InputStream is = ClassUtils.getResourceAsStream("META-INF/Mule.mf", getClass());
-            // a bit of a kludge as depending on how the jar is build the
+            // a bit of a kludge as depending on how the jar is built the
             // Meta-inf can be lower or upper case...
             if (is == null) {
                 is = ClassUtils.getResourceAsStream("meta-inf/Mule.mf", getClass());
