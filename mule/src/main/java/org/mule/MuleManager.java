@@ -1019,7 +1019,7 @@ public class MuleManager implements UMOManager
         }
         message.add(" ");
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL);
-        message.add(new Message(Messages.SERVER_STARTED_AT_X, df.format(new Date(getStartDate())).toString()).getMessage());
+        message.add(new Message(Messages.SERVER_STARTED_AT_X, df.format(new Date(getStartDate()))).getMessage());
         message.add("Server ID: " + id);
 
         // JDK, OS, and Host
