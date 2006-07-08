@@ -103,7 +103,7 @@ public class MuleServer implements Runnable
 
         if (config == null) {
             Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
-            System.out.println(message.toString());
+            System.err.println(message.toString());
             System.exit(1);
         }
 
@@ -113,7 +113,9 @@ public class MuleServer implements Runnable
             try {
                 setConfigBuilderClassName(cfgBuilderClassName);
             } catch (Exception e) {
-                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + cfgBuilderClassName), e);
+                logger.fatal(e);
+                final Message message = new Message(Messages.FAILED_LOAD_X, "Builder: " + cfgBuilderClassName);
+                System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
                 System.exit(1);
             }
         }
