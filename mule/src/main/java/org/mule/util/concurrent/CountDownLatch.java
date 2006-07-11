@@ -10,6 +10,7 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.util.concurrent;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -24,43 +25,81 @@ public class CountDownLatch extends edu.emory.mathcs.backport.java.util.concurre
     implements Lock
 {
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch#CountDownLatch(int)
+     */
     public CountDownLatch(int count)
     {
         super(count);
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#lock()
+     */
     public void lock()
     {
+        boolean interrupted = false;
+
         try
         {
-            super.await();
+            while (super.getCount() > 0)
+            {
+                try
+                {
+                    super.await();
+                }
+                catch (InterruptedException ex)
+                {
+                    interrupted = true;
+                }
+            }
         }
-        catch (InterruptedException ex)
+        finally
         {
-            // ignore
+            if (interrupted)
+            {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#lockInterruptibly()
+     */
     public void lockInterruptibly() throws InterruptedException
     {
         super.await();
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#tryLock()
+     */
     public boolean tryLock()
     {
         return (super.getCount() == 0);
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#tryLock(long,
+     *      TimeUnit)
+     */
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException
     {
         return super.await(time, unit);
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#unlock()
+     */
     public void unlock()
     {
         super.countDown();
     }
 
+    /**
+     * @see edu.emory.mathcs.backport.java.util.concurrent.locks.Lock#newCondition()
+     * @throws UnsupportedOperationException
+     */
     public Condition newCondition()
     {
         throw new UnsupportedOperationException();
