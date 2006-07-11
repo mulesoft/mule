@@ -11,17 +11,28 @@
  */
 package org.mule.transformers.xml;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.dom4j.XPath;
+import org.dom4j.Element;
+
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
  * The JXPathExtractor is a simple transformer that evaluates an xpath
  * expression against the given bean and that returns the result.
+ * <p/>
+ * By default, a single result will be returned. If multiple values are
+ * expected, set the {@link #singleResult} property to <code>false</code>.
+ * In this case a {@link List} of values will be returned.
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 public class JXPathExtractor extends AbstractTransformer
@@ -33,6 +44,8 @@ public class JXPathExtractor extends AbstractTransformer
 
     private String expression;
 
+    private boolean singleResult = true;
+
     /**
      * Evaluate the expression in the context of the given object and returns
      * the result. If the given object is a string, it assumes it is an valid
@@ -41,15 +54,27 @@ public class JXPathExtractor extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try {
-            Object o = null;
+            Object result;
             if (src instanceof String) {
                 Document doc = DocumentHelper.parseText((String) src);
-                o = doc.valueOf(expression);
+                if (singleResult) {
+                    result = doc.valueOf(expression);
+                } else {
+                    XPath xpath = doc.createXPath(expression);
+                    // TODO handle non-list cases, see
+                    // http://www.dom4j.org/apidocs/org/dom4j/XPath.html#evaluate(java.lang.Object)
+                    List obj = (List) xpath.evaluate(doc);
+                    result = new ArrayList(obj.size());
+                    for (int i = 0; i < obj.size(); i++) {
+                        final Element e = (Element) obj.get(i);
+                        ((List) result).add(e.getText());
+                    }
+                }
             } else {
                 JXPathContext context = JXPathContext.newContext(src);
-                o = context.getValue(expression);
+                result = context.getValue(expression);
             }
-            return o;
+            return result;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
@@ -69,5 +94,22 @@ public class JXPathExtractor extends AbstractTransformer
     public void setExpression(String expression)
     {
         this.expression = expression;
+    }
+
+    /**
+     * Should a single value be returned.
+     * @return value
+     */
+    public boolean isSingleResult() {
+        return singleResult;
+    }
+
+    /**
+     * If multiple results are expected from the {@link #expression}
+     * evaluation, set this to false.
+     * @param singleResult flag
+     */
+    public void setSingleResult(boolean singleResult) {
+        this.singleResult = singleResult;
     }
 }
