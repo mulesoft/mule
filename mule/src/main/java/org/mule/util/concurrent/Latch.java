@@ -12,6 +12,8 @@
  */
 package org.mule.util.concurrent;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+
 /**
  * @author Holger Hoffstaette
  */

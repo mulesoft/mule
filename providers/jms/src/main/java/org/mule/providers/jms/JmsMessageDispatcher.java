@@ -393,7 +393,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
         public void onMessage(Message message) {
             this.message = message;
-            latch.unlock();
+            latch.countDown();
             try {
                 released.whenTrue(null);
             }

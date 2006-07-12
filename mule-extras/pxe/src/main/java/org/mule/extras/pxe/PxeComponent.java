@@ -30,7 +30,6 @@ import com.fs.pxe.sfwk.spi.ServicePort;
 import com.fs.pxe.sfwk.spi.ServiceProviderException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 
 import javax.management.Attribute;
 import javax.management.MBeanServer;
@@ -100,7 +99,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
     private Map dbAttributes = new HashMap();
     private Map daoAttributes = new HashMap();
     private Map bpelAttributes = new HashMap();
-    private Lock lock;
+    private Latch lock;
     private MuleMessage result;
     private String configuration;
     private String pxeEndpoint;
@@ -434,9 +433,9 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             if(eventContext.isSynchronous()) {
                 lock = new Latch();
                 if(eventContext.getTimeout() == UMOEvent.TIMEOUT_WAIT_FOREVER) {
-                    lock.lock();
+                    lock.await();
                 } else {
-                    lock.tryLock(eventContext.getTimeout(), TimeUnit.MILLISECONDS);
+                    lock.await(eventContext.getTimeout(), TimeUnit.MILLISECONDS);
                     if(result == null) {
                         logger.info("Synchronization either timed out or no result was returned");
                     }
@@ -471,7 +470,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
                 result.setExceptionPayload(new ExceptionPayload(new Exception("Failed to process PXE Bpel event. See Message payload for details: " + fault.getDescription())));
 
             }
-            lock.unlock();
+            lock.countDown();
 
         } catch (Exception e) {
             throw new MessageExchangeException(e);

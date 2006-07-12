@@ -12,7 +12,12 @@
  */
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+
+import javax.resource.spi.work.Work;
+
+import java.util.Iterator;
+import java.util.List;
 
 import org.mule.config.ThreadingProfile;
 import org.mule.transaction.TransactionCallback;
@@ -22,12 +27,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.concurrent.CountDownLatch;
-
-import javax.resource.spi.work.Work;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles
@@ -105,7 +104,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             // for each message
             List messages = getMessages();
             if (messages != null && messages.size() > 0) {
-                final Lock countdown = new CountDownLatch(messages.size());
+                final CountDownLatch countdown = new CountDownLatch(messages.size());
                 for (Iterator it = messages.iterator(); it.hasNext();) {
                     final Object message = it.next();
                     if (logger.isTraceEnabled()) {
@@ -114,27 +113,26 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
                     try {
                         getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, message));
                     } catch (Exception e) {
-                        countdown.unlock();
+                        countdown.countDown();
                         throw e;
                     }
                 }
-                countdown.lock();
+                countdown.await();
             }
         }
     }
 
     protected class MessageProcessorWorker implements Work, TransactionCallback
     {
-
         private TransactionTemplate tt;
         private Object message;
-        private Lock lock;
+        private CountDownLatch latch;
 
-        public MessageProcessorWorker(TransactionTemplate tt, Lock lock, Object message)
+        public MessageProcessorWorker(TransactionTemplate tt, CountDownLatch latch, Object message)
         {
             this.tt = tt;
             this.message = message;
-            this.lock = lock;
+            this.latch = latch;
         }
 
         public void release()
@@ -149,7 +147,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             } catch (Exception e) {
                 handleException(e);
             } finally {
-                lock.unlock();
+                latch.countDown();
             }
         }
 
@@ -164,4 +162,5 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
     protected abstract List getMessages() throws Exception;
 
     protected abstract void processMessage(Object message) throws Exception;
+
 }

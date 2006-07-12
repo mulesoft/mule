@@ -12,12 +12,12 @@
 
 package org.mule.providers.quartz;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.concurrent.CountDownLatch;
 
 /**
  * 
@@ -33,6 +33,6 @@ public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz-receive.xml");
-        assertTrue(countDown.tryLock(5000, TimeUnit.MILLISECONDS));
+        assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
     }
 }

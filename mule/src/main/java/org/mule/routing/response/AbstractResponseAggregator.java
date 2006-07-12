@@ -16,6 +16,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -27,9 +31,6 @@ import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.concurrent.Latch;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -69,21 +70,22 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             removeGroup(id);
 
             responseEvents.put(id, returnMessage);
-            Lock l = null;
             locksCollectionLock.lock();
-            l = (Lock) locks.get(id);
+            Latch l = (Latch) locks.get(id);
             if (l == null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Creating latch for " + id + " in " + this);
                 }
+
                 l = new Latch();
-                if(locks.get(id)!=null) {
+                if (locks.get(id) != null) {
                     throw new IllegalStateException("There is already a lock with ID: " + id);
                 }
+
                 locks.put(id, l);
             }
             locksCollectionLock.unlock();
-            l.unlock();
+            l.countDown();
         }
     }
 
@@ -142,36 +144,47 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Waiting for response for message id: " + responseId + " in " + this);
         }
 
-        Lock l = null;
         locksCollectionLock.lock();
-            l = (Lock) locks.get(responseId);
-            if (l == null) {
+        Latch l = (Latch)locks.get(responseId);
+        if (l == null) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-                        + responseId + " in " + this);
-                l = new Latch();
-                 if(locks.get(responseId)!=null) {
-                    throw new IllegalStateException("There is already a lock with ID: " + responseId);
-                }
-                locks.put(responseId, l);
-            } else {
+                                + responseId + " in " + this);
+            }
+
+            if (locks.get(responseId) != null) {
+                throw new IllegalStateException("There is already a lock with ID: " + responseId);
+            }
+
+            l = new Latch();
+            locks.put(responseId, l);
+        }
+        else {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Got latch for message: " + responseId);
             }
+        }
+
         locksCollectionLock.unlock();
 
         boolean b = false;
         try {
-            logger.debug("Waiting for response to message: " + responseId);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Waiting for response to message: " + responseId);
+            }
+
             if (getTimeout() <= 0) {
-                l.lock();
+                l.await();
                 b = true;
             } else {
-                b = l.tryLock(this.getTimeout(), TimeUnit.MILLISECONDS);
+                b = l.await(this.getTimeout(), TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
         }
+
         if (!b) {
-            if(logger.isTraceEnabled()) {
+            if (logger.isTraceEnabled()) {
                 synchronized(responseEvents) {
                     logger.trace("Current responses are: \n" +
                     PropertiesUtils.propertiesToString(responseEvents, true));
@@ -185,9 +198,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         UMOMessage result = (UMOMessage) responseEvents.remove(responseId);
         locks.remove(responseId);
         if (result == null) {
-            // this should never happen ,just using it as a safe gaurd for now
+            // this should never happen, just using it as a safe gaurd for now
             throw new IllegalStateException("Response Message is null");
         }
+
         return result;
     }
 
