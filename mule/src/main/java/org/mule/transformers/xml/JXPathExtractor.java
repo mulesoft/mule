@@ -19,6 +19,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
@@ -30,7 +31,7 @@ import org.mule.umo.transformer.TransformerException;
  * By default, a single result will be returned. If multiple values are
  * expected, set the {@link #singleResult} property to <code>false</code>.
  * In this case a {@link List} of values will be returned.
- * 
+ *
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * @version $Revision$
@@ -66,8 +67,8 @@ public class JXPathExtractor extends AbstractTransformer
                     List obj = (List) xpath.evaluate(doc);
                     result = new ArrayList(obj.size());
                     for (int i = 0; i < obj.size(); i++) {
-                        final Element e = (Element) obj.get(i);
-                        ((List) result).add(e.getText());
+                        final Node node = (Node) obj.get(i);
+                        ((List) result).add(node.getText());
                     }
                 }
             } else {
