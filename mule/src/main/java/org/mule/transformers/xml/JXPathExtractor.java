@@ -11,15 +11,14 @@
  */
 package org.mule.transformers.xml;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
-import org.dom4j.XPath;
-import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.XPath;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
@@ -30,7 +29,8 @@ import org.mule.umo.transformer.TransformerException;
  * <p/>
  * By default, a single result will be returned. If multiple values are
  * expected, set the {@link #singleResult} property to <code>false</code>.
- * In this case a {@link List} of values will be returned.
+ * In this case a {@link List} of values will be returned. Note the
+ * property is currently ignored for non-String/XML payloads.
  *
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>

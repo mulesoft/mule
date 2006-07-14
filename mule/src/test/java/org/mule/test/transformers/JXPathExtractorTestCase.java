@@ -27,6 +27,19 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase {
                 "<node>value3</node>" +
             "</root>";
 
+    protected static final String TEST_XML_MULTI_NESTED_RESULTS =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<root>" +
+                "<node>" +
+                    "<subnode1>val1</subnode1>" +
+                    "<subnode2>val2</subnode2>" +
+                "</node>" +
+                "<node>" +
+                    "<subnode1>val3</subnode1>" +
+                    "<subnode2>val4</subnode2>" +
+                "</node>" +
+            "</root>";
+
     protected static final String TEST_XML_SINGLE_RESULT =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<root>" +
@@ -56,6 +69,24 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase {
         assertEquals("Wrong value returned.", "value1", results.get(0));
         assertEquals("Wrong value returned.", "value2", results.get(1));
         assertEquals("Wrong value returned.", "value3", results.get(2));
+    }
+
+    /**
+     * This xpath expression will internally have DefaultText returned,
+     * test there are no ClassCastExceptions.
+     */
+    public void testMultipleResultsNested() throws Exception {
+        JXPathExtractor extractor = new JXPathExtractor();
+        extractor.setExpression("/root/node[*]/*/text()");
+        extractor.setSingleResult(false);
+        final Object objResult = extractor.transform(TEST_XML_MULTI_NESTED_RESULTS);
+        assertNotNull(objResult);
+        List results = (List) objResult;
+        assertEquals("Wrong number of results returned.", 4, results.size());
+        assertEquals("Wrong value returned.", "val1", results.get(0));
+        assertEquals("Wrong value returned.", "val2", results.get(1));
+        assertEquals("Wrong value returned.", "val3", results.get(2));
+        assertEquals("Wrong value returned.", "val4", results.get(3));
     }
 
 }
