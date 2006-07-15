@@ -12,38 +12,39 @@
 
 package org.mule.transformers.simple;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
 /**
- * Converts a Byte array to a Hex String
+ * Converts a Hex String to a Byte array
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
  * @version $Revision: $
  */
-public class ByteArrayToHexString extends AbstractTransformer
+public class HexStringToByteArray extends AbstractTransformer
 {
 
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -7444711426569720031L;
+    private static final long serialVersionUID = 8266145248111508046L;
 
-    public ByteArrayToHexString()
+    public HexStringToByteArray()
     {
-        registerSourceType(byte[].class);
-        setReturnClass(String.class);
+        registerSourceType(String.class);
+        setReturnClass(byte[].class);
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src == null) {
-            return StringUtils.EMPTY;
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
         try {
-            return StringUtils.toHexString((byte[])src);
+            return StringUtils.hexStringToByteArray((String)src);
         }
         catch (Exception ex) {
             throw new TransformerException(this, ex);

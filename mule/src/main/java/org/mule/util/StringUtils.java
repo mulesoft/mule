@@ -36,4 +36,67 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         return results;
     }
 
+    /**
+     * Convert a hexadecimal string into its byte representation.
+     * 
+     * @param hex
+     *            The hexadecimal string.
+     * @return The converted bytes or <code>null</code> if the hex String is
+     *         null.
+     */
+    public static byte[] hexStringToByteArray(String hex)
+    {
+        if (hex == null)
+        {
+            return null;
+        }
+
+        int stringLength = hex.length();
+        if (stringLength % 2 != 0)
+        {
+            throw new IllegalArgumentException("Hex String must have even number of characters!");
+        }
+
+        byte[] result = new byte[stringLength / 2];
+
+        int j = 0;
+        for (int i = 0; i < result.length; i++)
+        {
+            char hi = Character.toLowerCase(hex.charAt(j++));
+            char lo = Character.toLowerCase(hex.charAt(j++));
+            result[i] = (byte)((Character.digit(hi, 16) << 4) | Character.digit(lo, 16));
+        }
+
+        return result;
+    }
+
+    /**
+     * Convert a byte array to a hexadecimal string.
+     * 
+     * @param bytes
+     *            The bytes to format.
+     * @return A hexadecimal representation of the specified bytes.
+     */
+    public static String toHexString(byte[] bytes)
+    {
+        if (bytes == null)
+        {
+            return null;
+        }
+
+        int numBytes = bytes.length;
+        StringBuffer str = new StringBuffer(numBytes * 2);
+
+        for (int i = 0; i < numBytes; i++)
+        {
+            str.append(HEX_CHARACTERS.charAt(bytes[i] >>> 4 & 0x0f));
+            str.append(HEX_CHARACTERS.charAt(bytes[i] & 0x0f));
+        }
+
+        return str.toString();
+    }
+
+    // lookup table needed for toHexString(byte[])
+    private static final String HEX_CHARACTERS = "0123456789abcdef";
+
 }

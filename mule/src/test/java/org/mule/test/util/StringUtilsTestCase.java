@@ -12,11 +12,11 @@
 
 package org.mule.test.util;
 
-import org.mule.util.StringUtils;
-
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+
+import org.mule.util.StringUtils;
 
 /**
  * <p/> <code>StringUtilsTestCase</code> TODO (document class)
@@ -36,6 +36,37 @@ public class StringUtilsTestCase extends TestCase
                         .append("  ,  ").append(inputValues[3]).append(" ").toString();
 
         assertTrue(Arrays.equals(inputValues, StringUtils.split(inputString, ",")));
+    }
+
+    public void testHexStringToByteArray()
+    {
+        assertNull(StringUtils.hexStringToByteArray(null));
+
+        try
+        {
+            StringUtils.hexStringToByteArray("1");
+            fail();
+        }
+        catch (IllegalArgumentException iex)
+        {
+            // OK
+        }
+
+        assertTrue(Arrays.equals(new byte[]{}, StringUtils.hexStringToByteArray("")));
+        assertTrue(Arrays.equals(new byte[]{1}, StringUtils.hexStringToByteArray("01")));
+        assertTrue(Arrays.equals(new byte[]{1, 2}, StringUtils.hexStringToByteArray("0102")));
+        assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0a0E")));
+        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0Aff")));
+    }
+
+    public void testByteArrayToHexString()
+    {
+        assertNull(StringUtils.toHexString(null));
+        assertEquals("", StringUtils.toHexString(new byte[]{}));
+        assertEquals("01", StringUtils.toHexString(new byte[]{1}));
+        assertEquals("0102", StringUtils.toHexString(new byte[]{1, 2}));
+        assertEquals("0a0e", StringUtils.toHexString(new byte[]{10, 14}));
+        assertEquals("0aff", StringUtils.toHexString(new byte[]{10, (byte)0xff}));
     }
 
 }
