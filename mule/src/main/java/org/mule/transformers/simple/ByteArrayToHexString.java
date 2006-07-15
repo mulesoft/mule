@@ -30,10 +30,22 @@ public class ByteArrayToHexString extends AbstractTransformer
      */
     private static final long serialVersionUID = -7444711426569720031L;
 
+    private volatile boolean upperCase = false;
+
     public ByteArrayToHexString()
     {
         registerSourceType(byte[].class);
         setReturnClass(String.class);
+    }
+
+    public boolean getUpperCase()
+    {
+        return upperCase;
+    }
+
+    public void setUpperCase(boolean value)
+    {
+        upperCase = value;
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
@@ -43,7 +55,7 @@ public class ByteArrayToHexString extends AbstractTransformer
         }
 
         try {
-            return StringUtils.toHexString((byte[])src);
+            return StringUtils.toHexString((byte[])src, upperCase);
         }
         catch (Exception ex) {
             throw new TransformerException(this, ex);

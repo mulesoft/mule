@@ -9,6 +9,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
 
     public Object getResultData()
     {
-        return new byte[]{1,2,10,(byte)0xff};
+        return new byte[]{1, 2, 10, (byte)0xff};
     }
 
     public boolean compareResults(Object src, Object result)
@@ -52,7 +53,7 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
         if (src == null || result == null) {
             return false;
         }
-        return Arrays.equals((byte[]) src, (byte[]) result);
+        return Arrays.equals((byte[])src, (byte[])result);
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
@@ -65,4 +66,14 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
         }
         return src.equals(result);
     }
+
+    // extra test for uppercase output
+    public void testUppercase() throws Exception
+    {
+        ByteArrayToHexString t = new ByteArrayToHexString();
+        t.setUpperCase(true);
+
+        assertEquals(((String)getTestData()).toUpperCase(), t.transform(getResultData()));
+    }
+
 }

@@ -19,8 +19,6 @@ import junit.framework.TestCase;
 import org.mule.util.StringUtils;
 
 /**
- * <p/> <code>StringUtilsTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,8 +53,10 @@ public class StringUtilsTestCase extends TestCase
         assertTrue(Arrays.equals(new byte[]{}, StringUtils.hexStringToByteArray("")));
         assertTrue(Arrays.equals(new byte[]{1}, StringUtils.hexStringToByteArray("01")));
         assertTrue(Arrays.equals(new byte[]{1, 2}, StringUtils.hexStringToByteArray("0102")));
-        assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0a0E")));
-        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0Aff")));
+        assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0A0E")));
+        assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0a0e")));
+        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0AFF")));
+        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0aff")));
     }
 
     public void testByteArrayToHexString()
@@ -66,7 +66,9 @@ public class StringUtilsTestCase extends TestCase
         assertEquals("01", StringUtils.toHexString(new byte[]{1}));
         assertEquals("0102", StringUtils.toHexString(new byte[]{1, 2}));
         assertEquals("0a0e", StringUtils.toHexString(new byte[]{10, 14}));
+        assertEquals("0A0E", StringUtils.toHexString(new byte[]{10, 14}, true));
         assertEquals("0aff", StringUtils.toHexString(new byte[]{10, (byte)0xff}));
+        assertEquals("0AFF", StringUtils.toHexString(new byte[]{10, (byte)0xff}, true));
     }
 
 }
