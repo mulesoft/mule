@@ -1,7 +1,5 @@
 /*
- * $Id:
- * /cvsroot/mule/mule/src/test/org/mule/test/transformers/DefaultTransformersTestCase.java,v
- * 06:45:02 $
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
@@ -21,7 +19,6 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.Base64;
 
 /**
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

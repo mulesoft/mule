@@ -19,8 +19,6 @@ import java.io.File;
 import junit.framework.TestCase;
 
 /**
- * <p/> <code>FileUtilsTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: 1665 $
  */

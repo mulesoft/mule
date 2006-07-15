@@ -24,8 +24,6 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * <code>TestCompression</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

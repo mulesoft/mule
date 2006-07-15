@@ -18,8 +18,6 @@ import org.mule.util.UUID;
 import junit.framework.TestCase;
 
 /**
- * <code>UUIDTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

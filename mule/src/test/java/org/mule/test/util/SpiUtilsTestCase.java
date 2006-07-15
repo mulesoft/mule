@@ -23,8 +23,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 /**
- * <code>SpiHelperTestCase</code> test the methods of the SpiHelper.
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

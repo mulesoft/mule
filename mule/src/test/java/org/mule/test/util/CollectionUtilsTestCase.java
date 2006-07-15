@@ -15,7 +15,8 @@ package org.mule.test.util;
 import junit.framework.TestCase;
 
 /**
- * @author Holger Hoffstaette
+ * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
+ * @version $Revision$
  */
 
 public class CollectionUtilsTestCase extends TestCase

@@ -1,7 +1,5 @@
 /*
- * $Id:
- * /cvsroot/mule/mule/src/test/org/mule/test/transformers/DefaultTransformersTestCase.java,v
- * 06:45:02 $
+ * $Id$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com

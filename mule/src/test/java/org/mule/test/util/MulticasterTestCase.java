@@ -24,8 +24,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 /**
- * <code>MulticasterTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

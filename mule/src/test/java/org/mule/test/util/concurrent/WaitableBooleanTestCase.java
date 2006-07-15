@@ -18,7 +18,8 @@ import org.mule.util.concurrent.WaitableBoolean;
 import junit.framework.TestCase;
 
 /**
- * @author Holger Hoffstaette
+ * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
+ * @version $Revision$
  */
 
 public class WaitableBooleanTestCase extends TestCase

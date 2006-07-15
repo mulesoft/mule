@@ -22,8 +22,6 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 /**
- * <code>XATransactionTestCase</code> TODO
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$

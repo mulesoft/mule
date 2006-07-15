@@ -22,9 +22,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 /**
- * <code>StringMessageUtilsTestCase</code> test the methods of the StringMessageUtils
- * formatting class
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

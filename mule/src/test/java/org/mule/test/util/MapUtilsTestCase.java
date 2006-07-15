@@ -23,7 +23,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 /**
- * @author Holger Hoffstaette
+ * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
+ * @version $Revision$
  */
 
 public class MapUtilsTestCase extends TestCase
