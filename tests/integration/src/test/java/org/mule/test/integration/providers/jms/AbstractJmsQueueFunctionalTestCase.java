@@ -11,7 +11,16 @@
  */
 package org.mule.test.integration.providers.jms;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
 
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
@@ -22,15 +31,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.concurrent.CountDownLatch;
-
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -75,11 +75,11 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         });
 
         logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
+        assertTrue(receiverIsUp.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
         receiverIsUp = null;
 
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
-        assertTrue(countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
+        assertTrue(countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -122,12 +122,12 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         });
 
         logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
+        assertTrue(receiverIsUp.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
         receiverIsUp = null;
 
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
 
-        assertTrue(countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
+        assertTrue(countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);

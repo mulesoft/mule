@@ -22,7 +22,7 @@ public class TestComponent implements Callable
     {
        if (eventContext.getMessageAsString().equals("quartz test")) {
             if (QuartzFunctionalTestCase.countDown != null) {
-                QuartzFunctionalTestCase.countDown.unlock();
+                QuartzFunctionalTestCase.countDown.countDown();
             }
         } else {
             throw new IllegalArgumentException("Unrecognised event payload");

@@ -12,7 +12,19 @@
 
 package org.mule.test.integration.providers.jms;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
+
+import java.util.HashMap;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -42,18 +54,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.concurrent.CountDownLatch;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-
-import java.util.HashMap;
 
 /**
  * <code>AbstractJmsTransactionFunctionalTest</code> is a base class for all
@@ -103,10 +103,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         afterInitialise();
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
-        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
                 + " of " + countDownInitialCount
-                + " checkpoints hit", countDown.tryLock());
+                + " checkpoints hit", countDown.getCount() == 0);
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -144,10 +144,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // started
         send(DEFAULT_MESSAGE, false, getAcknowledgementMode());
 
-        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
                 + " of " + countDownInitialCount
-                + " checkpoints hit", countDown.tryLock());
+                + " checkpoints hit", countDown.getCount() == 0);
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -205,10 +205,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // started
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
-        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
                 + " of " + countDownInitialCount
-                + " checkpoints hit", countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
+                + " checkpoints hit", countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -267,10 +267,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
         afterInitialise();
-        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
                 + " of " + countDownInitialCount
-                + " checkpoints hit", countDown.tryLock());
+                + " checkpoints hit", countDown.getCount() == 0);
 
         // Sleep a while to allow transaction to be rolled back
         afterInitialise();
@@ -512,10 +512,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
         afterInitialise();
-        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS);
         assertTrue("Only " + (countDownInitialCount - countDown.getCount())
                 + " of " + countDownInitialCount
-                + " checkpoints hit", countDown.tryLock());
+                + " checkpoints hit", countDown.getCount() == 0);
 
         assertNotNull(currentMsg);
         System.out.println(currentMsg);
