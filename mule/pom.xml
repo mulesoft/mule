@@ -253,13 +253,6 @@
             <version>2.1.1</version>
         </dependency>
 
-        <!-- Transactions logging system -->
-        <dependency>
-            <groupId>activeio</groupId>
-            <artifactId>activeio</artifactId>
-            <version>2.1</version>
-        </dependency>
-
         <!--
         ****************************************************************
         Testing Dependencies

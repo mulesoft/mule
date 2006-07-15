@@ -408,18 +408,6 @@
                 <war.bundle>false</war.bundle>
             </properties>
         </dependency>
-        <!-- Optional transactions logging system -->
-        <dependency>
-            <groupId>activeio</groupId>
-            <artifactId>activeio</artifactId>
-            <version>${activeio_version}</version>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
-                <rar.bundle>false</rar.bundle>
-                <war.bundle>false</war.bundle>
-            </properties>
-        </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>

@@ -513,7 +513,13 @@
             <groupId>oro</groupId>
             <version>${oro_version}</version>
         </dependency>
+
         <!-- required my ActiveMQ 3.x -->
+        <dependency>
+            <groupId>activeio</groupId>
+            <artifactId>activeio</artifactId>
+            <version>${activeio_version}</version>
+        </dependency>
         <dependency>
             <groupId>concurrent</groupId>
             <artifactId>concurrent</artifactId>
