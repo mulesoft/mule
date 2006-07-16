@@ -262,7 +262,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(2, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
-        assertEquals(ThreadingProfile.WHEN_EXHAUSTED_RUN, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
 
         MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
