@@ -242,27 +242,27 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // test config
         ThreadingProfile tp = MuleManager.getConfiguration().getDefaultThreadingProfile();
         assertEquals(0, tp.getMaxBufferSize());
-        assertEquals(8, tp.getMaxThreadsActive());
-        assertEquals(4, tp.getMaxThreadsIdle());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
         // test defaults
         tp = MuleManager.getConfiguration().getComponentThreadingProfile();
         assertEquals(0, tp.getMaxBufferSize());
-        assertEquals(8, tp.getMaxThreadsActive());
-        assertEquals(4, tp.getMaxThreadsIdle());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
-        // test thatvalues not set retain a default value
+        // test that values not set retain a default value
         AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("dummyConnector");
         tp = c.getDispatcherThreadingProfile();
         assertEquals(2, tp.getMaxBufferSize());
-        assertEquals(10, tp.getMaxThreadsActive());
-        assertEquals(10, tp.getMaxThreadsIdle());
-        assertEquals(4, tp.getPoolExhaustedAction());
-        assertEquals(60000, tp.getThreadTTL());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
+        assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
 
         MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
                                                                 .getModel()
@@ -271,8 +271,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(6, tp.getMaxBufferSize());
         assertEquals(12, tp.getMaxThreadsActive());
         assertEquals(6, tp.getMaxThreadsIdle());
-        assertEquals(4, tp.getPoolExhaustedAction());
-        assertEquals(60000, tp.getThreadTTL());
+        assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
     }
 
     public void testPoolingConfig()
