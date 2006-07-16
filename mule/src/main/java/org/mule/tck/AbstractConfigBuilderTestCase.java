@@ -175,6 +175,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(router.getCatchAllStrategy() instanceof TestCatchAllStrategy);
     }
 
+    // TODO what about this? can this be removed?
 //    public void testDescriptorEndpoints()
 //    {
 //        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
@@ -241,18 +242,18 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test config
         ThreadingProfile tp = MuleManager.getConfiguration().getDefaultThreadingProfile();
-        assertEquals(0, tp.getMaxBufferSize());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
-        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.WHEN_EXHAUSTED_WAIT, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
         // test defaults
         tp = MuleManager.getConfiguration().getComponentThreadingProfile();
-        assertEquals(0, tp.getMaxBufferSize());
+        assertEquals(ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
-        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.WHEN_EXHAUSTED_WAIT, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
         // test that values not set retain a default value
@@ -261,7 +262,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(2, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
-        assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
+        assertEquals(ThreadingProfile.WHEN_EXHAUSTED_RUN, tp.getPoolExhaustedAction());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
 
         MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
@@ -332,7 +333,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }
 
-    public void testTranactionConfig() throws Exception
+    public void testTransactionConfig() throws Exception
     {
         // test transaction config
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
