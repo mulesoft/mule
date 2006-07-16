@@ -44,13 +44,6 @@ public class WaitableBooleanTestCase extends TestCase
         super.tearDown();
     }
 
-    public void testHashCode()
-    {
-        assertTrue(TRUE.hashCode() != FALSE.hashCode());
-        assertEquals(TRUE.hashCode(), (new WaitableBoolean(true)).hashCode());
-        assertEquals(FALSE.hashCode(), (new WaitableBoolean(false)).hashCode());
-    }
-
     public void testCompareToBoolean()
     {
         assertEquals(0, TRUE.compareTo(true));
@@ -65,14 +58,29 @@ public class WaitableBooleanTestCase extends TestCase
         assertEquals(1, TRUE.compareTo(new WaitableBoolean(false)));
         assertEquals(0, FALSE.compareTo(new WaitableBoolean(false)));
         assertEquals(-1, FALSE.compareTo(new WaitableBoolean(true)));
+        assertEquals(0, TRUE.compareTo((Object)TRUE));
     }
 
-    public void testEqualsObject()
+    public void testCompareToObject()
     {
+        assertEquals(0, TRUE.compareTo((Object)TRUE));
+    }
+
+    public void testEquals()
+    {
+        assertTrue(TRUE.equals(TRUE));
         assertFalse(TRUE.equals(FALSE));
         assertFalse(FALSE.equals(TRUE));
         assertTrue(TRUE.equals(new WaitableBoolean(true)));
         assertTrue(FALSE.equals(new WaitableBoolean(false)));
+        assertFalse(TRUE.equals(":-)"));
+    }
+
+    public void testHashCode()
+    {
+        assertTrue(TRUE.hashCode() != FALSE.hashCode());
+        assertEquals(TRUE.hashCode(), (new WaitableBoolean(true)).hashCode());
+        assertEquals(FALSE.hashCode(), (new WaitableBoolean(false)).hashCode());
     }
 
     public void testToString()

@@ -164,7 +164,7 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public void whenFalse(Runnable action) throws InterruptedException
     {
-        this.whenEqual(false, action);
+        this.whenNotEqual(true, action);
     }
 
     public void whenEqual(boolean condition, Runnable action) throws InterruptedException
@@ -178,7 +178,7 @@ public class WaitableBoolean extends SynchronizedVariable
 
             if (action != null)
             {
-                action.run();
+                this.execute(action);
             }
         }
     }
