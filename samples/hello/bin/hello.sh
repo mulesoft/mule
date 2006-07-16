@@ -7,6 +7,6 @@ fi
 # Set your application specific classpath like this
 export CLASSPATH=$MULE_HOME/samples/hello/conf:$MULE_HOME/samples/hello/classes
 
-$MULE_HOME/bin/mule -config ../conf/hello-mule-config.xml
+$MULE_HOME/bin/mule -config hello-mule-config.xml
 
 export CLASSPATH=

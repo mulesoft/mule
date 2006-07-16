@@ -5,6 +5,6 @@ if "%MULE_HOME%" == "" SET MULE_HOME=..\..\..
 REM Set your application specific classpath like this
 SET CLASSPATH=%MULE_HOME%\samples\hello\conf;%MULE_HOME%\samples\hello\classes
 
-call %MULE_HOME%\bin\mule.bat -config ../conf/hello-spring-config.xml -builder org.mule.extras.spring.config.SpringConfigurationBuilder
+call %MULE_HOME%\bin\mule.bat -config hello-spring-config.xml -builder org.mule.extras.spring.config.SpringConfigurationBuilder
 
 SET CLASSPATH=
