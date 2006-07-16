@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+        <groupId>org.mule</groupId>
+        <artifactId>mule-samples</artifactId>
+        <version>${version}</version>
+  </parent>
+  <groupId>org.mule.samples</groupId>
+  <artifactId>mule-samples-loanbroker-esb-dist</artifactId>
+  <name>Mule Loan Broker ESB Example Dist</name>
+  <description>Grabs the dependencies used to execute the Loan Borker ESB example at runtime</description>
+  <dependencies>
+        
+    <dependency>
+            <groupId>openejb</groupId>
+            <artifactId>openejb-core</artifactId>
+            <version>1.0-beta1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>activemq</groupId>
+            <artifactId>activemq</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        
+  </dependencies>
+</project>

@@ -9,6 +9,6 @@
          directory in the jar appears to be lower case, however when unpacked the META-INF
          directory is upper case?? -->
          <ant:mkdir dir="${maven.build.dir}/ejbjar"/>
-         <ant:unjar src="${maven.build.dir}/${pom.name}-${pom.currentVersion}.jar" dest="${maven.build.dir}/ejbjar"/>
+         <ant:unjar src="${maven.build.dir}/${pom.artifactId}-${pom.currentVersion}.jar" dest="${maven.build.dir}/ejbjar"/>
      </goal>
 </project>
