@@ -28,14 +28,14 @@
         <dependency>
             <groupId>openejb</groupId>
             <artifactId>openejb-core</artifactId>
-            <version>1.0-beta1</version>
+            <version>${openejb_core_version}</version>
             <properties>
                 <runtime>true</runtime>
             </properties>
         </dependency>
         <dependency>
             <id>castor</id>
-            <version>0.9.5.3</version>
+            <version>${castor_version}</version>
             <url>http://www.castor.org</url>
             <properties>
                 <runtime>true</runtime>
@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <id>oro</id>
-            <version>2.0.8</version>
+            <version>${oro_version}</version>
             <properties>
                 <runtime>true</runtime>
             </properties>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.6.0</version>
+            <version>${xerces_impl_version}</version>
             <url>http://xml.apache.org</url>
             <properties>
                 <runtime>true</runtime>
@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <id>xml-apis</id>
-            <version>1.0.b2</version>
+            <version>${xml_apis_version}</version>
             <properties>
                 <runtime>true</runtime>
             </properties>
