@@ -7,6 +7,6 @@ fi
 # Set your application specific classpath like this
 export CLASSPATH=$MULE_HOME/samples/errorhandler/conf:$MULE_HOME/samples/errorhandler/classes
 
-exec $MULE_HOME/bin/mule -config ../conf/eh-mule-config.xml
+exec $MULE_HOME/bin/mule -config eh-mule-config.xml
 
 export CLASSPATH=
