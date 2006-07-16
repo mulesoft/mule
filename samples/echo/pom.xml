@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+        <groupId>org.mule</groupId>
+        <artifactId>mule-samples</artifactId>
+        <version>2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.mule.samples</groupId>
+  <artifactId>mule-samples-echo</artifactId>
+  <name>Mule Echo Sample</name>
+  <description>Is a simple component example that demostrates how to expose a component over multiple transports (soap and stream).</description>
+  <dependencies>
+    <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-axis-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+    <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-xfire-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-glue-provider</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+  </dependencies>
+</project>
