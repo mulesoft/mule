@@ -581,7 +581,7 @@
         <dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>${groovy_version}</version>
+            <version>${groovy_all_version}</version>
         </dependency>
         <!-- Quartz tests -->
         <dependency>
