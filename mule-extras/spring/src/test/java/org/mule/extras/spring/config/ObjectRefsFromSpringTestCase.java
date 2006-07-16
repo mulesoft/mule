@@ -20,7 +20,7 @@ public class ObjectRefsFromSpringTestCase extends FunctionalTestCase {
         assertNotNull(ep);
         assertEquals("testConnector", ep.getConnector().getName());
         assertTrue(((AbstractConnector)ep.getConnector()).getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertTrue(((AbstractConnector)ep.getConnector()).getExceptionListener() instanceof TestExceptionStrategy);
+        assertTrue(ep.getConnector().getExceptionListener() instanceof TestExceptionStrategy);
 
         assertNotNull(ep.getTransformer());
         assertEquals("testTransformer", ep.getTransformer().getName());
