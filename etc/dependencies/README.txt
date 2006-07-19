@@ -1,0 +1,7 @@
+The libraries in this directory are for one reason or another not available for download
+from one of the major Maven repositories (ibiblio, java.net, codehaus, apache.org, etc.)
+
+They are made available here for the sole purpose of conveniently compiling and testing 
+the Mule source code.  They should in no way be used in a non-development environment 
+without having the appropriate licenses / permissions from the library's owner and should
+be obtained through their official distribution channels.  
