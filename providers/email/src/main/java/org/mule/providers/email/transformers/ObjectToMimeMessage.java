@@ -83,6 +83,7 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         BodyPart part = new MimeBodyPart();
         part.setDataHandler(handler);
         part.setDescription(name);
+        part.setFileName(handler.getName());
         return part;
     }
 
