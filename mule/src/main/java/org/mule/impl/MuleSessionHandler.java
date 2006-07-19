@@ -79,7 +79,7 @@ public class MuleSessionHandler implements UMOSessionHandler {
                     throw new IllegalArgumentException(new Message(Messages.SESSION_VALUE_X_IS_MALFORMED, pair).toString());
                 }
                 name = pair.substring(0, i).trim();
-                value = pair.substring(i+ 2).trim();
+                value = pair.substring(i + 1).trim();
                 session.setProperty(name, value);
                 if(logger.isDebugEnabled()) {
                     logger.debug("Added Session variable: " + pair);
