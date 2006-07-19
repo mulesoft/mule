@@ -12,10 +12,10 @@
     <url>http://www.muleumo.org/docs/providers/jbi/</url>
     <dependencies>
          <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-jbi-spec</artifactId>
-            <version>${mule_jbi_spec_version}</version>
-            <url>http://www.mulejbi.org</url>
+            <groupId>servicemix</groupId>
+            <artifactId>servicemix-jbi</artifactId>
+            <version>${servicemix_jbi_spec_version}</version>
+            <url>http://www.servicemix.org</url>
         </dependency>
     </dependencies>
 </project>

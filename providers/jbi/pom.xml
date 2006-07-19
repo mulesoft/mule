@@ -13,11 +13,10 @@
     <name>Jbi Provider</name>
     <description>Allows JBI components to interact with Mule.  Note this is different from Mule-JBI, which is a JBI (JSR-208) implementation based on the Mule framework.</description>
     <dependencies>
-        <!-- TODO  Where is the mule-jbi-spec-XXX.jar supposed to come from?? -->
          <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-jbi-spec</artifactId>
-            <version>1.2</version>
+            <groupId>servicemix</groupId>
+            <artifactId>servicemix-jbi</artifactId>
+            <version>2.0.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
