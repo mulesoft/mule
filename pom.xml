@@ -110,7 +110,7 @@
         <repository>
           <id>apache-snapshots</id>
           <name>Snapshot repository</name>
-          <url>http://people.apache.org/maven-snapshot-repository/</url>
+          <url>http://people.apache.org/maven-snapshot-repository</url>
           <snapshots>
               <enabled>true</enabled>
           </snapshots>
@@ -121,6 +121,22 @@
     </repositories>
     
     <pluginRepositories>
+        <pluginRepository>
+            <!--
+                This is the same as apache-snapshots, but for plugins now.
+                Technically it could've been a different repo, but they
+                put all snapshots in one location at Apache.
+             -->
+            <id>apache-plugin-snapshots</id>
+            <name>Apache Maven Plugins Snapshot Repository</name>
+            <url>http://people.apache.org/maven-snapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
         <!--
         <pluginRepository>
             <id>Maven Snapshots</id>
@@ -174,6 +190,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!--
+                    Fix surefire-report:report goal, which failed to
+                    complete if there were test errors (no report was
+                    generated).
+                -->
+                <version>2.3-SNAPSHOT</version>
                 <configuration>
                     <excludes>
                         <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
