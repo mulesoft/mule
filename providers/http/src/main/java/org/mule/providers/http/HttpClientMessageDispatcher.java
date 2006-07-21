@@ -105,7 +105,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
     protected void doDispatch(UMOEvent event) throws Exception
@@ -122,7 +122,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
@@ -132,7 +132,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -277,6 +277,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                     new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                     new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
                             event.getCredentials().getPassword())));
+            client.getParams().setAuthenticationPreemptive(true);
+        } else {
+            //don't use preemptive if there are no credentials to send
+            client.getParams().setAuthenticationPreemptive(false);
         }
         return httpMethod;
     }
@@ -285,7 +289,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception
