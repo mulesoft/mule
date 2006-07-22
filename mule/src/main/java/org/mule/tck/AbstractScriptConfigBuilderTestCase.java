@@ -219,7 +219,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint);
         assertNull(endpoint.getTransformer());
 
-        endpoint = descriptor.getInboundEndpoint();
         assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
         assertTrue(descriptor.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
