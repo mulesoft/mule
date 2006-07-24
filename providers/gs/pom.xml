@@ -48,9 +48,9 @@
             <version>2.1</version>
         </dependency>
         <dependency>
-            <groupId>jini</groupId>
-            <artifactId>JSpaces</artifactId>
-            <version>0</version>
+            <groupId>com.gigaspaces</groupId>
+            <artifactId>gigaspaces-ee</artifactId>
+            <version>5.1.1506</version>
         </dependency>
 
         <!-- Needed for unit tests only -->

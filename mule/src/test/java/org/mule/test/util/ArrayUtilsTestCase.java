@@ -1,0 +1,48 @@
+/*
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
+package org.mule.test.util;
+
+import junit.framework.TestCase;
+
+import org.mule.util.ArrayUtils;
+
+public class ArrayUtilsTestCase extends TestCase
+{
+
+    public void testToArrayOfComponentType()
+    {
+        // null array
+        assertNull(ArrayUtils.toArrayOfComponentType(null, String.class));
+
+        // empty array, same result
+        String[] a = new String[]{};
+        String[] a2 = (String[])ArrayUtils.toArrayOfComponentType(a, String.class);
+        assertSame(a2, a);
+
+        // null component type is not allowed
+        try {
+            ArrayUtils.toArrayOfComponentType(a, null);
+            fail();
+        }
+        catch (IllegalArgumentException iex) {
+            // ok
+        }
+
+        // single element
+        a = new String[]{":-)"};
+        CharSequence[] cs = (CharSequence[])ArrayUtils.toArrayOfComponentType(a, CharSequence.class);
+        assertEquals(a.length, cs.length);
+        assertSame(a[0], cs[0]);
+    }
+
+}

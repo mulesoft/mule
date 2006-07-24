@@ -21,9 +21,9 @@
             <jar>jini-ext.jar</jar>
         </dependency>
         <dependency>
-            <groupId>jini</groupId>
-            <artifactId>JSpaces</artifactId>
-            <jar>JSpaces.jar</jar>
+            <groupId>gigaspaces</groupId>
+            <artifactId>gigaspaces-ee</artifactId>
+            <version>${gigaspaces_version}</version>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
