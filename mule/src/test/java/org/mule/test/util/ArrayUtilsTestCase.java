@@ -12,6 +12,8 @@
 
 package org.mule.test.util;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.mule.util.ArrayUtils;
@@ -43,6 +45,16 @@ public class ArrayUtilsTestCase extends TestCase
         CharSequence[] cs = (CharSequence[])ArrayUtils.toArrayOfComponentType(a, CharSequence.class);
         assertEquals(a.length, cs.length);
         assertSame(a[0], cs[0]);
+
+        // incompatible element types are not a good idea either
+        try {
+            ArrayUtils.toArrayOfComponentType(a, List.class);
+            fail();
+        }
+        catch (ArrayStoreException asx) {
+            // ok
+        }
+
     }
 
 }

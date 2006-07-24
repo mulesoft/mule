@@ -32,7 +32,10 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
      *         component type of the source array, the source array is returned (i.e. no
      *         copy is created).
      * @throws IllegalArgumentException
-     *             if the <code>Class</code> argument is <code>null</code>.
+     *             if the <code>clazz</code> argument is <code>null</code>.
+     * @throws ArrayStoreException
+     *             if the elements in <code>objects</code> cannot be cast to
+     *             <code>clazz</code>.
      */
     public static Object[] toArrayOfComponentType(Object[] objects, Class clazz)
     {
