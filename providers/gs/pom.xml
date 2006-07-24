@@ -49,8 +49,8 @@
         </dependency>
         <dependency>
             <groupId>com.gigaspaces</groupId>
-            <artifactId>gigaspaces-ee</artifactId>
-            <version>5.1.1506</version>
+            <artifactId>gigaspaces-ce</artifactId>
+            <version>5.1-1600.213-1.4</version>
         </dependency>
 
         <!-- Needed for unit tests only -->

@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>gigaspaces</groupId>
-            <artifactId>gigaspaces-ee</artifactId>
+            <artifactId>gigaspaces-ce</artifactId>
             <version>${gigaspaces_version}</version>
         </dependency>
         <dependency>
