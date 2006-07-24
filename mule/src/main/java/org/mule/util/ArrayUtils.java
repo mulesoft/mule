@@ -18,11 +18,21 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 {
 
     /**
-     * TODO document me :)
+     * Creates a copy of the given array, but with the given <code>Class</code> as
+     * element type. Useful for arrays of objects that implement multiple interfaces and a
+     * "typed view" onto these objects is required.
      * 
      * @param objects
+     *            the array of objects
      * @param clazz
-     * @return
+     *            the desired component type of the new array
+     * @return <code>null</code> when objects is <code>null</code>, or a new array
+     *         containing the elements of the source array which is typed to the given
+     *         <code>clazz</code> parameter. If <code>clazz</code> is already the
+     *         component type of the source array, the source array is returned (i.e. no
+     *         copy is created).
+     * @throws IllegalArgumentException
+     *             if the <code>Class</code> argument is <code>null</code>.
      */
     public static Object[] toArrayOfComponentType(Object[] objects, Class clazz)
     {
