@@ -45,6 +45,12 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         {
             getServletContext().log(e.getMessage(), e);
         }
+        catch (Error error)
+        {
+            // WSAD doesn't always report the java.lang.Error, log it
+            getServletContext().log(error.getMessage(), error);
+            throw error;
+        }
     }
 
     /**

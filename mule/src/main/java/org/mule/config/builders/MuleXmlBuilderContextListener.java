@@ -23,14 +23,14 @@ import javax.servlet.ServletContextListener;
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to
  * construct a MuleManager instance. This listener delegates to the
  * <i>MuleXmlConfigurationBuilder</i>.
- * 
+ *
  * <p>
  * The location of the configuration file can be specified in a init parameter
  * called <i>org.mule.config</i>, the value can be a path on the local file
  * system or on the classpath. If a config parameter is not specified a default
  * <i>/mule-config.xml</i> will be used.
  * </p>
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  * @see MuleXmlConfigurationBuilder
@@ -50,12 +50,17 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
             createManager(config, event.getServletContext());
         } catch (ConfigurationException e) {
             event.getServletContext().log(e.getMessage(), e);
+        } catch (Error error) {
+            // WSAD doesn't always report the java.lang.Error, log it
+            event.getServletContext().log(error.getMessage(), error);
+            throw error;
         }
+
     }
 
     /**
      * Used to actually construct the UMOManager instance
-     * 
+     *
      * @param configResource the location of the config resource, this can be on
      *            the local file system or on the classpath.
      * @return A configured UMOManager instance
@@ -70,7 +75,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      * If no config location resource is configured on the servlet context, the
      * value returned from this method will be used to initialise the
      * MuleManager.
-     * 
+     *
      * @return the default config resource location
      */
     protected String getDefaultConfigResource()
