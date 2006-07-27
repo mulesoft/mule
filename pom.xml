@@ -196,7 +196,8 @@
                     complete if there were test errors (no report was
                     generated).
                 -->
-                <version>2.3-SNAPSHOT</version>
+                <version>RELEASE</version>
+                <!--<version>2.3-SNAPSHOT</version>-->
                 <configuration>
                     <excludes>
                         <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
