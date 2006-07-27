@@ -173,6 +173,7 @@
                 <configuration>
                     <source>1.4</source>
                     <target>1.4</target>
+                    <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
 
@@ -184,6 +185,16 @@
                   <archive>
                     <index>true</index>
                   </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Javadoc settings -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <charset>ISO-8859-1</charset>
+                    <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
 
