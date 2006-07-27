@@ -74,7 +74,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void initBeanDefinitionReader(XmlBeanDefinitionReader xmlBeanDefinitionReader)
     {
-        xmlBeanDefinitionReader.setValidating(false);
+        //xmlBeanDefinitionReader.setValidationMode(false);
         super.initBeanDefinitionReader(xmlBeanDefinitionReader);
     }
 
@@ -83,5 +83,17 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
         initBeanDefinitionReader(beanDefinitionReader);
         loadBeanDefinitions(beanDefinitionReader);
+    }
+
+
+    /**
+     * Create the Mule bean factory for this context.
+     *
+     * @return the bean factory for this context
+     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
+     * @see #getInternalParentBeanFactory
+     */
+    protected DefaultListableBeanFactory createBeanFactory() {
+        return new MuleBeanFactory(getInternalParentBeanFactory());
     }
 }
