@@ -68,8 +68,6 @@
             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
         <transformer name="ExceptionBeanToXML" className="org.mule.transformers.xml.ObjectToXml"
             returnClass="java.lang.String"/>
-        <transformer name="FileMessageToObject" className="org.mule.providers.file.transformers.FileMessageToObject"
-            returnClass="java.lang.String"/>
         <transformer name="ExceptionBeanToErrorMessage" className="org.mule.samples.errorhandler.ExceptionBeanToErrorMessage"
             returnClass="org.mule.samples.errorhandler.ErrorMessage"/>
         <transformer name="ErrorMessageToException" className="org.mule.samples.errorhandler.ErrorMessageToException"
@@ -97,7 +95,7 @@
         -->
         <mule-descriptor name="Error Manager"
             inboundEndpoint="file://../test-data/in"
-            inboundTransformer="FileMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"
+            inboundTransformer="XMLToExceptionBean ExceptionBeanToErrorMessage"
             implementation="errorManager">
 
             <outbound-router>
