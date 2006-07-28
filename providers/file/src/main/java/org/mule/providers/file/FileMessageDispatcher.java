@@ -12,6 +12,7 @@
  */
 package org.mule.providers.file;
 
+import org.apache.commons.collections.MapUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -103,7 +104,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
             if(logger.isInfoEnabled()) {
                 logger.info("Writing file to: " + file.getAbsolutePath());
             }
-            return new FileOutputStream(file, connector.isOutputAppend());
+            
+            return new FileOutputStream(file,MapUtils.getBooleanValue(endpoint.getProperties(),"outputAppend", connector.isOutputAppend()));
         } catch (IOException e) {
             throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint, e);
         }
