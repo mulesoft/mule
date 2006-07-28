@@ -1,34 +1,33 @@
 package org.mule.test.config;
 
+import junit.framework.Assert;
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.PoolingProfile;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.PropertyExtractor;
 import org.mule.config.JXPathPropertyExtractor;
+import org.mule.config.PoolingProfile;
+import org.mule.config.PropertyExtractor;
+import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractConnector;
+import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -147,6 +146,8 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         UMOTransformer t = MuleManager.getInstance().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
+        assertTrue(((TestCompressionTransformer) t).isSourceTypeSupported(String.class, true));
+
         // This will only work with the MuleXml Builder other implementations
         // will have to set this proerty manually or mimic Mules behaviour
         Assert.assertEquals("this was set from the manager properties!",

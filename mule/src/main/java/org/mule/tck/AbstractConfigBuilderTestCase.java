@@ -126,6 +126,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), java.lang.String.class);
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
+        assertTrue(((TestCompressionTransformer) t).isSourceTypeSupported(String.class, true));
     }
 
     public void testModelConfig() throws Exception

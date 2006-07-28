@@ -91,7 +91,7 @@ public class MultiContainerContext implements UMOContainerContext {
                 component = container.getComponent(realKey);
             } catch (ObjectNotFoundException e) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Object: '" + realKey + "' not found in container: " + container.getName());
+                    logger.debug("Object: '" + realKey + "' not found in container: " + container.getName(), e.getCause());
                 }
             }
             if (component != null) {

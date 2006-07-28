@@ -11,7 +11,7 @@
  */
 package org.mule.management.agents;
 
-import com.sun.jdmk.comm.HtmlAdaptorServer;
+//import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -46,9 +46,9 @@ public class JdmkAgent implements UMOAgent
 
     protected Object createAdaptor() throws Exception
     {
-        Object adaptor;
+        Object adaptor=null;
         URI uri = new URI(jmxAdaptorUrl);
-        adaptor = new HtmlAdaptorServer(uri.getPort());
+        //adaptor = new HtmlAdaptorServer(uri.getPort());
         return adaptor;
     }
 
