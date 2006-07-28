@@ -15,6 +15,7 @@ package org.mule.test.integration.client;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -36,9 +37,8 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
 
         String input = "IBM";
         Map properties = new HashMap();
-        // TODO probably can remove this?
-        // properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
-        // properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
+        properties.put(SoapConstants.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
+        properties.put(SoapConstants.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
         String url = "wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&method=GetQuote";
         UMOMessage result = null;
         String resultPayload = StringUtils.EMPTY;

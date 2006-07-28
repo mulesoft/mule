@@ -34,7 +34,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
         UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayload());
+        assertEquals("Test Client Send message Received", message.getPayload());
     }
 
     public void testClientDispatchDirect() throws Exception
@@ -53,7 +53,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
         UMOMessage message = client.send("vmEndpoint", "Test Client Send message", null);
         assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayload());
+        assertEquals("Test Client Send message Received", message.getPayload());
     }
 
     public void testClientSend() throws Exception
@@ -64,7 +64,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
         UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayload());
+        assertEquals("Test Client Send message Received", message.getPayload());
     }
 
     public void testClientMultiSend() throws Exception
@@ -76,7 +76,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         for (int i = 0; i < 100; i++) {
             UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
             assertNotNull(message);
-            assertEquals("Received: Test Client Send message " + i, message.getPayload());
+            assertEquals("Test Client Send message " + i + " Received", message.getPayload());
         }
     }
 

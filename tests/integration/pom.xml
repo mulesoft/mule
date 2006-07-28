@@ -180,13 +180,23 @@
             <artifactId>mule-extras-spring</artifactId>
             <version>${version}</version>
         </dependency>
+		<dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-scripting-module</artifactId>
+            <version>${version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-ognl-module</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!-- Transitive dependencies for non-m2 projects -->
 
         <dependency>
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
-            <version>3.2.3</version>
+            <version>3.2.4</version>
             <!-- These transitive dependencies are not found on ibiblio and cause
                 the build to fail. -->
             <exclusions>
@@ -244,12 +254,6 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jta</artifactId>
             <version>1.0.1B-rc4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fscontext</groupId>
-            <artifactId>fscontext</artifactId>
-            <version>0</version>
         </dependency>
 
         <dependency>
