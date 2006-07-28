@@ -24,8 +24,37 @@
         <dependency>
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
+            <!-- These transitive dependencies are not found on ibiblio and cause
+                the build to fail. -->
+            <exclusions>
+                <exclusion>
+                    <groupId>javacc</groupId>
+                    <artifactId>javacc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activecluster</groupId>
+                    <artifactId>activecluster</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>incubator-derby</groupId>
+                    <artifactId>derby</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>incubator-derby</groupId>
+                    <artifactId>derbynet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xmlbeans</groupId>
+                    <artifactId>xmlbeans-jsr173-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activemq</groupId>
+                    <artifactId>activemq-core-test</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         
   </dependencies>
 </project>
