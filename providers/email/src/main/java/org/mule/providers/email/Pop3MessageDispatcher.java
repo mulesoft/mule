@@ -145,35 +145,32 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         if (timeout < 0) {
             timeout = Long.MAX_VALUE;
         }
-        try {
-            do {
-                if(hasMessages(folder)) {
-                    int count = getMessageCount(folder);
-                    if (count > 0) {
-                        Message message = getNextMessage(folder);
-                        // so we don't get the same message again
-                        flagMessage(folder, message);
+        
+        do {
+        	if(hasMessages(folder)) {
+            	int count = getMessageCount(folder);
+                if (count > 0) {
+                	Message message = getNextMessage(folder);
+                    // so we don't get the same message again
+                    flagMessage(folder, message);
 
-                        return new MuleMessage(connector.getMessageAdapter(message));
-                    } else if (count == -1) {
-                        throw new MessagingException("Cannot monitor folder: " + folder.getFullName() + " as folder is closed");
-                    }
+                    return new MuleMessage(connector.getMessageAdapter(message));
+                } else if (count == -1) {
+                	throw new MessagingException("Cannot monitor folder: " + folder.getFullName() + " as folder is closed");
                 }
-                long sleep = Math.min(this.connector.getCheckFrequency(), timeout - (System.currentTimeMillis() - t0));
-                if (sleep > 0) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("No results, sleeping for " + sleep);
-                    }
-                    Thread.sleep(sleep);
-                } else {
-                    logger.debug("Timeout");
-                    return null;
+            }
+            long sleep = Math.min(this.connector.getCheckFrequency(), timeout - (System.currentTimeMillis() - t0));
+            if (sleep > 0) {
+            	if (logger.isDebugEnabled()) {
+                	logger.debug("No results, sleeping for " + sleep);
                 }
+                Thread.sleep(sleep);
+            } else {
+            	logger.debug("Timeout");
+            	return null;
+            }
 
-            } while (true);
-        } finally {
-            doDisconnect();
-        }
+        } while (true);        
     }
 
     /**

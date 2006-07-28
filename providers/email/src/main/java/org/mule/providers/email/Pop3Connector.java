@@ -53,8 +53,13 @@ public class Pop3Connector extends AbstractServiceEnabledConnector implements Ma
      */
     protected boolean deleteReadMessages = true;
 
+	public Pop3Connector() {
+		super();
+		//by default, close client connections to pop3 after the request.
+		this.setCreateDispatcherPerRequest(true);
+	}
 
-    /**
+	/**
      * @return the milliseconds between checking the folder for messages
      */
     public long getCheckFrequency()
