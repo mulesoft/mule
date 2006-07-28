@@ -12,7 +12,7 @@
  */
 package org.mule.providers.file;
 
-import org.apache.commons.collections.MapUtils;
+import org.mule.util.MapUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
