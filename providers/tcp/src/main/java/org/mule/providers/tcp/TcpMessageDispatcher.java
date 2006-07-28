@@ -81,7 +81,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         try {
             doInternalDispatch(event);
         } finally {
-            if (!connector.isKeepSendSocketOpen()) {
+            if (!keepSendSocketOpen) {
                 doDispose();
             }
         }
@@ -111,10 +111,17 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     /**
      * The doSend() and doDispatch() methods need to handle socket
      * disposure differently, thus the need to extract this common code.
+     * @param event event
+     * @throws Exception in case of any error
      */
     protected void doInternalDispatch(UMOEvent event) throws Exception {
         Object payload = event.getTransformedMessage();
 
+        // utilize the value after any endpoint overrides, check for dead socket
+        if (!keepSendSocketOpen || connectedSocket == null || connectedSocket.isClosed()) {
+            connectedSocket = initSocket(endpoint.getEndpointURI().getAddress());
+        }
+        
         try {
             write(connectedSocket, payload);
             // If we're doing sync receive try and read return info from socket
@@ -217,7 +224,11 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     protected void doDispose() {
-        // template method
+        try {
+            doDisconnect();
+        } catch (Exception e) {
+            logger.error("Failed to shutdown the dispatcher.", e);
+        }
     }
 
 
@@ -226,7 +237,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         keepSendSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(),
                 "keepSendSocketOpen", connector.isKeepSendSocketOpen());
 
-        if(connectedSocket==null || connectedSocket.isClosed() || !keepSendSocketOpen) {
+        if(connectedSocket == null || connectedSocket.isClosed() || !keepSendSocketOpen) {
             connectedSocket = initSocket(endpoint.getEndpointURI().getAddress());
         }
     }
