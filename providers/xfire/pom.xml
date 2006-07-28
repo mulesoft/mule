@@ -48,6 +48,11 @@
             <artifactId>xfire-core</artifactId>
             <version>1.1.2</version>
         </dependency>
+		<dependency>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>xfire-annotations</artifactId>
+            <version>1.1.2</version>
+        </dependency>
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
