@@ -578,11 +578,7 @@
             <artifactId>hibernate</artifactId>
             <version>${hibernate_version}</version>
         </dependency>
-        <dependency>
-            <groupId>groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy_all_version}</version>
-        </dependency>
+        
         <!-- Quartz tests -->
         <dependency>
             <artifactId>mule-quartz-provider</artifactId>

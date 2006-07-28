@@ -15,5 +15,8 @@
 	<modules>
 		<module>full</module>
 		<module>custom</module>
+		
 	</modules>
+	
+	
 </project>

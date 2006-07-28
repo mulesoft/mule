@@ -119,6 +119,16 @@
         </dependency>
         <dependency>
             <groupId>mule</groupId>
+            <artifactId>mule-ejb-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://muleumo.org/docs/modules/mule-ejb-provider/</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
             <artifactId>mule-extras-spring</artifactId>
             <version>${pom.currentVersion}</version>
             <!-- Mule core jars are ignored and spring will be distributed with the extras so ignore it here -->

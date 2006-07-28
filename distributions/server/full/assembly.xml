@@ -24,6 +24,21 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>sbin</outputDirectory>
       <fileMode>744</fileMode>
     </fileSet>
+    
+    <!-- how should exclusions be defined? -->
+    <!--fileSet>
+      <directory>../../../samples</directory>
+      <outputDirectory>samples</outputDirectory>
+      <excludes>
+      <exclude>**/target/</exclude>
+      </excludes>
+    </fileSet-->
+    
+    <fileSet>
+      <directory>../../../licenses</directory>
+      <outputDirectory>licenses</outputDirectory>
+    </fileSet>
+    
   </fileSets>
 
   <dependencySets>
@@ -43,8 +58,22 @@ Assembly descriptor for the full Mule distribution.
       </excludes>
     </dependencySet>
     -->
+	  <!--
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+    </dependencySet>
+		  -->
+	  <dependencySet>
+      <outputDirectory>lib/mule</outputDirectory>
+      <includes>
+        <include>org.mule</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>lib/opt</outputDirectory>
+      <excludes>
+        <exclude>org.mule</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>

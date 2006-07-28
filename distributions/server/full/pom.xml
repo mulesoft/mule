@@ -24,7 +24,7 @@
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
@@ -35,6 +35,117 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-    </build>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+                <!-- Copy all sources into a single directory -->
+                <copy verbose="true" flatten="true" todir="target/source">
+		    <fileset dir="../../../">
+		        <include name="**/*-sources.jar"/>
+		    </fileset>
+		  </copy>
+		  
+		  <!-- Unpack all Source Jars -->
+		  <unjar dest="target/src">
+                      <fileset dir="target/source">
+                          <include name="*.jar"/>
+                          <exclude name="*sample*.jar"/>
+                          <exclude name="*tool*.jar"/>
+                      </fileset>
+                  </unjar>
+                  
+                  <!-- Delete the working directory -->
+                  <delete dir="target/source"/>
+                  
+                  <!-- Clean up the source tree a bit -->
+                  <delete>
+    			<fileset dir="target/src">
+    				<include name="*.xml"/>
+    				<include name="*.wsdd"/>
+    				<include name="log4j.properties"/>
+    			</fileset>
+                  </delete>
+
+	<!-- Generate JavaDoc from full source -->
+	<tstamp>
+            <format property="year" pattern="2003-yyyy"/>
+        </tstamp>
+	
+        <javadoc
+            destdir="target/docs/apidocs"
+            author="true"
+            version="false"
+            use="true"
+            classpathref="maven.compile.classpath"
+            windowtitle="Mule ${version} API"
+            doctitle="Mule ${version} API"
+            bottom="Copyright &amp;copy; ${year} ${pom.organization.name}. All Rights Reserved."
+            stylesheetfile="../../../mule/xdocs/stylesheets/maven.css"
+            >
+	    <!-- TODO: Move StyleSheet -->
+	    
+            <packageset dir="target/src/" defaultexcludes="yes">
+                <exclude name="org/mule/tck/testmodels/**"/>
+                <exclude name="org/mule/samples/**"/>
+                <exclude name="org/mule/tools/**"/>
+                <exclude name="**/*TestCase.*"/>
+            </packageset>
+        </javadoc>
+
+                  
+                  <!-- Copy all Samples -->
+                <copy verbose="true" todir="target/samples">
+		    <fileset dir="../../../samples">
+		        <exclude name="**/.mule"/>
+		        <exclude name="**/.settings"/>
+		        <exclude name="**/pom.xml"/>
+		        <exclude name="**/maven.xml"/>
+		        <exclude name="**/project.xml"/>
+		        <exclude name="**/target/*"/>
+		    </fileset>
+		  </copy>
+		  
+		  <!-- Mule All Jar -->
+		  
+		  <copy verbose="true" flatten="true" todir="target/dist">
+		    <fileset dir="../../../">
+		        <include name="**/*-mule-*.jar"/>
+		    </fileset>
+		  </copy>
+		  
+		  <!-- Unpack all Source Jars -->
+		  <unjar dest="target/dist/temp">
+                      <fileset dir="target/dist">
+                          <include name="*.jar"/>
+                          <exclude name="*sample*.jar"/>
+                          <exclude name="*tool*.jar"/>
+                      </fileset>
+                  </unjar>
+
+        <!-- unjar the core jar again to overlay the correct manifest -->
+        <mkdir dir="target/dist/temp"/>
+        <unjar src="target/dist/mule-core-${version}.jar" dest="target/dist/temp"/>
+        <copy file="target/dist/temp/META-INF/MANIFEST.MF" tofile="target/dist/temp/META-INF/Mule.mf"/>
+
+        <echo>creating jar: ${maven.build.dir}/mule-${version}</echo>
+        <jar manifest="target/dist/temp/META-INF/MANIFEST.MF" basedir="target/dist/temp" destfile="target/mule-${version}.jar"/>
+        
+	<copy file="target/mule-${version}.jar" todir="target/dist"/>
+        <!--local deploy -->
+        <copy todir="${maven.repo.local}/mule/jars" file="target/dist/mule-${version}.jar"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
