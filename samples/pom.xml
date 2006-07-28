@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule</groupId>
+        <artifactId>mule-project</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-samples</artifactId>
+    <packaging>pom</packaging>
+    <name>Mule Samples</name>
+    <description>Mule Sample Applications</description>
+
+    <modules>
+        <module>echo</module>
+        <module>hello</module>
+        <module>errorhandler</module>
+        <module>loanbroker</module>
+        <module>loanbroker-esb</module>
+        <module>mule-webapp</module>
+        <module>simple</module>
+        <module>stockquote</module>
+        <module>voipservice</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-vm-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-stream-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-file-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+    
+    <build>
+    	<outputDirectory>classes</outputDirectory>
+    	<testOutputDirectory>classes</testOutputDirectory>
+    	<resources>
+      	<resource>
+        <directory>conf</directory>
+      	</resource>
+    	</resources>
+    </build>
+</project>
