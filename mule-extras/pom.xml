@@ -22,6 +22,7 @@
         <module>picocontainer</module>
         <module>plexus</module>
         <module>spring</module>
+        <module>ra</module>
     </modules>
 
     <dependencies>
@@ -30,5 +31,6 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        
     </dependencies>
 </project>
