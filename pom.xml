@@ -100,6 +100,17 @@
             </snapshots>
         </repository>
         <repository>
+            <id>sateh.com</id>
+            <name>Mirror of http://repo1.maven.org/maven2/</name>
+            <url>http://maven.sateh.com/repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
             <id>java.net</id>
             <name>Java.net Maven Repository</name>
             <url>https://maven-repository.dev.java.net/nonav/repository</url>
@@ -154,7 +165,7 @@
           <extension>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-webdav</artifactId>
-            <version>1.0-beta-1-SNAPSHOT</version>
+            <version>1.0-beta-2-SNAPSHOT</version>
           </extension>
         </extensions>
     
@@ -292,8 +303,10 @@
         <module>mule</module>
         <module>providers</module>
         <module>mule-extras</module>
-        <!--
+        <module>modules</module>
         <module>samples</module>
+        <module>tests</module>
+        <!--
         <module>tools</module>
         -->
         <module>buildtools</module>
