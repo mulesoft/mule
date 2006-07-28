@@ -11,7 +11,7 @@
  */
 package org.mule.providers.tcp;
 
-import org.apache.commons.collections.MapUtils;
+import org.mule.util.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transformers.simple.SerializableToByteArray;
