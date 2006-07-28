@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="fileAppendEndpointTest" version="1.0">
+	<model name="fileAppend">
+		<mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
+			<inbound-router>
+				<endpoint address="vm://fileappend"/>
+			</inbound-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="file://myout">
+						<properties>
+							<property value="true" name="outputAppend"/>
+							<property value="out.txt" name="outputPattern"/>
+						</properties>
+					</endpoint>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+    </model>
+</mule-configuration>
