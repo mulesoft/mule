@@ -16,7 +16,7 @@
 
     <modules>
         <module>integration</module>
-        <module>vendor</module>
+        <!--module>vendor</module-->
     </modules>
 
     <build>
