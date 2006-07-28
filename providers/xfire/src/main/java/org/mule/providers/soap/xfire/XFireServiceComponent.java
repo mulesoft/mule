@@ -144,7 +144,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             request = endpointHeader;
         }
 
-        if (request != null && request.endsWith("?wsdl")) {
+        if (request != null && request.toLowerCase().endsWith("?wsdl")) {
             generateWSDL(response, serviceName);
         } else {
 
