@@ -14,7 +14,6 @@
 package org.mule.providers.soap.xfire;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.MessageContext;
@@ -36,6 +35,7 @@ import org.codehaus.xfire.util.STAXUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.util.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -57,7 +57,6 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.UMOWorkManager;
 
 import javax.xml.stream.XMLStreamException;
@@ -65,7 +64,6 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * The Xfire service component receives requests for Xfire services it manages
@@ -140,11 +138,12 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         String serviceName = getService(eventContext);
-        if(request==null) {
+        if(request == null) {
             request = endpointHeader;
         }
 
-        if (request != null && request.toLowerCase().endsWith("?wsdl")) {
+        String tempRequest = StringUtils.trimToEmpty(request).toLowerCase();
+        if (tempRequest.indexOf("?wsdl") > 0 || tempRequest.indexOf("&wsdl") > 0) {
             generateWSDL(response, serviceName);
         } else {
 
@@ -179,7 +178,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         // template method
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException
     {
         if (xfire == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xfire"), this);
@@ -229,7 +228,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             UMOEndpointURI endpointURI,
             OutStreamMessageAdapter response,
             String service,
-            String methodName) throws IOException, UnsupportedEncodingException, UMOException,
+            String methodName) throws IOException, UMOException,
             javax.mail.MessagingException, NoSuchMethodException
     {
 
