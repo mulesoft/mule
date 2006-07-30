@@ -71,7 +71,7 @@
           <url>dav:https://dav.codehaus.org/mule/</url>
         </site>
     </distributionManagement>
-    <repositories>      
+    <repositories>
         <repository>
             <id>codehaus</id>
             <name>Codehaus Maven 2.x Release Repository</name>
@@ -131,7 +131,7 @@
           </releases>
         </repository>
     </repositories>
-    
+
     <pluginRepositories>
         <pluginRepository>
             <!--
@@ -168,14 +168,14 @@
             <version>1.0-beta-2-SNAPSHOT</version>
           </extension>
         </extensions>
-    
+
         <!-- Project version filters -->
-        <!-- Fails if the project doesn't have this file, need to push it down?  Use settings.xml instead. 
+        <!-- Fails if the project doesn't have this file, need to push it down?  Use settings.xml instead.
         <filters>
             <filter>project.properties</filter>
-        </filters 
+        </filters
         -->
-        
+
         <plugins>
             <!-- Compile to JDK 1.4 -->
             <plugin>
@@ -301,23 +301,25 @@
 
     <modules>
         <module>mule</module>
-        <module>providers</module>
-        <module>mule-extras</module>
         <module>modules</module>
-        <module>samples</module>
+        <module>providers</module>
+
+        <!-- This module is supposed to be included by the "tests" profile below
+        which is activated in "settings.xml" but for some reason it is not being
+        activated (Maven bug?) -->
         <module>tests</module>
-        <!--
-        <module>tools</module>
-        -->
+
+        <module>samples</module>
+        <!-- <module>tools</module> -->
         <module>buildtools</module>
     </modules>
 
-    <!-- 
-    The default profiles for the build are configured in the file settings.xml. 
+    <!--
+    The default profiles for the build are configured in the file settings.xml.
     You can override the default profiles from the command line as follows:
         "mvn -Ddistributions=true -Dtests=false -Doracle=true"
-        
-    (For other ways to work with profiles, see 
+
+    (For other ways to work with profiles, see
         http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
     -->
     <profiles>
