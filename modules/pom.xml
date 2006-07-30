@@ -17,14 +17,15 @@
         <module>mule-i18n_ja_JP</module>
         <module>ognl</module>
         <module>scripting</module>
-        <!--module>acegi</module>
+        <module>spring</module>
+        <module>acegi</module>
         <module>client</module>
         <module>hivemind</module>
         <module>jotm</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
-        <module>spring</module-->
+        <module>ra</module>
     </modules>
 
     <dependencies>
