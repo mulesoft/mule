@@ -143,6 +143,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         String tempRequest = StringUtils.trimToEmpty(request).toLowerCase();
+        // TODO it will trigger WSDL generation on e.g. "?wsdlmode" param, add more checks
         if (tempRequest.indexOf("?wsdl") > 0 || tempRequest.indexOf("&wsdl") > 0) {
             generateWSDL(response, serviceName);
         } else {
