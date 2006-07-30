@@ -73,11 +73,12 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.eq(event));
         // called by Inbound message router
         session.expectAndReturn("getComponent", testComponent);
+        
         // called by idempotent receiver
         session.expectAndReturn("getComponent", testComponent);
         messageRouter.route(event);
+        
         session.verify();
-
         message = new MuleMessage("test event");
         event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
 

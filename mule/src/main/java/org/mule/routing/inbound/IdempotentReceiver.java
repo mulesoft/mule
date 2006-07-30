@@ -43,13 +43,13 @@ import java.util.Set;
 
 public class IdempotentReceiver extends SelectiveConsumer
 {
-    public static String DEFAULT_STORE_PATH = "./idempotent";
+    private static String DEFAULT_STORE_PATH = "./idempotent";
 
-    protected Set messageIds;
-    protected File idStore;
-    protected String componentName;
-    protected boolean disablePersistence = false;
-    protected String storePath;
+    private Set messageIds;
+    private File idStore;
+    private String componentName;
+    private boolean disablePersistence = false;
+    private String storePath;
 
     public IdempotentReceiver()
     {
@@ -65,22 +65,7 @@ public class IdempotentReceiver extends SelectiveConsumer
             // name
             load(event);
         }
-        String id = getIdForEvent(event);
-        if(messageIds.contains(id)) {
-            return false;
-        } else {
-            //Store the Id as obtaining the Id may be expensive. Doing it here means we only do it once.
-            try {
-                storeId(id);
-                return true;
-            } catch (IOException e) {
-                throw new RoutingException(new Message(Messages.FAILED_TO_WRITE_X_TO_STORE_X,
-                                           id, idStore.getAbsolutePath()),
-                                           event.getMessage(),
-                                           event.getEndpoint(),
-                                           e);
-            }
-        }
+        return !messageIds.contains(event.getMessage().getUniqueId());
     }
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
@@ -91,14 +76,21 @@ public class IdempotentReceiver extends SelectiveConsumer
             } catch (IllegalArgumentException e) {
                 throw new RoutingException(event.getMessage(), event.getEndpoint());
             }
-            return new UMOEvent[] { event };
+            String id = event.getMessage().getUniqueId();
+            try {
+                storeId(id);
+                return new UMOEvent[] { event };
+            } catch (IOException e) {
+                throw new RoutingException(new Message(Messages.FAILED_TO_WRITE_X_TO_STORE_X,
+                                                       id,
+                                                       idStore.getAbsolutePath()),
+                                           event.getMessage(),
+                                           event.getEndpoint(),
+                                           e);
+            }
         } else {
             return null;
         }
-    }
-
-    protected String getIdForEvent(UMOEvent event) throws MessagingException {
-        return event.getMessage().getUniqueId();
     }
 
     private void checkComponentName(String name) throws IllegalArgumentException
