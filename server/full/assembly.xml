@@ -39,6 +39,32 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>licenses</outputDirectory>
     </fileSet>
     
+    <!-- Using AntRun plugin in the pom.xml we execute so file operations 
+    and include the results in the assembly here. It would be nie if we didn't have
+    to drop into ant -->
+    <fileSet>
+      <directory>target/dist</directory>
+      <outputDirectory>dist</outputDirectory>
+    </fileSet>
+    
+    <!-- Samples -->
+    <fileSet>
+      <directory>target/samples</directory>
+      <outputDirectory>samples</outputDirectory>
+    </fileSet>
+    
+    <!-- All sources -->
+    <fileSet>
+      <directory>target/src</directory>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+    
+    <!-- Full Javadoc built against the src directory above -->
+    <fileSet>
+      <directory>target/docs</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
+    
   </fileSets>
 
   <dependencySets>
@@ -58,22 +84,53 @@ Assembly descriptor for the full Mule distribution.
       </excludes>
     </dependencySet>
     -->
-	  <!--
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
-    </dependencySet>
-		  -->
-	  <dependencySet>
-      <outputDirectory>lib/mule</outputDirectory>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
       <includes>
         <include>org.mule</include>
+        <!--include>org.mule:mule-core</include>
+        <include>backport-util-concurrent:backport-util-concurrent</include>
+        <include>commons-beanutils:commons-beanutils</include>
+         <include>commons-collections:commons-collections</include>
+         <include>commons-io:commons-io</include>
+         <include>commons-lang:commons-lang</include>
+         <include>commons-pool:commons-pool</include>
+	 <include>commons-discovery:commons-discovery</include>
+	 <include>commons-digester:commons-digester</include>
+	 <include>commons-pool:commons-logging</include>
+	 <include>commons-pool:commons-jxpath</include>
+	 <include>commons-pool:commons-pool</include>
+         <include>log4j:log4j</include>
+         <include>mx4j:mx4j-impl</include>
+         <include>mx4j:mx4j-jmx</include>
+         <include>mx4j:mx4j-remote</include>
+         <include>mx4j:mx4j-tools</include>
+         <include>jug:jug</include>
+         
+         <include>geronimo-spec:geronimo-geronimo-spec-jta</include>
+         <include>geronimo-spec:geronimo-spec-j2ee-connector</include>
+         <include>geronimo-spec:geronimo-spec-qname</include>
+         <include>geronimo-spec:geronimo-spec-jaxrpc</include>
+         <include>geronimo-spec:geronimo-spec-servlet</include>
+         <include>geronimo-spec:geronimo-spec-activation</include>
+         <include>dom4j:dom4j</include>
+         <include>xstream:xstream</include>
+         <include>xpp3:xpp3_min</include>
+         <include>jmxri:jmxri</include>
+         <include>jmxri:jmxtools</include>
+         <include>jmxri:jmxremote</include-->
       </includes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>lib/opt</outputDirectory>
+      <outputDirectory>lib</outputDirectory>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
       <excludes>
-        <exclude>org.mule</exclude>
+          <exclude>org.mule</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
+  
 </assembly>

@@ -111,10 +111,11 @@
 		  </copy>
 		  
 		  <!-- Mule All Jar -->
-		  
+		  <mkdir dir="target/dist"/>
+		  <mkdir dir="target/dist/temp"/>
 		  <copy verbose="true" flatten="true" todir="target/dist">
 		    <fileset dir="../../../">
-		        <include name="**/*-mule-*.jar"/>
+		        <include name="**/mule-*-${version}.jar"/>
 		    </fileset>
 		  </copy>
 		  
@@ -128,13 +129,13 @@
                   </unjar>
 
         <!-- unjar the core jar again to overlay the correct manifest -->
-        <mkdir dir="target/dist/temp"/>
         <unjar src="target/dist/mule-core-${version}.jar" dest="target/dist/temp"/>
         <copy file="target/dist/temp/META-INF/MANIFEST.MF" tofile="target/dist/temp/META-INF/Mule.mf"/>
 
-        <echo>creating jar: ${maven.build.dir}/mule-${version}</echo>
         <jar manifest="target/dist/temp/META-INF/MANIFEST.MF" basedir="target/dist/temp" destfile="target/mule-${version}.jar"/>
         
+        <delete dir="target/dist"/>
+        <mkdir dir="dist"/>
 	<copy file="target/mule-${version}.jar" todir="target/dist"/>
         <!--local deploy -->
         <copy todir="${maven.repo.local}/mule/jars" file="target/dist/mule-${version}.jar"/>
