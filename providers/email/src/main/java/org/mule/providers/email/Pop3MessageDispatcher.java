@@ -52,7 +52,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
 
-        if (folder==null || !folder.isOpen()) {
+        if (folder == null || !folder.isOpen()) {
             String inbox = (String)endpoint.getProperty("folder");
 
             if(inbox == null || endpoint.getProtocol().toLowerCase().startsWith("pop3"))  {

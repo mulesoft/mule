@@ -76,11 +76,13 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     
     public void doConnect() throws Exception
     {
-        String inbox = null;
+        // TODO refactor inbox discovery logic into a getter method for subclasses to override
+        String inbox;
         if (connector.getProtocol().toLowerCase().startsWith("imap")) {
             inbox = endpoint.getEndpointURI().getPath();
-            if(inbox.length()==0) {
-                inbox = Pop3Connector.MAILBOX;
+            if(inbox.length() == 0) {
+                // TODO danger here, custom connector may not necessarily inherit ImapConnector
+                inbox = ((ImapConnector) connector).getMailboxFolder();
             } else {
                 inbox = inbox.substring(1);
             }
@@ -238,7 +240,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                     // Depending on Server implementation it's not always
                     // necessary
                     // to open the folder to check it
-                    // Opening folders can be exprensive!
+                    // Opening folders can be expensive!
                     // folder.open(Folder.READ_ONLY);
                     this.folder.open(Folder.READ_WRITE);
                 } catch (MessagingException e) {

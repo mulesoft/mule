@@ -21,6 +21,9 @@ public class ImapConnector extends Pop3Connector {
 
     public static final int DEFAULT_IMAP_PORT = 143;
 
+    /** Default is INBOX. */
+    private String mailboxFolder = Pop3Connector.MAILBOX;
+
     public String getProtocol()
     {
         return "imap";
@@ -28,5 +31,14 @@ public class ImapConnector extends Pop3Connector {
 
     public int getDefaultPort() {
         return DEFAULT_IMAP_PORT;
+    }
+
+
+    public String getMailboxFolder() {
+        return mailboxFolder;
+    }
+
+    public void setMailboxFolder(String mailboxFolder) {
+        this.mailboxFolder = mailboxFolder;
     }
 }
