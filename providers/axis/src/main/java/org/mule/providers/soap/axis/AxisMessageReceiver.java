@@ -37,6 +37,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.xml.rpc.ParameterMode;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,14 +109,23 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
         // Add any custom options from the Descriptor config
         Map options = (Map) descriptor.getProperties().get("axisOptions");
-        if (options != null) {
-            Map.Entry entry;
-            for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();) {
-                entry = (Map.Entry) iterator.next();
-                service.setOption(entry.getKey().toString(), entry.getValue());
-                logger.debug("Adding Axis option: " + entry);
-            }
+        
+        //IF wsdl service name is not set, default to service name
+        if (options == null) {
+        	options=new HashMap(2);
         }
+        if(options.get("wsdlServiceElement")==null) {
+        	options.put("wsdlServiceElement", serviceName);
+        }
+           
+        Map.Entry entry;
+        for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry) iterator.next();
+            service.setOption(entry.getKey().toString(), entry.getValue());
+            logger.debug("Adding Axis option: " + entry);
+        }
+        
+        
         // set method names
         Class[] interfaces = ServiceProxy.getInterfacesForComponent(component);
         if (interfaces.length == 0) {
