@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule-providers</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-vm-provider</artifactId>
     <packaging>jar</packaging>
