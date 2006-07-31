@@ -1,3 +1,15 @@
+/*
+ * $Id$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
+ * 
+ * The software in this package is published under the terms of the BSD style
+ * license a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ *  
+ */
+
 package org.mule.test.util;
 
 import java.util.Calendar;
@@ -9,39 +21,47 @@ import org.mule.util.NumberUtils;
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class NumberUtilsTestCase extends TestCase {
+public class NumberUtilsTestCase extends TestCase
+{
 
     static final long l = 1000000000;
 
-    public void testStringToLong() {
+    public void testStringToLong()
+    {
         assertEquals(l, NumberUtils.toLong("1000000000"));
     }
 
-    public void testLongToLong() {
+    public void testLongToLong()
+    {
         assertEquals(l, NumberUtils.toLong(new Long(l)));
     }
 
-    public void testIntegerToLong() {
+    public void testIntegerToLong()
+    {
         assertEquals(l, NumberUtils.toLong(new Integer(1000000000)));
     }
 
-    public void testIncompatible() {
+    public void testIncompatible()
+    {
         try {
             NumberUtils.toLong(Calendar.getInstance().getTime());
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             // expected
         }
     }
 
-    // This test doesn't work as expected because it calls
-    // org.apache.commons.lang.math.toLong(String str) instead of org.mule.util.toLong(Object obj)
-//    public void testNull() {
-//        try {
-//            NumberUtils.toLong(null);
-//            fail();
-//        } catch (IllegalArgumentException e) {
-//            // expected
-//        }
-//    }
+    public void testNull()
+    {
+        try {
+            // need to cast to Object, otherwise compiler would resolve method to
+            // superclass' implementation
+            NumberUtils.toLong((Object)null);
+            fail();
+        }
+        catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 }
