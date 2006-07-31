@@ -16,7 +16,7 @@
         <profile>
             <id>java5</id>
             <modules>
-                <module>gs</module>
+                <!-- we're still going for JDK 1.4 -->
             </modules>
         </profile>
     </profiles>
@@ -29,6 +29,7 @@
         <module>file</module>
         <module>ftp</module>
         <module>glue</module>
+        <module>gs</module>
         <module>http</module>
         <module>jbi</module>
         <module>jdbc</module>
