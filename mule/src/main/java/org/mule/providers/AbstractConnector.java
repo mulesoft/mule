@@ -870,7 +870,11 @@ public abstract class AbstractConnector
 
     public AbstractMessageReceiver getReceiver(String key)
     {
-        return (AbstractMessageReceiver)receivers.get(key);
+        if (key != null) {
+            return (AbstractMessageReceiver)receivers.get(key);
+        } else {
+            throw new IllegalArgumentException("Receiver key must not be null");
+        }
     }
 
     public AbstractMessageReceiver[] getReceivers(String wildcardExpression)
