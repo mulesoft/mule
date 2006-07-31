@@ -13,6 +13,14 @@
 
 package org.mule.providers.http;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.resource.spi.work.Work;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -24,6 +32,7 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.NullPayload;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -35,18 +44,10 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesUtils;
 
-import javax.resource.spi.work.Work;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
  * to listen for http requests on a particular port
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -189,13 +190,18 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     // different receiver
                     AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
 
-                    // the respone only needs to be transformed explicitly if A)
-                    // the request was not served or a null result was returned
+                    // the respone only needs to be transformed explicitly if
+                    // A) the request was not served or B) a null result was returned
                     HttpResponse response = null;
                     if (receiver != null) {
                         UMOMessage returnMessage = receiver.routeMessage(message,
                                 endpoint.isSynchronous(), /* TODO streaming */ null);
-                        Object tempResponse = returnMessage.getPayload();
+                        Object tempResponse;
+                        if (returnMessage != null) {
+                            tempResponse = returnMessage.getPayload();
+                        } else {
+                            tempResponse = new NullPayload();
+                        }
                         // This removes the need for users to explicitly adding
                         // the response transformer ObjectToHttpResponse in
                         // their config
