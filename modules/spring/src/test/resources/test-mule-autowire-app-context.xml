@@ -103,6 +103,7 @@
             <property name="beanProperty1"><value>this was set from the manager properties!</value></property>
             <property name="returnClass"><value>java.lang.String</value></property>
             <property name="beanProperty2"><value>12</value></property>
+			<property name="sourceType"><value>java.lang.String</value></property>
         </bean>
 
 
