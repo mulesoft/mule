@@ -17,7 +17,7 @@ import javax.jms.TextMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TestComponent
+public class TestComponent implements ITestComponent
 {
     private int count = 0;
 
@@ -28,7 +28,7 @@ public class TestComponent
         return "Received: " + message;
     }
 
-    public String receive(TextMessage message) throws Exception
+    public String receiveJms(TextMessage message) throws Exception
     {
         System.out.println("Received: " + message.getText() + " Number: " + inc() + " in thread: "
                 + Thread.currentThread().getName());
