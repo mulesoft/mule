@@ -19,14 +19,16 @@ import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
- * <code>DynamicEntryPointResolver</code> is similar to the
- * <code>NonVoidEntryPointResolver</code> except it also allows for void entry
- * point s to be used. void entry points should be used with caution when
- * leaving event dispatching to the descretion of the Mule Server. If an event
- * is processed by a component and no return type is given, Mule will dispatch
- * the previous event assuming any changes by the componentwould have been made
- * to the previous event. In most situations thisbehaviour is fine, but there
- * are circumstances where this is not suitable.
+ * <code>DynamicEntryPointResolver</code>
+ * <OL>
+ *  <LI> Checks to see if the component implements the Callable lifecycle interface, then the onCall(UMOEventContext) method will be used to receive the event.
+ *  <LI> If the component has a transformer configured for it, the return type for the transformer will be matched against methods on the component to see if there is a method that accepts the transformer return type. If so this event will be used. Note if there is more than one match, an exception will be thrown.
+ *  <LI> If there is a method on the component that accepts an org.mule.umo.UMOEventContext . If so this event will be used. Note if there is more than one match, an exception will be thrown.
+ *  <LI> The last chack determines if there are any meothds on the component that accept a java.util.Event . If so this event will be used. Note if there is more than one match, an exception will be thrown.
+ *  <LI> If none of the above find a match an exception will be thrown and the component registration will fail.
+ * </OL>
+ * 
+ * It allows also void methods where Mule assumes that the Payload itself of the message will be modified.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
