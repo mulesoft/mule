@@ -41,7 +41,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase {
         }
     }
 
-    private void setupManager() throws Exception {
+    protected void setupManager() throws Exception {
         MuleManager.getConfiguration().setWorkListener(new TestingWorkListener());
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources());
