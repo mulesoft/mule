@@ -118,7 +118,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     public void doDisconnect() throws Exception
     {
-        if (folder != null) {
+        if (folder != null && folder.isOpen()) {
             folder.close(true);
         }
     }
