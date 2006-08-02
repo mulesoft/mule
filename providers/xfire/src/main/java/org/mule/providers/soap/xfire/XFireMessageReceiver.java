@@ -13,6 +13,10 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections.MapUtils;
 import org.codehaus.xfire.service.Service;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -20,9 +24,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * todo document
@@ -48,11 +49,11 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     protected void init() throws InitialisationException
     {
         try {
-            // TODO MULE20 get namespace from service name
-            String namespace = XFireConnector.DEFAULT_MULE_NAMESPACE_URI;
-
             Map props = new HashMap(component.getDescriptor().getProperties());
             props.putAll(endpoint.getProperties());
+
+            // TODO MULE20 get namespace from service name
+            String namespace = MapUtils.getString(props,"namespace", XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
 
             // String soapVersionString =
             // PropertiesHelper.getStringProperty(props, "soapVersion", "1.1");
@@ -88,8 +89,9 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
-            if (endpoint.getEndpointURI().getScheme().startsWith("http")) {
-                sync = true;
+            if (endpoint.getEndpointURI().getScheme().startsWith("http") || 
+                endpoint.getEndpointURI().getScheme().startsWith("servlet")) {
+            	sync = true;
             }
             service.setInvoker(new MuleInvoker(this, sync));
 

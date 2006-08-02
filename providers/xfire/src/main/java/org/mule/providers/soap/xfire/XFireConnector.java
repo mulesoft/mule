@@ -13,6 +13,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.apache.commons.lang.SystemUtils;
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
@@ -20,7 +21,6 @@ import org.codehaus.xfire.annotations.WebAnnotations;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
-import org.mule.util.ClassUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -37,7 +37,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.ClassUtils;
 
 /**
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
@@ -49,6 +49,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
+    public static final String XFIRE_PROPERTY = "xfire";
 
     private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
 
@@ -72,6 +73,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         registerSupportedProtocol("https");
         registerSupportedProtocol("jms");
         registerSupportedProtocol("vm");
+        registerSupportedProtocol("servlet");
     }
 
     public String getProtocol()
@@ -151,8 +153,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set externally
-            if (xfireDescriptor.getProperties().get("xfire") == null) {
-                xfireDescriptor.getProperties().put("xfire", xfire);
+            if (xfireDescriptor.getProperties().get(XFIRE_PROPERTY) == null) {
+                xfireDescriptor.getProperties().put(XFIRE_PROPERTY, xfire);
             }
             xfireDescriptor.setContainerManaged(false);
         }
@@ -176,8 +178,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         }
 
         //If we are using sockets then we need to set the endpoint name appropiately and if using http/https
-        //we need to default to POSt and set the Content-Type
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
+        //we need to default to POST and set the Content-Type
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp") || scheme.equals("servlet")) {
             endpoint += "/" + serviceName;
             receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");

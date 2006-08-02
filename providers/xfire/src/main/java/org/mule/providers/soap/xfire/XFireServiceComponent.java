@@ -44,6 +44,7 @@ import org.mule.impl.UMODescriptorAware;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
 import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -103,72 +104,21 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         OutStreamMessageAdapter response;
         UMOEndpointURI endpointURI = eventContext.getEndpointURI();
         String method;
+        
+        {
+        	        	logger.debug(eventContext);
+        	        	String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
+        	        	if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY)) {
+        	        		ByteArrayOutputStream out = new ByteArrayOutputStream();
+        	        		getXfire().generateWSDL(getServiceName(eventContext), out);
+        	        		return out.toString();
+        	        	} else {
+        	        		MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
+        	       		return channel.onCall(eventContext);
+        	       	}
+        	         }
 
-        if (eventContext.isStreaming()) {
-            StreamMessageAdapter sma = (StreamMessageAdapter)eventContext.getMessage().getPayload();
-            if (sma.getOutput() != null) {
-                response = new OutStreamMessageAdapter(sma.getOutput());
-            }
-            else {
-                response = new OutStreamMessageAdapter(new ByteArrayOutputStream());
-            }
-        }
-        else {
-            response = new OutStreamMessageAdapter(new ByteArrayOutputStream());
-        }
-
-        UMOMessage eventMsg = eventContext.getMessage();
-        String endpointHeader = eventMsg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
-        String request = eventMsg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
-        //If a http request is set we can get the method from the request
-        if(request!=null) {
-            endpointURI = new MuleEndpointURI("soap:" + endpointURI.toString() + request);
-        }
-
-        method = endpointURI.getParams().getProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY);
-
-        if (method == null) {
-            method = eventMsg.getStringProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY, null);
-        }
-        if (method == null) {
-            if (endpointHeader != null) {
-                endpointURI = new MuleEndpointURI(endpointHeader);
-                method = endpointURI.getParams().getProperty(org.mule.providers.soap.SoapConstants.SOAP_METHOD_PROPERTY);
-            }
-        }
-
-        String serviceName = getService(eventContext);
-        if(request == null) {
-            request = endpointHeader;
-        }
-
-        String tempRequest = StringUtils.trimToEmpty(request).toLowerCase();
-        // TODO it will trigger WSDL generation on e.g. "?wsdlmode" param, add more checks
-        if (tempRequest.indexOf("?wsdl") > 0 || tempRequest.indexOf("&wsdl") > 0) {
-            generateWSDL(response, serviceName);
-        } else {
-
-            if (method == null) {
-                throw new MuleException(new Message(Messages.PROPERTIES_X_NOT_SET, "method"));
-            }
-
-
-            ServiceRegistry reg = getServiceRegistry();
-            if (serviceName == null || serviceName.length() == 0 || !reg.hasService(serviceName)) {
-                if (!reg.hasService(serviceName)) {
-                    eventMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
-                            String.valueOf(HttpConstants.SC_NOT_FOUND));
-                }
-
-                generateServices(response);
-                return response;
-            }
-            invoke(eventContext, endpointURI, response, serviceName, method);
-        }
-        // Todo currently defeating streaming
-        return response.getPayloadAsBytes();
     }
-
     public void start() throws UMOException
     {
         // template method
@@ -225,85 +175,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
      * @throws java.io.UnsupportedEncodingException
      *
      */
-    protected void invoke(UMOEventContext eventContext,
-            UMOEndpointURI endpointURI,
-            OutStreamMessageAdapter response,
-            String service,
-            String methodName) throws IOException, UMOException,
-            javax.mail.MessagingException, NoSuchMethodException
-    {
-
-        MessageContext context = new MessageContext();
-        context.setXFire(xfire);
-
-        XFireMuleSession session = new XFireMuleSession(eventContext.getSession());
-        context.setSession(session);
-        context.setService(getService(service));
-
-        OperationInfo op = context.getService().getServiceInfo().getOperation(methodName);
-        if (op == null) {
-            throw new NoSuchMethodException(methodName);
-        }
-        context.setExchange(new MessageExchange(context));
-        context.getExchange().setOperation(op);
-
-        Channel channel;
-        String uri = endpointURI.toString();
-        try {
-            channel = transport.createChannel(uri);
-        }
-        catch (Exception e) {
-            logger.debug("Couldn't open channel.", e);
-            throw new MessagingException(new Message("xfire", 7, uri), eventContext.getMessage(), e);
-
-        }
-
-        UMOMessage eventMsg = eventContext.getMessage();
-
-        String encoding = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_ENCODING,
-                MuleManager.getConfiguration().getEncoding());
-
-        String contentType = eventMsg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
-
-        if (contentType == null) {
-            contentType = DEFAULT_CONTENT_TYPE + "; charset=" + encoding;
-            logger.warn("Content-Type not set on request, defaulting to: " + contentType);
-        }
-        else if (contentType.indexOf("charset=") == -1) {
-            contentType += "; charset=" + encoding;
-        }
-
-        if (contentType.toLowerCase().indexOf("multipart/related") != -1) {
-            try {
-                //Todo use  streamed attachments
-                Attachments atts = new JavaMailAttachments(getMessageStream(eventContext), contentType);
-
-                XMLStreamReader reader = STAXUtils.createXMLStreamReader(atts.getSoapMessage()
-                        .getDataHandler().getInputStream(), encoding, context);
-                InMessage message = new InMessage(reader, uri);
-                message.setProperty(SoapConstants.SOAP_ACTION, eventMsg.getStringProperty(
-                        SoapConstants.SOAP_ACTION, StringUtils.EMPTY));
-                message.setAttachments(atts);
-
-                context.getExchange().setInMessage(message);
-                context.setCurrentMessage(message);
-                context.setProperty(Channel.BACKCHANNEL_URI, response.getStream());
-                channel.receive(context, message);
-            }
-            catch (javax.mail.MessagingException e) {
-                throw new XFireRuntimeException("Couldn't parse request message.", e);
-            }
-        }
-        else {
-            XMLStreamReader reader = STAXUtils.createXMLStreamReader(getMessageStream(eventContext),
-                    encoding, context);
-            InMessage message = new InMessage(reader, uri);
-            context.getExchange().setInMessage(message);
-            context.setCurrentMessage(message);
-            context.setProperty(Channel.BACKCHANNEL_URI, response.getStream());
-            channel.receive(context, message);
-        }
-    }
 
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
@@ -343,7 +214,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     /**
      * Get the service that is mapped to the specified request.
      */
-    protected String getService(UMOEventContext context)
+    protected String getServiceName(UMOEventContext context)
     {
         String pathInfo = context.getEndpointURI().getPath();
 

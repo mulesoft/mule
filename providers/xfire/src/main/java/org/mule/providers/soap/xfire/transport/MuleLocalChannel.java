@@ -13,8 +13,22 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.MessageContext;
@@ -28,18 +42,13 @@ import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Session;
 import org.codehaus.xfire.util.STAXUtils;
+import org.mule.MuleException;
+import org.mule.providers.soap.xfire.XFireConnector;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * todo document
@@ -277,5 +286,77 @@ public class MuleLocalChannel extends AbstractChannel
         {
             // template method
         }
+    }
+
+    /**
+     * Get the service that is mapped to the specified request.
+     */
+    protected String getService(UMOEventContext context)
+    {
+        String pathInfo = context.getEndpointURI().getPath();
+
+        if (StringUtils.isEmpty(pathInfo)) {
+            return context.getEndpointURI().getHost();
+        }
+
+        String serviceName;
+
+        int i = pathInfo.lastIndexOf("/");
+
+        if (i > -1) {
+            serviceName = pathInfo.substring(i + 1);
+        }
+        else {
+            serviceName = pathInfo;
+        }
+
+        return serviceName;
+    }
+
+    public Object onCall(UMOEventContext ctx) throws UMOException {
+
+    	try {
+            MessageContext context = new MessageContext(); 
+            XFire xfire = (XFire) ctx.getComponentDescriptor().getProperties().get(XFireConnector.XFIRE_PROPERTY);
+    
+            context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
+            context.setXFire(xfire);
+
+    		ByteArrayOutputStream resultStream = new ByteArrayOutputStream(512); //Channel.BACKCHANNEL_URI
+            context.setProperty(Channel.BACKCHANNEL_URI, resultStream); // Return the result to us, not to the sender.
+
+            XMLStreamReader reader;
+            
+            // TODO isStreaming()?
+            Object payload = ctx.getMessage().getPayload();
+            if (payload instanceof InputStream) {
+            	reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
+            } else if (payload instanceof Reader) {
+            	reader = STAXUtils.createXMLStreamReader((Reader)payload, context);
+            } else {
+            	String text = ctx.getMessageAsString();
+            	reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
+            }
+
+            InMessage in = new InMessage(reader, getUri());
+    
+            receive(context, in);
+            
+            Object result = null;
+            if (context.getExchange().hasOutMessage()) {
+            	try {
+					result = resultStream.toString(context.getOutMessage().getEncoding());
+				} catch (UnsupportedEncodingException e1) {
+					throw new MuleException(e1);
+				}
+            }
+
+            // TODO Should this be an error?   Probably not
+            return result;
+            
+    	} catch (UMOException e) {
+    		logger.warn("Could not dispatch message to XFire!",e);
+    		throw e;
+    	}
     }
 }

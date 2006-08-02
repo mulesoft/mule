@@ -142,9 +142,9 @@
 
         <!-- needed for WSDL client -->
         <dependency>
-          <groupId>org.apache.ws.commons</groupId>
+          <groupId>ws-commons-xmlschema</groupId>          
           <artifactId>XmlSchema</artifactId>
-          <version>${XmlSchema_version}</version>
+          <version>1.0.3</version>
         </dependency>
    </dependencies>
 </project>

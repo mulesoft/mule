@@ -13,6 +13,10 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.lang.reflect.Method;
+
+import javax.xml.namespace.QName;
+
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.fault.XFireFault;
 import org.codehaus.xfire.service.invoker.Invoker;
@@ -23,9 +27,6 @@ import org.mule.providers.NullPayload;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
-import javax.xml.namespace.QName;
-import java.lang.reflect.Method;
 
 /**
  * Invokes a Mule Service via an Xfire binding

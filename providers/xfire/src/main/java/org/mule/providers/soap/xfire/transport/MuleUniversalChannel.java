@@ -12,6 +12,18 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,17 +50,6 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.providers.streaming.OutputHandler;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
-
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Provides a
