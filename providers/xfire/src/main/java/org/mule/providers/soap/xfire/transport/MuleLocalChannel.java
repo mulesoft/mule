@@ -1,13 +1,13 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -28,7 +28,6 @@ import javax.resource.spi.work.WorkException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.MessageContext;
@@ -47,12 +46,13 @@ import org.mule.providers.soap.xfire.XFireConnector;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * todo document
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -316,9 +316,9 @@ public class MuleLocalChannel extends AbstractChannel
     public Object onCall(UMOEventContext ctx) throws UMOException {
 
     	try {
-            MessageContext context = new MessageContext(); 
+            MessageContext context = new MessageContext();
             XFire xfire = (XFire) ctx.getComponentDescriptor().getProperties().get(XFireConnector.XFIRE_PROPERTY);
-    
+
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
             context.setXFire(xfire);
 
@@ -326,7 +326,7 @@ public class MuleLocalChannel extends AbstractChannel
             context.setProperty(Channel.BACKCHANNEL_URI, resultStream); // Return the result to us, not to the sender.
 
             XMLStreamReader reader;
-            
+
             // TODO isStreaming()?
             Object payload = ctx.getMessage().getPayload();
             if (payload instanceof InputStream) {
@@ -339,9 +339,9 @@ public class MuleLocalChannel extends AbstractChannel
             }
 
             InMessage in = new InMessage(reader, getUri());
-    
+
             receive(context, in);
-            
+
             Object result = null;
             if (context.getExchange().hasOutMessage()) {
             	try {
@@ -353,7 +353,7 @@ public class MuleLocalChannel extends AbstractChannel
 
             // TODO Should this be an error?   Probably not
             return result;
-            
+
     	} catch (UMOException e) {
     		logger.warn("Could not dispatch message to XFire!",e);
     		throw e;

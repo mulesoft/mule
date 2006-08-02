@@ -1,13 +1,13 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -50,7 +51,7 @@ import org.mule.util.TemplateParser;
 /**
  * The XfireMessageDispatcher is used for making Soap client requests to remote services
  * using the Xfire soap stack
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -131,11 +132,11 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         UMOMessage message = event.getMessage();
         Set attachmentNames = message.getAttachmentNames();
         if (attachmentNames != null && !attachmentNames.isEmpty()) {
-            ArrayList attachments = new ArrayList();
+            List attachments = new ArrayList();
             for (Iterator i = attachmentNames.iterator(); i.hasNext();) {
                 attachments.add(message.getAttachment((String)i.next()));
             }
-            ArrayList temp = new ArrayList(Arrays.asList(args));
+            List temp = new ArrayList(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[0]));
             args = temp.toArray();
         }
@@ -200,7 +201,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     * 
+     *
      * @param endpoint
      *            the endpoint to use when connecting to the resource
      * @param timeout

@@ -1,13 +1,13 @@
-/* 
+/*
  * $Id$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 
@@ -16,7 +16,7 @@ package org.mule.providers.soap.xfire;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
+import org.mule.util.MapUtils;
 import org.codehaus.xfire.service.Service;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -27,7 +27,7 @@ import org.mule.umo.provider.UMOConnector;
 
 /**
  * todo document
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -89,7 +89,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
-            if (endpoint.getEndpointURI().getScheme().startsWith("http") || 
+            if (endpoint.getEndpointURI().getScheme().startsWith("http") ||
                 endpoint.getEndpointURI().getScheme().startsWith("servlet")) {
             	sync = true;
             }

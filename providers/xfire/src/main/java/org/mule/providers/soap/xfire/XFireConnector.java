@@ -13,7 +13,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.apache.commons.lang.SystemUtils;
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
@@ -38,6 +37,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.SystemUtils;
 
 /**
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
