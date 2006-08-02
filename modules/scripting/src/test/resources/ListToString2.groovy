@@ -1,3 +1,3 @@
-result="";
-src.each { t | result+= " " + t };
+result = "";
+src.each { result += " ${it}" };
 return result.substring(1);

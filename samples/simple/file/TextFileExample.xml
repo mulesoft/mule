@@ -35,9 +35,9 @@
             <properties>
                 <property name="scriptEngineName" value="groovy"/>
                 <text-property name="scriptText">
-                     Object msg = eventContext.getTransformedMessageAsString();
-                     log.boilerPlate("Message is: " + msg);
-                     return msg + " processed";
+                     def msg = eventContext.transformedMessageAsString
+                     log.boilerPlate("Message is: ${msg}")
+                     return "${msg} processed"
                 </text-property>
             </properties>
         </mule-descriptor>

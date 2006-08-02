@@ -22,8 +22,8 @@
 	  
 	  <dependency>
             <groupId>groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.0-jsr-05</version>
+            <artifactId>groovy-all-1.0-jsr</artifactId>
+            <version>06</version>
 		  <scope>test</scope>
         </dependency>
   </dependencies>
