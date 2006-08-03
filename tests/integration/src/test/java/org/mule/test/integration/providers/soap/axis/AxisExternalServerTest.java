@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Requires an external Axis server running in Tomcat with the Calculator.jws service
+ * deployed to it.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision: $
  */
