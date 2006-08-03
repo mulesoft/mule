@@ -105,7 +105,7 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     public String getName() {
-        return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase();
+        return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase() + " ";
     }
 
     /**
