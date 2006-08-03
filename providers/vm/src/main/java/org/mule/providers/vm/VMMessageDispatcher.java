@@ -21,6 +21,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.streaming.StreamMessageAdapter;
+import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -54,13 +55,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     private VMConnector connector;
     
-    private SerializableToByteArray serializableToByteArray;
+    private ObjectToByteArray objectToByteArray;
 
     public VMMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (VMConnector)endpoint.getConnector();
-        serializableToByteArray = new SerializableToByteArray();
+        objectToByteArray = new ObjectToByteArray();
     }
 
     /*
@@ -198,7 +199,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         if(event.isStreaming() && retMessage!=null) {
             StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
-            sma.setResponse(new ByteArrayInputStream((byte[])serializableToByteArray.transform(retMessage.getPayload())));
+            sma.setResponse(new ByteArrayInputStream((byte[])objectToByteArray.transform(retMessage.getPayload())));
             retMessage = new MuleMessage(sma, retMessage);
         }
 
