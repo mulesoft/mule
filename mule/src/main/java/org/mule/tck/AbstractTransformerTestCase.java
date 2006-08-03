@@ -13,6 +13,8 @@
 
 package org.mule.tck;
 
+import java.util.Arrays;
+
 import org.mule.impl.RequestContext;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.transformer.TransformerException;
@@ -113,7 +115,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         if (src == null || result == null) {
             return false;
         }
-        return src.equals(result);
+        if(src instanceof Object[] && result instanceof Object[] ) {
+        	return Arrays.deepEquals((Object[])src, (Object[])result);
+        } else if (src instanceof byte[] && result instanceof byte[] ) {
+        	return Arrays.equals((byte[])src, (byte[])result);
+        } else {
+        	return src.equals(result);
+        }
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
