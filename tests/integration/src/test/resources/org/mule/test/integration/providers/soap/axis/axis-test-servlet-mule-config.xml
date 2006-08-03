@@ -7,7 +7,7 @@
 
     <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
         <properties>
-            <property name="servletUrl" value="http://localhost:8081/services"/>
+            <property name="servletUrl" value="http://localhost:18088/services"/>
         </properties>
     </connector>
 

@@ -27,7 +27,9 @@ import org.mule.test.integration.providers.soap.AbstractSoapFunctionalTestCase;
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
     private Server httpServer;
-    public static final int HTTP_PORT = 8081;
+    public static final int HTTP_PORT = 18088;
+    
+    
 
     protected void suitePostSetUp() throws Exception
     {
