@@ -1,0 +1,36 @@
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+	
+	<mule-environment-properties serverUrl="" synchronous="true"/>
+	
+    <security-manager>
+		<security-provider name="JaasProvider" className="com.ss.jaas.provider.JaasSimpleAuthenticationProvider">
+            <properties>
+                <property name="loginContextName" value="jaasTest"/> 
+				<property name="credentials" value="anon:anon;Marie.Rizzo:dragon;" /> 
+				<!-- uses DefaultLoginModule -->
+            </properties>
+        </security-provider>
+        <encryption-strategy name="PBE" className="org.mule.impl.security.PasswordBasedEncryptionStrategy">
+            <properties>
+                <property name="password" value="mule"/>
+            </properties>
+        </encryption-strategy>
+	</security-manager>
+	
+    <model name="test">
+		<mule-descriptor name="TestUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
+			<inbound-router>
+				<endpoint address="vm://localhost/test">
+					<security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+	                         <properties>
+		                         <property name="strategyName" value="PBE"/>
+			                 </properties>
+				      </security-filter> 
+				</endpoint>			
+			</inbound-router>
+		</mule-descriptor>	
+	</model> 
+</mule-configuration>
