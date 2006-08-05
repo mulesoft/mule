@@ -37,8 +37,8 @@ public interface PropertyExtractor
 
     /**
      * Where a property extract must first parse the message body of a message this
-     * implementation meothd will be more efficient as the parsed content is cached
-     * for each property extraction
+     * implementation method will be more efficient as the parsed content is cached
+     * for each property extraction.
      * @param names a list of property names or expressions
      * @param message the message to extract from
      * @return a map of key/value pairs where the key is the name or expression
