@@ -56,7 +56,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
             throws MessagingException
     {
 
-        UMOMessage result = null;
+        UMOMessage result;
         boolean matchfound = false;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
