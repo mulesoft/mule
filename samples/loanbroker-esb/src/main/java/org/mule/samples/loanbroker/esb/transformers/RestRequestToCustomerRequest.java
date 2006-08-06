@@ -37,15 +37,15 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
-        String name = null;
-        int ssn = 0;
-        double amount = 0;
-        int duration = 0;
+        String name;
+        int ssn;
+        double amount;
+        int duration;
         try {
             name = getParam(context, "customerName");
-            ssn = Integer.valueOf(getParam(context, "ssn")).intValue();
-            amount = Double.valueOf(getParam(context, "loanAmount")).doubleValue();
-            duration = Integer.valueOf(getParam(context, "loanDuration")).intValue();
+            ssn = Integer.parseInt(getParam(context, "ssn"));
+            amount = Double.parseDouble(getParam(context, "loanAmount"));
+            duration = Integer.parseInt(getParam(context, "loanDuration"));
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
@@ -57,7 +57,7 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
 
     protected String getParam(UMOEventContext context, String name) throws NullPointerException
     {
-        String value = context.getStringProperty(name);
+        String value = context.getMessage().getStringProperty(name, null);
         if(value==null) {
             throw new NullPointerException("Parameter '" + name + "' must be set on the request");
         }
