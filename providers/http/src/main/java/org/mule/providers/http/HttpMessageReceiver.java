@@ -24,6 +24,8 @@ import javax.resource.spi.work.Work;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.lang.ObjectUtils;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -164,7 +166,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     // TODO Mule 2.0 generic way to set stream message adapter
                     UMOMessageAdapter adapter;
-                    Object body = null;
+                    Object body;
                     if (endpoint.isStreaming() && request.getBody() != null) {
                         adapter = new StreamMessageAdapter(request.getBody(), conn.getOutputStream());
                         for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
@@ -173,6 +175,27 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                     }
                     else {
+                        // respond with status code 100, for Expect handshake according to rfc 2616 and http 1.1
+                        // the processing will continue and the request will be fully read immediately after
+                        if (headers.get(HttpConnector.HTTP_VERSION_PROPERTY).equals(HttpConstants.HTTP11))
+                        {
+                            // just in case we have something other than String in the headers map
+                            String expectHeaderValue =
+                                    ObjectUtils.toString(headers.get(HttpConstants.HEADER_EXPECT)).toLowerCase();
+                            if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                            {
+                                HttpResponse expected = new HttpResponse();
+                                expected.setStatusLine(reqLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                                final MuleEvent event = new MuleEvent(new MuleMessage(expected),
+                                                                      endpoint,
+                                                                      new MuleSession(component),
+                                                                      true);
+                                RequestContext.setEvent(event);
+                                expected = (HttpResponse) connector.getDefaultResponseTransformer().transform(expected);
+                                conn.writeResponse(expected);
+                            }
+                        }
+
                         body = request.getBodyBytes();
                         if (body == null) {
                             body = reqLine.getUri();
@@ -192,7 +215,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     // the respone only needs to be transformed explicitly if
                     // A) the request was not served or B) a null result was returned
-                    HttpResponse response = null;
+                    HttpResponse response;
                     if (receiver != null) {
                         UMOMessage returnMessage = receiver.routeMessage(message,
                                 endpoint.isSynchronous(), /* TODO streaming */ null);

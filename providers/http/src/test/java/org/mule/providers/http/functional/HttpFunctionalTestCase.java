@@ -39,8 +39,8 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected static String TEST_CONTENT_TYPE = "text/plain";
     protected static String TEST_CHARSET = "UTF-8";
 
-    private HttpConnection cnn;
-    private PostMethod postMethod;
+    protected HttpConnection cnn;
+    protected PostMethod postMethod;
     
     protected UMOEndpointURI getInDest()
     {

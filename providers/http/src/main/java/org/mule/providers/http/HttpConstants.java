@@ -204,4 +204,5 @@ public class HttpConstants
         }
     }
 
+    public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue";
 }
