@@ -13,58 +13,42 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.XFireRuntimeException;
-import org.codehaus.xfire.attachments.Attachments;
-import org.codehaus.xfire.attachments.JavaMailAttachments;
-import org.codehaus.xfire.exchange.InMessage;
-import org.codehaus.xfire.exchange.MessageExchange;
-import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceRegistry;
-import org.codehaus.xfire.soap.SoapConstants;
-import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.transport.TransportManager;
 import org.codehaus.xfire.transport.http.HtmlServiceWriter;
-import org.codehaus.xfire.util.STAXUtils;
-import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.util.StringUtils;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.UMODescriptorAware;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
 import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.manager.UMOWorkManager;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.mule.util.StringUtils;
 
 /**
  * The Xfire service component receives requests for Xfire services it manages
@@ -101,22 +85,16 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        OutStreamMessageAdapter response;
-        UMOEndpointURI endpointURI = eventContext.getEndpointURI();
-        String method;
-        
-        {
-        	        	logger.debug(eventContext);
-        	        	String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
-        	        	if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY)) {
-        	        		ByteArrayOutputStream out = new ByteArrayOutputStream();
-        	        		getXfire().generateWSDL(getServiceName(eventContext), out);
-        	        		return out.toString();
-        	        	} else {
-        	        		MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
-        	       		return channel.onCall(eventContext);
-        	       	}
-        	         }
+        logger.debug(eventContext);
+        String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
+        if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY)) {
+        	ByteArrayOutputStream out = new ByteArrayOutputStream();
+        	getXfire().generateWSDL(getServiceName(eventContext), out);
+        	return out.toString();
+        } else {
+        	MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
+        	return channel.onCall(eventContext);
+        }
 
     }
     public void start() throws UMOException

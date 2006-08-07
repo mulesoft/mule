@@ -50,6 +50,9 @@ public class MuleHeadersOutHandler extends AbstractHandler
                 header = new Element("Header", context.getOutMessage().getSoapVersion().getPrefix(), context.getOutMessage().getSoapVersion().getNamespace());
             }
 
+            //we can also add some extra properties like
+            //Enconding Property, Session Property
+            
             Element muleHeader = null;
             Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE, MuleSoapHeaders.MULE_10_ACTOR);
             if (muleHeaders.getCorrelationId() != null || muleHeaders.getReplyTo() != null) {

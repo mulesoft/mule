@@ -44,12 +44,15 @@ import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.util.STAXUtils;
+import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
+import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.streaming.OutputHandler;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
 
 /**
  * Provides a
@@ -210,16 +213,30 @@ public class MuleUniversalChannel extends AbstractChannel
                 for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
                     String headerName = (String)iterator.next();
                     Object headerValue = event.getMessage().getStringProperty(headerName, null);
-                    if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) != null) {
-                            headers.put(headerName, headerValue);
+                    
+                    //let us filter only MULE properties except MULE_USER, Content-Type and Content-Lenght, 
+                    // and all other properties are allowed through including custom headers
+                    if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
+                    	&& (!headerName.equals("Content-Type")) && (!headerName.equals("Content-Length"))) {
+                    		headers.put(headerName, headerValue);
                     }
                 }
+                
                 return headers;
             }
         };
 
         StreamMessageAdapter sp = new StreamMessageAdapter(handler);
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        
+       
+        //set all properties on the message adapter
+        UMOMessage msg = RequestContext.getEvent().getMessage();
+        for (Iterator i = msg.getPropertyNames().iterator();i.hasNext();)
+        {
+        	 String propertyName = (String)i.next();
+        	 sp.setProperty(propertyName, msg.getProperty(propertyName));
+        }
 
         client.sendStream(getUri(), sp);
 
