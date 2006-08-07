@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
+import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;
@@ -64,6 +65,38 @@ public class FunctionalTestComponent implements Callable
         if(throwException) {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
         }
+        return replyMessage;
+    }
+    
+    public Object onReceive(Object data) throws Exception
+    {
+        String contents = data.toString();
+        UMOEventContext context = RequestContext.getEventContext();
+
+        String msg = null;
+        msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
+                + context.getComponentDescriptor().getName() + ". Content is: "
+                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+        logger.info(msg);
+
+        if (eventCallback != null) {
+            eventCallback.eventReceived(context, this);
+        }
+
+        String replyMessage;
+
+        if(returnMessage!=null) {
+            replyMessage = returnMessage;
+        } else {
+            replyMessage = contents + " Received";
+        }
+
+        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+ 
+        if(throwException) {
+            throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
+        }
+        
         return replyMessage;
     }
 
