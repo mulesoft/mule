@@ -11,6 +11,17 @@
  */
 package org.mule.management.agents;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
@@ -27,35 +38,21 @@ import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
  * statistics and configuration viewing of a Mule instance..
- * 
+ *
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class Mx4jAgent implements UMOAgent
-{
-
-    private String name = "MX4j  Agent";
+public class Mx4jAgent implements UMOAgent {
+    private String name = "MX4J Agent";
     private String jmxAdaptorUrl = "http://localhost:9999";
     private Object adaptor;
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
 
     //Adaptor overrides
-
     private String login = null;
 
     private String password = null;
@@ -71,6 +68,143 @@ public class Mx4jAgent implements UMOAgent
     // SSL/TLS socket factory config
     private Map socketFactoryProperties = new HashMap();
 
+    protected Object createAdaptor() throws Exception {
+        Object adaptor;
+        Log.redirectTo(new CommonsLogger());
+        URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
+        adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
+
+        // Set the XSLT Processor with any local overrides
+        XSLTProcessor processor = new XSLTProcessor();
+
+        if (StringUtils.isNotBlank(xslFilePath)) {
+            processor.setFile(xslFilePath.trim());
+        }
+
+        if (StringUtils.isNotBlank(pathInJar)) {
+            processor.setPathInJar(pathInJar.trim());
+        }
+
+        processor.setUseCache(cacheXsl);
+
+        // TODO Document what this cast is for?
+        final HttpAdaptor httpAdaptor = ((HttpAdaptor) adaptor);
+        httpAdaptor.setProcessor(processor);
+
+        //Set endpoint authentication if required
+        if (login != null) {
+            httpAdaptor.addAuthorization(login, password);
+            httpAdaptor.setAuthenticationMethod(authenticationMethod);
+        }
+
+        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
+            SSLAdaptorServerSocketFactoryMBean factory;
+            if (SystemUtils.isIbmJDK()) {
+                factory = new IBMSslAdapterServerSocketFactory();
+            } else {
+                // BEA are using Sun's JSSE, so no extra checks necessary
+                factory = new SSLAdaptorServerSocketFactory();
+            }
+            BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
+            httpAdaptor.setSocketFactory(factory);
+        }
+
+        return adaptor;
+    }
+
+    /* @see org.mule.umo.lifecycle.Initialisable#initialise() */
+    public void initialise() throws InitialisationException {
+        try {
+            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            adaptor = createAdaptor();
+            adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
+            mBeanServer.registerMBean(adaptor, adaptorName);
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e);
+        }
+    }
+
+    /* @see org.mule.umo.lifecycle.Startable#start() */
+    public void start() throws UMOException {
+        try {
+            mBeanServer.invoke(adaptorName, "start", null, null);
+        } catch (InstanceNotFoundException e) {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
+        } catch (MBeanException e) {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
+        } catch (ReflectionException e) {
+            // ignore
+        }
+    }
+
+    /* @see org.mule.umo.lifecycle.Stoppable#stop() */
+    public void stop() throws UMOException {
+        try {
+            mBeanServer.invoke(adaptorName, "stop", null, null);
+        } catch (InstanceNotFoundException e) {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
+        } catch (MBeanException e) {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
+        } catch (ReflectionException e) {
+            // ignore
+        }
+    }
+
+    /* @see org.mule.umo.lifecycle.Disposable#dispose() */
+    public void dispose() {
+        try {
+            stop();
+        } catch (Exception e) {
+            // TODO: log an exception
+        }
+    }
+
+    /* @see org.mule.umo.manager.UMOAgent#registered() */
+    public void registered() {
+        // nothing to do
+    }
+
+    /* @see org.mule.umo.manager.UMOAgent#unregistered() */
+    public void unregistered() {
+        // nothing to do
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ///////////////////////////////////////////////////////////////////////////
+
+    /* @see org.mule.umo.manager.UMOAgent#getDescription() */
+    public String getDescription() {
+        return "MX4J Http adaptor: " + jmxAdaptorUrl;
+    }
+
+    /* @see org.mule.umo.manager.UMOAgent#getName() */
+    public String getName() {
+        return this.name;
+    }
+
+    /* @see org.mule.umo.manager.UMOAgent#setName(java.lang.String) */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /** @return Returns the jmxAdaptorUrl. */
+    public String getJmxAdaptorUrl() {
+        return jmxAdaptorUrl;
+    }
+
+    /** @param jmxAdaptorUrl The jmxAdaptorUrl to set. */
+    public void setJmxAdaptorUrl(String jmxAdaptorUrl) {
+        this.jmxAdaptorUrl = jmxAdaptorUrl;
+    }
+
+    public Map getSocketFactoryProperties() {
+        return socketFactoryProperties;
+    }
+
+    public void setSocketFactoryProperties(Map socketFactoryProperties) {
+        this.socketFactoryProperties = socketFactoryProperties;
+    }
 
     public String getLogin() {
         return login;
@@ -118,200 +252,5 @@ public class Mx4jAgent implements UMOAgent
 
     public void setCacheXsl(boolean cacheXsl) {
         this.cacheXsl = cacheXsl;
-    }
-
-    protected Object createAdaptor() throws Exception
-    {
-        Object adaptor;
-        Log.redirectTo(new CommonsLogger());
-        URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
-        adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
-
-        // Set the XSLT Processor with any local overrides
-
-        XSLTProcessor processor = new XSLTProcessor();
-
-        if (StringUtils.isNotBlank(xslFilePath)) {
-
-            processor.setFile(xslFilePath.trim());
-
-        }
-
-        if (StringUtils.isNotBlank(pathInJar)) {
-
-            processor.setPathInJar(pathInJar.trim());
-
-        }
-
-        processor.setUseCache(cacheXsl);
-
-        final HttpAdaptor httpAdaptor = ((HttpAdaptor) adaptor);
-        httpAdaptor.setProcessor(processor);
-
-        //Set endpoint authentication if required
-
-        if (login != null) {
-
-            httpAdaptor.addAuthorization(login, password);
-
-            httpAdaptor.setAuthenticationMethod(authenticationMethod);
-
-        }
-
-        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
-            SSLAdaptorServerSocketFactoryMBean factory;
-            if (SystemUtils.isIbmJDK()) {
-                factory = new IBMSslAdapterServerSocketFactory();
-            } else {
-                // BEA are using Sun's JSSE, so no extra checks necessary
-                factory = new SSLAdaptorServerSocketFactory();
-            }
-            BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
-            httpAdaptor.setSocketFactory(factory);
-        }
-
-        return adaptor;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#getName()
-     */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#getDescription()
-     */
-    public String getDescription()
-    {
-        return "MX4J Http adaptor: " + jmxAdaptorUrl;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Startable#start()
-     */
-    public void start() throws UMOException
-    {
-        try {
-            mBeanServer.invoke(adaptorName, "start", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
-        } catch (ReflectionException e) {
-            // ignore
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Stoppable#stop()
-     */
-    public void stop() throws UMOException
-    {
-        try {
-            mBeanServer.invoke(adaptorName, "stop", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
-        } catch (ReflectionException e) {
-            // ignore
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Disposable#dispose()
-     */
-    public void dispose()
-    {
-        try {
-            stop();
-        } catch (Exception e) {
-            // TODO: log an exception
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#registered()
-     */
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#unregistered()
-     */
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
-     */
-    public void initialise() throws InitialisationException
-    {
-        try {
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-            adaptor = createAdaptor();
-            adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
-            mBeanServer.registerMBean(adaptor, adaptorName);
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e);
-        }
-    }
-
-    /**
-     * @return Returns the jmxAdaptorUrl.
-     */
-    public String getJmxAdaptorUrl()
-    {
-        return jmxAdaptorUrl;
-    }
-
-    /**
-     * @param jmxAdaptorUrl The jmxAdaptorUrl to set.
-     */
-    public void setJmxAdaptorUrl(String jmxAdaptorUrl)
-    {
-        this.jmxAdaptorUrl = jmxAdaptorUrl;
-    }
-
-
-    public Map getSocketFactoryProperties() {
-        return socketFactoryProperties;
-    }
-
-    public void setSocketFactoryProperties(Map socketFactoryProperties) {
-        this.socketFactoryProperties = socketFactoryProperties;
     }
 }
