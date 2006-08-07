@@ -217,7 +217,7 @@ public class MuleUniversalChannel extends AbstractChannel
                     //let us filter only MULE properties except MULE_USER, Content-Type and Content-Lenght, 
                     // and all other properties are allowed through including custom headers
                     if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
-                    	&& (!headerName.equals("Content-Type")) && (!headerName.equals("Content-Length"))) {
+                    	&& (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName))) {
                     		headers.put(headerName, headerValue);
                     }
                 }
