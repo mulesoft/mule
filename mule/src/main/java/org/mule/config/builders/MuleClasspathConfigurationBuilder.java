@@ -11,14 +11,13 @@
  */
 package org.mule.config.builders;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -26,12 +25,14 @@ import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
+import org.mule.util.StringUtils;
 
 /**
  * <code>MuleClasspathConfigurationBuilder</code> can be used to configure a
  * MuleManager based on the configuration files on the classpath. the default
  * config resource name is <b>mule-config.xml</b> but this can be overrided by
- * passing the config resourse name to the configure method.
+ * passing a config resourse name or a list of resource names (comma separated)
+ * to the configure method.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -53,8 +54,9 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
      * 
-     * @param configResources can be null or a single resource name that will be
-     *            used to seach the classpath. The default is mule-config.xml
+     * @param configResources can be null or a comma separated resources name
+     *        string that will be used to search the classpath.
+     *        The default is mule-config.xml.
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException if the configResources
      *             param is invalid or the configurations fail to load
@@ -62,30 +64,36 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
      */
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        if (StringUtils.isNotBlank(configResources)) {
-            if (configResources.indexOf(",") > -1) {
-                throw new ConfigurationException(new Message(Messages.ONLY_SINGLE_RESOURCE_CAN_BE_SPECIFIED));
-            }
-        } else {
+        if (StringUtils.isBlank(configResources)) {
             configResources = MULE_CONFIGURATION_RESOURCE;
         }
 
         URL url = null;
         List list = new ArrayList();
-
+        String[] resString = null;
+        int i = 0;
+        
         try {
-            Enumeration e = Thread.currentThread().getContextClassLoader().getResources(configResources);
-            while (e.hasMoreElements()) {
-                url = (URL)e.nextElement();
-                logger.info("Loading resource: " + url.toExternalForm());
-                list.add(new ReaderResource(url.toExternalForm(),
-                        new InputStreamReader(url.openStream())));
-            }
+
+        resString = StringUtils.split(configResources, ",");
+        for (i = 0; i < resString.length; i++)
+        {
+            url = Thread.currentThread().getContextClassLoader().getResource(resString[i]);
+            if (url == null)
+                break; 
+            list.add(new ReaderResource(url.toExternalForm(),
+                                        new InputStreamReader(url.openStream())));
         }
-        catch (Exception e) {
+        }
+        catch (IOException ioe)
+        {
             throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Config: "
-                    + ObjectUtils.toString(url, "null")), e);
+                    + ObjectUtils.toString(url, "null")), ioe);
         }
+        
+        if (resString == null || list.size() != resString.length)
+            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Not all resources specified loaded: "
+                    + resString[i]));
 
         ReaderResource[] resources = new ReaderResource[list.size()];
         resources = (ReaderResource[]) list.toArray(resources);
