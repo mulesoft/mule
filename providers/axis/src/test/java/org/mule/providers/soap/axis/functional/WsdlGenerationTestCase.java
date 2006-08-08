@@ -34,11 +34,6 @@ public class WsdlGenerationTestCase extends FunctionalTestCase {
      */
     private static final String PROXY_REGEX = "^\\$Proxy(\\d+\\d*\\d*)$";
 
-    /**
-     * Same as #PROXY_REGEX, but for service.
-     */
-    private static final String PROXY_SERVICE_REGEX = "^\\$Proxy(\\d+\\d*\\d*)Service$";
-
     public WsdlGenerationTestCase() {
         super.setDisposeManagerPerSuite(true);
     }
@@ -65,9 +60,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase {
         assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
         assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
 
-        // standalone m2 test run can produce $Proxy0Service, $Proxy1Service, $Proxy3Service, etc.
-        final String proxyServiceName = doc.valueOf("/wsdl:definitions/wsdl:service/@name");
-        assertTrue(proxyServiceName.matches(PROXY_SERVICE_REGEX));
+        assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
 
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
         assertEquals("http://localhost:8081/services/EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
