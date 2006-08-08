@@ -22,7 +22,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.transformers.simple.ObjectToByteArray;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -90,7 +89,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (!connector.isQueueEvents()) {
             throw new UnsupportedOperationException("Receive only supported on the VM Queue Connector");
         }
-        QueueSession queueSession = null;
+        QueueSession queueSession;
         try {
             queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
@@ -171,7 +170,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
-        UMOMessage retMessage = null;
+        UMOMessage retMessage;
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         VMMessageReceiver receiver = connector.getReceiver(endpointUri);
         if (receiver == null) {
