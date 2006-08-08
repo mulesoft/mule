@@ -199,16 +199,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Javadoc settings -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <charset>ISO-8859-1</charset>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
-
             <!-- Global test exclusions -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -286,6 +276,48 @@
                 </reportSets>
             </plugin>
             -->
+
+            <!-- Javadoc settings -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <charset>ISO-8859-1</charset>
+                    <encoding>ISO-8859-1</encoding>
+                    <!-- aggregate all when built from the top-level directory -->
+                    <!--<aggregate>true</aggregate>-->
+                    <!-- Link to the external online JavaDoc -->
+                    <!-- TODO add more refs -->
+                    <links>
+                        <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
+                        <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api</link>
+                        <link>http://jakarta.apache.org/commons/lang/api-2.1</link>
+                        <link>http://logging.apache.org/log4j/docs/api</link>
+                    </links>
+                </configuration>
+            </plugin>
+
+
+            <!-- Source code cross-reference -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <configuration>
+                </configuration>
+            </plugin>
+
+            <!--
+                When there is JXR cross-refernce output available,
+                it will be linked to in case of test failures
+             -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <configuration>
+                    <!-- Display failed tests only -->
+                    <showSuccess>false</showSuccess>
+                </configuration>
+            </plugin>
 
             <!-- Checkstyle reports -->
             <plugin>
