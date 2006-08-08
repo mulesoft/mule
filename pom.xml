@@ -104,7 +104,7 @@
             <name>Mirror of http://repo1.maven.org/maven2/</name>
             <url>http://maven.sateh.com/repository</url>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
             <releases>
                 <enabled>true</enabled>
