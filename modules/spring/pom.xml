@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-spring</artifactId>
+    <artifactId>mule-module-spring</artifactId>
     <packaging>jar</packaging>
     <name>Spring Extensions</name>
     <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule.</description>   
@@ -35,7 +35,7 @@
         <!-- For test cases only -->
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
+            <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

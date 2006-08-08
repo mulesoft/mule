@@ -34,7 +34,7 @@
         
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
+            <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
         

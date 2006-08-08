@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-client</artifactId>
+    <artifactId>mule-module-client</artifactId>
     <packaging>jar</packaging>
     <name>Mule Client</name>
     <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>   

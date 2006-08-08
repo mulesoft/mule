@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-jaas</artifactId>
+    <artifactId>mule-module-jaas</artifactId>
     <packaging>jar</packaging>
     <name>Jaas Security</name>
     <description>Mule Jaas Support exposes Jaas Authentication providers and Method interceptors to authentication event traffic via endpoints.</description>   
@@ -22,7 +22,7 @@
         <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
+            <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

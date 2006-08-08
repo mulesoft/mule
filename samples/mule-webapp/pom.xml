@@ -29,7 +29,7 @@
         
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-extras-spring</artifactId>
+            <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
         </dependency>
         

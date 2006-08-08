@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-hivemind</artifactId>
+    <artifactId>mule-module-hivemind</artifactId>
     <packaging>jar</packaging>
     <name>HiveMind Extensions</name>
     <description>Provides extensions to use HiveMind with Mule, such as using the container as a factory for Mule managed objects.</description>

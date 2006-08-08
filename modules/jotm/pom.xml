@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-jotm</artifactId>
+    <artifactId>mule-module-jotm</artifactId>
     <packaging>jar</packaging>
     <name>Jotm Support</name>
     <description>Provides access to the Jotm transaction manager for User and Xa transactions.</description>

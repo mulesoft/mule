@@ -8,7 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-extras-plexus</artifactId>
+    <artifactId>mule-module-plexus</artifactId>
     <packaging>jar</packaging>
     <name>Plexus Extensions</name>
     <description>Provides extensions to use Plexus with Mule, such as using the container as a factory for Mule managed objects.</description>
