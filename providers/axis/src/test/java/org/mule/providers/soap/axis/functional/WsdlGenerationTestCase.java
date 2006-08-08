@@ -25,7 +25,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class WSDLGenerationTestCase extends FunctionalTestCase {
+public class WsdlGenerationTestCase extends FunctionalTestCase {
 
     /**
      * The generated proxy names have increasing counter if run
@@ -39,7 +39,7 @@ public class WSDLGenerationTestCase extends FunctionalTestCase {
      */
     private static final String PROXY_SERVICE_REGEX = "^\\$Proxy(\\d+\\d*\\d*)Service$";
 
-    public WSDLGenerationTestCase() {
+    public WsdlGenerationTestCase() {
         super.setDisposeManagerPerSuite(true);
     }
 
