@@ -13,10 +13,10 @@
     <packaging>jar</packaging>
     <name>Mule Core</name>
     <description>Mule server and core classes</description>
-    
+
     <build>
     </build>
-    
+
     <profiles>
         <profile>
             <!--
@@ -139,7 +139,7 @@
             <artifactId>geronimo-spec-j2ee-management</artifactId>
             <version>1.0-rc4</version>
         </dependency-->
-        
+
         <!-- Used for the WorkManager API & for the Mule RA -->
         <dependency>
             <groupId>geronimo-spec</groupId>
@@ -156,8 +156,8 @@
             <artifactId>geronimo-spec-ejb</artifactId>
             <version>2.1-rc4</version>
         </dependency-->
-		
-		<dependency>
+
+        <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-activation</artifactId>
             <version>1.0.2-rc4</version>
@@ -204,6 +204,16 @@
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xerces</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- exclude older jdom-b9 -->
+                    <groupId>jdom</groupId>
+                    <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -264,7 +274,7 @@
         <!--
         ****************************************************************
         Testing Dependencies
-        ****************************************************************** 
+        ******************************************************************
         -->
         <!-- These dependencies need scope="compile" for the org.mule.tck classes. -->
         <dependency>
