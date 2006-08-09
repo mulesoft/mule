@@ -43,15 +43,21 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
     public void testLotsOfLoanRequests() throws Exception {
         MuleClient client = new MuleClient();
         Customer c = new Customer("Ross Mason", 1234);
-        LoanRequest[] requests = new LoanRequest[2];
+        LoanRequest[] requests = new LoanRequest[3];
         requests[0] = new LoanRequest(c, 100000, 48);
         requests[1] = new LoanRequest(c, 1000, 12);
+        requests[2] = new LoanRequest(c, 10, 24);
         UMOMessage result;
         int i = 0;
         long start = System.currentTimeMillis();
         try {
             for (; i < REQUESTS; i++) {
-                result = client.send("vm://LoanBrokerRequests",  requests[i % 2], null);
+            	LoanRequest loanRequest = requests[i % 3];
+            	
+            	//must set the CreditProfile to null otherwise the first JXPathFilter
+            	//will be bypassed and CreditAgency component will be bypassed as well!!
+            	loanRequest.setCreditProfile(null);
+                result = client.send("vm://LoanBrokerRequests",  loanRequest, null);
                 assertNotNull(result);
                 assertFalse(result.getPayload() instanceof NullPayload);
                 assertTrue(result.getPayload() instanceof LoanQuote);
