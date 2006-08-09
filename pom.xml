@@ -195,7 +195,12 @@
                 <configuration>
                   <archive>
                     <index>true</index>
+                    <!-- List dependencies in the MANIFEST.MF -->
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                    </manifest>
                   </archive>
+
                 </configuration>
             </plugin>
 
