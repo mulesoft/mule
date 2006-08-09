@@ -1,0 +1,51 @@
+/*
+
+ * $Id: $
+
+ * ------------------------------------------------------------------------------------------------------
+
+ *
+
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+
+ * http://www.symphonysoft.com
+
+ *
+
+ * The software in this package is published under the terms of the BSD
+
+ * style license a copy of which has been included with this distribution in
+
+ * the LICENSE.txt file.
+
+ */
+
+
+package org.mule.extras.jaas;
+
+import org.mule.impl.security.MuleAuthentication;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+
+/**
+ * 
+ * @author Marie.Rizzo
+ *
+ */
+public class JaasSecurityContext implements UMOSecurityContext {
+
+	MuleAuthentication authentication;
+	
+	public JaasSecurityContext(MuleAuthentication authentication)
+    {
+        this.authentication = authentication;
+    }
+	
+	public UMOAuthentication getAuthentication() {
+	    return authentication;
+	}
+
+	public void setAuthentication(UMOAuthentication authentication) {
+		this.authentication = (MuleAuthentication) authentication;
+	}
+}

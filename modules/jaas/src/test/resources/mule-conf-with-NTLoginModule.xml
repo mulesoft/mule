@@ -6,7 +6,7 @@
 	<mule-environment-properties serverUrl="" synchronous="true"/>
 	
     <security-manager>
-		<security-provider name="JaasProvider" className="com.ss.jaas.provider.JaasSimpleAuthenticationProvider">
+		<security-provider name="JaasProvider" className="org.mule.extras.jaas.JaasSimpleAuthenticationProvider">
             <properties>
                 <property name="loginContextName" value="jaasTest"/> 
 				<property name="loginModule" value="com.sun.security.auth.module.NTLoginModule"/> 				
