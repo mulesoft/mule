@@ -645,18 +645,14 @@ public class MuleClient implements Disposable
     {
         UMOEvent event = getEvent(message, url, true, false);
         event.setTimeout(timeout);
-        UMOMessage result = null;
+
         try {
-            result = event.getSession().sendEvent(event);
+            return event.getSession().sendEvent(event);
         } catch (UMOException e) {
             throw e;
         } catch (Exception e) {
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
-        if (event.getEndpoint().getResponseTransformer() != null) {
-            // TODO MULE-757
-        }
-        return result;
     }
 
     /**
