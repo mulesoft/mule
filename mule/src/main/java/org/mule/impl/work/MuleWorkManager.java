@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 /**
  *
  * Copyright 2004 The Apache Software Foundation
@@ -23,6 +24,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package org.mule.impl.work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;

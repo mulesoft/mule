@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -11,15 +11,8 @@ package org.mule.test.transformers;
 
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.simple.ByteArrayToObject;
-import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.ObjectToByteArray;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

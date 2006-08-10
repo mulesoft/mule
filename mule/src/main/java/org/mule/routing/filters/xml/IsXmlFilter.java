@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.routing.filters.xml;
+
+import java.io.ByteArrayInputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.SAXReader;
+import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 import org.xml.sax.InputSource;
 
 /**

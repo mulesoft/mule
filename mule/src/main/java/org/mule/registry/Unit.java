@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,10 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- * $Date$
- */
-package org.mule.registry;
 
+package org.mule.registry;
 
 /**
  * 

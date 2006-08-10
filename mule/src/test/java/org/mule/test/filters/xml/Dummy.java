@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.filters.xml;
+
+public class Dummy
+{
+
+    private int id;
+    private String content;
+
+    public Dummy()
+    {
+        super();
     }
 
     /**
@@ -18,7 +30,8 @@
     }
 
     /**
-     * @param content The content to set.
+     * @param content
+     *            The content to set.
      */
     public void setContent(String content)
     {
@@ -34,10 +47,12 @@
     }
 
     /**
-     * @param id The id to set.
+     * @param id
+     *            The id to set.
      */
     public void setId(int id)
     {
         this.id = id;
     }
+
 }

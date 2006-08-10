@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,10 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
- * @version $Revision$
- */
+
+package org.mule.management.stats;
+
+import java.io.PrintWriter;
+
+import org.mule.management.stats.printers.SimplePrinter;
+
 public class ComponentStatistics implements Statistics
 {
     /**

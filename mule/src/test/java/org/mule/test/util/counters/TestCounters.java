@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,9 +8,15 @@
  * LICENSE.txt file.
  */
 
+package org.mule.test.util.counters;
+
 import java.util.Iterator;
 
 import junit.framework.TestCase;
+
+import org.mule.util.counters.Counter;
+import org.mule.util.counters.CounterFactory;
+import org.mule.util.counters.CounterFactory.Type;
 
 /**
  * @author Nodet

@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+/* 
+ * Encodes and decodes to and from Base64 notation.
+ *
+ * <p>
+ * Change Log:
+ * </p>
+ * <ul>
+ *  <li>current - cleaned up by Holger Hoffstaette (holger@codehaus.org) for Mule;
  *  removed System.out/err printing and properly throw IOExceptions from all methods.
  *  <li>v2.1 - Cleaned up javadoc comments and unused variables and methods. Added
  *   some convenience methods for reading and writing to and from files.</li>

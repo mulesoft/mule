@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.builders;
 
 import java.io.IOException;
@@ -26,11 +27,10 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.util.StringUtils;
 
 /**
- * <code>MuleClasspathConfigurationBuilder</code> can be used to configure a
- * MuleManager based on the configuration files on the classpath. the default
- * config resource name is <b>mule-config.xml</b> but this can be overrided by
- * passing a config resourse name or a list of resource names (comma separated)
- * to the configure method.
+ * <code>MuleClasspathConfigurationBuilder</code> can be used to configure a MuleManager
+ * based on the configuration files on the classpath. the default config resource name is
+ * <b>mule-config.xml</b> but this can be overrided by passing a config resourse name or
+ * a list of resource names (comma separated) to the configure method.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -52,12 +52,13 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
      * 
-     * @param configResources can be null or a comma separated resources name
-     *        string that will be used to search the classpath.
-     *        The default is mule-config.xml.
+     * @param configResources
+     *            can be null or a comma separated resources name string that will be used
+     *            to search the classpath. The default is mule-config.xml.
      * @return A configured UMOManager
-     * @throws org.mule.config.ConfigurationException if the configResources
-     *             param is invalid or the configurations fail to load
+     * @throws org.mule.config.ConfigurationException
+     *             if the configResources param is invalid or the configurations fail to
+     *             load
      * 
      */
     public UMOManager configure(String configResources) throws ConfigurationException
@@ -68,33 +69,29 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
 
         URL url = null;
         List list = new ArrayList();
-        String[] resString = null;
+        String[] resString;
         int i = 0;
-        
-        try {
 
-        resString = StringUtils.split(configResources, ",");
-        for (i = 0; i < resString.length; i++)
-        {
-            url = Thread.currentThread().getContextClassLoader().getResource(resString[i]);
-            if (url == null)
-                break; 
-            list.add(new ReaderResource(url.toExternalForm(),
-                                        new InputStreamReader(url.openStream())));
+        try {
+            resString = StringUtils.split(configResources, ",");
+            for (i = 0; i < resString.length; i++) {
+                url = Thread.currentThread().getContextClassLoader().getResource(resString[i]);
+                if (url == null) break;
+                list.add(new ReaderResource(url.toExternalForm(), new InputStreamReader(url.openStream())));
+            }
         }
-        }
-        catch (IOException ioe)
-        {
+        catch (IOException ioe) {
             throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Config: "
-                    + ObjectUtils.toString(url, "null")), ioe);
+                            + ObjectUtils.toString(url, "null")), ioe);
         }
-        
-        if (resString == null || list.size() != resString.length)
-            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Not all resources specified loaded: "
-                    + resString[i]));
+
+        if (list.size() != resString.length) {
+            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X,
+                            "Not all resources specified loaded: " + resString[i]));
+        }
 
         ReaderResource[] resources = new ReaderResource[list.size()];
-        resources = (ReaderResource[]) list.toArray(resources);
+        resources = (ReaderResource[])list.toArray(resources);
         configure(resources);
         return manager;
     }

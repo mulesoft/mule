@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,7 +10,6 @@
 
 package org.mule.transformers.simple;
 
-import java.io.ByteArrayInputStream;
 import java.io.ObjectStreamConstants;
 
 import org.mule.umo.transformer.TransformerException;

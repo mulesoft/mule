@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.config.builders;
+
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,9 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import org.mule.MuleManager;
+import org.mule.config.ConfigurationException;
+import org.mule.umo.manager.UMOManager;
+
 /**
  * @author EAF Team
- *
  */
 public class MuleXmlBuilderContextServlet extends HttpServlet
 {

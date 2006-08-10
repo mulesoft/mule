@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.impl.model;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleDescriptor;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.ComponentException;
@@ -18,6 +29,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.BeanUtils;
 
 /**
  * Reusable methods for working with UMOComponents.

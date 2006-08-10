@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.tck.testmodels.fruit;
+
+public class RedApple extends Apple
+{
+    /**
      * Serial version
      */
     private static final long serialVersionUID = 1731005445509956204L;

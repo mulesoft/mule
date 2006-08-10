@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,8 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
+
+package org.mule.test.filters.xml;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.mule.impl.MuleMessage;
+import org.mule.routing.filters.xml.IsXmlFilter;
+import org.mule.tck.AbstractMuleTestCase;
+
 public class IsXmlFilterTestCase extends AbstractMuleTestCase {
 
     private IsXmlFilter filter;
