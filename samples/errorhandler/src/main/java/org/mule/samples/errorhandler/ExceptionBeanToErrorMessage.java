@@ -7,8 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- */
- 
+
 package org.mule.samples.errorhandler;
 
 import org.mule.transformers.AbstractTransformer;
@@ -20,22 +19,27 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class ExceptionBeanToErrorMessage extends AbstractTransformer
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 7530701544127147265L;
+
     public ExceptionBeanToErrorMessage()
     {
         registerSourceType(ExceptionBean.class);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try
-        {
+        try {
             return new ErrorMessage((ExceptionBean)src);
         }
-        catch (InstantiationException e)
-        {
+        catch (InstantiationException e) {
             throw new TransformerException(this, e);
         }
     }

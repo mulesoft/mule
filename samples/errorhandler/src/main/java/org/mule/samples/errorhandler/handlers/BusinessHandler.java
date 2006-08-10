@@ -18,13 +18,14 @@ import org.mule.util.StringMessageUtils;
 
 /**
  * 
- * <code>RogueMessageBehaviour</code> TODO (document class)
+ * <code>BusinessHandler</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class BusinessHandler extends AbstractExceptionHandler
 {
+
     public BusinessHandler()
     {
         super();
@@ -33,8 +34,9 @@ public class BusinessHandler extends AbstractExceptionHandler
 
     protected void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        System.out.println( StringMessageUtils.getBoilerPlate("Exception received in /n" +
-                " BUSINESS EXCEPTION HANDLER /n." +
-                " Logic could be put in here to enrich the message content"));
+        System.out.println(StringMessageUtils.getBoilerPlate("Exception received in /n"
+                        + " BUSINESS EXCEPTION HANDLER /n."
+                        + " Logic could be put in here to enrich the message content"));
     }
+
 }

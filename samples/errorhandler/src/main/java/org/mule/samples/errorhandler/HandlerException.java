@@ -7,15 +7,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- * @version $Revision$
- */
-public class HandlerException extends UMOException {
 
-    public HandlerException(String message) {
+package org.mule.samples.errorhandler;
+
+import org.mule.config.i18n.Message;
+import org.mule.umo.UMOException;
+
+public class HandlerException extends UMOException
+{
+
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -1446892313657626797L;
+
+    public HandlerException(String message)
+    {
         super(Message.createStaticMessage(message));
     }
 
-    public HandlerException(String message, Throwable cause) {
+    public HandlerException(String message, Throwable cause)
+    {
         super(Message.createStaticMessage(message), cause);
     }
+
 }

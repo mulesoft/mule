@@ -7,22 +7,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- */
- 
+
 package org.mule.samples.errorhandler.exceptions;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- *  <code>FatalException</code> TODO (document class)
- *
+ * <code>FatalException</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class FatalException extends UMOException
 {
-    
+
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -5683879269751770579L;
+
     /**
      * @param message
      */

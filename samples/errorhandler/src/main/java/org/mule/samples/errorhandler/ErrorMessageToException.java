@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.errorhandler;
 
 import org.mule.transformers.AbstractTransformer;
@@ -18,6 +19,11 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class ErrorMessageToException extends AbstractTransformer 
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -4426474458155178245L;
+
     public ErrorMessageToException()
     {
         registerSourceType(ErrorMessage.class);
