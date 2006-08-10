@@ -1,14 +1,12 @@
-package org.mule.providers.soap.xfire;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.internal.notifications.MessageNotification;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;

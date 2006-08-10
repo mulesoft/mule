@@ -1,14 +1,12 @@
-package org.mule.providers.rmi;
-
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.ConnectException;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 

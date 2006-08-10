@@ -1,14 +1,12 @@
 /*
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
  * The software in this package is published under the terms of the BSD style
- * license a copy of which has been included with this distribution in the
+ * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- *
  */
-
 package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.C;

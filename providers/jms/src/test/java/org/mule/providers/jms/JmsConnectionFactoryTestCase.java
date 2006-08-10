@@ -1,14 +1,12 @@
-package org.mule.providers.jms;
-
-import org.mule.MuleManager;
-import org.mule.tck.AbstractMuleTestCase;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import java.util.HashMap;
 import java.util.Map;
 
