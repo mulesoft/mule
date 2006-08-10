@@ -1,14 +1,12 @@
-package org.springframework.beans.factory.support;
-
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.BeanCreationException;

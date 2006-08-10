@@ -1,14 +1,12 @@
-package org.mule.extras.spring.config;
-
-import org.mule.MuleManager;
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.umo.endpoint.UMOEndpoint;
-
-public class ObjectRefsFromSpringTestCase extends FunctionalTestCase {
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
         protected String getConfigResources() {
             return "test-refs-from-spring.xml";

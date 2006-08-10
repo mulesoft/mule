@@ -1,14 +1,12 @@
-/* 
- * $Id: PicoContainerContext.java 2179 2006-06-04 22:51:52Z holger $
- * ------------------------------------------------------------------------------------------------------
- * 
- * Copyright (c) SymphonySoft Limited. All rights reserved.
- * http://www.symphonysoft.com
- * 
- * The software in this package is published under the terms of the BSD
- * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
  */
 package org.mule.extras.picocontainer;
 
