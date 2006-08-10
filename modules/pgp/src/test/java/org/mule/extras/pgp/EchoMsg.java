@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-/**
- * @author ariva
- * 
- */
+package org.mule.extras.pgp;
+
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.lifecycle.Callable;
+
 public class EchoMsg implements Callable
 {
 
