@@ -7,6 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.extras.spring.config;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 

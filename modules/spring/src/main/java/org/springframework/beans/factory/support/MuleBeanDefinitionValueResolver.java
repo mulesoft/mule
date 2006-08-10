@@ -7,14 +7,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.core.CollectionFactory;
+
+package org.springframework.beans.factory.support;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.core.CollectionFactory;
 
 /**
  * A workaround class to override some private methods in the superclass.

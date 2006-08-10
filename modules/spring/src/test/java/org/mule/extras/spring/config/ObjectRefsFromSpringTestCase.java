@@ -8,6 +8,18 @@
  * LICENSE.txt file.
  */
 
+package org.mule.extras.spring.config;
+
+import org.mule.MuleManager;
+import org.mule.providers.AbstractConnector;
+import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.umo.endpoint.UMOEndpoint;
+
+public class ObjectRefsFromSpringTestCase extends FunctionalTestCase {
+
         protected String getConfigResources() {
             return "test-refs-from-spring.xml";
         }

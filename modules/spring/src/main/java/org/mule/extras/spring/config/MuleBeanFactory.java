@@ -7,7 +7,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-*/
 
 package org.mule.extras.spring.config;
 
@@ -38,6 +37,7 @@ public class MuleBeanFactory extends DefaultListableBeanFactory {
      * Create a new MuleBeanFactory.
      */
     public MuleBeanFactory() {
+        super();
     }
 
     /**
