@@ -1,14 +1,12 @@
 /*
- * Created on 4 févr. 2004
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-package org.mule.test.util.counters;
-
-import org.mule.util.counters.Counter;
-import org.mule.util.counters.CounterFactory;
-import org.mule.util.counters.CounterFactory.Type;
 
 import java.util.Iterator;
 

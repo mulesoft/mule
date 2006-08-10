@@ -1,14 +1,12 @@
 /*
- * Created on Jun 14, 2005
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-package org.mule.config.builders;
-
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationException;
-import org.mule.umo.manager.UMOManager;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

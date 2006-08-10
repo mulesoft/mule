@@ -1,14 +1,12 @@
 /*
- * Created by IntelliJ IDEA.
- * User: Administrator
- * Date: 08-Feb-2004
- * Time: 14:53:05
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-package org.mule.transaction;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.TransactionException;
 
 public class TransactionStatusException extends TransactionException
 {

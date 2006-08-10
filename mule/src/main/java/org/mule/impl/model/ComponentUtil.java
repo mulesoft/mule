@@ -1,14 +1,12 @@
-package org.mule.impl.model;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleDescriptor;
+/*
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.ComponentException;

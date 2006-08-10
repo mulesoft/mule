@@ -1,14 +1,12 @@
-/* 
- * $Id$
- * ------------------------------------------------------------------------------------------------------
- * 
- * Encodes and decodes to and from Base64 notation.
+/*
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * <p>
- * Change Log:
- * </p>
- * <ul>
- *  <li>current - cleaned up by Holger Hoffstaette (holger@codehaus.org) for Mule;
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
  *  removed System.out/err printing and properly throw IOExceptions from all methods.
  *  <li>v2.1 - Cleaned up javadoc comments and unused variables and methods. Added
  *   some convenience methods for reading and writing to and from files.</li>

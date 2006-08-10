@@ -1,14 +1,12 @@
-package org.mule.impl.model;
-
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.internal.notifications.ComponentNotification;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOAsynchronousComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
-import org.mule.util.concurrent.WaitableBoolean;
+/*
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 /**
  * Adds the ability to pause/resume event processing to <code>AbstractComponent</code>.

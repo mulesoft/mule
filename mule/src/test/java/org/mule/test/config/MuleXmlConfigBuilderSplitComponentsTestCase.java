@@ -1,14 +1,12 @@
-package org.mule.test.config;
-
-import org.mule.MuleManager;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.model.UMOModel;
-
-/**
- * Test for MULE-858
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+/*
+ * $Id
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-public class MuleXmlConfigBuilderSplitComponentsTestCase extends FunctionalTestCase {
 
     public MuleXmlConfigBuilderSplitComponentsTestCase() {
         super();
