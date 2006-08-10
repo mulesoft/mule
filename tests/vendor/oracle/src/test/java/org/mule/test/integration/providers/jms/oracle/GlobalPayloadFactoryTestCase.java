@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.providers.jms.oracle;
+
+import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
+import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
+
+/**
+ * Tests the {@code payloadFactory} property when set globally for the connector
+ * (instead of per endpoint).
+ *
+ * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+ */
 public class GlobalPayloadFactoryTestCase extends AbstractIntegrationTestCase {
 
     protected String getConfigurationFiles() {

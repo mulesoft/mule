@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.providers.jms.oracle;
+
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
+import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
+
+/**
+ * Tests the connector against a live Oracle database using native XML messages.
+ *
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96620/toc.htm">Oracle9i XML Database Developer's Guide - Oracle XML DB</a>
  */

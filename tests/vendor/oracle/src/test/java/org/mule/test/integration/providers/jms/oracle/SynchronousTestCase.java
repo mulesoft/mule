@@ -8,6 +8,18 @@
  * LICENSE.txt file.
  */
 
+package org.mule.test.integration.providers.jms.oracle;
+
+import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
+import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
+
+/**
+ * Makes sure the Oracle JMS connector does not fail when sending a synchronous message.
+ *
+ * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+ */
+public class SynchronousTestCase extends AbstractIntegrationTestCase {
+
     protected String getConfigurationFiles() {
         return "jms-connector-config.xml";
     }

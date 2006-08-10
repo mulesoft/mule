@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.providers.jms.oracle;
+
+import oracle.jms.AQjmsSession;
+
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.mule.config.ConfigurationException;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.i18n.Message;
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.umo.manager.UMOManager;
 
 public abstract class AbstractIntegrationTestCase extends XMLTestCase {
