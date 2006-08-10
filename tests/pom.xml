@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <groupId>org.codehaus.mule.tests</groupId>
+    <groupId>org.mule.tests</groupId>
     <artifactId>mule-tests</artifactId>
     <packaging>pom</packaging>
     <name>Mule Integration Tests</name>
