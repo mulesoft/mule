@@ -1,14 +1,12 @@
-package org.mule.samples.loanbroker.esb.transformers;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.mule.samples.loanbroker.esb.message.CreditProfile;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-
-/**
- * Extracts the customer credit profile info from Xml returned from the CreditAgency EJB App.
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
