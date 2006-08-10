@@ -8,6 +8,18 @@
  * LICENSE.txt file.
  */
 
+package org.mule.test.usecases.axis;
+
+/**
+ * SubmitTradeResponse.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ */
+
+public class SubmitTradeResponse  implements java.io.Serializable {
+    private static final long serialVersionUID = -1096201474470391609L;
+
     private org.mule.test.usecases.axis.TradeStatus _return;
 
     public SubmitTradeResponse()

@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.usecases.properties;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.mule.impl.MuleMessage;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.Callable;
+
 public class PropsComponent implements Callable {
 
      protected static Apple testObjectProperty = new Apple();

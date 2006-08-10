@@ -8,6 +8,17 @@
  * LICENSE.txt file.
  */
 
+package org.mule.test.usecases.model;
+
+import java.util.Iterator;
+
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.providers.AbstractConnector;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.provider.UMOMessageReceiver;
+
 /**
  * Makes sure endpoints are not started if a component's initialState is set to "stopped".
  * 

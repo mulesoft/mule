@@ -7,6 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.providers.file;
+
+import java.io.File;
+
+import org.mule.tck.FunctionalTestCase;
+
+/**
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ */
+public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
+{
+
     protected String getConfigResources() {
         return "org/mule/test/integration/providers/file/file-exception-strategy.xml";
     }

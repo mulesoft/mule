@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.usecases.axis.clientbridge;
+
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.manager.UMOManager;
+
+public class Client
+{
+    private static final String LOCAL_ENDPOINT = "vm://complexRequest";
     private static final String AXIS_ENDPOINT = "axis:http://localhost:8002/axisService/doSomeWork";
 
     public static void main(String[] args) throws Exception

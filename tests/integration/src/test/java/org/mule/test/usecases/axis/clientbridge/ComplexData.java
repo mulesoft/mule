@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.usecases.axis.clientbridge;
+
+import java.io.Serializable;
+
+public class ComplexData implements Serializable
+{
+    private String someString = "Default String";
+    private Integer someInteger = new Integer(13);
+    
+    public ComplexData()
+    {
         super();
     }
 

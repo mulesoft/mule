@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.usecases.axis;
+
+/**
+ * TradeStatus.java
+ *
+ * This file was auto-generated from WSDL
+ * by the IBM Web services WSDL2Java emitter.
+ * jdk0450.04 v122904173847
+ */
+
+public class TradeStatus  implements java.io.Serializable {
     private static final long serialVersionUID = 414517174955602939L;
 
     private java.lang.String status;

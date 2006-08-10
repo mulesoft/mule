@@ -8,7 +8,19 @@
  * LICENSE.txt file.
  */
 
-    private  org.mule.test.usecases.axis.Trade arg0;
+package org.mule.test.usecases.axis;
+
+/**
+ * SubmitTrade.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ */
+
+public class SubmitTrade  implements java.io.Serializable {
+    private static final long serialVersionUID = 6724911620302616166L;
+
+    private org.mule.test.usecases.axis.Trade arg0;
 
     public SubmitTrade()
     {

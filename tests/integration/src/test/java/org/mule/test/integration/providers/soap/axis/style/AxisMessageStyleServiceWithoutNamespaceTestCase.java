@@ -7,6 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.providers.soap.axis.style;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;
@@ -15,12 +24,6 @@ import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Andrew Rutter

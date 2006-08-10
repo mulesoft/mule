@@ -8,6 +8,8 @@
  * LICENSE.txt file.
  */
 
+package org.mule.test.usecases.axis;
+
 public class BackOfficeImplBindingImpl implements org.mule.test.usecases.axis.BackOfficeImpl
  {
     //Doc Lit test
