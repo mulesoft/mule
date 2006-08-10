@@ -7,21 +7,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- */
- 
+
 package org.mule.samples.hello;
 
 import java.io.Serializable;
 
-
 /**
- *  <code>ChatString</code> TODO (document class)
- *
+ * <code>ChatString</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ChatString implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -3140370545357738491L;
+
     private StringBuffer string = new StringBuffer();
 
     /**
@@ -64,16 +67,19 @@ public class ChatString implements Serializable
         return string.insert(index, str, offset, len);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString()
     {
         return string.toString();
     }
-    
+
     public int getSize()
     {
         return string.length();
     }
+
 }
