@@ -1,14 +1,12 @@
-package org.mule.test.usecases.axis.clientbridge;
-
-import java.io.Serializable;
-
-public class ComplexData implements Serializable
-{
-    private String someString = "Default String";
-    private Integer someInteger = new Integer(13);
-    
-    public ComplexData()
-    {
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
         super();
     }
 

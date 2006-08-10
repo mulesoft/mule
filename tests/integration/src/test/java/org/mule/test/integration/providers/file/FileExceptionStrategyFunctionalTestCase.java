@@ -1,14 +1,12 @@
-package org.mule.test.integration.providers.file;
-
-import org.mule.tck.FunctionalTestCase;
-
-import java.io.File;
-
-/**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
-{
     protected String getConfigResources() {
         return "org/mule/test/integration/providers/file/file-exception-strategy.xml";
     }

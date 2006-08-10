@@ -1,14 +1,12 @@
-/**
- * SubmitTrade.java
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-
-package  org.mule.test.usecases.axis;
-
-public class SubmitTrade  implements java.io.Serializable {
-    private static final long serialVersionUID = 6724911620302616166L;
 
     private  org.mule.test.usecases.axis.Trade arg0;
 

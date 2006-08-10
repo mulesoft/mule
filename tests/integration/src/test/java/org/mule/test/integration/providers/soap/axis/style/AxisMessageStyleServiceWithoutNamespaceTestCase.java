@@ -1,14 +1,12 @@
 /*
-=* AxisMessageStyleServiceTestCase.java
-=*
-=* Created on October 21, 2005, 1:11 PM
-=*
-=* To change this template, choose Tools | Options and locate the =emplate under
-=* the Source Creation and Management node. Right-click the template and =hoose
-=* Open. You can then make changes to the template in the Source Editor.
-=*/
-package org.mule.test.integration.providers.soap.axis.style;
-
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;

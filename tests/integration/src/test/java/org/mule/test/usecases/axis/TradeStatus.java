@@ -1,14 +1,12 @@
-/**
- * TradeStatus.java
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * This file was auto-generated from WSDL
- * by the IBM Web services WSDL2Java emitter.
- * jdk0450.04 v122904173847
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-
-package org.mule.test.usecases.axis;
-
-public class TradeStatus  implements java.io.Serializable {
     private static final long serialVersionUID = 414517174955602939L;
 
     private java.lang.String status;

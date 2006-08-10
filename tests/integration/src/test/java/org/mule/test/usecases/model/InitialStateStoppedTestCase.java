@@ -1,14 +1,12 @@
-package org.mule.test.usecases.model;
-
-
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.providers.AbstractConnector;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.provider.UMOMessageReceiver;
-
-import java.util.Iterator;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 /**
  * Makes sure endpoints are not started if a component's initialState is set to "stopped".

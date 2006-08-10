@@ -1,14 +1,12 @@
-package org.mule.test.usecases.properties;
-
-import org.mule.impl.RequestContext;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class DummyComponent {
-
-     public void processData(String theData) {
-         System.out.println(theData);
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
          List recipients = new ArrayList();
          recipients.add("ross.mason@symphonysoft.com");
          recipients.add("ross@rossmason.com");
