@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-*/
+
 package org.mule.providers.soap.axis.transport.jms;
 
 import org.mule.providers.soap.axis.transport.VoidURLConnection;

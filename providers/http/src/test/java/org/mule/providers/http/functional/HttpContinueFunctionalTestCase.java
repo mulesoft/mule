@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-*/
+
 package org.mule.providers.http.functional;
 
 import java.net.URI;
@@ -20,8 +20,6 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.time.StopWatch;
-
-import org.mule.providers.http.HttpConstants;
 
 public class HttpContinueFunctionalTestCase extends HttpFunctionalTestCase {
 

@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.providers.soap.xfire;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;

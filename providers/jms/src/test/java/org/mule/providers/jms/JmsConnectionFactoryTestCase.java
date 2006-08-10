@@ -7,8 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.providers.jms;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import org.mule.MuleManager;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * $Id$

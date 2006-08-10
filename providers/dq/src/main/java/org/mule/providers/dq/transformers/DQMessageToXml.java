@@ -7,6 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.providers.dq.transformers;
+
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.mule.providers.dq.DQMessage;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
+
+/**
  * <code>DQMessageToXml</code> Will convert a DQMessage to an xml string by
  * extracting the message payload. The xml exemple:
  * 

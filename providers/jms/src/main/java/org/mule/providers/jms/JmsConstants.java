@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- */
+
 package org.mule.providers.jms;
 
 /**
@@ -39,6 +39,5 @@ public class JmsConstants
     public static final String DURABLE_PROPERTY = "durable";
     public static final String DURABLE_NAME_PROPERTY = "durableName";
     public static final String CACHE_JMS_SESSIONS_PROPERTY = "cacheJmsSessions";
-
 
 }

@@ -7,6 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.providers.oracle.jms;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionConsumer;
+import javax.jms.ConnectionMetaData;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueSession;
@@ -14,6 +22,10 @@ import javax.jms.ServerSessionPool;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicSession;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import oracle.jms.AQjmsConnection;
 import oracle.jms.AQjmsQueueConnectionFactory;
@@ -162,12 +174,12 @@ public class OracleJmsConnection implements TopicConnection, QueueConnection {
         return null;
     }
 
-    // TODO How do we know which connection to use?
     public void setClientID(String arg0) throws JMSException {
+        // TODO How do we know which connection to use?
     }
 
-    // TODO How do we know which connection to use?
     public void setExceptionListener(ExceptionListener arg0) throws JMSException {
+        // TODO How do we know which connection to use?
     }
 
     private static Log logger = LogFactory.getLog(OracleJmsConnection.class);

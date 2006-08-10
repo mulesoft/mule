@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- */
+
 package org.mule.providers.jms;
 
 import org.mule.config.MuleProperties;
