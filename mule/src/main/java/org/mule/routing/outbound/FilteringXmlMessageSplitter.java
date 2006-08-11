@@ -48,7 +48,7 @@ import java.util.Map;
  * Note that each part returned is actually returned as a new Document.
  *
  * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 {

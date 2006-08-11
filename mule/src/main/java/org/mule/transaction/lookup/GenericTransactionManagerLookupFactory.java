@@ -34,7 +34,7 @@ import java.util.Map;
  * even available in the global JNDI namespace, so your only bet is to run Mule
  * in the same JVM as the application server.
  *
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory
 {

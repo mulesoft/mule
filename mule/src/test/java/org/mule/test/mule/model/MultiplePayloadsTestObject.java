@@ -13,7 +13,7 @@ package org.mule.test.mule.model;
 /**
  * A test object with multiple matching payloads for the discovery to fail.
  * 
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class MultiplePayloadsTestObject
 {

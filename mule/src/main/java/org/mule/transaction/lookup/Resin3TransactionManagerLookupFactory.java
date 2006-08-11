@@ -11,7 +11,7 @@
 package org.mule.transaction.lookup;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class Resin3TransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
 {

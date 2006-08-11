@@ -23,7 +23,7 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  *
  * $Id$
  */

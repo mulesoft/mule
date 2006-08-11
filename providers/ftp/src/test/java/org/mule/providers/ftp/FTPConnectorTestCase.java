@@ -20,7 +20,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import java.util.Properties;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class FTPConnectorTestCase extends AbstractConnectorTestCase
 {

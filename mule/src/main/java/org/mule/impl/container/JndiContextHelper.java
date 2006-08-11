@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Common code for initialising the JNDI context.
  *
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class JndiContextHelper
 {

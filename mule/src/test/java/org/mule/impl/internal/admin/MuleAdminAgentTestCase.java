@@ -14,7 +14,7 @@ import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * $Id$
  */
 public class MuleAdminAgentTestCase extends AbstractMuleTestCase

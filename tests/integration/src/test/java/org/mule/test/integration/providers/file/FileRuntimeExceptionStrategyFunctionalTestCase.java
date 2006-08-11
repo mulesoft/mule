@@ -15,7 +15,7 @@ import org.mule.tck.FunctionalTestCase;
 import java.io.File;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {

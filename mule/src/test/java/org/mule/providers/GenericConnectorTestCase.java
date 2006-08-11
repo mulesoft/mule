@@ -21,7 +21,7 @@ import javax.resource.spi.work.WorkException;
  * to call a protected method, and the latter class is in a
  * different package.
  *
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class GenericConnectorTestCase extends AbstractMuleTestCase {
 

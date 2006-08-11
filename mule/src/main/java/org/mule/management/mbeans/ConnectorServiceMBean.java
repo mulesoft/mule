@@ -18,7 +18,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import java.beans.ExceptionListener;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * 
  * $Id$
  */

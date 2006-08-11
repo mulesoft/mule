@@ -17,7 +17,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import javax.jms.TextMessage;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase {
 

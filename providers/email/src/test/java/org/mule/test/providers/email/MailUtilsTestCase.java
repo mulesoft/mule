@@ -15,7 +15,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import javax.mail.internet.InternetAddress;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class MailUtilsTestCase extends AbstractMuleTestCase
 {

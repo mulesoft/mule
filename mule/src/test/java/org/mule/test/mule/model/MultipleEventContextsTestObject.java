@@ -16,7 +16,7 @@ import org.mule.umo.UMOEventContext;
  * A test object with multiple matching methods accepting UMOEventContext for
  * the discovery to fail..
  * 
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class MultipleEventContextsTestObject
 {

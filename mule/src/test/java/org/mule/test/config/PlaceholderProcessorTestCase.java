@@ -17,7 +17,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class PlaceholderProcessorTestCase extends AbstractMuleTestCase
 {

@@ -19,7 +19,7 @@ import javax.management.ObjectName;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  *
  * $Id$$
  */

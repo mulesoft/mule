@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 public class ResponseAggregatorTestCase extends FunctionalTestCase {

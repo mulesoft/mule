@@ -15,7 +15,7 @@ import org.mule.tck.AbstractTransformerTestCase;
 /**
  * Use this superclass if you intend to compare Xml contents.
  *
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public abstract class AbstractXmlTransformerTestCase extends AbstractTransformerTestCase {
 

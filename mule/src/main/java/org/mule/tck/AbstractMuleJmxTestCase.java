@@ -23,7 +23,7 @@ import java.util.Set;
  * This base test case will create a new <code>MBean Server</code> if necessary, and
  * will clean up any registered MBeans in its <code>tearDown()</code> method.
  * 
- * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * 
  * $Id$
  */
