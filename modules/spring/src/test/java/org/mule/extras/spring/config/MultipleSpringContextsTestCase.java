@@ -1,5 +1,5 @@
 /*
- * $Id: EmbeddedBeansXmlTestCase.java 2657 2006-08-10 02:37:57Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
