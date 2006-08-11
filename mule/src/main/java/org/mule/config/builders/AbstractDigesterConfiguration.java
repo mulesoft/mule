@@ -105,7 +105,7 @@ public abstract class AbstractDigesterConfiguration
 
     protected Object process(ReaderResource[] configResources) throws ConfigurationException {
         Object result = null;
-        Reader configResource = null;
+        Reader configResource;
         for (int i = 0; i < configResources.length; i++) {
             try {
                 configResource = configResources[i].getReader();
@@ -123,7 +123,7 @@ public abstract class AbstractDigesterConfiguration
      * Attempt to load a configuration resource from the classpath, file
      * sytem, or as a URL.
      *
-     * @param configResource
+     * @param configResource Mule configuration resources
      * @return an InputStream to the resource
      * @throws ConfigurationException if the resource could not be loaded by any means
      */
@@ -144,6 +144,7 @@ public abstract class AbstractDigesterConfiguration
     protected void addContainerContextRules(String path, String setterMethod, int parentIndex) throws ConfigurationException {
         // Create container Context
         digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
+        digester.addSetProperties(path, "name", "name");
         addMulePropertiesRule(path, digester);
 
         //Set the container on the parent object

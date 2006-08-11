@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id$ -->
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+
+<mule-configuration version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+
+    <container-context
+            name="spring-1"
+            className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="test-application-context.xml"/>
+        </properties>
+    </container-context>
+
+    <container-context
+            name="spring-2"
+            className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="test-application-context-2.xml"/>
+        </properties>
+    </container-context>
+
+    <model name="MultiSpringContextModel">
+
+    </model>
+
+</mule-configuration>
