@@ -15,6 +15,7 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.jms.Queue;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.mule.impl.model.AbstractComponent;
@@ -24,6 +25,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
@@ -67,6 +69,14 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 }
             }
 
+            if (replyToDestination instanceof Topic &&
+                    replyToDestination instanceof Queue &&
+                    connector.getJmsSupport() instanceof Jms102bSupport) {
+                logger.error(StringMessageUtils.getBoilerPlate("ReplyTo destination implements both Queue and Topic " +
+                        "while complying with JMS 1.0.2b specification. " +
+                        "Please report your application server or JMS vendor name and version " +
+                        "to dev<_at_>mule.codehaus.org or http://jira.symphonysoft.com"));
+            }
             boolean topic = replyToDestination instanceof Topic;
             session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
