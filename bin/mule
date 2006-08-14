@@ -310,8 +310,14 @@ if $mule_exec_debug ; then
 fi
 eval $mule_exec_command
 
-export MULE_OPTS=
-export MULE_DEBUG_OPTS=
-export MULE_MAIN=
-export CUSTOM_LIB=
-export CLASSPATH=
+MULE_OPTS=
+MULE_DEBUG_OPTS=
+MULE_MAIN=
+CUSTOM_LIB=
+CLASSPATH=
+
+export MULE_OPTS
+export MULE_DEBUG_OPTS
+export MULE_MAIN
+export CUSTOM_LIB
+export CLASSPATH
