@@ -70,10 +70,20 @@ import java.util.Map;
  * doThreading</i> property on the threadingProfiles for dispachers and receivers.
  *
  * The lifecycle for a connector is -
- *
- * 1. Create 2. Initialise 3. Connect 3a. Connect receivers 4. Start 4a. Start Receivers
- * 5. Stop 5a. Stop Receivers 6. Disconnect 6a. Disconnect Receivers 7. Dispose 7a.
- * Dispose Receivers
+ * <ol>
+ * <li>Create
+ * <li>Initialise
+ * <li>Connect
+ * <li>Connect receivers
+ * <li>Start
+ * <li>Start Receivers
+ * <li>Stop
+ * <li>Stop Receivers
+ * <li>Disconnect
+ * <li>Disconnect Receivers
+ * <li>Dispose
+ * <li>Dispose Receivers
+ * </ol>
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -1191,7 +1201,7 @@ public abstract class AbstractConnector
      */
     UMOWorkManager createDispatcherWorkManager(String name)
     {
-        UMOWorkManager wm = null;
+        UMOWorkManager wm;
         if (useSingleDispatcherThreadPool && dispatcherWorkManager != null) {
             wm = dispatcherWorkManager;
         }
