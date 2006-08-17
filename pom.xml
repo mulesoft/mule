@@ -236,6 +236,20 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Bind Clover Coverage instrumentation to the site generation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clover-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -333,6 +347,15 @@
                     <headerLocation>codecheck/LICENSE.txt</headerLocation>
                 </configuration>
            </plugin>
+
+            <!-- Code Coverage -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clover-plugin</artifactId>
+                <configuration>
+                    <jdk>1.4</jdk>
+                </configuration>
+            </plugin>
         </plugins>
     </reporting>
 
