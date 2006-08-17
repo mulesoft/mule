@@ -16,7 +16,13 @@
             <groupId>as400dq</groupId>
             <artifactId>jt400</artifactId>
             <version>0</version>
-            <optional>true</optional>
+        </dependency>
+
+        <!-- TODO duplication of top-level declaration, but doesn't work under clover if not here -->
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.03</version>
         </dependency>
     </dependencies>
 </project>
