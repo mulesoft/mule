@@ -131,7 +131,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     public void initialise() throws InitialisationException, RecoverableException {
         if(serviceUrl==null && !urlFromMessage) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);
-        } else {
+        } else if(serviceUrl != null){
             try {
                 new URL(serviceUrl);
             } catch (MalformedURLException e) {
