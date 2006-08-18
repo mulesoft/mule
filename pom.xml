@@ -68,7 +68,7 @@
         <site>
           <id>mule-site</id>
           <name>Mule Website</name>
-          <url>dav:https://dav.codehaus.org/mule/</url>
+          <url>dav:https://dav.codehaus.org/mule/docs/</url>
         </site>
     </distributionManagement>
     <repositories>
@@ -460,6 +460,14 @@
                     <family>windows</family>
                 </os>
             </activation>
+        </profile>
+        <profile>
+          <id>ci-server</id>
+          <distributionManagement>
+            <site>
+              <url>file:///home/luntbuild/publish/mule/site</url>
+            </site>
+          </distributionManagement>
         </profile>
     </profiles>
 
