@@ -404,11 +404,6 @@
         <module>modules</module>
         <module>providers</module>
 
-        <!-- This module is supposed to be included by the "tests" profile below
-        which is activated in "settings.xml" but for some reason it is not being
-        activated (Maven bug?) -->
-        <module>tests</module>
-
         <module>samples</module>
         <!-- <module>tools</module> -->
         <module>buildtools</module>
