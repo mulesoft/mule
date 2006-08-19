@@ -2,29 +2,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-        <groupId>org.mule</groupId>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.samples</groupId>
         <artifactId>mule-samples</artifactId>
         <version>1.3-SNAPSHOT</version>
-  </parent>
-  <groupId>org.mule.samples</groupId>
-  <artifactId>mule-samples-simple</artifactId>
-  <name>Mule Simple Examples</name>
-  <description>A set of simple examples that demonstrate a single feature of Mule.</description>
-  <dependencies>
-        
-    <dependency>
+    </parent>
+    <artifactId>mule-samples-simple</artifactId>
+    <name>Simple Examples</name>
+    <description>A set of simple examples that demonstrate a single feature of Mule.</description>
+
+    <dependencies>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy-all-1.0-jsr</artifactId>
             <version>06</version>
         </dependency>
-  </dependencies>
+        <!-- Promote the scope of this dependency from "test" to "compile". -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
