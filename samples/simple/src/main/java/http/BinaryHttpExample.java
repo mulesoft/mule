@@ -8,9 +8,20 @@
  * LICENSE.txt file.
  */
 
-import junit.framework.TestSuite;
+package http;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import junit.framework.TestResult;
-import file.TextFileExample;
+import junit.framework.TestSuite;
+
+import org.mule.extras.client.MuleClient;
+import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.umo.UMOMessage;
+
+import util.SimpleRunner;
 
 public class BinaryHttpExample extends SimpleRunner
  {

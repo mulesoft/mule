@@ -9,20 +9,12 @@
  */
 package file;
 
-import util.SimpleRunner;
-
 import java.io.File;
 
-import http.BinaryHttpExample;
-import junit.framework.TestSuite;
 import junit.framework.TestResult;
+import junit.framework.TestSuite;
+import util.SimpleRunner;
 
-/**
- * todo document
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class TextFileExample extends SimpleRunner
  {
     public TextFileExample() {

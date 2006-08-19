@@ -7,19 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- * the LICENSE.txt file.
- */
+
+package util;
 
 import junit.framework.TestCase;
+
 import org.mule.MuleManager;
 import org.mule.MuleServer;
 
-/**
- * todo document
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class SimpleRunner extends TestCase
  {
     protected String config = null;
