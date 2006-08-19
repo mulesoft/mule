@@ -5,9 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
-        <artifactId>mule-project</artifactId>
+        <artifactId>mule</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
+    <groupId>org.mule.samples</groupId>
     <artifactId>mule-samples</artifactId>
     <packaging>pom</packaging>
     <name>Mule Samples</name>
@@ -15,15 +16,44 @@
 
     <modules>
         <module>echo</module>
-        <module>hello</module>
         <module>errorhandler</module>
+        <module>hello</module>
         <module>loanbroker</module>
         <module>loanbroker-esb</module>
-        <module>mule-webapp</module>
         <module>simple</module>
         <module>stockquote</module>
         <module>voipservice</module>
+        <module>webapp</module>
     </modules>
+
+    <build>
+    	<plugins>
+    		<!-- "mvn deploy" will copy the built jar to the $MULE_HOME/lib/user directory. -->
+    		<plugin>
+    			<groupId>org.codehaus.mojo</groupId>
+    			<artifactId>dependency-maven-plugin</artifactId>
+    			<executions>
+    				<execution>
+    					<id>copy-artifact</id>
+    					<phase>deploy</phase>
+    					<goals>
+    						<goal>copy</goal>
+    					</goals>
+    					<configuration>
+    						<outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+    						<artifactItems>
+    							<artifactItem>
+    								<groupId>${groupId}</groupId>
+    								<artifactId>${artifactId}</artifactId>
+    								<version>${version}</version>
+    							</artifactItem>
+    						</artifactItems>
+    					</configuration>
+    				</execution>
+    			</executions>
+    		</plugin>
+    	</plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -31,39 +61,25 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-stream-provider</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-file-provider</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>
-    
-    <build>
-    	<outputDirectory>classes</outputDirectory>
-    	<testOutputDirectory>classes</testOutputDirectory>
-    	<resources>
-      	<resource>
-        <directory>conf</directory>
-      	</resource>
-    	</resources>
-    </build>
 </project>
