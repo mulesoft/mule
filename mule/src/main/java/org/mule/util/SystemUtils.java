@@ -22,9 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
     protected static transient Log logger = LogFactory.getLog(SystemUtils.class);
@@ -75,7 +72,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
                 isUnix = false;
             }
             else {
-                command = "export -p";
+                command = "env";
             }
 
             process = Runtime.getRuntime().exec(command);
