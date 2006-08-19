@@ -547,7 +547,13 @@ case "$1" in
 
     *)
         echo "Usage: $0 { console | start | stop | restart | status | dump }"
-        exit 1
+        #exit 1
+        ######################################################################
+        # Customized for Mule
+        ######################################################################
+        echo "No command specified, running in console (foreground) mode by default, use Ctrl-C to exit..."
+		# Call this script recursively with the "console" parameter.
+        $REALPATH console $*
         ;;
 esac
 
