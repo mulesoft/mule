@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import ognl.Ognl;
@@ -17,13 +18,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author Holger Hoffstaette
- */
-
 public class OGNLFilter implements UMOFilter
 {
-    private static final Log LOGGER = LogFactory.getLog(OGNLFilter.class);
+    private static final Log logger = LogFactory.getLog(OGNLFilter.class);
 
     private String expression;
 
@@ -39,34 +36,29 @@ public class OGNLFilter implements UMOFilter
 
     public boolean accept(UMOMessage message)
     {
-        if (message == null)
-        {
+        if (message == null) {
             return false;
         }
 
         Object candidate = message.getPayload();
-        if (candidate == null)
-        {
+        if (candidate == null) {
             return false;
         }
 
-        if (expression == null)
-        {
-            LOGGER.warn("Expression for OGNLFilter is not set");
+        if (expression == null) {
+            logger.warn("Expression for OGNLFilter is not set");
             return false;
         }
 
-        try
-        {
+        try {
             Object result = Ognl.getValue(expression, candidate);
-            if (result instanceof Boolean)
-            {
+            if (result instanceof Boolean) {
                 return ((Boolean)result).booleanValue();
             }
         }
 
         catch (OgnlException ex) {
-            LOGGER.error("Error evaluating OGNL expression.", ex);
+            logger.error("Error evaluating OGNL expression.", ex);
         }
 
         // default: reject

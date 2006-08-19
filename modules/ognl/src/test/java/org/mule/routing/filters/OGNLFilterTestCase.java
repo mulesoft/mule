@@ -7,16 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import org.mule.impl.MuleMessage;
-import org.mule.routing.filters.OGNLFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
-
-/**
- * @author Holger Hoffstaette
- */
 
 public class OGNLFilterTestCase extends AbstractMuleTestCase
 {
@@ -54,7 +50,7 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
     public void testStringExpression()
     {
         UMOMessage message = new MuleMessage("foo");
-        filter.setExpression("equals(\"foo\")");                                     
+        filter.setExpression("equals(\"foo\")");
 
         assertTrue(filter.accept(message));
     }
@@ -68,7 +64,7 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
 
         assertTrue(filter.accept(message));
     }
-    
+
     private class Dummy
     {
 
@@ -89,7 +85,8 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
         }
 
         /**
-         * @param content The content to set.
+         * @param content
+         *            The content to set.
          */
         public void setContent(String content)
         {
@@ -105,7 +102,8 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
         }
 
         /**
-         * @param id The id to set.
+         * @param id
+         *            The id to set.
          */
         public void setId(int id)
         {
