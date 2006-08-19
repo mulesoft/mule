@@ -4,12 +4,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
+        <groupId>org.mule.distributions</groupId>
         <artifactId>mule-server</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-full</artifactId>
-    <!-- This should be "pom" not "jar" but if it is set to "pom", the list of dependencies gets ignored 
+    <!-- This should be "pom" not "jar" but if it is set to "pom", the list of dependencies gets ignored
     by the assembly plugin. -->
     <packaging>jar</packaging>
     <name>Full Distribution</name>
@@ -24,7 +24,7 @@
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
-                    <appendAssemblyId>true</appendAssemblyId>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
@@ -36,6 +36,7 @@
                 </executions>
             </plugin>
 
+	<!-- Disable Ross' ant magic for now, there's gotta be a better way to do this!
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -43,14 +44,14 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-                <!-- Copy all sources into a single directory -->
+                 Copy all sources into a single directory
                 <copy verbose="true" flatten="true" todir="target/source">
 		    <fileset dir="../../../">
 		        <include name="**/*-sources.jar"/>
 		    </fileset>
 		  </copy>
-		  
-		  <!-- Unpack all Source Jars -->
+
+		   Unpack all Source Jars
 		  <unjar dest="target/src">
                       <fileset dir="target/source">
                           <include name="*.jar"/>
@@ -58,11 +59,11 @@
                           <exclude name="*tool*.jar"/>
                       </fileset>
                   </unjar>
-                  
-                  <!-- Delete the working directory -->
+
+                   Delete the working directory
                   <delete dir="target/source"/>
-                  
-                  <!-- Clean up the source tree a bit -->
+
+                   Clean up the source tree a bit
                   <delete>
     			<fileset dir="target/src">
     				<include name="*.xml"/>
@@ -71,11 +72,11 @@
     			</fileset>
                   </delete>
 
-	<!-- Generate JavaDoc from full source -->
+	 Generate JavaDoc from full source
 	<tstamp>
             <format property="year" pattern="2003-yyyy"/>
         </tstamp>
-	
+
         <javadoc
             destdir="target/docs/apidocs"
             author="true"
@@ -87,8 +88,8 @@
             bottom="Copyright &amp;copy; ${year} ${pom.organization.name}. All Rights Reserved."
             stylesheetfile="../../../mule/xdocs/stylesheets/maven.css"
             >
-	    <!-- TODO: Move StyleSheet -->
-	    
+	     TODO: Move StyleSheet
+
             <packageset dir="target/src/" defaultexcludes="yes">
                 <exclude name="org/mule/tck/testmodels/**"/>
                 <exclude name="org/mule/samples/**"/>
@@ -97,8 +98,8 @@
             </packageset>
         </javadoc>
 
-                  
-                  <!-- Copy all Samples -->
+
+                   Copy all Samples
                 <copy verbose="true" todir="target/samples">
 		    <fileset dir="../../../samples">
 		        <exclude name="**/.mule"/>
@@ -109,8 +110,8 @@
 		        <exclude name="**/target/*"/>
 		    </fileset>
 		  </copy>
-		  
-		  <!-- Mule All Jar -->
+
+		   Mule All Jar
 		  <mkdir dir="target/dist"/>
 		  <mkdir dir="target/dist/temp"/>
 		  <copy verbose="true" flatten="true" todir="target/dist">
@@ -118,8 +119,8 @@
 		        <include name="**/mule-*-${version}.jar"/>
 		    </fileset>
 		  </copy>
-		  
-		  <!-- Unpack all Source Jars -->
+
+		   Unpack all Source Jars
 		  <unjar dest="target/dist/temp">
                       <fileset dir="target/dist">
                           <include name="*.jar"/>
@@ -128,16 +129,16 @@
                       </fileset>
                   </unjar>
 
-        <!-- unjar the core jar again to overlay the correct manifest -->
+         unjar the core jar again to overlay the correct manifest
         <unjar src="target/dist/mule-core-${version}.jar" dest="target/dist/temp"/>
         <copy file="target/dist/temp/META-INF/MANIFEST.MF" tofile="target/dist/temp/META-INF/Mule.mf"/>
 
         <jar manifest="target/dist/temp/META-INF/MANIFEST.MF" basedir="target/dist/temp" destfile="target/mule-${version}.jar"/>
-        
+
         <delete dir="target/dist"/>
         <mkdir dir="dist"/>
 	<copy file="target/mule-${version}.jar" todir="target/dist"/>
-        <!--local deploy -->
+        local deploy
         <copy todir="${maven.repo.local}/mule/jars" file="target/dist/mule-${version}.jar"/>
               </tasks>
             </configuration>
@@ -147,6 +148,7 @@
           </execution>
         </executions>
       </plugin>
+    -->
     </plugins>
   </build>
 </project>

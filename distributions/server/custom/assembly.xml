@@ -3,8 +3,8 @@ Assembly descriptor for the minimal Mule distribution.
 -->
 <assembly>
   <formats>
-    <format>tar.gz</format>
     <format>zip</format>
+    <format>tar.gz</format>
   </formats>
 
   <fileSets>
