@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
  * TODO document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class PojoTypeTemplateFilter implements JavaSpaceFilter
 {

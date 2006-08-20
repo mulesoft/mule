@@ -22,7 +22,7 @@ import java.io.Reader;
  * will Load the component form the descriptors' own properties
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class DescriptorContainerContext extends AbstractContainerContext
 {

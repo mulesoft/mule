@@ -24,7 +24,7 @@ import java.util.Iterator;
  * done inbetween.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2654 $
+ * @version $Revision$
  */
 public class BridgeComponent implements UMODescriptorAware, Callable {
 

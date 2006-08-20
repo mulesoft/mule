@@ -57,7 +57,7 @@ import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
  * </ul>
  * before {@link #createServerSocket} is called.
  *
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketFactoryMBean {
 

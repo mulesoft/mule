@@ -36,7 +36,7 @@ import java.util.Map;
  * AutowireUMOManagerFactoryBean for a simpler and cleaner spring configuration.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  * @see AutowireUMOManagerFactoryBean
  */
 public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean

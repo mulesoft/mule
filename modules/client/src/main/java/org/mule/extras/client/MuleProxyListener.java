@@ -24,7 +24,7 @@ import java.lang.reflect.Proxy;
  * to foward calls as Mule events from any Observer/Observerable implementation.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 
 public class MuleProxyListener implements InvocationHandler

@@ -18,7 +18,7 @@ import java.lang.reflect.InvocationTargetException;
  * todo document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public interface JavaSpaceFilter extends UMOFilter {
     

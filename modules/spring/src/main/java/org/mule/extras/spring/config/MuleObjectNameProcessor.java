@@ -26,7 +26,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * have to be set.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 
 public class MuleObjectNameProcessor implements BeanPostProcessor

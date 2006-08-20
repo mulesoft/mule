@@ -25,7 +25,7 @@ import javax.script.ScriptException;
  * Will run a script to perform transformation on an object
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2349 $
+ * @version $Revision$
  */
 public class ScriptTransformer extends AbstractEventAwareTransformer
 {

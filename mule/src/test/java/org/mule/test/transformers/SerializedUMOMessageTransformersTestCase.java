@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1506 $
+ * @version $Revision$
  */
 public class SerializedUMOMessageTransformersTestCase extends AbstractTransformerTestCase
 {

@@ -15,7 +15,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1506 $
+ * @version $Revision$
  */
 public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase
 {

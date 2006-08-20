@@ -27,7 +27,7 @@ import javax.script.ScriptException;
  * A message builder component that can execute message building as a script
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2176 $
+ * @version $Revision$
  */
 public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable {
 

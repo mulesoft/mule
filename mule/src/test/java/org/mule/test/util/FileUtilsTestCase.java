@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1665 $
+ * @version $Revision$
  */
 public class FileUtilsTestCase extends TestCase
 {

@@ -15,7 +15,7 @@ import org.mule.util.FileUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1983 $
+ * @version $Revision$
  */
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {

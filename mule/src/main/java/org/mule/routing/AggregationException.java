@@ -20,7 +20,7 @@ import org.mule.umo.routing.RoutingException;
  * todo document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class AggregationException extends RoutingException
 {

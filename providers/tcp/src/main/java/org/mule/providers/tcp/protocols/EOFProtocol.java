@@ -25,7 +25,7 @@ import java.net.SocketTimeoutException;
  * nothing. Reading is terminated by the stream being closed by the client
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1767 $
+ * @version $Revision$
  */
 public class EOFProtocol implements TcpProtocol
 {

@@ -32,7 +32,7 @@ import java.net.URL;
  * script file changes (providing the file is on the file system)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2176 $
+ * @version $Revision$
  */
 public abstract class AbstractScriptComponent implements Initialisable, Lifecycle, UMODescriptorAware, FileListener,
         Callable

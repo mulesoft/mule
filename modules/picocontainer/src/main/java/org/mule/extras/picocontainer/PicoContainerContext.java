@@ -35,7 +35,7 @@ import java.io.StringReader;
  * 
  * @author <a href="mailto:antonio.lopez@4clerks.com">Antonio Lopez</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class PicoContainerContext extends AbstractContainerContext
 {

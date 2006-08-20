@@ -13,7 +13,7 @@ package org.mule.impl.container;
  * @inheritDoc
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 432 $
+ * @version $Revision$
  */
 public class DescriptorContainerKeyPair extends ContainerKeyPair
 {

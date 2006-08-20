@@ -27,7 +27,7 @@ import java.io.IOException;
  * @see MuleBeanDefinitionReader
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
 {

@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2181 $
+ * @version $Revision$
  */
 public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
 {

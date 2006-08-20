@@ -76,7 +76,7 @@ import java.util.Map;
  * AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
         ApplicationContextAware

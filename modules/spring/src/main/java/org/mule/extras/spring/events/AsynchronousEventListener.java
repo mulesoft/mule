@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationListener;
  * threads can be executed at any time.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 
 public class AsynchronousEventListener implements MuleEventListener

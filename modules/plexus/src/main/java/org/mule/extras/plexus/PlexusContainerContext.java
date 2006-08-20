@@ -31,7 +31,7 @@ import java.net.URL;
  * 
  * @author Brian Topping
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class PlexusContainerContext extends AbstractContainerContext
 {

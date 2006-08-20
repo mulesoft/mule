@@ -16,7 +16,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2181 $
+ * @version $Revision$
  */
 public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 {

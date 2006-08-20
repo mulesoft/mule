@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  * details to the result message.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 
 public abstract class AbstractEventTransformer extends AbstractTransformer

@@ -20,7 +20,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class LoanBrokerESBTestCase extends FunctionalTestCase {
 

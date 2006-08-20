@@ -31,7 +31,7 @@ import java.io.IOException;
  * Will configure a MuleManager from one or more script files
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2176 $
+ * @version $Revision$
  */
 public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder {
 

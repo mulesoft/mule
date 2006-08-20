@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * TODO: document this class
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class SpringTransactionFactory implements UMOTransactionFactory
 {

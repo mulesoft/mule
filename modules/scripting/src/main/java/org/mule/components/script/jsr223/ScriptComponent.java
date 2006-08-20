@@ -25,7 +25,7 @@ import javax.script.Namespace;
  * such as javaScript, Groovy or Rhino to be embedded as Mule components
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2176 $
+ * @version $Revision$
  */
 public class ScriptComponent extends Scriptable implements Callable {
 

@@ -29,7 +29,7 @@ import java.util.Map;
  * route each new event to the endpoints on the router, one after the other.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
 {

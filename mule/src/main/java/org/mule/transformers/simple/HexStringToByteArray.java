@@ -19,7 +19,7 @@ import org.mule.util.StringUtils;
  * Converts a Hex String to a Byte array
  * 
  * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class HexStringToByteArray extends AbstractTransformer
 {

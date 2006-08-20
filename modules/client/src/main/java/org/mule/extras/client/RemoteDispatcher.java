@@ -44,7 +44,7 @@ import java.util.Map;
  * Url as the the transport channel.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 
 public class RemoteDispatcher implements Disposable {

@@ -19,7 +19,7 @@ import javax.resource.spi.work.WorkListener;
  * Default exception Handler used when executing work in the work manager
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class DefaultWorkListener implements WorkListener {
 

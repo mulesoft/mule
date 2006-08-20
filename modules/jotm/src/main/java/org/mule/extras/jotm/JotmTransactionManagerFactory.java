@@ -23,7 +23,7 @@ import javax.transaction.TransactionManager;
  * create a new local JOTM instance.
  * 
  * @author Guillaume Nodet
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class JotmTransactionManagerFactory implements UMOTransactionManagerFactory
 {

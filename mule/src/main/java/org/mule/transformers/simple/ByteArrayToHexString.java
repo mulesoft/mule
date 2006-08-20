@@ -18,7 +18,7 @@ import org.mule.util.StringUtils;
  * Converts a Byte array to a Hex String
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class ByteArrayToHexString extends AbstractTransformer
 {

@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  * allows EJB Session beans to be referenced as Mule managed UMOs
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2176 $
+ * @version $Revision$
  */
 public class EjbContainerContext extends RmiContainerContext
 {

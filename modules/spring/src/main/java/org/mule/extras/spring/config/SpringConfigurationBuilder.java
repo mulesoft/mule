@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
  * definitions for each of the document types are declared in the documents.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {

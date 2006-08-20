@@ -74,7 +74,7 @@ import java.util.Map;
  * <code>MuleManager.getInstance()</code>
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  * @see org.mule.impl.endpoint.MuleEndpointURI
  */
 public class MuleClient implements Disposable

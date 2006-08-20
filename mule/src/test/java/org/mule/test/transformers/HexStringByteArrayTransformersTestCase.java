@@ -19,7 +19,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {

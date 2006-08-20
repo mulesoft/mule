@@ -25,7 +25,7 @@ import org.mule.util.ClassUtils;
  * todo document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class MuleObjectServiceFactory extends ObjectServiceFactory {
 

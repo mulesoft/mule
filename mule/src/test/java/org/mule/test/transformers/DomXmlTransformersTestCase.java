@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 611 $
+ * @version $Revision$
  */
 public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 {

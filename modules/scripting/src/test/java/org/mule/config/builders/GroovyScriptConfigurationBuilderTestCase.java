@@ -17,7 +17,7 @@ import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 /**
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2181 $
+ * @version $Revision$
  */
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {

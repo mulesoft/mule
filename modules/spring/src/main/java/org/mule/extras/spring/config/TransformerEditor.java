@@ -21,7 +21,7 @@ import java.beans.PropertyEditorSupport;
  * transformer Objects
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2179 $
+ * @version $Revision$
  */
 public class TransformerEditor extends PropertyEditorSupport
 {

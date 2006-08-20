@@ -25,7 +25,7 @@ import java.util.Map;
  * deployed to it.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 public class AxisExternalServerTest extends TestCase {
 

@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 1506 $
+ * @version $Revision$
  */
 public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {
