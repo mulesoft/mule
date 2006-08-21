@@ -9,16 +9,17 @@
  */
 package org.mule.providers.ssl;
 
-import org.mule.providers.tcp.TcpMessageDispatcher;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+
+import org.mule.providers.tcp.TcpMessageDispatcher;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over
@@ -35,10 +36,22 @@ public class SslMessageDispatcher extends TcpMessageDispatcher
         super(endpoint);
     }
 
-    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
-        SocketFactory factory = SSLSocketFactory.getDefault();
+    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException {
+        SslConnector conn = (SslConnector) getConnector();
+        SSLContext context;
+        try {
+            context = SSLContext.getInstance(conn.getProtocol());
+            context.init(conn.getKeyManagerFactory().getKeyManagers(), conn.getTrustManagerFactory().getTrustManagers(), null);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException(e.getMessage());
+        } catch (KeyManagementException e) {
+            throw new IOException(e.getMessage());
+        }
+
+        SocketFactory factory = context.getSocketFactory();
         SSLSocket socket = (SSLSocket) factory.createSocket(inetAddress, port);
+        // startHandshake() will reset the current trust and initiate a new negotiation
+        // socket.startHandshake();
         return socket;
     }
 }

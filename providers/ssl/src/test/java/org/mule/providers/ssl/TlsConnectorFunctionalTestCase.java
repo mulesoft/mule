@@ -11,16 +11,10 @@ package org.mule.providers.ssl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
-
-import javax.net.ssl.SSLSocketFactory;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -51,14 +45,4 @@ public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCa
         return null;
     }
 
-    public UMOConnector createConnector() throws Exception
-    {
-        SslConnector cnn = SslConnectorTestCase.createConnector(false);
-        return cnn;
-    }
-
-    protected Socket createSocket(URI uri) throws IOException
-    {
-        return SSLSocketFactory.getDefault().createSocket(uri.getHost(), uri.getPort());
-    }
 }

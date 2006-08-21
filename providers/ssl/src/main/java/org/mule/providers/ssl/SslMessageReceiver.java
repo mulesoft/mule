@@ -27,6 +27,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * <code>SslMessageReceiver</code> acts like a tcp server to receive socket
@@ -45,21 +46,24 @@ public class SslMessageReceiver extends TcpMessageReceiver
 
     protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException, KeyManagementException
     {
-        SslConnector cnn = null;
-        ServerSocketFactory ssf = null;
+        SslConnector cnn;
+        ServerSocketFactory ssf;
         cnn = (SslConnector) connector;
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
-        SSLContext sslc = SSLContext.getInstance(cnn.getProtocol().toLowerCase());
+        SSLContext sslc = SSLContext.getInstance(cnn.getProtocol().toLowerCase(), cnn.getProvider());
 
         // Initialize the SSLContext to work with our key managers
-        sslc.init(cnn.getKeyManagerFactory().getKeyManagers(), null, null);
+        sslc.init(cnn.getKeyManagerFactory().getKeyManagers(),
+                  cnn.getTrustManagerFactory().getTrustManagers(),
+                  // TODO provide more secure seed (othen than the default one)  
+                  new SecureRandom());
 
         ssf = sslc.getServerSocketFactory();
 
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         int backlog = cnn.getBacklog();
-        SSLServerSocket serverSocket = null;
+        SSLServerSocket serverSocket;
 
         InetAddress inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()

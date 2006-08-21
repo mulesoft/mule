@@ -19,6 +19,7 @@ import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,7 +32,6 @@ import java.security.Security;
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
  * host.
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SslConnector extends TcpConnector
@@ -52,6 +52,10 @@ public class SslConnector extends TcpConnector
     private String clientKeyStorePassword = null;
     private String trustStore = null;
     private String trustStorePassword = null;
+    private String trustStoreType = DEFAULT_KEYSTORE_TYPE;
+    // default to key manager algorithm, overridable
+    private String trustManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
+    private TrustManagerFactory trustManagerFactory;
     private boolean explicitTrustStoreOnly = false;
 
     private KeyManagerFactory keyManagerFactory = null;
@@ -102,6 +106,31 @@ public class SslConnector extends TcpConnector
             } catch (Exception e) {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager ("
                         + getKeyManagerAlgorithm() + ")"), e, this);
+            }
+        }
+
+        if (getTrustStore() != null) {
+            KeyStore truststore;
+            try {
+                truststore = KeyStore.getInstance(trustStoreType);
+                InputStream is = FileUtils.loadResource(getTrustStore(), getClass());
+                if (is == null) {
+                    throw new FileNotFoundException("Failed to load truststore from classpath or local file: "
+                            + getTrustStore());
+                }
+                truststore.load(is, getTrustStorePassword().toCharArray());
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "TrustStore: " + getTrustStore()),
+                                                  e,
+                                                  this);
+            }
+
+            try {
+                trustManagerFactory = TrustManagerFactory.getInstance(getTrustManagerAlgorithm());
+                trustManagerFactory.init(truststore);
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Trust Manager ("
+                        + getTrustManagerAlgorithm() + ")"), e, this);
             }
         }
 
@@ -171,6 +200,32 @@ public class SslConnector extends TcpConnector
     public void setStorePassword(String storePassword)
     {
         this.storePassword = storePassword;
+    }
+
+
+    public String getTrustStoreType() {
+        return trustStoreType;
+    }
+
+    public void setTrustStoreType(String trustStoreType) {
+        this.trustStoreType = trustStoreType;
+    }
+
+
+    public TrustManagerFactory getTrustManagerFactory() {
+        return trustManagerFactory;
+    }
+
+    public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory) {
+        this.trustManagerFactory = trustManagerFactory;
+    }
+
+    public String getTrustManagerAlgorithm() {
+        return trustManagerAlgorithm;
+    }
+
+    public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
+        this.trustManagerAlgorithm = trustManagerAlgorithm;
     }
 
     public String getKeyStoreType()

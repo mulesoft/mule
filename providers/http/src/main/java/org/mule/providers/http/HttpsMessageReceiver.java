@@ -26,6 +26,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * <code>HttpsMessageReceiver</code> is a Https server implementation used to
@@ -48,13 +49,16 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     {
         HttpsConnector cnn;
         ServerSocketFactory ssf;
-        cnn = (HttpsConnector)connector;
+        cnn = (HttpsConnector) connector;
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
-        SSLContext sslc = SSLContext.getInstance(cnn.getSslType());
+        SSLContext sslc = SSLContext.getInstance(cnn.getSslType(), cnn.getProvider());
 
         // Initialize the SSLContext to work with our key managers
-        sslc.init(cnn.getKeyManagerFactory().getKeyManagers(), null, null);
+        sslc.init(cnn.getKeyManagerFactory().getKeyManagers(),
+                  cnn.getTrustManagerFactory().getTrustManagers(),
+                // TODO provide more secure seed (othen than the default one)
+                  new SecureRandom());
 
         ssf = sslc.getServerSocketFactory();
 

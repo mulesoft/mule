@@ -19,6 +19,7 @@ import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,6 @@ import java.security.Security;
 /**
  * <code>HttpsConnector</code> provides Https connectivity
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class HttpsConnector extends HttpConnector
@@ -44,7 +44,7 @@ public class HttpsConnector extends HttpConnector
     private String keyStore = DEFAULT_KEYSTORE;
     private String keyPassword = null;
     private String storePassword = null;
-    private String keystoreType = KeyStore.getDefaultType();
+    private String keystoreType = DEFAULT_KEYSTORE_TYPE;
     private String keyManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
     private String sslType = DEFAULT_SSL_TYPE;
     private Provider provider = spFactory.getProvider();
@@ -53,6 +53,10 @@ public class HttpsConnector extends HttpConnector
     private String clientKeyStorePassword = null;
     private String trustStore = null;
     private String trustStorePassword = null;
+    private String trustStoreType = DEFAULT_KEYSTORE_TYPE;
+    // default to key manager algorithm, overridable
+    private String trustManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
+    private TrustManagerFactory trustManagerFactory;
     private boolean explicitTrustStoreOnly = false;
 
     private KeyManagerFactory keyManagerFactory = null;
@@ -101,6 +105,31 @@ public class HttpsConnector extends HttpConnector
         catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e,
                     this);
+        }
+
+        if (getTrustStore() != null) {
+            KeyStore truststore;
+            try {
+                truststore = KeyStore.getInstance(trustStoreType);
+                InputStream is = FileUtils.loadResource(getTrustStore(), getClass());
+                if (is == null) {
+                    throw new FileNotFoundException("Failed to load truststore from classpath or local file: "
+                            + getTrustStore());
+                }
+                truststore.load(is, getTrustStorePassword().toCharArray());
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "TrustStore: " + getTrustStore()),
+                        e,
+                        this);
+            }
+
+            try {
+                trustManagerFactory = TrustManagerFactory.getInstance(getTrustManagerAlgorithm());
+                trustManagerFactory.init(truststore);
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Trust Manager ("
+                        + getTrustManagerAlgorithm() + ")"), e, this);
+            }
         }
 
         super.doInitialise();
@@ -179,6 +208,31 @@ public class HttpsConnector extends HttpConnector
     public void setStorePassword(String storePassword)
     {
         this.storePassword = storePassword;
+    }
+
+    public String getTrustStoreType() {
+        return trustStoreType;
+    }
+
+    public void setTrustStoreType(String trustStoreType) {
+        this.trustStoreType = trustStoreType;
+    }
+
+
+    public TrustManagerFactory getTrustManagerFactory() {
+        return trustManagerFactory;
+    }
+
+    public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory) {
+        this.trustManagerFactory = trustManagerFactory;
+    }
+
+    public String getTrustManagerAlgorithm() {
+        return trustManagerAlgorithm;
+    }
+
+    public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
+        this.trustManagerAlgorithm = trustManagerAlgorithm;
     }
 
     public String getKeystoreType()
