@@ -10,13 +10,13 @@
 
 package org.mule.test.integration.providers.file;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.FileInputStream;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * 
@@ -31,26 +31,10 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase{
         (new File("myout/out.txt")).delete();
         client.send("vm://fileappend", "Hello1", null);
         client.send("vm://fileappend", "Hello2", null);
-        assertEquals("Hello1Hello2\r\n",this.readFile("myout/out.txt"));
+        assertEquals("Hello1Hello2",IOUtils.toString(new FileInputStream("myout/out.txt")));
     }
-
-    private String readFile(String path) throws IOException
-    {
-        FileReader fr = new FileReader(path);
-        BufferedReader br=new BufferedReader(fr);
-
-        String tmp;
-        String email="";
-        while((tmp=br.readLine())!=null)
-        {
-            email=email.concat(tmp)+"\r\n";
-        }
-
-        return email;
-    }
-
 
     protected String getConfigResources() {
-        return "mule-fileappend-endpoint-config.xml";
+        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
     }
 }
