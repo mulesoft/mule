@@ -120,6 +120,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             else {
                 // Retrieve a session from the connector
                 session = connector.getSession(event.getEndpoint());
+                if(event.getEndpoint().getTransactionConfig().isTransacted())
+                {
+                	transacted=true;
+                }
             }
 
             // Add a reference to the JMS session used so that an EventAwareTransformer
