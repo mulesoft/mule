@@ -1,17 +1,27 @@
 /*
+
  * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ * ------------------------------------------------------------------------------------------------------
+
  *
- * The software in this package is published under the terms of the BSD style
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+
+ * http://www.symphonysoft.com
+
+ *
+
+ * The software in this package is published under the terms of the BSD
+
+ * style license a copy of which has been included with this distribution in
+
+ * the LICENSE.txt file.
+
  */
 
 package org.mule.extras.jaas.loginmodule;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +44,6 @@ import javax.security.auth.spi.LoginModule;
  * LoginModule interface.
  */
 public class DefaultLoginModule implements LoginModule {
-	
-	private static final Log logger = LogFactory.getLog(DefaultLoginModule.class);
 	
 	// Callback Handlers
 	private CallbackHandler callbackHandler;

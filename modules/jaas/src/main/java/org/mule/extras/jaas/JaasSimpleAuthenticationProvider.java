@@ -1,11 +1,23 @@
 /*
+
  * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ * ------------------------------------------------------------------------------------------------------
+
  *
- * The software in this package is published under the terms of the BSD style
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+
+ * http://www.symphonysoft.com
+
+ *
+
+ * The software in this package is published under the terms of the BSD
+
+ * style license a copy of which has been included with this distribution in
+
+ * the LICENSE.txt file.
+
  */
 
 package org.mule.extras.jaas;
@@ -19,9 +31,6 @@ import java.io.IOException;
 import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.mule.config.i18n.Messages;
 import org.mule.extras.jaas.JaasSecurityContextFactory;
@@ -45,14 +54,12 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
  */
 public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 
-	protected static final Log logger = LogFactory.getLog(JaasSimpleAuthenticationProvider.class);
-	
 	private String loginConfig;
 	private String loginContextName;
 	private String credentials;
 	private String loginModule;
 	private String DefaultModule = "org.mule.extras.jaas.loginmodule.DefaultLoginModule";
-	private static String name;
+	private String name;
 	
 	private UMOSecurityContextFactory factory;
 	
@@ -128,11 +135,9 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 	
 	    if (!alreadySet) {
 	        String key = prefix + n;
-	        logger.debug("Setting security property [" + key + "] to: " + loginConfigUrl);
 	        Security.setProperty(key, loginConfigUrl);
 	    }
 	}
-	
 	
 	/**
 	 * @return UMOAuthentication 
@@ -145,41 +150,38 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 	 * 
 	 */
 	public UMOAuthentication authenticate(UMOAuthentication authentication)
-	        throws org.mule.umo.security.SecurityException {
-		
-		LoginContext loginContext = null;
-		MuleAuthentication auth = (MuleAuthentication) authentication;
-	    	      
-	    // Create the Mule Callback Handler
-	    MuleCallbackHandler cbh = new MuleCallbackHandler(auth);
-	
-	    //Create the LoginContext object, and pass it to the CallbackHandler 
-	    try {
-	    	loginContext = new LoginContext(loginContextName,cbh);
-	    } catch (LoginException e){
-	       	System.err.println("Cannot create LoginContext. " + e.getMessage());
-	    } catch (SecurityException se) {
-	      	System.err.println("Cannot create LoginContext. " + se.getMessage());
-	    }
+    throws org.mule.umo.security.SecurityException {
 
-	    //Attempt to login the user
-	    try {
-	    	loginContext.login();
+		LoginContext loginContext;
+		MuleAuthentication auth = (MuleAuthentication) authentication;
+	      
+		// Create the Mule Callback Handler
+		MuleCallbackHandler cbh = new MuleCallbackHandler(auth);
+
+		//Create the LoginContext object, and pass it to the CallbackHandler 
+		try {
+			loginContext = new LoginContext(loginContextName,cbh);
+		} catch (LoginException e){
+			throw new SecurityException(e);
+		} catch (SecurityException se) {
+			throw new SecurityException(se);
+		}
+
+		//Attempt to login the user
+		try {
+			loginContext.login();
 		    }
-	    catch (LoginException le) {
-			  System.err.println("Authentication failed:");
-			  System.err.println("  " + le.getMessage());
+		catch (LoginException le) {
 			  throw new UnauthorisedException(new org.mule.config.i18n.Message(org.mule.config.i18n.Messages.AUTH_FAILED_FOR_USER_X, auth.getPrincipal()));
 		    }
-	    
-		System.out.println("Authentication succeeded!");
-		auth.setAuthenticated(true);	
 		
-	    return auth;
+		auth.setAuthenticated(true);	
+
+		return auth;
 	}
 	
 	public boolean supports(Class aClass) {
-	    return UMOAuthentication.class.isAssignableFrom(aClass);
+		return UMOAuthentication.class.isAssignableFrom(aClass);
 	}
 	
 	public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException {
@@ -205,18 +207,16 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 	    	    
 	    	    HashMap options = new HashMap();
 	    		options.put("credentials", credentials);
-	    		
-	    		AppConfigurationEntry appEntry = null;
-	    		
+	    			    		
 	    		// if a custom login module is not found, it will use the Default Login Module
 	    		if (loginModule != null){
-	    			appEntry = new AppConfigurationEntry(loginModule,AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,options);
+	    			entry = new AppConfigurationEntry(loginModule,AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,options);
 	    		}
 	    		else {
-	    			appEntry = new AppConfigurationEntry(DefaultModule,AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,options);
+	    			entry = new AppConfigurationEntry(DefaultModule,AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,options);
 	    		}
 	    		
-	    	    JaasConfig.addApplicationConfigEntry(loginContextName,appEntry);
+	    	    JaasConfig.addApplicationConfigEntry(loginContextName,entry);
 	    	}
 	    	catch(Exception e){
 	    		throw new InitialisationException(e, this);
@@ -282,7 +282,9 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 		}
 
 		public void refresh() {
-			
+			//Nothing to do here			
 		}		
 	}
 }
+
+
