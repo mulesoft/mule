@@ -150,9 +150,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider {
 			loginContext = new LoginContext(loginContextName,cbh);
 		} catch (LoginException e){
 			throw new SecurityException(e);
-		} catch (SecurityException se) {
-			throw new SecurityException(se);
-		}
+		} 
 
 		//Attempt to login the user
 		try {
