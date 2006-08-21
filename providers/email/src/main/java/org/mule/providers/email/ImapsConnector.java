@@ -18,6 +18,8 @@ package org.mule.providers.email;
 public class ImapsConnector extends Pop3sConnector {
 
     public static final int DEFAULT_IMAPS_PORT = 993;
+    
+    private String mailboxFolder = Pop3sConnector.MAILBOX;
 
     public String getProtocol()
     {
@@ -26,5 +28,13 @@ public class ImapsConnector extends Pop3sConnector {
 
     public int getDefaultPort() {
         return DEFAULT_IMAPS_PORT;
+    }
+    
+    public String getMailboxFolder() {
+        return mailboxFolder;
+    }
+
+    public void setMailboxFolder(String mailboxFolder) {
+        this.mailboxFolder = mailboxFolder;
     }
 }
