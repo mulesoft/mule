@@ -1,31 +1,15 @@
 /*
-
  * $Id$
-
- * ------------------------------------------------------------------------------------------------------
-
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
-
- * Copyright (c) SymphonySoft Limited. All rights reserved.
-
- * http://www.symphonysoft.com
-
- *
-
- * The software in this package is published under the terms of the BSD
-
- * style license a copy of which has been included with this distribution in
-
- * the LICENSE.txt file.
-
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 
 package org.mule.extras.jaas.loginmodule;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -35,6 +19,11 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * 
