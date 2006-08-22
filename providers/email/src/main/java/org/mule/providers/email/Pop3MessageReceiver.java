@@ -10,7 +10,6 @@
 
 package org.mule.providers.email;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
@@ -29,6 +28,7 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.util.FileUtils;
 import org.mule.util.UUID;
 
+import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -39,9 +39,11 @@ import javax.mail.URLName;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+
 
 /**
  * <code>Pop3MessageReceiver</code> polls a pop3 mailbox for messages removes
@@ -80,7 +82,13 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
             inbox = endpoint.getEndpointURI().getPath();
             if(inbox.length() == 0) {
                 // TODO danger here, custom connector may not necessarily inherit ImapConnector
-                inbox = ((ImapConnector) connector).getMailboxFolder();
+            	if(connector.getProtocol().toLowerCase().compareTo("imaps")==0)
+            	{
+            		inbox=((ImapsConnector)connector).getMailboxFolder();
+            	}else
+            	{
+            		inbox = ((ImapConnector) connector).getMailboxFolder();
+            	}
             } else {
                 inbox = inbox.substring(1);
             }
@@ -116,9 +124,6 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     public void doDisconnect() throws Exception
     {
-        if (folder != null && folder.isOpen()) {
-            folder.close(true);
-        }
     }
 
     public void doStop()
@@ -244,6 +249,8 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                 } catch (MessagingException e) {
                     logger.warn("Failed to open folder: " + folder.getFullName(), e);
                 }
+                // will be closed by the polling thread...
+                
                 // try
                 // {
                 // folder.close(true);
@@ -270,18 +277,23 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         if (backupFolder != null) {
             String filename = msg.getFileName();
             if (filename == null) {
-                filename = msg.getFrom()[0].toString() + "[" + UUID.getUUID() + "]";
+            	Address[] from=msg.getFrom();
+            	if(from!=null)
+            	{
+            		filename = from[0].toString();
+            	}
+            	else
+            	{
+            		filename = "(no from address)";
+            	}
+            	filename += "[" + UUID.getUUID() + "]";
             }
             filename = FileUtils.prepareWinFilename(filename);
             filename = backupFolder + filename + ".msg";
             logger.debug("Writing message to: " + filename);
             File f = FileUtils.createFile(filename);
-            FileWriter fw = new FileWriter(f);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            msg.writeTo(baos);
-            fw.write(new String(baos.toByteArray()));
-            baos.close();
-            fw.close();
+            FileOutputStream fos = new FileOutputStream(f);
+            msg.writeTo(fos);
         }
     }
 
@@ -304,9 +316,17 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
             } else if (count == -1) {
                 throw new MessagingException("Cannot monitor folder: " + folder.getFullName() + " as folder is closed");
             }
-            folder.close(true); // close and expunge deleted messages
         } catch (MessagingException e) {
             handleException(e);
+        }finally
+        {
+        	try
+        	{
+        		folder.close(true); // close and expunge deleted messages
+        	}catch(Exception e)
+        	{
+        		logger.error("Failed to close pop3  inbox: " + e.getMessage());
+        	}
         }
     }
 
@@ -315,14 +335,6 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         super.doDispose();
         if (folder != null) {
             folder.removeMessageCountListener(this);
-        }
-
-        try {
-            if (folder != null) {
-                folder.close(false);
-            }
-        } catch (Exception e) {
-            logger.error("Failed to close pop3  inbox: " + e.getMessage());
         }
     }
 
