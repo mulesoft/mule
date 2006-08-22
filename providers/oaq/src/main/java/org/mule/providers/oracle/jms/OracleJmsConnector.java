@@ -10,24 +10,22 @@
 
 package org.mule.providers.oracle.jms;
 
-import java.io.Serializable;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.naming.NamingException;
 
+import java.io.Serializable;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.jms.AQjmsSession;
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectException;
@@ -280,5 +278,4 @@ public class OracleJmsConnector extends JmsConnector {
         return jdbcConnectionPool;
     }
 
-    private static Log log = LogFactory.getLog(OracleJmsConnector.class);
 }

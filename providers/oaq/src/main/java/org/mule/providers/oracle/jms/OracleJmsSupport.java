@@ -10,8 +10,6 @@
 
 package org.mule.providers.oracle.jms;
 
-import java.util.Map;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -24,10 +22,10 @@ import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
 
+import java.util.Map;
+
 import oracle.jms.AQjmsSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
 
@@ -174,5 +172,4 @@ public class OracleJmsSupport extends Jms102bSupport {
         this.endpointProperties = endpointProperties;
     }
 
-    private static Log log = LogFactory.getLog(OracleJmsSupport.class);
 }
