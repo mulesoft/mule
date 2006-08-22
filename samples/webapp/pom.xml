@@ -11,13 +11,7 @@
 	<artifactId>mule-samples-webapp</artifactId>
 	<packaging>war</packaging>
 	<name>Web App Example</name>
-	<description>
-		Is a webapp that provides an interface to some of the examples
-		here such as the LoanBroker, Hello World and Echo examples. It
-		also provides examples of accessing Mule using REST style
-		service calls and is itself an example of how to embed Mule in a
-		webapp.
-	</description>
+	<description>Is a webapp that provides an interface to some of the examples here such as the LoanBroker, Hello World and Echo examples. It also provides examples of accessing Mule using REST style service calls and is itself an example of how to embed Mule in a webapp.</description>
 
 	<dependencies>
 		<dependency>

@@ -10,12 +10,7 @@
 	</parent>
 	<artifactId>mule-samples-stockquote</artifactId>
 	<name>Stock Quotes Sample</name>
-	<description>
-		This example demonstrates how to invoke an ASPX web service from
-		Mule and transform the result using XSLT and deserialise the
-		result to a StockQuote javabean. The examples demonstrates
-		invoking the service using REST and SOAP.
-	</description>
+	<description>This example demonstrates how to invoke an ASPX web service from Mule and transform the result using XSLT and deserialise the result to a StockQuote javabean. The examples demonstrates invoking the service using REST and SOAP.</description>
 
 	<dependencies>
 		<dependency>

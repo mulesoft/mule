@@ -10,10 +10,7 @@
 	</parent>
 	<artifactId>mule-samples-echo</artifactId>
 	<name>Echo Sample</name>
-	<description>
-		Is a simple component example that demostrates how to expose a
-		component over multiple transports (soap and stream).
-	</description>
+	<description>Is a simple component example that demostrates how to expose a component over multiple transports (soap and stream).</description>
 
 	<dependencies>
 		<dependency>
