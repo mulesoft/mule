@@ -460,7 +460,7 @@
           <id>ci-server</id>
           <distributionManagement>
             <site>
-              <url>file:///home/luntbuild/publish/mule/site</url>
+              <url>file:///home/luntbuild/publish/mule/docs</url>
             </site>
           </distributionManagement>
         </profile>
