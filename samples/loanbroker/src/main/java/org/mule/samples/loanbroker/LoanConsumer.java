@@ -16,7 +16,9 @@ import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.DateUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,9 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>LoanConsumer</code> is a loacn broker client app that uses command line prompts
+ * <code>LoanConsumer</code> is a loan broker client app that uses command line prompts
  * to obtain loan requests
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -133,18 +135,20 @@ public class LoanConsumer
     public static void main(String[] args)
     {
         LoanConsumer loanConsumer = null;
-
         try {
-            if (args.length > 0) {
-                loanConsumer = new LoanConsumer(args[0]);
+            String config = SystemUtils.getCommandLineOption("-config", args);
+            if (StringUtils.isNotBlank(config)) {
+                loanConsumer = new LoanConsumer(config);
 
                 int i = 100;
-                if (args.length > 1) {
-                    i = Integer.parseInt(args[1]);
+                String requests = SystemUtils.getCommandLineOption("-req", args);
+                if (requests != null) {
+                    i = Integer.parseInt(requests);
                 }
 
-                if (args.length > 2) {
-                    synchronous = Boolean.valueOf(args[2]).booleanValue();
+                String sync = SystemUtils.getCommandLineOption("-sync", args);
+                if (sync != null) {
+                    synchronous = Boolean.valueOf(sync).booleanValue();
                 }
 
                 if (synchronous) {
@@ -167,8 +171,7 @@ public class LoanConsumer
                 }
             }
             else {
-                String config = getConfig();
-                loanConsumer = new LoanConsumer(config);
+                loanConsumer = new LoanConsumer(getInteractiveConfig());
                 loanConsumer.run(synchronous);
             }
 
@@ -180,7 +183,7 @@ public class LoanConsumer
         }
     }
 
-    protected static String getConfig() throws IOException
+    protected static String getInteractiveConfig() throws IOException
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Welcome to the Mule Loan Broker example"));
 
