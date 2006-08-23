@@ -13,9 +13,7 @@ in INSTALL.txt first.  To run this example:
 Linux / Unix
 ------------
 mule -config error-config.xml
-mule -config error-spring-config.xml -builder spring
 
 Windows
 -------
 mule.bat -config error-config.xml
-mule.bat -config error-spring-config.xml -builder spring
