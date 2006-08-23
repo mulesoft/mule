@@ -96,7 +96,7 @@ Assembly descriptor for the full Mule distribution.
 		<include>org.mule:mule-module-acegi</include>
 		<include>org.mule:mule-module-client</include>
 		<include>org.mule:mule-module-hivemind</include>
-		<include>org.mule:mule-module-i18n</include>
+		<include>org.mule:mule-i18n_ja_JP</include>
 		<include>org.mule:mule-module-jotm</include>
 		<include>org.mule:mule-module-pgp</include>
 		<include>org.mule:mule-module-picocontainer</include>
