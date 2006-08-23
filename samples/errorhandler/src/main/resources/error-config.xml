@@ -10,7 +10,7 @@
     how to publish events to multiple outbound endpoints. The sample consists of two components;
     ExceptionManager and BusinessErrorManager.
     </description>
-    
+
     <environment-properties>
         <!-- provider properties-->
         <property name="java.naming.username" value="[% Your Jndi User name %]"/>
@@ -25,7 +25,7 @@
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="../conf/applicationContext.xml"/>
+            <property name="configFile" value="error-beans.xml"/>
         </properties>
     </container-context>
 

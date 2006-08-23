@@ -8,7 +8,7 @@
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="src/samples/errorhandler/conf/applicationContext.xml"/>
+            <property name="configFile" value="error-beans.xml"/>
         </properties>
     </container-context>
 
