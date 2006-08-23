@@ -53,6 +53,11 @@ configuration builder you could specify:
 
 mule -config my-config.xml -builder org.mule.extras.spring.SpringConfigurationBuilder
 
+Since the Spring configuration builder is so commonly used, a shortcut has been created
+for it, so you can even abbreviate the above with:
+
+mule -config my-config.xml -builder spring
+
 +------------------+
 | ADVANCED OPTIONS |
 +------------------+
