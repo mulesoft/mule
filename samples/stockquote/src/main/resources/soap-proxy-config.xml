@@ -23,6 +23,15 @@
         </properties>
     </connector>
 
+    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+            <property name="proxyHostname" value="${http.proxyHostname}"/>
+            <property name="proxyPort" value="${http.proxyPort}"/>
+            <property name="proxyUsername" value="${http.proxyUsername}"/>
+            <property name="proxyPassword" value="${http.proxyPassword}"/>
+        </properties>
+    </connector>
+
     <transformers>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
         <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>

@@ -2,7 +2,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Mule_Dot_Net_Stock_Quote_Sample_using_SOAP" version="1.0">
+<mule-configuration id="Mule_Dot_Net_Stock_Quote_Sample_using_WSDL_XFire" version="1.0">
     <description>
     The StockQuote SOAP example uses the Mule RestServiceWrapper to invoke a remote .Net service
     Using SOAP RPC style invocation and displays the result.
@@ -20,6 +20,15 @@
         <properties>
             <property name="promptMessage" value="Please enter a stock symbol: "/>
             <property name="messageDelayTime" value="1000"/>
+        </properties>
+    </connector>
+
+    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+            <property name="proxyHostname" value="${http.proxyHostname}"/>
+            <property name="proxyPort" value="${http.proxyPort}"/>
+            <property name="proxyUsername" value="${http.proxyUsername}"/>
+            <property name="proxyPassword" value="${http.proxyPassword}"/>
         </properties>
     </connector>
 
@@ -48,17 +57,7 @@
                 <!-- we use a chaining transformer to send the results of one endpoint execution as the input
                 for the next endpoint.  In this case it writes it out to System.out -->
                 <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote">
-                        <properties>
-                            <property name="soapAction" value="${methodNamespace}${method}"/>
-                            <map name="soapMethods">
-                                <list name="qname{GetQuote:http://www.webserviceX.NET/}">
-                                    <entry value="symbol;string;in"/>
-                                    <entry value="GetQuoteResult;string;out"/>
-                                </list>
-                            </map>
-                        </properties>
-                    </endpoint>
+                    <endpoint address="wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
                     <endpoint address="stream://System.out" transformers="SgmlDecoder Xslt XmlToObject"/>
                 </router>
             </outbound-router>

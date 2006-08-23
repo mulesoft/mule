@@ -28,7 +28,7 @@
         <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
         <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
             <properties>
-                <property name="xslFile" value="soap-stock.xsl"/>
+                <property name="xslFile" value="xsl/soap-stock.xsl"/>
             </properties>
         </transformer>
     </transformers>
