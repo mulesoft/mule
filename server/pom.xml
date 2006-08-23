@@ -16,4 +16,12 @@
 		<module>full</module>
 		<module>custom</module>
 	</modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-module-boot</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
 </project>

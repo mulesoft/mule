@@ -31,7 +31,7 @@ Assembly descriptor for the full Mule distribution.
       <directory>../../../samples</directory>
       <outputDirectory>examples</outputDirectory>
       <excludes>
-      	<exclude>**/target</exclude>
+      	<exclude>**/target/**</exclude>
       </excludes>
     </fileSet>
 
@@ -94,6 +94,7 @@ Assembly descriptor for the full Mule distribution.
 		<!-- Modules -->
 		<include>org.mule:mule-filter-ognl</include>
 		<include>org.mule:mule-module-acegi</include>
+		<include>org.mule:mule-module-boot</include>
 		<include>org.mule:mule-module-client</include>
 		<include>org.mule:mule-module-hivemind</include>
 		<include>org.mule:mule-i18n_ja_JP</include>
@@ -141,6 +142,7 @@ Assembly descriptor for the full Mule distribution.
 		<exclude>org.mule:mule-xmpp-provider</exclude>
 		<!-- Modules -->
 		<exclude>org.mule:mule-filter-ognl</exclude>
+		<exclude>org.mule:mule-module-boot</exclude>
 		<exclude>org.mule:mule-module-acegi</exclude>
 		<exclude>org.mule:mule-module-client</exclude>
 		<exclude>org.mule:mule-module-hivemind</exclude>
@@ -161,7 +163,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.samples:mule-samples-stockquote</exclude>
         <exclude>org.mule.samples:mule-samples-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
-        <exclude>org.mule:mule-full</exclude>
+        <exclude>org.mule.distributions:mule-full</exclude>
       </excludes>
     </dependencySet>
 

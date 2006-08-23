@@ -57,7 +57,7 @@ Assembly descriptor for the composite Mule library (jar).
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
       <excludes>
-        <exclude>org.mule:mule-embedded</exclude>
+        <exclude>org.mule.distributions:mule-embedded</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
