@@ -44,8 +44,9 @@ The distribution you have downloaded contains the following:
 ./logs         - Output will be sent here by default when running in background mode
 ./sbin         - Internal scripts which are not to be run by the user
 ./src          - The source code for all Mule modules, you can import this into your IDE
+./INSTALL.txt  - erm... this file!
 ./LICENSE.txt  - License agreement for Mule
-./README.txt   - erm... this file!
+./USAGE.txt    - Basic usage of Mule from the command-line
 
 +-----------------+
 | GETTING STARTED |
