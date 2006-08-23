@@ -14,18 +14,19 @@
     <description>These are the modules that comprise the Mule platform. mule-core is the main server module and trans port modules are prepended with '-provider'.</description>
 
     <modules>
-        <module>mule-i18n_ja_JP</module>
-        <module>ognl</module>
-        <module>scripting</module>
-        <module>spring</module>
         <module>acegi</module>
         <module>client</module>
         <module>hivemind</module>
+        <module>jaas</module>
         <module>jotm</module>
+        <module>mule-i18n_ja_JP</module>
+        <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
         <module>ra</module>
+        <module>scripting</module>
+        <module>spring</module>
     </modules>
 
     <dependencies>
