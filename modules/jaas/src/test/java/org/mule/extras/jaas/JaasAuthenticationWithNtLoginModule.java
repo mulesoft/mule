@@ -20,29 +20,33 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
 
-public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase {
-	
-	public JaasAuthenticationWithNtLoginModule() {
-		super();
-		this.setDisposeManagerPerSuite(true);
-	}
+public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
+{
 
-	public void testCaseAuthentication() throws Exception{
-	    MuleClient client = new MuleClient();
-	    
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
-	    assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertTrue(m.getPayloadAsString().equals("Test Received"));
-	}
-	
-				    
-	protected String getConfigResources() {
-		return "mule-conf-with-NTLoginModule.xml";
-	} 
+    public JaasAuthenticationWithNtLoginModule()
+    {
+        super();
+        this.setDisposeManagerPerSuite(true);
+    }
+
+    public void testCaseAuthentication() throws Exception
+    {
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
+        assertNotNull(m);
+        assertTrue(m.getPayload() instanceof String);
+        assertTrue(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    protected String getConfigResources()
+    {
+        return "mule-conf-with-NTLoginModule.xml";
+    }
 }

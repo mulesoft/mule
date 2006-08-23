@@ -10,7 +10,6 @@
 
 package org.mule.extras.jaas;
 
-
 import java.io.IOException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -20,21 +19,19 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.mule.umo.security.UMOAuthentication;
 
 /**
- * 
  * @author Marie.Rizzo
- *
  */
-public class MuleCallbackHandler implements CallbackHandler {
+public class MuleCallbackHandler implements CallbackHandler
+{
     private UMOAuthentication authentication;
     private String username;
     private String password;
- 
-    
+
     /**
-     * 
      * @param authentication
      */
-    public MuleCallbackHandler(UMOAuthentication authentication) {
+    public MuleCallbackHandler(UMOAuthentication authentication)
+    {
         this.authentication = authentication;
         this.username = (String)this.authentication.getPrincipal();
         this.password = (String)this.authentication.getCredentials();
@@ -42,22 +39,28 @@ public class MuleCallbackHandler implements CallbackHandler {
 
     /**
      * The handle() method handles the callbacks to be passed to the Jaas security.
-     * It makes use of two types of callbacks: the NameCallback and the PasswordCallback.
+     * It makes use of two types of callbacks: the NameCallback and the
+     * PasswordCallback.
      */
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException 
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof NameCallback) {
-                NameCallback nameCb = (NameCallback)callbacks[i]; 
+        for (int i = 0; i < callbacks.length; i++)
+        {
+            if (callbacks[i] instanceof NameCallback)
+            {
+                NameCallback nameCb = (NameCallback)callbacks[i];
                 nameCb.setName(username);
-            } else if(callbacks[i] instanceof PasswordCallback) {
+            }
+            else if (callbacks[i] instanceof PasswordCallback)
+            {
                 PasswordCallback passCb = (PasswordCallback)callbacks[i];
                 passCb.setPassword(password.toCharArray());
-            } else {
-                throw(new UnsupportedCallbackException(callbacks[i],"Callback class not supported"));
+            }
+            else
+            {
+                throw (new UnsupportedCallbackException(callbacks[i],
+                    "Callback class not supported"));
             }
         }
     }
 }
-
-

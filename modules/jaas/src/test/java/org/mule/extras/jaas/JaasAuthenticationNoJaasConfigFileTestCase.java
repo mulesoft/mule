@@ -20,82 +20,95 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
 
-public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCase {
-	
-	public JaasAuthenticationNoJaasConfigFileTestCase() {
-		super();
-		this.setDisposeManagerPerSuite(true);
-	}
+public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCase
+{
 
-	public void testCaseGoodAuthentication() throws Exception{
-	    MuleClient client = new MuleClient();
-	    
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
-	    assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertTrue(m.getPayloadAsString().equals("Test Received"));
-	}
-	
-	public void testCaseDifferentGoodAuthentication() throws Exception{
-	    MuleClient client = new MuleClient();
-	    
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
+    public JaasAuthenticationNoJaasConfigFileTestCase()
+    {
+        super();
+        this.setDisposeManagerPerSuite(true);
+    }
+
+    public void testCaseGoodAuthentication() throws Exception
+    {
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
         assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertTrue(m.getPayloadAsString().equals("Test Received"));   
-	}
-	
-	public void testCaseWrongCombinationOfCorrectUsernameAndPassword() throws Exception{
-	    MuleClient client = new MuleClient();
-	    
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
+        assertTrue(m.getPayload() instanceof String);
+        assertTrue(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    public void testCaseDifferentGoodAuthentication() throws Exception
+    {
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
         assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertFalse(m.getPayloadAsString().equals("Test Received"));
-	}
-	
-	public void testCaseBadUserName() throws Exception{
-	    MuleClient client = new MuleClient();
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
+        assertTrue(m.getPayload() instanceof String);
+        assertTrue(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    public void testCaseWrongCombinationOfCorrectUsernameAndPassword() throws Exception
+    {
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
         assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertFalse(m.getPayloadAsString().equals("Test Received"));
-	}
-	
-	public void testCaseBadPassword() throws Exception{
-	    MuleClient client = new MuleClient();
-		Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);     
-        UMOMessage m = client.send("vm://localhost/test","Test", props);
-        
+        assertTrue(m.getPayload() instanceof String);
+        assertFalse(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    public void testCaseBadUserName() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
         assertNotNull(m);
-	    assertTrue(m.getPayload() instanceof String);
-	    assertFalse(m.getPayloadAsString().equals("Test Received"));    
-	}
-				    
-	protected String getConfigResources() {
-		return "mule-conf-with-no-jaas-config-file.xml";
-	} 
+        assertTrue(m.getPayload() instanceof String);
+        assertFalse(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    public void testCaseBadPassword() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+
+        assertNotNull(m);
+        assertTrue(m.getPayload() instanceof String);
+        assertFalse(m.getPayloadAsString().equals("Test Received"));
+    }
+
+    protected String getConfigResources()
+    {
+        return "mule-conf-with-no-jaas-config-file.xml";
+    }
 }
