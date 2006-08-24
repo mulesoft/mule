@@ -24,6 +24,26 @@ import org.mule.umo.manager.UMOManager;
 public interface ConfigurationBuilder
 {
     /**
+     * Will configure a UMOManager based on the configurations made available
+     * through Readers
+     *
+     * @param configResources an array of Readers
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManager configure(ReaderResource[] configResources) throws ConfigurationException;
+
+    /**
+     * Will configure a UMOManager based on the configuration file(s) provided.
+     *
+     * @param configResources a comma separated list of configuration files to
+     *            load, this should be accessible on the classpath or filesystem
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManager configure(String configResources) throws ConfigurationException;
+
+    /**
      * Will configure a UMOManager based on the configuration file(s) provided.
      *
      * @param configResources - A comma-separated list of configuration files to
