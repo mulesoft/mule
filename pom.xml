@@ -405,7 +405,7 @@
         <module>providers</module>
         <module>samples</module>
         <!-- <module>tools</module> -->
-        <module>mule-buildtools</module>
+        <module>buildtools</module>
     </modules>
 
     <!--
