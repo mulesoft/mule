@@ -119,8 +119,8 @@ public abstract class AbstractDigesterConfiguration
     }
 
     /**
-     * Attempt to load a configuration resource from the classpath, file
-     * sytem, or as a URL.
+     * Attempt to load a configuration resource from the file system, classpath,
+     * or as a URL, in that order.
      *
      * @param configResource Mule configuration resources
      * @return an InputStream to the resource

@@ -137,10 +137,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
-     * Resource can be a URL, a path on the local file system or a resource name
-     * on the classpath. Finds and loads the resource by doing the following -
-     * 1. load it from the classpath 2. load it from the local file system 3.
-     * load it as a URL
+     * Attempts to locate a resource on the file system, classpath, or as a URL,
+     * in that order.
      *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
@@ -153,20 +151,10 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         if (resourceName == null) {
             throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Resource name").getMessage());
         }
-
-        // Try to load the resource from the classpath.
         InputStream is = null;
-        try {
-            is = getResourceAsStream(resourceName, callingClass);
-            if (is == null) {
-                logger.debug("Unable to load resource from the classpath");
-            }
-        } catch (Exception e) {
-            logger.debug("Unable to load resource from the classpath: " + e.getMessage());
-        }
 
         // Try to load the resource from the file system.
-        if ((is == null) && tryAsFile) {
+        if (tryAsFile) {
             try {
                 File file = new File(resourceName);
                 // Try using the startup directory in case the file has been given using
@@ -184,6 +172,19 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 logger.debug("Unable to load resource from the file system: " + e.getMessage());
             }
         }
+
+        // Try to load the resource from the classpath.
+        if (is == null) {
+            try {
+                is = getResourceAsStream(resourceName, callingClass);
+                if (is == null) {
+                    logger.debug("Unable to load resource from the classpath");
+                }
+            } catch (Exception e) {
+                logger.debug("Unable to load resource from the classpath: " + e.getMessage());
+            }
+        }
+
         // Try to load the resource as a URL.
         if ((is == null) && tryAsUrl) {
             try {
