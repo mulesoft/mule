@@ -5,7 +5,7 @@
     <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule</groupId>
-    <artifactId>mule-project</artifactId>
+    <artifactId>mule</artifactId>
     <packaging>pom</packaging>
     <version>1.3-SNAPSHOT</version>
 
@@ -228,13 +228,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.mule</groupId>
-                        <artifactId>buildtools</artifactId>
-                        <version>${version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
 
@@ -274,7 +267,7 @@
                     <!--</execution>-->
                 <!--</executions>-->
             <!--</plugin>-->
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -375,8 +368,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
-                    <configLocation>codecheck/checkstyle.xml</configLocation>
-                    <headerLocation>codecheck/LICENSE.txt</headerLocation>
+                    <configLocation>etc/checkstyle/checkstyle.xml</configLocation>
                 </configuration>
            </plugin>
 
@@ -403,10 +395,8 @@
         <module>mule</module>
         <module>modules</module>
         <module>providers</module>
-
-        <!--<module>samples</module>-->
+        <module>samples</module>
         <!-- <module>tools</module> -->
-        <module>buildtools</module>
     </modules>
 
     <!--
