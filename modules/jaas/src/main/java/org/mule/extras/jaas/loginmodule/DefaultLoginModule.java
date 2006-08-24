@@ -43,20 +43,29 @@ public class DefaultLoginModule implements LoginModule
     private String username;
     private String password;
     private String credentials;
-    private List CredentialList;
+    private List credentialList;
 
-    public boolean abort() throws LoginException
+    /**
+     * Abort if authentication fails
+     * 
+     * @return boolean
+     * @throws LoginException
+     */
+    public final boolean abort() throws LoginException
     {
-        if (succeeded == false)
+        if (!succeeded)
         {
             return false;
         }
-        else if (succeeded == true && commitSucceeded == false)
+        else if (succeeded && !commitSucceeded)
         {
             // login succeeded but overall authentication failed
             succeeded = false;
             username = null;
-            if (password != null) password = null;
+            if (password != null) 
+            {
+                password = null;
+            }
         }
         else
         {
@@ -67,9 +76,15 @@ public class DefaultLoginModule implements LoginModule
         return true;
     }
 
-    public boolean commit() throws LoginException
+    /**
+     * Commit if authentication succeeds, otherwise return false
+     * 
+     * @return boolean
+     * @throws LoginException
+     */
+    public final boolean commit() throws LoginException
     {
-        if (succeeded == false)
+        if (!succeeded)
         {
             return false;
         }
@@ -84,28 +99,44 @@ public class DefaultLoginModule implements LoginModule
         }
     }
 
-    public void initialize(Subject subject,
-                           CallbackHandler callbackHandler,
-                           Map sharedState,
-                           Map options)
+    /**
+     * Initialises the callbackHandler, the credentials and the credentials list
+     * 
+     * @param subject
+     * @param callbackHandler
+     * @param sharedState
+     * @param options
+     */
+    public final void initialize(Subject subject,
+                                 CallbackHandler callbackHandler,
+                                 Map sharedState,
+                                 Map options)
     {
         this.callbackHandler = callbackHandler;
 
-        this.credentials = (String)options.get("credentials");
-        this.CredentialList = GetCredentialList(this.credentials);
+        this.credentials = (String) options.get("credentials");
+        this.credentialList = getCredentialList (this.credentials);
     }
 
     /**
      * This method attempts to login the user by checking his credentials against
      * those of the authorised users.
+     * 
+     * @throws LoginException This is thrown either when there is no callback Handler
+     *             or else when the user fails to be authenticated
      */
-    public boolean login() throws LoginException
+    public final boolean login() throws LoginException
     {
         if (callbackHandler == null)
+        {
             throw new LoginException("Error: no CallbackHandler available "
                                      + "to garner authentication information from the user");
+        }
 
-        if (callbackHandler == null) throw new LoginException("no handler");
+        if (callbackHandler == null)
+        {
+            throw new LoginException("no handler");
+        }
 
         NameCallback nameCb = new NameCallback("user: ");
         PasswordCallback passCb = new PasswordCallback("password: ", true);
@@ -137,9 +168,9 @@ public class DefaultLoginModule implements LoginModule
         succeeded = false;
 
         // check the username and password against the list of authorised users
-        for (int i = 0; i < CredentialList.size(); i = i + 2)
+        for (int i = 0; i < credentialList.size(); i = i + 2)
         {
-            if (username.equals(CredentialList.get(i).toString()))
+            if (username.equals(credentialList.get(i).toString()))
             {
                 usernameCorrect = true;
             }
@@ -148,7 +179,7 @@ public class DefaultLoginModule implements LoginModule
                 usernameCorrect = false;
             }
 
-            if (password.equals(CredentialList.get(i + 1).toString()))
+            if (password.equals(credentialList.get(i + 1).toString()))
             {
                 passwordCorrect = true;
             }
@@ -166,7 +197,9 @@ public class DefaultLoginModule implements LoginModule
         }
 
         if (succeeded)
+        {
             return true;
+        }
         else
         {
             succeeded = false;
@@ -183,16 +216,14 @@ public class DefaultLoginModule implements LoginModule
         }
     }
 
-    public boolean logout() throws LoginException
+    /**
+     * Returns true when authentication succeeds or false when it fails
+     * 
+     * @return succeeded
+     */
+    public final boolean logout()
     {
-        if (succeeded == false)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return succeeded;
     }
 
     /**
@@ -201,48 +232,48 @@ public class DefaultLoginModule implements LoginModule
      * checked
      * 
      * @param credentials
-     * @return
+     * @return outputList
      */
-    public List GetCredentialList(String credentials)
+    public final List getCredentialList(String credentials)
     {
         boolean semicolonIsFound = false;
         boolean dividerIsFound = false;
         char[] credentialArray = credentials.toCharArray();
         String username = "";
         String password = "";
-        List Outputlist = new Vector();
+        List outputList = new Vector();
 
         for (int i = 0; i < credentials.length(); i++)
         {
-            if ((credentialArray[i] != ':') & (dividerIsFound == false))
+            if ((credentialArray[i] != ':') && (!dividerIsFound))
             {
                 username = username + credentialArray[i];
             }
-            else if ((credentialArray[i] == ':') && (dividerIsFound == false))
+            else if ((credentialArray[i] == ':') && (!dividerIsFound))
             {
                 dividerIsFound = true;
             }
-            else if ((credentialArray[i] != ';') && (semicolonIsFound == false)
-                     && (dividerIsFound == true))
+            else if ((credentialArray[i] != ';') && (!semicolonIsFound)
+                     && (dividerIsFound))
             {
                 password = password + credentialArray[i];
             }
-            else if ((credentialArray[i] != ';') && (semicolonIsFound == false)
-                     && (dividerIsFound == true))
+            else if ((credentialArray[i] != ';') && (!semicolonIsFound)
+                     && (dividerIsFound))
             {
                 password = password + credentialArray[i];
             }
-            else if ((credentialArray[i] == ';') && (semicolonIsFound == false)
-                     && (dividerIsFound == true))
+            else if ((credentialArray[i] == ';') && (!semicolonIsFound)
+                     && (dividerIsFound))
             {
-                Outputlist.add(username);
-                Outputlist.add(password);
+                outputList.add(username);
+                outputList.add(password);
                 semicolonIsFound = false;
                 dividerIsFound = false;
                 username = "";
                 password = "";
             }
         }
-        return Outputlist;
+        return outputList;
     }
 }

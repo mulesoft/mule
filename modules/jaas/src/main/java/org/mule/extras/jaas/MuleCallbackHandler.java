@@ -33,27 +33,31 @@ public class MuleCallbackHandler implements CallbackHandler
     public MuleCallbackHandler(UMOAuthentication authentication)
     {
         this.authentication = authentication;
-        this.username = (String)this.authentication.getPrincipal();
-        this.password = (String)this.authentication.getCredentials();
+        this.username = (String) this.authentication.getPrincipal();
+        this.password = (String) this.authentication.getCredentials();
     }
 
     /**
      * The handle() method handles the callbacks to be passed to the Jaas security.
      * It makes use of two types of callbacks: the NameCallback and the
      * PasswordCallback.
+     * 
+     * @param callbacks
+     * @throws IOException
+     * @throws UnsupportedCallbackException 
      */
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+    public final void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
         for (int i = 0; i < callbacks.length; i++)
         {
             if (callbacks[i] instanceof NameCallback)
             {
-                NameCallback nameCb = (NameCallback)callbacks[i];
+                NameCallback nameCb = (NameCallback) callbacks[i];
                 nameCb.setName(username);
             }
             else if (callbacks[i] instanceof PasswordCallback)
             {
-                PasswordCallback passCb = (PasswordCallback)callbacks[i];
+                PasswordCallback passCb = (PasswordCallback) callbacks[i];
                 passCb.setPassword(password.toCharArray());
             }
             else

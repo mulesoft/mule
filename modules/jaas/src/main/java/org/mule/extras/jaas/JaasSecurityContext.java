@@ -19,21 +19,36 @@ import org.mule.umo.security.UMOSecurityContext;
  */
 public class JaasSecurityContext implements UMOSecurityContext
 {
+    
+    private MuleAuthentication authentication;
 
-    MuleAuthentication authentication;
-
+    /**
+     * Constructor for the class
+     * 
+     * @param authentication
+     */
     public JaasSecurityContext(MuleAuthentication authentication)
     {
         this.authentication = authentication;
     }
 
-    public UMOAuthentication getAuthentication()
+    /**
+     * Returns the authentication
+     * 
+     * @return authentication
+     */
+    public final UMOAuthentication getAuthentication()
     {
         return authentication;
     }
 
-    public void setAuthentication(UMOAuthentication authentication)
+    /**
+     * Sets the Authentication
+     * 
+     * @param authentication
+     */
+    public final void setAuthentication(UMOAuthentication authentication)
     {
-        this.authentication = (MuleAuthentication)authentication;
+        this.authentication = (MuleAuthentication) authentication;
     }
 }
