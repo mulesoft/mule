@@ -31,7 +31,13 @@ import org.mule.util.StringUtils;
  * based on the configuration files on the classpath. the default config resource name is
  * <b>mule-config.xml</b> but this can be overrided by passing a config resourse name or
  * a list of resource names (comma separated) to the configure method.
- * 
+ *
+ * @deprecated The functionality of this configuration builder (loading resources
+ *  from the classpath) is now available in the standard MuleXmlConfigurationBuilder.
+ *  If you are using this builder, please verify whether your configuration will
+ *  work with org.mule.config.builders.MuleXmlConfigurationBuilder as this class is
+ *  deprecated and is soon to be removed.
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,7 +57,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
 
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
-     * 
+     *
      * @param configResources
      *            can be null or a comma separated resources name string that will be used
      *            to search the classpath. The default is mule-config.xml.
@@ -59,9 +65,9 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
      * @throws org.mule.config.ConfigurationException
      *             if the configResources param is invalid or the configurations fail to
      *             load
-     * 
+     *
      */
-    public UMOManager configure(String configResources) throws ConfigurationException
+    public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException
     {
         if (StringUtils.isBlank(configResources)) {
             configResources = MULE_CONFIGURATION_RESOURCE;
@@ -92,7 +98,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
 
         ReaderResource[] resources = new ReaderResource[list.size()];
         resources = (ReaderResource[])list.toArray(resources);
-        configure(resources);
+        configure(resources, null);
         return manager;
     }
 }

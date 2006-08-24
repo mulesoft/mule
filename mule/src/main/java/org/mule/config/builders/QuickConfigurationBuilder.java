@@ -9,6 +9,9 @@
  */
 package org.mule.config.builders;
 
+import java.util.Map;
+import java.util.Properties;
+
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -33,13 +36,11 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
 
-import java.util.Map;
-
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can
  * be used by clients, configuration scripts or test cases to quickly configure
  * a manager
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -60,7 +61,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Will construct a new Quick Config builder with the option of disposing of
      * the current Manager if one exists
-     * 
+     *
      * @param disposeCurrent true to dispose the current manager
      */
     public QuickConfigurationBuilder(boolean disposeCurrent)
@@ -88,7 +89,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Configures a started manager. This method will throw
      * InitialisationException if the current manager is already started
-     * 
+     *
      * @param synchronous whether to start the manager in synchronous mode
      * @param serverUrl the url used to receive client requests, or null if the
      *            server listening components should not be set up
@@ -131,7 +132,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Configures a started manager. This method will throw
      * InitialisationException if the current manager is already started
-     * 
+     *
      * @param synchronous whether to start the manager in synchronous mode
      * @param serverUrl the url used to receive client requests, or null if the
      *            server listening components should not be set up
@@ -166,7 +167,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * Registers a java object as a Umo pcomponent that listens for events on
      * the given url. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
-     * 
+     *
      * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload
      *            type
@@ -186,7 +187,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * events on the given urls. By default the ThreadingProfile for the
      * components will be set so that there will only be one thread of
      * execution.
-     * 
+     *
      * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload
      *            type
@@ -267,7 +268,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * </code>
      * Calling this method is equivilent to calling
      * UMOModel.registerComponent(..)
-     * 
+     *
      * @param descriptor the componet descriptor to register
      * @throws UMOException the descriptor is invalid or cannot be initialised
      *             or started
@@ -282,7 +283,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * Registers a java object as a Umo pcomponent that listens for events on
      * the given url. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation
@@ -301,7 +302,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * Registers a java object as a Umo pcomponent that listens for events on
      * the given url. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation
@@ -324,7 +325,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * events on the given urls. By default the ThreadingProfile for the
      * components will be set so that there will only be one thread of
      * execution.
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation which event to invoke based on the evnet
@@ -333,7 +334,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      *            later unregister it
      * @param inboundEndpointUri The url endpointUri to listen to
      * @param outboundEndpointUri The url endpointUri to dispatch to
-     * 
+     *
      * @throws UMOException
      */
     public UMOComponent registerComponent(String implementation,
@@ -349,7 +350,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * events on the given urls. By default the ThreadingProfile for the
      * components will be set so that there will only be one thread of
      * execution.
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation which event to invoke based on the evnet
@@ -374,7 +375,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation which event to invoke based on the evnet
@@ -408,7 +409,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation which event to invoke based on the evnet
@@ -442,7 +443,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     * 
+     *
      * @param implementation either a container refernece to an object or a
      *            fully qualified class name to use as the component
      *            implementation which event to invoke based on the evnet
@@ -476,7 +477,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Sets the component resolver on the model. Component resolver is used to
      * look up components in an external container such as Spring or Pico
-     * 
+     *
      * @param ctx
      * @throws UMOException
      */
@@ -489,7 +490,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * Unregisters a previously register components. This will also unregister
      * any listeners for the components Calling this method is equivilent to
      * calling UMOModel.unregisterComponent(..)
-     * 
+     *
      * @param name the name of the componet to unregister
      * @throws UMOException if unregistering the components fails, i.e. The
      *             underlying transport fails to unregister a listener. If the
@@ -572,16 +573,25 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return manager;
     }
 
+    /**
+     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
+     */
     public UMOManager configure(String configResources) throws ConfigurationException {
-        try {
-            manager.start();
-        } catch (UMOException e) {
-            throw new ConfigurationException(e);
-        }
-        return manager;
+        return configure(configResources, null);
     }
 
+    public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException {
+        return configure(new ReaderResource[0], null);
+    }
+
+    /**
+     * @deprecated Please use configure(ReaderResource[] configResources, Properties startupProperties) instead.
+     */
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+        return configure(configResources, null);
+    }
+
+    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties) throws ConfigurationException {
         try {
             manager.start();
         } catch (UMOException e) {
@@ -591,6 +601,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     public boolean isConfigured() {
-        return manager!=null; 
+        return manager!=null;
     }
 }

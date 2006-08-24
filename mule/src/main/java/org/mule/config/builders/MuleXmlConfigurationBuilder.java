@@ -10,6 +10,15 @@
 
 package org.mule.config.builders;
 
+import java.beans.ExceptionListener;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.digester.AbstractObjectCreationFactory;
 import org.apache.commons.digester.Digester;
@@ -76,17 +85,10 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
-
-import java.beans.ExceptionListener;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
@@ -176,7 +178,14 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         return "mule-configuration";
     }
 
-    public UMOManager configure(String configResources) throws ConfigurationException
+    /**
+     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
+     */
+    public UMOManager configure(String configResources) throws ConfigurationException {
+        return configure(configResources, null);
+    }
+
+    public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException
     {
         try {
             String[] resources = StringUtils.split(configResources, ",");
@@ -186,15 +195,30 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 InputStream is = loadConfig(resources[i].trim());
                 readers[i] = new ReaderResource(resources[i].trim(), new InputStreamReader(is, configEncoding));
             }
-            return configure(readers);
+
+            // Load startup properties if any.
+            if (startupPropertiesFile != null) {
+                return configure(readers, PropertiesUtils.loadProperties(startupPropertiesFile, getClass()));
+            }
+            else return configure(readers, null);
+
         } catch (Exception e) {
             throw new ConfigurationException(e);
         }
     }
 
-    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
-    {
-        manager = (MuleManager)process(configResources);
+    /**
+     * @deprecated Please use configure(ReaderResource[] configResources, Properties startupProperties) instead.
+     */
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+        return configure(configResources, null);
+    }
+
+    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties) throws ConfigurationException {
+        if (startupProperties != null) {
+            ((MuleManager) MuleManager.getInstance()).addProperties(startupProperties);
+        }
+        manager = (MuleManager) process(configResources);
         try {
             setContainerProperties();
             setTransformers();

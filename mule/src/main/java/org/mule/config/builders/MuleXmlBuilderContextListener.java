@@ -67,7 +67,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     protected UMOManager createManager(String configResource, ServletContext context) throws ConfigurationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context);
-        return builder.configure(configResource);
+        return builder.configure(configResource, null);
     }
 
     /**
