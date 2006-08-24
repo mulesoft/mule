@@ -10,6 +10,11 @@
 
 package org.mule;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
@@ -20,19 +25,13 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local
- * Mule Server deamon. It is initalised with a mule-config.xml file.
+ * Mule Server daemon. It is initialised with a mule-config.xml file.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleServer implements Runnable
 {
@@ -65,51 +64,53 @@ public class MuleServer implements Runnable
     private static String configBuilderClassName = null;
 
     /**
-     * default constructor
+     * A properties file to be read at startup.  This can be useful for setting
+     * properties which depend on the run-time environment (dev, test, production).
      */
-    public MuleServer()
-    {
-        super();
-    }
+    private static String startupPropertiesFile = null;
 
-    public MuleServer(String configResources)
-    {
-        setConfigurationResources(configResources);
-    }
+    /**
+     * When using the Java Service Wrapper, this property is set to the current directory
+     * from which Mule was run (i.e., not necessarily $MULE_HOME/bin)
+     */
+    private static String startupDirectory = null;
 
     /**
      * application entry point
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         MuleServer server = new MuleServer();
-        List opts = Arrays.asList(args);
-        String config = null;
 
-        if (opts.size() > 0) {
-            config = getOption("-config", opts);
-            if (config != null) {
-                server.setConfigurationResources(config);
-            }
-        } else {
+        // The startup directory should have been passed as the first parameter.
+        if (args.length > 0) {
+        	startupDirectory = args[0];
+        }
+
+        String config = SystemUtils.getCommandLineOption("-config", args);
+        // Try default if no config file was given.
+        if (config == null) {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
             URL configUrl = ClassUtils.getResource(DEFAULT_CONFIGURATION, MuleServer.class);
             if (configUrl != null) {
                 config = configUrl.toExternalForm();
-                server.setConfigurationResources(config);
             }
         }
-
-        if (config == null) {
+        if (config != null) {
+            server.setConfigurationResources(config);
+        } else {
             Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
             System.err.println(message.toString());
             System.exit(1);
         }
 
-        // save the ConfigrationBuilderClass name
-        String cfgBuilderClassName = getOption("-builder", opts);
+        // Configuration builder
+        String cfgBuilderClassName = SystemUtils.getCommandLineOption("-builder", args);
         if (cfgBuilderClassName != null) {
             try {
+                // Provide a shortcut for Spring: "-builder spring"
+                if (cfgBuilderClassName.equalsIgnoreCase("spring")) {
+                    cfgBuilderClassName = "org.mule.extras.spring.config.SpringConfigurationBuilder";
+                }
                 setConfigBuilderClassName(cfgBuilderClassName);
             } catch (Exception e) {
                 logger.fatal(e);
@@ -119,18 +120,21 @@ public class MuleServer implements Runnable
             }
         }
 
+        // Startup properties
+        String propertiesFile = SystemUtils.getCommandLineOption("-props", args);
+        if (propertiesFile != null) {
+            setStartupPropertiesFile(propertiesFile);
+        }
+
         server.start(false);
     }
 
-    private static String getOption(String option, List options)
-    {
-        if (options.contains(option)) {
-            int i = options.indexOf(option);
-            if (i < options.size() - 1) {
-                return options.get(i + 1).toString();
-            }
-        }
-        return null;
+    public MuleServer() {
+        super();
+    }
+
+    public MuleServer(String configResources) {
+        setConfigurationResources(configResources);
     }
 
     /**
@@ -161,27 +165,6 @@ public class MuleServer implements Runnable
         } catch (Throwable e) {
             shutdown(e);
         }
-    }
-
-    /**
-     * Getter for property messengerURL.
-     *
-     * @return Value of property messengerURL.
-     */
-    public String getConfigurationResources()
-    {
-        return configurationResources;
-    }
-
-    /**
-     * Setter for property messengerURL.
-     *
-     * @param configurationResources New value of property
-     *            configurationResources.
-     */
-    public void setConfigurationResources(String configurationResources)
-    {
-        this.configurationResources = configurationResources;
     }
 
     /**
@@ -231,9 +214,12 @@ public class MuleServer implements Runnable
     {
         logger.info("Mule Server starting...");
 
+        // TODO Why is this disabled?
         // registerShutdownHook();
+
         // install an RMI security manager in case we expose any RMI objects
         if (System.getSecurityManager() == null) {
+            // TODO Why is this disabled?
             // System.setSecurityManager(new RMISecurityManager());
         }
 
@@ -242,20 +228,18 @@ public class MuleServer implements Runnable
         ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) cfgBuilderClass.newInstance();
 
         if (!cfgBuilder.isConfigured()) {
-            if (configurationResources != null) {
-                cfgBuilder.configure(configurationResources);
-            } else {
+            if (configurationResources == null) {
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-                cfgBuilder.configure(DEFAULT_CONFIGURATION);
+                configurationResources = DEFAULT_CONFIGURATION;
             }
+            cfgBuilder.configure(configurationResources, getStartupPropertiesFile());
         }
-
         logger.info("Mule Server initialized.");
     }
 
     /**
      * Will shut down the server displaying the cause and time of the shutdown
-     * 
+     *
      * @param e the exception that caused the shutdown
      */
     void shutdown(Throwable e)
@@ -295,6 +279,42 @@ public class MuleServer implements Runnable
 
         System.exit(0);
 
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ///////////////////////////////////////////////////////////////////
+
+    /**
+     * Getter for property messengerURL.
+     * @return Value of property messengerURL.
+     */
+    public String getConfigurationResources() {
+        return configurationResources;
+    }
+
+    /**
+     * Setter for property messengerURL.
+     * @param configurationResources New value of property configurationResources.
+     */
+    public void setConfigurationResources(String configurationResources) {
+        this.configurationResources = configurationResources;
+    }
+
+    public static String getStartupPropertiesFile() {
+        return startupPropertiesFile;
+    }
+
+    public static void setStartupPropertiesFile(String startupPropertiesFile) {
+        MuleServer.startupPropertiesFile = startupPropertiesFile;
+    }
+
+    public static String getStartupDirectory() {
+        return startupDirectory;
+    }
+
+    public static void setStartupDirectory(String startupDirectory) {
+        MuleServer.startupDirectory = startupDirectory;
     }
 
 }
