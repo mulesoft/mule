@@ -23,10 +23,13 @@
             <artifactId>xapool</artifactId>
             <version>1.4</version>
         </dependency>
+        
+        <!-- For unit tests only -->
         <dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>1.7.3.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
