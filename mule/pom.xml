@@ -5,8 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
-        <artifactId>mule-project</artifactId>
-        <relativePath>../pom.xml</relativePath>
+        <artifactId>mule</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-core</artifactId>
@@ -147,7 +146,7 @@
             <version>2.1-rc4</version>
         </dependency-->
 
-        <dependency>
+		<dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-activation</artifactId>
             <version>1.0.2-rc4</version>
@@ -267,9 +266,22 @@
         <!--
         ****************************************************************
         Testing Dependencies
-        ******************************************************************
+        ****************************************************************
         -->
-        <!-- These dependencies need scope="compile" for the org.mule.tck classes. -->
+        <!--
+        The idea is to move all the org.mule.tck classes out of mule-core and into a separate module,
+        however this creates a "cyclic reference" in Maven.
+        <dependency>
+            <groupId>org.codehaus.mule.tests</groupId>
+            <artifactId>mule-tck-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+
+        <!-- Promote the scope of these dependencies from "test" to "compile" because they are used by
+             the org.mule.tck classes.  Note that if we eventually get these classes moved to a separate
+             module, these dependencies can be removed. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
