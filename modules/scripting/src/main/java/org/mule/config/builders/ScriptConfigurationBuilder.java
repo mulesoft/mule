@@ -2,13 +2,18 @@
  * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+*
  * The software in this package is published under the terms of the BSD style
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- */
-
+*/
 package org.mule.config.builders;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.script.CompiledScript;
+import javax.script.Namespace;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,17 +26,12 @@ import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
-
-import javax.script.CompiledScript;
-import javax.script.Namespace;
-
-import java.io.IOException;
+import org.mule.util.PropertiesUtils;
 
 /**
  * Will configure a MuleManager from one or more script files
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder {
 
@@ -64,6 +64,13 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 
 
     /**
+     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
+     */
+    public UMOManager configure(String configResources) throws ConfigurationException {
+        return configure(configResources, null);
+    }
+
+    /**
      * Will configure a UMOManager based on the configuration file(s) provided.
      *
      * @param configResources a comma separated list of configuration files to
@@ -72,7 +79,7 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
      * @throws org.mule.config.ConfigurationException
      *
      */
-    public UMOManager configure(String configResources) throws ConfigurationException {
+    public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException {
 //        if(!initialised) {
 //            try {
 //                initialise();
@@ -82,10 +89,25 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 //            }
 //        }
         try {
-            return configure(ReaderResource.parseResources( configResources));
+            ReaderResource[] readers = ReaderResource.parseResources(configResources);
+
+            // Load startup properties if any.
+            if (startupPropertiesFile != null) {
+                return configure(readers, PropertiesUtils.loadProperties(startupPropertiesFile, getClass()));
+            }
+            else {
+                return configure(readers, null);
+            }
         } catch (IOException e) {
             throw new ConfigurationException(e);
         }
+    }
+
+    /**
+     * @deprecated Please use configure(ReaderResource[] configResources, Properties startupProperties) instead.
+     */
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+        return configure(configResources, null);
     }
 
     /**
@@ -97,9 +119,12 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
      * @throws org.mule.config.ConfigurationException
      *
      */
-    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
-        try {
+    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties) throws ConfigurationException {
+        if (startupProperties != null) {
+            ((MuleManager) MuleManager.getInstance()).addProperties(startupProperties);
+        }
 
+        try {
             for (int i = 0; i < configResources.length; i++) {
                 ReaderResource configResource = configResources[i];
                 setScriptFile(configResource.getDescription());

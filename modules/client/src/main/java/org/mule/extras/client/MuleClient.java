@@ -169,7 +169,7 @@ public class MuleClient implements Disposable
                     + MuleXmlConfigurationBuilder.class.getName());
             builder = new MuleXmlConfigurationBuilder();
         }
-        manager = builder.configure(configResources);
+        manager = builder.configure(configResources, null);
     }
 
     /**
