@@ -92,7 +92,7 @@ public class MuleServer implements Runnable
 
         // The startup directory should have been passed as the first parameter.
         if (args.length > 0) {
-        	startupDirectory = args[0];
+            startupDirectory = args[0];
         }
 
         String config = SystemUtils.getCommandLineOption("-config", args);
