@@ -2,12 +2,11 @@
  * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+*
  * The software in this package is published under the terms of the BSD style
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
- */
-
+*/
 package org.mule.config.builders;
 
 import org.apache.commons.logging.Log;
@@ -161,7 +160,7 @@ public class PlaceholderProcessor
                 + File.separator + DEFAULT_ENCRYPTION_PROPERTIES_FILE);
 
         logger.info("Attempting to load encryption properties from: " + path);
-        Properties props = PropertiesUtils.loadProperties(path);
+        Properties props = PropertiesUtils.loadProperties(path, getClass());
 
         Map names = new HashMap();
         PropertiesUtils.getPropertiesWithPrefix(props, "name", names);
