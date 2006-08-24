@@ -49,7 +49,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private Class adapterClass = null;
-    private int pollInterval = 1000;
+    private int queueTimeout = 2000;
 
     /*
      * (non-Javadoc)
@@ -221,12 +221,12 @@ public class VMConnector extends AbstractServiceEnabledConnector
         return true;
     }
 
-    public int getPollInterval() {
-        return pollInterval;
+    public int getQueueTimeout() {
+        return queueTimeout;
     }
 
-    public void setPollInterval(int pollInterval) {
-        this.pollInterval = pollInterval;
+    public void setQueueTimeout(int queueTimeout) {
+        this.queueTimeout = queueTimeout;
     }
 
 }
