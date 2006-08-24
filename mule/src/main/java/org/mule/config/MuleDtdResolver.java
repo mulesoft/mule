@@ -9,15 +9,19 @@
  */
 package org.mule.config;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * <code>MuleDtdResolver</code> attempts to locate the mule-configuration.dtd
@@ -29,8 +33,8 @@ import java.io.InputStream;
  * based configuration and apply transformers to each of the configuration types
  * (if necessary) before constucting a Mule instance. <p/> Note that its up to
  * the Configuration builder implementation to do the actual transformations
- * this Resolver simple associates Xsl reosurces with dtds
- * 
+ * this Resolver simply associates Xsl reosurces with dtds
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -95,22 +99,21 @@ public class MuleDtdResolver implements EntityResolver
         if (delegate != null) {
             source = delegate.resolveEntity(publicId, systemId);
         }
-        if (source == null) {
-            if (systemId != null && systemId.indexOf(dtdName) > systemId.lastIndexOf("/")) {
-                String dtdFile = systemId.substring(systemId.indexOf(dtdName));
-                logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
+        if ((source == null) && StringUtils.isNotBlank(systemId) && systemId.endsWith(".dtd")) {
+            String[] tokens = systemId.split("/");
+            String dtdFile = tokens[tokens.length-1];
+            logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
-                InputStream is = ClassUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
-                if (is != null) {
-                    source = new InputSource(is);
-                    source.setPublicId(publicId);
-                    source.setSystemId(systemId);
-                    logger.debug("Found on classpath mule DTD: " + systemId);
-                    currentXsl = xsl;
-                    return source;
-                }
-                logger.debug("Could not find dtd resource on classpath: " + SEARCH_PATH + dtdFile);
+            InputStream is = ClassUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
+            if (is != null) {
+                source = new InputSource(is);
+                source.setPublicId(publicId);
+                source.setSystemId(systemId);
+                logger.debug("Found on classpath mule DTD: " + systemId);
+                currentXsl = xsl;
+                return source;
             }
+            logger.debug("Could not find dtd resource on classpath: " + SEARCH_PATH + dtdFile);
         }
         return source;
     }
