@@ -10,8 +10,7 @@
 
 package org.mule.util;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +21,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOMessage;
 
 /**
@@ -50,26 +51,28 @@ public class PropertiesUtils
     }
 
     /**
-     * This method reads the file in to a java.util.Properties object and
-     * returns it.
+     * Read in the properties from a properties file.  The file may be on the file system
+     * or the classpath.
+     *
+     * @param fileName - The name of the properties file
+     * @param callingClass - The Class which is calling this method.  This is used to
+     *                      determine the classpath.
+     * @return a java.util.Properties object containing the properties.
      */
-    public static synchronized Properties loadProperties(String fileName) throws Exception
-    {
-        InputStream is = null;
+    public static synchronized Properties loadProperties(String fileName, final Class callingClass) throws IOException {
+        InputStream is = ClassUtils.getResourceAsStream(fileName, callingClass,
+                                                    /*tryAsFile*/true, /*tryAsUrl*/false);
+        if (is == null) {
+            Message error = new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, fileName);
+            throw new IOException(error.toString());
+        }
+
         try {
-            is = new BufferedInputStream(new FileInputStream(fileName));
-            Properties p = new Properties();
-            p.load(is);
-            return p;
+            Properties props = new Properties();
+            props.load(is);
+            return props;
         }
-        catch (Exception ex) {
-            throw ex;
-        }
-        finally {
-            if (is != null) {
-                is.close();
-            }
-        }
+        finally { is.close(); }
     }
 
     public static String removeXmlNamespacePrefix(String eleName)
@@ -254,21 +257,26 @@ public class PropertiesUtils
         }
     }
 
-    /**
-     * Returns a map of property names/values for the given message.
-     */
     public static Map getMessageProperties(UMOMessage message) {
-        return getMessageProperties(new ArrayList(message.getPropertyNames()), message);
+        return getMessageProperties(new ArrayList(message.getPropertyNames()), message, /*prefixToExclude*/null);
+    }
+
+    public static Map getMessageProperties(List propertyNames, UMOMessage message) {
+        return getMessageProperties(propertyNames, message, /*prefixToExclude*/null);
     }
 
     /**
      * Returns a map of property names/values for the given message.
+     *
+     * @param prefixToExclude - will exclude all properties starting with this prefix
      */
-    public static Map getMessageProperties(List propertyNames, UMOMessage message) {
+    public static Map getMessageProperties(List propertyNames, UMOMessage message, String prefixToExclude) {
         Map props = new HashMap();
         for (Iterator iterator = propertyNames.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
-            props.put(s, message.getProperty(s));
+            String prop = (String) iterator.next();
+            if (prefixToExclude == null || prop.startsWith(prefixToExclude) == false) {
+                props.put(prop, message.getProperty(prop));
+            }
         }
         return props;
     }

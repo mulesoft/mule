@@ -10,9 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +27,12 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleServer;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+
 /**
  * This class is useful for loading resources and classes in a fault
  * tolerant manner that works across different applications servers.
@@ -37,10 +40,11 @@ import java.util.List;
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author $Author$
- * @version $Revision$
  */
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
+    protected static Log logger = LogFactory.getLog(ClassUtils.class);
+
     public static final Object[] NO_ARGS = new Object[]{};
 
     public static boolean isConcrete(Class clazz) {
@@ -142,30 +146,55 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param callingClass The Class object of the calling object
      * @param tryAsFile - try to load the resource from the local file system
      * @param tryAsUrl - try to load the resource as a URL
-     * @return an InputStream to the resource
-     * @throws IOException if the resource could not be found
+     * @return an InputStream to the resource or null if resource not found
      */
     public static InputStream getResourceAsStream(final String resourceName,
-            final Class callingClass, boolean tryAsFile, boolean tryAsUrl) throws IOException {
-
+            final Class callingClass, boolean tryAsFile, boolean tryAsUrl) {
         if (resourceName == null) {
-            throw new IOException(new Message(Messages.X_IS_NULL, "Resource name").getMessage());
+            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Resource name").getMessage());
         }
 
         // Try to load the resource from the classpath.
-        InputStream is = getResourceAsStream(resourceName, callingClass);
+        InputStream is = null;
+        try {
+            is = getResourceAsStream(resourceName, callingClass);
+            if (is == null) {
+                logger.debug("Unable to load resource from the classpath");
+            }
+        } catch (Exception e) {
+            logger.debug("Unable to load resource from the classpath: " + e.getMessage());
+        }
 
         // Try to load the resource from the file system.
         if ((is == null) && tryAsFile) {
-            File file = new File(resourceName);
-            if (file.exists()) {
-                is = new FileInputStream(file);
+            try {
+                File file = new File(resourceName);
+                // Try using the startup directory in case the file has been given using
+                // a relative path (./ or ../)
+                if (file.exists() == false &&  MuleServer.getStartupDirectory() != null) {
+                    file = new File(MuleServer.getStartupDirectory(), resourceName);
+                }
+
+                if (file.exists()) {
+                    is = new FileInputStream(file);
+                } else {
+                    logger.debug("Unable to load resource from the file system: " + file.getAbsolutePath());
+                }
+            } catch (Exception e) {
+                logger.debug("Unable to load resource from the file system: " + e.getMessage());
             }
         }
         // Try to load the resource as a URL.
         if ((is == null) && tryAsUrl) {
-            URL url = new URL(resourceName);
-            is = url.openStream();
+            try {
+                URL url = new URL(resourceName);
+                is = url.openStream();
+                if (is == null) {
+                    logger.debug("Unable to load resource as a URL");
+                }
+            } catch (Exception e) {
+                logger.debug("Unable to load resource as a URL: " + e.getMessage());
+            }
         }
         return is;
     }
@@ -176,6 +205,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
+     * @return an InputStream to the resource or null if resource not found
      */
     public static InputStream getResourceAsStream(final String resourceName, final Class callingClass) {
         InputStream inputStream = (InputStream) AccessController.doPrivileged(new PrivilegedAction() {
