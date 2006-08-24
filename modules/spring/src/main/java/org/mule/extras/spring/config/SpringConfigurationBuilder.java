@@ -23,7 +23,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.PropertiesUtils;
-import org.springframework.util.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from as
@@ -40,9 +40,23 @@ import org.springframework.util.StringUtils;
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {
     /**
+     * Will configure a UMOManager based on the configurations made available
+     * through Readers.
+     *
+     * @param configResources an array of Readers
+     * @return A configured UMOManager
+     * @throws org.mule.config.ConfigurationException
+     *
+     */
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
+    {
+        // just in case it's ever implemented
+        return configure(configResources, null);
+    }
+    /**
      *
      * Will configure a UMOManager based on the configurations made available
-     * through Readers
+     * through Readers.
      *
      * @param configResources an array of Readers
      * @return A configured UMOManager
@@ -60,8 +74,9 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
 
     public UMOManager configure(String configResource, String startupPropertiesFile) throws ConfigurationException {
         // Load startup properties if any.
-        if (startupPropertiesFile != null) {
+        if (StringUtils.isNotBlank(startupPropertiesFile)) {
             try {
+                startupPropertiesFile = StringUtils.trimToEmpty(startupPropertiesFile);
                 Properties startupProperties = PropertiesUtils.loadProperties(startupPropertiesFile, getClass());
                 ((MuleManager) MuleManager.getInstance()).addProperties(startupProperties);
             } catch (IOException e) {
@@ -72,7 +87,7 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
         if (configResource == null) {
             throw new ConfigurationException(new Message(Messages.X_IS_NULL, "Configuration Resource"));
         }
-        String[] resources = StringUtils.tokenizeToStringArray(configResource, ",;", true, true);
+        String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;", true, true);
 
         MuleManager.getConfiguration().setConfigResources(resources);
         new MuleApplicationContext(resources);
