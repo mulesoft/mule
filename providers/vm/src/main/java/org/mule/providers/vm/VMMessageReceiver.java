@@ -68,7 +68,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEventListener#onEvent(org.mule.umo.UMOEvent)
      */
     public void onEvent(UMOEvent event) throws UMOException
@@ -100,7 +100,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-        UMOEvent event = (UMOEvent) queue.poll(1000);
+        UMOEvent event = (UMOEvent) queue.poll(connector.getPollInterval());
         if(event!=null) {
             routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
         }
@@ -109,7 +109,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
      */
     protected void processMessage(Object msg) throws Exception

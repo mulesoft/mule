@@ -39,10 +39,9 @@ import java.util.Iterator;
 /**
  * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule
  * component to <p/> be accessed from an endpoint
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 
 public class VMConnector extends AbstractServiceEnabledConnector
@@ -50,10 +49,11 @@ public class VMConnector extends AbstractServiceEnabledConnector
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private Class adapterClass = null;
+    private int pollInterval = 1000;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnector#create()
      */
     public void doInitialise() throws InitialisationException
@@ -75,7 +75,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession,
      *      org.mule.umo.endpoint.UMOEndpoint)
      */
@@ -89,7 +89,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#getMessageAdapter(java.lang.Object)
      */
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
@@ -107,7 +107,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -117,7 +117,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
@@ -219,6 +219,14 @@ public class VMConnector extends AbstractServiceEnabledConnector
     public boolean isRemoteSyncEnabled()
     {
         return true;
+    }
+
+    public int getPollInterval() {
+        return pollInterval;
+    }
+
+    public void setPollInterval(int pollInterval) {
+        this.pollInterval = pollInterval;
     }
 
 }
