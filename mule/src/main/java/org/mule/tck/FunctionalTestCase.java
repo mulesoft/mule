@@ -42,7 +42,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase {
     protected void setupManager() throws Exception {
         MuleManager.getConfiguration().setWorkListener(new TestingWorkListener());
         ConfigurationBuilder builder = getBuilder();
-        builder.configure(getConfigResources());
+        builder.configure(getConfigResources(), null);
     }
 
     protected final void doTearDown() throws Exception {
@@ -73,7 +73,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase {
             if(event.getException()!=null) {
                 Throwable t = event.getException().getCause();
                 if(t!=null) {
-                    
+
                     if(t instanceof Error) {
                         throw (Error)t;
                     } else if(t instanceof RuntimeException) {
