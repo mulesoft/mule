@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
-        <artifactId>mule-project</artifactId>
+        <artifactId>mule</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-modules</artifactId>
@@ -15,16 +15,17 @@
 
     <modules>
         <module>acegi</module>
+        <module>boot</module>
         <module>client</module>
         <module>hivemind</module>
+        <module>i18n</module>
         <module>jaas</module>
+        <module>jca</module>
         <module>jotm</module>
-        <module>mule-i18n_ja_JP</module>
         <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
-        <module>ra</module>
         <module>scripting</module>
         <module>spring</module>
     </modules>
@@ -35,7 +36,7 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-    
+
     <!-- TODO duplication of top-level declaration, but doesn't work under clover if not here -->
         <dependency>
             <groupId>xml-apis</groupId>
@@ -43,6 +44,6 @@
             <version>1.3.03</version>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 </project>

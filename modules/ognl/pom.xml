@@ -10,9 +10,9 @@
     </parent>
   <groupId>org.mule</groupId>
   <artifactId>mule-filter-ognl</artifactId>
-  <name>Mule OGNL Module</name>
+  <name>OGNL Filters</name>
   <description>Support for filtering events using OGNL notation.</description>
-  
+
   <dependencies>
   	<dependency>
             <groupId>ognl</groupId>
