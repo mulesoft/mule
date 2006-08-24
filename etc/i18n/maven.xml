@@ -1,4 +1,0 @@
-<project default="default">
-    
-    <goal name="default" prereqs="clean,jar:install"/>
-</project>
