@@ -41,7 +41,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
      * load it form the classpath 3. load it from from the local file system 4.
      * load it as a url
      * 
-     * @param configResource
+     * @param configResource a single configuration resource
      * @return an inputstream to the resource
      * @throws org.mule.config.ConfigurationException
      * 
