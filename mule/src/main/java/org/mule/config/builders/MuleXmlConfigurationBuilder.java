@@ -758,8 +758,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     protected void addMessageRouterRules(Digester digester, String path, String type) throws ConfigurationException
     {
-        String defaultRouter = null;
-        String setMethod = null;
+        String defaultRouter;
+        String setMethod;
         if ("inbound".equals(type)) {
             defaultRouter = DEFAULT_INBOUND_MESSAGE_ROUTER;
             setMethod = "setInboundRouter";
