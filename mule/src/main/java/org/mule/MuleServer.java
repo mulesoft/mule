@@ -41,6 +41,14 @@ public class MuleServer implements Runnable
     public static final Class DEFAULT_CONFIG_BUILDER_CLASS = MuleXmlConfigurationBuilder.class;
 
     /**
+     * Required to support the '-config spring' shortcut.
+     * Don't use a class object so the core doesn't depend on Spring.
+     * TODO this may not be a problem for Mule 2.x
+     */
+    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER =
+            "org.mule.extras.spring.config.SpringConfigurationBuilder";
+
+    /**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(MuleServer.class);
@@ -76,7 +84,8 @@ public class MuleServer implements Runnable
     private static String startupDirectory = null;
 
     /**
-     * application entry point
+     * Application entry point.
+     * @param args command-line args
      */
     public static void main(String[] args) {
         MuleServer server = new MuleServer();
@@ -109,7 +118,7 @@ public class MuleServer implements Runnable
             try {
                 // Provide a shortcut for Spring: "-builder spring"
                 if (cfgBuilderClassName.equalsIgnoreCase("spring")) {
-                    cfgBuilderClassName = "org.mule.extras.spring.config.SpringConfigurationBuilder";
+                    cfgBuilderClassName = CLASSNAME_SPRING_CONFIG_BUILDER;
                 }
                 setConfigBuilderClassName(cfgBuilderClassName);
             } catch (Exception e) {
