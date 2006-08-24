@@ -10,6 +10,12 @@
 
 package org.mule.providers.http.transformers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.io.IOUtils;
@@ -20,14 +26,9 @@ import org.mule.providers.http.ResponseWriter;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
-
 /**
- * Converts an Http Response object to String. Not that the response headers are
- * not preserved.
+ * Converts an Http Response object to String. Note that the response headers are
+ * preserved.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,18 +43,24 @@ public class HttpResponseToString extends AbstractTransformer
     public HttpResponseToString()
     {
         registerSourceType(HttpResponse.class);
+        setReturnClass(String.class);
     }
 
+    /**
+     * Perform the transformation to always return a String object
+     */
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try {
+        try
+        {
             HttpResponse response = (HttpResponse)src;
             ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
             OutputStream outstream = bos;
             ResponseWriter writer = new ResponseWriter(outstream, encoding);
             writer.println(response.getStatusLine());
             Iterator item = response.getHeaderIterator();
-            while (item.hasNext()) {
+            while (item.hasNext())
+            {
                 Header header = (Header)item.next();
                 writer.print(header.toExternalForm());
             }
@@ -61,19 +68,23 @@ public class HttpResponseToString extends AbstractTransformer
             writer.flush();
 
             InputStream content = response.getBody();
-            if (content != null) {
+            if (content != null)
+            {
                 Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
-                if (transferenc != null) {
+                if (transferenc != null)
+                {
                     response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
-                    if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                    if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                    {
                         outstream = new ChunkedOutputStream(outstream);
                     }
+                }
 
-                    IOUtils.copy(content, outstream);
+                IOUtils.copy(content, outstream);
 
-                    if (outstream instanceof ChunkedOutputStream) {
-                        ((ChunkedOutputStream)outstream).finish();
-                    }
+                if (outstream instanceof ChunkedOutputStream)
+                {
+                    ((ChunkedOutputStream)outstream).finish();
                 }
             }
 
@@ -83,14 +94,24 @@ public class HttpResponseToString extends AbstractTransformer
             outstream.close();
             writer.close();
             bos.close();
-            if (getReturnClass().equals(String.class)) {
-                return new String(result, encoding);
+
+            String output = null;
+            try
+            {
+                output = new String(result, encoding);
             }
-            else {
-                return result;
+            catch (UnsupportedEncodingException uee)
+            {
+                // I believe this is never reached since a TransformerExcpetion
+                // is thrown before at new ResponseWriter(outstream, encoding) if
+                // encoding is not supported
+                output = new String(result);
             }
+
+            return output;
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             throw new TransformerException(this, e);
         }
     }
