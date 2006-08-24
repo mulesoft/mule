@@ -552,7 +552,7 @@ Jndi
     named must match the protocol of the endpoint address.  If this value is not set
     the first connector found with the correct protocol will be used
 -->
-<!ATTLIST endpoint connector    IDREF           #IMPLIED>
+<!ATTLIST endpoint connector    CDATA           #IMPLIED>
 <!--
     Determines whether the endpoint provider is a sender, receiver or a senderAndReceiver.
     An endpoint can be senderAndReceiver meaning that there is no difference for the endpoint
@@ -622,7 +622,7 @@ Jndi
     name
     The name of the global referene to use
 -->
-<!ATTLIST global-endpoint name    IDREF            #REQUIRED>
+<!ATTLIST global-endpoint name    CDATA            #REQUIRED>
 
 <!--
     address
@@ -680,7 +680,7 @@ authenticated against.  However a space separated list of provider names can
 be specified to change the order or the restrict the list of security
 providers used.
 -->
-<!ATTLIST security-filter useProviders    IDREFS            #IMPLIED>
+<!ATTLIST security-filter useProviders    CDATA            #IMPLIED>
 
 <!--
 A fully qualified classname of the security filter to use on this endpoint
@@ -1635,7 +1635,7 @@ Whether the properties in the properties file override properties already set on
 -->
 <!ELEMENT constructor-arg (
         description?,
-        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
+        (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
@@ -1674,7 +1674,7 @@ Whether the properties in the properties file override properties already set on
 -->
 <!ELEMENT spring-property (
         description?,
-        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
+        (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
@@ -1775,17 +1775,17 @@ Whether the properties in the properties file override properties already set on
     within the same bean factory XML file.
 -->
 <!ATTLIST ref bean CDATA #IMPLIED>
-<!ATTLIST ref local IDREF #IMPLIED>
+<!ATTLIST ref local CDATA #IMPLIED>
 <!ATTLIST ref parent CDATA #IMPLIED>
 
 <!--
     Defines a string property value, which must also be the id of another
     bean in this factory or an external factory (parent or included factory).
     While a regular 'value' element could instead be used for the same effect,
-    using idref in this case allows validation of local bean ids by the xml
+    using CDATA in this case allows validation of local bean ids by the xml
     parser, and name completion by helper tools.
 -->
-<!ELEMENT idref EMPTY>
+<!ELEMENT CDATA EMPTY>
 
 <!--
     ID refs must specify a name of the target bean.
@@ -1795,8 +1795,8 @@ Whether the properties in the properties file override properties already set on
     they can be checked by this DTD, thus should be preferred for references
     within the same bean factory XML file.
 -->
-<!ATTLIST idref bean CDATA #IMPLIED>
-<!ATTLIST idref local IDREF #IMPLIED>
+<!ATTLIST CDATA bean CDATA #IMPLIED>
+<!ATTLIST CDATA local CDATA #IMPLIED>
 
 <!--
     Contains a string representation of a property value.
@@ -1835,7 +1835,7 @@ Whether the properties in the properties file override properties already set on
     is automatically performed by the BeanFactory.
 -->
 <!ELEMENT spring-list (
-        (bean | ref | idref | value | null | spring-list | set | spring-map | props)*
+        (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)*
 )>
 
 <!--
@@ -1844,7 +1844,7 @@ Whether the properties in the properties file override properties already set on
     although references will be strongly typed.
 -->
 <!ELEMENT set (
-        (bean | ref | idref | value | null | spring-list | set | spring-map | props)*
+        (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)*
 )>
 
 <!--
@@ -1861,7 +1861,7 @@ Whether the properties in the properties file override properties already set on
 -->
 <!ELEMENT spring-entry (
   key?,
-        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
+        (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
@@ -1888,7 +1888,7 @@ Whether the properties in the properties file override properties already set on
     A key element can contain an inner bean, ref, value, or collection.
 -->
 <!ELEMENT key (
-    (bean | ref | idref | value | null | spring-list | set | spring-map | props)
+    (bean | ref | CDATA | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
