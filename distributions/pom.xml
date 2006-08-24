@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
-        <artifactId>mule-project</artifactId>
+        <artifactId>mule</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.distributions</groupId>
