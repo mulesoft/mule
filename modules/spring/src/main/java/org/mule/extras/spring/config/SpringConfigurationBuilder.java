@@ -54,9 +54,6 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    /**
-     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
-     */
     public UMOManager configure(String configResources) throws ConfigurationException {
         return configure(configResources, null);
     }

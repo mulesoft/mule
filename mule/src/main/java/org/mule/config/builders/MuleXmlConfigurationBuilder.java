@@ -178,9 +178,6 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         return "mule-configuration";
     }
 
-    /**
-     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
-     */
     public UMOManager configure(String configResources) throws ConfigurationException {
         return configure(configResources, null);
     }

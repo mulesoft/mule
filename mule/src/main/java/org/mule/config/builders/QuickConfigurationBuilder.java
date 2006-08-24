@@ -573,9 +573,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return manager;
     }
 
-    /**
-     * @deprecated Please use configure(String configResources, String startupPropertiesFile) instead.
-     */
     public UMOManager configure(String configResources) throws ConfigurationException {
         return configure(configResources, null);
     }
@@ -584,9 +581,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return configure(new ReaderResource[0], null);
     }
 
-    /**
-     * @deprecated Please use configure(ReaderResource[] configResources, Properties startupProperties) instead.
-     */
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
         return configure(configResources, null);
     }
