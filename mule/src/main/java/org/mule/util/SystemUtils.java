@@ -13,8 +13,10 @@ package org.mule.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -33,7 +35,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     /**
      * Get the operating system environment variables.
      * This should work for Windows and Linux.
-     * 
+     *
      * @return Map<String, String> or an empty map if there was an error.
      */
     public static synchronized Map getenv()
@@ -113,7 +115,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
         return env;
     }
-    
+
     public static String getenv(String name)
     {
         return (String)SystemUtils.getenv().get(name);
@@ -129,4 +131,21 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
     }
 
+    /**
+     * Returns the value corresponding to the given option from the command line, for
+     * example if the options are "-config mule-config.xml" getCommandLineOption("config")
+     * would return "mule-config.xml"
+     *
+     * TODO Replace this functionality with Apache Commons CLI: see MULE-956
+     */
+    public static String getCommandLineOption(String option, String args[]) {
+        List options = Arrays.asList(args);
+        if (options.contains(option)) {
+            int i = options.indexOf(option);
+            if (i < options.size() - 1) {
+                return options.get(i + 1).toString();
+            }
+        }
+        return null;
+    }
 }
