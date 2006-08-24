@@ -80,7 +80,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         this.bootstrapContext = bootstrapContext;
         if (info.getConfigurations() != null) {
             if (MuleManager.isInstanciated()) {
-                throw new ResourceAdapterInternalException("A manageris already configured, cannot configure a new one using the configurations set on the Resource Adapter");
+                throw new ResourceAdapterInternalException("A manager is already configured, cannot configure a new one using the configurations set on the Resource Adapter");
             } else {
                 ConfigurationBuilder builder = null;
                 try {
@@ -94,7 +94,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
                 try {
 
-                    manager = builder.configure(info.getConfigurations());
+                    manager = builder.configure(info.getConfigurations(), null);
                 } catch (ConfigurationException e) {
                     throw new ResourceAdapterInternalException("Failed to load configurations: "
                             + info.getConfigurations(), e);
