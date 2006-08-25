@@ -27,42 +27,42 @@
     </modules>
 
     <build>
-    	<!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-    	<resources>
-    		<resource>
-    			<directory>conf</directory>
-    		</resource>
-    		<resource>
-    			<directory>src/main/resources</directory>
-    		</resource>
-    	</resources>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
 
-    	<plugins>
-    		<!-- "mvn deploy" will copy the built jar to the $MULE_HOME/lib/user directory. -->
-    		<plugin>
-    			<groupId>org.codehaus.mojo</groupId>
-    			<artifactId>dependency-maven-plugin</artifactId>
-    			<executions>
-    				<execution>
-    					<id>copy-artifact</id>
-    					<phase>deploy</phase>
-    					<goals>
-    						<goal>copy</goal>
-    					</goals>
-    					<configuration>
-    						<outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-    						<artifactItems>
-    							<artifactItem>
-    								<groupId>${groupId}</groupId>
-    								<artifactId>${artifactId}</artifactId>
-    								<version>${version}</version>
-    							</artifactItem>
-    						</artifactItems>
-    					</configuration>
-    				</execution>
-    			</executions>
-    		</plugin>
-    	</plugins>
+        <plugins>
+            <!-- "mvn deploy" will copy the built jar to the $MULE_HOME/lib/user directory. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>dependency-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>

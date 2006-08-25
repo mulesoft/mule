@@ -25,7 +25,7 @@
 
     <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
         <properties>
-        	<file-properties location="proxy.properties" />
+            <file-properties location="proxy.properties" />
         </properties>
     </connector>
 
