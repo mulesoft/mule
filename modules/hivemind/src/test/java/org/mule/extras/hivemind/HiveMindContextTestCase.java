@@ -17,57 +17,143 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
- * @author <a href="mailto:massimo@datacode.it">Massimo Lusetti</a>
+ * Test case for a context container whose backend is an HiveMind Registry
+ * 
+ * @author <a href="mailto:mlusetti@gmail.com">Massimo Lusetti</a>
  * @version $Revision$
  */
 public class HiveMindContextTestCase extends AbstractContainerContextTestCase
 {
-
     HiveMindContext context;
 
     protected void doSetUp() throws Exception
     {
-    context = new HiveMindContext();
-    context.initialise();
+        context = new HiveMindContext();
+        context.initialise();
     }
+
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
-    */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
+     */
     public UMOContainerContext getContainerContext()
     {
-/*
-            Registry registry = context.getRegistry();
-
-        boolean x = registry.containsService(FruitBowl.class);
-        System.err.println("Contiene FruitBowl? " + x);
-        FruitBowl bowl = (FruitBowl) registry.getService(FruitBowl.class);
-        System.err.println("bowl contiene: " + bowl.toString());
-        System.err.println("bowl contiene: " + bowl.getApple());
-        
-        
-*/
         return context;
     }
 
+    /**
+     * Container should never be null
+     * 
+     * @throws Exception
+     */
     public void testContainerNotNull() throws Exception
     {
-    assertNotNull(getContainerContext());
+        assertNotNull(getContainerContext());
     }
 
+    /**
+     * Registry should never be null
+     */
+    public void testRegistryNotNull()
+    {
+        assertNotNull(context.getRegistry());
+    }
+
+    /**
+     * Test getting an object before initializing the Registry
+     */
+    public void testIllegalState()
+    {
+        try
+        {
+            HiveMindContext ctx = new HiveMindContext();
+            ctx.getComponent(new Object());
+            fail();
+        }
+        catch (IllegalStateException ise)
+        {
+            // Expected
+        }
+        catch (ObjectNotFoundException obfe)
+        {
+            fail("Should throw a IllegalStateExeption instead of ObjectNotFoundException");
+        }
+    }
+
+    /**
+     * When an object is not in the Registry
+     */
+    public void testObjectNotFound()
+    {
+        try
+        {
+            context.getComponent(new String("Not present").getClass());
+            fail("Should have thrown ObjectNotFoundException");
+        }
+        catch (ObjectNotFoundException onfe)
+        {
+            // Expeced
+        }
+    }
+
+    /**
+     * When an object is not in the Registry caused by a key not recognized
+     */
+    public void testObjectNotFoundByKeyType()
+    {
+        try
+        {
+            context.getComponent(new FruitBowl());
+            fail("Should have thrown ObjectNotFoundException");
+        }
+        catch (ObjectNotFoundException onfe)
+        {
+            // Expeced
+        }
+    }
+
+    /**
+     * Shouldn't be possibile to get a component after disposing the container
+     * 
+     * @throws Exception
+     */
+    public void testDispose() throws Exception
+    {
+        HiveMindContext context = new HiveMindContext();
+        context.initialise();
+        context.dispose();
+
+        try
+        {
+            context.getComponent(Class.class);
+            fail("Shouldn't be possibile to get a component after disposing the container");
+        }
+        catch (NullPointerException npe)
+        {
+            // Expected
+        }
+    }
+
+    /**
+     * Test the real Registry built to serve the correct services
+     * 
+     * @throws Exception
+     */
     public void testFruitBowl() throws Exception
     {
-    FruitBowl result = null;
-    try {
-            result = (FruitBowl) context.getComponent(FruitBowl.class.getName());
+        FruitBowl result = null;
+        try
+        {
+            result = (FruitBowl)context.getComponent(FruitBowl.class.getName());
             assertNotNull("Component FruitBwol should exist in container", result);
             Apple apple = result.getApple();
             assertNotNull("Component Apple should be in FruitBowl", apple);
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             fail("Component should exist in the container");
         }
     }
 
-    
 }
