@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +26,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireException;
@@ -319,7 +319,7 @@ public class MuleLocalChannel extends AbstractChannel
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
             context.setXFire(xfire);
 
-            ByteArrayOutputStream resultStream = new ByteArrayOutputStream(512); //Channel.BACKCHANNEL_URI
+            ByteArrayOutputStream resultStream = new ByteArrayOutputStream(); //Channel.BACKCHANNEL_URI
             context.setProperty(Channel.BACKCHANNEL_URI, resultStream); // Return the result to us, not to the sender.
 
             XMLStreamReader reader;
@@ -331,7 +331,7 @@ public class MuleLocalChannel extends AbstractChannel
             } else if (payload instanceof Reader) {
                 reader = STAXUtils.createXMLStreamReader((Reader)payload, context);
             } else {
-                String text = ctx.getMessageAsString();
+                String text = ctx.getTransformedMessageAsString(ctx.getEncoding());
                 reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
             }
 
