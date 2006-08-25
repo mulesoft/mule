@@ -12,15 +12,15 @@ in INSTALL.txt first.  To run this example:
 
 Linux / Unix
 ------------
-mule -config soap-config.xml
-mule -config wsdl-config.xml
-mule -config rest-config.xml
+mule -config ./conf/soap-config.xml
+mule -config ./conf/wsdl-config.xml
+mule -config ./conf/rest-config.xml
 
 Windows
 -------
-mule.bat -config soap-config.xml
-mule.bat -config wsdl-config.xml
-mule.bat -config rest-config.xml
+mule.bat -config .\conf\soap-config.xml
+mule.bat -config .\conf\wsdl-config.xml
+mule.bat -config .\conf\rest-config.xml
 
 +-------------------+
 | Firewall settings |
@@ -31,12 +31,12 @@ in the proxy.properties file.  Then you can run the example as follows:
 
 Linux / Unix
 ------------
-mule -config soap-proxy-config.xml -props proxy.properties
-mule -config wsdl-proxy-config.xml -props proxy.properties
-mule -config rest-proxy-config.xml -props proxy.properties
+mule -config ./conf/soap-proxy-config.xml -props proxy.properties
+mule -config ./conf/wsdl-proxy-config.xml -props proxy.properties
+mule -config ./conf/rest-proxy-config.xml -props proxy.properties
 
 Windows
 -------
-mule.bat -config soap-proxy-config.xml -props proxy.properties
-mule.bat -config wsdl-proxy-config.xml -props proxy.properties
-mule.bat -config rest-proxy-config.xml -props proxy.properties
+mule.bat -config .\conf\soap-proxy-config.xml -props proxy.properties
+mule.bat -config .\conf\wsdl-proxy-config.xml -props proxy.properties
+mule.bat -config .\conf\rest-proxy-config.xml -props proxy.properties

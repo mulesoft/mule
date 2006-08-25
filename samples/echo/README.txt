@@ -11,8 +11,8 @@ in INSTALL.txt first.  To run this example:
 
 Linux / Unix
 ------------
-mule -config echo-config.xml
+mule -config ./conf/echo-config.xml
 
 Windows
 -------
-mule.bat -config echo-config.xml
+mule.bat -config .\conf\echo-config.xml

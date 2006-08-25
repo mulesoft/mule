@@ -27,6 +27,16 @@
     </modules>
 
     <build>
+    	<!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+    	<resources>
+    		<resource>
+    			<directory>conf</directory>
+    		</resource>
+    		<resource>
+    			<directory>src/main/resources</directory>
+    		</resource>
+    	</resources>
+
     	<plugins>
     		<!-- "mvn deploy" will copy the built jar to the $MULE_HOME/lib/user directory. -->
     		<plugin>
@@ -58,12 +68,7 @@
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-module-client</artifactId>
+            <artifactId>mule-stream-provider</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -73,12 +78,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-stream-provider</artifactId>
+            <artifactId>mule-file-provider</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-file-provider</artifactId>
+            <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

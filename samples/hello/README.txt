@@ -13,13 +13,13 @@ in INSTALL.txt first.  To run this example:
 
 Linux / Unix
 ------------
-mule -config hello-config.xml
-mule -config hello-http-config.xml
-mule -config hello-spring-config.xml -builder spring
+mule -config ./conf/hello-config.xml
+mule -config ./conf/hello-http-config.xml
+mule -config ./conf/hello-spring-config.xml -builder spring
 
 Windows
 -------
-mule.bat -config hello-config.xml
-mule.bat -config hello-http-config.xml
-mule.bat -config hello-spring-config.xml -builder spring
+mule.bat -config .\conf\hello-config.xml
+mule.bat -config .\conf\hello-http-config.xml
+mule.bat -config .\conf\hello-spring-config.xml -builder spring
 

@@ -12,8 +12,8 @@ in INSTALL.txt first.  To run this example:
 
 Linux / Unix
 ------------
-mule -config error-config.xml
+mule -config ./conf/error-config.xml
 
 Windows
 -------
-mule.bat -config error-config.xml
+mule.bat -config .\conf\error-config.xml
