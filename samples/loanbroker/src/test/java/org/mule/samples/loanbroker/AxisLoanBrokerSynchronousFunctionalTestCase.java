@@ -23,7 +23,7 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
     public static final int REQUESTS = 100;
 
     protected String getConfigResources() {
-        return "loan-broker-axis-sync-config.xml";
+        return "loan-broker-axis-sync-test-config.xml";
     }
 
     public void testSingleLoanRequest() throws Exception {

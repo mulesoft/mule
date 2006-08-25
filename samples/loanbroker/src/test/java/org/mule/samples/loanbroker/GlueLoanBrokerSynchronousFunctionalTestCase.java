@@ -18,6 +18,6 @@ package org.mule.samples.loanbroker;
 public class GlueLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerSynchronousFunctionalTestCase {
 
     protected String getConfigResources() {
-        return "loan-broker-glue-sync-config.xml";
+        return "loan-broker-glue-sync-test-config.xml";
     }
 }
