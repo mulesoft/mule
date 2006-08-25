@@ -3,11 +3,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mule</groupId>
+    <parent>
+    	<groupId>org.mule</groupId>
+        <artifactId>mule</artifactId>
+        <version>1.3-SNAPSHOT</version>
+    </parent>
     <artifactId>mule-buildtools</artifactId>
     <packaging>jar</packaging>
     <name>Mule's build tools</name>
-    <version>1.3-SNAPSHOT</version>
     <description>These are the tools used by the Mule's build procedure</description>
 
     <build>
