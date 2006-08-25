@@ -312,14 +312,14 @@ public class MuleLocalChannel extends AbstractChannel
 
     public Object onCall(UMOEventContext ctx) throws UMOException {
 
-    	try {
+        try {
             MessageContext context = new MessageContext();
             XFire xfire = (XFire) ctx.getComponentDescriptor().getProperties().get(XFireConnector.XFIRE_PROPERTY);
 
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
             context.setXFire(xfire);
 
-    		ByteArrayOutputStream resultStream = new ByteArrayOutputStream(512); //Channel.BACKCHANNEL_URI
+            ByteArrayOutputStream resultStream = new ByteArrayOutputStream(512); //Channel.BACKCHANNEL_URI
             context.setProperty(Channel.BACKCHANNEL_URI, resultStream); // Return the result to us, not to the sender.
 
             XMLStreamReader reader;
@@ -327,12 +327,12 @@ public class MuleLocalChannel extends AbstractChannel
             // TODO isStreaming()?
             Object payload = ctx.getMessage().getPayload();
             if (payload instanceof InputStream) {
-            	reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
+                reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
             } else if (payload instanceof Reader) {
-            	reader = STAXUtils.createXMLStreamReader((Reader)payload, context);
+                reader = STAXUtils.createXMLStreamReader((Reader)payload, context);
             } else {
-            	String text = ctx.getMessageAsString();
-            	reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
+                String text = ctx.getMessageAsString();
+                reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
             }
 
             InMessage in = new InMessage(reader, getUri());
@@ -341,19 +341,19 @@ public class MuleLocalChannel extends AbstractChannel
 
             Object result = null;
             if (context.getExchange().hasOutMessage()) {
-            	try {
-					result = resultStream.toString(context.getOutMessage().getEncoding());
-				} catch (UnsupportedEncodingException e1) {
-					throw new MuleException(e1);
-				}
+                try {
+                    result = resultStream.toString(context.getOutMessage().getEncoding());
+                } catch (UnsupportedEncodingException e1) {
+                    throw new MuleException(e1);
+                }
             }
 
             // TODO Should this be an error?   Probably not
             return result;
 
-    	} catch (UMOException e) {
-    		logger.warn("Could not dispatch message to XFire!",e);
-    		throw e;
-    	}
+        } catch (UMOException e) {
+            logger.warn("Could not dispatch message to XFire!",e);
+            throw e;
+        }
     }
 }

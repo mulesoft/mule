@@ -88,7 +88,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             // default to synchronous if using http
             if (endpoint.getEndpointURI().getScheme().startsWith("http") ||
                 endpoint.getEndpointURI().getScheme().startsWith("servlet")) {
-            	sync = true;
+                sync = true;
             }
             service.setInvoker(new MuleInvoker(this, sync));
 

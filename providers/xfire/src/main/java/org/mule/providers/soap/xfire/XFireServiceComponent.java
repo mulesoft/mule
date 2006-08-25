@@ -85,12 +85,12 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         logger.debug(eventContext);
         String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
         if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY)) {
-        	ByteArrayOutputStream out = new ByteArrayOutputStream();
-        	getXfire().generateWSDL(getServiceName(eventContext), out);
-        	return out.toString();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            getXfire().generateWSDL(getServiceName(eventContext), out);
+            return out.toString();
         } else {
-        	MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
-        	return channel.onCall(eventContext);
+            MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
+            return channel.onCall(eventContext);
         }
 
     }

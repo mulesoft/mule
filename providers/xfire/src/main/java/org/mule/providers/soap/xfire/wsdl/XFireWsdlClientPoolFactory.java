@@ -32,8 +32,8 @@ public class XFireWsdlClientPoolFactory extends XFireClientPoolFactory
     
     public Object makeObject() throws Exception
     {
-    	//We are assuming here that we are not going to use any 
-    	//other transport other than http.
+        //We are assuming here that we are not going to use any
+        //other transport other than http.
         Client client = new Client(new URL(uri.getAddress()));
         client.setXFire(xfire);
         client.setEndpointUri(uri.toString());

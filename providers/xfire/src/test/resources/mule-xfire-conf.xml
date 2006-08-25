@@ -4,7 +4,7 @@
 
 <mule-configuration id="myId" version="1.0">
     <description>
-		Testing XFire http headers
+        Testing XFire http headers
     </description>
 
     <mule-environment-properties synchronous="true" enableMessageEvents="true"/>
@@ -16,7 +16,7 @@
             </inbound-router>
         </mule-descriptor>
     </model>
-	
+
 </mule-configuration>
 
 <!--FunctionalTestComponent-->

@@ -215,8 +215,8 @@ public class MuleUniversalChannel extends AbstractChannel
                     //let us filter only MULE properties except MULE_USER, Content-Type and Content-Lenght, 
                     // and all other properties are allowed through including custom headers
                     if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
-                    	&& (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName))) {
-                    		headers.put(headerName, headerValue);
+                        && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName))) {
+                            headers.put(headerName, headerValue);
                     }
                 }
                 
@@ -232,8 +232,8 @@ public class MuleUniversalChannel extends AbstractChannel
         UMOMessage msg = RequestContext.getEvent().getMessage();
         for (Iterator i = msg.getPropertyNames().iterator();i.hasNext();)
         {
-        	 String propertyName = (String)i.next();
-        	 sp.setProperty(propertyName, msg.getProperty(propertyName));
+             String propertyName = (String)i.next();
+             sp.setProperty(propertyName, msg.getProperty(propertyName));
         }
 
         client.sendStream(getUri(), sp);
