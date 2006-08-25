@@ -13,9 +13,12 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * <code>FileToString</code> reads file contents into a string.
@@ -63,36 +66,20 @@ public class FileToString extends AbstractTransformer
             return src.toString();
         }
 
-        StringBuffer sb = new StringBuffer(new Long(((File) src).length())
-                .intValue());
-        char[] buf = new char[1024 * 8];
-        FileReader fr = null;
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
         try
         {
-            fr = new FileReader((File) src);
-            int read = 0;
-            while ((read = fr.read(buf)) >= 0)
-            {
-                sb.append(buf, 0, read);
-            }
+        	fis = new FileInputStream((File)src);
+        	isr=(encoding!=null ? new InputStreamReader(fis, encoding) : new InputStreamReader(fis));
+        		
+        	return IOUtils.toString(isr);
         } catch (IOException e)
         {
             throw new TransformerException(this, e);
         } finally
         {
-            try
-            {
-                if (fr != null)
-                {
-                    fr.close();
-                }
-            } catch (IOException e)
-            {
-                logger.debug("Failed to close reader in transformer: "
-                        + e.getMessage());
-            }
+        	IOUtils.closeQuietly(isr);
         }
-
-        return sb.toString();
     }
 }
