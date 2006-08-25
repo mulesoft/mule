@@ -21,12 +21,18 @@
         </properties>
     </connector>
 
+    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+        	<file-properties location="proxy.properties" />
+        </properties>
+    </connector>
+
     <transformers>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
         <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
         <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
             <properties>
-                <property name="xslFile" value="rest-stock.xsl"/>
+                <property name="xslFile" value="xsl/rest-stock.xsl"/>
             </properties>
         </transformer>
     </transformers>

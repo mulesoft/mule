@@ -27,16 +27,16 @@ mule.bat -config .\conf\rest-config.xml
 +-------------------+
 
 If you are behind a firewall, you will need to configure the settings for your HTTP proxy
-in the proxy.properties file.  Then you can run the example as follows:
+in the ./conf/proxy.properties file.  Then you can run the example as follows:
 
 Linux / Unix
 ------------
-mule -config ./conf/soap-proxy-config.xml -props proxy.properties
-mule -config ./conf/wsdl-proxy-config.xml -props proxy.properties
-mule -config ./conf/rest-proxy-config.xml -props proxy.properties
+mule -config ./conf/soap-config.xml -props ./conf/proxy.properties
+mule -config ./conf/wsdl-config.xml -props ./conf/proxy.properties
+mule -config ./conf/rest-config.xml -props ./conf/proxy.properties
 
 Windows
 -------
-mule.bat -config .\conf\soap-proxy-config.xml -props proxy.properties
-mule.bat -config .\conf\wsdl-proxy-config.xml -props proxy.properties
-mule.bat -config .\conf\rest-proxy-config.xml -props proxy.properties
+mule.bat -config .\conf\soap-config.xml -props .\conf\proxy.properties
+mule.bat -config .\conf\wsdl-config.xml -props .\conf\proxy.properties
+mule.bat -config .\conf\rest-config.xml -props .\conf\proxy.properties

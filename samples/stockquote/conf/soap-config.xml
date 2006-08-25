@@ -23,6 +23,12 @@
         </properties>
     </connector>
 
+    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+        	<file-properties location="proxy.properties" />
+        </properties>
+    </connector>
+
     <transformers>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
         <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
