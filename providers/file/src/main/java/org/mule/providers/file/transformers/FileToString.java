@@ -7,18 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.file.transformers;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.io.IOUtils;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>FileToString</code> reads file contents into a string.
@@ -26,7 +21,7 @@ import org.apache.commons.io.IOUtils;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class FileToString extends AbstractTransformer
+public class FileToString extends FileToByteArray
 {
     /**
      * Serial version
@@ -41,45 +36,37 @@ public class FileToString extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src, String encoding)
-            throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof byte[])
-        {
-            if (encoding != null)
-            {
-                try
-                {
-                    return new String((byte[]) src, encoding);
-                } catch (UnsupportedEncodingException ex)
-                {
-                    return new String((byte[]) src);
-                }
-            }
-            else
-            {
-                return new String((byte[]) src);
-            }
-        }
+        byte[] bytes;
+
         if (src instanceof String)
         {
-            return src.toString();
+            try
+            {
+                return new String(((String)src).getBytes(), encoding);
+            }
+            catch (UnsupportedEncodingException uee)
+            {
+                return new String(((String)src).getBytes());
+            }
+        }
+        else if (src instanceof byte[])
+        {
+            bytes = (byte[])src;
+        }
+        else
+        {
+            bytes = (byte[])super.doTransform(src, encoding);
         }
 
-        FileInputStream fis = null;
-        InputStreamReader isr = null;
         try
         {
-        	fis = new FileInputStream((File)src);
-        	isr=(encoding!=null ? new InputStreamReader(fis, encoding) : new InputStreamReader(fis));
-        		
-        	return IOUtils.toString(isr);
-        } catch (IOException e)
+            return new String(bytes, encoding);
+        }
+        catch (UnsupportedEncodingException uee)
         {
-            throw new TransformerException(this, e);
-        } finally
-        {
-        	IOUtils.closeQuietly(isr);
+            return new String(bytes);
         }
     }
 }
