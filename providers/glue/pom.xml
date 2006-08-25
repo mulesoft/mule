@@ -13,22 +13,6 @@
     <name>Glue Provider</name>
     <description>A Mule provider for Soap Connectivity using Web Methods Glue.</description>
     
-    <build>
-        <!-- m2 Standard directory layout 
-            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -39,7 +23,6 @@
             <groupId>glue</groupId>
             <artifactId>glue</artifactId>
             <version>5.0.2</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
