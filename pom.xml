@@ -400,12 +400,12 @@
     </reporting>
 
     <modules>
+        <module>buildtools</module>
         <module>mule</module>
         <module>modules</module>
         <module>providers</module>
         <module>samples</module>
         <!-- <module>tools</module> -->
-        <module>buildtools</module>
     </modules>
 
     <!--
