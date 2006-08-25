@@ -10,6 +10,14 @@
 
 package org.mule.config.builders;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.digester.CallMethodRule;
 import org.apache.commons.digester.CallParamRule;
@@ -18,20 +26,15 @@ import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
 import org.apache.commons.digester.RuleSetBase;
 import org.mule.MuleManager;
+import org.mule.MuleServer;
+import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PropertyFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
 import org.xml.sax.Attributes;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * A digester rule set that loads rules for <properties> tags and its child tags;
@@ -46,7 +49,6 @@ public class MulePropertiesRuleSet extends RuleSetBase
     private String propertiesSetterName;
     private List objectRefs = null;
     private String parentElement = "properties";
-
 
     public MulePropertiesRuleSet(String path, String propertiesSetterName, List objectRefs) {
         this(path, objectRefs);
@@ -213,7 +215,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
         });
     }
 
-    protected void addFilePropertiesRule(Digester digester, String path)
+    protected synchronized void addFilePropertiesRule(Digester digester, String path)
     {
         digester.addRule(path, new Rule() {
             public void begin(String s, String s1, Attributes attributes) throws Exception
@@ -224,21 +226,44 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String location = attributes.getValue("location");
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
-                InputStream is = FileUtils.loadResource(location, getClass());
+                InputStream is = ClassUtils.getResourceAsStream(location, getClass(),
+                                                                /*tryAsFile*/true, /*tryAsUrl*/true);
                 if (is == null) {
-                    throw new FileNotFoundException(location);
+                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, location));
                 }
-                Properties p = new Properties();
-                p.load(is);
-                Map props = (Map) digester.peek();
+
+                Properties fileProps = new Properties();
+                fileProps.load(is);
+                Map digesterProps = (Map) digester.peek();
+
                 if (override) {
-                    props.putAll(p);
+                    // Set all properties.
+                    digesterProps.putAll(fileProps);
                 } else {
+                    // Set only those properties which have not yet been set.
                     String key;
-                    for (Iterator iterator = p.keySet().iterator(); iterator.hasNext();) {
+                    for (Iterator iterator = fileProps.keySet().iterator(); iterator.hasNext();) {
                         key = (String) iterator.next();
-                        if (!props.containsKey(key)) {
-                            props.put(key, p.getProperty(key));
+                        if (!digesterProps.containsKey(key)) {
+                            digesterProps.put(key, fileProps.getProperty(key));
+                        }
+                    }
+                }
+
+                // If startup properties were given on the command line, they should override the file properties.
+                if (StringUtils.isNotBlank(MuleServer.getStartupPropertiesFile())) {
+                    is = ClassUtils.getResourceAsStream(MuleServer.getStartupPropertiesFile(), getClass(),
+                                                        /*tryAsFile*/true, /*tryAsUrl*/false);
+                    if (is != null) {
+                        Properties startupProps = new Properties();
+                        startupProps.load(is);
+                        String key;
+                        // For each startup property, if the property has been set, override its value.
+                        for (Iterator iterator = startupProps.keySet().iterator(); iterator.hasNext();) {
+                            key = (String) iterator.next();
+                            if (digesterProps.containsKey(key)) {
+                                digesterProps.put(key, startupProps.getProperty(key));
+                            }
                         }
                     }
                 }
