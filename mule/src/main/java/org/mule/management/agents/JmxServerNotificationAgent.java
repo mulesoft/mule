@@ -38,11 +38,11 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
     public static final String BROADCASTER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationBroadcaster";
 
     private MBeanServer mBeanServer;
-    private BroadcastNotificationService broadcastNotificationMbean = null;
+    private BroadcastNotificationService broadcastNotificationMbean;
     private boolean useInstanceIdAsDomain = true;
     private boolean registerListenerMbean = true;
-    private ObjectName listenerObjectName = null;
-    private ObjectName broadcasterObjectName = null;
+    private ObjectName listenerObjectName;
+    private ObjectName broadcasterObjectName;
 
 
     protected void doInitialise() throws InitialisationException {
@@ -52,7 +52,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
         try {
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
             broadcasterObjectName = ObjectName.getInstance(getDomainName() + ":" + BROADCASTER_JMX_OBJECT_NAME);
-             broadcastNotificationMbean = new BroadcastNotificationService();
+            broadcastNotificationMbean = new BroadcastNotificationService();
             mBeanServer.registerMBean(broadcastNotificationMbean, broadcasterObjectName);
             if(registerListenerMbean) {
                 listenerObjectName = ObjectName.getInstance(getDomainName() + ":" + LISTENER_JMX_OBJECT_NAME);
@@ -89,7 +89,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
     /**
      * Should be a 1 line description of the agent
      *
-     * @return
+     * @return description
      */
     public String getDescription() {
         return "Jmx Notification Agent" + (registerListenerMbean ? "(Listener MBean registered)" : "");

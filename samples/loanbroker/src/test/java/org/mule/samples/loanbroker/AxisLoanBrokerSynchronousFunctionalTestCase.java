@@ -50,11 +50,11 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
         long start = System.currentTimeMillis();
         try {
             for (; i < REQUESTS; i++) {
-            	LoanRequest loanRequest = requests[i % 3];
-            	
-            	//must set the CreditProfile to null otherwise the first JXPathFilter
-            	//will be bypassed and CreditAgency component will be bypassed as well!!
-            	loanRequest.setCreditProfile(null);
+                LoanRequest loanRequest = requests[i % 3];
+
+                //must set the CreditProfile to null otherwise the first JXPathFilter
+                //will be bypassed and CreditAgency component will be bypassed as well!!
+                loanRequest.setCreditProfile(null);
                 result = client.send("vm://LoanBrokerRequests",  loanRequest, null);
                 assertNotNull(result);
                 assertFalse(result.getPayload() instanceof NullPayload);

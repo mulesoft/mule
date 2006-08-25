@@ -15,13 +15,21 @@
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-xfire-provider</artifactId>
+            <artifactId>mule-axis-provider</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-jms-provider</artifactId>
+            <artifactId>mule-glue-provider</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-xfire-provider</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
