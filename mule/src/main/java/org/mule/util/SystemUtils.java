@@ -43,14 +43,15 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         Map env = Collections./*<String, String>*/EMPTY_MAP;
 
         try {
-            if (SystemUtils.IS_JAVA_1_5) {
-                // the following runaround is necessary since we still want to compile on JDK 1.4
-                Method envMethod = System.class.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
-                env = (Map)envMethod.invoke(System.class, (Class[])null);
+            if (SystemUtils.IS_JAVA_1_4) {
+                // fallback to external process
+                env = getenvJDK14();
             }
             else {
-                // fallback
-                env = getenvJDK14();
+                // the following runaround is necessary since we still want to compile on JDK 1.4
+                Class target = System.class;
+                Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
+                env = (Map)envMethod.invoke(target, (Class[])null);
             }
         }
         catch (Exception ex) {
