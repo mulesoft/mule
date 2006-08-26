@@ -17,6 +17,12 @@
             <groupId>openejb</groupId>
             <artifactId>openejb-core</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>castor</groupId>
+                    <artifactId>castor</artifactId>
+                </exclusion>
+                </exclusions>
         </dependency>
         <dependency>
             <groupId>activemq</groupId>
