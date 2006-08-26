@@ -13,11 +13,11 @@
 
     <mule-environment-properties synchronous="true" serverUrl=""/>
 
-    <agents>
+    <!-- agents -->
         <!-- starts an RMI registry on the default port 1099 for JMX Remoting and then sets up
              all the default Jmx support agents in Mule -->
-        <agent name="JMX" className="org.mule.management.agents.DefaultJmxSupportAgent"/>
-    </agents>
+        <!-- agent name="JMX" className="org.mule.management.agents.DefaultJmxSupportAgent"/ -->
+    <!-- /agents -->
 
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
