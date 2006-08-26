@@ -20,7 +20,7 @@ rem
 rem Find the application home.
 rem
 rem %~dp0 is location of current script under NT
-set _REALPATH=%~dp0
+set _REALPATH=%~dp0..\sbin\
 
 rem Decide on the wrapper binary.
 set _WRAPPER_BASE=wrapper
