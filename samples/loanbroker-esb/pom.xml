@@ -18,11 +18,18 @@
             <artifactId>openejb-core</artifactId>
             <version>1.0</version>
             <exclusions>
+                <!-- Tries to pull an unpublished castor version -->
                 <exclusion>
                     <groupId>castor</groupId>
                     <artifactId>castor</artifactId>
                 </exclusion>
-                </exclusions>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- But still need castor at runtime -->
+            <groupId>castor</groupId>
+            <artifactId>castor</artifactId>
+            <version>0.9.9</version>
         </dependency>
         <dependency>
             <groupId>activemq</groupId>
