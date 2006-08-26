@@ -646,11 +646,13 @@ public abstract class AbstractConnector
             logger.info("removing listener on endpointUri: " + endpointUri);
         }
 
-        UMOMessageReceiver receiver = (UMOMessageReceiver)receivers.remove(getReceiverKey(component,
-                endpoint));
-        if (receiver != null) {
-            destroyReceiver(receiver, endpoint);
-            receiver.dispose();
+        if (receivers != null && !receivers.isEmpty()) {
+            UMOMessageReceiver receiver = (UMOMessageReceiver)receivers.remove(getReceiverKey(component,
+                    endpoint));
+            if (receiver != null) {
+                destroyReceiver(receiver, endpoint);
+                receiver.dispose();
+            }
         }
     }
 
