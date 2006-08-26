@@ -277,9 +277,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             try {
                 umoEndpoint.getConnector().unregisterListener(receiver.getComponent(), receiver.getEndpoint());
             } catch (Exception e) {
-                logger.error("Failed to unregistering Axis endpoint: " + endpointKey + " for service: "
+                logger.error("Failed to unregister Axis endpoint: " + endpointKey + " for service: "
                         + receiver.getComponent().getDescriptor().getName() + ". Error is: " + e.getMessage(), e);
             }
+            // TODO why break? For does not loop.
             break;
         }
     }
