@@ -15,6 +15,7 @@ import java.io.FileWriter;
 
 import org.mule.providers.file.transformers.FileToString;
 import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
@@ -94,7 +95,7 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
     /**
      * Transform with a wrong encoding should result in an Exception to be thrown
      */
-    public void testTransformExcEnc()
+    public void testTransformExcEnc() throws Exception
     {
         try
         {
@@ -102,7 +103,7 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
             fts.doTransform(getTestData(), "NO-SUCH_ENCODING");
             fail("Should fail when the specified encoding is not supported");
         }
-        catch (Exception exc)
+        catch (TransformerException tfe)
         {
             // Expected
         }
