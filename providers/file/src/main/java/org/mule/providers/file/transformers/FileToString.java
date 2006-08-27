@@ -31,27 +31,23 @@ public class FileToString extends FileToByteArray
     public FileToString()
     {
         registerSourceType(File.class);
-        registerSourceType(String.class);
         registerSourceType(byte[].class);
         setReturnClass(String.class);
     }
 
+    /**
+     * Simple implementation which relies on {@link FileToByteArray} to get a
+     * <code>byte[]</code> from the file beeing parsed and then transform it to a
+     * String with the correct encoding. If the encoding isn't supported simply throw
+     * an exception, good tranformation or no trasfromation at all. NOTE: if a
+     * <code>byte[]</code> is passed in as a source object this transformer accept
+     * it an try the usual transformation.
+     */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] bytes;
 
-        if (src instanceof String)
-        {
-            try
-            {
-                return new String(((String)src).getBytes(), encoding);
-            }
-            catch (UnsupportedEncodingException uee)
-            {
-                return new String(((String)src).getBytes());
-            }
-        }
-        else if (src instanceof byte[])
+        if (src instanceof byte[])
         {
             bytes = (byte[])src;
         }
@@ -66,7 +62,7 @@ public class FileToString extends FileToByteArray
         }
         catch (UnsupportedEncodingException uee)
         {
-            return new String(bytes);
+            throw new TransformerException(this, uee);
         }
     }
 }
