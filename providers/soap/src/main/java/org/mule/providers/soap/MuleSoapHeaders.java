@@ -65,11 +65,16 @@ public class MuleSoapHeaders
     public MuleSoapHeaders(SOAPHeader soapHeader)
     {
         Iterator iter = soapHeader.examineHeaderElements(MULE_10_ACTOR);
-        SOAPHeaderElement header;
+        SOAPHeaderElement headerElement;
         while (iter.hasNext()) {
-            header = (SOAPHeaderElement) iter.next();
-            Iterator iter2 = header.getChildElements();
-            readElements(iter2);
+            headerElement = (SOAPHeaderElement) iter.next();
+            
+            //checking that the elements are part of the mule namespace
+            if (org.mule.util.StringUtils.equals(MULE_10_ACTOR, headerElement.getNamespaceURI()))
+            {
+                Iterator iter2 = headerElement.getChildElements();
+                readElements(iter2);
+            }
         }
     }
 
@@ -79,19 +84,33 @@ public class MuleSoapHeaders
     }
 
     protected void readElements(Iterator elements) {
-        Element element;
+
+        SOAPElement element;
+        
         while (elements.hasNext()) {
-                element = (Element)elements.next();
-                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getLocalName())) {
-                    correlationId = getStringValue(element);
-                } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getLocalName())) {
-                    correlationGroup = getStringValue(element);
-                } else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getLocalName())) {
-                    correlationSequence = getStringValue(element);
-                } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getLocalName())) {
-                    replyTo = getStringValue(element);
+        	
+    		Object elementObject = elements.next();
+
+            //Fixed MULE-770 (http://jira.symphonysoft.com/browse/MULE-770)
+    		if (elementObject instanceof SOAPElement) 
+    		// if not, means that it is a value not an element, therefore we cannot look for correlation_id ...
+    		{
+                element = (SOAPElement)elementObject;
+                String localName = element.getLocalName();
+                String elementValue = getStringValue(element);
+                
+                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(localName)) {
+                    correlationId = elementValue;
+                } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(localName)) {
+                    correlationGroup = elementValue;
+                } else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(localName)) {
+                    correlationSequence = elementValue;
+                } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(localName)) {
+                    replyTo = elementValue;
                 }
-            }
+                
+    		}
+        }
     }
     private String getStringValue(Element e)
     {
