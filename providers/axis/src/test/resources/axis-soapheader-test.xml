@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="AxisSoapHeaders" version="1.0">
+   
+    <model name="Axis_Headers_TestCase">
+        <mule-descriptor name="component" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:81/services"/>
+            </inbound-router>
+			<response-router>
+				<endpoint address="http://localhost:82/reply"/>
+			</response-router>
+        </mule-descriptor>
+		
+    </model>
+	
+</mule-configuration>
