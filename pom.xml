@@ -281,7 +281,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-simple</artifactId>
+            <artifactId>mule-samples-scripting</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

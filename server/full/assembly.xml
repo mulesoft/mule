@@ -159,7 +159,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.samples:mule-samples-hello</exclude>
         <exclude>org.mule.samples:mule-samples-loanbroker</exclude>
         <exclude>org.mule.samples:mule-samples-loanbroker-esb</exclude>
-        <exclude>org.mule.samples:mule-samples-simple</exclude>
+        <exclude>org.mule.samples:mule-samples-scripting</exclude>
         <exclude>org.mule.samples:mule-samples-stockquote</exclude>
         <exclude>org.mule.samples:mule-samples-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
@@ -177,7 +177,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.samples:mule-samples-hello</include>
         <include>org.mule.samples:mule-samples-loanbroker</include>
         <include>org.mule.samples:mule-samples-loanbroker-esb</include>
-        <include>org.mule.samples:mule-samples-simple</include>
+        <include>org.mule.samples:mule-samples-scripting</include>
         <include>org.mule.samples:mule-samples-stockquote</include>
         <include>org.mule.samples:mule-samples-voipservice</include>
       </includes>
