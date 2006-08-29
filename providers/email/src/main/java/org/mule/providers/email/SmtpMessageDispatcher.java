@@ -10,22 +10,25 @@
 
 package org.mule.providers.email;
 
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
+import java.util.Calendar;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.URLName;
-import java.util.Calendar;
+
+import org.mule.config.i18n.Messages;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.util.StringUtils;
 
 /**
  * <code>SmtpMessageDispatcher</code> will dispatch Mule events as Mime email messages over an Smtp gateway
@@ -49,18 +52,37 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
         if(transport==null) {
             UMOEndpointURI uri = endpoint.getEndpointURI();
-            URLName url = new URLName(connector.getProtocol(),
-                                  uri.getHost(),
-                                  uri.getPort(),
-                                  null,
-                                  uri.getUsername(),
-                                  uri.getPassword());
 
-            session = MailUtils.createMailSession(url, connector);
-            session.setDebug(logger.isDebugEnabled());
+            // Try to get the properties from the endpoint and use the connector
+            // properties if they are not given.
 
-            transport = session.getTransport(connector.getProtocol());
-            transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+            String host = uri.getHost();
+            if (host == null) { host = connector.getHost(); }
+
+            int port = uri.getPort();
+            if (port == -1) { port = connector.getPort(); }
+
+            String username = uri.getUsername();
+            if (StringUtils.isBlank(username)) { username = connector.getUsername(); }
+
+            String password = uri.getPassword();
+            if (StringUtils.isBlank(password)) { password = connector.getPassword(); }
+
+            URLName url =
+                new URLName(connector.getProtocol(), host, port, null, username, password);
+
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Creating mail session, host = " + url.getHost() + ", port = " + url.getPort() + ", user = " + url.getUsername() + ", pass = " + url.getPassword());
+                }
+                session = MailUtils.createMailSession(url, connector);
+                session.setDebug(logger.isDebugEnabled());
+
+                transport = session.getTransport(url);
+                transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+            } catch (Exception e) {
+                throw new EndpointException(org.mule.config.i18n.Message.createStaticMessage("Unable to connect to mail transport."), e);
+            }
         }
     }
 
@@ -75,7 +97,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#dispatch(java.lang.Object,
      *      org.mule.providers.MuleEndpoint)
      */
@@ -103,7 +125,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -160,7 +182,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()

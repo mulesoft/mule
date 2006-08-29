@@ -68,7 +68,7 @@ public class MailUtils
         synchronized (props) {
             props.put("mail." + protocol +".host", url.getHost());
             int port = url.getPort();
-            if(port==-1) {
+            if(port == -1) {
                 port = connector.getDefaultPort();
             }
             props.put("mail." + protocol + ".port", String.valueOf(port));
@@ -78,8 +78,8 @@ public class MailUtils
 
             }
             props.setProperty("mail." + protocol + ".rsetbeforequit","true");
-            
-            if (url.getPassword() != null) {
+
+            if (StringUtils.isNotBlank(url.getPassword())) {
                 props.put("mail." + protocol + ".auth", "true");
                 Authenticator auth = connector.getAuthenticator();
                 if(auth==null) {
