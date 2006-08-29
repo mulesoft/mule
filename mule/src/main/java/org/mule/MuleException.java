@@ -17,7 +17,7 @@ import org.mule.umo.UMOException;
  * <code>MuleException</code> Is the base exception type for the Mule
  * application any other exceptions thrown by Mule code will be based on this
  * exception.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -28,12 +28,22 @@ public class MuleException extends UMOException
      */
     private static final long serialVersionUID = 2554735072826262515L;
 
+    public MuleException(String message)
+    {
+        this(Message.createStaticMessage(message));
+    }
+
     /**
      * @param message the exception message
      */
     public MuleException(Message message)
     {
         super(message);
+    }
+
+    public MuleException(String message, Throwable cause)
+    {
+        this(Message.createStaticMessage(message), cause);
     }
 
     /**
