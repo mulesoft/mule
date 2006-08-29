@@ -20,13 +20,13 @@
             <artifactId>mule-oracle-jms-provider</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <!-- The Oracle JDBC driver. -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>ojdbc14</artifactId>
-            <!-- <version>10.2.0.2</version> --> 
-            <version>9.2.0.5</version> 
+            <!-- <version>10.2.0.2</version> -->
+            <version>9.2.0.5</version>
         </dependency>
 
         <!-- The Oracle JMS implementation (oracle.jms.*) -->
@@ -49,13 +49,20 @@
             <artifactId>xdb</artifactId>
             <version>9i</version>
         </dependency>
-        <!-- This is the xmlparserv2.jar with all non-Oracle classes removed 
-             (javax.xml.*, org.w3c.dom.*, org.xml.sax.*) so as to avoid version conflicts with 
+        <!-- This is the xmlparserv2.jar with all non-Oracle classes removed
+             (javax.xml.*, org.w3c.dom.*, org.xml.sax.*) so as to avoid version conflicts with
              other libraries that might be in the classpath. -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>xmlparserv2-distilled</artifactId>
             <version>9i</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
