@@ -11,6 +11,8 @@
 package org.mule.providers.file;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -24,6 +26,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -137,7 +140,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                     .getFilename(msgAdapter, moveToPattern);
             }
 
-            destinationFile = new File(moveDir, destinationFileName);
+            destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
         boolean fileWasMoved = false;
@@ -243,7 +246,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
     {
         boolean result = false;
         try {
-            result = this.moveFile(sourceFile, new File(destinationFilePath));
+            result = this.moveFile(sourceFile, FileUtils.newFile(destinationFilePath));
         }
         catch (Throwable t) {
             logger.debug("rollback of file move failed: " + t.getMessage());
@@ -253,7 +256,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     /**
      * Get a list of files to be processed.
-     * 
+     *
      * @return an array of files to be processed.
      * @throws org.mule.MuleException which will wrap any other exceptions or
      *             errors.
@@ -262,6 +265,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
     {
         try {
             File[] todoFiles = readDirectory.listFiles(filenameFilter);
+            //logger.trace("Reading directory " + readDirectory.getAbsolutePath() + " -> " + todoFiles.length + " file(s)");
             return (todoFiles == null ? new File[0] : todoFiles);
         }
         catch (Exception e) {

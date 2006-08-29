@@ -50,7 +50,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
     protected void doDispatch(UMOEvent event) throws Exception {
@@ -102,7 +102,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
             if(logger.isInfoEnabled()) {
                 logger.info("Writing file to: " + file.getAbsolutePath());
             }
-            
+
             return new FileOutputStream(file,MapUtils.getBooleanValue(endpoint.getProperties(),"outputAppend", connector.isOutputAppend()));
         } catch (IOException e) {
             throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint, e);
@@ -134,7 +134,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
 
-        File file = new File(endpoint.getEndpointURI().getAddress());
+        File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
         String filter = (String) endpoint.getProperty("filter");
@@ -162,7 +162,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
                 MuleMessage message = new MuleMessage(connector.getMessageAdapter(result));
                 if (connector.getMoveToDirectory() != null) {
                     {
-                        File destinationFile = new File(connector.getMoveToDirectory(), result.getName());
+                        File destinationFile = FileUtils.newFile(connector.getMoveToDirectory(), result.getName());
                         if (!result.renameTo(destinationFile)) {
                             logger.error("Failed to move file: " + result.getAbsolutePath() + " to "
                                     + destinationFile.getAbsolutePath());
@@ -178,7 +178,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
     private File getNextFile(String dir, FilenameFilter filter) throws UMOException {
         File[] files = new File[]{};
-        File file = new File(dir);
+        File file = FileUtils.newFile(dir);
         File result = null;
         try {
             if (file.exists()) {
@@ -203,7 +203,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception {
@@ -213,7 +213,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector() {
