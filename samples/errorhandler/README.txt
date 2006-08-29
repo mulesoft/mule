@@ -17,3 +17,19 @@ mule -config ./conf/error-config.xml
 Windows
 -------
 mule.bat -config .\conf\error-config.xml
+
++-----------------+
+| E-mail settings |
++-----------------+
+
+The FatalException part of this example sends an alert e-mail to the Mule administrator.
+For this to work, you will need to configure your e-mail address and SMTP settings in the
+file ./conf/email.properties  Then you can run the example as follows:
+
+Linux / Unix
+------------
+mule -config ./conf/error-config.xml -props ./conf/email.properties
+
+Windows
+-------
+mule.bat -config .\conf\error-config.xml -props .\conf\email.properties

@@ -1,6 +1,10 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
+    <bean id="activeMqConnectionFactory" class="org.activemq.ActiveMQConnectionFactory">
+        <property name="useEmbeddedBroker" value="true"/>
+    </bean>
+
     <bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
         <property name="handlers">
             <list>
