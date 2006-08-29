@@ -10,10 +10,7 @@
 
 package org.mule.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,9 +26,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleServer;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * This class is useful for loading resources and classes in a fault
@@ -134,92 +128,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             });
         }
         return enumeration;
-    }
-
-    /**
-     * Attempts to locate a resource on the file system, classpath, or as a URL,
-     * in that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @param tryAsFile - try to load the resource from the local file system
-     * @param tryAsUrl - try to load the resource as a URL
-     * @return an InputStream to the resource or null if resource not found
-     */
-    public static InputStream getResourceAsStream(final String resourceName,
-            final Class callingClass, boolean tryAsFile, boolean tryAsUrl) {
-        if (resourceName == null) {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Resource name").getMessage());
-        }
-        InputStream is = null;
-
-        // Try to load the resource from the file system.
-        if (tryAsFile) {
-            try {
-                File file = new File(resourceName);
-                // Try using the startup directory in case the file has been given using
-                // a relative path (./ or ../)
-                if (file.exists() == false &&  MuleServer.getStartupDirectory() != null) {
-                    file = new File(MuleServer.getStartupDirectory(), resourceName);
-                }
-
-                if (file.exists()) {
-                    is = new FileInputStream(file);
-                } else {
-                    logger.debug("Unable to load resource from the file system: " + file.getAbsolutePath());
-                }
-            } catch (Exception e) {
-                logger.debug("Unable to load resource from the file system: " + e.getMessage());
-            }
-        }
-
-        // Try to load the resource from the classpath.
-        if (is == null) {
-            try {
-                is = getResourceAsStream(resourceName, callingClass);
-                if (is == null) {
-                    logger.debug("Unable to load resource from the classpath");
-                }
-            } catch (Exception e) {
-                logger.debug("Unable to load resource from the classpath: " + e.getMessage());
-            }
-        }
-
-        // Try to load the resource as a URL.
-        if ((is == null) && tryAsUrl) {
-            try {
-                URL url = new URL(resourceName);
-                is = url.openStream();
-                if (is == null) {
-                    logger.debug("Unable to load resource as a URL");
-                }
-            } catch (Exception e) {
-                logger.debug("Unable to load resource as a URL: " + e.getMessage());
-            }
-        }
-        return is;
-    }
-
-    /**
-     * This is a convenience method to load a resource as a stream. <p/> The
-     * algorithm used to find the resource is given in getResource()
-     *
-     * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
-     * @return an InputStream to the resource or null if resource not found
-     */
-    public static InputStream getResourceAsStream(final String resourceName, final Class callingClass) {
-        InputStream inputStream = (InputStream) AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
-                URL url = getResource(resourceName, callingClass);
-                try {
-                    return (url != null) ? url.openStream() : null;
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-        });
-        return inputStream;
     }
 
     /**

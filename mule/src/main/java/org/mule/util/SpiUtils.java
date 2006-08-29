@@ -10,16 +10,16 @@
 
 package org.mule.util;
 
+import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Properties;
+
 import org.apache.commons.discovery.DiscoveryException;
 import org.apache.commons.discovery.resource.ClassLoaders;
 import org.apache.commons.discovery.tools.DiscoverClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.InputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Properties;
 
 public class SpiUtils
 {
@@ -29,7 +29,7 @@ public class SpiUtils
 
     /**
      * Find class implementing a specified SPI.
-     * 
+     *
      * @param spi Service Provider Interface Class.
      * @param propertyFileName is a location of a property file that contains
      *            the SPI property value
@@ -55,7 +55,7 @@ public class SpiUtils
      * Find class implementing a specified SPI. The system properties will be
      * checked for an SPI property to use. this will be the fully qualified SPI
      * class name.
-     * 
+     *
      * @param spi Service Provider Interface Class.
      * @param defaultImpl Default implementation class name.
      * @param currentClass is used to include the classloader of the calling
@@ -84,7 +84,7 @@ public class SpiUtils
      * Find class implementing a specified SPI. The system properties will be
      * checked for an SPI property to use. this will be the fully qualified SPI
      * class name.
-     * 
+     *
      * @param spi Service Provider Interface Class.
      * @param currentClass is used to include the classloader of the calling
      *            class in the search. All system classloaders will be checked
@@ -105,7 +105,7 @@ public class SpiUtils
 
     /**
      * Find class implementing a specified SPI.
-     * 
+     *
      * @param spi Service Provider Interface Class.
      * @param currentClass is used to include the classloader of the calling
      *            class in the search.
@@ -139,6 +139,6 @@ public class SpiUtils
         } else {
             path = SERVICE_ROOT + path + name;
         }
-        return ClassUtils.getResourceAsStream(path, currentClass);
+        return IOUtils.getResourceAsStream(path, currentClass, false, false);
     }
 }

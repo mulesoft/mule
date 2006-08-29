@@ -12,12 +12,9 @@ package org.mule.config;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -104,7 +101,7 @@ public class MuleDtdResolver implements EntityResolver
             String dtdFile = tokens[tokens.length-1];
             logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
-            InputStream is = ClassUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
+            InputStream is = IOUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass(), false, false);
             if (is != null) {
                 source = new InputSource(is);
                 source.setPublicId(publicId);

@@ -33,6 +33,7 @@ import org.mule.config.PropertyFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.xml.sax.Attributes;
 
@@ -226,7 +227,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String location = attributes.getValue("location");
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
-                InputStream is = ClassUtils.getResourceAsStream(location, getClass(),
+                InputStream is = IOUtils.getResourceAsStream(location, getClass(),
                                                                 /*tryAsFile*/true, /*tryAsUrl*/true);
                 if (is == null) {
                     throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, location));
@@ -252,7 +253,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
                 // If startup properties were given on the command line, they should override the file properties.
                 if (StringUtils.isNotBlank(MuleServer.getStartupPropertiesFile())) {
-                    is = ClassUtils.getResourceAsStream(MuleServer.getStartupPropertiesFile(), getClass(),
+                    is = IOUtils.getResourceAsStream(MuleServer.getStartupPropertiesFile(), getClass(),
                                                         /*tryAsFile*/true, /*tryAsUrl*/false);
                     if (is != null) {
                         Properties startupProps = new Properties();

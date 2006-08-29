@@ -10,6 +10,13 @@
 
 package org.mule.config;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
+import javax.resource.spi.work.WorkListener;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -20,21 +27,15 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
-import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
-
-import javax.resource.spi.work.WorkListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 /**
  * <code>MuleConfiguration</code> holds the runtime configuration specific to
  * the <code>MuleManager</code>. Once the <code>MuleManager</code> has been
  * initialised this class is immutable.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,7 +45,7 @@ public class MuleConfiguration
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-    
+
     /**
      * The default serverUrl used to receive incoming requests from clients
      */
@@ -131,7 +132,7 @@ public class MuleConfiguration
     private String encoding = DEFAULT_ENCODING;
 
     private String osEncoding = DEFAULT_OS_ENCODING;
-    
+
     private PoolingProfile poolingProfile = new PoolingProfile();
 
     /**
@@ -430,11 +431,11 @@ public class MuleConfiguration
     {
         if (manifest == null) {
             manifest = new Manifest();
-            InputStream is = ClassUtils.getResourceAsStream("META-INF/Mule.mf", getClass());
+            InputStream is = IOUtils.getResourceAsStream("META-INF/Mule.mf", getClass(), false, false);
             // a bit of a kludge as depending on how the jar is built the
             // Meta-inf can be lower or upper case...
             if (is == null) {
-                is = ClassUtils.getResourceAsStream("meta-inf/Mule.mf", getClass());
+                is = IOUtils.getResourceAsStream("meta-inf/Mule.mf", getClass(), false, false);
             }
             if (is != null) {
                 try {
@@ -489,7 +490,7 @@ public class MuleConfiguration
      * Returns a clone of the default Connection strategy. The clone ensures
      * that the connection strategy can be manipulated without affecting other
      * connectors using the same strategy
-     * 
+     *
      * @return a clone of the default Connection strategy
      */
     public ConnectionStrategy getConnectionStrategy()
@@ -505,7 +506,7 @@ public class MuleConfiguration
      * Sets the connection strategy used by all connectors managed in this Mule
      * instance if the connector has no connection strategy specifically set on
      * it.
-     * 
+     *
      * @param connectionStrategy the default strategy to use
      */
     public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
@@ -551,7 +552,7 @@ public class MuleConfiguration
     public void setOSEncoding(String osEncoding) {
         this.osEncoding = osEncoding;
     }
-    
+
     public boolean isEnableMessageEvents() {
         return enableMessageEvents;
     }

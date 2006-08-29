@@ -60,7 +60,7 @@ public class PropertiesUtils
      * @return a java.util.Properties object containing the properties.
      */
     public static synchronized Properties loadProperties(String fileName, final Class callingClass) throws IOException {
-        InputStream is = ClassUtils.getResourceAsStream(fileName, callingClass,
+        InputStream is = IOUtils.getResourceAsStream(fileName, callingClass,
                                                     /*tryAsFile*/true, /*tryAsUrl*/false);
         if (is == null) {
             Message error = new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, fileName);

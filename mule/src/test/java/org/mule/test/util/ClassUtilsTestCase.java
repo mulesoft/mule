@@ -10,6 +10,13 @@
 
 package org.mule.test.util;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -18,14 +25,6 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ClassUtils;
-
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -109,15 +108,6 @@ public class ClassUtilsTestCase extends TestCase
 
         resource = ClassUtils.getResource("test-dummyX.properties", getClass());
         assertNull(resource);
-    }
-
-    public void testLoadingResourcesAsStream() throws Exception
-    {
-        InputStream is = ClassUtils.getResourceAsStream("test-dummy.properties", getClass());
-        assertNotNull(is);
-
-        is = ClassUtils.getResourceAsStream("test-dummyX.properties", getClass());
-        assertNull(is);
     }
 
     public void testLoadingResourceEnumeration() throws Exception
