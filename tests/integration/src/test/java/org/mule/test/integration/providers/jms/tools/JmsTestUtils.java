@@ -9,8 +9,10 @@
  */
 package org.mule.test.integration.providers.jms.tools;
 
-import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -40,14 +42,13 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.Reference;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
  * <code>JmsTestUtils</code> TODO (document class)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -70,7 +71,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties() throws IOException
     {
-        InputStream is = ClassUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
+        InputStream is = IOUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class, false, false);
 
         String jmsProps = OPEN_JMS_PROPERTIES;
         if (is != null) {
@@ -84,7 +85,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties(String propertyFile) throws IOException
     {
-        InputStream is = ClassUtils.getResourceAsStream(propertyFile, JmsTestUtils.class);
+        InputStream is = IOUtils.getResourceAsStream(propertyFile, JmsTestUtils.class, false, false);
 
         Properties p = new Properties();
         p.load(is);
