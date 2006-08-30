@@ -7,11 +7,11 @@ Linux / Unix
 
 mule [-config <your-config.xml>]
 
-	(runs in the foreground, stop with Ctrl-C)
+    (runs in the foreground, stop with Ctrl-C)
 
 mule start|stop|restart [-config <your-config.xml>]
 
-	(runs in the background as a daemon)
+    (runs in the background as a daemon)
 
 Windows
 -------

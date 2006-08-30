@@ -12,10 +12,10 @@
     <packaging>pom</packaging>
     <name>Stand-alone Server</name>
 
-	<modules>
-		<module>full</module>
-		<module>custom</module>
-	</modules>
+    <modules>
+        <module>full</module>
+        <module>custom</module>
+    </modules>
 
     <dependencies>
         <dependency>

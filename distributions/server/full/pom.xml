@@ -36,7 +36,7 @@
                 </executions>
             </plugin>
 
-	<!-- Disable Ross' ant magic for now, there's gotta be a better way to do this!
+    <!-- Disable Ross' ant magic for now, there's gotta be a better way to do this!
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -46,13 +46,13 @@
               <tasks>
                  Copy all sources into a single directory
                 <copy verbose="true" flatten="true" todir="target/source">
-		    <fileset dir="../../../">
-		        <include name="**/*-sources.jar"/>
-		    </fileset>
-		  </copy>
+            <fileset dir="../../../">
+                <include name="**/*-sources.jar"/>
+            </fileset>
+          </copy>
 
-		   Unpack all Source Jars
-		  <unjar dest="target/src">
+           Unpack all Source Jars
+          <unjar dest="target/src">
                       <fileset dir="target/source">
                           <include name="*.jar"/>
                           <exclude name="*sample*.jar"/>
@@ -65,15 +65,15 @@
 
                    Clean up the source tree a bit
                   <delete>
-    			<fileset dir="target/src">
-    				<include name="*.xml"/>
-    				<include name="*.wsdd"/>
-    				<include name="log4j.properties"/>
-    			</fileset>
+                <fileset dir="target/src">
+                    <include name="*.xml"/>
+                    <include name="*.wsdd"/>
+                    <include name="log4j.properties"/>
+                </fileset>
                   </delete>
 
-	 Generate JavaDoc from full source
-	<tstamp>
+     Generate JavaDoc from full source
+    <tstamp>
             <format property="year" pattern="2003-yyyy"/>
         </tstamp>
 
@@ -88,7 +88,7 @@
             bottom="Copyright &amp;copy; ${year} ${pom.organization.name}. All Rights Reserved."
             stylesheetfile="../../../mule/xdocs/stylesheets/maven.css"
             >
-	     TODO: Move StyleSheet
+         TODO: Move StyleSheet
 
             <packageset dir="target/src/" defaultexcludes="yes">
                 <exclude name="org/mule/tck/testmodels/**"/>
@@ -101,27 +101,27 @@
 
                    Copy all Samples
                 <copy verbose="true" todir="target/samples">
-		    <fileset dir="../../../samples">
-		        <exclude name="**/.mule"/>
-		        <exclude name="**/.settings"/>
-		        <exclude name="**/pom.xml"/>
-		        <exclude name="**/maven.xml"/>
-		        <exclude name="**/project.xml"/>
-		        <exclude name="**/target/*"/>
-		    </fileset>
-		  </copy>
+            <fileset dir="../../../samples">
+                <exclude name="**/.mule"/>
+                <exclude name="**/.settings"/>
+                <exclude name="**/pom.xml"/>
+                <exclude name="**/maven.xml"/>
+                <exclude name="**/project.xml"/>
+                <exclude name="**/target/*"/>
+            </fileset>
+          </copy>
 
-		   Mule All Jar
-		  <mkdir dir="target/dist"/>
-		  <mkdir dir="target/dist/temp"/>
-		  <copy verbose="true" flatten="true" todir="target/dist">
-		    <fileset dir="../../../">
-		        <include name="**/mule-*-${version}.jar"/>
-		    </fileset>
-		  </copy>
+           Mule All Jar
+          <mkdir dir="target/dist"/>
+          <mkdir dir="target/dist/temp"/>
+          <copy verbose="true" flatten="true" todir="target/dist">
+            <fileset dir="../../../">
+                <include name="**/mule-*-${version}.jar"/>
+            </fileset>
+          </copy>
 
-		   Unpack all Source Jars
-		  <unjar dest="target/dist/temp">
+           Unpack all Source Jars
+          <unjar dest="target/dist/temp">
                       <fileset dir="target/dist">
                           <include name="*.jar"/>
                           <exclude name="*sample*.jar"/>
@@ -137,7 +137,7 @@
 
         <delete dir="target/dist"/>
         <mkdir dir="dist"/>
-	<copy file="target/mule-${version}.jar" todir="target/dist"/>
+    <copy file="target/mule-${version}.jar" todir="target/dist"/>
         local deploy
         <copy todir="${maven.repo.local}/mule/jars" file="target/dist/mule-${version}.jar"/>
               </tasks>

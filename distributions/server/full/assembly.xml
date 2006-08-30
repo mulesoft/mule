@@ -26,21 +26,21 @@ Assembly descriptor for the full Mule distribution.
       <fileMode>744</fileMode>
     </fileSet>
 
-	<!-- Copy samples to "examples" -->
+    <!-- Copy samples to "examples" -->
     <fileSet>
       <directory>../../../samples</directory>
       <outputDirectory>examples</outputDirectory>
       <excludes>
-      	<exclude>**/target/**</exclude>
+          <exclude>**/target/**</exclude>
       </excludes>
     </fileSet>
 
-  	<!-- Copy the USAGE.txt file to the root directory for visibility -->
+      <!-- Copy the USAGE.txt file to the root directory for visibility -->
     <fileSet>
       <directory>../src/main/resources/bin</directory>
       <outputDirectory></outputDirectory>
       <includes>
-      	<include>USAGE.txt</include>
+          <include>USAGE.txt</include>
       </includes>
     </fileSet>
   </fileSets>
@@ -48,10 +48,10 @@ Assembly descriptor for the full Mule distribution.
   <!-- This doesn't work because Maven makes the path relative to the current
   directory instead of the project directory... JIRA issue = #?
   <files>
-  	<file>
-  		<source>../src/main/resources/bin/USAGE.txt</source>
-      	<outputDirectory></outputDirectory>
-  	</file>
+      <file>
+          <source>../src/main/resources/bin/USAGE.txt</source>
+          <outputDirectory></outputDirectory>
+      </file>
   </files>
   -->
 
@@ -65,45 +65,45 @@ Assembly descriptor for the full Mule distribution.
       <includes>
         <!-- Core -->
         <include>org.mule:mule-core</include>
-		<!-- Providers -->
-		<include>org.mule:mule-axis-provider</include>
-		<include>org.mule:mule-dq-provider</include>
-		<include>org.mule:mule-ejb-provider</include>
-		<include>org.mule:mule-email-provider</include>
-		<include>org.mule:mule-file-provider</include>
-		<include>org.mule:mule-ftp-provider</include>
-		<include>org.mule:mule-gigaspaces-provider</include>
-		<include>org.mule:mule-glue-provider</include>
-		<include>org.mule:mule-http-provider</include>
-		<include>org.mule:mule-jbi-provider</include>
-		<include>org.mule:mule-jdbc-provider</include>
-		<include>org.mule:mule-jms-provider</include>
-		<include>org.mule:mule-multicast-provider</include>
-		<include>org.mule:mule-oracle-jms-provider</include>
-		<include>org.mule:mule-quartz-provider</include>
-		<include>org.mule:mule-rmi-provider</include>
-		<include>org.mule:mule-soap-provider</include>
-		<include>org.mule:mule-space-provider</include>
-		<include>org.mule:mule-ssl-provider</include>
-		<include>org.mule:mule-stream-provider</include>
-		<include>org.mule:mule-tcp-provider</include>
-		<include>org.mule:mule-udp-provider</include>
-		<include>org.mule:mule-vm-provider</include>
-		<include>org.mule:mule-xfire-provider</include>
-		<include>org.mule:mule-xmpp-provider</include>
-		<!-- Modules -->
-		<include>org.mule:mule-filter-ognl</include>
-		<include>org.mule:mule-module-acegi</include>
-		<include>org.mule:mule-module-boot</include>
-		<include>org.mule:mule-module-client</include>
-		<include>org.mule:mule-module-hivemind</include>
-		<include>org.mule:mule-i18n_ja_JP</include>
-		<include>org.mule:mule-module-jotm</include>
-		<include>org.mule:mule-module-pgp</include>
-		<include>org.mule:mule-module-picocontainer</include>
-		<include>org.mule:mule-module-plexus</include>
-		<include>org.mule:mule-module-scripting</include>
-		<include>org.mule:mule-module-spring</include>
+        <!-- Providers -->
+        <include>org.mule:mule-axis-provider</include>
+        <include>org.mule:mule-dq-provider</include>
+        <include>org.mule:mule-ejb-provider</include>
+        <include>org.mule:mule-email-provider</include>
+        <include>org.mule:mule-file-provider</include>
+        <include>org.mule:mule-ftp-provider</include>
+        <include>org.mule:mule-gigaspaces-provider</include>
+        <include>org.mule:mule-glue-provider</include>
+        <include>org.mule:mule-http-provider</include>
+        <include>org.mule:mule-jbi-provider</include>
+        <include>org.mule:mule-jdbc-provider</include>
+        <include>org.mule:mule-jms-provider</include>
+        <include>org.mule:mule-multicast-provider</include>
+        <include>org.mule:mule-oracle-jms-provider</include>
+        <include>org.mule:mule-quartz-provider</include>
+        <include>org.mule:mule-rmi-provider</include>
+        <include>org.mule:mule-soap-provider</include>
+        <include>org.mule:mule-space-provider</include>
+        <include>org.mule:mule-ssl-provider</include>
+        <include>org.mule:mule-stream-provider</include>
+        <include>org.mule:mule-tcp-provider</include>
+        <include>org.mule:mule-udp-provider</include>
+        <include>org.mule:mule-vm-provider</include>
+        <include>org.mule:mule-xfire-provider</include>
+        <include>org.mule:mule-xmpp-provider</include>
+        <!-- Modules -->
+        <include>org.mule:mule-filter-ognl</include>
+        <include>org.mule:mule-module-acegi</include>
+        <include>org.mule:mule-module-boot</include>
+        <include>org.mule:mule-module-client</include>
+        <include>org.mule:mule-module-hivemind</include>
+        <include>org.mule:mule-i18n_ja_JP</include>
+        <include>org.mule:mule-module-jotm</include>
+        <include>org.mule:mule-module-pgp</include>
+        <include>org.mule:mule-module-picocontainer</include>
+        <include>org.mule:mule-module-plexus</include>
+        <include>org.mule:mule-module-scripting</include>
+        <include>org.mule:mule-module-spring</include>
       </includes>
     </dependencySet>
 
@@ -114,46 +114,46 @@ Assembly descriptor for the full Mule distribution.
       <excludes>
         <!-- Core -->
         <exclude>org.mule:mule-core</exclude>
-		<!-- Providers -->
-		<exclude>org.mule:mule-axis-provider</exclude>
-		<exclude>org.mule:mule-dq-provider</exclude>
-		<exclude>org.mule:mule-ejb-provider</exclude>
-		<exclude>org.mule:mule-email-provider</exclude>
-		<exclude>org.mule:mule-file-provider</exclude>
-		<exclude>org.mule:mule-ftp-provider</exclude>
-		<exclude>org.mule:mule-gigaspaces-provider</exclude>
-		<exclude>org.mule:mule-glue-provider</exclude>
-		<exclude>org.mule:mule-http-provider</exclude>
-		<exclude>org.mule:mule-jbi-provider</exclude>
-		<exclude>org.mule:mule-jdbc-provider</exclude>
-		<exclude>org.mule:mule-jms-provider</exclude>
-		<exclude>org.mule:mule-multicast-provider</exclude>
-		<exclude>org.mule:mule-oracle-jms-provider</exclude>
-		<exclude>org.mule:mule-quartz-provider</exclude>
-		<exclude>org.mule:mule-rmi-provider</exclude>
-		<exclude>org.mule:mule-soap-provider</exclude>
-		<exclude>org.mule:mule-space-provider</exclude>
-		<exclude>org.mule:mule-ssl-provider</exclude>
-		<exclude>org.mule:mule-stream-provider</exclude>
-		<exclude>org.mule:mule-tcp-provider</exclude>
-		<exclude>org.mule:mule-udp-provider</exclude>
-		<exclude>org.mule:mule-vm-provider</exclude>
-		<exclude>org.mule:mule-xfire-provider</exclude>
-		<exclude>org.mule:mule-xmpp-provider</exclude>
-		<!-- Modules -->
-		<exclude>org.mule:mule-filter-ognl</exclude>
-		<exclude>org.mule:mule-module-boot</exclude>
-		<exclude>org.mule:mule-module-acegi</exclude>
-		<exclude>org.mule:mule-module-client</exclude>
-		<exclude>org.mule:mule-module-hivemind</exclude>
-		<exclude>org.mule:mule-module-i18n</exclude>
-		<exclude>org.mule:mule-module-jotm</exclude>
-		<exclude>org.mule:mule-module-pgp</exclude>
-		<exclude>org.mule:mule-module-picocontainer</exclude>
-		<exclude>org.mule:mule-module-plexus</exclude>
-		<exclude>org.mule:mule-module-scripting</exclude>
-		<exclude>org.mule:mule-module-spring</exclude>
-		<!-- Samples -->
+        <!-- Providers -->
+        <exclude>org.mule:mule-axis-provider</exclude>
+        <exclude>org.mule:mule-dq-provider</exclude>
+        <exclude>org.mule:mule-ejb-provider</exclude>
+        <exclude>org.mule:mule-email-provider</exclude>
+        <exclude>org.mule:mule-file-provider</exclude>
+        <exclude>org.mule:mule-ftp-provider</exclude>
+        <exclude>org.mule:mule-gigaspaces-provider</exclude>
+        <exclude>org.mule:mule-glue-provider</exclude>
+        <exclude>org.mule:mule-http-provider</exclude>
+        <exclude>org.mule:mule-jbi-provider</exclude>
+        <exclude>org.mule:mule-jdbc-provider</exclude>
+        <exclude>org.mule:mule-jms-provider</exclude>
+        <exclude>org.mule:mule-multicast-provider</exclude>
+        <exclude>org.mule:mule-oracle-jms-provider</exclude>
+        <exclude>org.mule:mule-quartz-provider</exclude>
+        <exclude>org.mule:mule-rmi-provider</exclude>
+        <exclude>org.mule:mule-soap-provider</exclude>
+        <exclude>org.mule:mule-space-provider</exclude>
+        <exclude>org.mule:mule-ssl-provider</exclude>
+        <exclude>org.mule:mule-stream-provider</exclude>
+        <exclude>org.mule:mule-tcp-provider</exclude>
+        <exclude>org.mule:mule-udp-provider</exclude>
+        <exclude>org.mule:mule-vm-provider</exclude>
+        <exclude>org.mule:mule-xfire-provider</exclude>
+        <exclude>org.mule:mule-xmpp-provider</exclude>
+        <!-- Modules -->
+        <exclude>org.mule:mule-filter-ognl</exclude>
+        <exclude>org.mule:mule-module-boot</exclude>
+        <exclude>org.mule:mule-module-acegi</exclude>
+        <exclude>org.mule:mule-module-client</exclude>
+        <exclude>org.mule:mule-module-hivemind</exclude>
+        <exclude>org.mule:mule-module-i18n</exclude>
+        <exclude>org.mule:mule-module-jotm</exclude>
+        <exclude>org.mule:mule-module-pgp</exclude>
+        <exclude>org.mule:mule-module-picocontainer</exclude>
+        <exclude>org.mule:mule-module-plexus</exclude>
+        <exclude>org.mule:mule-module-scripting</exclude>
+        <exclude>org.mule:mule-module-spring</exclude>
+        <!-- Samples -->
         <exclude>org.mule.samples:mule-samples-echo</exclude>
         <exclude>org.mule.samples:mule-samples-errorhandler</exclude>
         <exclude>org.mule.samples:mule-samples-hello</exclude>
