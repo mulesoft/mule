@@ -39,30 +39,30 @@
         </plugins>
     </build>
 
-	<modules>
-		<module>server</module>
-  		<module>jca</module>
-		<module>embedded</module>
-		<!-- <module>extras</module> -->
-	</modules>
+    <modules>
+        <module>server</module>
+          <module>jca</module>
+        <module>embedded</module>
+        <!-- <module>extras</module> -->
+    </modules>
 
     <!-- This list should include all Mule modules. -->
     <dependencies>
-		<!--
-		********************************************************
-		Core
-		*********************************************************
-		-->
+        <!--
+        ********************************************************
+        Core
+        *********************************************************
+        -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-		<!--
-		********************************************************
-		Providers
-		*********************************************************
-		-->
+        <!--
+        ********************************************************
+        Providers
+        *********************************************************
+        -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-axis-provider</artifactId>
@@ -188,11 +188,11 @@
             <artifactId>mule-xmpp-provider</artifactId>
             <version>${version}</version>
         </dependency>
-		<!--
-		********************************************************
-		Modules
-		*********************************************************
-		-->
+        <!--
+        ********************************************************
+        Modules
+        *********************************************************
+        -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-filter-ognl</artifactId>
@@ -249,11 +249,11 @@
             <version>${version}</version>
         </dependency>
 
-		<!--
-		********************************************************
-		Samples
-		*********************************************************
-		-->
+        <!--
+        ********************************************************
+        Samples
+        *********************************************************
+        -->
         <dependency>
             <groupId>org.mule.samples</groupId>
             <artifactId>mule-samples-echo</artifactId>
