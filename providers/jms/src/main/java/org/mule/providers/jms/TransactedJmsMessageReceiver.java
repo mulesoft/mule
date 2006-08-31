@@ -118,7 +118,13 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     public void doConnect() throws Exception
     {
         if (connector.isConnected()) {
-            createConsumer();
+            //TODO Fix Bug
+            
+            //creating this consumer now would prevent from the actual worker consumer
+            //to receive the message!
+            //createConsumer();
+            //if we comment this line, if one tries to restart the service through JMX,
+            //this will fail...
         }
     }
 
