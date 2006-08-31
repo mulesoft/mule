@@ -52,9 +52,19 @@ public class SmtpsConnector extends SmtpConnector {
         System.setProperty("mail.smtps.socketFactory.class", getSocketFactory());
         System.setProperty("mail.smtps.socketFactory.fallback", getSocketFactoryFallback());
 
-        System.setProperty("mail.smtp.ssl", "true");
-        System.setProperty("mail.smtp.socketFactory.class", getSocketFactory());
-        System.setProperty("mail.smtp.socketFactory.fallback", getSocketFactoryFallback());
+        /*
+         * These Properties need to be set, but if set on the System properties
+         * They will ovverwrite SMTP properties, thus effectively only
+         * letting eiter SMTP or SMTPs endpoints in 1 config.
+         * 
+         * These Veriables will be set in the MailUtils, createMailSession so
+         * they will only effrect the smtps Session.
+         * 
+         * System.setProperty("mail.smtp.ssl", "true");
+         * System.setProperty("mail.smtp.socketFactory.class", getSocketFactory());
+         * System.setProperty("mail.smtp.socketFactory.fallback", getSocketFactoryFallback());
+         */
+        
 
         if(getTrustStore()!=null) {
             System.setProperty("javax.net.ssl.trustStore", getTrustStore());

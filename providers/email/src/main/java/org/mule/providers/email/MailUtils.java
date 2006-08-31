@@ -75,7 +75,24 @@ public class MailUtils
 
             if(secure) {
                 System.setProperty("mail." + protocol + ".socketFactory.port", String.valueOf(port));
+                if(protocol.equals("smtp"))
+                {
+                    //these following properties should not be set
+                    //on the System properties as well since they will
+                    //conflict with the smtp properties.
+                    props=(Properties)props.clone();
+                	
+                    props.put("mail.smtp.ssl", "true");
+                	props.put("mail.smtp.socketFactory.class", ((SmtpsConnector)connector).getSocketFactory());
+                	props.put("mail.smtp.socketFactory.fallback", ((SmtpsConnector)connector).getSocketFactoryFallback());
 
+                    if(((SmtpsConnector)connector).getTrustStore()!=null) {
+                        System.setProperty("javax.net.ssl.trustStore", ((SmtpsConnector)connector).getTrustStore());
+                        if(((SmtpsConnector)connector).getTrustStorePassword()!=null) {
+                            System.setProperty("javax.net.ssl.trustStorePassword", ((SmtpsConnector)connector).getTrustStorePassword());
+                        }
+                    }
+                }
             }
             props.setProperty("mail." + protocol + ".rsetbeforequit","true");
 
