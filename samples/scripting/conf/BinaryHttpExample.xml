@@ -31,8 +31,9 @@
             <properties>
                 <property name="scriptEngineName" value="groovy"/>
                 <text-property name="scriptText">
-                     Object msg = eventContext.getTransformedMessage();
-                     log.boilerPlate("Message Received:" + msg + " - class: " + msg.getClass().getName());
+                     def msg = eventContext.transformedMessageAsString
+                     log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
+                     return "${msg} processed"
                      return ["Hello", ":-)"];
                 </text-property>
             </properties>
