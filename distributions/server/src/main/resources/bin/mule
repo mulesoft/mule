@@ -5,6 +5,10 @@
 # Java Service Wrapper sh script.  Suitable for starting and stopping
 #  wrapped Java applications on UNIX platforms.
 
+######################################################################
+# Customized for Mule
+######################################################################
+
 # Application
 APP_NAME="mule"
 APP_LONG_NAME="Mule"
@@ -12,6 +16,22 @@ APP_LONG_NAME="Mule"
 # Wrapper
 WRAPPER_CMD="../sbin/wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
+
+# Set the startup directory so that any relative paths can be resolved later.
+STARTUP_DIR=`pwd`
+
+MULE_OPTS="wrapper.working.dir=$STARTUP_DIR \
+           wrapper.app.parameter.1=$2 \
+           wrapper.app.parameter.2=$3 \
+           wrapper.app.parameter.3=$4 \
+           wrapper.app.parameter.4=$5 \
+           wrapper.app.parameter.5=$6 \
+           wrapper.app.parameter.6=$7 \
+           wrapper.app.parameter.7=$8 \
+           wrapper.app.parameter.8=$9 \
+           wrapper.app.parameter.9=$10"
+
+######################################################################
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
@@ -38,43 +58,8 @@ PIDDIR="."
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.
 # chkconfig: 2345 20 80
-# description: Test Wrapper Sample Application
+# description: Mule
 
-######################################################################
-# Customized for Mule
-######################################################################
-
-# Pass the current directory so that any relative paths in the command-line arguments
-# can be resolved later.
-MULE_CWD=`pwd`
-export MULE_CWD
-
-# Pass through any command-line options to the Java class.
-MULE_ARG1="$2"
-MULE_ARG2="$3"
-MULE_ARG3="$4"
-MULE_ARG4="$5"
-MULE_ARG5="$6"
-MULE_ARG6="$7"
-MULE_ARG7="$8"
-MULE_ARG8="$9"
-MULE_ARG9="$10"
-MULE_ARG10="$11"
-export MULE_ARG1
-export MULE_ARG2
-export MULE_ARG3
-export MULE_ARG4
-export MULE_ARG5
-export MULE_ARG6
-export MULE_ARG7
-export MULE_ARG8
-export MULE_ARG9
-export MULE_ARG10
-
-######################################################################
-
-#-----------------------------------------------------------------------------
-# Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
 
 # Get the fully qualified path to the script
@@ -188,7 +173,7 @@ then
     DIST_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
 fi
 case "$DIST_ARCH" in
-    'amd64' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
+    'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
         DIST_ARCH="x86"
         ;;
     'ip27')
@@ -207,6 +192,15 @@ case "$DIST_ARCH" in
         DIST_ARCH="parisc"
         ;;
 esac
+
+outputFile() {
+    if [ -f $1 ]
+    then
+        echo "  $1 (Found but not executable.)";
+    else
+        echo "  $1"
+    fi
+}
 
 # Decide on the wrapper binary to use.
 # If a 32-bit wrapper binary exists then it will work on 32 or 64 bit
@@ -238,11 +232,11 @@ else
                     if [ ! -x $WRAPPER_CMD ]
                     then
                         echo "Unable to locate any of the following binaries:"
-                        echo "  $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-                        echo "  $WRAPPER_CMD-$DIST_OS-universal-32"
-                        echo "  $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-                        echo "  $WRAPPER_CMD-$DIST_OS-universal-64"
-                        echo "  $WRAPPER_CMD"
+                        outputFile $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32
+                        outputFile $WRAPPER_CMD-$DIST_OS-universal-32
+                        outputFile $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64
+                        outputFile $WRAPPER_CMD-$DIST_OS-universal-64
+                        outputFile $WRAPPER_CMD
                         exit 1
                     fi
                 fi
@@ -257,9 +251,9 @@ else
             if [ ! -x $WRAPPER_CMD ]
             then
                 echo "Unable to locate any of the following binaries:"
-                echo "  $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-                echo "  $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-                echo "  $WRAPPER_CMD"
+                outputFile $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32
+                outputFile $WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64
+                outputFile $WRAPPER_CMD
                 exit 1
             fi
         fi
@@ -403,7 +397,11 @@ console() {
     if [ "X$pid" = "X" ]
     then
         COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE $ANCHORPROP $LOCKPROP"
-        exec $COMMAND_LINE
+        ######################################################################
+        # Customized for Mule
+        ######################################################################
+        exec $COMMAND_LINE $MULE_OPTS
+        ######################################################################
     else
         echo "$APP_LONG_NAME is already running."
         exit 1
@@ -416,7 +414,11 @@ start() {
     if [ "X$pid" = "X" ]
     then
         COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
-        exec $COMMAND_LINE
+        ######################################################################
+        # Customized for Mule
+        ######################################################################
+        exec $COMMAND_LINE $MULE_OPTS
+        ######################################################################
     else
         echo "$APP_LONG_NAME is already running."
         exit 1
@@ -517,6 +519,14 @@ dump() {
     fi
 }
 
+######################################################################
+# Customized for Mule
+######################################################################
+# Export the location of this script.  This will be used in wrapper.conf
+MULE_EXE="$REALDIR"
+export MULE_EXE
+######################################################################
+
 case "$1" in
 
     'console')
@@ -558,8 +568,8 @@ case "$1" in
         ######################################################################
         echo "No command specified, running in console (foreground) mode by default, use Ctrl-C to exit..."
 
-        # Change back to the original working directory.
-        cd $MULE_CWD
+        # Change back to the original startup directory.
+        cd $STARTUP_DIR
 
 		# Call this script recursively with the "console" parameter.
         $REALPATH console $*
