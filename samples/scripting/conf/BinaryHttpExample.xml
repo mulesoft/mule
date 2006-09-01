@@ -33,7 +33,6 @@
                 <text-property name="scriptText">
                      def msg = eventContext.transformedMessageAsString
                      log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
-                     return "${msg} processed"
                      return ["Hello", ":-)"];
                 </text-property>
             </properties>
