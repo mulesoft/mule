@@ -41,9 +41,21 @@ rem
 rem Find the wrapper.conf
 rem
 :conf
-set _WRAPPER_CONF="%~f1"
-if not %_WRAPPER_CONF%=="" goto startup
+rem set _WRAPPER_CONF="%~f1"
+rem if not %_WRAPPER_CONF%=="" goto startup
 set _WRAPPER_CONF="%_REALPATH%..\conf\wrapper.conf"
+
+if not "%1"=="" set MULE_ARG1="%1"
+if not "%2"=="" set MULE_ARG2="%2"
+if not "%3"=="" set MULE_ARG3="%3"
+if not "%4"=="" set MULE_ARG4="%4"
+if not "%5"=="" set MULE_ARG5="%5"
+if not "%6"=="" set MULE_ARG6="%6"
+if not "%7"=="" set MULE_ARG7="%7"
+if not "%8"=="" set MULE_ARG8="%8"
+if not "%9"=="" set MULE_ARG9="%9"
+if not "%10"=="" set MULE_ARG10="%10"
+
 
 rem
 rem Start the Wrapper
