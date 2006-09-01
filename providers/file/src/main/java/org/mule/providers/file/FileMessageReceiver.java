@@ -10,9 +10,14 @@
 
 package org.mule.providers.file;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -21,20 +26,12 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.ClassUtils;
+import org.mule.umo.routing.RoutingException;
 import org.mule.util.FileUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files
@@ -140,7 +137,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                     .getFilename(msgAdapter, moveToPattern);
             }
 
-            destinationFile = FileUtils.newFile(moveDir, destinationFileName);
+            destinationFile = new File(moveDir, destinationFileName);
         }
 
         boolean fileWasMoved = false;
@@ -246,7 +243,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
     {
         boolean result = false;
         try {
-            result = this.moveFile(sourceFile, FileUtils.newFile(destinationFilePath));
+            result = this.moveFile(sourceFile, new File(destinationFilePath));
         }
         catch (Throwable t) {
             logger.debug("rollback of file move failed: " + t.getMessage());

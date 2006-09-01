@@ -28,12 +28,10 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.MuleServer;
 
 /**
  * <code>FileUtils</code> contains useful methods for dealing with files & directories.
@@ -46,46 +44,16 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 {
     protected static Log logger = LogFactory.getLog(FileUtils.class);
 
-    /**
-     * Factory method which properly handles relative paths.  Should be be used
-     * instead of "new File(String pathname)".
-     */
-    public static File newFile(String pathname)
-    {
-        if (StringUtils.isNotBlank(MuleServer.getStartupDirectory())) {
-            pathname = FilenameUtils.concat(MuleServer.getStartupDirectory(), pathname);
-        }
-        return new File(pathname);
-    }
-
-    /**
-     * Factory method which properly handles relative paths.  Should be be used
-     * instead of "new File(String parent, String child)".
-     */
-    public static File newFile(String parent, String child)
-    {
-        return newFile(FilenameUtils.concat(parent, child));
-    }
-
-    /**
-     * Factory method which properly handles relative paths.  Should be be used
-     * instead of "new File(File parent, String child)".
-     */
-    public static File newFile(File parent, String child)
-    {
-        return newFile(parent.getPath(), child);
-    }
-
     /** TODO Document me! **/
     public static File createFile(String filename) throws IOException
     {
-        File file = FileUtils.newFile(filename);
+        File file = new File(filename);
         if (!file.canWrite()) {
             String dirName = file.getPath();
             int i = dirName.lastIndexOf(File.separator);
             if (i > -1) {
                 dirName = dirName.substring(0, i);
-                File dir = FileUtils.newFile(dirName);
+                File dir = new File(dirName);
                 dir.mkdirs();
             }
             file.createNewFile();
@@ -103,7 +71,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     public static File openDirectory(String directory) throws IOException
     {
-        File dir = newFile(directory);
+        File dir = new File(directory);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -159,7 +127,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     public static File loadFile(String filename) throws IOException
     {
-        File file = newFile(filename);
+        File file = new File(filename);
         if (file.canRead()) {
             return file;
         }
@@ -185,7 +153,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             {
                 public Object run()
                 {
-                    File f = newFile(resourceName);
+                    File f = new File(resourceName);
                     if (f.exists()) {
                         try {
                             return f.toURL();
@@ -216,7 +184,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             resourceName = url.getFile();
         }
 
-        return FileUtils.readFileToString(newFile(resourceName), encoding);
+        return FileUtils.readFileToString(new File(resourceName), encoding);
     }
 
     public static InputStream loadResource(String resourceName, Class callingClass) throws IOException
@@ -224,7 +192,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         URL url = getResource(resourceName, callingClass);
         InputStream resource = null;
         if (url == null) {
-            File f = newFile(resourceName);
+            File f = new File(resourceName);
             if (f.exists()) {
                 resource = new FileInputStream(f);
             }
@@ -249,7 +217,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         URL url = getResource(resourceName, callingClass);
         String resource = null;
         if (url == null) {
-            File f = newFile(resourceName);
+            File f = new File(resourceName);
             if (f.exists()) {
                 resource = f.getAbsolutePath();
             }
@@ -313,7 +281,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             zip = new ZipFile(archive);
             for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
-                File f = newFile(directory, entry.getName());
+                File f = new File(directory, entry.getName());
                 if (entry.isDirectory()) {
                     if (!f.mkdirs()) {
                         throw new IOException("Could not create directory: " + f);

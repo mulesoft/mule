@@ -19,7 +19,6 @@ import java.security.PrivilegedAction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleServer;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
@@ -48,12 +47,6 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         if (tryAsFile) {
             try {
                 File file = new File(resourceName);
-                // Try using the startup directory in case the file has been given using
-                // a relative path (./ or ../)
-                if (file.exists() == false &&  MuleServer.getStartupDirectory() != null) {
-                    file = new File(MuleServer.getStartupDirectory(), resourceName);
-                }
-
                 if (file.exists()) {
                     is = new FileInputStream(file);
                 } else {

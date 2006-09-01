@@ -78,22 +78,11 @@ public class MuleServer implements Runnable
     private static String startupPropertiesFile = null;
 
     /**
-     * When using the Java Service Wrapper, this property is set to the current directory
-     * from which Mule was run (i.e., not necessarily $MULE_HOME/bin)
-     */
-    private static String startupDirectory = null;
-
-    /**
      * Application entry point.
      * @param args command-line args
      */
     public static void main(String[] args) {
         MuleServer server = new MuleServer();
-
-        // The startup directory should have been passed as the first parameter.
-        if (args.length > 0) {
-            startupDirectory = args[0];
-        }
 
         String config = SystemUtils.getCommandLineOption("-config", args);
         // Try default if no config file was given.
@@ -317,13 +306,4 @@ public class MuleServer implements Runnable
     public static void setStartupPropertiesFile(String startupPropertiesFile) {
         MuleServer.startupPropertiesFile = startupPropertiesFile;
     }
-
-    public static String getStartupDirectory() {
-        return startupDirectory;
-    }
-
-    public static void setStartupDirectory(String startupDirectory) {
-        MuleServer.startupDirectory = startupDirectory;
-    }
-
 }
