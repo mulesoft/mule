@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package util;
+package org.mule.samples.scripting;
 
 import junit.framework.TestCase;
 

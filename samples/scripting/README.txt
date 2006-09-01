@@ -10,10 +10,10 @@ in INSTALL.txt first.  To run this example:
 
 Linux / Unix
 ------------
-mule -main http.BinaryHttpExample
-mule -main file.TextFileExample
+mule -main org.mule.samples.scripting.BinaryHttpExample
+mule -main org.mule.samples.scripting.TextFileExample
 
 Windows
 -------
-mule.bat -main http.BinaryHttpExample
-mule.bat -main file.TextFileExample
+mule.bat -main org.mule.samples.scripting.BinaryHttpExample
+mule.bat -main org.mule.samples.scripting.TextFileExample

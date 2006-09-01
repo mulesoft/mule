@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:BinaryHttpExample.java 2854 2006-08-29 22:49:34 +0000 (Tue, 29 Aug 2006) tcarlson $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package http;
+package org.mule.samples.scripting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +17,9 @@ import java.util.List;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.mule.MuleServer;
 import org.mule.extras.client.MuleClient;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.umo.UMOMessage;
-
-import util.SimpleRunner;
 
 public class BinaryHttpExample extends SimpleRunner
  {
@@ -31,11 +28,6 @@ public class BinaryHttpExample extends SimpleRunner
     }
 
     public static void main(String[] args) {
-        // The startup directory should have been passed as the first parameter.
-        if (args.length > 0) {
-            MuleServer.setStartupDirectory(args[0]);
-        }
-
         TestSuite suite = new TestSuite(BinaryHttpExample.class);
         TestResult result = new TestResult();
         suite.run(result);
