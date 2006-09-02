@@ -19,7 +19,6 @@ import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
 import org.mule.impl.endpoint.UrlEndpointBuilder;
 import org.mule.providers.NullPayload;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransactionConfig;
@@ -30,10 +29,13 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectFactory;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 /**
@@ -154,7 +156,6 @@ public class ConnectorServiceDescriptor
         temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         if (temp != null) {
             endpointBuilder = temp;
-            // endpointBuilderImpl=null;
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_SERVICE_FINDER);
@@ -285,15 +286,28 @@ public class ConnectorServiceDescriptor
         return createMessageAdapter(message, messageAdapter);
     }
 
-    public UMOMessageAdapter createStreamMessageAdapter(Object message) throws ConnectorServiceException
+    public UMOStreamMessageAdapter createStreamMessageAdapter(InputStream in, OutputStream out) throws ConnectorServiceException
     {
         if(getStreamMessageAdapter()==null) {
-            streamMessageAdapter = StreamMessageAdapter.class.getName();
+            //streamMessageAdapter = StreamMessageAdapter.class.getName();
             if(logger.isDebugEnabled()) {
                 logger.debug("No stream.message.adapter set in service description, defaulting to: " + streamMessageAdapter);
             }
+            //If the stream.message.adapter is not set streaming should not be used
+            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                                                                "stream.message.adapter", getProtocol() + " service descriptor"));
         }
-        return createMessageAdapter(message, streamMessageAdapter);
+        try {
+            if(out==null) {
+                return (UMOStreamMessageAdapter) ClassUtils.instanciateClass(streamMessageAdapter, new Object[] { in });
+            } else {
+                return (UMOStreamMessageAdapter) ClassUtils.instanciateClass(streamMessageAdapter, new Object[] { in, out });
+            }
+        } catch (Exception e) {
+                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                                "Message Adapter",
+                                                                streamMessageAdapter), e);
+            }
     }
 
     protected UMOMessageAdapter createMessageAdapter(Object message, String clazz) throws ConnectorServiceException
@@ -337,7 +351,9 @@ public class ConnectorServiceDescriptor
         return createMessageReceiver(connector, component, endpoint, null);
     }
 
-    public UMOMessageReceiver createMessageReceiver(UMOConnector connector,
+    public UMOMessageReceiver
+
+    createMessageReceiver(UMOConnector connector,
                                                     UMOComponent component,
                                                     UMOEndpoint endpoint,
                                                     Object[] args) throws UMOException

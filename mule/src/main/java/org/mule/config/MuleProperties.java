@@ -82,6 +82,7 @@ public interface MuleProperties
     public final String CONNECTOR_CLASS = "connector";
     public final String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
     public final String CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS = "transacted.message.receiver";
+    public final String CONNECTOR_XA_MESSAGE_RECEIVER_CLASS = "xa.message.receiver";
     public final String CONNECTOR_FACTORY = "connector.factory";
     public final String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     public final String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";

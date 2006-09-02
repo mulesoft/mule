@@ -15,14 +15,21 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * <p>
@@ -122,6 +129,12 @@ public class TestConnector extends AbstractConnector
         return new DummyMessageAdapter(message);
     }
 
+
+    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out) throws MessagingException
+    {
+        return new DummyMessageAdapter(in);
+    }
+
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint) {
@@ -143,7 +156,7 @@ public class TestConnector extends AbstractConnector
         // nothing to do
     }
 
-    public class DummyMessageAdapter extends AbstractMessageAdapter
+    public class DummyMessageAdapter extends AbstractMessageAdapter implements UMOStreamMessageAdapter
     {
         /**
          * Serial version
@@ -186,6 +199,36 @@ public class TestConnector extends AbstractConnector
         public String getPayloadAsString(String encoding) throws Exception
         {
             return message.toString();
+        }
+
+
+        public InputStream getInputStream()
+        {
+            return null;
+        }
+
+        public OutputStream getOutputStream()
+        {
+            return null;
+        }
+
+        public void write(UMOEvent event) throws IOException
+        {
+        }
+
+        public OutputHandler getOutputHandler()
+        {
+            return null;
+        }
+
+        public void setOutputHandler(OutputHandler handler)
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public void release()
+        {
+            //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 

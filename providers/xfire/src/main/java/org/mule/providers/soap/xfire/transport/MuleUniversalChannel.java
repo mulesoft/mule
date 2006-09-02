@@ -10,18 +10,6 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,10 +35,22 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.streaming.OutputHandler;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.OutputHandler;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
+
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Provides a
@@ -224,7 +224,8 @@ public class MuleUniversalChannel extends AbstractChannel
             }
         };
 
-        StreamMessageAdapter sp = new StreamMessageAdapter(handler);
+        //We can create a generic StreamMessageAdapter here as the underlying transport will create one specific to the transport
+        UMOStreamMessageAdapter sp = new StreamMessageAdapter(handler);
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         
        
@@ -236,12 +237,12 @@ public class MuleUniversalChannel extends AbstractChannel
              sp.setProperty(propertyName, msg.getProperty(propertyName));
         }
 
-        client.sendStream(getUri(), sp);
+        UMOStreamMessageAdapter result = client.sendStream(getUri(), sp);
 
-        if (sp.hasResponse()) {
+        if (result!=null) {
             InMessage inMessage;
-            String ct = (String)sp.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-            InputStream in = sp.getResponse();
+            String ct = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            InputStream in = result.getInputStream();
             if (ct.toLowerCase().indexOf("multipart/related") != -1) {
                 try {
                     Attachments atts = new JavaMailAttachments(in, ct);
@@ -260,6 +261,8 @@ public class MuleUniversalChannel extends AbstractChannel
             }
             getEndpoint().onReceive(context, inMessage);
         }
+        sp.release();
+        result.release();
 
     }
 

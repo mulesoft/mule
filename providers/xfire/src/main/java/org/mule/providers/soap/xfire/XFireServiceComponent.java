@@ -10,12 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +39,13 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.StringUtils;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The Xfire service component receives requests for Xfire services it manages
@@ -143,11 +143,12 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     }
 
     /**
-     * @param eventContext
-     * @param response
-     * @param service
-     * @throws IOException
-     * @throws java.io.UnsupportedEncodingException
+     * Gets the stream representation of the current message. If the message is set for streaming
+     * the input stream on the UMOStreamMEssageAdapter will be used, otherwise a byteArrayInputStream will be used to
+     * hold the byte[] representation of the current message.
+     * @param context the event context
+     * @return The inputstream for the current message
+     * @throws UMOException
      *
      */
 
@@ -160,14 +161,10 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         if (eventMsgPayload instanceof InputStream) {
             is = (InputStream)eventMsgPayload;
         }
-        else if (eventMsg.getAdapter() instanceof StreamMessageAdapter) {
+        else if (eventMsg.getAdapter() instanceof UMOStreamMessageAdapter) {
             StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
-            if (sma.getInput() != null) {
-                is = sma.getInput();
-            }
-            else {
-                is = sma.getResponse();
-            }
+            is = sma.getInputStream();
+
         }
         else {
             is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
@@ -176,18 +173,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     }
 
     /**
-     * @param response
-     * @param service
-     * @throws IOException
-     */
-    protected void generateWSDL(OutStreamMessageAdapter response, String service) throws IOException
-    {
-        response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-        getXfire().generateWSDL(service, response.getStream());
-    }
-
-    /**
      * Get the service that is mapped to the specified request.
+     * @param context the context from which to find the service name
+     * @return the service that is mapped to the specified request.
      */
     protected String getServiceName(UMOEventContext context)
     {

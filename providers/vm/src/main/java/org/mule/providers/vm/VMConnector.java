@@ -156,15 +156,15 @@ public class VMConnector extends AbstractServiceEnabledConnector
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null) {
             if (tx.hasResource(qm)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Retrieving queue session from current transaction");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Retrieving queue session from current transaction");
                 }
                 return (QueueSession) tx.getResource(qm);
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Retrieving new queue session from queue manager");
+        if (logger.isTraceEnabled()) {
+           // logger.trace("Retrieving new queue session from queue manager");
         }
 
         QueueSession session = qm.getQueueSession();

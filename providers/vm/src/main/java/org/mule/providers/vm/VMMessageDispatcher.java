@@ -17,7 +17,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -27,10 +26,12 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
@@ -148,10 +149,11 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
 
             if(event.isStreaming()) {
-                StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
-                sma.setIn(new PipedInputStream());
-                PipedOutputStream out = new PipedOutputStream((PipedInputStream)sma.getInput());
-                sma.write(event, out);
+
+                PipedInputStream in = new PipedInputStream();
+                PipedOutputStream out = new PipedOutputStream(in);
+                UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, out);
+                sma.write(event);
             }
             receiver.onEvent(event);
         }
@@ -185,17 +187,22 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
         }
         if(event.isStreaming()) {
-            StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
-            sma.setIn(new PipedInputStream());
-            PipedOutputStream out = new PipedOutputStream((PipedInputStream)sma.getInput());
-            sma.write(event, out);
+            PipedInputStream in = new PipedInputStream();
+            PipedOutputStream out = new PipedOutputStream(in);
+            UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, out);
+            sma.write(event);
         }
 
         retMessage = (UMOMessage) receiver.onCall(event);
 
         if(event.isStreaming() && retMessage!=null) {
-            StreamMessageAdapter sma = (StreamMessageAdapter)event.getMessage().getAdapter();
-            sma.setResponse(new ByteArrayInputStream((byte[])objectToByteArray.transform(retMessage.getPayload())));
+            InputStream in;
+            if(retMessage.getPayload() instanceof InputStream) {
+                in = (InputStream)retMessage.getPayload();
+            } else {
+                in = new ByteArrayInputStream((byte[])objectToByteArray.transform(retMessage.getPayload()));
+            }
+            UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, null);
             retMessage = new MuleMessage(sma, retMessage);
         }
 

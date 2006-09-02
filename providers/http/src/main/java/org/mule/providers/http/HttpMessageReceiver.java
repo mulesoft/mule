@@ -10,19 +10,10 @@
 
 package org.mule.providers.http;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.resource.spi.work.Work;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.lang.ObjectUtils;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -32,7 +23,6 @@ import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
@@ -42,6 +32,13 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesUtils;
+
+import javax.resource.spi.work.Work;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -165,7 +162,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     UMOMessageAdapter adapter;
                     Object body;
                     if (endpoint.isStreaming() && request.getBody() != null) {
-                        adapter = new StreamMessageAdapter(request.getBody(), conn.getOutputStream());
+                        adapter = connector.getStreamMessageAdapter(request.getBody(), conn.getOutputStream());
                         for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
                             Map.Entry entry = (Map.Entry)iterator.next();
                             adapter.setProperty((String)entry.getKey(), entry.getValue());

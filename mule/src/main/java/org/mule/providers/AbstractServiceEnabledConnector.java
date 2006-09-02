@@ -22,9 +22,13 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.BeanUtils;
+import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -89,6 +93,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
         // Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e,
         // this);
         // }
+        setName(ObjectNameHelper.getConnectorName(this));
     }
 
     protected synchronized void initFromServiceDescriptor() throws InitialisationException
@@ -152,6 +157,15 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             return serviceDescriptor.createMessageAdapter(message);
         } catch (ConnectorServiceException e) {
             throw new MessagingException(new Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"), message, e);
+        }
+    }
+
+    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out) throws MessagingException
+    {
+        try {
+            return serviceDescriptor.createStreamMessageAdapter(in, out);
+        } catch (ConnectorServiceException e) {
+            throw new MessagingException(new Message(Messages.FAILED_TO_CREATE_X, "Stream Message Adapter"), in, e);
         }
     }
 

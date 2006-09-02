@@ -12,18 +12,22 @@ package org.mule.providers.streaming;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.OutputHandler;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * todo document
+ * Provides a generic base class for stream based message flows in Mule.  This adapter represents the 3 flows of
+ * data that Mule identifies, namely inbound, outbound and response flows. These are represented by three streams on the
+ * adapter.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StreamMessageAdapter extends AbstractMessageAdapter
+public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOStreamMessageAdapter
 {
     /**
      * Serial version
@@ -34,6 +38,29 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
     protected OutputStream out;
     protected OutputHandler handler;
     private NullPayload nullPayload = new NullPayload();
+
+    public StreamMessageAdapter(InputStream in) {
+        this.in = in;
+    }
+
+    public StreamMessageAdapter(InputStream in, OutputStream out) {
+        this.in = in;
+        this.out = out;
+    }
+
+    public StreamMessageAdapter(OutputHandler handler) {
+        this.handler = handler;
+    }
+
+    public StreamMessageAdapter(OutputStream out, OutputHandler handler) {
+        this.out = out;
+        this.handler = handler;
+    }
+    public StreamMessageAdapter(InputStream in, OutputStream out, OutputHandler handler) {
+        this.in = in;
+        this.out = out;
+        this.handler = handler;
+    }
 
     /**
      * Converts the message implementation into a String representation
@@ -65,46 +92,23 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
      * @return the current message
      */
     public Object getPayload() {
-        if(response!=null) {
-            return response;
-        }
         if(in!=null) {
             return in;
         }
         return nullPayload;
     }
 
-    public StreamMessageAdapter(InputStream in) {
-        this.in = in;
-    }
 
-    public StreamMessageAdapter(InputStream in, OutputStream out) {
-        this.in = in;
-        this.out = out;
-    }
 
-    public StreamMessageAdapter(OutputHandler handler) {
-        this.handler = handler;
-    }
-    public StreamMessageAdapter(OutputStream out, OutputHandler handler) {
-        this.out = out;
-        this.handler = handler;
-    }
-    public StreamMessageAdapter(InputStream in, OutputStream out, OutputHandler handler) {
-        this.in = in;
-        this.out = out;
-        this.handler = handler;
-    }
-
-    public InputStream getInput() {
+    public InputStream getInputStream() {
         return in;
     }
 
-    public OutputStream getOutput() {
+    public OutputStream getOutputStream() {
         return out;
     }
 
-    public void write(UMOEvent event, OutputStream out) throws IOException
+    public void write(UMOEvent event) throws IOException
     {
         handler.write(event, out);
     }
@@ -118,19 +122,15 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
         this.handler = handler;
     }
 
-    public InputStream getResponse() {
-        return response;
-    }
+//    public void setInputStream(InputStream in) {
+//        this.in = in;
+//    }
 
-    public void setResponse(InputStream response) {
-        this.response = response;
-    }
-
-    public boolean hasResponse() {
-        return response!=null;
-    }
-
-    public void setIn(InputStream in) {
-        this.in = in;
+    /**
+     * The release method is called by Mule to notify this adapter that it is no longer needed. This method can be
+     * used to release any resources that a custom StreamAdapter may have associated with it.
+     */
+    public void release() {
+        
     }
 }

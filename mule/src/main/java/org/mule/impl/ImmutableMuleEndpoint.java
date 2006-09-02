@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -36,6 +35,7 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -622,10 +622,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 name = endpointUri.getEndpointName();
             }
         }
-        if (name == null) {
-            name = "_" + endpointUri.getScheme() + "Endpoint#" + hashCode();
-            endpointUri.setEndpointName(name);
-        }
+        name = ObjectNameHelper.getEndpointName(this);
+
         String sync = endpointUri.getParams().getProperty("synchronous", null);
         if (sync != null) {
             synchronous = Boolean.valueOf(sync);

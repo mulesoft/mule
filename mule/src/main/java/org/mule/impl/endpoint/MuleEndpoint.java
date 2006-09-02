@@ -53,6 +53,23 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, null, null);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public MuleEndpoint(String name,
                         UMOEndpointURI endpointUri,
                         UMOConnector connector,

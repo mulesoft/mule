@@ -29,7 +29,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -44,6 +43,7 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
@@ -263,7 +263,7 @@ public class MuleClient implements Disposable
      * @param message the message to send
      * @throws org.mule.umo.UMOException
      */
-    public void dispatchStream(String url, StreamMessageAdapter message) throws UMOException
+    public void dispatchStream(String url, UMOStreamMessageAdapter message) throws UMOException
     {
         UMOEvent event = getEvent(new MuleMessage(message), url, false, true);
         try {
@@ -275,9 +275,9 @@ public class MuleClient implements Disposable
         }
     }
 
-    public void sendStream(String url, StreamMessageAdapter message) throws UMOException
+    public UMOStreamMessageAdapter sendStream(String url, UMOStreamMessageAdapter message) throws UMOException
     {
-        sendStream(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
+        return sendStream(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
     }
     /**
      * Sends a streaming event synchronously to a endpointUri via a mule server and a
@@ -290,17 +290,26 @@ public class MuleClient implements Disposable
      *            for a response
      * @throws org.mule.umo.UMOException
      */
-    public void sendStream(String url, StreamMessageAdapter message, int timeout) throws UMOException
+    public UMOStreamMessageAdapter sendStream(String url, UMOStreamMessageAdapter message, int timeout) throws UMOException
     {
         UMOEvent event = getEvent(new MuleMessage(message), url, true, true);
         event.setTimeout(timeout);
         try {
-            event.getSession().sendEvent(event);
+            UMOMessage result = event.getSession().sendEvent(event);
+            if(result != null) {
+                if(result.getAdapter() instanceof UMOStreamMessageAdapter) {
+                    return (UMOStreamMessageAdapter)result.getAdapter();
+                } else {
+                    //todo i18n (though this case should never happen...)
+                    throw new IllegalStateException("Mismatch of stream states. A stream was used for outbound channel, but a stream was not used for the response");
+                }
+            }
         } catch (UMOException e) {
             throw e;
         } catch (Exception e) {
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
+        return null;
     }
     /**
      * sends an event synchronously to a components

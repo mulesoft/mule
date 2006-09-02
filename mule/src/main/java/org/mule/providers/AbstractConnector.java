@@ -13,7 +13,6 @@ package org.mule.providers;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -51,7 +50,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
-
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,7 +134,8 @@ public abstract class AbstractConnector
     protected UMOMessageDispatcherFactory dispatcherFactory;
 
     /**
-     * A pool of dispatchers for this connector, the pool is keyed on endpointUri
+     * A pool of dispa
+     * tchers for this connector, the pool is keyed on endpointUri
      */
     protected ConcurrentMap dispatchers;
 

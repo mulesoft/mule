@@ -43,6 +43,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -245,8 +246,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             else if (body instanceof HttpMethod) {
                 httpMethod = (HttpMethod)body;
             }
-            else if (body instanceof StreamMessageAdapter) {
-                 StreamMessageAdapter sma = (StreamMessageAdapter)body;
+            else if (body instanceof UMOStreamMessageAdapter) {
+                 UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
                 Map headers = sma.getOutputHandler().getHeaders(event);
                 for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
                     Map.Entry entry = (Map.Entry) iterator.next();
@@ -318,8 +319,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             // text or binary content?
             Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
             if ((header != null) && event.isStreaming()) {
-                StreamMessageAdapter sp = (StreamMessageAdapter)event.getMessage().getAdapter();
-                sp.setResponse(httpMethod.getResponseBodyAsStream());
+                HttpStreamMessageAdapter sp = (HttpStreamMessageAdapter)connector.getStreamMessageAdapter(
+                        httpMethod.getResponseBodyAsStream(), null);
+                sp.setHttpMethod(httpMethod);
                 m = new MuleMessage(sp, h);
             }
             else {
@@ -367,10 +369,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     private class StreamPayloadRequestEntity implements RequestEntity
     {
-        private StreamMessageAdapter messageAdapter;
+        private UMOStreamMessageAdapter messageAdapter;
         private UMOEvent event;
 
-        public StreamPayloadRequestEntity(StreamMessageAdapter messageAdapter, UMOEvent event)
+        public StreamPayloadRequestEntity(UMOStreamMessageAdapter messageAdapter, UMOEvent event)
         {
             this.messageAdapter = messageAdapter;
             this.event = event;
