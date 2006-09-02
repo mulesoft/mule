@@ -24,7 +24,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.BeanUtils;
-import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
 
 import java.io.InputStream;
@@ -93,7 +92,6 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
         // Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e,
         // this);
         // }
-        setName(ObjectNameHelper.getConnectorName(this));
     }
 
     protected synchronized void initFromServiceDescriptor() throws InitialisationException

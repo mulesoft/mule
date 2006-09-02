@@ -35,7 +35,6 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
-import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -622,7 +621,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 name = endpointUri.getEndpointName();
             }
         }
-        name = ObjectNameHelper.getEndpointName(this);
+        if (name == null) {
+            name = "_" + endpointUri.getScheme() + "Endpoint#" + hashCode();
+            endpointUri.setEndpointName(name);
+        }
 
         String sync = endpointUri.getParams().getProperty("synchronous", null);
         if (sync != null) {

@@ -54,22 +54,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public MuleEndpoint(String name,
                         UMOEndpointURI endpointUri,
                         UMOConnector connector,
