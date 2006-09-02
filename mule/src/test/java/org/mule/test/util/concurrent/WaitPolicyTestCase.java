@@ -17,10 +17,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.StringUtils;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.concurrent.WaitPolicy;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +24,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-/**
- * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision$
- */
+import org.apache.commons.lang.StringUtils;
+import org.mule.util.concurrent.Latch;
+import org.mule.util.concurrent.WaitPolicy;
 
 public class WaitPolicyTestCase extends TestCase
 {
@@ -48,9 +43,7 @@ public class WaitPolicyTestCase extends TestCase
         super.setUp();
 
         // allow 1 active & 1 queued Thread
-        _executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue(1));
-
+        _executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1));
         _asyncGroup = new ExceptionCollectingThreadGroup();
         SleepyTask.activeTasks = new AtomicInteger(0);
     }
@@ -207,11 +200,10 @@ public class WaitPolicyTestCase extends TestCase
 
 }
 
-
 class LastRejectedWaitPolicy extends WaitPolicy
 {
     // needed to hand the rejected Runnable back to the TestCase
-    private Runnable _lastRejected;
+    private volatile Runnable _lastRejected;
 
     public LastRejectedWaitPolicy()
     {
@@ -236,14 +228,13 @@ class LastRejectedWaitPolicy extends WaitPolicy
 
 }
 
-
 // task to execute - just sleeps for the given interval
 class SleepyTask extends Object implements Runnable
 {
     public static AtomicInteger activeTasks;
 
-    private String _name;
-    private long _sleepTime;
+    private final String _name;
+    private final long _sleepTime;
 
     public SleepyTask(String name, long sleepTime)
     {
@@ -251,7 +242,7 @@ class SleepyTask extends Object implements Runnable
         {
             throw new IllegalArgumentException("SleepyTask needs a name!");
         }
-    
+
         _name = name;
         _sleepTime = sleepTime;
     }
@@ -279,11 +270,10 @@ class SleepyTask extends Object implements Runnable
 
 }
 
-
 // ThreadGroup wrapper that collects uncaught exceptions
 class ExceptionCollectingThreadGroup extends ThreadGroup
 {
-    private List _exceptions;
+    private final List _exceptions;
 
     public ExceptionCollectingThreadGroup()
     {
@@ -304,4 +294,3 @@ class ExceptionCollectingThreadGroup extends ThreadGroup
     }
 
 }
-

@@ -10,14 +10,9 @@
 
 package org.mule.test.util.concurrent;
 
-import org.mule.util.concurrent.WaitableBoolean;
-
 import junit.framework.TestCase;
 
-/**
- * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision$
- */
+import org.mule.util.concurrent.WaitableBoolean;
 
 public class WaitableBooleanTestCase extends TestCase
 {
