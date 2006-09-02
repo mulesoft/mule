@@ -10,6 +10,18 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +35,6 @@ import org.codehaus.xfire.attachments.SimpleAttachment;
 import org.codehaus.xfire.exchange.AbstractMessage;
 import org.codehaus.xfire.exchange.InMessage;
 import org.codehaus.xfire.exchange.OutMessage;
-import org.codehaus.xfire.soap.Soap11;
 import org.codehaus.xfire.soap.Soap12;
 import org.codehaus.xfire.soap.SoapConstants;
 import org.codehaus.xfire.soap.SoapVersion;
@@ -41,22 +52,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
- * Provides a
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO explain what this does and how, at least briefly :)
  */
 public class MuleUniversalChannel extends AbstractChannel
 {
@@ -78,57 +75,69 @@ public class MuleUniversalChannel extends AbstractChannel
 
     public void send(MessageContext context, OutMessage message) throws XFireException
     {
-        if (message.getUri().equals(Channel.BACKCHANNEL_URI)) {
+        if (message.getUri().equals(Channel.BACKCHANNEL_URI))
+        {
             final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
-            if (out != null) {
-                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                        .getEncoding(), context);
+            if (out != null)
+            {
+                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
+                    context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
-            else {
+            else
+            {
                 throw new XFireRuntimeException("No backchannel exists for message");
             }
 
-            try {
+            try
+            {
                 Attachments atts = message.getAttachments();
-                if (atts != null && atts.size() > 0) {
+                if (atts != null && atts.size() > 0)
+                {
                     writeAttachmentBody(context, message);
                     // TODO response.setContentType(atts.getContentType());
 
                     atts.write(out);
                 }
-                else {
+                else
+                {
                     // TODO response.setContentType(getSoapMimeType(message));
 
                     writeWithoutAttachments(context, message, out);
                 }
             }
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 throw new XFireException("Couldn't send message.", e);
             }
         }
-        else {
-            try {
+        else
+        {
+            try
+            {
                 sendViaClient(context, message);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 throw new XFireException("Failed to Send via MuleUniversalChnnel: " + e.getMessage(), e);
             }
         }
     }
 
     void writeWithoutAttachments(MessageContext context, OutMessage message, OutputStream out)
-            throws XFireException
+        throws XFireException
     {
         XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(), context);
 
         message.getSerializer().writeMessage(message, writer, context);
 
-        try {
+        try
+        {
             writer.flush();
         }
-        catch (XMLStreamException e) {
+        catch (XMLStreamException e)
+        {
             logger.error(e);
             throw new XFireException("Couldn't send message.", e);
         }
@@ -152,10 +161,14 @@ public class MuleUniversalChannel extends AbstractChannel
 
     String getMimeType(AbstractMessage msg)
     {
-        if (msg.getAttachments() != null && msg.getAttachments().size() > 0) {
-            return msg.getAttachments().getContentType();
+        Attachments atts = msg.getAttachments();
+
+        if (atts != null && atts.size() > 0)
+        {
+            return atts.getContentType();
         }
-        else {
+        else
+        {
             return getSoapMimeType(msg);
         }
     }
@@ -163,107 +176,139 @@ public class MuleUniversalChannel extends AbstractChannel
     static String getSoapMimeType(AbstractMessage msg)
     {
         SoapVersion soap = msg.getSoapVersion();
-        if (soap instanceof Soap11) {
-            return "text/xml; charset=" + msg.getEncoding();
+        String encoding = msg.getEncoding();
+        StringBuffer soapMimeType = new StringBuffer(40);
+
+        if (soap instanceof Soap12)
+        {
+            soapMimeType.append("application/soap+xml; charset=");
         }
-        else if (soap instanceof Soap12) {
-            return "application/soap+xml; charset=" + msg.getEncoding();
+        else
+        {
+            // SOAP 1.1 & default
+            soapMimeType.append("text/xml; charset=");
         }
-        else {
-            return "text/xml; charset=" + msg.getEncoding();
-        }
+
+        return soapMimeType.append(encoding).toString();
     }
 
     private void sendViaClient(final MessageContext context, final OutMessage message) throws Exception
     {
         MuleClient client = new MuleClient();
-        OutputHandler handler = new OutputHandler() {
+        OutputHandler handler = new OutputHandler()
+        {
             public void write(UMOEvent event, OutputStream out) throws IOException
             {
-                try {
+                try
+                {
                     Attachments atts = message.getAttachments();
-                    if (atts != null && atts.size() > 0) {
+                    if (atts != null && atts.size() > 0)
+                    {
                         atts.write(out);
                     }
-                    else {
-                        XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                                .getEncoding(), context);
+                    else
+                    {
+                        XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
+                            context);
                         message.getSerializer().writeMessage(message, writer, context);
-                        try {
+                        try
+                        {
                             writer.flush();
                         }
-                        catch (XMLStreamException e) {
+                        catch (XMLStreamException e)
+                        {
                             logger.error(e);
                             throw new XFireException("Couldn't send message.", e);
                         }
                     }
                 }
-                catch (XFireException e) {
+                catch (XFireException e)
+                {
                     logger.error("Couldn't send message.", e);
                     throw new IOException(e.getMessage());
                 }
             }
 
-            public Map getHeaders(UMOEvent event) {
+            public Map getHeaders(UMOEvent event)
+            {
                 Map headers = new HashMap();
                 headers.put(HttpConstants.HEADER_CONTENT_TYPE, getSoapMimeType(message));
                 headers.put(SoapConstants.SOAP_ACTION, message.getProperty(SoapConstants.SOAP_ACTION));
-                for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
+                UMOMessage msg = event.getMessage();
+                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+                {
                     String headerName = (String)iterator.next();
-                    Object headerValue = event.getMessage().getStringProperty(headerName, null);
-                    
-                    //let us filter only MULE properties except MULE_USER, Content-Type and Content-Lenght, 
-                    // and all other properties are allowed through including custom headers
+                    Object headerValue = msg.getStringProperty(headerName, null);
+
+                    // let us filter only MULE properties except MULE_USER,
+                    // Content-Type and Content-Lenght; all other properties are
+                    // allowed through including custom headers
                     if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
-                        && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName)) && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName))) {
-                            headers.put(headerName, headerValue);
+                        && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName))
+                        && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName)))
+                    {
+                        headers.put(headerName, headerValue);
                     }
                 }
-                
+
                 return headers;
             }
         };
 
-        //We can create a generic StreamMessageAdapter here as the underlying transport will create one specific to the transport
+        // We can create a generic StreamMessageAdapter here as the underlying
+        // transport will create one specific to the transport
         UMOStreamMessageAdapter sp = new StreamMessageAdapter(handler);
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        
-       
-        //set all properties on the message adapter
+
+        // set all properties on the message adapter
         UMOMessage msg = RequestContext.getEvent().getMessage();
-        for (Iterator i = msg.getPropertyNames().iterator();i.hasNext();)
+        for (Iterator i = msg.getPropertyNames().iterator(); i.hasNext();)
         {
-             String propertyName = (String)i.next();
-             sp.setProperty(propertyName, msg.getProperty(propertyName));
+            String propertyName = (String)i.next();
+            sp.setProperty(propertyName, msg.getProperty(propertyName));
         }
 
-        UMOStreamMessageAdapter result = client.sendStream(getUri(), sp);
+        UMOStreamMessageAdapter result = null;
 
-        if (result!=null) {
-            InMessage inMessage;
-            String ct = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-            InputStream in = result.getInputStream();
-            if (ct.toLowerCase().indexOf("multipart/related") != -1) {
-                try {
-                    Attachments atts = new JavaMailAttachments(in, ct);
-                    InputStream msgIs = atts.getSoapMessage().getDataHandler().getInputStream();
-                    inMessage = new InMessage(STAXUtils.createXMLStreamReader(msgIs, message
-                            .getEncoding(), context), getUri());
-                    inMessage.setAttachments(atts);
+        try
+        {
+            result = client.sendStream(getUri(), sp);
+            if (result != null)
+            {
+                InMessage inMessage;
+                String contentType = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                InputStream in = result.getInputStream();
+                if (contentType.toLowerCase().indexOf("multipart/related") != -1)
+                {
+                    try
+                    {
+                        Attachments atts = new JavaMailAttachments(in, contentType);
+                        InputStream msgIs = atts.getSoapMessage().getDataHandler().getInputStream();
+                        inMessage = new InMessage(STAXUtils.createXMLStreamReader(msgIs,
+                            message.getEncoding(), context), getUri());
+                        inMessage.setAttachments(atts);
+                    }
+                    catch (MessagingException e)
+                    {
+                        throw new IOException(e.getMessage());
+                    }
                 }
-                catch (MessagingException e) {
-                    throw new IOException(e.getMessage());
+                else
+                {
+                    inMessage = new InMessage(STAXUtils.createXMLStreamReader(in, message.getEncoding(),
+                        context), getUri());
                 }
+                getEndpoint().onReceive(context, inMessage);
             }
-            else {
-                inMessage = new InMessage(STAXUtils.createXMLStreamReader(in, message.getEncoding(), context),
-                        getUri());
-            }
-            getEndpoint().onReceive(context, inMessage);
         }
-        sp.release();
-        result.release();
-
+        finally
+        {
+            sp.release();
+            if (result != null)
+            {
+                result.release();
+            }
+        }
     }
 
     public void close()
