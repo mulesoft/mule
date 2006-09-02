@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,22 +10,24 @@
 
 package org.mule.providers.http;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.apache.commons.httpclient.HttpMethod;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.provider.OutputHandler;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 /**
- * A HttpStream adapter that can be used with the HttpClinetMessageDispatcher as knows when to release the Http Connection.
+ * A HttpStream adapter that can be used with the HttpClientMessageDispatcher who
+ * knows when to release the Http Connection.
  */
 public class HttpStreamMessageAdapter extends StreamMessageAdapter
-
 {
+    private static final long serialVersionUID = -7836682641618511926L;
 
+    protected volatile HttpMethod httpMethod;
 
     public HttpStreamMessageAdapter(InputStream in)
     {
@@ -52,10 +54,6 @@ public class HttpStreamMessageAdapter extends StreamMessageAdapter
         super(in, out, handler);
     }
 
-    
-    protected HttpMethod httpMethod;
-
-
     public HttpMethod getHttpMethod()
     {
         return httpMethod;
@@ -68,7 +66,7 @@ public class HttpStreamMessageAdapter extends StreamMessageAdapter
 
     public void release()
     {
-        if(httpMethod==null)
+        if (httpMethod == null)
         {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "httpMethod object").toString());
         }
