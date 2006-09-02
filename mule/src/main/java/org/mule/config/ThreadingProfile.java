@@ -16,10 +16,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
 
 /**
@@ -321,26 +321,6 @@ public class ThreadingProfile
                 + threadPriority + ", workManagerFactory=" + workManagerFactory
                 + ", rejectedExecutionHandler=" + rejectedExecutionHandler + ", threadFactory="
                 + threadFactory + "}";
-    }
-
-    public static class NamedThreadFactory implements ThreadFactory
-    {
-        private String name;
-        private int priority;
-        private AtomicLong counter = new AtomicLong(1);
-
-        public NamedThreadFactory(String name, int priority)
-        {
-            this.name = name;
-            this.priority = priority;
-        }
-
-        public Thread newThread(Runnable runnable)
-        {
-            Thread t = new Thread(runnable, name + '.' + counter.getAndIncrement());
-            t.setPriority(priority);
-            return t;
-        }
     }
 
     public static interface WorkManagerFactory
