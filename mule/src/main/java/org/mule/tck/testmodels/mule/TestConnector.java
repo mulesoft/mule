@@ -214,6 +214,7 @@ public class TestConnector extends AbstractConnector
 
         public void write(UMOEvent event) throws IOException
         {
+            // nothing to do
         }
 
         public OutputHandler getOutputHandler()
@@ -223,12 +224,12 @@ public class TestConnector extends AbstractConnector
 
         public void setOutputHandler(OutputHandler handler)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // nothing to do
         }
 
         public void release()
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // nothing to do
         }
     }
 

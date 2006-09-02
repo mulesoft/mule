@@ -33,6 +33,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
      * Serial version
      */
     private static final long serialVersionUID = 6794965828515586752L;
+
     protected InputStream in;
     protected InputStream response;
     protected OutputStream out;
@@ -122,15 +123,13 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
         this.handler = handler;
     }
 
-//    public void setInputStream(InputStream in) {
-//        this.in = in;
-//    }
-
     /**
-     * The release method is called by Mule to notify this adapter that it is no longer needed. This method can be
-     * used to release any resources that a custom StreamAdapter may have associated with it.
+     * The release method is called by Mule to notify this adapter that it is no
+     * longer needed. This method can be used to release any resources that a custom
+     * StreamAdapter may have associated with it.
      */
     public void release() {
-        
+        // nothing to do?
     }
+
 }
