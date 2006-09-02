@@ -43,9 +43,9 @@ public class FutureMessageResult extends FutureTask
      * <p>
      * Reasons for these defaults:
      * <ul>
-     * <li> a daemon thread prevents the VM from blocking on shutdown; lifecycle
-     * control should be done elsewhere (e.g. the provider of the custom
-     * ExecutorService), otherwise this class would become too overloaded
+     * <li> a daemon thread does not block the VM on shutdown; lifecycle control
+     * should be done elsewhere (e.g. the provider of the custom ExecutorService),
+     * otherwise this class would become too overloaded
      * <li> a single thread provides for conservative & predictable yet async
      * behaviour from a client's point of view
      * <li> the unbounded queue is not optimal but probably harmless since e.g. a
