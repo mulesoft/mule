@@ -25,7 +25,7 @@ import org.codehaus.xfire.transport.DefaultEndpoint;
 import org.codehaus.xfire.wsdl11.WSDL11Transport;
 
 /**
- * todo document
+ * TODO document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -38,9 +38,6 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
     public static final String SOAP12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
 
     public final static String HTTP_BINDING = "http://www.w3.org/2004/08/wsdl/http";
-
-    // public final static String CHUNKING_ENABLED =
-    // "urn:xfire:transport:http:chunking-enabled";
 
     public final static String HTTP_TRANSPORT_NS = "http://schemas.xmlsoap.org/soap/mule";
 

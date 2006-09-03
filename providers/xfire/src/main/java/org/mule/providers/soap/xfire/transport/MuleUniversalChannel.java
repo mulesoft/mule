@@ -41,13 +41,17 @@ import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.util.STAXUtils;
+import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessageConstants;
+import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
@@ -60,17 +64,32 @@ public class MuleUniversalChannel extends AbstractChannel
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient final Log logger = LogFactory.getLog(getClass());
+
+    /**
+     * MuleClient used for sending "universal" requests
+     */
+    protected transient final MuleClient client;
 
     public MuleUniversalChannel(String uri, MuleUniversalTransport transport)
     {
         setTransport(transport);
         setUri(uri);
+
+        try
+        {
+            this.client = new MuleClient();
+        }
+        catch (UMOException ex)
+        {
+            throw new MuleRuntimeException(new Message(CoreMessageConstants.X_FAILED_TO_INITIALISE,
+                "MuleClient"), ex);
+        }
     }
 
     public void open()
     {
-        // template method
+        // nothing to do here
     }
 
     public void send(MessageContext context, OutMessage message) throws XFireException
@@ -97,13 +116,11 @@ public class MuleUniversalChannel extends AbstractChannel
                 {
                     writeAttachmentBody(context, message);
                     // TODO response.setContentType(atts.getContentType());
-
                     atts.write(out);
                 }
                 else
                 {
                     // TODO response.setContentType(getSoapMimeType(message));
-
                     writeWithoutAttachments(context, message, out);
                 }
             }
@@ -120,7 +137,7 @@ public class MuleUniversalChannel extends AbstractChannel
             }
             catch (Exception e)
             {
-                throw new XFireException("Failed to Send via MuleUniversalChnnel: " + e.getMessage(), e);
+                throw new XFireException("Failed to Send via MuleUniversalChannel: " + e.getMessage(), e);
             }
         }
     }
@@ -194,7 +211,6 @@ public class MuleUniversalChannel extends AbstractChannel
 
     private void sendViaClient(final MessageContext context, final OutMessage message) throws Exception
     {
-        MuleClient client = new MuleClient();
         OutputHandler handler = new OutputHandler()
         {
             public void write(UMOEvent event, OutputStream out) throws IOException
@@ -313,7 +329,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
     public void close()
     {
-        // template method
+        // nothing to do here
     }
 
     public boolean isAsync()
