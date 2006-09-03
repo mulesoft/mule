@@ -33,16 +33,21 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
      */
     protected boolean shouldAggregate(EventGroup events)
     {
-        int size = events.expectedSize();
-        if (size == -1) {
+        int expected = events.expectedSize();
+        if (expected == -1)
+        {
             logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used.  Message is being forwarded");
             return true;
         }
 
-        logger.info("Aggregator: Current Event groups = " + eventGroups.size());
-        logger.info("correlation size is " + size + ". current event group size is " + events.size()
-                + " for correlation " + events.getGroupId());
-        return size == events.size();
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Aggregator: Current EventGroup size = " + eventGroups.size());
+            logger.info("correlation size is " + expected + ". current event group size is " + events.size()
+                        + " for correlation " + events.getGroupId());
+        }
+
+        return expected == events.size();
     }
 
 
