@@ -14,6 +14,7 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.Service;
+import org.mule.config.MuleProperties;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -45,9 +46,7 @@ public class XFireClientPoolFactory extends BasePoolableObjectFactory
 
     public void passivateObject(Object obj) throws Exception
     {
-        // TODO XFIRE-429: uncomment when xfire-1.1.1 is in place, so that idle clients do
-        // not hold on to their previous event for longer than necessary
-        // ((Client)obj).removeProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        ((Client)obj).removeProperty(MuleProperties.MULE_EVENT_PROPERTY);
         super.passivateObject(obj);
     }
 
