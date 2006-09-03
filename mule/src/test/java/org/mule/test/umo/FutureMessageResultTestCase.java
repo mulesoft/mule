@@ -63,7 +63,8 @@ public class FutureMessageResultTestCase extends TestCase
 
         try
         {
-            new FutureMessageResult(Dummy, null, null);
+            FutureMessageResult f = new FutureMessageResult(Dummy);
+            f.setExecutorService(null);
             fail();
         }
         catch (IllegalArgumentException iex)
@@ -75,7 +76,8 @@ public class FutureMessageResultTestCase extends TestCase
         {
             ExecutorService e = Executors.newCachedThreadPool();
             e.shutdown();
-            new FutureMessageResult(Dummy, null, e);
+            FutureMessageResult f = new FutureMessageResult(Dummy);
+            f.setExecutorService(e);
             fail();
         }
         catch (IllegalArgumentException iex)
@@ -121,7 +123,8 @@ public class FutureMessageResultTestCase extends TestCase
 
         try
         {
-            assertNull(f.getMessage(50));
+            f.getMessage(50);
+            fail();
         }
         catch (TimeoutException tex)
         {

@@ -54,40 +54,58 @@ public class FutureMessageResult extends FutureTask
      * </ul>
      */
     private static final ExecutorService DefaultExecutor = Executors.newSingleThreadExecutor(
-        new DaemonThreadFactory("DefaultMuleFutureMessageExecutor"));
+        new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
 
-    private final ExecutorService executor;
-    private final UMOTransformer transformer;
+    private volatile ExecutorService executor;
+    private volatile UMOTransformer transformer;
 
     public FutureMessageResult(Callable callable)
     {
-        this(callable, null);
+        super(callable);
+        this.setExecutorService(DefaultExecutor);
     }
 
+    /**
+     * @deprecated Please use {@link #FutureMessageResult(Callable)} and configure
+     *             e.g with {@link #setExecutorService(ExecutorService)} or
+     *             {@link #setTransformer(UMOTransformer)}
+     */
     public FutureMessageResult(Callable callable, UMOTransformer transformer)
     {
-        this(callable, transformer, DefaultExecutor);
+        this(callable);
+        this.setTransformer(transformer);
     }
 
-    public FutureMessageResult(Callable callable, UMOTransformer transformer, ExecutorService executor)
+    /**
+     * Set a post-invocation transformer.
+     * 
+     * @param t UMOTransformer to be applied to the result of this invocation. May be
+     *            null.
+     */
+    public void setTransformer(UMOTransformer t)
     {
-        // null Callable will explode
-        super(callable);
+        this.transformer = t;
+    }
 
-        // may be null
-        this.transformer = transformer;
-
-        if (executor == null)
+    /**
+     * Set an ExecutorService to run this invocation.
+     * 
+     * @param e the executor to be used.
+     * @throws IllegalArgumentException when the executor is null or shutdown.
+     */
+    public void setExecutorService(ExecutorService e)
+    {
+        if (e == null)
         {
             throw new IllegalArgumentException("ExecutorService must not be null.");
         }
 
-        if (executor.isShutdown())
+        if (e.isShutdown())
         {
             throw new IllegalArgumentException("ExecutorService must not be shutdown.");
         }
 
-        this.executor = executor;
+        this.executor = e;
     }
 
     public UMOMessage getMessage() throws InterruptedException, ExecutionException, TransformerException

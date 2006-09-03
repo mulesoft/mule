@@ -333,6 +333,7 @@ public class MuleEventContext implements UMOEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable);
+        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -369,6 +370,7 @@ public class MuleEventContext implements UMOEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable);
+        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -408,6 +410,7 @@ public class MuleEventContext implements UMOEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable);
+        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -449,6 +452,7 @@ public class MuleEventContext implements UMOEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable);
+        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
