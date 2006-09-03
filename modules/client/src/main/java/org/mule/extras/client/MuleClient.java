@@ -62,19 +62,26 @@ import org.mule.util.StringUtils;
  * receive events from a Mule Server. In most Mule applications events are triggered
  * by some external occurrence such as a message being received on a queue or file
  * being copied to a directory. The Mule client allows the user to send and receive
- * events programmatically through its Api. <p/> The client defines a UMOEndpointURI
- * which is used to determine how a message is sent of received. The url defines the
- * protocol, the endpointUri destination of the message and optionally the endpoint
- * to use when dispatching the event. For example - <p/> <code>vm://my.object</code>
- * dispatches to a <code>my.object</code> destination using the VM endpoint. There
- * needs to be a global Vm endpoint registered for the message to be sent <p/>
- * <code>jms://jmsProvider/orders.topic</code> dispatches a jms message via the
+ * events programmatically through its Api.
+ * <p>
+ * The client defines a UMOEndpointURI which is used to determine how a message is
+ * sent of received. The url defines the protocol, the endpointUri destination of the
+ * message and optionally the endpoint to use when dispatching the event. For
+ * example:
+ * <p>
+ * <code>vm://my.object</code> dispatches to a <code>my.object</code> destination
+ * using the VM endpoint. There needs to be a global VM endpoint registered for the
+ * message to be sent.
+ * <p>
+ * <code>jms://jmsProvider/orders.topic</code> dispatches a JMS message via the
  * globally registered jmsProvider over a topic destination called
- * <code>orders.topic</code>. <p/> <code>jms://orders.topic</code> Is equivilent
- * to the above except that the endpoint is determined by the protocol, so the first
- * jms endpoint is used. <p/> <p/> Note that there must be a configured MuleManager
- * for this client to work. It will use the one available using
- * <code>MuleManager.getInstance()</code>
+ * <code>orders.topic</code>.
+ * <p>
+ * <code>jms://orders.topic</code> is equivalent to the above except that the
+ * endpoint is determined by the protocol, so the first JMS endpoint is used.
+ * <p>
+ * Note that there must be a configured MuleManager for this client to work. It will
+ * use the one available using <code>MuleManager.getInstance()</code>
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
