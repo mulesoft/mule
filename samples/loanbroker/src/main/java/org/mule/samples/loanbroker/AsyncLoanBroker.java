@@ -31,8 +31,6 @@ public class AsyncLoanBroker implements LoanBroker
     private static volatile int quotes = 0;
     private static volatile int requests = 0;
 
-    // private static long start = 0;
-
     public AsyncLoanBroker()
     {
         super();
@@ -41,39 +39,27 @@ public class AsyncLoanBroker implements LoanBroker
     public BankQuoteRequest getLoanQuote(LoanRequest request)
     {
         logger.info("\nClient " + request.getCustomer().getName() + " with ssn= "
-                + request.getCustomer().getSsn() + " requests a loan of amount= "
-                + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
+                    + request.getCustomer().getSsn() + " requests a loan of amount= "
+                    + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
         BankQuoteRequest bqr = new BankQuoteRequest();
         bqr.setLoanRequest(request);
-        // System.out.println("ORequest: " + incRequests());
         return bqr;
     }
 
     public Object receiveQuote(LoanQuote quote)
     {
-        logger.info("\nLoan Broker Quote received: " + quote);
         System.out.println("Quote " + incQuotes() + " received: " + quote);
-
-        // System.out.println("OQuote: " + incQuotes());
         return null;
     }
 
-    public synchronized int incQuotes()
+    public int incQuotes()
     {
-        // if(quotes % 100 == 0) {
-        // System.out.println("%% Received " + quotes + " quotes in: " +
-        // (System.currentTimeMillis() - start));
-        // }
         return ++quotes;
     }
 
-    public synchronized int incRequests()
+    public int incRequests()
     {
-        // if (requests == 0) start = System.currentTimeMillis();
-        // if(requests % 100 == 0) {
-        // System.out.println("## Sent " + requests + " messages in: " +
-        // (System.currentTimeMillis() - start));
-        // }
         return ++requests;
     }
+
 }
