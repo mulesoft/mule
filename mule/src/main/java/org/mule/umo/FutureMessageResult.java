@@ -33,13 +33,12 @@ public class FutureMessageResult extends FutureTask
 {
     /**
      * This is a simple default Executor for FutureMessageResults. Instead of
-     * spawning a Thread for each invocation it uses a single pooled daemon Thread
-     * with an unbounded queue, so "truly" concurrent operation of multiple Futures
-     * or otherwise customized execution behaviour requires calling the
-     * {@link #FutureMessageResult(Callable, UMOTransformer, ExecutorService)}
-     * constructor and passing in a custom {@link ExecutorService}. This is strongly
-     * recommended in order to provide better control over concurrency, resource
-     * consumption and possible overruns.
+     * spawning a Thread for each invocation it uses a single daemon Thread with an
+     * unbounded queue, so "truly" concurrent operation of multiple Futures or
+     * otherwise customized execution behaviour requires calling the
+     * {@link #setExecutorService(ExecutorService)} method and passing in a custom
+     * {@link ExecutorService}. This is strongly recommended in order to provide
+     * better control over concurrency, resource consumption and possible overruns.
      * <p>
      * Reasons for these defaults:
      * <ul>
