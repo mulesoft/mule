@@ -9,9 +9,8 @@
  */
 package org.mule.extras.acegi;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.GrantedAuthority;
-
+import org.acegisecurity.Authentication;
+import org.acegisecurity.GrantedAuthority;
 import org.mule.umo.security.UMOAuthentication;
 
 /**

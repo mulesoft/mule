@@ -9,9 +9,9 @@
  */
 package org.mule.extras.acegi;
 
-import net.sf.acegisecurity.context.SecureContext;
-import net.sf.acegisecurity.context.SecureContextImpl;
-
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.context.SecurityContextImpl;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityContextFactory;
@@ -26,9 +26,10 @@ import org.mule.umo.security.UMOSecurityContextFactory;
 public class AcegiSecurityContextFactory implements UMOSecurityContextFactory
 {
     public UMOSecurityContext create(UMOAuthentication authentication)
-    {
-        SecureContext context = new SecureContextImpl();
+    {       
+        SecurityContext context = new SecurityContextImpl();
         context.setAuthentication(((AcegiAuthenticationAdapter) authentication).getDelegate());
+        SecurityContextHolder.setContext(context);
         return new AcegiSecurityContext(context);
     }
 }

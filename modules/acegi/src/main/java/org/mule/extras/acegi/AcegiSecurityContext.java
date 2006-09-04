@@ -9,9 +9,8 @@
  */
 package org.mule.extras.acegi;
 
-import net.sf.acegisecurity.context.ContextInvalidException;
-import net.sf.acegisecurity.context.SecureContext;
-
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 
@@ -25,27 +24,25 @@ import org.mule.umo.security.UMOSecurityContext;
 
 public class AcegiSecurityContext implements UMOSecurityContext
 {
-    private SecureContext delegate;
+    private SecurityContext delegate;
     private AcegiAuthenticationAdapter authentication;
 
-    public AcegiSecurityContext(SecureContext delegate)
+    public AcegiSecurityContext(SecurityContext delegate)
     {
         this.delegate = delegate;
+        SecurityContextHolder.setContext(this.delegate);
     }
 
     public void setAuthentication(UMOAuthentication authentication)
     {
         this.authentication = ((AcegiAuthenticationAdapter) authentication);
         delegate.setAuthentication(this.authentication.getDelegate());
+        SecurityContextHolder.setContext(delegate);
     }
-
+    
     public UMOAuthentication getAuthentication()
     {
         return authentication;
     }
-
-    public void validate() throws ContextInvalidException
-    {
-        delegate.validate();
-    }
 }
+

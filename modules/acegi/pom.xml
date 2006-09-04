@@ -12,6 +12,16 @@
     <packaging>jar</packaging>
     <name>Acegi Security</name>
     <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.</description>   
+	<repositories>
+        <repository>
+	        <id>acegi</id>
+		    <name>Acegi Release Repository</name>
+            <url>http://acegisecurity.sourceforge.net/repository/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+	</repositories>	
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -26,15 +36,14 @@
         <dependency>
             <groupId>acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
-            <version>0.7.0</version>
+            <version>1.0.0-RC2</version>
             <exclusions>
                 <exclusion>
-                    <!-- Acegi 0.7.0 will try to pull an older Spring 1.1.3 and fail the test -->
+                    <!-- Acegi 1.0.0-RC2 will try to pull an older Spring 1.1.3 and fail the test -->
                     <groupId>springframework</groupId>
                     <artifactId>spring-core</artifactId>
                 </exclusion>
-            </exclusions>
-                
+            </exclusions>  
         </dependency>
 
         <!-- For unit tests only -->

@@ -9,9 +9,10 @@
  */
 package org.mule.extras.acegi.filters.http;
 
-import net.sf.acegisecurity.AuthenticationException;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
+import org.acegisecurity.Authentication;
+import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,7 +98,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * Authenticates the current message if authenticate is set to true. This
      * method will always populate the secure context in the session
      * 
-     * @param event the current message received
+     * @param event the current message recieved
      * @throws org.mule.umo.security.SecurityException if authentication fails
      */
     public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,

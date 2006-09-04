@@ -9,13 +9,13 @@
  */
 package org.mule.extras.acegi;
 
-import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.GrantedAuthorityImpl;
-import net.sf.acegisecurity.providers.AuthenticationProvider;
-import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
-import net.sf.acegisecurity.providers.dao.User;
-import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
-import net.sf.acegisecurity.providers.dao.memory.UserMap;
+import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.GrantedAuthorityImpl;
+import org.acegisecurity.providers.AuthenticationProvider;
+import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
+import org.acegisecurity.userdetails.User;
+import org.acegisecurity.userdetails.memory.InMemoryDaoImpl;
+import org.acegisecurity.userdetails.memory.UserMap;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -73,16 +73,18 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
                              true,
                              true,
                              true,
+                             true,
                              new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ADMIN") }));
         map.addUser(new User("anon",
                              "anon",
                              true,
                              true,
                              true,
+                             true,
                              new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ANONYOMUS") }));
         dao.setUserMap(map);
         dao.afterPropertiesSet();
-        provider.setAuthenticationDao(dao);
+        provider.setUserDetailsService(dao); //.setAuthenticationDao(dao);
         return provider;
     }
 
