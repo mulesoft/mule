@@ -12,16 +12,6 @@
     <packaging>jar</packaging>
     <name>Acegi Security</name>
     <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.</description>   
-	<repositories>
-        <repository>
-	        <id>acegi</id>
-		    <name>Acegi Release Repository</name>
-            <url>http://acegisecurity.sourceforge.net/repository/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-	</repositories>	
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -34,14 +24,49 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>acegisecurity</groupId>
+            <groupId>org.acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
-            <version>1.0.0-RC2</version>
+            <version>1.0.1</version>
             <exclusions>
-                <exclusion>
-                    <!-- Acegi 1.0.0-RC2 will try to pull an older Spring 1.1.3 and fail the test -->
-                    <groupId>springframework</groupId>
+                <exclusion>					
+                    <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-remoting</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-webmvc</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jdbc</artifactId>
+                </exclusion>
+				<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
                 </exclusion>
             </exclusions>  
         </dependency>
