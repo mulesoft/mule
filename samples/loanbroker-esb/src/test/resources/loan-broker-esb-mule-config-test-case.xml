@@ -50,9 +50,11 @@
             <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
             <property name="securityPolicy" value="security.policy"/>
             <map name="jndiProviderProperties">
-                <property name="openejb.base" value="./samples/loanbroker-esb/conf"/>
+                <property name="openejb.base" value="./conf"/>
+                <!--<property name="openejb.base" value="./samples/loanbroker-esb/conf"/>-->
                 <property name="openejb.configuration" value="openejb.conf"/>
-                <property name="openejb.nobanner" value="true"/>
+                <property name="openejb.nobanner" value="false"/>
+                <!--<property name="openejb.nobanner" value="true"/>-->
             </map>
         </properties>
     </connector>
@@ -104,7 +106,7 @@
                 </router>
             </outbound-router>
 
-            <response-router timeout="1000000">
+            <response-router timeout="10000">
                 <endpoint address="LoanQuotes"/>
                 <router className="org.mule.samples.loanbroker.esb.routers.BankQuotesResponseAggregator"/>
             </response-router>
@@ -122,9 +124,11 @@
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <!-- We invoke the credit Agency service using remoteSync which means that a response
-                    will be returned from the service. there is also a responseTransformer that will
-                    conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
+                    <!--
+                        We invoke the credit Agency service using remoteSync which means that a response
+                        will be returned from the service. there is also a responseTransformer that will
+                        convert the Xml returned from the CreditAgency Ejb into a CreditProfile object
+                    -->
                     <endpoint remoteSync="true" transformers="LoanQuoteRequestToCreditProfileArgs"
                         responseTransformers="CreditProfileXmlToCreditProfile" address="CreditAgency"/>
                     <endpoint address="LenderGateway"/>
