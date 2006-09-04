@@ -9,9 +9,7 @@
  */
 package org.mule.extras.acegi.filters.http;
 
-import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
