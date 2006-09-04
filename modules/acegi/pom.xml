@@ -28,43 +28,48 @@
             <artifactId>acegi-security</artifactId>
             <version>1.0.1</version>
             <exclusions>
-                <exclusion>					
+                <!-- We need commons-lang 2.1, not 2.0 -->
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-beans</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-remoting</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-dao</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-webmvc</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-web</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-jdbc</artifactId>
                 </exclusion>
-				<exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-support</artifactId>
                 </exclusion>
