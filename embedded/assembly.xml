@@ -48,6 +48,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule:mule-module-client</include>
         <include>org.mule:mule-module-hivemind</include>
         <include>org.mule:mule-module-i18n</include>
+        <include>org.mule:mule-module-jaas</include>
         <include>org.mule:mule-module-jotm</include>
         <include>org.mule:mule-module-pgp</include>
         <include>org.mule:mule-module-picocontainer</include>

@@ -33,10 +33,10 @@ Assembly descriptor for the full Mule distribution.
             Mule Examples: Echo
         ============================
       -->
-      <fileSet>
+    <fileSet>
           <directory>../../../samples/echo</directory>
           <outputDirectory>examples/echo</outputDirectory>
-          <excludes>
+      <excludes>
               <exclude>.mule</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
@@ -47,8 +47,8 @@ Assembly descriptor for the full Mule distribution.
               <exclude>*.iml</exclude>
               <exclude>pom.xml</exclude>
               <exclude>*.log</exclude>
-          </excludes>
-      </fileSet>
+      </excludes>
+    </fileSet>
 
 
       <!--
@@ -301,17 +301,22 @@ Assembly descriptor for the full Mule distribution.
           <include>USAGE.txt</include>
       </includes>
     </fileSet>
-  </fileSets>
 
-  <!-- This doesn't work because Maven makes the path relative to the current
-  directory instead of the project directory... JIRA issue = #?
-  <files>
-      <file>
-          <source>../src/main/resources/bin/USAGE.txt</source>
-          <outputDirectory></outputDirectory>
-      </file>
-  </files>
-  -->
+    <!-- Copy javadocs ("mvn site" must have been run previously) -->
+    <fileSet>
+      <directory>../../../target/site/apidocs</directory>
+      <outputDirectory>docs/api</outputDirectory>
+    </fileSet>
+
+    <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
+    <fileSet>
+      <directory>../../../samples/loanbroker-esb/loanbroker/src/main/resources</directory>
+      <outputDirectory>lib/user</outputDirectory>
+      <includes>
+          <include>openejb.conf</include>
+      </includes>
+    </fileSet>
+  </fileSets>
 
   <!-- Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
        replace the following lists with some clever wildcards. -->
@@ -355,7 +360,8 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule:mule-module-boot</include>
         <include>org.mule:mule-module-client</include>
         <include>org.mule:mule-module-hivemind</include>
-        <include>org.mule:mule-i18n_ja_JP</include>
+        <include>org.mule:mule-module-i18n</include>
+        <include>org.mule:mule-module-jaas</include>
         <include>org.mule:mule-module-jotm</include>
         <include>org.mule:mule-module-pgp</include>
         <include>org.mule:mule-module-picocontainer</include>
@@ -405,6 +411,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule:mule-module-client</exclude>
         <exclude>org.mule:mule-module-hivemind</exclude>
         <exclude>org.mule:mule-module-i18n</exclude>
+        <exclude>org.mule:mule-module-jaas</exclude>
         <exclude>org.mule:mule-module-jotm</exclude>
         <exclude>org.mule:mule-module-pgp</exclude>
         <exclude>org.mule:mule-module-picocontainer</exclude>
@@ -417,28 +424,32 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.samples:mule-samples-hello</exclude>
         <exclude>org.mule.samples:mule-samples-loanbroker</exclude>
         <exclude>org.mule.samples:mule-samples-loanbroker-esb</exclude>
+        <exclude>org.mule.samples:mule-samples-loanbroker-esb-credit-agency</exclude>
         <exclude>org.mule.samples:mule-samples-scripting</exclude>
         <exclude>org.mule.samples:mule-samples-stockquote</exclude>
         <exclude>org.mule.samples:mule-samples-voipservice</exclude>
-         <!--Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
+        <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
       </excludes>
     </dependencySet>
 
     <!-- Mule samples -->
-    <!--<dependencySet>-->
-      <!--<outputDirectory>lib/user</outputDirectory>-->
-      <!--<scope>runtime</scope>-->
-      <!--<includes>-->
-        <!--<include>org.mule.samples:mule-samples-echo</include>-->
-        <!--<include>org.mule.samples:mule-samples-errorhandler</include>-->
-        <!--<include>org.mule.samples:mule-samples-hello</include>-->
-        <!--<include>org.mule.samples:mule-samples-loanbroker</include>-->
-        <!--<include>org.mule.samples:mule-samples-loanbroker-esb</include>-->
-        <!--<include>org.mule.samples:mule-samples-scripting</include>-->
-        <!--<include>org.mule.samples:mule-samples-stockquote</include>-->
-        <!--<include>org.mule.samples:mule-samples-voipservice</include>-->
-      <!--</includes>-->
-    <!--</dependencySet>-->
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <scope>runtime</scope>
+	  <!-- Don't put the version number in the examples.  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <includes>
+        <include>org.mule.samples:mule-samples-echo</include>
+        <include>org.mule.samples:mule-samples-errorhandler</include>
+        <include>org.mule.samples:mule-samples-hello</include>
+        <include>org.mule.samples:mule-samples-loanbroker</include>
+        <include>org.mule.samples:mule-samples-loanbroker-esb</include>
+        <include>org.mule.samples:mule-samples-loanbroker-esb-credit-agency</include>
+        <include>org.mule.samples:mule-samples-scripting</include>
+        <include>org.mule.samples:mule-samples-stockquote</include>
+        <include>org.mule.samples:mule-samples-voipservice</include>
+      </includes>
+    </dependencySet>
   </dependencySets>
 </assembly>
