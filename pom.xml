@@ -220,8 +220,6 @@
                         <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
                         <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
                         <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
-                        <!-- TODO -->
-                        <exclude implementation="java.lang.String">**/LoanBrokerESBTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
