@@ -41,7 +41,7 @@
 
     <modules>
         <module>server</module>
-          <module>jca</module>
+        <module>jca</module>
         <module>embedded</module>
         <!-- <module>extras</module> -->
     </modules>
@@ -220,6 +220,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
+            <artifactId>mule-module-jaas</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
             <artifactId>mule-module-jotm</artifactId>
             <version>${version}</version>
         </dependency>
@@ -277,6 +282,11 @@
         <dependency>
             <groupId>org.mule.samples</groupId>
             <artifactId>mule-samples-loanbroker-esb</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.samples</groupId>
+            <artifactId>mule-samples-loanbroker-esb-credit-agency</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
