@@ -9,16 +9,17 @@
  */
 package org.mule.samples.loanbroker.esb;
 
+import java.io.IOException;
+
+import org.activemq.broker.BrokerContainer;
+import org.activemq.broker.impl.BrokerContainerImpl;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.samples.loanbroker.esb.message.Customer;
 import org.mule.samples.loanbroker.esb.message.CustomerQuoteRequest;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringMessageUtils;
-
-import java.io.IOException;
 
 /**
  * <code>Main</code> Executes the LoanBroker ESB application
@@ -30,18 +31,25 @@ import java.io.IOException;
 public class Main
  {
     private MuleClient client = null;
+    private BrokerContainer msgBroker = null;
 
+    public Main(String config) throws Exception {
+        // Start up the ActiveMQ message broker.
+        msgBroker = new BrokerContainerImpl("ActiveMQ");
+        msgBroker.addConnector("tcp://localhost:61616");
+        msgBroker.start();
 
-    public Main(String config) throws UMOException {
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure(config);
+        builder.configure(config, null);
         client = new MuleClient();
     }
 
-    public void close() {
+    public void close() throws Exception {
         MuleManager.getInstance().dispose();
+        if (msgBroker != null) {
+            msgBroker.stop();
+        }
     }
-
 
     private static double getRandomAmount() {
         return Math.round(Math.random() * 18000);

@@ -6,30 +6,25 @@
 <!--  This is the configuration for the Loan Broker ESB example -->
 <!-- See http://mule.codehaus.org/LoanBroker  for more information, diagrams and even a presentation! -->
 
-<mule-configuration id="Mule_Loan_broker_ESB_with_Ejb_Container" version="1.0">
+<mule-configuration id="Mule_Loan_broker_ESB" version="1.0">
 
     <description>
     The Loan Broker ESB example implements the Loan Broker Example using an ESB topology.
     See http://mule.codehaus.org/LoanBroker+ESB for details.
-
-    Instead of using an ejb Connector as in the other configuration (see mule-config.xml in this directory)
-    We configure an EJB container context and reference the EJB session bean directly as a Mule Managed component
-    The advantage of using an EjbContainerContext over an Ejb Connector is that the container is early binding where as
-    connector is only invoked once an event is received for the referenced Ejb.
     </description>
 
-    <container-context className="org.mule.impl.container.EjbContainerContext">
+    <connector name="ejbConnector" className="org.mule.providers.ejb.EjbConnector">
         <properties>
+            <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
             <property name="securityPolicy" value="security.policy"/>
-            <map name="environment">
-                <property name="java.naming.factory.initial" value="org.openejb.client.LocalInitialContextFactory"/>
-                <property name="java.naming.provider.url" value="rmi://localhost:1099"/>
-                <property name="openejb.base" value="."/>
-                <property name="openejb.configuration" value="../conf/openejb.conf"/>
+            <map name="jndiProviderProperties">
+                <system-property name="openejb.base" key="mule.home"/>
+                <property name="openejb.configuration" value="./lib/user/openejb.conf"/>
+                <property name="logging.conf" value="./conf/log4j.properties"/>
                 <property name="openejb.nobanner" value="true"/>
             </map>
         </properties>
-    </container-context>
+    </connector>
 
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
@@ -47,11 +42,10 @@
         <endpoint-identifier name="LoanBrokerRequests" value="vm://loan.broker.requests"/>
         <endpoint-identifier name="LoanQuotes" value="jms://esb.loan.quotes"/>
         <endpoint-identifier name="CreditAgencyGateway" value="jms://esb.credit.agency"/>
-
-        <!-- Thus is the endpoint used to pass events to the Credit Agency Ejb
-        Notice we set the 'method' param on the endpoint. This is because we need to tell
-        Mule which meothod to invoke as Mule cannot introspect the EJB proxy -->
-        <endpoint-identifier name="CreditAgency" value="vm://credit.agency.service?method=getCreditProfile"/>
+        <!-- here we're telling Mule to invoke a remote Ejb directly (not host a
+        proxy service for the remote object as with the other example in mule-config-with-ejb-container.xml example)
+        -->
+        <endpoint-identifier name="CreditAgency" value="ejb://localhost:1099/local/CreditAgency?method=getCreditProfile"/>
         <endpoint-identifier name="LenderGateway" value="jms://esb.lender.service"/>
         <endpoint-identifier name="LenderService" value="vm://lender.service"/>
         <endpoint-identifier name="BankingGateway" value="jms://esb.banks"/>
@@ -99,7 +93,7 @@
         <!--
         The credit agency service will get the credit profile for a customer
         -->
-        <mule-descriptor name="CreditAgencyGateway"
+         <mule-descriptor name="CreditAgencyGateway"
             implementation="org.mule.components.builder.ReflectionMessageBuilder">
 
             <inbound-router>
@@ -116,16 +110,6 @@
                     <endpoint address="LenderGateway"/>
                 </router>
             </outbound-router>
-        </mule-descriptor>
-
-        <!--  This is the CreditAgency Ejb component.  The implementation is the Jndi naming location
-        of the the Home interface for the CreditAgency bean.  This is just a single inbound endpoint which
-        with return the result of the invocation
-        -->
-        <mule-descriptor name="CreditAgency" implementation="local/CreditAgency">
-            <inbound-router>
-                <endpoint address="CreditAgency"/>
-            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="LenderGateway"
