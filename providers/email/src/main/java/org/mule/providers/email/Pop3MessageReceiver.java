@@ -124,6 +124,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     public void doDisconnect() throws Exception
     {
+        // nothing to do here
     }
 
     public void doStop()
@@ -297,7 +298,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         }
     }
 
-    public void poll()
+    public synchronized void poll()
     {
         try {
             try {
