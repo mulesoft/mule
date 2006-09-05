@@ -10,13 +10,13 @@
 
 package org.mule.providers.soap.axis.functional;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AxisSoapHeadersTestCase extends FunctionalTestCase{
 
@@ -38,14 +38,14 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase{
                     "<soapenv:Header>" +
                         "<Action>storeModuleInformation</Action>"+ //this should be ignored
                         "<mule:header>" +
-                            "<mule:MULE_REPLYTO>http://localhost:82/reply</mule:MULE_REPLYTO>" + 
+                            "<mule:MULE_REPLYTO>http://localhost:12182/reply</mule:MULE_REPLYTO>" + 
                         "</mule:header>" +
                     "</soapenv:Header>" +
 					
 					"<soapenv:Body><echo soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><value0 xsi:type=\"soapenc:string\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">Test Message</value0></echo></soapenv:Body>" +
 				"</soapenv:Envelope>");
 		
-		UMOMessage reply = client.send("http://localhost:81/services/component", soapRequest, properties);
+		UMOMessage reply = client.send("http://localhost:12181/services/component", soapRequest, properties);
 		
 		assertEquals(reply.getPayloadAsString(),"<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><echoResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><echoReturn xsi:type=\"xsd:string\">Test Message</echoReturn></echoResponse></soapenv:Body></soapenv:Envelope>");
 	}

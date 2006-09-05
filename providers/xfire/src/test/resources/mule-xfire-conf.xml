@@ -12,11 +12,9 @@
     <model name="TestXfireHeaders">
         <mule-descriptor name="TestComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:81/services"/>
+                <endpoint address="xfire:http://localhost:10181/services"/>
             </inbound-router>
         </mule-descriptor>
     </model>
 
 </mule-configuration>
-
-<!--FunctionalTestComponent-->

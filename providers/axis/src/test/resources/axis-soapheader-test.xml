@@ -7,10 +7,10 @@
     <model name="Axis_Headers_TestCase">
         <mule-descriptor name="component" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:81/services"/>
+                <endpoint address="axis:http://localhost:12181/services"/>
             </inbound-router>
 			<response-router>
-				<endpoint address="http://localhost:82/reply"/>
+				<endpoint address="http://localhost:12182/reply"/>
 			</response-router>
         </mule-descriptor>
 		

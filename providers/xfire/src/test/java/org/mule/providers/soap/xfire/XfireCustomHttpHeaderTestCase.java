@@ -10,10 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
@@ -23,6 +19,10 @@ import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 public class XfireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener{
 
@@ -40,7 +40,7 @@ public class XfireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "sayHello");
         props.put(myProperty, myProperty);
 
-        UMOMessage reply = client.send("xfire:http://localhost:81/services/TestComponent?method=onReceive", new MuleMessage(new Object[] {"Test String"}) , props);
+        UMOMessage reply = client.send("xfire:http://localhost:10181/services/TestComponent?method=onReceive", new MuleMessage(new Object[] {"Test String"}) , props);
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
         assertEquals(reply.getPayloadAsString(), "Test String Received");
