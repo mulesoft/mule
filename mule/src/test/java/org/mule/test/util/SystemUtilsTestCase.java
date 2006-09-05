@@ -10,15 +10,12 @@
 
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.util.SystemUtils;
-
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import junit.framework.TestCase;
+
+import org.mule.util.SystemUtils;
+
 public class SystemUtilsTestCase extends TestCase
 {
 
@@ -27,7 +24,9 @@ public class SystemUtilsTestCase extends TestCase
         Map env = SystemUtils.getenv();
         assertNotNull(env);
         assertFalse(env.isEmpty());
-        assertNotNull(env.get("PATH"));
+
+        String envVarToTest = (SystemUtils.IS_OS_WINDOWS ? "Path" : "PATH");
+        assertNotNull(env.get(envVarToTest));
     }
 
 }
