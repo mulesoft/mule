@@ -338,7 +338,7 @@
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
                     <!-- aggregate all when built from the top-level directory -->
-                    <!--<aggregate>true</aggregate>-->
+                    <aggregate>true</aggregate>
                     <!-- Link to the external online JavaDoc -->
                     <!-- TODO add more refs -->
                     <links>
@@ -347,6 +347,28 @@
                         <link>http://jakarta.apache.org/commons/lang/api-2.1</link>
                         <link>http://logging.apache.org/log4j/docs/api</link>
                     </links>
+					<groups>
+						<group>
+							<title>Mule Core</title>
+							<packages>org.mule*</packages>
+						</group>
+						<group>
+							<title>Modules (not part of the Mule core)</title>
+							<packages>org.mule.extras.*</packages>
+						</group>
+						<group>
+							<title>Transports (a.k.a. Providers)</title>
+							<packages>org.mule.providers.*</packages>
+						</group>
+						<group>
+							<title>Testing Framework</title>
+							<packages>org.mule.tck*</packages>
+						</group>
+						<group>
+							<title>Examples</title>
+							<packages>org.mule.samples.*</packages>
+						</group>
+					</groups>
                 </configuration>
             </plugin>
 
