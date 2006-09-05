@@ -50,8 +50,8 @@
             <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
             <property name="securityPolicy" value="security.policy"/>
             <map name="jndiProviderProperties">
-                <system-property name="openejb.base" key="mule.home"/>
-                <property name="openejb.configuration" value="lib/user/openejb.conf"/>
+                <property name="openejb.base" value="."/>
+                <property name="openejb.configuration" value="src/test/resources/openejb.conf"/>
                 <property name="openejb.nobanner" value="true"/>
             </map>
         </properties>
