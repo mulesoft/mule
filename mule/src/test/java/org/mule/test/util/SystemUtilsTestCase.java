@@ -10,11 +10,10 @@
 
 package org.mule.test.util;
 
-import java.util.Map;
-
 import junit.framework.TestCase;
-
 import org.mule.util.SystemUtils;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -28,8 +27,7 @@ public class SystemUtilsTestCase extends TestCase
         Map env = SystemUtils.getenv();
         assertNotNull(env);
         assertFalse(env.isEmpty());
-        assertNotNull(env.get("JAVA_HOME"));
-        assertEquals(env.get("JAVA_HOME"), SystemUtils.getenv("JAVA_HOME"));
+        assertNotNull(env.get("PATH"));
     }
 
 }
