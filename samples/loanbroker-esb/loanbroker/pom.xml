@@ -14,6 +14,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule.samples</groupId>
+        	<artifactId>mule-samples-loanbroker-esb-credit-agency</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
             <version>3.2.4</version>
