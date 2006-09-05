@@ -12,10 +12,10 @@
     The Loan Broker ESB example implements the Loan Broker Example using an ESB topology.
     See http://mule.codehaus.org/LoanBroker+ESB for details.
 
-    Instead of using an ejb Connector as in the other configuration (see loan-broker-esb-mule-config.xml in this
-    directory).  We configure an EJB container context and reference the EJB session bean directly as a Mule Managed
-    component.  The advantage of using an EjbContainerContext over an Ejb Connector is that the container is early
-    binding where as connector is only invoked once an event is received for the referenced Ejb.
+    Instead of using an ejb Connector as in the other configuration (see mule-config.xml in this directory)
+    We configure an EJB container context and reference the EJB session bean directly as a Mule Managed component
+    The advantage of using an EjbContainerContext over an Ejb Connector is that the container is early binding where as
+    connector is only invoked once an event is received for the referenced Ejb.
     </description>
 
     <container-context className="org.mule.impl.container.EjbContainerContext">
@@ -37,8 +37,9 @@
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
             <property name="specification" value="1.1"/>
-            <map name="jndiProviderProperties">
+            <map name="connectionFactoryProperties">
                 <property name="brokerURL" value="tcp://localhost:61616"/>
+                <property name="useEmbeddedBroker" value="true"/>
             </map>
         </properties>
     </connector>
