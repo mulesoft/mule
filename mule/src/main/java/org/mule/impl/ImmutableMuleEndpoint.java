@@ -35,6 +35,7 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -42,7 +43,7 @@ import java.util.Map;
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server.
  * A endpoint is a grouping of an endpoint, an endpointUri and a transformer.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -293,7 +294,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getEndpointURI()
      */
     public UMOEndpointURI getEndpointURI()
@@ -308,7 +309,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getType()
      */
     public String getType()
@@ -318,7 +319,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getConnectorName()
      */
     public UMOConnector getConnector()
@@ -328,7 +329,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getName()
      */
     public String getName()
@@ -338,7 +339,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransformer()
      */
     public UMOTransformer getTransformer()
@@ -348,7 +349,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getParams()
      */
     public Map getProperties()
@@ -358,7 +359,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     // TODO this is the 'old' implementation of the clone() method which returns
@@ -403,7 +404,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#isReadOnly()
      */
     public boolean isReadOnly()
@@ -426,7 +427,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getProtocol()
      */
     public String getProtocol()
@@ -436,7 +437,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canReceive()
      */
     public boolean canReceive()
@@ -447,7 +448,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canSend()
      */
     public boolean canSend()
@@ -458,7 +459,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransactionConfig()
      */
     public UMOTransactionConfig getTransactionConfig()
@@ -621,10 +622,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 name = endpointUri.getEndpointName();
             }
         }
-        if (name == null) {
-            name = "_" + endpointUri.getScheme() + "Endpoint#" + hashCode();
-            endpointUri.setEndpointName(name);
-        }
+        name = ObjectNameHelper.getEndpointName(this);
 
         String sync = endpointUri.getParams().getProperty("synchronous", null);
         if (sync != null) {

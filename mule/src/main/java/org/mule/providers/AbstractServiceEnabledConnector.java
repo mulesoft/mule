@@ -24,6 +24,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.BeanUtils;
+import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
 
 import java.io.InputStream;
@@ -37,9 +38,9 @@ import java.util.Properties;
  * service descriptor.  Using this method greatly reduces the code required to
  * implement a connector and means that Mule can create connectors and endpoints
  * from a url if the connector has a service descriptor.
- * 
+ *
  * @see ConnectorServiceDescriptor
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -83,15 +84,10 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
         if (endpointUri.getPort() > -1) {
             props.setProperty("port", String.valueOf(endpointUri.getPort()));
         }
-        // try
-        // {
+
         BeanUtils.populateWithoutFail(this, props, true);
-        // } catch (InvocationTargetException e)
-        // {
-        // throw new InitialisationException(new
-        // Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e,
-        // this);
-        // }
+
+        setName(ObjectNameHelper.getConnectorName(this));
     }
 
     protected synchronized void initFromServiceDescriptor() throws InitialisationException

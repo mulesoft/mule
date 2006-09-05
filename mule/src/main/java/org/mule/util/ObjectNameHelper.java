@@ -17,33 +17,31 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  */
 public class ObjectNameHelper
 {
+    public static final String SEPARATOR = ".";
+
     public static String getEndpointName(UMOImmutableEndpoint endpoint) {
-        String name = null;
         if(endpoint.getName() != null) {
-            name = endpoint.getName();
+            return endpoint.getName();
         } else {
-            name = endpoint.getEndpointURI().getAddress();
+            return "_Endpoint" + SEPARATOR + replaceObjectNameChars(endpoint.getEndpointURI().getAddress());
         }
-        return "_Endpoint:" + replaceObjectNameChars(name);
     }
 
     public static String getConnectorName(AbstractConnector connector) {
-        String name = null;
         if(connector.getName() != null) {
-            name = connector.getName();
+            return connector.getName();
         } else {
-            name = connector.getConnectionDescription();
+            return "_Connector" + SEPARATOR + replaceObjectNameChars(connector.getConnectionDescription());
         }
-        return "_Connector:" + replaceObjectNameChars(name);
     }
 
 
     public static String replaceObjectNameChars(String name)
     {
         String value = name.replaceAll("//", "");
-        value = value.replaceAll("/", ":");
-        value = value.replaceAll("?", ":");
-        value = value.replaceAll("&", ":");
+        value = value.replaceAll("/", SEPARATOR);
+        value = value.replaceAll("\\?", SEPARATOR);
+        value = value.replaceAll("&", SEPARATOR);
         value = value.replaceAll("=", "-");
         return value;
     }
