@@ -262,10 +262,10 @@ Assembly descriptor for the full Mule distribution.
         ============================
       -->
       <fileSet>
-          <exclude>.mule</exclude>
           <directory>../../../samples/webapp</directory>
           <outputDirectory>examples/webapp</outputDirectory>
           <excludes>
+              <exclude>.mule</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
