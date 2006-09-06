@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:LoanQuoteRequest.java 2944 2006-09-05 10:38:45 +0000 (Tue, 05 Sep 2006) tcarlson $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -14,11 +14,11 @@ import org.mule.samples.loanbroker.esb.bank.Bank;
 import java.io.Serializable;
 
 /**
- * <code>LoanQuoteRequest</code> represents customer a request for a loan broker
+ * <code>LoanQuoteRequest</code> represents a customer request for a loan
  * through a loan broker
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @version $Revision:2944 $
  */
 public class LoanQuoteRequest implements Serializable
 {
