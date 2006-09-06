@@ -256,52 +256,52 @@
 
         <!--
         ********************************************************
-        Samples
+        Examples
         *********************************************************
         -->
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-echo</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-echo</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-errorhandler</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-errorhandler</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-hello</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-hello</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-loanbroker</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-loanbroker-esb</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esb</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-loanbroker-esb-credit-agency</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-scripting</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-scripting</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-stockquote</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-stockquote</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-            <artifactId>mule-samples-voipservice</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-voipservice</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

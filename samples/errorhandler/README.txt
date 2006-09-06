@@ -1,9 +1,9 @@
 +-----------------------+
 | Error Handler Example |
 +-----------------------+
-The Error handler sample demonstrates using Spring as the external container to provide
+The Error handler example demonstrates using Spring as the external container to provide
 the objects managed by Mule and how to publish events to multiple outbound endpoints.
-The sample consists of two components: ExecptionManager and BusinessErrorManager.
+The example consists of two components: ExecptionManager and BusinessErrorManager.
 
 For more information, refer to http://www.muleumo.org/Examples
 

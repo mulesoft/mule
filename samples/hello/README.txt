@@ -1,7 +1,7 @@
 +---------------------+
 | Hello World Example |
 +---------------------+
-This sample uses two components to create a hello world message. When the sample starts
+This example uses two components to create a hello world message. When the example starts
 it prompts the user at the console to type in their name, the user's name is then passed
 to the first component which adds something to the string before passes on to the second
 component that also adds some text before outputting the results back to the console.

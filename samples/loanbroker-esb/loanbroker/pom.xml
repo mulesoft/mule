@@ -4,18 +4,18 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.samples</groupId>
-        <artifactId>mule-samples-loanbroker-esb-parent</artifactId>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-example-loanbroker-esb-parent</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-samples-loanbroker-esb</artifactId>
+    <artifactId>mule-example-loanbroker-esb</artifactId>
     <packaging>jar</packaging>
     <name>Loan Broker ESB Example: Mule Configuration</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.samples</groupId>
-        	<artifactId>mule-samples-loanbroker-esb-credit-agency</artifactId>
+            <groupId>org.mule.examples</groupId>
+        	<artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
             <version>${version}</version>
         </dependency>
 

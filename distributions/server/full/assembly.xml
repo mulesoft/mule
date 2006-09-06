@@ -34,7 +34,7 @@ Assembly descriptor for the full Mule distribution.
         ============================
       -->
     <fileSet>
-          <directory>../../../samples/echo</directory>
+          <directory>../../../examples/echo</directory>
           <outputDirectory>examples/echo</outputDirectory>
       <excludes>
               <exclude>.mule/**</exclude>
@@ -57,7 +57,7 @@ Assembly descriptor for the full Mule distribution.
         ==================================
       -->
       <fileSet>
-          <directory>../../../samples/errorhandler</directory>
+          <directory>../../../examples/errorhandler</directory>
           <outputDirectory>examples/errorhandler</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -74,7 +74,7 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/errorhandler/src/main/java</directory>
+          <directory>../../../examples/errorhandler/src/main/java</directory>
           <outputDirectory>examples/errorhandler/src</outputDirectory>
       </fileSet>
 
@@ -84,7 +84,7 @@ Assembly descriptor for the full Mule distribution.
         ============================
       -->
       <fileSet>
-          <directory>../../../samples/hello</directory>
+          <directory>../../../examples/hello</directory>
           <outputDirectory>examples/hello</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -101,7 +101,7 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/hello/src/main/java</directory>
+          <directory>../../../examples/hello/src/main/java</directory>
           <outputDirectory>examples/hello/src</outputDirectory>
       </fileSet>
 
@@ -112,7 +112,7 @@ Assembly descriptor for the full Mule distribution.
         ===============================
       -->
       <fileSet>
-          <directory>../../../samples/loanbroker</directory>
+          <directory>../../../examples/loanbroker</directory>
           <outputDirectory>examples/loanbroker</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -129,7 +129,7 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker/src/main/java</directory>
+          <directory>../../../examples/loanbroker/src/main/java</directory>
           <outputDirectory>examples/loanbroker/src</outputDirectory>
       </fileSet>
 
@@ -140,7 +140,7 @@ Assembly descriptor for the full Mule distribution.
         ===================================
       -->
       <fileSet>
-          <directory>../../../samples/loanbroker-esb</directory>
+          <directory>../../../examples/loanbroker-esb</directory>
           <outputDirectory>examples/loanbroker-esb</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -158,22 +158,22 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker-esb/loanbroker/src/main/java</directory>
+          <directory>../../../examples/loanbroker-esb/loanbroker/src/main/java</directory>
           <outputDirectory>examples/loanbroker-esb/src/loanbroker</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker-esb/loanbroker/src/main/resources</directory>
+          <directory>../../../examples/loanbroker-esb/loanbroker/src/main/resources</directory>
           <outputDirectory>examples/loanbroker-esb/src/loanbroker</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker-esb/credit-agency/src/main/java</directory>
+          <directory>../../../examples/loanbroker-esb/credit-agency/src/main/java</directory>
           <outputDirectory>examples/loanbroker-esb/src/credit-agency</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker-esb/credit-agency/src/main/resources</directory>
+          <directory>../../../examples/loanbroker-esb/credit-agency/src/main/resources</directory>
           <outputDirectory>examples/loanbroker-esb/src/credit-agency</outputDirectory>
       </fileSet>
 
@@ -184,7 +184,7 @@ Assembly descriptor for the full Mule distribution.
         =============================
       -->
       <fileSet>
-          <directory>../../../samples/scripting</directory>
+          <directory>../../../examples/scripting</directory>
           <outputDirectory>examples/scripting</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -201,12 +201,12 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/scripting/src/main/java</directory>
+          <directory>../../../examples/scripting/src/main/java</directory>
           <outputDirectory>examples/scripting/src</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/scripting/src/main/resources</directory>
+          <directory>../../../examples/scripting/src/main/resources</directory>
           <outputDirectory>examples/scripting/src</outputDirectory>
       </fileSet>
 
@@ -217,7 +217,7 @@ Assembly descriptor for the full Mule distribution.
         ===============================
       -->
       <fileSet>
-          <directory>../../../samples/stockquote</directory>
+          <directory>../../../examples/stockquote</directory>
           <outputDirectory>examples/stockquote</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -234,12 +234,12 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/stockquote/src/main/java</directory>
+          <directory>../../../examples/stockquote/src/main/java</directory>
           <outputDirectory>examples/stockquote/src</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/stockquote/src/main/resources</directory>
+          <directory>../../../examples/stockquote/src/main/resources</directory>
           <outputDirectory>examples/stockquote/src</outputDirectory>
       </fileSet>
 
@@ -250,7 +250,7 @@ Assembly descriptor for the full Mule distribution.
         ================================
       -->
       <fileSet>
-          <directory>../../../samples/voipservice</directory>
+          <directory>../../../examples/voipservice</directory>
           <outputDirectory>examples/voipservice</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -267,7 +267,7 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/voipservice/src/main/java</directory>
+          <directory>../../../examples/voipservice/src/main/java</directory>
           <outputDirectory>examples/voipservice/src</outputDirectory>
       </fileSet>
 
@@ -278,7 +278,7 @@ Assembly descriptor for the full Mule distribution.
         ============================
       -->
       <fileSet>
-          <directory>../../../samples/webapp</directory>
+          <directory>../../../examples/webapp</directory>
           <outputDirectory>examples/webapp</outputDirectory>
           <excludes>
               <exclude>.mule/**</exclude>
@@ -295,17 +295,17 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/webapp/src/main/java</directory>
+          <directory>../../../examples/webapp/src/main/java</directory>
           <outputDirectory>examples/webapp/src</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/webapp/src/main/resources</directory>
+          <directory>../../../examples/webapp/src/main/resources</directory>
           <outputDirectory>examples/webapp/src</outputDirectory>
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/webapp/src/main/java</directory>
+          <directory>../../../examples/webapp/src/main/java</directory>
           <outputDirectory>examples/webapp/web</outputDirectory>
       </fileSet>
 
@@ -326,7 +326,7 @@ Assembly descriptor for the full Mule distribution.
 
     <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
     <fileSet>
-      <directory>../../../samples/loanbroker-esb/loanbroker/src/main/resources</directory>
+      <directory>../../../examples/loanbroker-esb/loanbroker/src/main/resources</directory>
       <outputDirectory>lib/user</outputDirectory>
       <includes>
           <include>openejb.conf</include>
@@ -434,37 +434,37 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule:mule-module-plexus</exclude>
         <exclude>org.mule:mule-module-scripting</exclude>
         <exclude>org.mule:mule-module-spring</exclude>
-        <!-- Samples -->
-        <exclude>org.mule.samples:mule-samples-echo</exclude>
-        <exclude>org.mule.samples:mule-samples-errorhandler</exclude>
-        <exclude>org.mule.samples:mule-samples-hello</exclude>
-        <exclude>org.mule.samples:mule-samples-loanbroker</exclude>
-        <exclude>org.mule.samples:mule-samples-loanbroker-esb</exclude>
-        <exclude>org.mule.samples:mule-samples-loanbroker-esb-credit-agency</exclude>
-        <exclude>org.mule.samples:mule-samples-scripting</exclude>
-        <exclude>org.mule.samples:mule-samples-stockquote</exclude>
-        <exclude>org.mule.samples:mule-samples-voipservice</exclude>
+        <!-- Examples -->
+        <exclude>org.mule.examples:mule-example-echo</exclude>
+        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
+        <exclude>org.mule.examples:mule-example-hello</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb-credit-agency</exclude>
+        <exclude>org.mule.examples:mule-example-scripting</exclude>
+        <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
       </excludes>
     </dependencySet>
 
-    <!-- Mule samples -->
+    <!-- Mule examples -->
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
 	  <!-- Don't put the version number in the examples.  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <include>org.mule.samples:mule-samples-echo</include>
-        <include>org.mule.samples:mule-samples-errorhandler</include>
-        <include>org.mule.samples:mule-samples-hello</include>
-        <include>org.mule.samples:mule-samples-loanbroker</include>
-        <include>org.mule.samples:mule-samples-loanbroker-esb</include>
-        <include>org.mule.samples:mule-samples-loanbroker-esb-credit-agency</include>
-        <include>org.mule.samples:mule-samples-scripting</include>
-        <include>org.mule.samples:mule-samples-stockquote</include>
-        <include>org.mule.samples:mule-samples-voipservice</include>
+        <include>org.mule.examples:mule-example-echo</include>
+        <include>org.mule.examples:mule-example-errorhandler</include>
+        <include>org.mule.examples:mule-example-hello</include>
+        <include>org.mule.examples:mule-example-loanbroker</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
+        <include>org.mule.examples:mule-example-scripting</include>
+        <include>org.mule.examples:mule-example-stockquote</include>
+        <include>org.mule.examples:mule-example-voipservice</include>
       </includes>
     </dependencySet>
   </dependencySets>
