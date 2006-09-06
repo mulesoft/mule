@@ -60,132 +60,132 @@
         </dependency>
         <!--
         ********************************************************
-        Providers
+        Transports
         *********************************************************
         -->
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-axis-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-dq-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-dq</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-ejb-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ejb</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-email-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-email</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-file-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-ftp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ftp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-gigaspaces-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-gigaspaces</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-glue-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-glue</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-jbi-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jbi</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-jdbc-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jdbc</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-jms-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-multicast-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-multicast</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-oracle-jms-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-oracleaq</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-quartz-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-quartz</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-rmi-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-rmi</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-soap-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-space-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-space</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-ssl-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ssl</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-stream-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stream</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-tcp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-udp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-udp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-vm-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-xfire-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-xmpp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xmpp</artifactId>
             <version>${version}</version>
         </dependency>
         <!--
