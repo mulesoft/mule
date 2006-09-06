@@ -434,7 +434,7 @@
 
     <modules>
         <module>buildtools</module>
-        <module>mule</module>
+        <module>core</module>
         <module>modules</module>
         <module>providers</module>
         <module>examples</module>
