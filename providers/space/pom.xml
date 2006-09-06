@@ -32,7 +32,7 @@
     <dependencies>
         <!-- Needed for unit tests only -->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>

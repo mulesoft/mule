@@ -21,7 +21,7 @@
 
         <!-- The Mule client is needed for MuleClientReceiveJob and MuleClientDispatchJob -->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>

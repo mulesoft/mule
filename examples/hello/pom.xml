@@ -13,7 +13,7 @@
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
         </dependency>

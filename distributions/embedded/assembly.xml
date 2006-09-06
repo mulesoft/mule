@@ -43,18 +43,18 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule:mule-xfire-provider</include>
         <include>org.mule:mule-xmpp-provider</include>
         <!-- Modules -->
-        <include>org.mule:mule-filter-ognl</include>
-        <include>org.mule:mule-module-acegi</include>
-        <include>org.mule:mule-module-client</include>
-        <include>org.mule:mule-module-hivemind</include>
-        <include>org.mule:mule-module-i18n</include>
-        <include>org.mule:mule-module-jaas</include>
-        <include>org.mule:mule-module-jotm</include>
-        <include>org.mule:mule-module-pgp</include>
-        <include>org.mule:mule-module-picocontainer</include>
-        <include>org.mule:mule-module-plexus</include>
-        <include>org.mule:mule-module-scripting</include>
-        <include>org.mule:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-hivemind</include>
+        <include>org.mule.modules:mule-module-i18n</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-picocontainer</include>
+        <include>org.mule.modules:mule-module-plexus</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-spring</include>
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
       <excludes>

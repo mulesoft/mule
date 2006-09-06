@@ -14,7 +14,7 @@
     <description>Demonstrates using Spring as the external container to provide the objects managed by Mule and how to publish events to multiple outbound endpoints. The example consists of two components; ExecptionManager and BusinessErrorManager.</description>
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
         </dependency>
