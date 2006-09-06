@@ -15,13 +15,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-xfire-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

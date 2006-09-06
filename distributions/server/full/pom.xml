@@ -13,7 +13,7 @@
     by the assembly plugin. -->
     <packaging>jar</packaging>
     <name>Full Distribution</name>
-    <description>Includes the Mule server with all its providers and extras.</description>
+    <description>Includes the Mule server with all of its modules and transports.</description>
 
     <build>
     	<plugins>

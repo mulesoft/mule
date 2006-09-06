@@ -34,15 +34,15 @@
 		</dependency>
 
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-vm-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-tcp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

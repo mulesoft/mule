@@ -4,15 +4,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-tcp-provider</artifactId>
+    <artifactId>mule-transport-tcp</artifactId>
     <packaging>jar</packaging>
-    <name>Tcp Provider</name>
-    <description>A Mule provider for Tcp Connectivity. This provider supplies a tcp Server and client implementation.</description>
-    <dependencies>
-       
-    </dependencies>
+    <name>Tcp Transport</name>
+    <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 </project>

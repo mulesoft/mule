@@ -13,7 +13,7 @@
     by the assembly plugin. -->
     <packaging>jar</packaging>
     <name>Embedded (Single jar file)</name>
-    <description>Assembles the Mule core, providers and extras into a single library (jar).
+    <description>Assembles the Mule core, modules, and transports into a single library (jar).
     This is useful for embedding Mule into an existing project.</description>
 
     <build>

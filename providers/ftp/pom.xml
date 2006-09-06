@@ -4,14 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-ftp-provider</artifactId>
+    <artifactId>mule-transport-ftp</artifactId>
     <packaging>jar</packaging>
-    <name>Ftp Provider</name>
-    <description>A Mule provider for Ftp Connectivity.</description>
+    <name>Ftp Transport</name>
+    <description>A Mule transport for Ftp Connectivity.</description>
 
     <build>
         <plugins>
@@ -29,8 +29,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-file-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

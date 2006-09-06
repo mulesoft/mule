@@ -4,30 +4,16 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-axis-provider</artifactId>
+    <artifactId>mule-transport-axis</artifactId>
     <packaging>jar</packaging>
-    <name>Axis Provider</name>
-    <description>A Mule provider for Soap Connectivity using Axis.</description>
+    <name>Axis Transport</name>
+    <description>A Mule transport for Soap Connectivity using Axis.</description>
     
     <build>
-        <!-- m2 Standard directory layout 
-            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -43,8 +29,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-soap-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

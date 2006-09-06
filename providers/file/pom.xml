@@ -4,17 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-file-provider</artifactId>
+    <artifactId>mule-transport-file</artifactId>
     <packaging>jar</packaging>
-    <name>File Provider</name>
-    <description>A Mule provider for File Connectivity. This connector allows files to be read and written to
-        directories on the local file system. The connector can be configured to filter the file it reads and the way
+    <name>File Transport</name>
+    <description>A Mule transport for File Connectivity. This transport allows files to be read and written to
+        directories on the local file system. The transport can be configured to filter the file it reads and the way
         files are written, such as whether binary output is used or the file is appended to.</description>
-    <dependencies>
-        
-    </dependencies>
 </project>

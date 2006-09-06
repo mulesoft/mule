@@ -4,35 +4,19 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-soap-provider</artifactId>
+    <artifactId>mule-transport-soap</artifactId>
     <packaging>jar</packaging>
-    <name>Soap Provider</name>
-    <description>A Mule provider for Soap Connectivity. The provider will use Axis or Glue depending on which is on the classpath.</description>
-
-    <build>
-        <!-- m2 Standard directory layout 
-            TODO Remove this when the m2 directory layout becomes the default for the entire Mule project. -->
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-    </build>
+    <name>Soap Transport</name>
+    <description>A Mule transport for Soap Connectivity. The transport will use Axis or Glue depending on which is on the classpath.</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

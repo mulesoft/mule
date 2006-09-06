@@ -4,12 +4,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-udp-provider</artifactId>
+    <artifactId>mule-transport-udp</artifactId>
     <packaging>jar</packaging>
-    <name>Udp Provider</name>
-    <description>A Mule provider for Udp Connectivity. This provider supplies a Udp Data Packet dispatcher and client implementation.</description>
+    <name>Udp Transport</name>
+    <description>A Mule transport for Udp Connectivity. This transport supplies a Udp Data Packet dispatcher and client implementation.</description>
 </project>

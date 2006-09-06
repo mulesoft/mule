@@ -12,12 +12,12 @@
     <artifactId>mule-tests-oracle</artifactId>
     <packaging>jar</packaging>
     <name>Oracle Integration Tests</name>
-    <description>Functional and integration tests for the Mule Oracle JMS provider.</description>
+    <description>Functional and integration tests for the Oracle AQ transport.</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-oracle-jms-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-oracleaq</artifactId>
             <version>${version}</version>
         </dependency>
 

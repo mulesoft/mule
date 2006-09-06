@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-jbi-provider</artifactId>
+    <artifactId>mule-transport-jbi</artifactId>
     <packaging>jar</packaging>
-    <name>Jbi Provider</name>
+    <name>Jbi Transport</name>
     <description>Allows JBI components to interact with Mule.  Note this is different from Mule-JBI, which is a JBI (JSR-208) implementation based on the Mule framework.</description>
     <dependencies>
       <dependency>

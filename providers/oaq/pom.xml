@@ -4,19 +4,19 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-oracle-jms-provider</artifactId>
+    <artifactId>mule-transport-oracleaq</artifactId>
     <packaging>jar</packaging>
-    <name>Oracle Advanced Queuing Provider</name>
-    <description>Adds Oracle-specific functionality to the standard Mule JMS provider.</description>
+    <name>Oracle Advanced Queuing Transport</name>
+    <description>Adds Oracle-specific functionality to the standard Mule JMS transport.</description>
     <dependencies>
-        <!-- The standard JMS provider for Mule -->
+        <!-- The standard JMS transport for Mule -->
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-jms-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
             <exclusions>
                 <!-- Don't include the JMS 1.1 spec. -->

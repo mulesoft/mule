@@ -14,8 +14,8 @@
     <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.</description>   
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -84,8 +84,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-vm-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

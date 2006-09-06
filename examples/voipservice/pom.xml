@@ -14,8 +14,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-axis-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

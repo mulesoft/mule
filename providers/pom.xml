@@ -8,9 +8,10 @@
         <artifactId>mule</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-providers</artifactId>
+    <groupId>org.mule.transports</groupId>
+    <artifactId>mule-transports</artifactId>
     <packaging>pom</packaging>
-    <name>Mule Providers</name>
+    <name>Mule Transports</name>
 
     <profiles>
         <profile>
@@ -66,10 +67,10 @@
 
         <!--
             TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
-            makes JMS provider happy to compile when run from the project root folder,
+            makes JMS transport happy to compile when run from the project root folder,
             otherwise it cannot find classes from commons-collections.
 
-            At the same time, running either from the providers or jms folder works fine
+            At the same time, running either from the transports or jms folder works fine
             without this hack.
 
             It seems m2 dependency visibility hierarchy is limited to 1 level deep.
@@ -83,7 +84,7 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.3</version>
-            <!-- TODO get rid of duplication in the top-level providers pom.xml -->
+            <!-- TODO get rid of duplication in the top-level transports pom.xml -->
             <exclusions>
                 <exclusion>
                     <groupId>xerces</groupId>

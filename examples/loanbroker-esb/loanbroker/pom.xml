@@ -53,18 +53,18 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-jms-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-xfire-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-ejb-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ejb</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -73,8 +73,8 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-axis-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

@@ -15,26 +15,26 @@
     <dependencies>
         <!-- Dependencies are for unit tests only -->
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-vm-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
         <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-stream-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stream</artifactId>
             <version>${version}</version>
         <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-tcp-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         <scope>test</scope>
         </dependency>

@@ -12,7 +12,7 @@
     <artifactId>mule-modules</artifactId>
     <packaging>pom</packaging>
     <name>Mule Modules</name>
-    <description>These are the modules that comprise the Mule platform. mule-core is the main server module and trans port modules are prepended with '-provider'.</description>
+    <description>These are the modules that comprise the Mule platform. mule-core is the main server module and transport modules are prepended with '-transport-'.</description>
 
     <modules>
         <module>acegi</module>

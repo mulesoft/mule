@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule-providers</artifactId>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-xfire-provider</artifactId>
+    <artifactId>mule-transport-xfire</artifactId>
     <packaging>jar</packaging>
-    <name>Xfire Provider</name>
-    <description>A Mule provider for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
+    <name>Xfire Transport</name>
+    <description>A Mule transport for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
 
     <repositories>
         <repository>
@@ -28,8 +28,8 @@
     
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-soap-provider</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
         <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
