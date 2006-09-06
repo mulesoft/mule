@@ -37,7 +37,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/echo</directory>
           <outputDirectory>examples/echo</outputDirectory>
       <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -60,7 +60,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/errorhandler</directory>
           <outputDirectory>examples/errorhandler</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -87,7 +87,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/hello</directory>
           <outputDirectory>examples/hello</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -115,7 +115,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/loanbroker</directory>
           <outputDirectory>examples/loanbroker</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -143,10 +143,11 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/loanbroker-esb</directory>
           <outputDirectory>examples/loanbroker-esb</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
-              <exclude>src/**</exclude>
+              <exclude>credit-agency/**</exclude>
+              <exclude>loanbroker/**</exclude>
               <exclude>.project</exclude>
               <exclude>.classpath</exclude>
               <exclude>.settings</exclude>
@@ -157,8 +158,23 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../samples/loanbroker-esb/src/main/java</directory>
-          <outputDirectory>examples/loanbroker-esb/src</outputDirectory>
+          <directory>../../../samples/loanbroker-esb/loanbroker/src/main/java</directory>
+          <outputDirectory>examples/loanbroker-esb/src/loanbroker</outputDirectory>
+      </fileSet>
+
+      <fileSet>
+          <directory>../../../samples/loanbroker-esb/loanbroker/src/main/resources</directory>
+          <outputDirectory>examples/loanbroker-esb/src/loanbroker</outputDirectory>
+      </fileSet>
+
+      <fileSet>
+          <directory>../../../samples/loanbroker-esb/credit-agency/src/main/java</directory>
+          <outputDirectory>examples/loanbroker-esb/src/credit-agency</outputDirectory>
+      </fileSet>
+
+      <fileSet>
+          <directory>../../../samples/loanbroker-esb/credit-agency/src/main/resources</directory>
+          <outputDirectory>examples/loanbroker-esb/src/credit-agency</outputDirectory>
       </fileSet>
 
 
@@ -171,7 +187,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/scripting</directory>
           <outputDirectory>examples/scripting</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -204,7 +220,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/stockquote</directory>
           <outputDirectory>examples/stockquote</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -237,7 +253,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/voipservice</directory>
           <outputDirectory>examples/voipservice</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -265,7 +281,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../samples/webapp</directory>
           <outputDirectory>examples/webapp</outputDirectory>
           <excludes>
-              <exclude>.mule</exclude>
+              <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
               <exclude>src/**</exclude>
@@ -303,10 +319,10 @@ Assembly descriptor for the full Mule distribution.
     </fileSet>
 
     <!-- Copy javadocs ("mvn site" must have been run previously) -->
-    <fileSet>
-      <directory>../../../target/site/apidocs</directory>
-      <outputDirectory>docs/api</outputDirectory>
-    </fileSet>
+    <!--<fileSet>-->
+      <!--<directory>../../../target/site/apidocs</directory>-->
+      <!--<outputDirectory>docs/api</outputDirectory>-->
+    <!--</fileSet>-->
 
     <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
     <fileSet>
