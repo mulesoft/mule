@@ -371,19 +371,19 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule:mule-xfire-provider</include>
         <include>org.mule:mule-xmpp-provider</include>
         <!-- Modules -->
-        <include>org.mule:mule-filter-ognl</include>
-        <include>org.mule:mule-module-acegi</include>
-        <include>org.mule:mule-module-boot</include>
-        <include>org.mule:mule-module-client</include>
-        <include>org.mule:mule-module-hivemind</include>
-        <include>org.mule:mule-module-i18n</include>
-        <include>org.mule:mule-module-jaas</include>
-        <include>org.mule:mule-module-jotm</include>
-        <include>org.mule:mule-module-pgp</include>
-        <include>org.mule:mule-module-picocontainer</include>
-        <include>org.mule:mule-module-plexus</include>
-        <include>org.mule:mule-module-scripting</include>
-        <include>org.mule:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-hivemind</include>
+        <include>org.mule.modules:mule-module-i18n</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-picocontainer</include>
+        <include>org.mule.modules:mule-module-plexus</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-spring</include>
       </includes>
     </dependencySet>
 
@@ -421,19 +421,19 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule:mule-xfire-provider</exclude>
         <exclude>org.mule:mule-xmpp-provider</exclude>
         <!-- Modules -->
-        <exclude>org.mule:mule-filter-ognl</exclude>
-        <exclude>org.mule:mule-module-boot</exclude>
-        <exclude>org.mule:mule-module-acegi</exclude>
-        <exclude>org.mule:mule-module-client</exclude>
-        <exclude>org.mule:mule-module-hivemind</exclude>
-        <exclude>org.mule:mule-module-i18n</exclude>
-        <exclude>org.mule:mule-module-jaas</exclude>
-        <exclude>org.mule:mule-module-jotm</exclude>
-        <exclude>org.mule:mule-module-pgp</exclude>
-        <exclude>org.mule:mule-module-picocontainer</exclude>
-        <exclude>org.mule:mule-module-plexus</exclude>
-        <exclude>org.mule:mule-module-scripting</exclude>
-        <exclude>org.mule:mule-module-spring</exclude>
+        <exclude>org.mule.modules:mule-module-ognl</exclude>
+        <exclude>org.mule.modules:mule-module-boot</exclude>
+        <exclude>org.mule.modules:mule-module-acegi</exclude>
+        <exclude>org.mule.modules:mule-module-client</exclude>
+        <exclude>org.mule.modules:mule-module-hivemind</exclude>
+        <exclude>org.mule.modules:mule-module-i18n</exclude>
+        <exclude>org.mule.modules:mule-module-jaas</exclude>
+        <exclude>org.mule.modules:mule-module-jotm</exclude>
+        <exclude>org.mule.modules:mule-module-pgp</exclude>
+        <exclude>org.mule.modules:mule-module-picocontainer</exclude>
+        <exclude>org.mule.modules:mule-module-plexus</exclude>
+        <exclude>org.mule.modules:mule-module-scripting</exclude>
+        <exclude>org.mule.modules:mule-module-spring</exclude>
         <!-- Examples -->
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
