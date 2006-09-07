@@ -216,6 +216,10 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
             ((MuleManager) MuleManager.getInstance()).addProperties(startupProperties);
         }
         manager = (MuleManager) process(configResources);
+        if (manager == null) {
+            throw new ConfigurationException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X,
+                                                         "Are you using a correct configuration builder?"));
+        }
         try {
             setContainerProperties();
             setTransformers();
