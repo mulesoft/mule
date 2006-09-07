@@ -13,6 +13,7 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -64,9 +65,19 @@ public class AxisServiceProxy extends ServiceProxy
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
-            if (message != null) {
+            
+            UMOExceptionPayload wsException = message.getExceptionPayload(); 
+            if (wsException != null)
+            {
+                throw wsException.getException();
+            }
+            
+            if (message != null) 
+            {
                 return message.getPayload();
-            } else {
+            } 
+            else 
+            {
                 return null;
             }
         }
