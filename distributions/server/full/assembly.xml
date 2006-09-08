@@ -464,12 +464,12 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
-	  <!-- Don't put the version number in the examples.  -->
+      <!-- Don't put the version number in the examples.  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
-        <include>org.mule.examples:mule-example-hello</include>
+        <!--<include>org.mule.examples:mule-example-hello</include>-->
         <include>org.mule.examples:mule-example-loanbroker</include>
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
         <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
