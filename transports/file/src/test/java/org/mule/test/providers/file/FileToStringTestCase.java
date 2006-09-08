@@ -17,6 +17,7 @@ import org.mule.providers.file.transformers.FileToString;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.SystemUtils;
 
 /**
  * Test case for FileToString transformer
@@ -35,7 +36,7 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        _testData = new File(System.getProperty("java.io.tmpdir") + "FileToStringTestData");
+        _testData = new File(SystemUtils.JAVA_IO_TMPDIR, "FileToStringTestData");
         FileWriter fw = new FileWriter(_testData);
         fw.write(_resultData);
         fw.close();
@@ -48,8 +49,8 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
      */
     protected void doTearDown() throws Exception
     {
+        assertTrue(_testData.delete());
         super.doTearDown();
-        _testData.delete();
     }
 
     /*
