@@ -17,20 +17,30 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
 {
-    protected static CountDownLatch countDown;
+    protected static volatile CountDownLatch countDown;
+
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        countDown = new CountDownLatch(3);
+    }
+
+    protected void doTearDown() throws Exception
+    {
+        countDown = null;
+        super.doTearDown();
+    }
 
     public void testMuleReceiverJob() throws Exception
     {
-        countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz-receive.xml");
-        assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
+        if (!countDown.await(5000, TimeUnit.MILLISECONDS))
+        {
+            fail("CountDown failed: expected 0, value is: " + countDown.getCount());
+        }
     }
+
 }
