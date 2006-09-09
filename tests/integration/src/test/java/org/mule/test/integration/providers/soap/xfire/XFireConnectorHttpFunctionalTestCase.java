@@ -16,7 +16,7 @@ import org.mule.test.integration.providers.soap.AbstractSoapUrlEndpointFunctiona
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XfireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
+public class XFireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
     protected String getTransportProtocol() {
         return "http";

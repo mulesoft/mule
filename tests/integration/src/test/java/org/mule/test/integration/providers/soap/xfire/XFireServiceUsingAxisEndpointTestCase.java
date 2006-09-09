@@ -24,9 +24,9 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class TestXFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase{
+public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase{
 	
-	protected static transient Log logger = LogFactory.getLog(TestXFireServiceUsingAxisEndpointTestCase.class);
+	protected static transient Log logger = LogFactory.getLog(XFireServiceUsingAxisEndpointTestCase.class);
 	
 	public void testXfire() throws Exception
 	{
