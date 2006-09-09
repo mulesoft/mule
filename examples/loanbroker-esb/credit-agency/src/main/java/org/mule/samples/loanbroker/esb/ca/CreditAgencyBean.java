@@ -22,20 +22,26 @@ import java.text.MessageFormat;
  * @version $Revision$
  */
 public class CreditAgencyBean implements SessionBean {
+    private static final long serialVersionUID = 1546168214387311746L;
+
     private SessionContext ctx;
 
     private static final String MSG="<credit-profile><customer-name>{0}</customer-name><customer-ssn>{1}</customer-ssn><credit-score>{2}</credit-score><customer-history>{3}</customer-history></credit-profile>";
 
     public void ejbActivate() throws EJBException {
+        // nothing to do
     }
 
     public void ejbPassivate() throws EJBException {
+        // nothing to do
     }
 
     public void ejbRemove() throws EJBException {
+        // nothing to do
     }
 
     public void ejbCreate() throws EJBException {
+        // nothing to do
     }
 
     public void setSessionContext(SessionContext sessionContext) throws EJBException {
