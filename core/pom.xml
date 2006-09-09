@@ -181,7 +181,6 @@
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.5</version>
-            
         </dependency>
 
         <!-- JXPath filtering of events -->
@@ -192,6 +191,11 @@
             <!-- TODO get rid of duplication in the top-level transports pom.xml -->
             <exclusions>
                 <exclusion>
+                    <!-- not required; likely a m1 POM conversion bug -->
+                    <groupId>ant</groupId>
+                    <artifactId>ant-optional</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xerces</artifactId>
                 </exclusion>
@@ -201,12 +205,15 @@
                     <artifactId>jdom</artifactId>
                 </exclusion>
                 <exclusion>
+                    <!-- no need for another JUnit -->
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
                     <!-- exclude older Servlet 2.2 spec jar -->
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
-                
-
             </exclusions>
         </dependency>
 
