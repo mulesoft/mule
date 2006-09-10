@@ -58,11 +58,26 @@ public class DefaultMuleClassPathConfig
             }
 
             muleJars = listJars(FOLDER_MULE);
+            List muleCoreJars = new LinkedList();
             for (int i = 0; i < muleJars.length; i++)
             {
                 File jar = muleJars[i];
-                addURL(jar.toURL());
+                // unix platforms may sometime list jars in a different order,
+                // but mule-core.jar HAS to be the first in the core libs
+                // we can't move it to the very top of the whole list, as otherwise
+                // we'll not be able to patch mule-core by dropping a jar in the user lib,
+                // so re-arranging the stuff in a local mule-core jar list.
+                if (jar.getName().indexOf("mule-core") > -1)
+                {
+                    // move it to the top
+                    muleCoreJars.add(0, jar.toURL());
+                }
+                else
+                {
+                    muleCoreJars.add(jar.toURL());
+                }
             }
+            addURLs(muleCoreJars);
 
             muleJars = listJars(FOLDER_OPT);
             for (int i = 0; i < muleJars.length; i++)
