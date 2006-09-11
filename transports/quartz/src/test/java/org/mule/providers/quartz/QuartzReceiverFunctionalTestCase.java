@@ -20,6 +20,12 @@ import org.mule.tck.AbstractMuleTestCase;
 public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
 {
 
+    public QuartzReceiverFunctionalTestCase()
+    {
+        super();
+        this.setDisposeManagerPerSuite(true);
+    }
+
     public void testMuleReceiverJob() throws Exception
     {
         CountDownLatch counter = TestComponent.QuartzCounter;
