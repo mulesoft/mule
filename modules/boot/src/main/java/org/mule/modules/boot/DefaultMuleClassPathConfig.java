@@ -58,13 +58,11 @@ public class DefaultMuleClassPathConfig
             }
 
             muleJars = listJars(FOLDER_MULE);
-            List muleCoreJars = new LinkedList();
             for (int i = 0; i < muleJars.length; i++)
             {
                 File jar = muleJars[i];
                 addURL(jar.toURL());
             }
-            addURLs(muleCoreJars);
 
             muleJars = listJars(FOLDER_OPT);
             for (int i = 0; i < muleJars.length; i++)
