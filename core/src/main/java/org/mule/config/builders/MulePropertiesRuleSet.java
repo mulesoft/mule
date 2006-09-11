@@ -227,8 +227,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String location = attributes.getValue("location");
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
-                InputStream is = IOUtils.getResourceAsStream(location, getClass(),
-                                                                /*tryAsFile*/true, /*tryAsUrl*/true);
+                InputStream is = IOUtils.getResourceAsStream(location, getClass());
                 if (is == null) {
                     throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, location));
                 }

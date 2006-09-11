@@ -11,10 +11,10 @@ package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
- * @author <a href="mailto:jesper@selskabet.org">Jesper S. Møller</a>
+ * @author <a href="mailto:jesper@selskabet.org">Jesper S. M?ller</a>
  * @version $Revision$
  */
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
@@ -25,8 +25,8 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
 
     protected void doSetUp() throws Exception
     {
-        srcData = FileUtils.loadResourceAsString("simple.xml", getClass());
-        resultData = FileUtils.loadResourceAsString("simple-out.xml", getClass());
+        srcData = IOUtils.getResourceAsString("simple.xml", getClass());
+        resultData = IOUtils.getResourceAsString("simple-out.xml", getClass());
     }
 
     public UMOTransformer getTransformer() throws Exception

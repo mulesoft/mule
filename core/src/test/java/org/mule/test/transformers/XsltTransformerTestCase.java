@@ -11,7 +11,7 @@ package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -25,8 +25,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
     protected void doSetUp() throws Exception
     {
-        srcData = FileUtils.loadResourceAsString("cdcatalog.xml", getClass());
-        resultData = FileUtils.loadResourceAsString("cdcatalog.html", getClass());
+        srcData = IOUtils.getResourceAsString("cdcatalog.xml", getClass());
+        resultData = IOUtils.getResourceAsString("cdcatalog.html", getClass());
     }
 
     public UMOTransformer getTransformer() throws Exception

@@ -9,7 +9,6 @@
  */
 package org.mule.transformers.xml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -29,12 +28,12 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other
  * XML-ish) object
- * 
+ *
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stephane</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Moller</a>
@@ -90,7 +89,7 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Transform, using XSLT, a XML String to another String.
-     * 
+     *
      * @param src
      *            The source XML (String, byte[], DOM, etc.)
      * @return The result String (or DOM)
@@ -156,52 +155,30 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Returns the StreamSource corresponding to xslFile
-     * 
+     *
      * @return The StreamSource
      * @throws InitialisationException
      */
     private StreamSource getStreamSource() throws InitialisationException
     {
-
-        if (xslt != null)
-        {
+        if (xslt != null) {
             return new StreamSource(new StringReader(xslt));
         }
 
-        if (xslFile == null)
-        {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL,
-                    "xslFile"), this);
+        if (xslFile == null) {
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "xslFile"), this);
         }
 
-        File file = new File(xslFile);
-        StreamSource source;
-
-        if (file.exists())
-        {
-            source = new StreamSource(file);
+        InputStream is;
+        try {
+            is = IOUtils.getResourceAsStream(xslFile, getClass());
+        } catch (IOException e) {
+            throw new InitialisationException(e, this);
         }
-        else
-        {
-            try
-            {
-                InputStream stream = FileUtils
-                        .loadResource(xslFile, getClass());
-                if (stream == null)
-                {
-                    throw new InitialisationException(new Message(
-                            Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, xslFile),
-                            this);
-                }
-                source = new StreamSource(stream);
-            } catch (IOException e)
-            {
-                throw new InitialisationException(new Message(
-                        Messages.FAILED_LOAD_X, xslFile), e, this);
-            }
+        if (is != null) { return new StreamSource(is);
+        } else {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, xslFile), this);
         }
-
-        return source;
     }
 
     public Object clone() throws CloneNotSupportedException
@@ -275,7 +252,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      * Sets the the current maximum number of idle transformer objects allowed
      * in the pool
-     * 
+     *
      * @param maxIdleTransformers
      *            New maximum size to set
      */

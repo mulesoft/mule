@@ -10,6 +10,7 @@
 
 package org.mule.config.builders;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -127,8 +128,14 @@ public abstract class AbstractDigesterConfiguration
      * @throws ConfigurationException if the resource could not be loaded by any means
      */
     protected InputStream loadConfig(String configResource) throws ConfigurationException {
-        InputStream is = IOUtils.getResourceAsStream(configResource, getClass(),
-                                                        /*tryAsFile*/true, /*tryAsUrl*/true);
+        InputStream is = null;
+        try {
+            is = IOUtils.getResourceAsStream(configResource, getClass());
+        } catch (IOException e) {
+            throw new ConfigurationException(new Message(
+                    Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource), e);
+        }
+
         if (is != null) {
             return is;
         } else {

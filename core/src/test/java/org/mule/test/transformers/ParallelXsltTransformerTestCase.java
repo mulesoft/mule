@@ -19,10 +19,10 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
+ * @author <a href="mailto:jesper@selskabet.org">Jesper Steen M?ller</a>
  * @version $Revision$
  */
 public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
@@ -33,8 +33,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        srcData = FileUtils.loadResourceAsString("cdcatalog-utf-8.xml", getClass(), "UTF-8");
-        resultData = FileUtils.loadResourceAsString("cdcatalog-utf-8.html", getClass(), "UTF-8");
+        srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
+        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()), "UTF-8");
     }
 
     public UMOTransformer getTransformer() throws Exception
@@ -44,17 +44,17 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
         transformer.initialise();
         return transformer;
     }
-    
+
     int running = 0;
-    
+
     public synchronized void signalStarted() {
         ++running;
     }
-    
+
     public synchronized void signalDone() {
         if (--running == 0) this.notify();
     }
-    
+
     public void testParallelTransformation() throws Exception {
         final UMOTransformer transformer = getTransformer();
 

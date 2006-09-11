@@ -101,7 +101,7 @@ public class MuleDtdResolver implements EntityResolver
             String dtdFile = tokens[tokens.length-1];
             logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
-            InputStream is = IOUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass(), false, false);
+            InputStream is = IOUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass(), /*tryAsFile*/true, /*tryAsUrl*/false);
             if (is != null) {
                 source = new InputSource(is);
                 source.setPublicId(publicId);

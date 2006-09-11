@@ -61,7 +61,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
     // JAXP properties for specifying external XSD language (as required by newer JAXP implementation)
     private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema"; 
+    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     protected static ThreadLocal properties = new ThreadLocal();
     protected static ThreadLocal nodes = new ThreadLocal();
@@ -142,8 +142,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 SAXReader reader = new SAXReader();
                 setDoSchemaValidation(reader, isValidateSchema());
 
-                InputStream xsdAsStream = IOUtils.getResourceAsStream(getExternalSchemaLocation(), getClass(),
-                                                                      false, false);
+                InputStream xsdAsStream = IOUtils.getResourceAsStream(getExternalSchemaLocation(), getClass());
                 if (xsdAsStream == null) {
                     throw new IllegalArgumentException("Couldn't find schema at " + getExternalSchemaLocation());
                 }

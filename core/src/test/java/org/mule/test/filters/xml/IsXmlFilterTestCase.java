@@ -13,10 +13,10 @@ package org.mule.test.filters.xml;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.IsXmlFilter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.IOUtils;
 
 public class IsXmlFilterTestCase extends AbstractMuleTestCase {
 
@@ -58,8 +58,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
     }
 
     private String loadFromClasspath(final String name) throws IOException {
-        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        final InputStream is = currentClassLoader.getResourceAsStream(name);
+        InputStream is = IOUtils.getResourceAsStream(name, getClass());
         assertNotNull("Test resource not found.", is);
 
         return IOUtils.toString(is);

@@ -9,20 +9,20 @@
  */
 package org.mule.config;
 
-import org.mule.MuleManager;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.mule.MuleManager;
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
+
 /**
  * <code>ReaderResource</code> is a reader with a description associated with
  * it. This is useful for error resolution as the reader description can be
  * included when reporting errors during reading the resource.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -53,7 +53,7 @@ public class ReaderResource
         MuleManager.getConfiguration().setConfigResources(resources);
         ReaderResource[] readers = new ReaderResource[resources.length];
         for (int i = 0; i < resources.length; i++) {
-            InputStream is = FileUtils.loadResource(resources[i].trim(), ReaderResource.class);
+            InputStream is = IOUtils.getResourceAsStream(resources[i].trim(), ReaderResource.class);
             if(is==null) {
                 throw new IOException("could not load resource: " + resources[i].trim());
             }

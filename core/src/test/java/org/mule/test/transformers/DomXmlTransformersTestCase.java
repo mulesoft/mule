@@ -17,7 +17,7 @@ import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.xml.DomDocumentToXml;
 import org.mule.transformers.xml.XmlToDomDocument;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.w3c.dom.Document;
 
 /**
@@ -32,7 +32,7 @@ public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 
     protected void doSetUp() throws Exception
     {
-        srcData = FileUtils.loadResourceAsString("cdcatalog.xml", getClass());
+        srcData = IOUtils.getResourceAsString("cdcatalog.xml", getClass());
         org.dom4j.Document dom4jDoc = DocumentHelper.parseText(srcData);
         resultData = new DOMWriter().write(dom4jDoc);
     }

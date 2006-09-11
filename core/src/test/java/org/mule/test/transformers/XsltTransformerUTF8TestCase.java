@@ -11,7 +11,7 @@ package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -25,8 +25,8 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
 
     protected void doSetUp() throws Exception
     {
-        srcData = FileUtils.loadResourceAsString("cdcatalog-utf-8.xml", getClass(), "UTF-8");
-        resultData = FileUtils.loadResourceAsString("cdcatalog-utf-8.html", getClass(), "UTF-8");
+        srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
+        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()), "UTF-8");
     }
 
     public UMOTransformer getTransformer() throws Exception

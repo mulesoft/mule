@@ -19,17 +19,21 @@ import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+
 import mx4j.log.Log;
 import mx4j.log.Logger;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-import org.mule.umo.security.provider.SecurityProviderInfo;
-import org.mule.umo.security.provider.SecurityProviderFactory;
+
 import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderInfo;
+import org.mule.util.IOUtils;
 
 /**
  * This MBean creates SSLServerSocket instances. <p>
@@ -177,7 +181,7 @@ public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketF
 
         try {
             KeyStore keystore = KeyStore.getInstance(m_keyStoreType);
-            InputStream keyStoreStream = getClass().getClassLoader().getResourceAsStream(m_keyStoreName);
+            InputStream keyStoreStream = IOUtils.getResourceAsStream(m_keyStoreName, getClass());
             // Must check for nullity, otherwise a new empty keystore is created by KeyStore.load
             if (keyStoreStream == null) {
                 // Let's look at the file system, maybe that the name provided is in fact a file path
@@ -207,7 +211,7 @@ public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketF
                 }
 
                 KeyStore trustStore = KeyStore.getInstance(m_trustStoreType);
-                InputStream trustStoreStream = getClass().getClassLoader().getResourceAsStream(m_trustStoreName);
+                InputStream trustStoreStream = IOUtils.getResourceAsStream(m_trustStoreName, getClass());
                 // Check for nullity
                 if (trustStoreStream == null) {
                     throw new IOException("Cannot find TrustStore " + m_trustStoreName);

@@ -9,9 +9,9 @@
  */
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.mule.impl.MuleMessage;
@@ -22,10 +22,11 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -68,20 +69,20 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
     public void testStringPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = FileUtils.loadResourceAsString("purchase-order2.xml", getClass());
+        String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
 
     public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = FileUtils.loadResourceAsString("purchase-order2.xml", getClass());
+        String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
         Document doc = DocumentHelper.parseText(payload);
         internalTestSuccessfulXmlSplitter(doc);
     }
 
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
-        String payload = FileUtils.loadResourceAsString("purchase-order2.xml", getClass());
+        String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
@@ -126,7 +127,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);
 
-        String payload = FileUtils.loadResourceAsString("purchase-order.xml", getClass());
+        String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
 
         UMOMessage message = new MuleMessage(payload);
 

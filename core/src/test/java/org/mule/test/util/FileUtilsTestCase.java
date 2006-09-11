@@ -10,11 +10,11 @@
 
 package org.mule.test.util;
 
-import org.mule.util.FileUtils;
-
 import java.io.File;
 
 import junit.framework.TestCase;
+
+import org.mule.util.FileUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -40,7 +40,7 @@ public class FileUtilsTestCase extends TestCase
             assertTrue(content.indexOf("this is a test file") > -1);
             assertTrue(content.indexOf(" and this is appended content") > -1);
 
-            file = FileUtils.loadFile(TEST_FILE);
+            file = new File(TEST_FILE);
             assertNotNull(file);
             assertTrue(file.exists());
 
@@ -54,7 +54,7 @@ public class FileUtilsTestCase extends TestCase
             assertTrue(file.canRead());
             file.delete();
 
-            file = FileUtils.loadFile(TEST_FILE);
+            file = new File(TEST_FILE);
             file.delete();
 
             File dir = FileUtils.openDirectory("src");

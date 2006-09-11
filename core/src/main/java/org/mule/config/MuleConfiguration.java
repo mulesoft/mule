@@ -431,18 +431,20 @@ public class MuleConfiguration
     {
         if (manifest == null) {
             manifest = new Manifest();
-            InputStream is = IOUtils.getResourceAsStream("META-INF/Mule.mf", getClass(), false, false);
-            // a bit of a kludge as depending on how the jar is built the
-            // Meta-inf can be lower or upper case...
-            if (is == null) {
-                is = IOUtils.getResourceAsStream("meta-inf/Mule.mf", getClass(), false, false);
-            }
-            if (is != null) {
-                try {
-                    manifest.read(is);
-                } catch (IOException e) {
-                    // ignore
+
+            InputStream is = null;
+            try {
+                is = IOUtils.getResourceAsStream("META-INF/Mule.mf", getClass(), false, false);
+                // a bit of a kludge as depending on how the jar is built the
+                // Meta-inf can be lower or upper case...
+                if (is == null) {
+                    is = IOUtils.getResourceAsStream("meta-inf/Mule.mf", getClass(), false, false);
                 }
+
+                if (is != null) { manifest.read(is); }
+
+            } catch (IOException e) {
+                // ignore
             }
         }
         return manifest;

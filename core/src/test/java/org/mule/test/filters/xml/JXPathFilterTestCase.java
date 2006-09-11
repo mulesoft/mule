@@ -12,11 +12,11 @@ package org.mule.test.filters.xml;
 
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.dom4j.InvalidXPathException;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.IOUtils;
 
 /**
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe St?phane</a>
@@ -30,8 +30,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase {
 
     protected void doSetUp() throws Exception {
         // Read Xml file
-        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        final InputStream is = currentClassLoader.getResourceAsStream("cdcatalog.xml");
+        InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", getClass());
         assertNotNull("Test resource not found.", is);
         xmlData = IOUtils.toString(is);
 

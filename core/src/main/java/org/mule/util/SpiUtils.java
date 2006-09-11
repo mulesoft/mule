@@ -10,6 +10,7 @@
 
 package org.mule.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -139,6 +140,10 @@ public class SpiUtils
         } else {
             path = SERVICE_ROOT + path + name;
         }
-        return IOUtils.getResourceAsStream(path, currentClass, false, false);
+        try {
+            return IOUtils.getResourceAsStream(path, currentClass, false, false);
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

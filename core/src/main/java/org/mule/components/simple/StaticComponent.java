@@ -10,14 +10,14 @@
 
 package org.mule.components.simple;
 
+import java.io.IOException;
+
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.FileUtils;
-
-import java.io.IOException;
+import org.mule.util.IOUtils;
 
 /**
  * A component that will return a static data object as a result.  This is useful
@@ -36,7 +36,7 @@ public class StaticComponent implements Callable, Initialisable {
         if(dataFile!=null)
         {
             try {
-                data = FileUtils.loadResourceAsString(dataFile, getClass());
+                data = IOUtils.getResourceAsString(dataFile, getClass());
             } catch (IOException e) {
                 throw new InitialisationException(e, this);
             }
