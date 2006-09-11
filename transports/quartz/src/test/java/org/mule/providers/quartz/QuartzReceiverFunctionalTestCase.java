@@ -22,11 +22,13 @@ public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
 
     public void testMuleReceiverJob() throws Exception
     {
+        CountDownLatch counter = TestComponent.QuartzCounter;
+        assertEquals(3, counter.getCount());
+
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz-receive.xml");
 
-        CountDownLatch counter = TestComponent.getQuartzCounter();
-        if (!counter.await(5000, TimeUnit.MILLISECONDS))
+        if (!counter.await(10000, TimeUnit.MILLISECONDS))
         {
             fail("CountDown failed: expected 0, value is: " + counter.getCount());
         }
