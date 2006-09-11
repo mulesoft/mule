@@ -14,35 +14,18 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 
-public class TestComponent implements Initialisable, Disposable, Callable
+public class TestComponent implements Callable
 {
-    private static CountDownLatch QuartzCounter;
-
-    public static synchronized CountDownLatch getQuartzCounter()
-    {
-        return QuartzCounter;
-    }
-
-    public void initialise()
-    {
-        TestComponent.QuartzCounter = new CountDownLatch(3);
-    }
-
-    public void dispose()
-    {
-        TestComponent.QuartzCounter = null;
-    }
+    protected static final CountDownLatch QuartzCounter = new CountDownLatch(3);
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         if (eventContext.getMessageAsString().equals("quartz test"))
         {
-            if (TestComponent.getQuartzCounter() != null)
+            if (QuartzCounter != null)
             {
-                TestComponent.getQuartzCounter().countDown();
+                QuartzCounter.countDown();
             }
             else
             {
