@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-public class XfireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener{
+public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener{
 
     private List notifications;
     private final String myProperty = new String("myProperty");
