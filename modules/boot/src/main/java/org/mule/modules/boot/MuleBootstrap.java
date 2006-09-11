@@ -9,6 +9,7 @@
  */
 package org.mule.modules.boot;
 
+import org.mule.MuleServer;
 import org.mule.util.SystemUtils;
 import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
@@ -95,7 +96,7 @@ public class MuleBootstrap
 
         if (mainClassName == null)
         {
-            mainClassName = "org.mule.MuleServer";
+            mainClassName = MuleServer.class.getName();
         }
 
         // Add the main class name as the first argument to the Wrapper.

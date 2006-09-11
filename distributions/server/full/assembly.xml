@@ -352,7 +352,17 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
       <scope>runtime</scope>
+      <!--
+            Don't put the SNAPSHOT wording in the examples.
+            For some mysterious reason it makes our 2 CPU Opteron Linux box unhappy,
+            and it fails at runtime. Oddly enough, the error exposes itself _only_ on
+            this beafy Linux server (other less powerful Linux boxes are fine) as a
+            MissingResourceBundle and _only_ for properties files, connector descriptors
+            and similar resources. Dropping 'SNAPSHOT' from the jar name fixes it.
+       -->
+      <outputFileNameMapping>${artifactId}-1.3.${extension}</outputFileNameMapping>
       <includes>
+
         <!-- Core -->
         <include>org.mule:mule-core</include>
         <!-- Transports -->
