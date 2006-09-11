@@ -9,6 +9,17 @@
  */
 package org.mule.extras.spring.config;
 
+import java.io.IOException;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+
 import org.dom4j.io.DOMReader;
 import org.mule.config.MuleDtdResolver;
 import org.mule.umo.transformer.UMOTransformer;
@@ -20,28 +31,17 @@ import org.springframework.beans.factory.xml.BeansDtdResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
-
-import java.io.IOException;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that
  * will apply a transformation to Mule Xml configuration files before loading
  * bean definitions allowing Mule Xml config to be parsed as Spring
  * configuration.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 {
@@ -52,11 +52,17 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
     {
         super(beanDefinitionRegistry);
+        // TODO Make this configurable as a property somehow.
+        setValidationMode(VALIDATION_DTD);
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
         ((DefaultListableBeanFactory) beanDefinitionRegistry).registerCustomEditor(
                 UMOTransformer.class,
                 new TransformerEditor());
+    }
+
+    public ResourceLoader getResourceLoader() {
+        return new MuleResourceLoader();
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
