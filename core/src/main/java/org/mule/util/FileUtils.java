@@ -13,22 +13,17 @@ package org.mule.util;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -125,106 +120,23 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         return f;
     }
 
-    public static File loadFile(String filename) throws IOException
-    {
-        File file = new File(filename);
-        if (file.canRead()) {
-            return file;
-        }
-        else {
-            throw new IOException("File: " + filename + " can not be read");
-        }
-    }
-
-    /**
-     * Load a given resource. Trying broader class loaders each time.
-     *
-     * @param resourceName
-     *            The name of the resource to load
-     * @param callingClass
-     *            The Class object of the calling object
-     */
-    public static URL getResource(final String resourceName, final Class callingClass)
-    {
-        URL url = ClassUtils.getResource(resourceName, callingClass);
-
-        if (url == null) {
-            url = (URL)AccessController.doPrivileged(new PrivilegedAction()
-            {
-                public Object run()
-                {
-                    File f = new File(resourceName);
-                    if (f.exists()) {
-                        try {
-                            return f.toURL();
-                        }
-                        catch (MalformedURLException e) {
-                            return null;
-                        }
-                    }
-                    return null;
-                }
-            });
-        }
-        return url;
-    }
-
-    public static String loadResourceAsString(String resourceName, Class callingClass)
-            throws IOException
-    {
-        return loadResourceAsString(resourceName, callingClass, MuleManager.getConfiguration()
-                .getEncoding());
-    }
-
-    public static String loadResourceAsString(String resourceName, Class callingClass, String encoding)
-            throws IOException
-    {
-        URL url = getResource(resourceName, callingClass);
-        if (url != null) {
-            resourceName = url.getFile();
-        }
-
-        return FileUtils.readFileToString(new File(resourceName), encoding);
-    }
-
-    public static InputStream loadResource(String resourceName, Class callingClass) throws IOException
-    {
-        URL url = getResource(resourceName, callingClass);
-        InputStream resource = null;
-        if (url == null) {
-            File f = new File(resourceName);
-            if (f.exists()) {
-                resource = new FileInputStream(f);
-            }
-        }
-        else {
-            resource = url.openStream();
-        }
-        return resource;
-    }
-
+    /** TODO Document me! **/
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException
     {
         return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
     }
 
+    /** TODO Document me! **/
     public static String getResourcePath(String resourceName, Class callingClass, String encoding)
             throws IOException
     {
         if (resourceName == null) {
             return null;
         }
-        URL url = getResource(resourceName, callingClass);
-        String resource = null;
-        if (url == null) {
-            File f = new File(resourceName);
-            if (f.exists()) {
-                resource = f.getAbsolutePath();
-            }
-        }
-        else {
-            resource = URLDecoder.decode(url.toExternalForm(), encoding);
-        }
+        URL url = IOUtils.getResourceAsUrl(resourceName, callingClass);
+
+        String resource = URLDecoder.decode(url.toExternalForm(), encoding);
+
         if (resource != null) {
             if (resource.startsWith("file:/")) {
                 resource = resource.substring(6);
