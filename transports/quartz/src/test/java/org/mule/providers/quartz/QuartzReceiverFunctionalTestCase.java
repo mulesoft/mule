@@ -34,7 +34,7 @@ public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz-receive.xml");
 
-        if (!counter.await(10000, TimeUnit.MILLISECONDS))
+        if (!counter.await(30000, TimeUnit.MILLISECONDS))
         {
             fail("CountDown failed: expected 0, value is: " + counter.getCount());
         }
