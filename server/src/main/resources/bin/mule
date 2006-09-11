@@ -166,32 +166,48 @@ case "$DIST_OS" in
         ;;
 esac
 
+######################################################################
+# Patched for Mule
+######################################################################
+
 # Resolve the architecture
-DIST_ARCH=`uname -p | tr [:upper:] [:lower:] | tr -d [:blank:]`
-if [ "$DIST_ARCH" = "unknown" ]
-then
-    DIST_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
-fi
-case "$DIST_ARCH" in
-    'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
-        DIST_ARCH="x86"
-        ;;
-    'ip27')
-        DIST_ARCH="mips"
-        ;;
-    'power' | 'powerpc' | 'power_pc' | 'ppc64')
-        DIST_ARCH="ppc"
-        ;;
-    'pa_risc' | 'pa-risc')
-        DIST_ARCH="parisc"
-        ;;
-    'sun4u' | 'sparcv9')
-        DIST_ARCH="sparc"
-        ;;
-    '9000/800')
-        DIST_ARCH="parisc"
-        ;;
-esac
+PROC_ARCH=`uname -p | tr [:upper:] [:lower:] | tr -d [:blank:]`
+while :
+do
+	case "$PROC_ARCH" in
+	    'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
+	        DIST_ARCH="x86"
+	        break;;
+	    'ip27')
+	        DIST_ARCH="mips"
+	        break;;
+	    'power' | 'powerpc' | 'power_pc' | 'ppc64')
+	        DIST_ARCH="ppc"
+	        break;;
+	    'pa_risc' | 'pa-risc')
+	        DIST_ARCH="parisc"
+	        break;;
+	    'sun4u' | 'sparcv9' | 'sparc')
+	        DIST_ARCH="sparc"
+	        break;;
+	    '9000/800')
+	        DIST_ARCH="parisc"
+	        break;;
+	    *)
+			if [ "$DIST_ARCH" = "" ]
+			then
+			    echo "Processor type $PROC_ARCH not recognized.  Falling back on machine hardware name (uname -m)"
+			    DIST_ARCH="unknown"
+			    PROC_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
+			else
+			    echo "Neither the processor type (uname -p) nor the machine hardware type (uname -m) were recognized."
+			    echo "Please report this message along with your machine's processor/architecture."
+			    exit 1
+			fi
+	        ;;
+	esac
+done
+######################################################################
 
 outputFile() {
     if [ -f $1 ]
