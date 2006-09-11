@@ -56,7 +56,7 @@ public class MuleBootstrap
 
         // system classloader is in this case the one that launched the application,
         // which is usually something like a JDK-vendor proprietary AppClassLoader
-        URLClassLoader sysCl = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URLClassLoader sysCl = (URLClassLoader) sys;
 
         /*
           IMPORTANT NOTE:
