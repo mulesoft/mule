@@ -9,24 +9,25 @@
  */
 package org.mule.providers.ssl;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.tcp.TcpConnector;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.provider.SecurityProviderFactory;
-import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
-import org.mule.umo.security.provider.SecurityProviderInfo;
-import org.mule.util.FileUtils;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManagerFactory;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.providers.tcp.TcpConnector;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderFactory;
+import org.mule.umo.security.provider.SecurityProviderInfo;
+import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
@@ -87,7 +88,7 @@ public class SslConnector extends TcpConnector
                 Security.addProvider(getProvider());
                 // Create keyStore
                 keystore = KeyStore.getInstance(keyStoreType);
-                InputStream is = FileUtils.loadResource(getKeyStore(), getClass());
+                InputStream is = IOUtils.getResourceAsStream(getKeyStore(), getClass());
                 if (is == null) {
                     throw new FileNotFoundException("Failed to load keystore from classpath or local file: "
                             + getKeyStore());
@@ -113,7 +114,7 @@ public class SslConnector extends TcpConnector
             KeyStore truststore;
             try {
                 truststore = KeyStore.getInstance(trustStoreType);
-                InputStream is = FileUtils.loadResource(getTrustStore(), getClass());
+                InputStream is = IOUtils.getResourceAsStream(getTrustStore(), getClass());
                 if (is == null) {
                     throw new FileNotFoundException("Failed to load truststore from classpath or local file: "
                             + getTrustStore());

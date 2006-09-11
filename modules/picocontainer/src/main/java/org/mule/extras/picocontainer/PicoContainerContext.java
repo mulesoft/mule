@@ -10,6 +10,9 @@
 
 package org.mule.extras.picocontainer;
 
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
@@ -19,20 +22,17 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.SimpleReference;
 
-import java.io.Reader;
-import java.io.StringReader;
-
 /**
  * <code>PicoContainerContext</code> is a Pico Context that can expose
  * pico-managed components for use in the Mule framework.
- * 
+ *
  * @author <a href="mailto:antonio.lopez@4clerks.com">Antonio Lopez</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -69,7 +69,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
@@ -84,7 +84,7 @@ public class PicoContainerContext extends AbstractContainerContext
         if(key instanceof ContainerKeyPair) {
             key = ((ContainerKeyPair)key).getKey();
         }
-        
+
         Object component = null;
         if (key instanceof String) {
             try {
@@ -121,7 +121,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
     /**
      * The config file can be a resource on the classpath on a file system.
-     * 
+     *
      * @param configFile The configFile to set.
      */
     public void setConfigFile(String configFile) throws PicoCompositionException
@@ -168,7 +168,7 @@ public class PicoContainerContext extends AbstractContainerContext
         }
         try {
             String builderClassName = getBuilderClassName(configFile);
-            String configString = FileUtils.loadResourceAsString(configFile, getClass());
+            String configString = IOUtils.getResourceAsString(configFile, getClass());
             StringReader configReader = new StringReader(configString);
             doConfigure(configReader, builderClassName);
 

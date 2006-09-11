@@ -157,7 +157,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
         if (tx != null) {
             if (tx.hasResource(qm)) {
                 if (logger.isTraceEnabled()) {
-                    logger.trace("Retrieving queue session from current transaction");
+                    // logger.trace("Retrieving queue session from current transaction");
                 }
                 return (QueueSession) tx.getResource(qm);
             }

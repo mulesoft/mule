@@ -9,6 +9,9 @@
  */
 package org.mule.extras.plexus;
 
+import java.io.Reader;
+import java.net.URL;
+
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.mule.config.ConfigurationException;
@@ -20,15 +23,12 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.FileUtils;
-
-import java.io.Reader;
-import java.net.URL;
+import org.mule.util.IOUtils;
 
 /**
  * <code>PlexusContainerContext</code> integrate the plexus container with
  * Mule so that Mule objects can be constructed using Plexus-managed objects
- * 
+ *
  * @author Brian Topping
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -94,7 +94,7 @@ public class PlexusContainerContext extends AbstractContainerContext
             return;
         }
         try {
-            URL url = FileUtils.getResource(configFile, getClass());
+            URL url = IOUtils.getResourceAsUrl(configFile, getClass());
             if (url == null) {
                 throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
             }

@@ -9,14 +9,11 @@
  */
 package org.mule.components.script.jsr223;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.FileUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -25,11 +22,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.util.IOUtils;
 
 /**
  * A JSR 223 Script component. Allows any JSR 223 compliant script engines
@@ -84,7 +84,7 @@ public class Scriptable implements Initialisable {
                 } else {
                     InputStream is = null;
                     try {
-                        is = FileUtils.loadResource(scriptFile, getClass());
+                        is = IOUtils.getResourceAsStream(scriptFile, getClass());
                         script = new InputStreamReader(is);
                     } catch (IOException e) {
                         throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, scriptFile), e, this);

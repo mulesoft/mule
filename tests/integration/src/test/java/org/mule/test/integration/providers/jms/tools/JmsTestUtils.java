@@ -71,7 +71,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties() throws IOException
     {
-        InputStream is = IOUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class, false, false);
+        InputStream is = IOUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
 
         String jmsProps = OPEN_JMS_PROPERTIES;
         if (is != null) {
@@ -85,7 +85,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties(String propertyFile) throws IOException
     {
-        InputStream is = IOUtils.getResourceAsStream(propertyFile, JmsTestUtils.class, false, false);
+        InputStream is = IOUtils.getResourceAsStream(propertyFile, JmsTestUtils.class);
 
         Properties p = new Properties();
         p.load(is);

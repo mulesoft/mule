@@ -12,7 +12,7 @@ package org.mule.test.integration.providers.jms.oracle;
 
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
+import org.mule.util.IOUtils;
 import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
 import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
 
@@ -41,8 +41,7 @@ public class XmlPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
     public void testLargeXmlMessage() throws Exception {
         AQUtil.createOrReplaceXmlQueue(jmsSession, jmsConnector.getUsername(), TestConfig.QUEUE_XML, false);
 
-        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        final InputStream is = currentClassLoader.getResourceAsStream(TestConfig.XML_MESSAGE_FILE);
+        InputStream is = IOUtils.getResourceAsStream(TestConfig.XML_MESSAGE_FILE, getClass());
         assertNotNull("Test resource not found.", is);
         String xml = IOUtils.toString(is);
 

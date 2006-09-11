@@ -9,24 +9,24 @@
  */
 package org.mule.extras.pgp;
 
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundle;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.FileUtils;
-
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.IOUtils;
+
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundle;
+
 /**
  * @author ariva
- * 
+ *
  */
 public class PGPKeyRingImpl implements PGPKeyRing
 {
@@ -81,7 +81,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
 
     private void readPrivateKeyBundle() throws Exception
     {
-        InputStream in = FileUtils.loadResource(secretKeyRingFileName, getClass());
+        InputStream in = IOUtils.getResourceAsStream(secretKeyRingFileName, getClass());
 
         ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);
@@ -137,7 +137,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
     private void readPublicKeyRing() throws Exception
     {
         logger.debug(System.getProperties().get("user.dir"));
-        InputStream in = FileUtils.loadResource(publicKeyRingFileName, getClass());
+        InputStream in = IOUtils.getResourceAsStream(publicKeyRingFileName, getClass());
 
         ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);

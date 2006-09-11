@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +49,7 @@ public final class DQMessageUtils
 
     /**
      * Returns a DQMessage corresponding to the byte array and the record format
-     * 
+     *
      * @param data The data
      * @param format The record format
      * @return The DQMessage
@@ -72,7 +73,7 @@ public final class DQMessageUtils
 
     /**
      * Returns a Record corresponding to the DQMessage and the record format
-     * 
+     *
      * @param msg The DQMessage
      * @param format The record format
      * @return The Record
@@ -100,7 +101,7 @@ public final class DQMessageUtils
 
     /**
      * Returns the record format described in the record descriptor file.
-     * 
+     *
      * @param recordDescriptor The record descriptor filename
      * @param as400 The as400
      * @return The RecordFormat
@@ -114,29 +115,17 @@ public final class DQMessageUtils
         if (recordDescriptor == null) {
             throw new Exception("Failed to read record descriptor : recordDescriptor property is not set ");
         }
-        
+
         InputStream input = null;
         RecordFormat recordFormat = null;
-
         try {
-            File file = new File(recordDescriptor);
-
-            if (file.exists()) {
-                input = new FileInputStream(file);
-            } else {
-                input = DQMessageUtils.class.getClassLoader().getResourceAsStream(recordDescriptor);
-                if (input == null) {
-                    throw new Exception("Failed to read record descriptor  (" + recordDescriptor + ") cannot be found ");
-                }
+            input = IOUtils.getResourceAsStream(recordDescriptor, DQMessageUtils.class);
+            if (input == null) {
+                throw new Exception("Failed to read record descriptor  (" + recordDescriptor + ") cannot be found ");
             }
-
             recordFormat = parse(input, as400);
-        } catch (Exception e) {
-            throw e;
         } finally {
-            if (input != null) {
-                input.close();
-            }
+            if (input != null) { input.close(); }
         }
 
         return recordFormat;
@@ -144,7 +133,7 @@ public final class DQMessageUtils
 
     /**
      * Returns the record format.
-     * 
+     *
      * @param stream The record descriptor inputstream
      * @param as400 The as400
      * @return The RecordFormat
@@ -174,7 +163,7 @@ public final class DQMessageUtils
 
     /**
      * Add a charachter field in the record format.
-     * 
+     *
      * @param format The record format
      * @param length The field length
      * @param as400 The as400

@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import org.mule.util.ClassHelper;
+import org.mule.util.IOUtils;
 import org.mule.util.Utility;
 
 import javax.jms.*;
@@ -26,7 +26,7 @@ import java.util.Properties;
 
 /**
  * <code>JmsTestUtils</code> TODO (document class)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,7 +49,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties() throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
+        InputStream is = IOUtils.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
 
         String jmsProps = OPEN_JMS_PROPERTIES;
         if (is != null) {
@@ -63,7 +63,7 @@ public class JmsTestUtils
 
     public static Properties getJmsProperties(String propertyFile) throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(propertyFile, JmsTestUtils.class);
+        InputStream is = IOUtils.getResourceAsStream(propertyFile, JmsTestUtils.class);
 
         Properties p = new Properties();
         p.load(is);
