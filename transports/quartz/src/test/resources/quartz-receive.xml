@@ -5,12 +5,13 @@
 
 <mule-configuration id="quartz_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties serverUrl="" />
 
     <global-endpoints>
         <endpoint name="quartz.in" address="quartz:/myService">
             <properties>
                 <property name="repeatInterval" value="1000" />
+                <property name="repeatCount" value="3" />
                 <property name="payload" value="quartz test" />
             </properties>
         </endpoint>
@@ -23,7 +24,15 @@
             implementation="org.mule.providers.quartz.TestComponent"
             inboundEndpoint="quartz.in">
 
+        <!--
+            we want exactly one TestComponent for this test,
+            otherwise counter bookkeeping would be more difficult
+            than necessary.
+        -->
+        <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+
         </mule-descriptor>
+
     </model>
 
 </mule-configuration>
