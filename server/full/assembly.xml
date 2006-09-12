@@ -528,6 +528,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>openejb:openejb-core</exclude>
         <exclude>castor:castor</exclude>
         <exclude>idb:idb</exclude>
+        <exclude>activemq:smackx</exclude>
       </excludes>
     </dependencySet>
 
