@@ -91,6 +91,12 @@
             <classpath refid="classpath.example"/>
             <classpath refid="classpath.mule"/>
         </javac>
+        <!-- Copy all resources to the output folder as well -->
+        <copy todir="${dir.classes}">
+            <fileset dir="${dir.src}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
     </target>
 
 </project>
