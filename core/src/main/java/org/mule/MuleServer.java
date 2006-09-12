@@ -24,6 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -88,7 +89,8 @@ public class MuleServer implements Runnable
         // Try default if no config file was given.
         if (config == null) {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-            URL configUrl = ClassUtils.getResource(DEFAULT_CONFIGURATION, MuleServer.class);
+            // try to load the config as a file as well
+            URL configUrl = IOUtils.getResourceAsUrl(DEFAULT_CONFIGURATION, MuleServer.class, true);
             if (configUrl != null) {
                 config = configUrl.toExternalForm();
             }
