@@ -16,25 +16,46 @@
     <description>Includes the Mule server with all of its modules and transports.</description>
 
     <build>
-    	<plugins>
-    		<plugin>
-    			<artifactId>maven-assembly-plugin</artifactId>
-    			<configuration>
-    				<finalName>mule-${version}</finalName>
-    				<descriptors>
-    					<descriptor>assembly.xml</descriptor>
-    				</descriptors>
-    				<appendAssemblyId>false</appendAssemblyId>
-    			</configuration>
-    			<executions>
-    				<execution>
-    					<phase>package</phase>
-    					<goals>
-    						<goal>assembly</goal>
-    					</goals>
-    				</execution>
-    			</executions>
-    		</plugin>
-    	</plugins>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>mule-${version}</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assembly</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Create a dummy javadoc folder so the assembly always succeeds
+                even without a full site run.
+             -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="../../../target/site/apidocs"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
