@@ -526,6 +526,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>xerces:xmlParserAPIs</exclude>
         <exclude>openejb:openejb-core</exclude>
         <exclude>castor:castor</exclude>
+        <exclude>idb:idb</exclude>
       </excludes>
     </dependencySet>
 
