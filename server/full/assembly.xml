@@ -522,6 +522,7 @@ Assembly descriptor for the full Mule distribution.
         <!-- exclude>org.apache.derby:derby</exclude -->
         <exclude>com.gigaspaces:gigaspaces-ce</exclude>
         <exclude>glue:glue</exclude>
+        <exclude>script:jsr223</exclude>
         <!-- This is an old transitive dependency, we already have xml jars -->
         <exclude>xerces:xmlParserAPIs</exclude>
         <exclude>openejb:openejb-core</exclude>
