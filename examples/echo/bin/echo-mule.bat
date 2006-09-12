@@ -5,6 +5,6 @@ if "%MULE_HOME%" == "" SET MULE_HOME=..\..\..
 REM Set your application specific classpath like this
 REM The echo does not use any user-defined classes, but just in case
 REM you want to play with any
-SET MULE_LIB=%MULE_HOME%\examples\echo\classes
+SET MULE_LIB=%MULE_HOME%\examples\echo\classes;%MULE_HOME%\examples\echo\conf
 
 call %MULE_HOME%\bin\mule.bat -config ../conf/echo-config.xml

@@ -6,7 +6,7 @@ if [ -z "$MULE_HOME" ] ; then
 fi
 
 # Set your application specific classpath like this
-MULE_LIB=$MULE_HOME/examples/hello/classes
+MULE_LIB=$MULE_HOME/examples/hello/classes:$MULE_HOME/examples/hello/conf
 export MULE_LIB
 
 $MULE_HOME/bin/mule -config ../conf/hello-spring-config.xml -builder spring

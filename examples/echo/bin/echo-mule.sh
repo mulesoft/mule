@@ -8,7 +8,7 @@ fi
 # Set your application specific classpath like this.
 # The echo does not use any user-defined classes, but just in case
 # you want to play with any
-MULE_LIB=$MULE_HOME/examples/echo/classes
+MULE_LIB=$MULE_HOME/examples/echo/classes:$MULE_HOME/examples/echo/conf
 export MULE_LIB
 
 $MULE_HOME/bin/mule -config ../conf/echo-config.xml
