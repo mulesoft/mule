@@ -34,9 +34,12 @@ public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz-receive.xml");
 
-        if (!counter.await(30000, TimeUnit.MILLISECONDS))
+        // we wait up to 60 seconds here which is WAY too long for three ticks with 1
+        // second interval, but it seems that "sometimes" it takes a very long time
+        // for Quartz go kick in. Once it starts ticking everything is fine.
+        if (!counter.await(60, TimeUnit.SECONDS))
         {
-            fail("CountDown failed: expected 0, value is: " + counter.getCount());
+            fail("CountDown timed out: expected 0, value is: " + counter.getCount());
         }
     }
 
