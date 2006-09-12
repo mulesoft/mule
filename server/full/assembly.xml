@@ -520,6 +520,8 @@ Assembly descriptor for the full Mule distribution.
            from the distributions/server/full folder
         -->
         <!-- exclude>org.apache.derby:derby</exclude -->
+        <exclude>com.gigaspaces:gigaspaces-ce</exclude>
+        <exclude>glue:glue</exclude>
       </excludes>
     </dependencySet>
 
