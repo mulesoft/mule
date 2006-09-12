@@ -505,7 +505,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
         <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
-        <include>org.mule.examples:mule-example-stockquote</include>
+        <!--<include>org.mule.examples:mule-example-stockquote</include>-->
         <include>org.mule.examples:mule-example-voipservice</include>
       </includes>
     </dependencySet>
