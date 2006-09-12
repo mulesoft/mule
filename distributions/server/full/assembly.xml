@@ -259,8 +259,8 @@ Assembly descriptor for the full Mule distribution.
       </fileSet>
 
       <fileSet>
-          <directory>../../../stockquote/hello/bin</directory>
-          <outputDirectory>stockquote/hello/bin</outputDirectory>
+          <directory>../../../examples/stockquote/bin</directory>
+          <outputDirectory>examples/stockquote/bin</outputDirectory>
           <fileMode>744</fileMode>
           <includes>
               <include>*.sh</include>
@@ -287,6 +287,8 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/voipservice</directory>
           <outputDirectory>examples/voipservice</outputDirectory>
           <excludes>
+              <!-- Exclude here, add later with permissions set -->
+              <exclude>bin/*.sh</exclude>
               <exclude>.mule/**</exclude>
               <exclude>target/**</exclude>
               <!-- Will later re-map sources into a simpler non-m2 structure -->
@@ -298,6 +300,15 @@ Assembly descriptor for the full Mule distribution.
               <exclude>pom.xml</exclude>
               <exclude>*.log</exclude>
           </excludes>
+      </fileSet>
+
+      <fileSet>
+          <directory>../../../examples/voipservice/bin</directory>
+          <outputDirectory>examples/voipservice/bin</outputDirectory>
+          <fileMode>744</fileMode>
+          <includes>
+              <include>*.sh</include>
+          </includes>
       </fileSet>
 
       <fileSet>
@@ -517,7 +528,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <!--<include>org.mule.examples:mule-example-stockquote</include>-->
-        <include>org.mule.examples:mule-example-voipservice</include>
+        <!--<include>org.mule.examples:mule-example-voipservice</include>-->
       </includes>
     </dependencySet>
   </dependencySets>
