@@ -9,5 +9,5 @@ fi
 MULE_LIB=$MULE_HOME/examples/voipservice/classes:$MULE_HOME/examples/voipservice/conf
 export MULE_LIB
 
-$MULE_HOME/bin/mule -config ../conf/voip-broker-sync-config.xml
+$MULE_HOME/bin/mule -config ../conf/voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer
 
