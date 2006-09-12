@@ -6,7 +6,7 @@ if [ -z "$MULE_HOME" ] ; then
 fi
 
 # Set your application specific classpath like this
-MULE_LIB=$MULE_HOME/examples/errorhandler/classes
+MULE_LIB=$MULE_HOME/examples/errorhandler/classes:$MULE_HOME/examples/errorhandler/conf
 export MULE_LIB
 
 $MULE_HOME/bin/mule -config ../conf/error-config.xml
