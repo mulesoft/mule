@@ -524,6 +524,8 @@ Assembly descriptor for the full Mule distribution.
         <exclude>glue:glue</exclude>
         <!-- This is an old transitive dependency, we already have xml jars -->
         <exclude>xerces:xmlParserAPIs</exclude>
+        <exclude>openejb:openejb-core</exclude>
+        <exclude>castor:castor</exclude>
       </excludes>
     </dependencySet>
 
