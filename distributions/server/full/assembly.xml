@@ -510,6 +510,16 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
+
+        <!--
+           This works for excluding 3rd-party transitive dependencies.
+           The exact groupId:artifactId can be obtained by running
+
+               mvn -X
+
+           from the distributions/server/full folder
+        -->
+        <!-- exclude>org.apache.derby:derby</exclude -->
       </excludes>
     </dependencySet>
 
@@ -523,9 +533,9 @@ Assembly descriptor for the full Mule distribution.
         <!--<include>org.mule.examples:mule-example-echo</include>-->
         <!--<include>org.mule.examples:mule-example-errorhandler</include>-->
         <!--<include>org.mule.examples:mule-example-hello</include>-->
-        <include>org.mule.examples:mule-example-loanbroker</include>
-        <include>org.mule.examples:mule-example-loanbroker-esb</include>
-        <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
+        <!--<include>org.mule.examples:mule-example-loanbroker</include>-->
+        <!--<include>org.mule.examples:mule-example-loanbroker-esb</include>-->
+        <!--<include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>-->
         <include>org.mule.examples:mule-example-scripting</include>
         <!--<include>org.mule.examples:mule-example-stockquote</include>-->
         <!--<include>org.mule.examples:mule-example-voipservice</include>-->
