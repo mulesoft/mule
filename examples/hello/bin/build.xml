@@ -10,7 +10,7 @@
  LICENSE.txt file.
 -->
 
-<project name="Mule Examples: Hello" default="compile" basedir="."
+<project name="Mule Examples: Hello" default="compile" basedir=".."
          xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <property name="dir.src" value="src"/>
