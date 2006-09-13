@@ -110,6 +110,12 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <!--
+            I don't think we need to keep this active: java.net is mirrored to
+            ibiblio and sateh. It also makes downloads *horribly* slow even with a proxy,
+            since their server does not correctly return a 404 for unresolvable artifacts
+            but instead dynamically creates the same nice error page over and over again?!
+            WTF is wrong with these people??
         <repository>
             <id>java.net</id>
             <name>Java.net Maven Repository</name>
@@ -119,6 +125,7 @@
             </snapshots>
             <layout>legacy</layout>
         </repository>
+        -->
         <repository>
           <id>apache-snapshots</id>
           <name>Snapshot repository</name>
@@ -436,6 +443,8 @@
         <module>buildtools</module>
         <module>core</module>
         <module>modules</module>
+        <module>filters</module>
+        <module>transformers</module>
         <module>transports</module>
         <module>examples</module>
         <!-- <module>tools</module> -->
