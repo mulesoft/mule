@@ -23,7 +23,6 @@
         <module>jaas</module>
         <module>jca</module>
         <module>jotm</module>
-        <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
