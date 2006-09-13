@@ -57,8 +57,8 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
                 loanRequest.setCreditProfile(null);
                 result = client.send("vm://LoanBrokerRequests",  loanRequest, null);
                 assertNotNull(result);
-                assertFalse(result.getPayload() instanceof NullPayload);
-                assertTrue(result.getPayload() instanceof LoanQuote);
+                assertFalse("received a NullPayload", result.getPayload() instanceof NullPayload);
+                assertTrue("did not receive a LoanQuote but: " + result.getPayload(), result.getPayload() instanceof LoanQuote);
                 LoanQuote quote = (LoanQuote)result.getPayload();
                 assertTrue(quote.getInterestRate() > 0);
             }
