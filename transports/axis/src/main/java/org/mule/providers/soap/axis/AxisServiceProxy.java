@@ -66,17 +66,18 @@ public class AxisServiceProxy extends ServiceProxy
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
             
-            UMOExceptionPayload wsException = message.getExceptionPayload(); 
-            if (wsException != null)
+            if (message != null)
             {
-                throw wsException.getException();
-            }
-            
-            if (message != null) 
-            {
+                UMOExceptionPayload wsException = message.getExceptionPayload(); 
+                
+                if (wsException != null)
+                {
+                    throw wsException.getException();
+                }
+  
                 return message.getPayload();
             } 
-            else 
+            else
             {
                 return null;
             }
