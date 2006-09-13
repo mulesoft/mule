@@ -15,17 +15,15 @@ import com.ibm.as400.access.CharacterFieldDescription;
 import com.ibm.as400.access.Record;
 import com.ibm.as400.access.RecordFormat;
 
+import java.io.InputStream;
+import java.util.Iterator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.mule.util.IOUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Iterator;
 
 /**
  * @author m999svm <p/> DQMessageUtils utility class for DQMessage
