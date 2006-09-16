@@ -112,7 +112,7 @@ public class FutureMessageResultTestCase extends TestCase
             public Object call() throws InterruptedException
             {
                 // I'm slow, have patience with me
-                Thread.sleep(200);
+                Thread.sleep(3000L);
                 wasCalled = true;
                 return null;
             }
@@ -123,12 +123,14 @@ public class FutureMessageResultTestCase extends TestCase
 
         try
         {
-            f.getMessage(50);
+            f.getMessage(500L);
             fail();
         }
         catch (TimeoutException tex)
         {
-            // OK: we did not wait long enough for our straggler
+            // OK: we did not wait long enough for our straggler, so let's tell him
+            // to forget about his task
+            f.cancel(true);
         }
 
         assertFalse(wasCalled);
