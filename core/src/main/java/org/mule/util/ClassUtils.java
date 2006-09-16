@@ -10,6 +10,9 @@
 
 package org.mule.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,9 +26,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is useful for loading resources and classes in a fault
@@ -329,20 +329,21 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param implementation the class to build methods on
      * @param parameterTypes the argument param types to look for
      * @param voidOk         whether void methods shouldbe included in the found list
-     * @param ignoreEquals   whether to ignore the equals method in the methods
-     *                       returned
      * @param matchOnObject  Determines whether parameters of OBject type are matched when they are
      *                       of Object.class type
+     * @param ignoreMethods  An array of method names to ignore. Often 'equals' is not a desired match.
+     * This argument can be null.
      * @return a list of methods on the class that match the criteria. If there
      *         are none, an empty list is returned
      */
     public static List getSatisfiableMethods(Class implementation,
                                              Class[] parameterTypes,
                                              boolean voidOk,
-                                             boolean ignoreEquals,
-                                             boolean matchOnObject) {
+                                             boolean matchOnObject,
+                                             String[] ignoreMethods) {
 
         List result = new ArrayList();
+        List ignore = (ignoreMethods==null ? new ArrayList() : Arrays.asList(ignoreMethods));
         List methods = Arrays.asList(implementation.getMethods());
         for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
             Method method = (Method) iterator.next();
@@ -350,7 +351,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
             if (compare(methodParams, parameterTypes, matchOnObject)) {
 
-                if ((method.getName().equals("equals") && !ignoreEquals) || !method.getName().equals("equals")) {
+                if (!ignore.contains(method.getName())) {
                     if ((method.getReturnType().getName().equals("void") && voidOk)
                             || !method.getReturnType().getName().equals("void")) {
                         result.add(method);

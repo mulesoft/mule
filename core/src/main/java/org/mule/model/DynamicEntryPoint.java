@@ -48,6 +48,10 @@ public class DynamicEntryPoint implements UMOEntryPoint
     private Map entryPoints = new HashMap();
     private Method currentMethod;
 
+    //we dot wan tto match these methods when looking for a service method to
+    //invoke
+    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+
     public Class[] getParameterTypes()
     {
         if (currentMethod == null) {
@@ -105,8 +109,8 @@ public class DynamicEntryPoint implements UMOEntryPoint
         List methods = ClassUtils.getSatisfiableMethods(component.getClass(),
                                                          ClassUtils.getClassTypes(context),
                                                          true,
-                                                         true,
-                                                         false);
+                                                         false,
+                                                         ignoreMethods);
         if (methods.size() > 1) {
             TooManySatisfiableMethodsException tmsmex = new TooManySatisfiableMethodsException(component.getClass());
             throw new InvocationTargetException(
@@ -124,7 +128,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                                                         ClassUtils.getClassTypes(payload),
                                                         true,
                                                         true,
-                                                        true);
+                                                        ignoreMethods);
             if (methods.size() > 1) {
                 throw new TooManySatisfiableMethodsException(component.getClass());
             }

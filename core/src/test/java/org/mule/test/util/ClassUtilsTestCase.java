@@ -10,13 +10,7 @@
 
 package org.mule.test.util;
 
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -26,12 +20,22 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ClassUtils;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ClassUtilsTestCase extends TestCase
 {
+
+    //we dot wan tto match these methods when looking for a service method to
+    //invoke
+    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+
     public void testIsConcrete() throws Exception
     {
         assertTrue(ClassUtils.isConcrete(Orange.class));
@@ -124,26 +128,26 @@ public class ClassUtilsTestCase extends TestCase
 
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, true);
+        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
 
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, true);
+        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         //Test object param being unacceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, false);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         //Test object param being acceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, true);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         //Test object param being acceptible but not void
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, true);
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());

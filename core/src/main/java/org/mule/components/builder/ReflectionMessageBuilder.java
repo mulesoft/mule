@@ -26,12 +26,15 @@ import java.util.List;
  */
 public class ReflectionMessageBuilder extends AbstractMessageBuilder {
 
+    //we dot wan tto match these methods when looking for a method
+    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+
     public Object buildMessage( UMOMessage request, UMOMessage response) throws MessageBuilderException {
         Object master = request.getPayload();
         Object property = response.getPayload();
         List methods = null;
         try {
-            methods = ClassUtils.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, true, false);
+            methods = ClassUtils.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, false, ignoreMethods);
         } catch (Exception e) {
             throw new MessageBuilderException(request, e);
         }
