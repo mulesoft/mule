@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.util;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -18,65 +18,48 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
+import java.lang.IllegalAccessException;
+import java.lang.InstantiationException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * <code>AbstractXStreamTransformer</code> is a base class for all XStream
- * based transformers. It takes care of creating and configuring the xstream
- * parser
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Initializes the XStream utility for converting Objects to XML and XML to Objects.
  */
-
-public abstract class AbstractXStreamTransformer extends AbstractEventAwareTransformer
+public class XStreamFactory
 {
-    private XStream xstream = null;
-    private boolean useJaxpDom = false;
-    private Map aliases;
-    private List converters;
+    private static XStream xstream;
 
-    public final XStream getXStream() throws TransformerException
+    public XStreamFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
-        if (xstream == null) {
-            if (useJaxpDom) {
-                xstream = new XStream(new DomDriver());
-            } else {
-                xstream = new XStream(new XppDriver());
-            }
+    	this(false, null, null);
+    }
+
+    public XStreamFactory(boolean useJaxpDom, Map aliases, List converters) throws ClassNotFoundException, InstantiationException, IllegalAccessException
+    {
+        if (useJaxpDom) {
+            xstream = new XStream(new DomDriver());
+        } else {
+            xstream = new XStream(new XppDriver());
         }
 
         // We must always register this converter as the Mule Message uses
         // ConcurrentHashMaps, but XStream does not support them out of the box right now
-        try {
-            xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
-        }
-        catch (ClassNotFoundException cnf) {
-            throw new TransformerException(this, cnf);
-        }
+        xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
 
-        addAliases();
-        addConverters();
+        addAliases(aliases);
+        addConverters(converters);
+    }
+
+    public final XStream getInstance()
+    {
         return xstream;
     }
 
-    public boolean isUseJaxpDom()
-    {
-        return useJaxpDom;
-    }
-
-    public void setUseJaxpDom(boolean useJaxpDom)
-    {
-        this.useJaxpDom = useJaxpDom;
-    }
-
-    private void addAliases() throws TransformerException
+    private void addAliases(Map aliases) throws ClassNotFoundException
     {
         if (aliases == null) {
             return;
@@ -88,16 +71,12 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
         for (Iterator iterator = aliases.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             classname = entry.getValue().toString();
-            try {
-                clazz = ClassUtils.loadClass(classname, getClass());
-            } catch (ClassNotFoundException e) {
-                throw new TransformerException(new Message(Messages.CLASS_X_NOT_FOUND, classname), this, e);
-            }
+            clazz = ClassUtils.loadClass(classname, getClass());
             xstream.alias(entry.getKey().toString(), clazz);
         }
     }
 
-    private void addConverters() throws TransformerException
+    private void addConverters(List converters) throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         if (converters == null) {
             return;
@@ -107,37 +86,9 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
 
         for (Iterator iterator = converters.iterator(); iterator.hasNext();) {
             classname = iterator.next().toString();
-            try {
-                clazz = ClassUtils.loadClass(classname, getClass());
-                xstream.registerConverter((Converter) clazz.newInstance());
-            } catch (Exception e) {
-                throw new TransformerException(this, e);
-            }
+            clazz = ClassUtils.loadClass(classname, getClass());
+            xstream.registerConverter((Converter) clazz.newInstance());
         }
-    }
-
-    public Map getAliases()
-    {
-        return aliases;
-    }
-
-    public void setAliases(Map aliases)
-    {
-        this.aliases = aliases;
-    }
-
-    public List getConverters()
-    {
-        return converters;
-    }
-
-    public void setConverters(List converters)
-    {
-        this.converters = converters;
-    }
-
-    protected boolean requiresCurrentEvent() {
-        return false;
     }
 
     private class ConcurrentHashMapConverter extends MapConverter
