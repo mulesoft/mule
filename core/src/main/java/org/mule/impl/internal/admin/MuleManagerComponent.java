@@ -12,6 +12,7 @@ package org.mule.impl.internal.admin;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import com.thoughtworks.xstream.XStream;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -27,8 +28,6 @@ import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
-import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -44,14 +43,16 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.XStreamFactory;
 
+import java.lang.Exception;
 import java.util.Map;
 
 /**
  * <code>MuleManagerComponent</code> is a MuleManager interal server component
  * responsible for receiving remote requests and dispatching them locally.  This allows
  * developer to tunnel requests through http ssl to a Mule instance behind a firewall
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -66,14 +67,15 @@ public class MuleManagerComponent implements Callable, Initialisable
     public static final String MANAGER_COMPONENT_NAME = "_muleManagerComponent";
     public static final String MANAGER_ENDPOINT_NAME = "_muleManagerEndpoint";
 
-    private XmlToObject remoteTransformer;
-    private ObjectToXml objectToXml;
+    private XStream xstream = null;
 
     public void initialise() throws InitialisationException
     {
-        objectToXml = new ObjectToXml();
-        remoteTransformer = new XmlToObject();
-        remoteTransformer.setReturnClass(AdminNotification.class);
+    	try {
+    		xstream = new XStreamFactory().getInstance();
+    	} catch (Exception e) {
+            throw new InitialisationException(Message.createStaticMessage("Unable to initialize XStream"), e);
+    	}
     }
 
     public Object onCall(UMOEventContext context) throws Exception
@@ -81,7 +83,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         Object result = null;
         String xml = context.getMessageAsString();
         logger.debug("Message received by MuleManagerComponent");
-        AdminNotification action = (AdminNotification) remoteTransformer.transform(xml);
+        AdminNotification action = (AdminNotification) xstream.fromXML(xml);
         if (AdminNotification.ACTION_INVOKE == action.getAction()) {
             result = invokeAction(action, context);
         } else if (AdminNotification.ACTION_SEND == action.getAction()) {
@@ -117,11 +119,10 @@ public class MuleManagerComponent implements Callable, Initialisable
             ep.setTransformer(null);
             UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
             RequestContext.setEvent(event);
-            
-            if (context.isSynchronous()) {
 
+            if (context.isSynchronous()) {
                 result = session.getComponent().sendEvent(event);
-                return objectToXml.transform(result);
+                return xstream.toXML(result);
             } else {
                 session.getComponent().dispatchEvent(event);
                 return null;
@@ -147,7 +148,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 if (result == null) {
                     return null;
                 } else {
-                    return objectToXml.transform(result);
+                    return xstream.toXML(result);
                 }
             }
         } catch (Exception e) {
@@ -177,7 +178,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                     Object payload = trans.transform(result.getPayload());
                     result = new MuleMessage(payload, result);
                 }
-                return objectToXml.transform(result);
+                return xstream.toXML(result);
             } else {
                 return null;
             }
@@ -217,8 +218,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
         result.setExceptionPayload(new ExceptionPayload(e));
         try {
-            return (String)objectToXml.transform(result);
-        } catch (TransformerException e1) {
+            return xstream.toXML(result);
+        } catch (Exception e1) {
             logger.error(e.toString(), e);
             return e.getMessage();
         }
