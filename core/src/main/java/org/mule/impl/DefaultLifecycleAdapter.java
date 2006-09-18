@@ -17,7 +17,10 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
+import org.mule.umo.ComponentException;
 import org.mule.umo.Invocation;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -186,7 +189,8 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         try {
             result = entryPoint.invoke(component, RequestContext.getEventContext());
         } catch (Exception e) {
-            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, component.getClass().getName()), e);
+            //should all Exceptions caught here be a ComponentException?!?
+            throw new ComponentException(new Message(Messages.FAILED_TO_INVOKE_X, component.getClass().getName()),invocation.getMessage(),RequestContext.getEvent().getComponent(),e);
         }
 
         UMOMessage resultMessage = null;
