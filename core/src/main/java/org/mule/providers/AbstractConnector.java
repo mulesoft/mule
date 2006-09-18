@@ -26,7 +26,6 @@ import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.internal.notifications.ConnectionNotification;
-import org.mule.management.mbeans.EndpointService;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -841,19 +840,6 @@ public abstract class AbstractConnector
     public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
     {
         this.connectionStrategy = connectionStrategy;
-    }
-
-    public List getEndpointMBeans()
-    {
-        // for now only return receiver endpoints as those are the ones we can
-        // control
-        // in terms of connecting/disconnecting
-        List beans = new ArrayList(receivers.size());
-        for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-            UMOMessageReceiver receiver = (UMOMessageReceiver)iterator.next();
-            beans.add(new EndpointService(receiver));
-        }
-        return beans;
     }
 
     public boolean isDisposing()
