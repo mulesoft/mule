@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Test_Split_Components" version="1.0">
+    <description>Part 2 of 3</description>
+
+    <model name="testModel">
+        <mule-descriptor name="Component1" implementation="org.mule.components.simple.NullComponent" />
+        <mule-descriptor name="Component2" implementation="org.mule.components.simple.NullComponent" />
+    </model>
+</mule-configuration>

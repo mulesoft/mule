@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration version="1.0">
+    
+    <mule-environment-properties serverUrl=""/>
+
+    <global-endpoints>
+        <endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>
+        <endpoint name="outbound" address="test://outbound" createConnector="ALWAYS_CREATE"/>
+    </global-endpoints>
+
+    <model name="Dual Connector Test">
+        <mule-descriptor name="Inbound Listener"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="outbound"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>
