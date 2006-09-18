@@ -43,18 +43,23 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-hivemind</include>
         <include>org.mule.modules:mule-module-i18n</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-plexus</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-xml</include>
+        <!-- Filters -->
+        <include>org.mule.filters:mule-filter-ognl</include>
+        <!-- Transformers -->
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
       <excludes>

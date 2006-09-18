@@ -433,7 +433,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
-        <include>org.mule.transports:mule-transport-oracle-jms</include>
+        <include>org.mule.transports:mule-transport-oracleaq</include>
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
@@ -446,19 +446,24 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-hivemind</include>
         <include>org.mule.modules:mule-module-i18n</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-plexus</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-xml</include>
+        <!-- Filters -->
+        <include>org.mule.filters:mule-filter-ognl</include>
+        <!-- Transformers -->
       </includes>
     </dependencySet>
 
@@ -469,6 +474,7 @@ Assembly descriptor for the full Mule distribution.
       <excludes>
         <!-- Core -->
         <exclude>org.mule:mule-core</exclude>
+        <exclude>org.mule:mule-core-tests</exclude>
         <!-- Transports -->
         <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-dq</exclude>
@@ -483,7 +489,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-jdbc</exclude>
         <exclude>org.mule.transports:mule-transport-jms</exclude>
         <exclude>org.mule.transports:mule-transport-multicast</exclude>
-        <exclude>org.mule.transports:mule-transport-oracle-jms</exclude>
+        <exclude>org.mule.transports:mule-transport-oracleaq</exclude>
         <exclude>org.mule.transports:mule-transport-quartz</exclude>
         <exclude>org.mule.transports:mule-transport-rmi</exclude>
         <exclude>org.mule.transports:mule-transport-soap</exclude>
@@ -496,19 +502,24 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
         <!-- Modules -->
-        <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
+        <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-hivemind</exclude>
         <exclude>org.mule.modules:mule-module-i18n</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jotm</exclude>
+        <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
         <exclude>org.mule.modules:mule-module-picocontainer</exclude>
         <exclude>org.mule.modules:mule-module-plexus</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
+        <exclude>org.mule.modules:mule-module-xml</exclude>
+        <!-- Filters -->
+        <exclude>org.mule.filters:mule-filter-ognl</exclude>
+        <!-- Transformers -->
         <!-- Examples -->
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
@@ -521,35 +532,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
-
-        <!--
-           This works for excluding 3rd-party transitive dependencies.
-           The exact groupId:artifactId can be obtained by running
-
-               mvn -X
-
-           from the distributions/server/full folder
-        -->
-
-        <exclude>com.gigaspaces:gigaspaces-ce</exclude>
-        <exclude>glue:glue</exclude>
-        <exclude>script:jsr223</exclude>
-        <!-- This is an old transitive dependency, we already have xml jars -->
-        <exclude>xerces:xmlParserAPIs</exclude>
-        <exclude>openejb:openejb-core</exclude>
-        <exclude>castor:castor</exclude>
-        <exclude>idb:idb</exclude>
-        <exclude>activemq:smackx</exclude>
-        <exclude>jmock:jmock</exclude>
-        <exclude>jmock:jmock-cglib</exclude>
-        <exclude>activesoap:jaxp-api</exclude>
-        <exclude>ant:ant</exclude>
-        <!-- pulls in a duplicate xml apis -->
-        <exclude>activesoap:jaxp-api</exclude>
-        <exclude>hsqldb:hsqldb</exclude>
-        <exclude>axion:axion</exclude>
-        <exclude>org.apache.derby:derby</exclude>
-        <exclude>org.apache.derby:derbynet</exclude>
       </excludes>
     </dependencySet>
 
@@ -557,18 +539,21 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
-      <!-- Don't put the version number in the examples.  -->
+      <!-- Don't put the version number in the examples. -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <!--<include>org.mule.examples:mule-example-echo</include>-->
-        <!--<include>org.mule.examples:mule-example-errorhandler</include>-->
-        <!--<include>org.mule.examples:mule-example-hello</include>-->
-        <!--<include>org.mule.examples:mule-example-loanbroker</include>-->
-        <!--<include>org.mule.examples:mule-example-loanbroker-esb</include>-->
-        <!--<include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>-->
+        <include>org.mule.examples:mule-example-echo</include>
+        <include>org.mule.examples:mule-example-errorhandler</include>
+        <include>org.mule.examples:mule-example-hello</include>
+        <include>org.mule.examples:mule-example-loanbroker</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
-        <!--<include>org.mule.examples:mule-example-stockquote</include>-->
-        <!--<include>org.mule.examples:mule-example-voipservice</include>-->
+        <include>org.mule.examples:mule-example-stockquote</include>
+        <include>org.mule.examples:mule-example-voipservice</include>
+        <!--<include>activemq:activemq</include>-->
+        <!--<include>openejb:openejb-core</include>-->
+        <!--<include>castor:castor</include>-->
       </includes>
     </dependencySet>
   </dependencySets>
