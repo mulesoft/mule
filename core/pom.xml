@@ -13,37 +13,42 @@
     <name>Mule Core</name>
     <description>Mule server and core classes</description>
 
-    <build>
-    </build>
-
-    <profiles>
-        <profile>
-            <!--
-                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                Unfortunately, it doesn't support validation against a
-                XML Schema. Detect 1.4.x and add xerces to the classpath.
-                5.x and above come with xerces pre-bundled.
-            -->
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                    <version>1.3.03</version>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                    <version>2.8.0</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
     <dependencies>
+        <!--
+        ****************************************************************
+        Specs - These J2EE specs are used to compile against but their actual 
+                implementation will depend on the resources available to Mule 
+                at run-time.
+        ******************************************************************
+        -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jaxrpc</artifactId>
+            <version>1.1-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-qname</artifactId>
+            <version>1.1-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jta</artifactId>
+            <version>1.0.1B-rc4</version>
+        </dependency>
+        <!-- Used for the WorkManager API & for the Mule RA -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-connector</artifactId>
+            <version>1.5-rc4</version>
+        </dependency>
+        <!-- Not needed for JDK 6 -->
+		<dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>1.0.2-rc4</version>
+        </dependency>
+
         <!--
         ****************************************************************
         Required Dependencies
@@ -84,22 +89,6 @@
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
         </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jaxrpc</artifactId>
-            <version>1.1-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-qname</artifactId>
-            <version>1.1-rc4</version>
-        </dependency>
-        <!-- Used by Xml based filters and transformers -->
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.4</version>
-        </dependency>
         <!-- UUID generator -->
         <dependency>
             <groupId>org.safehaus.jug</groupId>
@@ -107,6 +96,7 @@
             <version>2.0.0</version>
             <classifier>asl</classifier>
         </dependency>
+        
         <!-- Used for de/serialising objects -->
         <dependency>
             <groupId>xstream</groupId>
@@ -118,44 +108,13 @@
             <artifactId>xpp3_min</artifactId>
             <version>1.1.3.4.O</version>
         </dependency>
+        <!--
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jta</artifactId>
-            <version>1.0.1B-rc4</version>
+            <groupId>woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
+            <version>2.9.3</version>
         </dependency>
-        <!--dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-management</artifactId>
-            <version>1.0-rc4</version>
-        </dependency-->
-
-        <!-- Used for the WorkManager API & for the Mule RA -->
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-connector</artifactId>
-            <version>1.5-rc4</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-servlet</artifactId>
-            <version>2.4-rc4</version>
-        </dependency>
-        <!--dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-ejb</artifactId>
-            <version>2.1-rc4</version>
-        </dependency-->
-
-		<dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>1.0.2-rc4</version>
-        </dependency>
-        <!--dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-        </dependency-->
+        -->
 
         <!--
         ****************************************************************
@@ -176,136 +135,11 @@
             </exclusions>
         </dependency>
 
-        <!-- For MuleXmlConfigurationBuilder -->
-        <dependency>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-            <version>1.5</version>
-        </dependency>
-
-        <!-- JXPath filtering of events -->
-        <dependency>
-            <groupId>commons-jxpath</groupId>
-            <artifactId>commons-jxpath</artifactId>
-            <version>1.2</version>
-            <!-- TODO get rid of duplication in the top-level transports pom.xml -->
-            <exclusions>
-                <exclusion>
-                    <!-- not required; likely a m1 POM conversion bug -->
-                    <groupId>ant</groupId>
-                    <artifactId>ant-optional</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xerces</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!-- exclude older jdom-b9 -->
-                    <groupId>jdom</groupId>
-                    <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!-- no need for another JUnit -->
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!-- exclude older Servlet 2.2 spec jar -->
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Used for script component support -->
-        <!--dependency>
-            <groupId>script</groupId>
-            <artifactId>jsr223</artifactId>
-            <version>1.0</version>
-        </dependency-->
-
         <!-- Logging -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.13</version>
-        </dependency>
-
-        <!-- Management deps -->
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxri</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxtools</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxremoting</artifactId>
-            <version>1.2</version>
-        </dependency>
-
-        <!-- mx4j Agent support  -->
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-jmx</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-impl</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-tools</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-remote</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <!--
-        ****************************************************************
-        Testing Dependencies
-        ****************************************************************
-        -->
-        <!--
-        The idea is to move all the org.mule.tck classes out of mule-core and into a separate module,
-        however this creates a "cyclic reference" in Maven.
-        <dependency>
-            <groupId>org.codehaus.mule.tests</groupId>
-            <artifactId>mule-tck-core</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-
-        <!-- Promote the scope of these dependencies from "test" to "compile" because they are used by
-             the org.mule.tck classes.  Note that if we eventually get these classes moved to a separate
-             module, these dependencies can be removed. -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
-            <version>0.09</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
