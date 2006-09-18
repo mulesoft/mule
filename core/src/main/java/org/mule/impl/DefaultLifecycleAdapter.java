@@ -19,8 +19,6 @@ import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.umo.ComponentException;
 import org.mule.umo.Invocation;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
