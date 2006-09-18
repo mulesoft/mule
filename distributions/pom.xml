@@ -194,13 +194,18 @@
         *********************************************************
         -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-ognl</artifactId>
+            <groupId>org.mule.filters</groupId>
+            <artifactId>mule-filter-ognl</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -230,6 +235,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-management</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
@@ -251,6 +261,11 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
 
