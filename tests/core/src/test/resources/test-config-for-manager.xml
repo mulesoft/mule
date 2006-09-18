@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <environment-properties>
+        <property name="envProperty1" value="value1"/>
+    </environment-properties>
+
+    <mule-environment-properties
+        synchronous="false"
+        serverUrl=""
+        model="test-dev"/>
+
+    <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
+
+    <connector name="testConnector" className="org.mule.tck.testmodels.mule.TestConnector"/>
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="testEndpointURI" value="test://endpoint.test"/>
+    </endpoint-identifiers>
+
+    <transformers>
+        <transformer name="testTransformer" className="org.mule.tck.testmodels.mule.TestCompressionTransformer" returnClass="java.lang.String">
+            <properties>
+                <property name="containerProperty" value="blah"/>
+            </properties>
+        </transformer>
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="testEndpoint" address="testEndpointURI" connector="testConnector"/>
+    </global-endpoints>
+
+    <interceptor-stack name="testInterceptorStack">
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+    </interceptor-stack>
+
+    <model name="test-dev">
+        <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+
+        <component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
+
+        <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+
+        <mule-descriptor name="testUMO"
+            inboundEndpoint="testEndpoint"
+            outboundEndpoint="test://endpoint.test"
+            implementation="org.mule.tck.testmodels.fruit.Orange">
+        </mule-descriptor>
+    </model>
+</mule-configuration>
