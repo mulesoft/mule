@@ -163,7 +163,7 @@ public class RemoteDispatcher implements Disposable
 
         if (executor != null)
         {
-            result.setExecutorService(executor);
+            result.setExecutor(executor);
         }
 
         if (transformers != null)
@@ -208,7 +208,7 @@ public class RemoteDispatcher implements Disposable
 
         if (executor != null)
         {
-            result.setExecutorService(executor);
+            result.setExecutor(executor);
         }
 
         result.execute();
@@ -239,7 +239,7 @@ public class RemoteDispatcher implements Disposable
 
         if (executor != null)
         {
-            result.setExecutorService(executor);
+            result.setExecutor(executor);
         }
 
         result.execute();

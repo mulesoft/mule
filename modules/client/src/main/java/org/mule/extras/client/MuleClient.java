@@ -560,7 +560,7 @@ public class MuleClient implements Disposable
 
         if (executor != null)
         {
-            result.setExecutorService(executor);
+            result.setExecutor(executor);
         }
 
         result.execute();
@@ -625,7 +625,7 @@ public class MuleClient implements Disposable
 
         if (executor != null)
         {
-            result.setExecutorService(executor);
+            result.setExecutor(executor);
         }
 
         if (StringUtils.isNotBlank(transformers))
