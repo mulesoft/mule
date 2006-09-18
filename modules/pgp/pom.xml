@@ -29,6 +29,15 @@
     </build>
 
     <dependencies>
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>cryptix-jce</groupId>
             <artifactId>cryptix-jce-api</artifactId>

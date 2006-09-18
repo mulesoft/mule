@@ -19,10 +19,50 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- Don't distribute this because it will cause conflicts on a J2EE app server -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>2.4-rc4</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-saaj</artifactId>
             <version>1.1-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>relaxngDatatype</groupId>
+                    <artifactId>relaxngDatatype</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>isorelax</groupId>
+                    <artifactId>isorelax</artifactId>
+                </exclusion>
+                <!--
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                -->
+                <exclusion>
+                    <groupId>saxpath</groupId>
+                    <artifactId>saxpath</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>msv</groupId>
+                    <artifactId>msv</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

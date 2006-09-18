@@ -12,10 +12,10 @@
     <artifactId>mule-transformers</artifactId>
     <packaging>pom</packaging>
     <name>Mule Transformers</name>
-    <description>PLEASE DESCRIBE ME</description>
+    <description>Specialized transformers which are not part of the Mule core.</description>
 
     <modules>
-        <!-- none yet -->
+        <!-- <module>jxpath</module> -->
     </modules>
 
     <dependencies>
@@ -24,6 +24,25 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- TODO duplication of top-level declaration, but doesn't work under clover if not here -->
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.03</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

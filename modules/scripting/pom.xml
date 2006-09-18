@@ -13,39 +13,53 @@
 	<description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
 	<dependencies>
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Used by ScriptConfigurationBuilder -->
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-builders</artifactId>
+			<version>${version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>script</groupId>
 			<artifactId>jsr223</artifactId>
 			<version>1.0</version>
+            <scope>provided</scope>
 		</dependency>
 
+        <!-- For unit tests only -->
 		<dependency>
 			<groupId>groovy</groupId>
 			<artifactId>groovy-all-1.0-jsr</artifactId>
 			<version>06</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-client</artifactId>
 			<version>${version}</version>
 			<scope>test</scope>
 		</dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
 	</dependencies>
 </project>

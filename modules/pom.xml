@@ -16,6 +16,7 @@
 
     <modules>
         <module>acegi</module>
+        <module>builders</module>
         <module>boot</module>
         <module>client</module>
         <module>hivemind</module>
@@ -23,11 +24,14 @@
         <module>jaas</module>
         <module>jca</module>
         <module>jotm</module>
+        <module>management</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
+        <module>registry</module>
         <module>scripting</module>
         <module>spring</module>
+        <module>xml</module>
     </modules>
 
     <dependencies>
@@ -36,6 +40,20 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- TODO Creates cyclic dependency: mule-tests-functional -> mule-module-builders -> mule-tests-functional 
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
 
     <!-- TODO duplication of top-level declaration, but doesn't work under clover if not here -->
         <dependency>

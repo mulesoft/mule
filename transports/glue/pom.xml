@@ -19,10 +19,18 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- Don't distribute this because it will cause conflicts on a J2EE app server -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>2.4-rc4</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>glue</groupId>
             <artifactId>glue</artifactId>
             <version>5.0.2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

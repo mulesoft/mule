@@ -31,7 +31,13 @@
         <dependency>
             <groupId>plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
-            <version>1.0-alpha-2</version>
+            <version>1.0-alpha-6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>classworlds</groupId>
+                    <artifactId>classworlds</artifactId>
+                </exclusion>
+            </exclusions>            
         </dependency>
     </dependencies>
 </project>

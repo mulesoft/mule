@@ -446,6 +446,7 @@
         <module>filters</module>
         <module>transformers</module>
         <module>transports</module>
+        <module>tests</module>
         <module>examples</module>
         <!-- <module>tools</module> -->
     </modules>
@@ -460,6 +461,7 @@
     -->
     <profiles>
         <profile>
+            <!-- Integration tests -->
             <id>tests</id>
             <activation>
                 <property>
@@ -467,9 +469,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <modules>
-                <module>tests</module>
-            </modules>
         </profile>
         <profile>
             <id>distributions</id>
@@ -508,25 +507,6 @@
     </profiles>
 
     <dependencies>
-        <!-- Testing Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
-            <version>0.09</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
 

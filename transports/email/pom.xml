@@ -12,11 +12,14 @@
     <packaging>jar</packaging>
     <name>Email Transport</name>
     <description>A Mule transport for Email Connectivity. This transport supplies a Pop3 connector, Smtp connector and a Mail connector which is an aggregation of the two.</description>
+
     <dependencies>
+        <!-- Don't distribute these because they will cause conflicts on a J2EE app server -->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>1.3.1-rc5</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

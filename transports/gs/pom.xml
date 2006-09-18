@@ -21,20 +21,23 @@
             <version>${version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.gigaspaces</groupId>
+            <artifactId>gigaspaces-ce</artifactId>
+            <version>5.1-1600.213-1.4</version>
+            <scope>provided</scope>
+        </dependency>
      <dependency>
             <groupId>jini</groupId>
             <artifactId>jini-core</artifactId>
             <version>2.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jini</groupId>
             <artifactId>jini-ext</artifactId>
             <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.gigaspaces</groupId>
-            <artifactId>gigaspaces-ce</artifactId>
-            <version>5.1-1600.213-1.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Needed for unit tests only -->

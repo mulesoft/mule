@@ -23,6 +23,38 @@
             <artifactId>xapool</artifactId>
             <version>1.4</version>
         </dependency>
+        <!-- TODO Verify whether we really need XML dependencies for a JDBC transport -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>relaxngDatatype</groupId>
+                    <artifactId>relaxngDatatype</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>isorelax</groupId>
+                    <artifactId>isorelax</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>saxpath</groupId>
+                    <artifactId>saxpath</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>msv</groupId>
+                    <artifactId>msv</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         
         <!-- For unit tests only -->
         <dependency>

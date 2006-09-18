@@ -33,5 +33,28 @@
             <artifactId>org.mortbay.jetty</artifactId>
             <version>5.1.10</version>
         </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>2.4-rc4</version>
+            <!-- TODO MULE-10221 
+                This library causes conflicts when Mule is deployed to a Web/J2EE server but is
+                needed otherwise.
+            <scope>provided</scope> 
+            -->
+        </dependency>
+
+        <!--
+            TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
+            makes me happy to compile when run from the project root folder,
+            otherwise it cannot find classes from commons-logging.
+
+            It seems m2 dependency visibility hierarchy is limited to 1 level deep.
+        -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
     </dependencies>
 </project>
