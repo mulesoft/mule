@@ -12,7 +12,7 @@ package org.mule.umo;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutionException;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -36,9 +36,9 @@ public class FutureMessageResult extends FutureTask
      * spawning a Thread for each invocation it uses a single daemon Thread with an
      * unbounded queue, so "truly" concurrent operation of multiple Futures or
      * otherwise customized execution behaviour requires calling the
-     * {@link #setExecutorService(ExecutorService)} method and passing in a custom
-     * {@link ExecutorService}. This is strongly recommended in order to provide
-     * better control over concurrency, resource consumption and possible overruns.
+     * {@link #setExecutor(Executor)} method and passing in a custom {@link Executor}.
+     * This is strongly recommended in order to provide better control over
+     * concurrency, resource consumption and possible overruns.
      * <p>
      * Reasons for these defaults:
      * <ul>
@@ -52,21 +52,21 @@ public class FutureMessageResult extends FutureTask
      * out invocations are GC'ed so the problem is rather unlikely to occur.
      * </ul>
      */
-    private static final ExecutorService DefaultExecutor = Executors.newSingleThreadExecutor(
-        new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
+    private static final Executor DefaultExecutor =
+        Executors.newSingleThreadExecutor(new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
 
-    private volatile ExecutorService executor;
+    private volatile Executor executor;
     private volatile UMOTransformer transformer;
 
     public FutureMessageResult(Callable callable)
     {
         super(callable);
-        this.setExecutorService(DefaultExecutor);
+        this.setExecutor(DefaultExecutor);
     }
 
     /**
      * @deprecated Please use {@link #FutureMessageResult(Callable)} and configure
-     *             e.g with {@link #setExecutorService(ExecutorService)} or
+     *             e.g with {@link #setExecutor(Executor)} or
      *             {@link #setTransformer(UMOTransformer)}
      */
     public FutureMessageResult(Callable callable, UMOTransformer transformer)
@@ -92,16 +92,11 @@ public class FutureMessageResult extends FutureTask
      * @param e the executor to be used.
      * @throws IllegalArgumentException when the executor is null or shutdown.
      */
-    public void setExecutorService(ExecutorService e)
+    public void setExecutor(Executor e)
     {
         if (e == null)
         {
-            throw new IllegalArgumentException("ExecutorService must not be null.");
-        }
-
-        if (e.isShutdown())
-        {
-            throw new IllegalArgumentException("ExecutorService must not be shutdown.");
+            throw new IllegalArgumentException("Executor must not be null.");
         }
 
         this.executor = e;

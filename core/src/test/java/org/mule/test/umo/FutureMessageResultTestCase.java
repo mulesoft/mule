@@ -14,6 +14,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutionException;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 
 import junit.framework.TestCase;
@@ -31,7 +32,7 @@ public class FutureMessageResultTestCase extends TestCase
         }
     };
 
-    private volatile boolean wasCalled;
+    volatile boolean wasCalled;
 
     public FutureMessageResultTestCase(String name)
     {
@@ -64,7 +65,7 @@ public class FutureMessageResultTestCase extends TestCase
         try
         {
             FutureMessageResult f = new FutureMessageResult(Dummy);
-            f.setExecutorService(null);
+            f.setExecutor(null);
             fail();
         }
         catch (IllegalArgumentException iex)
@@ -72,18 +73,6 @@ public class FutureMessageResultTestCase extends TestCase
             // OK: no null ExecutorService
         }
 
-        try
-        {
-            ExecutorService e = Executors.newCachedThreadPool();
-            e.shutdown();
-            FutureMessageResult f = new FutureMessageResult(Dummy);
-            f.setExecutorService(e);
-            fail();
-        }
-        catch (IllegalArgumentException iex)
-        {
-            // OK: no shutdown ExecutorService
-        }
     }
 
     public void testExecute() throws ExecutionException, InterruptedException, TransformerException
@@ -102,6 +91,25 @@ public class FutureMessageResultTestCase extends TestCase
 
         assertNull(f.getMessage());
         assertTrue(wasCalled);
+    }
+
+    public void testExecuteWithShutdownExecutor()
+    {
+        ExecutorService e = Executors.newCachedThreadPool();
+        e.shutdown();
+
+        FutureMessageResult f = new FutureMessageResult(Dummy);
+        f.setExecutor(e);
+
+        try
+        {
+            f.execute();
+            fail();
+        }
+        catch (RejectedExecutionException rex)
+        {
+            // OK: fail with shutdown Executor
+        }
     }
 
     public void testExecuteWithTimeout()
@@ -132,8 +140,10 @@ public class FutureMessageResultTestCase extends TestCase
             // to forget about his task
             f.cancel(true);
         }
-
-        assertFalse(wasCalled);
+        finally
+        {
+            assertFalse(wasCalled);
+        }
     }
 
 }
