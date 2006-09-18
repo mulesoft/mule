@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -37,13 +36,14 @@ import org.mule.util.SystemUtils;
 public class MuleServer implements Runnable
 {
     /**
-     * Default configuration builder class name.
+     * Don't use a class object so the core doesn't depend on mule-module-builders.
      */
-    public static final Class DEFAULT_CONFIG_BUILDER_CLASS = MuleXmlConfigurationBuilder.class;
+    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER =
+            "org.mule.config.builders.MuleXmlConfigurationBuilder";
 
     /**
      * Required to support the '-config spring' shortcut.
-     * Don't use a class object so the core doesn't depend on Spring.
+     * Don't use a class object so the core doesn't depend on mule-module-spring.
      * TODO this may not be a problem for Mule 2.x
      */
     protected static final String CLASSNAME_SPRING_CONFIG_BUILDER =
@@ -201,7 +201,7 @@ public class MuleServer implements Runnable
         if (configBuilderClassName != null) {
             return configBuilderClassName;
         } else {
-            return DEFAULT_CONFIG_BUILDER_CLASS.getName();
+            return CLASSNAME_DEFAULT_CONFIG_BUILDER;
         }
     }
 
