@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+    <cd>
+        <title>De første kærester på månen</title>
+        <artist>TV-2</artist>
+        <country>Danmark</country>
+        <company>Columbia</company>
+        <price>149</price>
+        <year>2005</year>
+    </cd>
+    <cd>
+        <title>春のかたみ</title>
+        <artist>元ちとせ</artist>
+        <country>Japan</country>
+        <company>Sony Records</company>
+        <price>42</price>
+        <year>2006</year>
+    </cd>
+</catalog>
