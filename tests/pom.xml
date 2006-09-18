@@ -11,23 +11,20 @@
     <groupId>org.mule.tests</groupId>
     <artifactId>mule-tests</artifactId>
     <packaging>pom</packaging>
-    <name>Mule Integration Tests</name>
+    <name>Mule Tests</name>
 
     <modules>
-        <module>integration</module>
-        <module>vendor</module>
+        <module>core</module>
+        <module>functional</module>
     </modules>
 
-    <build>
-        <defaultGoal>test</defaultGoal>
-    </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <profiles>
+        <profile>
+            <id>tests</id>
+            <modules>
+                <module>integration</module>
+                <module>vendor</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
