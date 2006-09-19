@@ -12,6 +12,18 @@
     <name>Loan Broker Example</name>
     <description>The Loan Broker example application is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -23,6 +35,12 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-glue</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>glue</groupId>
+            <artifactId>glue</artifactId>
+            <version>5.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -12,6 +12,19 @@
     <artifactId>mule-example-errorhandler</artifactId>
     <name>Error Handler Example</name>
     <description>Demonstrates using Spring as the external container to provide the objects managed by Mule and how to publish events to multiple outbound endpoints. The example consists of two components; ExecptionManager and BusinessErrorManager.</description>
+
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -32,12 +45,43 @@
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
             <version>3.2.4</version>
-            <!-- These transitive dependencies are not found on ibiblio and cause
-                the build to fail. -->
+            <scope>provided</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>commons-dbcp</groupId>
+                    <artifactId>commons-dbcp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-full</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-asm</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>javacc</groupId>
                     <artifactId>javacc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activeio</groupId>
+                    <artifactId>activeio</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jmock</groupId>
+                    <artifactId>jmock</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>howl</groupId>
+                    <artifactId>howl-logger</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>axion</groupId>
+                    <artifactId>axion</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>activecluster</groupId>

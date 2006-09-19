@@ -13,6 +13,18 @@
     <name>Web App Example</name>
     <description>Is a webapp that provides an interface to some of the examples here such as the LoanBroker, Hello World and Echo examples. It also provides examples of accessing Mule using REST style service calls and is itself an example of how to embed Mule in a webapp.</description>
 
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

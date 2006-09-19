@@ -11,6 +11,19 @@
     <artifactId>mule-example-hello</artifactId>
     <name>Hello Example</name>
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
+
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

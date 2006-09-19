@@ -23,6 +23,7 @@
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
             <version>3.2.4</version>
+            <scope>provided</scope>
             <!-- These transitive dependencies are not found on ibiblio and cause
                 the build to fail. -->
             <exclusions>

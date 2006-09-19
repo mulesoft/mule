@@ -12,6 +12,18 @@
     <name>VOIP Service Example</name>
     <description>The Voip Service example is taken from a Java.net featured article, Provisioning Services Through ESB (http://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html) describes how to orchestrate services through abstraction, providing a VOIP provisioning example developed using Mule.</description>
 
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

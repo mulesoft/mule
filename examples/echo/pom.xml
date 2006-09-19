@@ -12,6 +12,18 @@
     <name>Echo Example</name>
     <description>Is a simple component example that demostrates how to expose a component over multiple transports (soap and stream).</description>
 
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -27,6 +39,12 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-glue</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>glue</groupId>
+            <artifactId>glue</artifactId>
+            <version>5.0.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
