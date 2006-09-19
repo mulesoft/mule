@@ -128,10 +128,12 @@ public class UniversalSender extends BasicHandler
             // for MULE_USER header. Filter out other headers like "soapMethods" and "method"
             UMOMessage currentMessage = RequestContext.getEvent().getMessage();
             final String METHOD = "method";
+            final String SOAP_METHODS = "soapMethods";
+
             for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String name = (String)iterator.next();
-                if (!StringUtils.equals(name, SoapConstants.SOAP_METHOD_PROPERTY) && !StringUtils.equals(name, METHOD) && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY) && !StringUtils.equals(name, SoapConstants.SOAP_METHOD_PROPERTY) && !StringUtils.equals(name, METHOD) && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
                 {
                     props.put(name, currentMessage.getProperty(name));
                 }
