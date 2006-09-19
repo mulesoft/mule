@@ -13,20 +13,6 @@
     <name>Spring Extensions</name>
     <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule.</description>   
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- TODO Throws a NPE -->
-                        <exclude>**/ObjectRefsFromSpringTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->

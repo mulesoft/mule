@@ -25,20 +25,6 @@
         </repository>
     </repositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- TODO gives an NPE on Digester.getXMLReader() -->
-                        <exclude>**/XFireCustomHttpHeaderTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
