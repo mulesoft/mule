@@ -223,6 +223,7 @@
                 <version>RELEASE</version>
                 <!--<version>2.3-SNAPSHOT</version>-->
                 <configuration>
+                    <argLine>-Xms64m -Xmx256m</argLine>
                     <excludes>
                         <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
                         <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
