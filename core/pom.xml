@@ -141,5 +141,14 @@
             <artifactId>log4j</artifactId>
             <version>1.2.13</version>
         </dependency>
+
+        <!-- Although there are no tests to run, we need to include this otherwise we'll get a
+            "No Java test frameworks found" error when building. -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
