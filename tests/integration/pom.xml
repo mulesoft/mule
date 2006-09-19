@@ -239,6 +239,10 @@
                     <artifactId>xmlbeans-jsr173-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>activemq</groupId>
                     <artifactId>activemq-core-test</artifactId>
                 </exclusion>
