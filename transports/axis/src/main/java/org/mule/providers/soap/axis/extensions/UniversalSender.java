@@ -12,11 +12,19 @@ package org.mule.providers.soap.axis.extensions;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.handlers.BasicHandler;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -24,10 +32,12 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -39,14 +49,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.mule.util.StringUtils;
 
 /**
  * todo document
@@ -120,6 +123,20 @@ public class UniversalSender extends BasicHandler
                     props.put(name, msgContext.getProperty(name));
                 }
             }
+            
+            //add all custom headers, filter out all mule headers (such as MULE_SESSION) except
+            // for MULE_USER header. Filter out other headers like "soapMethods" and "method"
+            UMOMessage currentMessage = RequestContext.getEvent().getMessage();
+            final String METHOD = "method";
+            for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
+            {
+                String name = (String)iterator.next();
+                if (!StringUtils.equals(name, SoapConstants.SOAP_METHOD_PROPERTY) && !StringUtils.equals(name, METHOD) && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                {
+                    props.put(name, currentMessage.getProperty(name));
+                }
+            }
+            
             if(call.useSOAPAction()) {
                 uri = call.getSOAPActionURI();
             }
