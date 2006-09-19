@@ -19,12 +19,15 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- Don't distribute this because it will cause conflicts on a J2EE app server -->
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-servlet</artifactId>
             <version>2.4-rc4</version>
-            <scope>provided</scope>
+            <!-- TODO MULE-10221 
+                This library causes conflicts when Mule is deployed to a Web/J2EE server but is
+                needed otherwise.
+            <scope>provided</scope> 
+            -->
         </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
