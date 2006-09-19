@@ -452,6 +452,31 @@
     </modules>
 
     <!--
+        Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
+        Unfortunately, it doesn't support validation against a
+        XML Schema. We have to unconditionally include Xerces with
+        the project and force-override all submodules because otherwise
+        it would not be possible to unconditionally exclude these
+        dependencies for JDK 1.5 except by touching every single child POM.
+        While the adding/overriding of these dependencies works in a profile,
+        the global exclusion is apparently not possible without specifying
+        a dependency - which is not possible since we're in the root node.
+        This very sad affair needs reconsideration once we depend on JDK 1.5.
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.03</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+    </dependencies>
+
+    <!--
     The default profiles for the build are configured in the file settings.xml.
     You can override the default profiles from the command line as follows:
         "mvn -Ddistributions=true -Dtests=false -Doracle=true"
@@ -460,6 +485,7 @@
         http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
     -->
     <profiles>
+
         <profile>
             <!-- Integration tests -->
             <id>tests</id>
@@ -470,6 +496,7 @@
                 </property>
             </activation>
         </profile>
+
         <profile>
             <id>distributions</id>
             <activation>
@@ -482,12 +509,21 @@
                 <module>distributions</module>
             </modules>
         </profile>
+
+        <profile>
+            <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+            </activation>
+        </profile>
+
         <profile>
             <id>java5</id>
             <activation>
                 <jdk>1.5</jdk>
             </activation>
         </profile>
+
         <profile>
             <id>windows</id>
             <activation>
@@ -496,6 +532,7 @@
                 </os>
             </activation>
         </profile>
+
         <profile>
           <id>ci-server</id>
           <distributionManagement>
@@ -504,9 +541,8 @@
             </site>
           </distributionManagement>
         </profile>
+
     </profiles>
 
-    <dependencies>
-    </dependencies>
 </project>
 
