@@ -107,6 +107,7 @@ public abstract class JdbcUtils
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
                 foundValue = true;
             }
+            // TODO Document what this is all about.  What does parsing XML have to do with JDBC??
             else if (root instanceof org.w3c.dom.Document)
             {
                 org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document)root;
