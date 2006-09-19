@@ -73,6 +73,7 @@
         <javac srcdir="${dir.src}"
                destdir="${dir.classes}"
                debug="true"
+               source="1.4"
                target="1.4">
             <classpath refid="classpath.example"/>
             <classpath refid="classpath.mule"/>
