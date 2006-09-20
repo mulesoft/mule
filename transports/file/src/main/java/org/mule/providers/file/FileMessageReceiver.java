@@ -160,6 +160,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
                 // create new MessageAdapter for destinationFile
                 msgAdapter = connector.getMessageAdapter(destinationFile);
+                msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
 
