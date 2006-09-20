@@ -42,10 +42,12 @@
             <version>${version}</version>
         </dependency>
 
+        <!-- Used by SpringTransactionFactory -->
+        <!-- TODO: verify whether this dependency is really required. -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${version}</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>1.1-rc4</version>
         </dependency>
 
         <!-- Needed for XSLT -->
@@ -54,6 +56,10 @@
             <artifactId>dom4j</artifactId>
             <version>1.4</version>
             <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>jaxen</groupId>
                     <artifactId>jaxen</artifactId>
@@ -67,57 +73,12 @@
                     <artifactId>isorelax</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>saxpath</groupId>
                     <artifactId>saxpath</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>msv</groupId>
                     <artifactId>msv</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Used by SpringTransactionFactory
-             TODO: verify whether this dependency is really required. -->
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>1.1-rc4</version>
-        </dependency>
-
-        <!-- For test cases only -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-jxpath</groupId>
-            <artifactId>commons-jxpath</artifactId>
-            <version>1.2</version>
-            <scope>test</scope>
-            <!-- TODO get rid of duplication in the top-level transports pom.xml -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xerces</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -139,5 +100,26 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
         </dependency>
+
+        <!-- For test cases only -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
 </project>
