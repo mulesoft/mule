@@ -39,22 +39,12 @@
             <version>${version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.codehaus.xfire</groupId>
-            <artifactId>xfire-aegis</artifactId>
-            <version>1.2.1</version>
-        </dependency>
+        <!-- XFire dependencies -->
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
             <version>1.2.1</version>
             <exclusions>
-                <!--
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-                -->
                 <exclusion>
                     <groupId>javax.mail</groupId>
                     <artifactId>mail</artifactId>
@@ -64,6 +54,11 @@
                     <artifactId>activation</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>xfire-aegis</artifactId>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
@@ -87,14 +82,13 @@
             <artifactId>ant</artifactId>
             <version>1.6.5</version>
         </dependency>
-
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <!-- need to re-add javamail -->
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
