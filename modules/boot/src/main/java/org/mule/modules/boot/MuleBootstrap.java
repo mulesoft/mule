@@ -29,12 +29,12 @@ import java.util.List;
 public class MuleBootstrap
 {
 
-
     /**
      * Do not instantiate MuleBootstrap.
      */
     private MuleBootstrap()
     {
+        super();
     }
 
     /**
