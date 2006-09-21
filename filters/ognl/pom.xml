@@ -4,11 +4,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
   <parent>
-        <groupId>org.mule.filters</groupId>
-        <artifactId>mule-filters</artifactId>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
         <version>1.3-SNAPSHOT</version>
     </parent>
-  <artifactId>mule-filter-ognl</artifactId>
+  <artifactId>mule-module-ognl</artifactId>
   <name>OGNL Filter</name>
   <description>Support for filtering events using OGNL notation.</description>
 
