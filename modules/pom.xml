@@ -25,6 +25,7 @@
         <module>jca</module>
         <module>jotm</module>
         <module>management</module>
+        <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>plexus</module>
