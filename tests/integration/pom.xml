@@ -180,6 +180,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-ognl</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
@@ -201,11 +206,6 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.filters</groupId>
-            <artifactId>mule-filter-ognl</artifactId>
             <version>${version}</version>
         </dependency>
 
