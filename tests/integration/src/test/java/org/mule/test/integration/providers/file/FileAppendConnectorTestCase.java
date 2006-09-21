@@ -13,28 +13,48 @@ package org.mule.test.integration.providers.file;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import org.apache.commons.io.IOUtils;
+public class FileAppendConnectorTestCase extends FunctionalTestCase
+{
 
-/**
- * 
- * @author <a href="mailto:stephen.fenech@symphonysoft.com">Stephen Fenech</a>
- *
- */
-public class FileAppendConnectorTestCase extends FunctionalTestCase{
-    
     public void testBasic() throws Exception
     {
-        MuleClient client=new MuleClient();
-        (new File("myout/out.txt")).delete();
-        client.send("vm://fileappend", "Hello1", null);
-        client.send("vm://fileappend", "Hello2", null);
-        assertEquals("Hello1Hello2",IOUtils.toString(new FileInputStream("myout/out.txt")));
+        String myDirName = "myout";
+        String myFileName = "out.txt";
+        FileInputStream myFileStream = null;
+
+        // make sure there is no directory and file
+        File myDir = new File(myDirName);
+        if (myDir.isDirectory())
+        {
+            assertTrue(myDir.delete());
+        }
+
+        try
+        {
+            assertFalse(new File(myDir, myFileName).exists());
+
+            MuleClient client = new MuleClient();
+            client.send("vm://fileappend", "Hello1", null);
+            client.send("vm://fileappend", "Hello2", null);
+
+            // the output file should exist now
+            myFileStream = new FileInputStream(new File(myDir, myFileName));
+            assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
+        }
+        finally
+        {
+            IOUtils.closeQuietly(myFileStream);
+            assertTrue(new File(myDir, myFileName).delete());
+            assertTrue(myDir.delete());
+        }
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
     }
 }
