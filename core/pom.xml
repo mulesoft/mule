@@ -22,31 +22,31 @@
         ******************************************************************
         -->
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jaxrpc</artifactId>
-            <version>1.1-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-qname</artifactId>
-            <version>1.1-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-qname_1.1_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jta</artifactId>
-            <version>1.0.1B-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <!-- Used for the WorkManager API & for the Mule RA -->
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-connector</artifactId>
-            <version>1.5-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <!-- Not needed for JDK 6 -->
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>1.0.2-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+            <version>1.1</version>
         </dependency>
 
         <!--

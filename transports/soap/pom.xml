@@ -111,9 +111,9 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-servlet</artifactId>
-            <version>2.4-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.4_spec</artifactId>
+            <version>1.0.1</version>
             <!-- TODO MULE-10221 
             This library causes conflicts when Mule is deployed to a Web/J2EE server but is
             needed otherwise.
@@ -121,9 +121,9 @@
             -->
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-saaj</artifactId>
-            <version>1.1-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-saaj_1.1_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 </project>

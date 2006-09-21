@@ -53,11 +53,5 @@
             <artifactId>mule-transport-email</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- Dependency introduced by Mule Core -->
-        <!--dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-connector</artifactId>
-            <version>1.5-rc4</version>
-        </dependency-->
     </dependencies>
 </project>

@@ -21,8 +21,8 @@
             <exclusions>
                 <!-- Don't include the JMS 1.1 spec. -->
                 <exclusion>
-                    <groupId>geronimo-spec</groupId>
-                    <artifactId>geronimo-spec-jms</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

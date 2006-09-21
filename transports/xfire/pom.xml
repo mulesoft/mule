@@ -90,9 +90,9 @@
         </dependency>
         <!-- need to re-add javamail -->
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-javamail</artifactId>
-            <version>1.3.1-rc5</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-javamail_1.3.1_spec</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 </project>
