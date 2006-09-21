@@ -2,9 +2,6 @@
 | BASIC USAGE |
 +-------------+
 
-Linux / Unix
-------------
-
 mule [-config <your-config.xml>]
 
     (runs in the foreground, stop with Ctrl-C)
@@ -12,11 +9,6 @@ mule [-config <your-config.xml>]
 mule start|stop|restart [-config <your-config.xml>]
 
     (runs in the background as a daemon)
-
-Windows
--------
-
-mule.bat [-config <your-config.xml>]
 
 +---------------------+
 | CONFIGURATION FILES |
