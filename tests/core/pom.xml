@@ -16,6 +16,9 @@
     <profiles>
         <profile>
             <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+            </activation>
             <dependencies>
                 <!-- see mule-module-xml -->
                 <dependency>

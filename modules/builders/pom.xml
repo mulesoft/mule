@@ -15,6 +15,9 @@
     <profiles>
         <profile>
             <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+            </activation>
             <dependencies>
                 <!-- see mule-module-xml -->
                 <dependency>
@@ -37,6 +40,9 @@
         </profile>
         <profile>
             <id>java5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
             <dependencies>
                 <!-- Used by MuleXmlConfigurationBuilder -->
                 <dependency>

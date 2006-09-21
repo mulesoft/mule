@@ -13,15 +13,6 @@
     <packaging>pom</packaging>
     <name>Mule Transports</name>
 
-    <profiles>
-        <profile>
-            <id>java5</id>
-            <modules>
-                <!-- we're still going for JDK 1.4 -->
-            </modules>
-        </profile>
-    </profiles>
-
     <modules>
         <module>axis</module>
         <module>dq</module>
