@@ -194,11 +194,6 @@
         *********************************************************
         -->
         <dependency>
-            <groupId>org.mule.filters</groupId>
-            <artifactId>mule-filter-ognl</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
@@ -236,6 +231,11 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-ognl</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
