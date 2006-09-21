@@ -13,6 +13,90 @@
     <name>Spring Extensions</name>
     <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule.</description>   
 
+    <profiles>
+        <profile>
+            <id>java14</id>
+            <dependencies>
+                <!-- see mule-module-xml -->
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                    <version>1.3.03</version>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                    <version>2.8.0</version>
+                </dependency>
+                <!-- Needed for XSLT -->
+                <dependency>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                    <version>1.4</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>jaxen</groupId>
+                            <artifactId>jaxen</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>relaxngDatatype</groupId>
+                            <artifactId>relaxngDatatype</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>isorelax</groupId>
+                            <artifactId>isorelax</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>saxpath</groupId>
+                            <artifactId>saxpath</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>msv</groupId>
+                            <artifactId>msv</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>java5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                    <version>1.4</version>
+                    <exclusions>
+                        <!-- IMPORTANT for JDK5 -->
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>jaxen</groupId>
+                            <artifactId>jaxen</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>relaxngDatatype</groupId>
+                            <artifactId>relaxngDatatype</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>isorelax</groupId>
+                            <artifactId>isorelax</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>saxpath</groupId>
+                            <artifactId>saxpath</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>msv</groupId>
+                            <artifactId>msv</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
     <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
@@ -48,39 +132,6 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jms</artifactId>
             <version>1.1-rc4</version>
-        </dependency>
-
-        <!-- Needed for XSLT -->
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jaxen</groupId>
-                    <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>relaxngDatatype</groupId>
-                    <artifactId>relaxngDatatype</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>isorelax</groupId>
-                    <artifactId>isorelax</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>saxpath</groupId>
-                    <artifactId>saxpath</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>msv</groupId>
-                    <artifactId>msv</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!--
