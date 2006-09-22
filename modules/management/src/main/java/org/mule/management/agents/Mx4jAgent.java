@@ -9,24 +9,12 @@
  */
 package org.mule.management.agents;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -35,6 +23,16 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
@@ -46,7 +44,7 @@ import org.mule.util.SystemUtils;
 public class Mx4jAgent implements UMOAgent {
     private String name = "MX4J Agent";
     private String jmxAdaptorUrl = "http://localhost:9999";
-    private Object adaptor;
+    private HttpAdaptor adaptor;
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
 
@@ -66,8 +64,8 @@ public class Mx4jAgent implements UMOAgent {
     // SSL/TLS socket factory config
     private Map socketFactoryProperties = new HashMap();
 
-    protected Object createAdaptor() throws Exception {
-        Object adaptor;
+    protected HttpAdaptor createAdaptor() throws Exception {
+
         Log.redirectTo(new CommonsLogger());
         URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
         adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
@@ -85,14 +83,12 @@ public class Mx4jAgent implements UMOAgent {
 
         processor.setUseCache(cacheXsl);
 
-        // TODO Document what this cast is for?
-        final HttpAdaptor httpAdaptor = ((HttpAdaptor) adaptor);
-        httpAdaptor.setProcessor(processor);
+        adaptor.setProcessor(processor);
 
         //Set endpoint authentication if required
         if (login != null) {
-            httpAdaptor.addAuthorization(login, password);
-            httpAdaptor.setAuthenticationMethod(authenticationMethod);
+            adaptor.addAuthorization(login, password);
+            adaptor.setAuthenticationMethod(authenticationMethod);
         }
 
         if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
@@ -104,7 +100,7 @@ public class Mx4jAgent implements UMOAgent {
                 factory = new SSLAdaptorServerSocketFactory();
             }
             BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
-            httpAdaptor.setSocketFactory(factory);
+            adaptor.setSocketFactory(factory);
         }
 
         return adaptor;
@@ -118,7 +114,7 @@ public class Mx4jAgent implements UMOAgent {
             adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
             mBeanServer.registerMBean(adaptor, adaptorName);
         } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e, this);
         }
     }
 
