@@ -151,7 +151,7 @@ public abstract class UMOException extends Exception
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringMessageUtils.charString('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
         buf.append("Type                  : ").append(getClass().getName()).append(SystemUtils.LINE_SEPARATOR);
-        buf.append("Code                  : ").append(getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Code                  : ").append("MULE_ERROR-").append(getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
         // buf.append("Msg Code : ").append(getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
 
         Map info = ExceptionHelper.getExceptionInfo(this);
