@@ -12,6 +12,6 @@
     <mule-descriptor name="RestTesterUMO"
         inboundEndpoint="servlet://restPUTTest"
         outboundEndpoint="restFileEndpoint" 
-        implementation="org.mule.samples.rest.RestTester">
+        implementation="org.mule.tck.functional.FunctionalTestComponent">
     </mule-descriptor>
 </mule-configuration>

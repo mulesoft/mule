@@ -9,7 +9,7 @@
 
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+        <agent name="mx4jAgent" className="org.mule.management.agents.Mx4jAgent"/>
     </agents>
 
     <model name="samples">
