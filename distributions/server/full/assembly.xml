@@ -51,6 +51,15 @@ Assembly descriptor for the full Mule distribution.
       </excludes>
     </fileSet>
 
+      <fileSet>
+          <directory>../../../examples/echo/bin</directory>
+          <outputDirectory>examples/echo/bin</outputDirectory>
+          <fileMode>744</fileMode>
+          <includes>
+              <include>*.sh</include>
+          </includes>
+      </fileSet>
+
 
       <!--
         ==================================
