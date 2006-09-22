@@ -10,14 +10,13 @@
 
 package org.mule.components.simple;
 
-import java.io.IOException;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.IOUtils;
+
+import java.io.IOException;
 
 /**
  * A component that will return a static data object as a result.  This is useful
@@ -31,8 +30,10 @@ public class StaticComponent implements Callable, Initialisable {
 
     private Object data;
     private String dataFile;
+    private String prefix;
+    private String postfix;
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException {
         if(dataFile!=null)
         {
             try {
@@ -59,7 +60,41 @@ public class StaticComponent implements Callable, Initialisable {
         this.dataFile = dataFile;
     }
 
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
+    }
+
+    public String getPostfix()
+    {
+        return postfix;
+    }
+
+    public void setPostfix(String postfix)
+    {
+        this.postfix = postfix;
+    }
+
     public Object onCall(UMOEventContext eventContext) throws Exception {
-        return data;
+
+        if(data!=null) {
+            return data;
+        }
+
+        String eventData = eventContext.getTransformedMessageAsString();
+
+        if(prefix!=null) {
+            eventData = prefix + eventData;
+        }
+
+        if (postfix!=null) {
+            eventData += postfix;
+        }
+        return eventData;
     }
 }
