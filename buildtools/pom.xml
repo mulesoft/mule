@@ -12,7 +12,13 @@
     <packaging>jar</packaging>
     <name>Mule's build tools</name>
     <description>These are the tools used by the Mule's build procedure</description>
-
+    <dependencies>
+        <dependency>
+            <artifactId>junit</artifactId>
+            <groupId>junit</groupId>
+            <version>3.8.1</version>
+        </dependency>
+    </dependencies>
     <build>
     <!-- nothing here yet -->
     </build>
