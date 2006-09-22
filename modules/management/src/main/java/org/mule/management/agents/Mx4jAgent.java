@@ -23,6 +23,7 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.apache.commons.logging.LogFactory;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -41,7 +42,10 @@ import java.util.Map;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class Mx4jAgent implements UMOAgent {
+public class Mx4jAgent implements UMOAgent
+{
+    private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
+
     private String name = "MX4J Agent";
     private String jmxAdaptorUrl = "http://localhost:9999";
     private HttpAdaptor adaptor;
@@ -149,7 +153,15 @@ public class Mx4jAgent implements UMOAgent {
         try {
             stop();
         } catch (Exception e) {
-            // TODO: log an exception
+            logger.warn("Failed to stop Mx4jAgent: " + e.getMessage());
+        } finally {
+            try
+            {
+                mBeanServer.unregisterMBean(adaptorName);
+            } catch (Exception e)
+            {
+                logger.error("Couldn't unregister MBean: " + adaptorName.getCanonicalName(), e);
+            }
         }
     }
 
