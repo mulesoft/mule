@@ -1,14 +1,14 @@
-Welcome to Mule!
-----------------
-http://www.muleumo.org
-
++------------------------+
+|    Welcome to Mule!    |
+|------------------------|
+| http://www.muleumo.org |
++------------------------+
 Mule is a highly scalable Enterprise Services framework and messaging broker.
-To get you started here is some useful information.
+Here is some useful information to get you started.
 
 +--------------+
 | INSTALLATION |
 +--------------+
-
 If you're reading this, it means you've already downloaded and unpacked the distribution.
 The only other thing you need to do to get started using Mule is to set the location of
 your Mule installation and add it to your path.  This will depend on your platform, but
@@ -29,7 +29,6 @@ set PATH=%PATH%;%MULE_HOME%\bin
 +--------------+
 | DISTRIBUTION |
 +--------------+
-
 The distribution you have downloaded contains the following:
 
 ./bin          - Shell and batch scripts for controlling Mule from the command line
@@ -51,7 +50,6 @@ The distribution you have downloaded contains the following:
 +-----------------+
 | GETTING STARTED |
 +-----------------+
-
 Take a look at the latest documentation on our website:
 http://www.muleumo.org/Getting+Started+Guide
 
@@ -64,7 +62,6 @@ http://www.muleumo.org/Mule+Examples
 +----------+
 | FEEDBACK |
 +----------+
-
 We hope you enjoy using Mule. To help us make it a better product please tell
 us about any issues (no matter how small), suggestions or other comments you have.
 You can post on the mailing list - user@mule.codehaus.org or raise
