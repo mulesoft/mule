@@ -1,13 +1,17 @@
 #! /bin/sh
+
 # There is no need to call this if you set the MULE_HOME in your environment
 if [ -z "$MULE_HOME" ] ; then
   MULE_HOME=../../..
   export MULE_HOME
 fi
 
-# Set your application specific classpath like this
-MULE_LIB=$MULE_HOME/examples/errorhandler/classes:$MULE_HOME/examples/errorhandler/conf
+MULE_LIB=$MULE_HOME/examples/errorhandler/conf
 export MULE_LIB
 
-$MULE_HOME/bin/mule -config ../conf/error-config.xml
-
+if [ -f "$MULE_HOME/lib/user/activemq.jar" ]
+then
+    $MULE_HOME/bin/mule -config ../conf/error-config.xml
+else
+    echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+fi
