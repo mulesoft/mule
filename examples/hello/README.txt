@@ -8,10 +8,33 @@ component that also adds some text before outputting the results back to the con
 
 For more information, refer to http://www.muleumo.org/Examples
 
-If you haven't yet added Mule to your executable path, please follow the instructions
-in INSTALL.txt first.  To run this example:
++---------------------+
+| Running the example |
++---------------------+
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run 
+the example.
 
-mule -config conf/hello-config.xml
-mule -config conf/hello-http-config.xml
-mule -config conf/hello-spring-config.xml -builder spring
+Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
+can run the example from the command line as follows:
 
+    Linux / Unix
+    ------------
+    mule -config ./conf/hello-config.xml
+    mule -config ./conf/hello-http-config.xml
+    mule -config ./conf/hello-spring-config.xml -builder spring
+
+    Windows
+    -------
+    mule.bat -config .\conf\hello-config.xml
+    mule.bat -config .\conf\hello-http-config.xml
+    mule.bat -config .\conf\hello-spring-config.xml -builder spring
+
++----------------------+
+| Building the example |
++----------------------+
+First, make sure you have set the MULE_HOME environment variable as recommended in INSTALL.txt
+
+Depending on the build tool you are using (Ant or Maven), you can build the example by simply 
+running "ant" or "mvn".  This will compile the example classes, produce a jar file, and copy 
+everything to $MULE_HOME/lib/user, which is where your custom classes and configuration files 
+should go.  

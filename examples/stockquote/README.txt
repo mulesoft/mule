@@ -7,20 +7,26 @@ demonstrates using REST and SOAP to invoke the service.
 
 For more information, refer to http://www.muleumo.org/Examples
 
-If you haven't yet added Mule to your executable path, please follow the instructions
-in INSTALL.txt first.  To run this example:
++---------------------+
+| Running the example |
++---------------------+
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run 
+the example.
 
-Linux / Unix
-------------
-mule -config ./conf/soap-config.xml
-mule -config ./conf/wsdl-config.xml
-mule -config ./conf/rest-config.xml
+Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
+can run the example from the command line as follows:
 
-Windows
--------
-mule.bat -config .\conf\soap-config.xml
-mule.bat -config .\conf\wsdl-config.xml
-mule.bat -config .\conf\rest-config.xml
+    Linux / Unix
+    ------------
+    mule -config ./conf/soap-config.xml
+    mule -config ./conf/wsdl-config.xml
+    mule -config ./conf/rest-config.xml
+
+    Windows
+    -------
+    mule.bat -config .\conf\soap-config.xml
+    mule.bat -config .\conf\wsdl-config.xml
+    mule.bat -config .\conf\rest-config.xml
 
 +-------------------+
 | Firewall settings |
@@ -29,14 +35,24 @@ mule.bat -config .\conf\rest-config.xml
 If you are behind a firewall, you will need to configure the settings for your HTTP proxy
 in the ./conf/proxy.properties file.  Then you can run the example as follows:
 
-Linux / Unix
-------------
-mule -config ./conf/soap-config.xml -props ./conf/proxy.properties
-mule -config ./conf/wsdl-config.xml -props ./conf/proxy.properties
-mule -config ./conf/rest-config.xml -props ./conf/proxy.properties
+    Linux / Unix
+    ------------
+    mule -config ./conf/soap-config.xml -props ./conf/proxy.properties
+    mule -config ./conf/wsdl-config.xml -props ./conf/proxy.properties
+    mule -config ./conf/rest-config.xml -props ./conf/proxy.properties
 
-Windows
--------
-mule.bat -config .\conf\soap-config.xml -props .\conf\proxy.properties
-mule.bat -config .\conf\wsdl-config.xml -props .\conf\proxy.properties
-mule.bat -config .\conf\rest-config.xml -props .\conf\proxy.properties
+    Windows
+    -------
+    mule.bat -config .\conf\soap-config.xml -props .\conf\proxy.properties
+    mule.bat -config .\conf\wsdl-config.xml -props .\conf\proxy.properties
+    mule.bat -config .\conf\rest-config.xml -props .\conf\proxy.properties
+
++----------------------+
+| Building the example |
++----------------------+
+First, make sure you have set the MULE_HOME environment variable as recommended in INSTALL.txt
+
+Depending on the build tool you are using (Ant or Maven), you can build the example by simply 
+running "ant" or "mvn".  This will compile the example classes, produce a jar file, and copy 
+everything to $MULE_HOME/lib/user, which is where your custom classes and configuration files 
+should go.  

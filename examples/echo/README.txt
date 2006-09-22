@@ -6,13 +6,24 @@ in this case as an Axis web sevice and via System.in (request) and System.out (r
 
 For more information, refer to http://www.muleumo.org/Examples
 
-If you haven't yet added Mule to your executable path, please follow the instructions
-in INSTALL.txt first.  To run this example:
++---------------------+
+| Running the example |
++---------------------+
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run 
+the example.
 
-Linux / Unix
-------------
-mule -config ./conf/echo-config.xml
+Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
+can run the example from the command line as follows:
 
-Windows
--------
-mule.bat -config .\conf\echo-config.xml
+    Linux / Unix
+    ------------
+    mule -config ./conf/echo-config.xml
+
+    Windows
+    -------
+    mule.bat -config .\conf\echo-config.xml
+
++----------------------+
+| Building the example |
++----------------------+
+This example has no custom classes so there's not much point in building it.
