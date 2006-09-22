@@ -308,6 +308,8 @@ Assembly descriptor for the full Mule distribution.
               <exclude>.classpath</exclude>
               <exclude>.settings</exclude>
               <exclude>*.iml</exclude>
+              <exclude>*.ipr</exclude>
+              <exclude>*.iws</exclude>
               <exclude>pom.xml</exclude>
               <exclude>*.log</exclude>
           </excludes>
@@ -345,25 +347,23 @@ Assembly descriptor for the full Mule distribution.
               <exclude>.classpath</exclude>
               <exclude>.settings</exclude>
               <exclude>*.iml</exclude>
+              <exclude>*.ipr</exclude>
+              <exclude>*.iws</exclude>
               <exclude>pom.xml</exclude>
               <exclude>*.log</exclude>
           </excludes>
       </fileSet>
 
       <fileSet>
-          <directory>../../../examples/webapp/src/main/java</directory>
-          <outputDirectory>examples/webapp/src</outputDirectory>
+          <directory>../../../examples/webapp/src/main/webapp</directory>
+          <outputDirectory>examples/webapp/webapp</outputDirectory>
       </fileSet>
 
       <fileSet>
           <directory>../../../examples/webapp/src/main/resources</directory>
-          <outputDirectory>examples/webapp/src</outputDirectory>
+          <outputDirectory>examples/webapp/webapp/classes</outputDirectory>
       </fileSet>
 
-      <fileSet>
-          <directory>../../../examples/webapp/src/main/java</directory>
-          <outputDirectory>examples/webapp/web</outputDirectory>
-      </fileSet>
 
     <!-- Copy the USAGE.txt file to the root directory for visibility -->
     <fileSet>
