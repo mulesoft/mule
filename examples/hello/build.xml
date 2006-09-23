@@ -19,7 +19,7 @@
         <delete dir="${dir.build}"/>
     </target>
 
-    <target name="sanity.check">
+    <target name="sanity.check" depends="clean">
         <property environment="env"/>
         <property name="dir.mule.home" value="${env.MULE_HOME}"/>
         <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
