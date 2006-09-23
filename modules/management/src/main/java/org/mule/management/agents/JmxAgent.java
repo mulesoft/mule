@@ -327,8 +327,8 @@ public class JmxAgent implements UMOAgent
             if (connector instanceof AbstractConnector) {
                 for (Iterator iterator = ((AbstractConnector) connector).getReceivers().values().iterator(); iterator.hasNext();) {
                     EndpointServiceMBean mBean = new EndpointService((UMOMessageReceiver) iterator.next());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Attempting to register service with name: " + getDomainName()
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Attempting to register service with name: " + getDomainName()
                                 + ":type=org.mule.umo.UMOEndpoint,name=" + mBean.getName());
                     }
                     ObjectName on = ObjectName.getInstance(getDomainName() + ":type=org.mule.Endpoint,component=" + mBean.getComponentName()+ ",name=" + mBean.getName());
