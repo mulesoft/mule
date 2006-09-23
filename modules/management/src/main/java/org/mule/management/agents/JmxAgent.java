@@ -80,7 +80,6 @@ public class JmxAgent implements UMOAgent
     private List registeredMBeans = new ArrayList();
     private boolean serverCreated = false;
     private boolean initialized = false;
-    private boolean useInstanceIdAsDomain = true;
 
     /*
      * (non-Javadoc)
@@ -257,11 +256,7 @@ public class JmxAgent implements UMOAgent
 
     protected String getDomainName()
     {
-        if (MuleManager.getInstance().getId() != null && isUseInstanceIdAsDomain()) {
-            return MuleManager.getInstance().getId();
-        } else {
-            return "org.mule";
-        }
+        return "Mule";
     }
 
     protected void registerStatisticsService() throws NotCompliantMBeanException, MBeanRegistrationException,
@@ -458,11 +453,4 @@ public class JmxAgent implements UMOAgent
         this.connectorServerProperties = connectorServerProperties;
     }
 
-    public boolean isUseInstanceIdAsDomain() {
-        return useInstanceIdAsDomain;
-    }
-
-    public void setUseInstanceIdAsDomain(boolean useInstanceIdAsDomain) {
-        this.useInstanceIdAsDomain = useInstanceIdAsDomain;
-    }
 }
