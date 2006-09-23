@@ -26,7 +26,8 @@
     <mule-descriptor name="GreeterUMO" implementation="org.mule.samples.hello.Greeter">
         <inbound-router>
             <endpoint address="vm://greeter" transformers="StringToNameString"/>
-            <endpoint address="servlet://greeter" transformers="StringToNameString"/>
+            <!-- Used by the REST Hello world Example -->
+            <endpoint address="servlet://greeter" name="servletGreeter" transformers="StringToNameString"/>
         </inbound-router>
         <outbound-router>
             <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

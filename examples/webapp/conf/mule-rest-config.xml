@@ -6,7 +6,7 @@
 <mule-configuration id="Samples" version="1.0">
 
     <global-endpoints>
-        <endpoint name="restFileEndpoint" address="file://./temp/mule"/>
+        <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
     </global-endpoints>
 
     <mule-descriptor name="RestTesterUMO"
