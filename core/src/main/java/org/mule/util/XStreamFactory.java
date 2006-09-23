@@ -27,6 +27,7 @@ public class XStreamFactory
 {
     public static final String XSTREAM_DOM_DRIVER = "com.thoughtworks.xstream.io.xml.DomDriver";
     public static final String XSTREAM_DOM4J_DRIVER = "com.thoughtworks.xstream.io.xml.Dom4JDriver";
+    public static final String XSTREAM_JDOM_DRIVER = "com.thoughtworks.xstream.io.xml.JDomDriver";
     public static final String XSTREAM_STAX_DRIVER = "com.thoughtworks.xstream.io.xml.StaxDriver";
     public static final String XSTREAM_XPP_DRIVER = "com.thoughtworks.xstream.io.xml.XppDriver";
 
