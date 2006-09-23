@@ -11,9 +11,9 @@ package org.mule.management.mbeans;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.util.ObjectNameHelper;
 
 import java.beans.ExceptionListener;
 
@@ -25,10 +25,12 @@ import java.beans.ExceptionListener;
 public class ConnectorService implements ConnectorServiceMBean
 {
     private UMOConnector connector;
+    private String name;
 
     public ConnectorService(final UMOConnector connector)
     {
         this.connector = connector;
+        name = ObjectNameHelper.getConnectorName(connector);
     }
 
     public boolean isStarted()
@@ -48,7 +50,7 @@ public class ConnectorService implements ConnectorServiceMBean
 
     public String getName()
     {
-        return connector.getName();
+        return name;
     }
 
     public String getProtocol()
@@ -83,8 +85,7 @@ public class ConnectorService implements ConnectorServiceMBean
         connector.dispose();
     }
 
-    public void initialise()
-            throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException
     {
         connector.initialise();
     }

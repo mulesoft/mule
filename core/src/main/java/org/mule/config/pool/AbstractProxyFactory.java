@@ -11,7 +11,7 @@
 package org.mule.config.pool;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.ComponentUtil;
+import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -47,7 +47,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
     }
 
     public Object create() throws UMOException {
-        Object component = ComponentUtil.createComponent(descriptor);
+        Object component = ComponentFactory.createComponent(descriptor);
         afterComponentCreate(component);
         return createProxy(component);
     }

@@ -113,6 +113,12 @@ public class JcaComponent implements UMOComponent
         // nothing to do
     }
 
+
+    public boolean isPaused()
+    {
+        return false;
+    }
+
     public void start() throws UMOException
     {
         started = true;

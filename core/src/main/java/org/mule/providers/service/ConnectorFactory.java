@@ -29,6 +29,7 @@ import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectFactory;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.SpiUtils;
+import org.mule.util.ObjectNameHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,7 +103,7 @@ public class ConnectorFactory
         endpoint.setEndpointURI(uri);
         String name = uri.getEndpointName();
         if (name == null) {
-            name = "_" + scheme + "Endpoint#" + endpoint.hashCode();
+            name = ObjectNameHelper.getEndpointName(endpoint);
         }
         endpoint.setName(name);
 
@@ -222,7 +223,7 @@ public class ConnectorFactory
         }
 
         if (connector.getName() == null) {
-            connector.setName("_" + scheme + "Connector#" + connector.hashCode());
+            connector.setName(ObjectNameHelper.getConnectorName(connector));
         }
         // set any manager default properties for the connector
         // these are set on the Manager with a protocol i.e.

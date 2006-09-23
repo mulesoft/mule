@@ -18,11 +18,6 @@ import javax.management.ObjectName;
 
 import java.util.Set;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- *
- * $Id$$
- */
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
@@ -31,17 +26,16 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        jmxAgent.setUseInstanceIdAsDomain(false);
         manager.registerConnector(connector);
         manager.registerAgent(jmxAgent);
         manager.start();
 
-        Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
+        Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("Mule:*"), null);
         assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
 
         manager.dispose();
 
-        mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
+        mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("Mule:*"), null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
     }
 }

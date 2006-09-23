@@ -16,6 +16,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ObjectNameHelper;
 
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint
@@ -62,14 +63,7 @@ public class EndpointService implements EndpointServiceMBean
             throw new IllegalArgumentException("Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
 
-        //Endpoint naming is a little messy right now.  Need to tighten it up
-
-        name = endpoint.getConnector().getProtocol().toLowerCase() + "#";
-        if(endpoint.getName().startsWith(name)) {
-            name = endpoint.getName().replaceAll(":", "#");
-        } else {
-            name += endpoint.getName().replaceAll(":", "#");
-        }
+        name = ObjectNameHelper.getEndpointName(endpoint);
 
     }
 

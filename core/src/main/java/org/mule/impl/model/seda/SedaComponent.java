@@ -10,14 +10,6 @@
 
 package org.mule.impl.model.seda;
 
-import java.util.NoSuchElementException;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkListener;
-import javax.resource.spi.work.WorkManager;
-
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.PoolingProfile;
@@ -27,7 +19,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.FailedToQueueEventException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.model.AbstractAsynchronousComponent;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.umo.ComponentException;
@@ -40,6 +32,13 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkManager;
+import java.util.NoSuchElementException;
+
 /**
  * A Seda component runs inside a Seda Model and is responsible for managing a
  * Seda Queue and thread pool for a Mule sevice component. In Seda terms this is
@@ -48,8 +47,7 @@ import org.mule.util.queue.QueueSession;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SedaComponent extends AbstractAsynchronousComponent implements
-        Work, WorkListener
+public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {
     /**
      * Serial version
@@ -91,7 +89,9 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
     protected boolean componentPerRequest = false;
 
     /**
-     * Default constructor
+     * Creates a new SEDA component
+     * @param descriptor The descriptor of the component to creat
+     * @param model the model in which the component is registered
      */
     public SedaComponent(MuleDescriptor descriptor, SedaModel model)
     {
@@ -346,6 +346,7 @@ public class SedaComponent extends AbstractAsynchronousComponent implements
                 }
             } catch (Exception e)
             {
+                //noinspection ThrowFromFinallyBlock
                 throw new ComponentException(event.getMessage(), this, e);
             }
 

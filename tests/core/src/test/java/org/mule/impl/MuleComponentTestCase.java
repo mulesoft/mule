@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.impl.model.ComponentUtil;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.ComponentException;
@@ -37,7 +36,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
         final UMOComponent comp = session.getComponent();
         assertTrue(comp.isStarted());
-        ComponentUtil.pause(comp);
+        comp.pause();
         new Thread(new Runnable() {
             public void run()
             {
@@ -47,7 +46,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
                     // ignore
                 }
                 try {
-                    ComponentUtil.resume(comp);
+                    comp.resume();
                 } catch (UMOException e) {
                     fail(e.getMessage());
                 }

@@ -180,8 +180,6 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
      * component is a placeholder of the JBI component that isn't managed
      * by mule
      *
-     * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
-     * @version $Revision$
      */
     class NullUMOComponent implements UMOComponent
     {
@@ -214,6 +212,12 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
         public void resume() throws UMOException {
             // nothing to do
+        }
+
+
+        public boolean isPaused()
+        {
+            return false;
         }
 
         public void start() throws UMOException {

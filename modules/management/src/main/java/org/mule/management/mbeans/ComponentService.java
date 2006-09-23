@@ -10,21 +10,19 @@
 
 package org.mule.management.mbeans;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.ComponentUtil;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMOAsynchronousComponent;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 /**
  * <code>ComponentService</code> exposes service information about a Mule
@@ -80,7 +78,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      * @see org.mule.config.MuleConfiguration
      */
     public void pause() throws UMOException {
-        ComponentUtil.pause(getComponent());
+        getComponent().pause();
     }
 
     /**
@@ -90,16 +88,11 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      * @throws org.mule.umo.UMOException if the component failed to resume
      */
     public void resume() throws UMOException {
-        ComponentUtil.resume(getComponent());
+        getComponent().resume();
     }
 
     public boolean isPaused() {
-        if (getComponent() instanceof UMOAsynchronousComponent) {
-            return ((UMOAsynchronousComponent) getComponent()).isPaused();
-        } else {
-            LOGGER.warn("Attempting to query 'paused' status for component " + getComponent() + " which does not implement UMOAsynchronousComponent.");
-            return false;
-        }
+        return getComponent().isPaused();
     }
 
     public boolean isStopped()

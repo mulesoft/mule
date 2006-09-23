@@ -10,10 +10,10 @@
 
 package org.mule.umo;
 
-import java.io.Serializable;
-
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
+
+import java.io.Serializable;
 
 /**
  * <code>UMOComponent</code> is the interal repesentation of a Mule Managed
@@ -67,4 +67,26 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable
      * @return the underlying instance form this component
      */
     Object getInstance() throws UMOException;
+
+    /**
+     * Pauses event processing for a single Mule Component. Unlike
+     * stop(), a paused component will still consume messages from the
+     * underlying transport, but those messages will be queued until the
+     * component is resumed.
+     *
+     */
+     void pause() throws UMOException;
+
+    /**
+     * Resumes a single Mule Component that has been paused. If the component is
+     * not paused nothing is executed.
+     *
+     */
+     void resume() throws UMOException;
+
+    /**
+     * True if the component is in a paused state, false otherwise
+     * @return True if the component is in a paused state, false otherwise
+     */
+    boolean isPaused();
 }
