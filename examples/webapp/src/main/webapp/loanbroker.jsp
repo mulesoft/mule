@@ -32,7 +32,6 @@
         }%>
         </ol>
 
-        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%5FSamples%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {
         MuleClient client = new MuleClient();
@@ -76,7 +75,7 @@
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
 <tr><td>For more information about Loan Broker example go <a target="_blank" href="http://mule.codehaus.org/Loan+Broker+Example">here</a>.<br/>
-To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/loanbroker/">here</a>.</td></tr>
+To view the source and configuration go <a target="_blank" href="http://svn.mule.codehaus.org/browse/mule/trunk/mule/examples/loanbroker/">here</a>.</td></tr>
 </table>
 </body>
 </html>

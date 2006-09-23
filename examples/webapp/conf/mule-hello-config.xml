@@ -27,7 +27,7 @@
         <inbound-router>
             <endpoint address="vm://greeter" transformers="StringToNameString"/>
             <!-- Used by the REST Hello world Example -->
-            <endpoint address="servlet://greeter" name="servletGreeter" transformers="StringToNameString"/>
+            <endpoint address="servlet://greeter" transformers="StringToNameString"/>
         </inbound-router>
         <outbound-router>
             <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
