@@ -12,7 +12,6 @@ package org.mule.providers.http.servlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.umo.UMOMessage;
@@ -21,7 +20,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 
 /**
@@ -108,13 +106,12 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         }
         else {
             HttpResponse httpResponse;
-            if (message.getAdapter() instanceof WriterMessageAdapter) {
-                WriterMessageAdapter adapter = (WriterMessageAdapter) message.getAdapter();
-                httpResponse = new HttpResponse();
-                httpResponse.setBodyString(adapter.getPayloadAsString());
-            }
-            else {
+            
+            if (message.getPayload() instanceof HttpResponse){
                 httpResponse = (HttpResponse)message.getPayload();
+            } else {
+                httpResponse = new HttpResponse();
+                httpResponse.setBodyString(message.getAdapter().getPayloadAsString());
             }
 
             String contentType = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE)
