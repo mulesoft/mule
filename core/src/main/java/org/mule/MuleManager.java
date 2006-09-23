@@ -12,6 +12,23 @@ package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -46,8 +63,6 @@ import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
-import org.mule.impl.space.SpaceMonitorNotification;
-import org.mule.impl.space.SpaceMonitorNotificationListener;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
@@ -65,6 +80,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringMessageUtils;
@@ -72,23 +88,6 @@ import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
-
-import javax.transaction.TransactionManager;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -249,8 +248,22 @@ public class MuleManager implements UMOManager
         notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
         notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
         notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
-        notificationManager.registerEventType(SpaceMonitorNotification.class, SpaceMonitorNotificationListener.class);
-
+        
+        // This is obviously just a workaround until extension modules can register
+        // their own classes for notifications. Need to revisit this when the
+        // ManagementContext has been implanted properly.
+        try
+        {
+            Class spaceNotificationClass = ClassUtils.loadClass(
+                "org.mule.impl.space.SpaceMonitorNotification", this.getClass());
+            Class spaceListenerClass = ClassUtils.loadClass(
+                "org.mule.impl.space.SpaceMonitorNotificationListener", this.getClass());
+            notificationManager.registerEventType(spaceNotificationClass, spaceListenerClass);
+        }
+        catch (ClassNotFoundException cnf)
+        {
+            // ignore - apparently not available
+        }
     }
 
     /**
