@@ -10,10 +10,7 @@
 
 package org.mule.providers.jms;
 
-/**
- * @author Holger Hoffstaette
- */
-
+// @Immutable
 public class JmsConstants
 {
     public static final String JMS_SPECIFICATION_102B = "1.0.2b";
@@ -30,7 +27,7 @@ public class JmsConstants
     public static final String JMS_TIMESTAMP = "JMSTimestamp";
     public static final String JMS_TYPE = "JMSType";
 
-    //QoS properties
+    // QoS properties
     public static final String TIME_TO_LIVE_PROPERTY = "timeToLive";
     public static final String PERSISTENT_DELIVERY_PROPERTY = "persistentDelivery";
     public static final String PRIORITY_PROPERTY = "priority";
