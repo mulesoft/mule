@@ -7,18 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 /**
- * <code>ComponentException</code> should be thrown when some action on a
- * component fails such as starting or stopping
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ComponentException</code> should be thrown when some action on a component
+ * fails, such as starting or stopping
  */
+// @Immutable
 public class ComponentException extends MessagingException
 {
     /**
@@ -26,7 +25,7 @@ public class ComponentException extends MessagingException
      */
     private static final long serialVersionUID = 56178344205041599L;
 
-    private transient UMOComponent component;
+    private transient final UMOComponent component;
 
     /**
      * @param message the exception message
@@ -58,15 +57,18 @@ public class ComponentException extends MessagingException
         return component;
     }
 
-    private static Message generateMessage(Message message, UMOComponent component)
+    private static Message generateMessage(Message previousMessage, UMOComponent component)
     {
-        Message m = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
-        if (message != null) {
-            message.setNextMessage(m);
-            return message;
-        } else {
-            message = new Message(0);
-            return m;
+        Message returnMessage = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
+        if (previousMessage != null)
+        {
+            previousMessage.setNextMessage(returnMessage);
+            return previousMessage;
+        }
+        else
+        {
+            return returnMessage;
         }
     }
+
 }
