@@ -10,6 +10,10 @@
 
 package org.mule.providers;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
@@ -18,20 +22,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
 /**
  * <p>
- * <code>PollingMessageReceiver</code> implements a polling message receiver.
- * The receiver provides a poll method that implementations should implement to
- * execute their custom code. Note that the receiver will not poll if the
- * associated connector is not started.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * <code>PollingMessageReceiver</code> implements a polling message receiver. The
+ * receiver provides a poll method that implementations should implement to execute
+ * their custom code. Note that the receiver will not poll if the associated
+ * connector is not started.
  */
 public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements Work
 {
@@ -51,9 +47,12 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     public void doStart() throws UMOException
     {
-        try {
+        try
+        {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
-        } catch (WorkException e) {
+        }
+        catch (WorkException e)
+        {
             stopped.set(true);
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
@@ -61,20 +60,29 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     public void run()
     {
-        try {
+        try
+        {
             Thread.sleep(STARTUP_DELAY);
-            while (!stopped.get()) {
+            while (!stopped.get())
+            {
                 connected.whenTrue(null);
-                try {
+                try
+                {
                     poll();
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
                     return;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     handleException(e);
                 }
                 Thread.sleep(frequency);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             // Exit thread
         }
     }
@@ -86,9 +94,12 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     public void setFrequency(long l)
     {
-        if (l <= 0) {
+        if (l <= 0)
+        {
             frequency = DEFAULT_POLL_FREQUENCY;
-        } else {
+        }
+        else
+        {
             frequency = l;
         }
     }
@@ -98,10 +109,6 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
         return frequency;
     }
 
-    protected void doDispose()
-    {
-        // nothing to do
-    }
-
     public abstract void poll() throws Exception;
+
 }
