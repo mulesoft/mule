@@ -7,28 +7,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo;
 
 import org.mule.impl.RequestContext;
 
 /**
- * <code>Invocation</code> represents a link in an interceptor chain.
- * Interceptors can be configured om Mule Managed components.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Invocation</code> represents a link in an interceptor chain. Interceptors
+ * can be configured om Mule Managed components.
  */
-
+// @ThreadSafe
 public class Invocation
 {
     /** The components descriptor */
-    private UMOImmutableDescriptor descriptor;
+    // @GuardedBy(itself)
+    private final UMOImmutableDescriptor descriptor;
+
+    /** the next invocation in the chain */
+    // @GuardedBy(itself)
+    private final Invocation invocation;
 
     /** The current message for the component */
+    // @GuardedBy(this)
     private UMOMessage message;
-
-    /** he next invocation in the chain */
-    private Invocation invocation;
 
     /**
      * Constructs an initialised invocation
@@ -65,6 +66,11 @@ public class Invocation
         return descriptor;
     }
 
+    public UMOEvent getEvent()
+    {
+        return RequestContext.getEvent();
+    }
+
     /**
      * Returns the current message
      * 
@@ -72,16 +78,18 @@ public class Invocation
      */
     public UMOMessage getMessage()
     {
-        return message;
+        synchronized (this)
+        {
+            return message;
+        }
     }
 
-    public UMOEvent getEvent()
+    public void setMessage(UMOMessage message)
     {
-        return RequestContext.getEvent();
+        synchronized (this)
+        {
+            this.message = message;
+        }
     }
 
-    public synchronized void setMessage(UMOMessage message)
-    {
-        this.message = message;
-    }
 }

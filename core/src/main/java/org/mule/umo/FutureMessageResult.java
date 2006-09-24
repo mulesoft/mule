@@ -28,7 +28,7 @@ import org.mule.util.concurrent.DaemonThreadFactory;
  * on a Mule Server. This object makes the result available to the client code once
  * the request has been processed. This execution happens asynchronously.
  */
-
+// @ThreadSafe
 public class FutureMessageResult extends FutureTask
 {
     /**
@@ -55,13 +55,15 @@ public class FutureMessageResult extends FutureTask
     private static final Executor DefaultExecutor =
         Executors.newSingleThreadExecutor(new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
 
-    private volatile Executor executor;
-    private volatile UMOTransformer transformer;
+    // @GuardedBy(this)
+    private Executor executor;
+    // @GuardedBy(this)
+    private UMOTransformer transformer;
 
     public FutureMessageResult(Callable callable)
     {
         super(callable);
-        this.setExecutor(DefaultExecutor);
+        this.executor = DefaultExecutor;
     }
 
     /**
@@ -72,7 +74,7 @@ public class FutureMessageResult extends FutureTask
     public FutureMessageResult(Callable callable, UMOTransformer transformer)
     {
         this(callable);
-        this.setTransformer(transformer);
+        this.transformer = transformer;
     }
 
     /**
@@ -83,7 +85,10 @@ public class FutureMessageResult extends FutureTask
      */
     public void setTransformer(UMOTransformer t)
     {
-        this.transformer = t;
+        synchronized (this)
+        {
+            this.transformer = t;
+        }
     }
 
     /**
@@ -99,7 +104,10 @@ public class FutureMessageResult extends FutureTask
             throw new IllegalArgumentException("Executor must not be null.");
         }
 
-        this.executor = e;
+        synchronized (this)
+        {
+            this.executor = e;
+        }
     }
 
     public UMOMessage getMessage() throws InterruptedException, ExecutionException, TransformerException
@@ -121,10 +129,15 @@ public class FutureMessageResult extends FutureTask
             {
                 return (UMOMessage)obj;
             }
-            if (transformer != null)
+
+            synchronized (this)
             {
-                obj = transformer.transform(obj);
+                if (transformer != null)
+                {
+                    obj = transformer.transform(obj);
+                }
             }
+
             return new MuleMessage(obj);
         }
         else
@@ -138,7 +151,10 @@ public class FutureMessageResult extends FutureTask
      */
     public void execute()
     {
-        executor.execute(this);
+        synchronized (this)
+        {
+            executor.execute(this);
+        }
     }
 
 }
