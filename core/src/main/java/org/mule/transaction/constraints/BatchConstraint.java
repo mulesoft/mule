@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transaction.constraints;
 
 import org.mule.umo.UMOEvent;
@@ -14,41 +15,52 @@ import org.mule.umo.UMOEvent;
 /**
  * <code>BatchConstraint</code> is a filter that counts on every execution and
  * returns true when the batch size value equals the execution count.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-
+// @ThreadSafe
 public class BatchConstraint extends ConstraintFilter
 {
+    // @GuardedBy(this)
     private int batchSize = 1;
-
+    // @GuardedBy(this)
     private int batchCount = 0;
 
     public boolean accept(UMOEvent event)
     {
-        batchCount++;
-        return batchCount == batchSize;
+        synchronized (this)
+        {
+            batchCount++;
+            return batchCount == batchSize;
+        }
     }
 
     public int getBatchSize()
     {
-        return batchSize;
+        synchronized (this)
+        {
+            return batchSize;
+        }
     }
 
-    public void setBatchSize(int batchSize)
+    public synchronized void setBatchSize(int batchSize)
     {
-        this.batchSize = batchSize;
+        synchronized (this)
+        {
+            this.batchSize = batchSize;
+        }
     }
 
     public Object clone() throws CloneNotSupportedException
     {
-        BatchConstraint clone = new BatchConstraint();
-        clone.setBatchSize(batchSize);
-        for (int i = 0; i < batchCount; i++) {
-            clone.accept(null);
+        synchronized (this)
+        {
+            BatchConstraint clone = (BatchConstraint)super.clone();
+            clone.setBatchSize(batchSize);
+            for (int i = 0; i < batchCount; i++)
+            {
+                clone.accept(null);
+            }
+            return clone;
         }
-        return clone;
     }
 
 }
