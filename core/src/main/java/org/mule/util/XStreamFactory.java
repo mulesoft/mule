@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * Initializes the XStream utility for converting Objects to XML and XML to Objects.
  */
+// @Immutable
 public class XStreamFactory
 {
     public static final String XSTREAM_DOM_DRIVER = "com.thoughtworks.xstream.io.xml.DomDriver";

@@ -10,21 +10,18 @@
 
 package org.mule.util;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * <code>DateUtils</code> contains some useful methods dealing date/time conversion,
- * formatting etc.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
+/**
+ * <code>DateUtils</code> contains some useful methods dealing date/time
+ * conversion, formatting etc.
+ */
+// @Immutable
 public class DateUtils extends org.apache.commons.lang.time.DateUtils
 {
 
@@ -73,12 +70,11 @@ public class DateUtils extends org.apache.commons.lang.time.DateUtils
         long secs = mills / 1000;
         mills = mills - (secs * 1000);
 
-        StringBuffer bf = new StringBuffer();
+        StringBuffer bf = new StringBuffer(60);
         bf.append(days).append(" ").append(new Message(Messages.DAYS).getMessage()).append(", ");
         bf.append(hours).append(" ").append(new Message(Messages.HOURS).getMessage()).append(", ");
         bf.append(mins).append(" ").append(new Message(Messages.MINS).getMessage()).append(", ");
-        bf.append(secs).append(".").append(mills).append(" ").append(
-                new Message(Messages.SEC).getMessage());
+        bf.append(secs).append(".").append(mills).append(" ").append(new Message(Messages.SEC).getMessage());
         return bf.toString();
     }
 

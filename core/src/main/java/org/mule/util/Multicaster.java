@@ -21,23 +21,21 @@ import java.util.List;
 /**
  * <code>Multicaster</code> is a utility that can call a given method on a
  * collection of objects that implement one or more common interfaces. The create
- * method returns a proxy that can be cast to any of the the interfaces passed
- * and be used like a single object.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * method returns a proxy that can be cast to any of the the interfaces passed and be
+ * used like a single object.
  */
-
+// @Immutable
 public class Multicaster
 {
+
     public static Object create(Class theInterface, Collection objects)
     {
-        return create(new Class[] { theInterface }, objects);
+        return create(new Class[]{theInterface}, objects);
     }
 
     public static Object create(Class theInterface, Collection objects, InvokeListener listener)
     {
-        return create(new Class[] { theInterface }, objects, listener);
+        return create(new Class[]{theInterface}, objects, listener);
     }
 
     public static Object create(Class[] interfaces, Collection objects)
@@ -47,17 +45,16 @@ public class Multicaster
 
     public static Object create(Class[] interfaces, Collection objects, InvokeListener listener)
     {
-        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                                              interfaces,
-                                              new CastingHandler(objects, listener));
+        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces,
+            new CastingHandler(objects, listener));
 
         return proxy;
     }
 
     private static class CastingHandler implements InvocationHandler
     {
-        private Collection objects;
-        private InvokeListener listener;
+        private final Collection objects;
+        private final InvokeListener listener;
 
         public CastingHandler(Collection objects)
         {
@@ -75,20 +72,29 @@ public class Multicaster
             List results = new ArrayList();
             Object item = null;
             Object result;
-            for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
-                try {
+
+            for (Iterator iterator = objects.iterator(); iterator.hasNext();)
+            {
+                try
+                {
                     item = iterator.next();
                     result = method.invoke(item, args);
-                    if (listener != null) {
+                    if (listener != null)
+                    {
                         listener.afterExecute(item, method, args);
                     }
-                    if (result != null) {
+                    if (result != null)
+                    {
                         results.add(result);
                     }
-                } catch (Throwable t) {
-                    if (listener != null) {
+                }
+                catch (Throwable t)
+                {
+                    if (listener != null)
+                    {
                         t = listener.onException(item, method, args, t);
-                        if (t != null) {
+                        if (t != null)
+                        {
                             throw t;
                         }
                     }
@@ -102,14 +108,7 @@ public class Multicaster
     {
         void afterExecute(Object object, Method method, Object[] args);
 
-        /**
-         * 
-         * @param object
-         * @param method
-         * @param args
-         * @param t
-         * @return A Throwable to throw otherwise null to ingore the exception
-         */
         Throwable onException(Object object, Method method, Object[] args, Throwable t);
     }
+
 }

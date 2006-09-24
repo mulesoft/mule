@@ -15,25 +15,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
- * The Encoder contains methods that convert characters to Character entities
- * as defined by http://www.w3.org/TR/REC-html40/sgml/entities.html.
+ * The Encoder contains methods that convert characters to Character entities as
+ * defined by http://www.w3.org/TR/REC-html40/sgml/entities.html.
  */
-public class SgmlCodec {
+// @Immutable
+public class SgmlCodec
+{
+    private static final Map decoder = new HashMap(300);
+    private static final String[] encoder = new String[0x100];
+    private static final Pattern entityPattern = Pattern.compile("&#(\\d+);|&(\\w+);");
 
-    protected final static Map decoder = new HashMap(300);
-
-    protected static String[] encoder = new String[0x100];
-
-    protected static final Pattern entityPattern = Pattern.compile("&#(\\d+);|&(\\w+);");
-
-    static {
+    static
+    {
         add("&quot", 34);
         add("&amp", 38);
         add("&lt", 60);
         add("&gt", 62);
-        add("&at", 64); //@
+        add("&at", 64); // @
         add("&nbsp", 160);
         add("&iexcl", 161);
         add("&cent", 162);
@@ -284,33 +283,35 @@ public class SgmlCodec {
         add("&euro", 8364);
     }
 
-    public final static String encodeString(String s) {
+    public final static String encodeString(String s)
+    {
 
         int length = s.length();
         StringBuffer buffer = new StringBuffer(length * 2);
 
-        for (int i = 0; i < length; i++) {
-
+        for (int i = 0; i < length; i++)
+        {
             char c = s.charAt(i);
             int j = c;
 
-            if ((j < 0x100) && (encoder[j] != null)) {
-
+            if ((j < 0x100) && (encoder[j] != null))
+            {
                 buffer.append(encoder[j]);
-
                 // have a named encoding
                 buffer.append(';');
-            } else if (j < 0x80) {
-
+            }
+            else if (j < 0x80)
+            {
                 buffer.append(c);
-
                 // use ASCII value
-            } else {
+            }
+            else
+            {
 
                 buffer.append("&#");
 
                 // use numeric encoding
-                buffer.append((int) c);
+                buffer.append((int)c);
                 buffer.append(';');
             }
         }
@@ -323,7 +324,8 @@ public class SgmlCodec {
         String result = string;
         Matcher m = entityPattern.matcher(string);
 
-        while(m.find()) {
+        while (m.find())
+        {
             String ent = m.group();
             result = result.replaceAll(ent, decodeEntity(ent));
         }
@@ -332,47 +334,49 @@ public class SgmlCodec {
 
     public final static String decodeEntity(String entity)
     {
-        if (entity.charAt(entity.length() - 1) == ';') {
+        if (entity.charAt(entity.length() - 1) == ';')
+        {
             // remove trailing semicolon
             entity = entity.substring(0, entity.length() - 1);
         }
 
-        if (entity.charAt(1) == '#') {
-
+        if (entity.charAt(1) == '#')
+        {
             int start = 2;
             int radix = 10;
 
-            if ((entity.charAt(2) == 'X') || (entity.charAt(2) == 'x')) {
+            if ((entity.charAt(2) == 'X') || (entity.charAt(2) == 'x'))
+            {
 
                 start++;
                 radix = 16;
             }
 
-            Character c =
-                    new Character((char) Integer.parseInt(entity.substring(start), radix));
+            return String.valueOf((char)Integer.parseInt(entity.substring(start), radix));
+        }
+        else
+        {
+            String s = (String)decoder.get(entity);
 
-            return c.toString();
-        } else {
-
-            String s = (String) decoder.get(entity);
-
-            if (s != null) {
-
+            if (s != null)
+            {
                 return s;
-            } else {
-
+            }
+            else
+            {
                 return "";
             }
         }
     }
 
-    protected final static void add(String entity, int value) {
+    protected final static void add(String entity, int value)
+    {
+        decoder.put(entity, String.valueOf((char)value));
 
-        decoder.put(entity, (new Character((char) value)).toString());
-
-        if (value < 0x100) {
-
+        if (value < 0x100)
+        {
             encoder[value] = entity;
         }
     }
+
 }

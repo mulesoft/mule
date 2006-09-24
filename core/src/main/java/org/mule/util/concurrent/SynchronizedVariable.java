@@ -12,9 +12,6 @@ package org.mule.util.concurrent;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
-/**
- * @author Holger Hoffstaette
- */
 // @ThreadSafe
 public abstract class SynchronizedVariable implements Executor
 {

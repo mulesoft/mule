@@ -12,10 +12,8 @@ package org.mule.util;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
+// @Immutable
 public interface ObjectFactory
 {
     Object create() throws Exception;

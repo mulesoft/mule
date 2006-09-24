@@ -10,46 +10,46 @@
 
 package org.mule.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * <code>BeanUtils</code> provides functions for altering the way commons
- * BeanUtils works
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+/**
+ * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils
+ * works
+ */
+// @Immutable
 public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
 {
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(BeanUtils.class);
+    private static transient final Log logger = LogFactory.getLog(BeanUtils.class);
 
     /**
      * Exception safe version of BeanUtils.populateWithoutFail
-     * 
-     * @param object
-     * @param props
      */
     public static void populateWithoutFail(Object object, Map props, boolean logWarnings)
     {
-        Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            try {
-                org.apache.commons.beanutils.BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
-            } catch (Exception e) {
-                if (logWarnings) {
-                    logger.warn("Property: " + entry.getKey() + "=" + entry.getValue() + " not found on object: "
-                            + object.getClass().getName());
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry)iterator.next();
+
+            try
+            {
+                BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
+            }
+            catch (Exception e)
+            {
+                if (logWarnings)
+                {
+                    logger.warn("Property: " + entry.getKey() + "=" + entry.getValue()
+                                + " not found on object: " + object.getClass().getName());
                 }
             }
         }
     }
+
 }

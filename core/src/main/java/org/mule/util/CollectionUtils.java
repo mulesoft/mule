@@ -10,10 +10,7 @@
 
 package org.mule.util;
 
-/**
- * @author Holger Hoffstaette
- */
-
+// @Immutable
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
     // nothing here (yet :)

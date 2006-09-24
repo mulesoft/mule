@@ -13,15 +13,12 @@ package org.mule.util;
 import org.safehaus.uuid.UUIDGenerator;
 
 /**
- * <code>UUID</code> Generates a UUID using the doom dark JUG library
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UUID</code> Generates a UUID using the JUG library
  */
-
+// @Immutable
 public class UUID
 {
-    private static UUIDGenerator generator = UUIDGenerator.getInstance();
+    private static final UUIDGenerator generator = UUIDGenerator.getInstance();
 
     private UUID()
     {

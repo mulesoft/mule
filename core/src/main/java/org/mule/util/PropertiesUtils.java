@@ -10,6 +10,8 @@
 
 package org.mule.util;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,18 +28,17 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>PropertiesHelper</code> is a utility class for manipulating and
- * filtering property Maps.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>PropertiesHelper</code> is a utility class for manipulating and filtering
+ * property Maps.
  */
+// @ThreadSafe
 public class PropertiesUtils
 {
+    // @GuardedBy(itself)
+    private static final List maskedProperties = new CopyOnWriteArrayList();
 
-    private static List maskedProperties = new ArrayList();
-
-    static {
+    static
+    {
         // When printing property lists mask password fields
         // Users can register their own fields to mask
         registeredMaskedPropertyName("password");
@@ -45,34 +46,42 @@ public class PropertiesUtils
 
     public static void registeredMaskedPropertyName(String name)
     {
-        if (name != null) {
+        if (name != null)
+        {
             maskedProperties.add(name);
         }
     }
 
     /**
-     * Read in the properties from a properties file.  The file may be on the file system
-     * or the classpath.
-     *
+     * Read in the properties from a properties file. The file may be on the file
+     * system or the classpath.
+     * 
      * @param fileName - The name of the properties file
-     * @param callingClass - The Class which is calling this method.  This is used to
-     *                      determine the classpath.
+     * @param callingClass - The Class which is calling this method. This is used to
+     *            determine the classpath.
      * @return a java.util.Properties object containing the properties.
      */
-    public static synchronized Properties loadProperties(String fileName, final Class callingClass) throws IOException {
+    public static synchronized Properties loadProperties(String fileName, final Class callingClass)
+        throws IOException
+    {
         InputStream is = IOUtils.getResourceAsStream(fileName, callingClass,
-                                                    /*tryAsFile*/true, /*tryAsUrl*/false);
-        if (is == null) {
+        /* tryAsFile */true, /* tryAsUrl */false);
+        if (is == null)
+        {
             Message error = new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, fileName);
             throw new IOException(error.toString());
         }
 
-        try {
+        try
+        {
             Properties props = new Properties();
             props.load(is);
             return props;
         }
-        finally { is.close(); }
+        finally
+        {
+            is.close();
+        }
     }
 
     public static String removeXmlNamespacePrefix(String eleName)
@@ -91,7 +100,8 @@ public class PropertiesUtils
     {
         HashMap props = new HashMap(properties.size());
         Map.Entry entry;
-        for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();)
+        {
             entry = (Map.Entry)iter.next();
             props.put(removeNamespacePrefix((String)entry.getKey()), entry.getValue());
 
@@ -101,24 +111,24 @@ public class PropertiesUtils
 
     /**
      * Will create a map of properties where the names have a prefix
-     *
-     * @param props
-     *            the source set of properties
-     * @param prefix
-     *            the prefix to filter on
-     * @return and new Map containing the filtered list of properties or an
-     *         empty map if no properties matched the prefix
-     * @deprecated use void getPropertiesWithPrefix(Map props, String prefix,
-     *             Map newProps)
+     * 
+     * @param props the source set of properties
+     * @param prefix the prefix to filter on
+     * @return and new Map containing the filtered list of properties or an empty map
+     *         if no properties matched the prefix
+     * @deprecated use void getPropertiesWithPrefix(Map props, String prefix, Map
+     *             newProps)
      */
     public static Map getPropertiesWithPrefix(Map props, String prefix)
     {
         Map newProps = new HashMap();
 
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
             entry = (Map.Entry)iterator.next();
-            if (entry.getKey().toString().startsWith(prefix)) {
+            if (entry.getKey().toString().startsWith(prefix))
+            {
                 newProps.put(entry.getKey(), entry.getValue());
             }
         }
@@ -128,21 +138,20 @@ public class PropertiesUtils
     /**
      * Will create a map of properties where the names have a prefix Allows the
      * callee to supply the target map so a comarator can be set
-     *
-     * @param props
-     *            the source set of properties
-     * @param prefix
-     *            the prefix to filter on
-     * @param newProps
-     *            return map containing the filtered list of properties or an
+     * 
+     * @param props the source set of properties
+     * @param prefix the prefix to filter on
+     * @param newProps return map containing the filtered list of properties or an
      *            empty map if no properties matched the prefix
      */
     public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
     {
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
             entry = (Map.Entry)iterator.next();
-            if (entry.getKey().toString().startsWith(prefix)) {
+            if (entry.getKey().toString().startsWith(prefix))
+            {
                 newProps.put(entry.getKey(), entry.getValue());
             }
         }
@@ -152,9 +161,11 @@ public class PropertiesUtils
     {
         Map newProps = new HashMap();
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
             entry = (Map.Entry)iterator.next();
-            if (!entry.getKey().toString().startsWith(prefix)) {
+            if (!entry.getKey().toString().startsWith(prefix))
+            {
                 newProps.put(entry.getKey(), entry.getValue());
             }
         }
@@ -165,14 +176,16 @@ public class PropertiesUtils
     {
         Properties props = new Properties();
 
-        if (query == null) {
+        if (query == null)
+        {
             return props;
         }
 
-        query = new StringBuffer(query.length()+1).append('&').append(query).toString();
+        query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
-        while ((x = addProperty(query, x, props)) != -1) {
+        while ((x = addProperty(query, x, props)) != -1)
+        {
             // run
         }
 
@@ -184,23 +197,28 @@ public class PropertiesUtils
         int i = query.indexOf('&', start);
         int i2 = query.indexOf('&', i + 1);
         String pair;
-        if (i > -1 && i2 > -1) {
+        if (i > -1 && i2 > -1)
+        {
             pair = query.substring(i + 1, i2);
         }
-        else if (i > -1) {
+        else if (i > -1)
+        {
             pair = query.substring(i + 1);
         }
-        else {
+        else
+        {
             return -1;
         }
         int eq = pair.indexOf('=');
 
-        if (eq <= 0) {
+        if (eq <= 0)
+        {
             String key = pair;
             String value = StringUtils.EMPTY;
             properties.setProperty(key, value);
         }
-        else {
+        else
+        {
             String key = pair.substring(0, eq);
             String value = (eq == pair.length() ? StringUtils.EMPTY : pair.substring(eq + 1));
             properties.setProperty(key, value);
@@ -210,25 +228,30 @@ public class PropertiesUtils
 
     public static String propertiesToString(Map props, boolean newline)
     {
-        if (props == null || props.isEmpty()) {
+        if (props == null || props.isEmpty())
+        {
             return "{}";
         }
 
         StringBuffer buf = new StringBuffer(props.size() * 32);
         buf.append('{');
 
-        if (newline) {
+        if (newline)
+        {
             buf.append(SystemUtils.LINE_SEPARATOR);
         }
 
         Object[] entries = props.entrySet().toArray();
         int i, numEntries = entries.length;
-        for (i = 0; i < numEntries - 1; i++) {
+        for (i = 0; i < numEntries - 1; i++)
+        {
             appendMaskedProperty(buf, (Map.Entry)entries[i]);
-            if (newline) {
+            if (newline)
+            {
                 buf.append(SystemUtils.LINE_SEPARATOR);
             }
-            else {
+            else
+            {
                 buf.append(',').append(' ');
             }
         }
@@ -236,7 +259,8 @@ public class PropertiesUtils
         // don't forget the last one
         appendMaskedProperty(buf, (Map.Entry)entries[i]);
 
-        if (newline) {
+        if (newline)
+        {
             buf.append(SystemUtils.LINE_SEPARATOR);
         }
 
@@ -249,32 +273,40 @@ public class PropertiesUtils
         String key = property.getKey().toString();
         buffer.append(key).append('=');
 
-        if (maskedProperties.contains(key)) {
+        if (maskedProperties.contains(key))
+        {
             buffer.append("*****");
         }
-        else {
+        else
+        {
             buffer.append(property.getValue());
         }
     }
 
-    public static Map getMessageProperties(UMOMessage message) {
-        return getMessageProperties(new ArrayList(message.getPropertyNames()), message, /*prefixToExclude*/null);
+    public static Map getMessageProperties(UMOMessage message)
+    {
+        return getMessageProperties(new ArrayList(message.getPropertyNames()), message, /* prefixToExclude */
+        null);
     }
 
-    public static Map getMessageProperties(List propertyNames, UMOMessage message) {
-        return getMessageProperties(propertyNames, message, /*prefixToExclude*/null);
+    public static Map getMessageProperties(List propertyNames, UMOMessage message)
+    {
+        return getMessageProperties(propertyNames, message, /* prefixToExclude */null);
     }
 
     /**
      * Returns a map of property names/values for the given message.
-     *
+     * 
      * @param prefixToExclude - will exclude all properties starting with this prefix
      */
-    public static Map getMessageProperties(List propertyNames, UMOMessage message, String prefixToExclude) {
+    public static Map getMessageProperties(List propertyNames, UMOMessage message, String prefixToExclude)
+    {
         Map props = new HashMap();
-        for (Iterator iterator = propertyNames.iterator(); iterator.hasNext();) {
-            String prop = (String) iterator.next();
-            if (prefixToExclude == null || prop.startsWith(prefixToExclude) == false) {
+        for (Iterator iterator = propertyNames.iterator(); iterator.hasNext();)
+        {
+            String prop = (String)iterator.next();
+            if (prefixToExclude == null || prop.startsWith(prefixToExclude) == false)
+            {
                 props.put(prop, message.getProperty(prop));
             }
         }

@@ -1,5 +1,5 @@
 /*
- * $Id
+ * $Id:$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util;
 
 import java.io.File;
@@ -22,23 +23,29 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
+// @Immutable
 public class IOUtils extends org.apache.commons.io.IOUtils
 {
-    protected static Log logger = LogFactory.getLog(IOUtils.class);
+    private static final Log logger = LogFactory.getLog(IOUtils.class);
 
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     *
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return the requested resource as a string
      */
-    public static String getResourceAsString(final String resourceName, final Class callingClass) throws IOException {
+    public static String getResourceAsString(final String resourceName, final Class callingClass)
+        throws IOException
+    {
         InputStream is = getResourceAsStream(resourceName, callingClass);
-        if (is != null) {
+        if (is != null)
+        {
             return toString(is);
-        } else {
+        }
+        else
+        {
             throw new IOException("Unable to load resource " + resourceName);
         }
     }
@@ -46,20 +53,21 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     *
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return an InputStream to the resource or null if resource not found
      */
-    public static InputStream getResourceAsStream(final String resourceName,
-                                    final Class callingClass) throws IOException  {
+    public static InputStream getResourceAsStream(final String resourceName, final Class callingClass)
+        throws IOException
+    {
         return getResourceAsStream(resourceName, callingClass, true, true);
     }
 
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     *
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @param tryAsFile - try to load the resource from the local file system
@@ -67,79 +75,107 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @return an InputStream to the resource or null if resource not found
      */
     public static InputStream getResourceAsStream(final String resourceName,
-            final Class callingClass, boolean tryAsFile, boolean tryAsUrl) throws IOException {
+                                                  final Class callingClass,
+                                                  boolean tryAsFile,
+                                                  boolean tryAsUrl) throws IOException
+    {
 
         URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile);
 
         // Try to load the resource itself as a URL.
-        if ((url == null) && (tryAsUrl == true)) {
-            try {
+        if ((url == null) && (tryAsUrl == true))
+        {
+            try
+            {
                 url = new URL(resourceName);
-            } catch (MalformedURLException e) {
+            }
+            catch (MalformedURLException e)
+            {
                 logger.debug("Unable to load resource as a URL: " + resourceName);
             }
         }
 
-        if (url == null) {
+        if (url == null)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             return url.openStream();
         }
     }
 
     /**
-     * Attempts to load a resource from the file system or from the classpath, in that order.
-     *
+     * Attempts to load a resource from the file system or from the classpath, in
+     * that order.
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @param tryAsFile - try to load the resource from the local file system
      * @return an URL to the resource or null if resource not found
      */
-    public static URL getResourceAsUrl(final String resourceName, final Class callingClass) {
+    public static URL getResourceAsUrl(final String resourceName, final Class callingClass)
+    {
         return getResourceAsUrl(resourceName, callingClass, true);
     }
 
     /**
-     * Attempts to load a resource from the file system or from the classpath, in that order.
-     *
+     * Attempts to load a resource from the file system or from the classpath, in
+     * that order.
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @param tryAsFile - try to load the resource from the local file system
      * @return an URL to the resource or null if resource not found
      */
-    public static URL getResourceAsUrl(final String resourceName,
-                                       final Class callingClass, boolean tryAsFile) {
-        if (resourceName == null) {
+    public static URL getResourceAsUrl(final String resourceName, final Class callingClass, boolean tryAsFile)
+    {
+        if (resourceName == null)
+        {
             throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Resource name").getMessage());
         }
         URL url = null;
 
         // Try to load the resource from the file system.
-        if (tryAsFile) {
-            try {
+        if (tryAsFile)
+        {
+            try
+            {
                 File file = new File(resourceName);
-                if (file.exists()) {
+                if (file.exists())
+                {
                     url = file.getAbsoluteFile().toURL();
-                } else {
+                }
+                else
+                {
                     logger.debug("Unable to load resource from the file system: " + file.getAbsolutePath());
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 logger.debug("Unable to load resource from the file system: " + e.getMessage());
             }
         }
 
         // Try to load the resource from the classpath.
-        if (url == null) {
-            try {
-                url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
-                    public Object run() {
+        if (url == null)
+        {
+            try
+            {
+                url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+                {
+                    public Object run()
+                    {
                         return ClassUtils.getResource(resourceName, callingClass);
                     }
                 });
-                if (url == null) {
+                if (url == null)
+                {
                     logger.debug("Unable to load resource from the classpath");
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 logger.debug("Unable to load resource from the classpath: " + e.getMessage());
             }
         }

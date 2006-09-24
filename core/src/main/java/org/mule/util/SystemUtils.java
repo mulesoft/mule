@@ -24,37 +24,43 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+// @Immutable
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
-    protected static transient Log logger = LogFactory.getLog(SystemUtils.class);
+    protected static transient final Log logger = LogFactory.getLog(SystemUtils.class);
 
     // bash prepends: declare -x
     // zsh prepends: typeset -x
-    private static String[] UNIX_ENV_PREFIXES = new String[]{"declare -", "typeset -"};
+    private static final String[] UNIX_ENV_PREFIXES = new String[]{"declare -", "typeset -"};
 
     /**
-     * Get the operating system environment variables.
-     * This should work for Windows and Linux.
-     *
+     * Get the operating system environment variables. This should work for Windows
+     * and Linux.
+     * 
      * @return Map<String, String> or an empty map if there was an error.
      */
     public static synchronized Map getenv()
     {
-        Map env = Collections./*<String, String>*/EMPTY_MAP;
+        Map env = Collections./* <String, String> */EMPTY_MAP;
 
-        try {
-            if (SystemUtils.IS_JAVA_1_4) {
+        try
+        {
+            if (SystemUtils.IS_JAVA_1_4)
+            {
                 // fallback to external process
                 env = getenvJDK14();
             }
-            else {
-                // the following runaround is necessary since we still want to compile on JDK 1.4
+            else
+            {
+                // the following runaround is necessary since we still want to
+                // compile on JDK 1.4
                 Class target = System.class;
                 Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
                 env = (Map)envMethod.invoke(target, (Class[])null);
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             logger.error("Could not access OS environment: ", ex);
         }
 
@@ -66,15 +72,18 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         Map env = new HashMap();
         Process process = null;
 
-        try {
+        try
+        {
             boolean isUnix = true;
             String command;
 
-            if (SystemUtils.IS_OS_WINDOWS) {
+            if (SystemUtils.IS_OS_WINDOWS)
+            {
                 command = "cmd /c set";
                 isUnix = false;
             }
-            else {
+            else
+            {
                 command = "env";
             }
 
@@ -82,34 +91,42 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line;
-            while ((line = br.readLine()) != null) {
-                for (int prefix = 0; prefix < UNIX_ENV_PREFIXES.length; prefix++) {
-                    if (line.startsWith(UNIX_ENV_PREFIXES[prefix])) {
+            while ((line = br.readLine()) != null)
+            {
+                for (int prefix = 0; prefix < UNIX_ENV_PREFIXES.length; prefix++)
+                {
+                    if (line.startsWith(UNIX_ENV_PREFIXES[prefix]))
+                    {
                         line = line.substring(UNIX_ENV_PREFIXES[prefix].length());
                     }
                 }
 
                 int index = -1;
-                if ((index = line.indexOf('=')) > -1) {
+                if ((index = line.indexOf('=')) > -1)
+                {
                     String key = line.substring(0, index).trim();
                     String value = line.substring(index + 1).trim();
                     // remove quotes, if any
-                    if (isUnix && value.length() > 1
-                                    && (value.startsWith("\"") || value.startsWith("'"))) {
+                    if (isUnix && value.length() > 1 && (value.startsWith("\"") || value.startsWith("'")))
+                    {
                         value = value.substring(1, value.length() - 1);
                     }
                     env.put(key, value);
                 }
-                else {
+                else
+                {
                     env.put(line, StringUtils.EMPTY);
                 }
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw e; // bubble up
         }
-        finally {
-            if (process != null) {
+        finally
+        {
+            if (process != null)
+            {
                 process.destroy();
             }
         }
@@ -134,16 +151,18 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     /**
      * Returns the value corresponding to the given option from the command line, for
-     * example if the options are "-config mule-config.xml" getCommandLineOption("config")
-     * would return "mule-config.xml"
-     *
-     * TODO Replace this functionality with Apache Commons CLI: see MULE-956
+     * example if the options are "-config mule-config.xml"
+     * getCommandLineOption("config") would return "mule-config.xml" TODO Replace
+     * this functionality with Apache Commons CLI: see MULE-956
      */
-    public static String getCommandLineOption(String option, String args[]) {
+    public static String getCommandLineOption(String option, String args[])
+    {
         List options = Arrays.asList(args);
-        if (options.contains(option)) {
+        if (options.contains(option))
+        {
             int i = options.indexOf(option);
-            if (i < options.size() - 1) {
+            if (i < options.size() - 1)
+            {
                 return options.get(i + 1).toString();
             }
         }

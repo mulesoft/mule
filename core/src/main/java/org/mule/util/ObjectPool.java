@@ -12,22 +12,20 @@ package org.mule.util;
 
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
+// @Immutable
 public interface ObjectPool
 {
     /**
      * Constants used to determine the exhaused action of the pool
      */
-    int WHEN_EXHAUSTED_FAIL = 0;
-    int WHEN_EXHAUSTED_BLOCK = 1;
-    int WHEN_EXHAUSTED_GROW = 2;
+    static final int WHEN_EXHAUSTED_FAIL = 0;
+    static final int WHEN_EXHAUSTED_BLOCK = 1;
+    static final int WHEN_EXHAUSTED_GROW = 2;
 
-    int DEFAULT_MAX_SIZE = 5;
-    int DEFAULT_MAX_WAIT = 4000;
-    int DEFAULT_EXHAUSTED_ACTION = WHEN_EXHAUSTED_BLOCK;
+    static final int DEFAULT_MAX_SIZE = 5;
+    static final int DEFAULT_MAX_WAIT = 4000;
+    static final int DEFAULT_EXHAUSTED_ACTION = WHEN_EXHAUSTED_BLOCK;
 
     Object borrowObject() throws Exception;
 
@@ -48,4 +46,5 @@ public interface ObjectPool
     void onAdd(Object obj);
 
     void onRemove(Object obj);
+
 }

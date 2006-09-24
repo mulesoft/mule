@@ -16,16 +16,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
- * @author Holger Hoffstaette
- */
-
-/**
- * A handler for unexecutable tasks that waits until the task can be submitted
- * for execution or times out.
- * 
- * Generously snipped from the jsr166 repository at:
+ * A handler for unexecutable tasks that waits until the task can be submitted for
+ * execution or times out. Generously snipped from the jsr166 repository at:
  * <a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java"></a>.
- * 
  */
 // @Immutable
 public class WaitPolicy implements RejectedExecutionHandler
@@ -43,8 +36,8 @@ public class WaitPolicy implements RejectedExecutionHandler
     }
 
     /**
-     * Constructs a <tt>WaitPolicy</tt> with timeout.
-     * A negative <code>time</code> value is interpreted as <code>Long.MAX_VALUE</code>. 
+     * Constructs a <tt>WaitPolicy</tt> with timeout. A negative <code>time</code>
+     * value is interpreted as <code>Long.MAX_VALUE</code>.
      */
     public WaitPolicy(long time, TimeUnit timeUnit)
     {

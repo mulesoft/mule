@@ -16,10 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author Holger Hoffstaette
- */
-
+// @Immutable
 public class MapUtils extends org.apache.commons.collections.MapUtils
 {
 
@@ -46,34 +43,36 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
     }
 
     /**
-     * Create & populate a Map of arbitrary class. Populating stops when either the keys
-     * or values iterator is null or exhausted.
+     * Create & populate a Map of arbitrary class. Populating stops when either the
+     * keys or values iterator is null or exhausted.
      * 
-     * @param mapClass
-     *            the Class of the Map to instantiate
-     * @param keys
-     *            iterator for Objects ued as keys
-     * @param values
-     *            iterator for Objects used as values
+     * @param mapClass the Class of the Map to instantiate
+     * @param keys iterator for Objects ued as keys
+     * @param values iterator for Objects used as values
      * @return the instantiated Map
      */
     public static Map mapWithKeysAndValues(Class mapClass, Iterator keys, Iterator values)
     {
         Map m = null;
 
-        if (mapClass == null) {
+        if (mapClass == null)
+        {
             throw new IllegalArgumentException("Map class must not be null!");
         }
 
-        try {
+        try
+        {
             m = (Map)mapClass.newInstance();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new RuntimeException(ex);
         }
 
-        if (keys != null && values != null) {
-            while (keys.hasNext() && values.hasNext()) {
+        if (keys != null && values != null)
+        {
+            while (keys.hasNext() && values.hasNext())
+            {
                 m.put(keys.next(), values.next());
             }
         }
