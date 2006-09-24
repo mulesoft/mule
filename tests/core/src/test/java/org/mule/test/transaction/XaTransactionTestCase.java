@@ -7,23 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transaction;
 
 import com.mockobjects.dynamic.Mock;
+
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.XaTransaction;
 import org.mule.umo.UMOTransaction;
-
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
- */
 
 public class XaTransactionTestCase extends AbstractMuleTestCase
 {
@@ -31,7 +26,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        TransactionManager tm = (TransactionManager) mockTm.proxy();
+        TransactionManager tm = (TransactionManager)mockTm.proxy();
         MuleManager.getInstance().setTransactionManager(tm);
     }
 

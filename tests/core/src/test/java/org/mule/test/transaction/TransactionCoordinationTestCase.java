@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transaction;
 
 import com.mockobjects.dynamic.Mock;
@@ -15,11 +16,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
@@ -40,7 +36,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     {
         assertNull(tc.getTransaction());
         Mock mockTx = new Mock(UMOTransaction.class, "trans");
-        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
+        UMOTransaction tx = (UMOTransaction)mockTx.proxy();
 
         tc.bindTransaction(tx);
         assertEquals(tx, tc.getTransaction());
@@ -51,16 +47,19 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     {
         assertNull(tc.getTransaction());
         Mock mockTx = new Mock(UMOTransaction.class, "trans");
-        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
+        UMOTransaction tx = (UMOTransaction)mockTx.proxy();
 
         tc.bindTransaction(tx);
         assertEquals(tx, tc.getTransaction());
 
-        try {
-            UMOTransaction tx2 = (UMOTransaction) new Mock(UMOTransaction.class, "trans").proxy();
+        try
+        {
+            UMOTransaction tx2 = (UMOTransaction)new Mock(UMOTransaction.class, "trans").proxy();
             tc.bindTransaction(tx2);
             fail();
-        } catch (IllegalTransactionStateException e) {
+        }
+        catch (IllegalTransactionStateException e)
+        {
             // expected
         }
 
@@ -70,27 +69,30 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testUnbindTransactionWithoutBound() throws Exception
     {
         assertNull(tc.getTransaction());
-        //try {
-            Mock mockTx = new Mock(UMOTransaction.class, "trans");
-            UMOTransaction tx = (UMOTransaction) mockTx.proxy();
-            tc.unbindTransaction(tx);
-//            fail();
-//        } catch (IllegalTransactionStateException e) {
-//            // expected
-//        }
+        // try {
+        Mock mockTx = new Mock(UMOTransaction.class, "trans");
+        UMOTransaction tx = (UMOTransaction)mockTx.proxy();
+        tc.unbindTransaction(tx);
+        // fail();
+        // } catch (IllegalTransactionStateException e) {
+        // // expected
+        // }
     }
 
     public void testSetInstanceWithBound() throws Exception
     {
         assertNull(tc.getTransaction());
         Mock mockTx = new Mock(UMOTransaction.class, "trans");
-        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
+        UMOTransaction tx = (UMOTransaction)mockTx.proxy();
 
         tc.bindTransaction(tx);
-        try {
+        try
+        {
             TransactionCoordination.setInstance(null);
             fail();
-        } catch (IllegalStateException e) {
+        }
+        catch (IllegalStateException e)
+        {
             // expected
         }
 
