@@ -14,10 +14,10 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ConnectorException</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ConnectorException</code> Is thrown in the context of a UMOConnector, usually some sort of transport
+ * level error where the connection has failed.  This exception maintains a reference to the connector. 
+ *
+ * @see UMOConnector
  */
 public class ConnectorException extends UMOException
 {
@@ -26,10 +26,14 @@ public class ConnectorException extends UMOException
      */
     private static final long serialVersionUID = 4729481487016346035L;
 
+    /**
+     * The connector relevant to this exception
+     */
     private transient UMOConnector connector;
 
     /**
      * @param message the exception message
+     * @param connector where the exception occurred or is being thrown
      */
     public ConnectorException(Message message, UMOConnector connector)
     {
@@ -39,6 +43,7 @@ public class ConnectorException extends UMOException
 
     /**
      * @param message the exception message
+     * @param connector where the exception occurred or is being thrown
      * @param cause the exception that cause this exception to be thrown
      */
     public ConnectorException(Message message, UMOConnector connector, Throwable cause)
@@ -52,11 +57,8 @@ public class ConnectorException extends UMOException
         Message m = new Message(Messages.CONNECTOR_CAUSED_ERROR, connector);
         if (message != null) {
             message.setNextMessage(m);
-            return message;
-        } else {
-            message = new Message(-1);
-            return m;
         }
+        return m;
     }
 
     public UMOConnector getConnector()
