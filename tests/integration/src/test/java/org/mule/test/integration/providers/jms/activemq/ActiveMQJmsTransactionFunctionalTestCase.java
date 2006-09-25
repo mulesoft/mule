@@ -67,9 +67,13 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         Map overrides = new HashMap();
         overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
         connector.setServiceOverrides(overrides);
+        
+        //The following comment seems like doesn't count anymore
+        /*
         //Using multiple receiver threads with ActiveMQ causes the DLQ test case to fail
         //because of ActiveMQ prefetch. Disabling this feature fixes the problem
-        connector.setCreateMultipleTransactedReceivers(false);
+        //connector.setCreateMultipleTransactedReceivers(false);
+        */
         return connector;
     }
 
