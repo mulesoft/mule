@@ -10,18 +10,20 @@
     <property name="app.name" value="mule-example-errorhandler"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.resources" value="conf"/>
+    <property name="dir.conf" value="conf"/>
+    <property name="dir.resources" value="resources"/>
     <property name="dir.build" value="build"/>
     <property name="dir.classes" value="build/classes"/>
 
     <property name="url.maven.repo" value="http://maven.sateh.com/repository"/>
+    <property name="url.mule-deps.repo" value="http://dist.codehaus.org/mule/dependencies/maven2"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
-    <target name="sanity.check" depends="clean">
+    <target name="sanity.check">
         <property environment="env"/>
         <property name="dir.mule.home" value="${env.MULE_HOME}"/>
         <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
@@ -42,12 +44,12 @@
     <target name="get.libraries"
             depends="sanity.check">
             
-        <get src="${url.maven.repo}/activemq/activemq/3.2.4/activemq-3.2.4.jar"
-             dest="${dir.user.lib}/activemq.jar"
+        <get src="${url.maven.repo}/groovy/groovy-all-1.0-jsr/06/groovy-all-1.0-jsr-06.jar"
+             dest="${dir.user.lib}/groovy.jar"
              verbose="true"
              usetimestamp="true"/>
-        <get src="${url.maven.repo}/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"
-             dest="${dir.user.lib}/concurrent.jar"
+        <get src="${url.mule-deps.repo}/script/jsr223/1.0/jsr223-1.0.jar"
+             dest="${dir.user.lib}/jsr223.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
@@ -90,6 +92,7 @@
         
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
+            <fileset dir="${dir.conf}"/>
             <fileset dir="${dir.resources}"/>
         </copy>
     </target>

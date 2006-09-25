@@ -1,8 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
- $Id$
- ======================================================================================
  Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
 
  The software in this package is published under the terms of the MuleSource MPL
@@ -10,8 +6,7 @@
  LICENSE.txt file.
 -->
 
-<project name="Mule Examples: WebApp" default="deploy" basedir=".">
-
+<project name="Mule Examples: WebApp" default="package">
 
   <property name="app.name" value="mule-example-webapp"/>
 
@@ -92,7 +87,7 @@
            depends="compile"
            description="Package the application">
 
-        <war destfile="${dir.build}/mule-webapp.war" webxml="${dir.webapp}/web.xml">
+        <war destfile="${dir.build}/${app.name}.war" webxml="${dir.webapp}/web.xml">
             <lib dir="${dir.mule.home}/lib/user">
                 <include name="**/*.jar"/>
             </lib>
@@ -107,13 +102,4 @@
             <webinf dir="${dir.resources}"/>
         </war>
    </target>
-
-   <target name="deploy"
-           depends="package"
-           description="Deploy the application to the Mule server">
-
-        <!-- do nothing -->
-
-   </target>
-
 </project>

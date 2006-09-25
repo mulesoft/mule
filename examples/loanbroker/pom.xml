@@ -29,7 +29,11 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xfire</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -41,12 +45,6 @@
             <groupId>glue</groupId>
             <artifactId>glue</artifactId>
             <version>5.0.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
-            <version>${version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>org.mule.examples</groupId>
+    <artifactId>mule-example-hello</artifactId>
+    <version>1.0</version>
+    <name>Hello Example</name>
+    <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
+
+    <properties>
+        <muleVersion>1.3</muleVersion>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>codehaus</id>
+            <name>Codehaus Maven 2.x Release Repository</name>
+            <url>http://repository.codehaus.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>codehaus-snapshots</id>
+            <name>Codehaus Maven 2.x Snapshots Repository</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache-plugin-snapshots</id>
+            <name>Apache Maven Plugins Snapshot Repository</name>
+            <url>http://people.apache.org/maven-snapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+  
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
+                overwriting the previous one. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <!-- The overWrite functionality is documented but not available in the latest 
+                    released version (see http://jira.codehaus.org/browse/MDEP-35) -->
+                <version>2.0-20060907.213033-3</version>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
