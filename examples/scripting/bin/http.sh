@@ -10,5 +10,10 @@ fi
 MULE_LIB=../conf
 export MULE_LIB
 
-$MULE_HOME/bin/mule -config ../conf/loan-broker-xfire-sync-config.xml org.mule.samples.loanbroker.LoanConsumer
+if [ -f "$MULE_HOME/lib/user/groovy.jar" ]
+then
+    $MULE_HOME/bin/mule -main org.mule.samples.scripting.BinaryHttpExample
+else
+    echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+fi
 
