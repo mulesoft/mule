@@ -10,19 +10,27 @@
 package org.mule.tck;
 
 import org.mule.MuleManager;
+import org.mule.util.ClassUtils;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.DefaultWorkListener;
 
 import javax.resource.spi.work.WorkEvent;
 
 /**
- * Is a base tast case for tests that initialise Mule using a configuration file
+ * Is a base tast case for tests that initialise Mule using a configuration file.
+ * The default configuration builder used is the MuleXmlConfigurationBuilder. This
+ * you need to have the mule-modules-builders module/jar on your classpath. If you want
+ * to use a different builder, just overload the <code>getBuilder()</code> method of
+ * this class to return the type of builder you want to use with your test.
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Note you can overload the <code>getBuilder()</code> to return an initialised instance of
+ * the QuickConfiguratonBuilder, this allows the developer to programmatically build a Mule
+ * instance and roves the need for additional config files for the test.
+ *
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase {
+
+    public static final String DEFAULT_BUILDER_CLASS = "org.mule.config.builders.MuleXmlConfigurationBuilder";
 
     protected final void doSetUp() throws Exception {
         doPreFunctionalSetUp();
@@ -50,7 +58,18 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase {
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception {
-        return new MuleXmlConfigurationBuilder();
+
+        try
+        {
+            Class builderClass = ClassUtils.loadClass(DEFAULT_BUILDER_CLASS, getClass());
+            return (ConfigurationBuilder)builderClass.newInstance();
+        } catch (ClassNotFoundException e)
+        {
+            throw new ClassNotFoundException("The builder " + DEFAULT_BUILDER_CLASS + " is not on your classpath and " +
+                    "the getBuilder() method of this class has not been overloaded to return adifferent builder. Please " +
+                    "check your functional test.", e);
+        }
+
     }
 
     protected void doPreFunctionalSetUp() throws Exception {
