@@ -16,6 +16,7 @@
     <modules>
         <module>core</module>
         <module>functional</module>
+        <module>integration</module>
     </modules>
 
     <profiles>
