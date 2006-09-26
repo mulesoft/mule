@@ -7,7 +7,7 @@
 -->
 <project name="Mule Examples: Error Handler" default="deploy">
 
-    <property name="app.name" value="mule-example-errorhandler"/>
+    <property name="app.name" value="mule-example-scripting"/>
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
