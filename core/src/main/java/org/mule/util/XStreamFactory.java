@@ -77,43 +77,17 @@ public class XStreamFactory
 
     private class ConcurrentHashMapConverter extends MapConverter
     {
-        private Class jdk5ConcurrentHashMap = null;
-        private Class backportConcurrentHashMap = null;
-
         public ConcurrentHashMapConverter(Mapper mapper) throws ClassNotFoundException
         {
             super(mapper);
-            try
-            {
-                jdk5ConcurrentHashMap = ClassUtils.loadClass("java.util.concurrent.ConcurrentHashMap",
-                    getClass());
-            }
-            catch (ClassNotFoundException e)
-            {
-                // ignore: probably running on JDK 1.4
-            }
-
-            try
-            {
-                backportConcurrentHashMap = ClassUtils.loadClass(
-                    "edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", getClass());
-            }
-            catch (ClassNotFoundException e)
-            {
-                // ignore: maybe running Mule 3.0 with native util.concurrent :)
-            }
-
-            // ..however if both are null something is wrong.
-            if (jdk5ConcurrentHashMap == null && backportConcurrentHashMap == null)
-            {
-                throw new ClassNotFoundException(
-                    "Neither java.util.concurrent.ConcurrentHashMap nor edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap could be found - cannot continue.");
-            }
         }
 
         public boolean canConvert(Class aClass)
         {
-            return aClass.equals(backportConcurrentHashMap) || aClass.equals(jdk5ConcurrentHashMap);
+            String className = aClass.getName();
+            return className.equals("java.util.concurrent.ConcurrentHashMap")
+                   || className.equals("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap");
         }
     }
+
 }
