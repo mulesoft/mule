@@ -51,8 +51,8 @@
             <property name="securityPolicy" value="security.policy"/>
             <map name="jndiProviderProperties">
                 <property name="openejb.base" value="."/>
-                <property name="openejb.configuration" value="examples/loanbroker-esb/loanbroker/src/test/resources/openejb.conf"/>
-                <property name="logging.conf" value="distributions/server/src/main/resources/conf/log4j.properties"/>
+                <property name="openejb.configuration" value="src/test/resources/openejb.conf"/>
+                <property name="logging.conf" value="conf/log4j.properties"/> 
                 <property name="openejb.nobanner" value="true"/>
             </map>
         </properties>
