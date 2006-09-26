@@ -10,10 +10,6 @@
 
 package org.mule.test.integration.providers.soap.xfire;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -23,6 +19,10 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase{
 	
@@ -44,7 +44,7 @@ public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase{
 		MuleClient client = new MuleClient();
 		Map props = new HashMap();
 		props.put("http.method", "GET");
-		UMOMessage reply = client.send("http://localhost:82/services/XfireService?wsdl", "/services/Hello_Xfire?wsdl", props);
+		UMOMessage reply = client.send("http://localhost:33382/services/XfireService?wsdl", "/services/Hello_Xfire?wsdl", props);
 		
 		assertNotNull(reply);
 		assertNotNull(reply.getPayload());
