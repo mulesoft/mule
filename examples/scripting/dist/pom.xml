@@ -11,7 +11,7 @@
     <description>A couple of simple examples that demonstrate Mule's JSR-223 Scripting support.</description>
 
     <properties>
-        <muleVersion>1.3</muleVersion>
+        <muleVersion>1.3-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>

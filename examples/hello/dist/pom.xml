@@ -11,7 +11,7 @@
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
 
     <properties>
-        <muleVersion>1.3</muleVersion>
+        <muleVersion>1.3-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
