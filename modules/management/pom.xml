@@ -13,7 +13,11 @@
   <description>Management Extensions for Mule</description>
 
   <dependencies>
-        <!-- mx4j Agent support  -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency>
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
@@ -34,22 +38,5 @@
             <artifactId>mx4j-remote</artifactId>
             <version>2.1.1</version>
         </dependency>
-
-        <!-- Only needed for rendering statistics 
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxri</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxtools</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>jmxri</groupId>
-            <artifactId>jmxremoting</artifactId>
-            <version>1.2</version>
-        </dependency>-->
   </dependencies>
 </project>
