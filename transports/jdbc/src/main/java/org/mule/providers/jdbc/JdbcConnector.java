@@ -41,6 +41,11 @@ import java.util.Map;
  */
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {
+    // These are properties that can be overridden on the Receiver by the
+    // endpoint
+    // declaration
+    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
+    public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
     private static final String DEFAULT_QUERY_RUNNER = "org.apache.commons.dbutils.QueryRunner";
     private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
@@ -73,6 +78,18 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
+        Map props = endpoint.getProperties();
+        if (props != null) {
+            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
+            if (tempPolling != null) {
+                pollingFrequency = Long.parseLong(tempPolling);
+            }
+	}
+
+        if (pollingFrequency <= 0) {
+           pollingFrequency = DEFAULT_POLLING_FREQUENCY;
+        }
+
         String[] params = getReadAndAckStatements(endpoint);
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, params);
     }
@@ -92,6 +109,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             }
             this.jndiContext = new InitialContext(props);
         }
+
     }
 
     protected void createDataSource() throws InitialisationException, NamingException
