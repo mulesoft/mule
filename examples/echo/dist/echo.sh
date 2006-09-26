@@ -6,8 +6,9 @@ if [ -z "$MULE_HOME" ] ; then
   export MULE_HOME
 fi
 
-# Any changes to the files in ../conf will take precedence over those deployed to $MULE_HOME/lib/user
-MULE_LIB=../conf
+# Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
+MULE_LIB=./conf
 export MULE_LIB
 
-$MULE_HOME/bin/mule -config ../conf/hello-http-config.xml
+exec $MULE_HOME/bin/mule -config ./conf/echo-config.xml
+

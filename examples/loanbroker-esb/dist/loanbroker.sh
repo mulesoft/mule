@@ -6,8 +6,8 @@ if [ -z "$MULE_HOME" ] ; then
   export MULE_HOME
 fi
 
-# Any changes to the files in ../conf will take precedence over those deployed to $MULE_HOME/lib/user
-MULE_LIB=../conf
+# Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
+MULE_LIB=./conf
 export MULE_LIB
 
 if [ ! -f "$MULE_HOME/lib/user/openejb.jar" ]
@@ -20,7 +20,7 @@ fi
 
 if [ -z "$MISSING_LIB" ]
 then
-    $MULE_HOME/bin/mule -main org.mule.samples.loanbroker.esb.Main
+    exec $MULE_HOME/bin/mule -main org.mule.samples.loanbroker.esb.Main
 else
     echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
 fi
