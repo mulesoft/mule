@@ -22,7 +22,7 @@ import org.mule.util.XStreamFactory;
 /**
  * Tests configuration and creation of XStream-based transformers
  */
-public class AbstractXStreamTransformerTestCase extends TestCase
+public class XStreamTransformerConfigurationTestCase extends TestCase
 {
     public static boolean MyDriverDidInitialize;
 
@@ -78,7 +78,7 @@ public class AbstractXStreamTransformerTestCase extends TestCase
         public MyDOMDriver()
         {
             super();
-            AbstractXStreamTransformerTestCase.MyDriverDidInitialize = true;
+            XStreamTransformerConfigurationTestCase.MyDriverDidInitialize = true;
         }
     }
 
