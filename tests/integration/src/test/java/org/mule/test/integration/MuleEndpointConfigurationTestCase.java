@@ -15,7 +15,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMODescriptor;
@@ -25,8 +24,7 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Test the creation of various endpoints from the service descriptor
  */
 public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
@@ -101,8 +99,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertNotNull(endpoint.getName());
         assertEquals("tcp://localhost:60201", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertEquals("org.mule.transformers.simple.StringToByteArray", endpoint.getTransformer().getClass().getName());
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
     }
@@ -131,8 +128,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         endpoint = (UMOEndpoint) router2.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof StringToByteArray);
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint) router2.getEndpoints().get(1);
@@ -177,9 +173,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof StringToByteArray);
-
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint) router.getEndpoints().get(1);
@@ -222,15 +216,13 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertEquals("org.mule.transformers.simple.StringToByteArray", endpoint.getTransformer().getClass().getName());
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint) router.getEndpoints().get(1);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45432", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertEquals("org.mule.transformers.simple.StringToByteArray", endpoint.getTransformer().getClass().getName());
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
     }
 
@@ -243,8 +235,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45433", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertEquals("org.mule.transformers.simple.StringToByteArray", endpoint.getTransformer().getClass().getName());
+        assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         // test inbound
