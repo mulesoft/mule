@@ -15,7 +15,7 @@
 		<!--Hosting the XFire service-->
 		<mule-descriptor name="XfireService" implementation="org.mule.test.integration.service.TestComponent">
 			<inbound-router>
-				<endpoint address="xfire:http://localhost:82/services"/>
+				<endpoint address="xfire:http://localhost:33382/services"/>
 			</inbound-router>
 		</mule-descriptor>
 		
@@ -26,7 +26,7 @@
 			</inbound-router>
 			<outbound-router>
 				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="axis:http://localhost:82/services/XfireService?method=receive">
+					<endpoint address="axis:http://localhost:33382/services/XfireService?method=receive">
 						<properties>
                             <property name="soapAction" value="${methodNamespace}${method}"/>
                             <map name="soapMethods">
