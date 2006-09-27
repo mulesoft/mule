@@ -80,6 +80,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         }
 
         UMOSecurityContext context = getSecurityManager().createSecurityContext(authResult);
+        context.setAuthentication(authResult);
         event.getSession().setSecurityContext(context);
     }
 
