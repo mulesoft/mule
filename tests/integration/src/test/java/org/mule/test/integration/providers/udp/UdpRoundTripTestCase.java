@@ -59,8 +59,8 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
         log.info("recv bytes: " + Arrays.toString(inboundPacket.getData()));
 
         DataInputStream dataIn = new DataInputStream(bytesIn);
-        assertEquals(1.0f, dataIn.readFloat());
-        assertEquals(2.0f, dataIn.readFloat());
+        assertEquals(1.0f, dataIn.readFloat(), Float.POSITIVE_INFINITY);
+        assertEquals(2.0f, dataIn.readFloat(), Float.POSITIVE_INFINITY);
         //log.info("float #1: " + dataIn.readFloat());
         //log.info("float #2: " + dataIn.readFloat());
     }
