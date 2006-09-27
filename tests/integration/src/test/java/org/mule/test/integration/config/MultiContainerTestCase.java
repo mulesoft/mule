@@ -20,8 +20,7 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Tests Deploying and referencing components from two different spring container contexts
  */
 public class MultiContainerTestCase extends FunctionalTestCase
 {
@@ -33,9 +32,9 @@ public class MultiContainerTestCase extends FunctionalTestCase
     {
         UMOContainerContext context = MuleManager.getInstance().getContainerContext();
         assertNotNull(context);
-        assertNotNull(context.getComponent("plexus-Apple"));
+        assertNotNull(context.getComponent("spring2-Apple"));
         assertNotNull(context.getComponent("spring-Apple"));
-        assertNotNull(context.getComponent("plexus-Banana"));
+        assertNotNull(context.getComponent("spring2-Banana"));
         assertNotNull(context.getComponent("spring-Banana"));
 
         try {
@@ -50,25 +49,25 @@ public class MultiContainerTestCase extends FunctionalTestCase
     {
         UMOContainerContext context = MuleManager.getInstance().getContainerContext();
         assertNotNull(context);
-        Orange o = (Orange) context.getComponent(new ContainerKeyPair("spring", "Orange"));
+        Orange o = (Orange) context.getComponent(new ContainerKeyPair("spring1", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
 
-        o = (Orange) context.getComponent(new ContainerKeyPair("plexus", "Orange"));
+        o = (Orange) context.getComponent(new ContainerKeyPair("spring2", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
 
         // gets the component from the first container
         o = (Orange) context.getComponent("Orange");
         assertNotNull(o);
-        assertEquals(new Integer(10), o.getSegments());
+        assertEquals(new Integer(8), o.getSegments());
     }
 
     public void testSpecificContainerAddressingForComponents() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
-        d.setContainer("plexus");
+        d.setContainer("spring2");
         builder.registerComponent(d);
         UMOComponent c = builder.getManager().getModel().getComponent("myOrange");
         assertNotNull(c);
@@ -78,7 +77,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         assertEquals(10, orange.getSegments().intValue());
 
         d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
-        d.setContainer("spring");
+        d.setContainer("spring1");
         builder.registerComponent(d);
         c = builder.getManager().getModel().getComponent("myOrange2");
         assertNotNull(c);
