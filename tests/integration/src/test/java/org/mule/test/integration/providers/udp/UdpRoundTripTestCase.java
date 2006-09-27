@@ -1,5 +1,5 @@
 /*
- * $$Id: $$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,12 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.udp;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.tck.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,10 +21,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import org.mule.tck.FunctionalTestCase;
+
 public class UdpRoundTripTestCase extends FunctionalTestCase
 {
-    private static Log log = LogFactory.getLog(UdpRoundTripTestCase.class);
-
 
     protected String getConfigResources()
     {
@@ -35,34 +33,37 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
 
     public void testSendAndReceiveUDP() throws IOException
     {
+        int outPort = 9001;
+        int inPort = 9002;
+
+        // the socket we talk to
+        DatagramSocket socket = new DatagramSocket(inPort, InetAddress.getLocalHost());
+
+        // prepare outgoing packet
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         DataOutputStream dataOut = new DataOutputStream(bytesOut);
         dataOut.writeFloat(1.0f);
         dataOut.writeFloat(2.0f);
+        byte[] bytesToSend = bytesOut.toByteArray();
 
-        int outPort = 9001;
-        int inPort = 9002;
-
-        DatagramSocket socket = new DatagramSocket(inPort, InetAddress.getLocalHost());
-
-        byte[] bytes = bytesOut.toByteArray();
-        DatagramPacket outboundPacket = new DatagramPacket(bytes, bytes.length, InetAddress
-                        .getLocalHost(), outPort);
+        DatagramPacket outboundPacket = new DatagramPacket(bytesToSend, bytesToSend.length,
+            InetAddress.getLocalHost(), outPort);
         socket.send(outboundPacket);
-        log.info("sent bytes: " + Arrays.toString(outboundPacket.getData()));
 
-        byte[] buffer = new byte[bytes.length];
-        DatagramPacket inboundPacket = new DatagramPacket(buffer, buffer.length);
+        // receive whatever came back
+        byte[] receiveBuffer = new byte[bytesToSend.length];
+        DatagramPacket inboundPacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
         socket.receive(inboundPacket);
 
-        ByteArrayInputStream bytesIn = new ByteArrayInputStream(inboundPacket.getData());
-        log.info("recv bytes: " + Arrays.toString(inboundPacket.getData()));
+        // compare byte buffers as strings so we get to see the diff
+        assertEquals(Arrays.toString(outboundPacket.getData()), Arrays.toString(inboundPacket.getData()));
 
+        // make sure the contents are really the same
+        ByteArrayInputStream bytesIn = new ByteArrayInputStream(inboundPacket.getData());
         DataInputStream dataIn = new DataInputStream(bytesIn);
-        assertEquals(1.0f, dataIn.readFloat(), Float.POSITIVE_INFINITY);
-        assertEquals(2.0f, dataIn.readFloat(), Float.POSITIVE_INFINITY);
-        //log.info("float #1: " + dataIn.readFloat());
-        //log.info("float #2: " + dataIn.readFloat());
+        // the delta is only here to make JUnit happy
+        assertEquals(1.0f, dataIn.readFloat(), 0.1f);
+        assertEquals(2.0f, dataIn.readFloat(), 0.1f);
     }
 
 }
