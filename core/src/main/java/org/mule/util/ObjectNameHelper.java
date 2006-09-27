@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -23,7 +23,7 @@ public class ObjectNameHelper
     public static final String SEPARATOR = ".";
     public static final char HASH = '#';
     public static final String CONNECTOR_PREFIX = "_connector";
-    public static final String ENDPOINT_PREFIX = "_connector";
+    public static final String ENDPOINT_PREFIX = "_endpoint";
 
     public static String getEndpointName(UMOImmutableEndpoint endpoint)
     {
@@ -33,8 +33,20 @@ public class ObjectNameHelper
         }
         else
         {
-            return ENDPOINT_PREFIX + SEPARATOR
+            String name = ENDPOINT_PREFIX + SEPARATOR
                    + replaceObjectNameChars(endpoint.getEndpointURI().getAddress());
+
+            int i = 0;
+
+            //Check that the generated name does not conflict with an existing global endpoint.
+            //We can't check local edpoints right now but the chances of conflict are very small and will be
+            //reported during JMX object registration
+            while (MuleManager.getInstance().lookupEndpoint(name) != null)
+            {
+                i++;
+                name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(endpoint.getEndpointURI().getAddress()) + SEPARATOR + i;
+            }
+            return name;
         }
     }
 
