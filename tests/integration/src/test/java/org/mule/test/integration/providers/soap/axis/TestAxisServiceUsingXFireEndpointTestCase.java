@@ -10,10 +10,6 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -23,6 +19,10 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TestAxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase{
 
@@ -49,7 +49,7 @@ public class TestAxisServiceUsingXFireEndpointTestCase extends FunctionalTestCas
 		MuleClient client = new MuleClient();
 		Map props = new HashMap();
 		props.put("http.method", "GET");
-		UMOMessage reply = client.send("http://localhost:81/services/AxisService?WSDL", "", props);
+		UMOMessage reply = client.send("http://localhost:33381/services/AxisService?WSDL", "", props);
 		
 		assertNotNull(reply);
 		assertNotNull(reply.getPayload());
