@@ -27,6 +27,7 @@
                         <exclude>org/mule/test/integration/client/MuleClientWsdlSoapExternalTestCase.java</exclude>
                         <exclude>org/mule/test/integration/providers/http/HttpFunctionalTestCase.java</exclude>
                         <exclude>org/mule/test/integration/providers/xmpp/XmppFunctionalTestCase.java</exclude>
+                        <exclude>org/mule/test/integration/providers/udp/UdpRoundTripTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
