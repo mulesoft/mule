@@ -16,8 +16,7 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * @author Guillaume Nodet
- * @version $Revision$
+ * Parses a JDBC style endpoint to a MuleEndpointURI
  */
 public class JdbcEndpointBuilder extends AbstractEndpointBuilder
 {
@@ -34,6 +33,11 @@ public class JdbcEndpointBuilder extends AbstractEndpointBuilder
             address = uri.getPath().substring(1);
         } else {
             address = uri.getAuthority();
+        }
+        //JDBC endpoints can just have a param string, hence te address is left null, but the address
+        //should always be a non-null value
+        if(address==null) {
+            address=uri.getScheme();
         }
     }
 }
