@@ -8,7 +8,7 @@
 rm -rf $M2_REPO/org/mule/
 
 # Check-out project if necessary, otherwise update.
-if [ ! -f "mule" ]
+if [ ! -d "mule" ]
 then
     svn co http://svn.codehaus.org/mule/trunk/mule mule
     cd mule
