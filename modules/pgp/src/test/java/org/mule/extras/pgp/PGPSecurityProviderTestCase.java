@@ -76,7 +76,6 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
             auth = securityProvider.authenticate(auth);
 
             assertTrue(auth.isAuthenticated());
-            assertNotNull(auth.getDetails());
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
