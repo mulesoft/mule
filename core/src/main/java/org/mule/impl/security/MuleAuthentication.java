@@ -9,6 +9,8 @@
  */
 package org.mule.impl.security;
 
+import java.util.Map;
+
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOCredentials;
 
@@ -23,7 +25,7 @@ public class MuleAuthentication implements UMOAuthentication
     private boolean authenticated;
     private char[] credentials;
     private String user;
-    private Object details;
+    private Map properties;
 
     public MuleAuthentication(UMOCredentials credentials)
     {
@@ -46,18 +48,20 @@ public class MuleAuthentication implements UMOAuthentication
         return new String(credentials);
     }
 
-    public Object getDetails()
-    {
-        return details;
-    }
-
-    public void setDetails(Object details)
-    {
-        this.details = details;
-    }
-
     public Object getPrincipal()
     {
         return user;
     }
+
+    public Map getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map properties)
+    {
+        this.properties = properties;
+    }
+
+   
 }
