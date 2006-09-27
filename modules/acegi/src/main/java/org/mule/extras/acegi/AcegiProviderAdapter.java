@@ -7,13 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
+
+import java.util.Map;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.AuthenticationProvider;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOAuthentication;
@@ -23,8 +25,8 @@ import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
- * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security
- * provider to use with the UMOSecurityManager
+ * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
+ * use with the UMOSecurityManager
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -34,6 +36,7 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
     private AuthenticationProvider delegate;
     private String name;
     private UMOSecurityContextFactory factory;
+    private Map securityProperties;
 
     public AcegiProviderAdapter()
     {
@@ -70,21 +73,26 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
         return name;
     }
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
+    public UMOAuthentication authenticate(UMOAuthentication authentication)
+        throws SecurityException
     {
         Authentication auth = null;
-        if (authentication instanceof AcegiAuthenticationAdapter) {
-            auth = ((AcegiAuthenticationAdapter) authentication).getDelegate();
-        } else {
-            auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
-                                                           authentication.getCredentials());
+        if (authentication instanceof AcegiAuthenticationAdapter)
+        {
+            auth = ((AcegiAuthenticationAdapter)authentication).getDelegate();
         }
+        else
+        {
+            auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
+                authentication.getCredentials());
 
+        }
         auth = delegate.authenticate(auth);
-        return new AcegiAuthenticationAdapter(auth);
+        return new AcegiAuthenticationAdapter(auth,getSecurityProperties());
     }
 
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException
+    public Authentication authenticate(Authentication authentication)
+        throws AuthenticationException
     {
         return delegate.authenticate(authentication);
     }
@@ -104,8 +112,23 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
         this.delegate = delegate;
     }
 
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException
+    public UMOSecurityContext createSecurityContext(UMOAuthentication auth)
+        throws UnknownAuthenticationTypeException
     {
+        /*
+         * if (strategy != null){ return factory.create(auth, strategy); } else {
+         */
         return factory.create(auth);
+        // }
+    }
+
+    public Map getSecurityProperties()
+    {
+        return securityProperties;
+    }
+
+    public void setSecurityProperties(Map securityProperties)
+    {
+        this.securityProperties = securityProperties;
     }
 }

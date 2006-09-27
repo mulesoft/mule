@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+	
+	<mule-environment-properties synchronous="false"/>
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="componentSecurityContext.xml"/>
+        </properties>
+    </container-context>
+
+	<security-manager>
+        <security-provider name="memory-dao" className="org.mule.extras.acegi.AcegiProviderAdapter">
+            <properties>
+                <container-property name="delegate" reference="daoAuthenticationProvider"/>
+				<map name="securityProperties">
+					<property name="securityMode" value="MODE_GLOBAL"/>
+				</map>
+            </properties>
+        </security-provider>
+        <encryption-strategy name="PBE" className="org.mule.impl.security.PasswordBasedEncryptionStrategy">
+            <properties>
+                <property name="password" value="mule"/>
+            </properties>
+        </encryption-strategy>
+    </security-manager>
+		
+	<connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+	
+    <model name="test">
+		<mule-descriptor name="EchoUMO" implementation="EchoComponent">
+			<inbound-router>
+				<endpoint address="vm://test">
+					<security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+	                         <properties>
+		                         <property name="strategyName" value="PBE"/>
+			                 </properties>
+				     </security-filter>
+				</endpoint>
+			</inbound-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="vm://output"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+	</model> 
+</mule-configuration>

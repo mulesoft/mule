@@ -7,7 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
+
+import java.util.Map;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.GrantedAuthority;
@@ -22,10 +25,17 @@ import org.mule.umo.security.UMOAuthentication;
 public class AcegiAuthenticationAdapter implements UMOAuthentication
 {
     private Authentication delegate;
+    private Map properties;
 
     public AcegiAuthenticationAdapter(Authentication authentication)
     {
         this.delegate = authentication;
+    }
+
+    public AcegiAuthenticationAdapter(Authentication authentication, Map properties)
+    {
+        this.delegate = authentication;
+        this.properties = properties;
     }
 
     public void setAuthenticated(boolean b)
@@ -76,5 +86,15 @@ public class AcegiAuthenticationAdapter implements UMOAuthentication
     public Authentication getDelegate()
     {
         return delegate;
+    }
+
+    public Map getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map properties)
+    {
+        this.properties = properties;       
     }
 }

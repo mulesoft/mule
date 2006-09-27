@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
 
 import org.acegisecurity.context.SecurityContext;
@@ -35,14 +36,13 @@ public class AcegiSecurityContext implements UMOSecurityContext
 
     public void setAuthentication(UMOAuthentication authentication)
     {
-        this.authentication = ((AcegiAuthenticationAdapter) authentication);
+        this.authentication = ((AcegiAuthenticationAdapter)authentication);
         delegate.setAuthentication(this.authentication.getDelegate());
         SecurityContextHolder.setContext(delegate);
     }
-    
+
     public UMOAuthentication getAuthentication()
     {
-        return authentication;
+        return this.authentication;
     }
 }
-
