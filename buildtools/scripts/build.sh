@@ -40,3 +40,6 @@ mvn -Dmaven.test.skip=true -Ptests source:jar
 
 # Generate all distributions
 mvn -Dmaven.test.skip=true -Pdistributions install
+
+# Upload all modules, javadocs, and sources to the public repository
+# mvn -Dmaven.test.skip=true -Ptests -DperformRelease=true deploy
