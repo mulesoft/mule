@@ -9,6 +9,8 @@
  */
 package org.mule.extras.pgp;
 
+import java.util.Map;
+
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
 
@@ -85,6 +87,18 @@ public class PGPAuthentication implements UMOAuthentication
     public Object getPrincipal()
     {
         return userName;
+    }
+
+    public Map getProperties()
+    {
+        // TODO 
+        return null;
+    }
+
+    public void setProperties(Map securityMode)
+    {
+        // TODO 
+        
     }
 
 }
