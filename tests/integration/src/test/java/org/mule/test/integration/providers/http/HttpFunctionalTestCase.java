@@ -105,7 +105,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
             return;
         }
 
-        String requestAddress = "http://mule.codehaus.org/docs/apidocs/";
+        String requestAddress = "http://www.google.co.uk/intl/en/about.html";
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put("http.method", "GET");
@@ -113,6 +113,6 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         UMOMessage m = client.send(requestAddress, null, props);
         assertNotNull(m);
         assertNotNull(m.getPayload());
-        assertTrue(m.getPayloadAsString().indexOf("javadoc") > -1);
+        assertTrue(m.getPayloadAsString().indexOf("About Google") > -1);
     }
 }
