@@ -13,8 +13,10 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 
@@ -48,9 +50,18 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         }
 
         TestReceiver receiver = new TestReceiver();
-        MuleEndpointURI url = new MuleEndpointURI(urlString);
+        //we need to code the component creation here, which isn't ideal, see MULE-1060
         String name = "myComponent";
-        client.registerComponent(receiver, name, url);
+        MuleDescriptor descriptor = new MuleDescriptor();
+        descriptor.setName(name);
+        descriptor.setImplementationInstance(receiver);
+
+        MuleEndpoint endpoint = new MuleEndpoint(urlString, true);
+        //We get a byte[] from a tcp endpoint so we need to convert it
+        endpoint.setTransformer(new ByteArrayToString());
+        descriptor.setInboundEndpoint(endpoint);
+        client.registerComponent(descriptor);
+        
         assertTrue(MuleManager.getInstance().getModel().isComponentRegistered(name));
 
         UMOMessage message = client.send(urlString, "Test Client Send message", null);
