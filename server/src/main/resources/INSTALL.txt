@@ -38,7 +38,8 @@ The distribution you have downloaded contains the following:
 ./lib/boot     - Libraries used by the Java Service Wrapper to boot up the server
 ./lib/mule     - Mule libraries
 ./lib/opt      - Non-Mule libraries
-./lib/user     - This is where you should place your custom classes/libraries
+./lib/user     - This is where you should place your custom classes/libraries.
+                 These are PREPENDED to Mule's classpath and, in effect, patch Mule.
 ./licences     - License information for all libraries shipped with Mule
 ./logs         - Output will be sent here by default when running in background mode
 ./sbin         - Internal scripts which are not to be run by the user
