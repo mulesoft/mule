@@ -10,5 +10,5 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec $MULE_HOME/bin/mule -config ./conf/loan-broker-xfire-sync-config.xml org.mule.samples.loanbroker.LoanConsumer
+exec $MULE_HOME/bin/mule -main org.mule.samples.loanbroker.LoanConsumer
 
