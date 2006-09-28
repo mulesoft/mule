@@ -1014,6 +1014,8 @@ public class MuleManager implements UMOManager
 
         // Mule Version, Timestamp, and Server ID
         List message = new ArrayList();
+        Manifest mf = config.getManifest();
+        Map att = mf.getMainAttributes();
         if (att.values().size() > 0) {
             message.add(StringUtils.defaultString(config.getProductDescription(), notset)
                     + " " + new Message(Messages.VERSION).getMessage() + " "
