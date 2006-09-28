@@ -11,24 +11,6 @@
 package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
-import javax.transaction.TransactionManager;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -88,6 +70,21 @@ import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
+
+import javax.transaction.TransactionManager;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Manifest;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -1017,15 +1014,13 @@ public class MuleManager implements UMOManager
 
         // Mule Version, Timestamp, and Server ID
         List message = new ArrayList();
-        Manifest mf = config.getManifest();
-        Map att = mf.getMainAttributes();
         if (att.values().size() > 0) {
-            message.add(MapUtils.getString(att, new Attributes.Name("Specification-Title"), notset)
+            message.add(StringUtils.defaultString(config.getProductDescription(), notset)
                     + " " + new Message(Messages.VERSION).getMessage() + " "
-                    + MapUtils.getString(att, new Attributes.Name("Implementation-Version"), notset));
+                    + StringUtils.defaultString(config.getProductVersion(), notset));
 
-            message.add(MapUtils.getString(att, new Attributes.Name("Specification-Vendor"), notset));
-            message.add(MapUtils.getString(att, new Attributes.Name("Implementation-Vendor"), notset));
+            message.add(StringUtils.defaultString(config.getVendorName(), notset));
+            message.add(StringUtils.defaultString(config.getProductMoreInfo(), notset));
         } else {
             message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }
@@ -1040,7 +1035,7 @@ public class MuleManager implements UMOManager
         message.add("OS: " + System.getProperty("os.name") + (patch!=null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
         try {
             InetAddress host = InetAddress.getLocalHost();
-            message.add("Host: " + host.getCanonicalHostName() + " (" + host.getHostAddress() + ")");
+            message.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
         } catch (UnknownHostException e) {
             // ignore
         }
