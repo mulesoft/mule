@@ -216,9 +216,11 @@
                         <!-- Custom Entries -->
                         <manifestEntries>
                             <More-Info>For more information go to ${pom.url}</More-Info>
-                            <Support>For commercial support go to ${pom.organization.url}</Support>
-                            <Description>Open Source ESB and Integration Platform</Description>
+                            <Support>Get commercial support: ${pom.organization.url}</Support>
+                            <Description>Mule ESB and Integration Platform</Description>
                             <License>MulesSource MPL http://www.mulesource.com/MSPL/</License>
+                            <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                            <Product-Url>${pom.url}</Product-Url>
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
                         </manifestEntries>
