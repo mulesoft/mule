@@ -12,6 +12,7 @@
     <packaging>jar</packaging>
     <name>Mule Core</name>
     <description>Mule server and core classes</description>
+    <url>http://mule.mulesource.org</url>
 
     <dependencies>
         <!--
