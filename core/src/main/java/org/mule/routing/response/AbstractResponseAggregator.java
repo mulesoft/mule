@@ -14,10 +14,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -29,6 +25,9 @@ import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.concurrent.Latch;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -50,24 +49,48 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    /**
+     * The collection of messages that are ready to be returned to the callee. Keyed by Message ID
+     */
     protected Map responseEvents = new ConcurrentHashMap();
+
+    /**
+     * A map of locks used to synchronize operations on an eventGroup or response message
+     * for a given Message ID.
+     */
     private Map locks = new HashMap();
 
+    /**
+     * Map of EventGroup objects. These represent one or mre messages to be agregated. These are keyed on Message
+     * ID. There will be one responseEvent for every EventGroup.
+     */
     protected Map eventGroups = new ConcurrentHashMap();
+
+    /**
+     * The lock used to synchronize operations on the locks Map
+     */
     private Lock locksCollectionLock = new ReentrantLock();
 
     public void process(UMOEvent event) throws RoutingException
     {
         AtomicBoolean doAggregate = new AtomicBoolean(false);
+        //Add new event to an event group (it will create a new group if one does not exist for  the event correlation ID)
         EventGroup eg = addEvent(event);
+        //Check to see if the event group is ready to be aggregated
         doAggregate.compareAndSet(false, shouldAggregate(eg));
 
         if (doAggregate.get()) {
+            //Create the response message
             UMOMessage returnMessage = aggregateEvents(eg);
             Object id = eg.getGroupId();
+            //Remove the eventGroup as no further message will be received for this group once we aggregate
             removeGroup(id);
 
+            //Add the new response message so that it can be collected by the response Thread
             responseEvents.put(id, returnMessage);
+
+            //Will get/create a latch for the response Message ID and release it, notifying other threads that
+            //the response message is available
             locksCollectionLock.lock();
             Latch l = (Latch) locks.get(id);
             if (l == null) {
@@ -134,6 +157,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         eventGroups.remove(id);
     }
 
+    /**
+     * This method is called by the responding callee thread and should return the aggregated response message
+     * @param message
+     * @return
+     * @throws RoutingException
+     */
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
         Object responseId = getCallResponseAggregateIdentifier(message);
@@ -150,9 +179,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                                 + responseId + " in " + this);
             }
 
-            if (locks.get(responseId) != null) {
-                throw new IllegalStateException("There is already a lock with ID: " + responseId);
-            }
+//            if (locks.get(responseId) != null) {
+//                throw new IllegalStateException("There is already a lock with ID: " + responseId);
+//            }
 
             l = new Latch();
             locks.put(responseId, l);
@@ -170,7 +199,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             if (logger.isDebugEnabled()) {
                 logger.debug("Waiting for response to message: " + responseId);
             }
-
+            //How long should we wait for the lock?
             if (getTimeout() <= 0) {
                 l.await();
                 b = true;
@@ -188,6 +217,8 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                     PropertiesUtils.propertiesToString(responseEvents, true));
                 }
             }
+            responseEvents.remove(responseId);
+            locks.remove(responseId);
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
                                                            String.valueOf(getTimeout()),
                                                            responseId), message, null);
