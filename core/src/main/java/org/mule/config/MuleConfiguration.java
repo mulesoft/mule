@@ -10,13 +10,6 @@
 
 package org.mule.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
-import javax.resource.spi.work.WorkListener;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,9 +20,18 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
-import org.mule.util.IOUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
+
+import javax.resource.spi.work.WorkListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import java.util.Enumeration;
 
 /**
  * <code>MuleConfiguration</code> holds the runtime configuration specific to
@@ -417,9 +419,39 @@ public class MuleConfiguration
         return getManifestProperty("Specification-Vendor");
     }
 
+    public String getVendorUrl()
+    {
+        return getManifestProperty("Vendor-Url");
+    }
+
+    public String getProductUrl()
+    {
+        return getManifestProperty("Product-Url");
+    }
+
     public String getProductName()
     {
         return getManifestProperty("Implementation-Title");
+    }
+
+    public String getProductMoreInfo()
+    {
+        return getManifestProperty("More-Info");
+    }
+
+    public String getProductSupport()
+    {
+        return getManifestProperty("Support");
+    }
+
+    public String getProductLicenseInfo()
+    {
+        return getManifestProperty("License");
+    }
+
+    public String getProductDescription()
+    {
+        return getManifestProperty("Description");
     }
 
     public String getBuildDate()
@@ -434,17 +466,39 @@ public class MuleConfiguration
 
             InputStream is = null;
             try {
-                is = IOUtils.getResourceAsStream("META-INF/Mule.mf", getClass(), false, false);
-                // a bit of a kludge as depending on how the jar is built the
-                // Meta-inf can be lower or upper case...
-                if (is == null) {
-                    is = IOUtils.getResourceAsStream("meta-inf/Mule.mf", getClass(), false, false);
+                //We want to load the MANIFEST.MF from the mule-core jar. Sine we don't the version we're using
+                //we have to search for the jar on the classpath
+                URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+                {
+                    public Object run()
+                    {
+                        try
+                        {
+                            Enumeration e = MuleConfiguration.class.getClassLoader().getResources(("META-INF/MANIFEST.MF"));
+                            while(e.hasMoreElements()) {
+                                URL url = (URL)e.nextElement();
+                                if(url.toExternalForm().indexOf("mule-core") > -1) {
+                                    return url;
+                                }
+                            }
+                        } catch (IOException e1)
+                        {
+                            e1.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+
+                if(url !=null)
+                {
+                    is = url.openStream();
                 }
+
 
                 if (is != null) { manifest.read(is); }
 
             } catch (IOException e) {
-                // ignore
+                logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
             }
         }
         return manifest;
