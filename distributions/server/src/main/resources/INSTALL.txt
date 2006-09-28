@@ -1,8 +1,8 @@
-+------------------------+
-|    Welcome to Mule!    |
-|------------------------|
-| http://www.muleumo.org |
-+------------------------+
++----------------------------+
+|      Welcome to Mule!      |
+|----------------------------|
+| http://mule.mulesource.org |
++----------------------------+
 Mule is a highly scalable Enterprise Services framework and messaging broker.
 Here is some useful information to get you started.
 
@@ -39,7 +39,8 @@ The distribution you have downloaded contains the following:
 ./lib/mule     - Mule libraries
 ./lib/opt      - Non-Mule libraries
 ./lib/user     - This is where you should place your custom classes/libraries.
-                 These are PREPENDED to Mule's classpath and, in effect, patch Mule.
+                 This directory comes before ./lib/mule on the classpath and can
+                 therefore be used to patch the distributed Mule classes if necessary.
 ./licences     - License information for all libraries shipped with Mule
 ./logs         - Output will be sent here by default when running in background mode
 ./sbin         - Internal scripts which are not to be run by the user
