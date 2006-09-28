@@ -11,14 +11,14 @@
 
     <!-- Organization -->
     <organization>
-        <name>SymphonySoft Limited</name>
-        <url>http://www.symphonysoft.com</url>
+        <name>MuleSource Inc.</name>
+        <url>http://www.mulesource.com</url>
     </organization>
 
     <!-- Project -->
     <name>Mule</name>
-    <description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
-    <url>http://muleumo.org</url>
+    <description>Mule is a simple yet robust and highly scalable Integration and ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
+    <url>http://mule.mulesource.org</url>
     <inceptionYear>2003</inceptionYear>
     <mailingLists>
         <!-- Refer to http://muleumo.org/Mailing+Lists -->
@@ -31,7 +31,7 @@
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://jira.muleumo.org/browse/MULE</url>
+        <url>http://dev.mulesource.com/jira/browse/MULE</url>
     </issueManagement>
 
     <!-- Build -->
