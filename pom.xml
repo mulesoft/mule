@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,11 @@
 
     <!-- Project -->
     <name>Mule</name>
-    <description>Mule is a simple yet robust and highly scalable Integration and ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
+
+    <description>Mule is a simple yet robust and highly scalable Integration and ESB services framework. It is designed
+        as a light-weight, event-driven component technology that handles communication with disparate systems
+        transparently providing a simple component interface.
+    </description>
     <url>http://mule.mulesource.org</url>
     <inceptionYear>2003</inceptionYear>
     <mailingLists>
@@ -55,20 +59,20 @@
     <distributionManagement>
         <downloadUrl>http://muleumo.org/Download</downloadUrl>
         <repository>
-          <id>mule-releases</id>
-          <name>Mule Release Repository</name>
-          <url>dav:https://dav.codehaus.org/repository/mule/</url>
+            <id>mule-releases</id>
+            <name>Mule Release Repository</name>
+            <url>dav:https://dav.codehaus.org/repository/mule/</url>
         </repository>
         <snapshotRepository>
-          <id>mule-snapshots</id>
-          <name>Mule Snapshot Repository</name>
-          <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
-          <uniqueVersion>false</uniqueVersion>
+            <id>mule-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
+            <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
-          <id>mule-site</id>
-          <name>Mule Website</name>
-          <url>dav:https://dav.codehaus.org/mule/docs/</url>
+            <id>mule-site</id>
+            <name>Mule Website</name>
+            <url>dav:https://dav.codehaus.org/mule/docs/</url>
         </site>
     </distributionManagement>
     <repositories>
@@ -127,15 +131,15 @@
         </repository>
         -->
         <repository>
-          <id>apache-snapshots</id>
-          <name>Snapshot repository</name>
-          <url>http://people.apache.org/maven-snapshot-repository</url>
-          <snapshots>
-              <enabled>true</enabled>
-          </snapshots>
-          <releases>
-              <enabled>false</enabled>
-          </releases>
+            <id>apache-snapshots</id>
+            <name>Snapshot repository</name>
+            <url>http://people.apache.org/maven-snapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
 
@@ -169,11 +173,11 @@
 
         <!-- WebDAV for remote deployment -->
         <extensions>
-          <extension>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-webdav</artifactId>
-            <version>1.0-beta-2-SNAPSHOT</version>
-          </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2-SNAPSHOT</version>
+            </extension>
         </extensions>
 
         <!-- Project version filters -->
@@ -200,13 +204,26 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                  <archive>
-                    <index>true</index>
-                    <!-- List dependencies in the MANIFEST.MF -->
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                    </manifest>
-                  </archive>
+
+                    <archive>
+
+                        <index>true</index>
+                        <!-- List dependencies in the MANIFEST.MF -->
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+
+                        </manifest>
+                        <!-- Custom Entries -->
+                        <manifestEntries>
+                            <More-Info>For more information go to ${pom.url}</More-Info>
+                            <Support>For commercial support go to ${pom.organization.url}</Support>
+                            <Description>Open Source ESB and Integration Platform</Description>
+                            <License>MulesSource MPL http://www.mulesource.com/MSPL/</License>
+                            <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
+                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                        </manifestEntries>
+
+                    </archive>
 
                 </configuration>
             </plugin>
@@ -251,12 +268,12 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <!--<configuration>-->
-                    <!--<instrumentation>-->
-                        <!--<ignore>com.example.boringcode.*</ignore>-->
-                        <!--<excludes>-->
-                            <!--<exclude implementation="java.lang.String">**/*TestCase.class</exclude>-->
-                        <!--</excludes>-->
-                    <!--</instrumentation>-->
+                <!--<instrumentation>-->
+                <!--<ignore>com.example.boringcode.*</ignore>-->
+                <!--<excludes>-->
+                <!--<exclude implementation="java.lang.String">**/*TestCase.class</exclude>-->
+                <!--</excludes>-->
+                <!--</instrumentation>-->
                 <!--</configuration>-->
                 <executions>
                     <execution>
@@ -271,16 +288,16 @@
             <!-- Bind Clover Coverage instrumentation to the site generation -->
             <!-- Blocked by http://jira.codehaus.org/browse/MCLOVER-50 -->
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-clover-plugin</artifactId>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>pre-site</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>instrument</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-clover-plugin</artifactId>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<phase>pre-site</phase>-->
+            <!--<goals>-->
+            <!--<goal>instrument</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
             <!--</plugin>-->
 
             <plugin>
@@ -419,7 +436,7 @@
                     <configLocation>codecheck/checkstyle.xml</configLocation>
                     <headerLocation>codecheck/LICENSE.txt</headerLocation>
                 </configuration>
-           </plugin>
+            </plugin>
 
 
             <!-- Code Coverage by Cobertura -->
@@ -431,11 +448,11 @@
             <!-- Code Coverage by Clover -->
             <!-- Blocked by http://jira.codehaus.org/browse/MCLOVER-50 -->
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-clover-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<jdk>1.4</jdk>-->
-                <!--</configuration>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-clover-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<jdk>1.4</jdk>-->
+            <!--</configuration>-->
             <!--</plugin>-->
         </plugins>
     </reporting>
@@ -513,12 +530,12 @@
         </profile>
 
         <profile>
-          <id>ci-server</id>
-          <distributionManagement>
-            <site>
-              <url>file:///home/luntbuild/publish/mule/docs</url>
-            </site>
-          </distributionManagement>
+            <id>ci-server</id>
+            <distributionManagement>
+                <site>
+                    <url>file:///home/luntbuild/publish/mule/docs</url>
+                </site>
+            </distributionManagement>
         </profile>
 
     </profiles>
