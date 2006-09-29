@@ -14,6 +14,7 @@ import java.beans.ExceptionListener;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,9 +95,6 @@ import org.xml.sax.Attributes;
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
  * builds a MuleManager instance based on a mule xml configration file defined
  * in the mule-configuration.dtd.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration implements ConfigurationBuilder
 {
@@ -274,14 +272,17 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         // because Mule Xml allows developers to overload global endpoints
         // we need a way to initialise Global endpoints after the Xml has
         // been processed but before the MuleManager is initialised. So we do
-        // it here
-        Map endpoints = MuleManager.getInstance().getEndpoints();
-        UMOEndpoint ep;
+        // it here.
+        UMOManager manager = MuleManager.getInstance();
+
+        // we need to take a copy of the endpoints since we're going to modify them
+        // while iterating
+        Map endpoints = new HashMap(manager.getEndpoints());
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();) {
-            ep = (UMOEndpoint) iterator.next();
+            UMOEndpoint ep = (UMOEndpoint) iterator.next();
             ep.initialise();
-            MuleManager.getInstance().unregisterEndpoint(ep.getName());
-            MuleManager.getInstance().registerEndpoint(ep);
+            manager.unregisterEndpoint(ep.getName());
+            manager.registerEndpoint(ep);
         }
 
         try {
