@@ -58,10 +58,18 @@ public class AxisExceptionTestCase extends FunctionalTestCase
             assertNotNull(t);
             assertEquals(TestComponentException.class.getCanonicalName() + ": " + TestComponentException.MESSAGE_PREFIX + TestComponent.EXCEPTION_MESSAGE, t.getMessage());
             
-        }
-        
-        
+        }  
+    }
+    
+    public void testExceptionBasedRoutingForAxis() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        UMOMessage reply = client.send("vm://localhost.test", new MuleMessage("test"));
 
+        assertNotNull(reply);
+        assertNotNull(reply.getPayload());
+        assertTrue(reply.getPayload() instanceof String);
+        assertEquals("Received: test", reply.getPayloadAsString());
     }
 
 }

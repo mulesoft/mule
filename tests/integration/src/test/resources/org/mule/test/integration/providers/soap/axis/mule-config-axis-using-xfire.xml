@@ -23,6 +23,19 @@
 			</properties>
 		</mule-descriptor>
 		
+		<!--Bridge Component used to test the ExceptionBasedRouting on Axis-->
+		<mule-descriptor name="test" implementation="org.mule.components.simple.BridgeComponent">
+			<inbound-router>
+				<endpoint address="vm://localhost.test"/>
+			</inbound-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.ExceptionBasedRouter">
+					<endpoint address="axis:http://localhost:33380/services/AxisService?method=receive"/>
+					<endpoint address="axis:http://localhost:33381/services/AxisService?method=receive"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+		
 		<!--Accessing an Axis hosted web-service using XFire dynamic client-->
 		<mule-descriptor name="BridgeToAxisService" implementation="org.mule.components.simple.BridgeComponent">
 			<inbound-router>
