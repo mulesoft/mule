@@ -40,6 +40,7 @@ import javax.jms.XATopicSession;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -264,7 +265,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
                                                                                new XAResourceInvocationHandler());
                         tx.enlistResource(xares);
                     }
-                }
+                }                
             }
 
             protected class XAResourceInvocationHandler implements InvocationHandler
@@ -282,8 +283,41 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
                         if (logger.isDebugEnabled()) {
                             logger.debug("Invoking " + method);
                         }
-                        if (method.getName().equals("end")) {
+                        /*
+                         * In jotm version 1.5.3, it first was making a call to method
+                         * end, and then followed by either commit,rollback or prepare.
+                         * 
+                         * In jotm version 2.0.10, the end method is not called before commit
+                         * rollback or prepare, and thus an exception with error code -6 was
+                         * being thrown. In order to solve this, the method being invoked is
+                         * checked, if it is either commit,rollback or prepare, the end method
+                         * is called beforehand.                  
+                         */
+                        
+                        //not relevent with jotm 2.0.10
+                        /*if (method.getName().equals("end")) {
                             tx = null;
+                        }*/
+                        
+                        //new methods to cater for jotm 2.0.10 not calling the end method. 
+                        if(method.getName().equals("commit"))
+                        {
+                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
+                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMSUCCESS)});
+                            tx=null;
+                        }
+                        if(method.getName().equals("rollback"))
+                        {
+                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
+                            //not sure if the flag should be TMFAIL or TMSUCCESS...
+                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMFAIL)});
+                            tx=null;
+                        }
+                        if(method.getName().equals("prepare"))
+                        {
+                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
+                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMSUCCESS)});
+                            tx=null;
                         }
                         return method.invoke(xares, args);
                     } catch (InvocationTargetException e) {
