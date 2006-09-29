@@ -11,7 +11,8 @@
   <property name="app.name" value="mule-example-webapp"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.resources" value="conf"/>
+    <property name="dir.conf" value="conf"/>
+    <property name="dir.resources" value="resources"/>
     <property name="dir.webapp" value="webapp"/>
     <property name="dir.build" value="build"/>
     <property name="dir.classes" value="build/classes"/>
@@ -76,10 +77,7 @@
 
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
-            <fileset dir="${dir.java}">
-                <include name="*.xml"/>
-                <include name="*.xsl"/>
-            </fileset>
+            <fileset dir="${dir.resources}"/>
         </copy>
     </target>
 
@@ -99,7 +97,7 @@
             </lib>
             <fileset dir="${dir.webapp}"/>
             <classes dir="${dir.classes}"/>
-            <webinf dir="${dir.resources}"/>
+            <webinf dir="${dir.conf}"/>
         </war>
    </target>
 </project>
