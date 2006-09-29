@@ -13,6 +13,8 @@ package org.mule.util;
 import org.mule.MuleManager;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Generates consistent objects names for Mule components
@@ -25,18 +27,29 @@ public class ObjectNameHelper
     public static final String CONNECTOR_PREFIX = "_connector";
     public static final String ENDPOINT_PREFIX = "_endpoint";
 
+    /**
+     * logger used by this class
+     */
+    static transient Log logger = LogFactory.getLog(ObjectNameHelper.class);
+
     public static String getEndpointName(UMOImmutableEndpoint endpoint)
     {
-        if (endpoint.getName() != null)
+        String name = endpoint.getName();
+        if (name != null)
         {
-            return replaceObjectNameChars(endpoint.getName());
+            //If the name is the same as the address, we need to add the scheme
+            if(name.equals(endpoint.getEndpointURI().getAddress())) {
+                name = endpoint.getEndpointURI().getScheme() + SEPARATOR + name;
+            }
+            return replaceObjectNameChars(name);
+
         }
         else
         {
             String address = endpoint.getEndpointURI().getAddress();
             //Make sure we include the endpoint scheme in the name
             address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme() + SEPARATOR + address);
-            String name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
+            name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
             int i = 0;
 
