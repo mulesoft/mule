@@ -7,7 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.functional;
+
+import java.util.HashMap;
 
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -24,15 +27,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
-import java.util.HashMap;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTestCase
 {
+    protected static final int NUM_MESSAGES_TO_SEND = 100;
+
     protected UMOConnector connector;
     protected static UMOManager manager;
     protected boolean callbackCalled = false;
@@ -48,9 +46,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration()
-                   .getPoolingProfile()
-                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         manager.setModel(new SedaModel());
         callbackCalled = false;
@@ -63,14 +60,16 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     protected void doTearDown() throws Exception
     {
-        if (connector != null) {
+        if (connector != null)
+        {
             connector.dispose();
         }
     }
 
     public void testSend() throws Exception
     {
-        if(!isPrereqsMet("org.mule.tck.functional.AbstractProviderFunctionalTestCase.testSend()")) {
+        if (!isPrereqsMet("org.mule.tck.functional.AbstractProviderFunctionalTestCase.testSend()"))
+        {
             return;
         }
 
@@ -78,8 +77,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
         initialiseComponent(descriptor, this.createEventCallback());
 
-
-        sendTestData(100);
+        sendTestData(NUM_MESSAGES_TO_SEND);
 
         afterInitialise();
 
@@ -88,7 +86,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         assertTrue(callbackCalled);
     }
 
-    public UMOComponent initialiseComponent(UMODescriptor descriptor, EventCallback callback) throws Exception
+    public UMOComponent initialiseComponent(UMODescriptor descriptor, EventCallback callback)
+        throws Exception
     {
         descriptor.setOutboundEndpoint(createOutboundEndpoint());
         descriptor.setInboundEndpoint(createInboundEndpoint());
@@ -102,27 +101,37 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     }
 
     /**
-     * Implementing tests can overide this to add further configuration to the outbound endpoint
+     * Implementing tests can overide this to add further configuration to the
+     * outbound endpoint
+     * 
      * @return
      */
-    protected UMOEndpoint createOutboundEndpoint() {
-        if(getOutDest() != null) {
-            return new MuleEndpoint("testOut", getOutDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
-        } else {
+    protected UMOEndpoint createOutboundEndpoint()
+    {
+        if (getOutDest() != null)
+        {
+            return new MuleEndpoint("testOut", getOutDest(), connector, null,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
+        }
+        else
+        {
             return null;
         }
-
     }
 
-     /**
-     * Implementing tests can overide this to add further configuration to the inbound endpoint
+    /**
+     * Implementing tests can overide this to add further configuration to the
+     * inbound endpoint
+     * 
      * @return
      */
-    protected UMOEndpoint createInboundEndpoint() {
-        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
+    protected UMOEndpoint createInboundEndpoint()
+    {
+        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null,
+            UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
         ep.setSynchronous(true);
         return ep;
-     }
+    }
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation)
     {
@@ -140,16 +149,21 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     public EventCallback createEventCallback()
     {
-        EventCallback callback = new EventCallback() {
+        EventCallback callback = new EventCallback()
+        {
             public void eventReceived(UMOEventContext context, Object Component)
             {
-                synchronized (lock) {
+                synchronized (lock)
+                {
                     callbackCalled = true;
                     callbackCount++;
                 }
-                if(!transacted) {
+                if (!transacted)
+                {
                     assertNull(context.getCurrentTransaction());
-                } else {
+                }
+                else
+                {
                     assertNotNull(context.getCurrentTransaction());
                 }
             }
@@ -166,4 +180,5 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected abstract UMOEndpointURI getOutDest();
 
     protected abstract UMOConnector createConnector() throws Exception;
+
 }
