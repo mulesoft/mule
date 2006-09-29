@@ -10,34 +10,25 @@
 
 package org.mule.providers.udp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(UdpConnectorFunctionalTestCase.class);
+    private static final String MESSAGE = "Hello";
 
     DatagramSocket s = null;
     URI serverUri = null;
-    int sentPackets = 0;
 
     protected void doSetUp() throws Exception
     {
@@ -65,11 +56,11 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         s = new DatagramSocket(0);
         s.setSoTimeout(2000);
 
-        for (sentPackets = 0; sentPackets < iterations; sentPackets++)
+        for (int sentPackets = 0; sentPackets < iterations; sentPackets++)
         {
-            String msg = "Hello" + sentPackets;
+            String msg = MESSAGE + sentPackets;
             DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet,
-                    serverUri.getPort());
+                serverUri.getPort());
             s.send(packet);
         }
     }
@@ -78,17 +69,23 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     {
         URI uri = getOutDest().getUri();
         InetAddress inet = InetAddress.getByName(uri.getHost());
+        Set receivedMessages = new HashSet(NUM_MESSAGES_TO_SEND);
         int receivedPackets;
 
-        for (receivedPackets = 0; receivedPackets < sentPackets; receivedPackets++)
+        for (receivedPackets = 0; receivedPackets < NUM_MESSAGES_TO_SEND; receivedPackets++)
         {
             DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, serverUri.getPort());
             s.receive(packet);
-            UdpMessageAdapter adapter = new UdpMessageAdapter(packet);
-            System.out.println("Received message: " + adapter.getPayloadAsString());
+            receivedMessages.add(new UdpMessageAdapter(packet).getPayloadAsString());
         }
 
-        assertEquals(sentPackets, receivedPackets);
+        assertEquals(NUM_MESSAGES_TO_SEND, receivedPackets);
+
+        for (int i = 0; i < receivedMessages.size(); i++)
+        {
+            String message = MESSAGE + i + " Received";
+            assertTrue("checking for received message '" + message + "'", receivedMessages.contains(message));
+        }
     }
 
     protected UMOEndpointURI getInDest()
