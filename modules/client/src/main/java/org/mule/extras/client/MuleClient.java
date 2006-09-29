@@ -12,13 +12,6 @@ package org.mule.extras.client;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -57,6 +50,12 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
  * receive events from a Mule Server. In most Mule applications events are triggered
@@ -82,9 +81,7 @@ import org.mule.util.StringUtils;
  * <p>
  * Note that there must be a configured MuleManager for this client to work. It will
  * use the one available using <code>MuleManager.getInstance()</code>
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ *
  * @see org.mule.impl.endpoint.MuleEndpointURI
  */
 public class MuleClient implements Disposable
@@ -223,14 +220,29 @@ public class MuleClient implements Disposable
     {
         // if we are creating a server for this client then set client mode
         // this will disable Admin connections by default;
-        MuleManager.getConfiguration().setClientMode(!MuleManager.isInstanciated());
+        // If there is no local manager present create a default manager
+        if(MuleManager.isInstanciated())
+        {
+            if(logger.isInfoEnabled())
+            {
+                logger.info("There is already a manager available to this client locally, no need to create a new one");
+            }
+        } else
+        {
+            MuleManager.getConfiguration().setClientMode(true);
+            if(logger.isInfoEnabled())
+            {
+                logger.info("There is no manager instance available locally for this client, Creating a new Manager");
+            }
+        }
+
 
         manager = MuleManager.getInstance();
         builder = new QuickConfigurationBuilder();
-        // If there is no local manager present create a default manager
+
         if (!manager.isInitialised() && startManager == true)
         {
-            logger.info("Initialising a new Mule Manager");
+            if(logger.isInfoEnabled()) logger.info("Starting Mule Manager for this client");
             ((MuleManager)manager).start();
         }
     }

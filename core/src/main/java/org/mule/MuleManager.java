@@ -90,8 +90,6 @@ import java.util.jar.Manifest;
  * <code>MuleManager</code> maintains and provides services for a Mule
  * instance.
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleManager implements UMOManager
 {
@@ -293,6 +291,7 @@ public class MuleManager implements UMOManager
     public static UMOManager getInstance()
     {
         if (instance == null) {
+            logger.info("Manager instance is Null, creating new instance");
             instance = createInstance();
         }
         return instance;
