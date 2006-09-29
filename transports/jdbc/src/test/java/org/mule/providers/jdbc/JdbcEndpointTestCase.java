@@ -13,10 +13,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
+
 public class JdbcEndpointTestCase extends AbstractMuleTestCase
 {
 
@@ -35,7 +32,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
     {
         UMOEndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE");
         assertEquals("jdbc", url.getScheme());
-        assertEquals(null, url.getAddress());
+        assertEquals("jdbc", url.getAddress());
         assertNull(url.getEndpointName());
         assertNotNull(url.getParams());
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
