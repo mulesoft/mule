@@ -7,34 +7,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.jms.JMSException;
 
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.tck.AbstractMuleTestCase;
 
-import javax.jms.JMSException;
+public class JmsExceptionReaderTestCase extends AbstractMuleTestCase
+{
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-/**
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
-
-    /**
-     * Print the name of this test to standard output.
-     */
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
     }
 
-    public void testNestedExceptionRetrieval() throws Exception {
+    public void testNestedExceptionRetrieval() throws Exception
+    {
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
         assertNotNull(t);
@@ -54,16 +50,16 @@ public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
         assertEquals(2, info.size());
         assertNotNull(info.get("JavaDoc"));
         assertEquals("1234", info.get("JMS Code"));
-
-        System.out.println(ExceptionHelper.getRootMuleException(testException).getDetailedMessage());
     }
 
-    private Exception getException() {
+    private Exception getException()
+    {
 
         JMSException e = new JMSException("Jms error", "1234");
         e.setLinkedException(new IOException("blah"));
 
-        return new MuleException(Message.createStaticMessage("foo"),
-                new MuleException(Message.createStaticMessage("bar"), e));
+        return new MuleException(Message.createStaticMessage("foo"), new MuleException(
+            Message.createStaticMessage("bar"), e));
     }
+
 }
