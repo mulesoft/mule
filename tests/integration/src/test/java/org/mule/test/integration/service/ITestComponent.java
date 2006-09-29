@@ -18,7 +18,6 @@ package org.mule.test.integration.service;
  */
 public interface ITestComponent
 {
-
     public String receive(String message) throws Exception;
-
+    public String throwsException(String message) throws Exception;
 }
