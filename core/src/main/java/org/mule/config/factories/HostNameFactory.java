@@ -1,5 +1,5 @@
 /*
- * $$Id: $$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,12 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.factories;
 
-import org.mule.config.PropertyFactory;
+package org.mule.config.factories;
 
 import java.net.InetAddress;
 import java.util.Map;
+
+import org.mule.config.PropertyFactory;
 
 /**
  * Extracts the local hostname from the local system
@@ -24,4 +25,5 @@ public class HostNameFactory implements PropertyFactory
     {
         return InetAddress.getLocalHost().getHostName();
     }
+
 }
