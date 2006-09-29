@@ -95,13 +95,14 @@ public class AxisExternalServerTest extends TestCase {
 //        assertEquals(result.getPayload(), new Integer(6));
 //    }
 
-    public void testAxisServiceUsingWSDL() throws Exception {
-        String URL = "wsdl-axis:http://localhost:8080/axis/Calculator.jws?wsdl&method=add";
-        MuleClient client = new MuleClient();
-
-        UMOMessage result = client.send(URL, new Object[]{new Integer(4), new Integer(4)}, null);
-        assertNotNull(result);
-
-        assertEquals(result.getPayload(), new Integer(8));
-    }
+    //wsdl-axis is currently disabled due to the problems axis had with this feature
+//    public void testAxisServiceUsingWSDL() throws Exception {
+//        String URL = "wsdl-axis:http://localhost:8080/axis/Calculator.jws?wsdl&method=add";
+//        MuleClient client = new MuleClient();
+//
+//        UMOMessage result = client.send(URL, new Object[]{new Integer(4), new Integer(4)}, null);
+//        assertNotNull(result);
+//
+//        assertEquals(result.getPayload(), new Integer(8));
+//    }
 }
