@@ -9,17 +9,19 @@
  */
 package org.mule.providers.soap.axis;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
@@ -71,8 +73,16 @@ public class AxisServiceProxy extends ServiceProxy
                 UMOExceptionPayload wsException = message.getExceptionPayload(); 
                 
                 if (wsException != null)
-                {
-                    throw wsException.getException();
+                {                 
+                    UMOException umoException = ExceptionHelper.getRootMuleException(wsException.getException());
+                    //if the exception has a cause, then throw only the cause 
+                    if(umoException.getCause()!=null) 
+                    {
+                        throw umoException.getCause();
+                    } else 
+                    {
+                        throw umoException;
+                    }
                 }
   
                 return message.getPayload();

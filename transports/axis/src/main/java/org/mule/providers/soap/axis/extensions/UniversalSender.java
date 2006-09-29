@@ -125,15 +125,14 @@ public class UniversalSender extends BasicHandler
             }
             
             //add all custom headers, filter out all mule headers (such as MULE_SESSION) except
-            // for MULE_USER header. Filter out other headers like "soapMethods" and "method"
+            // for MULE_USER header. Filter out other headers like "soapMethods" and "method" and "soapAction"
             UMOMessage currentMessage = RequestContext.getEvent().getMessage();
-            final String METHOD = "method";
             final String SOAP_METHODS = "soapMethods";
 
             for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String name = (String)iterator.next();
-                if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY) && !StringUtils.equals(name, SoapConstants.SOAP_METHOD_PROPERTY) && !StringUtils.equals(name, METHOD) && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY) && !StringUtils.equals(name, SoapConstants.SOAP_METHOD_PROPERTY) && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
                 {
                     props.put(name, currentMessage.getProperty(name));
                 }
@@ -165,10 +164,12 @@ public class UniversalSender extends BasicHandler
                 dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint, dispatchEvent.getSession(),
                         dispatchEvent.isSynchronous());
                 UMOMessage result = session.sendEvent(dispatchEvent);
-                if(result!=null) {
+                if(result!=null) 
+                {                  
                     byte[] response = result.getPayloadAsBytes();
                     Message responseMessage = new Message(response);
                     msgContext.setResponseMessage(responseMessage);
+                
                 } else {
                     logger.warn("No response message was returned from synchronous call to: " + uri);
                 }
@@ -179,9 +180,13 @@ public class UniversalSender extends BasicHandler
             } else {
                 session.dispatchEvent(dispatchEvent);
             }
-        } catch (Exception e) {
-            logger.error("Failed to dispatch soap event from Axis Universal transport: " + e.toString());
-            requestEndpoint.getConnector().handleException(e);
+        } 
+        catch (AxisFault axisFault)
+        {
+            throw axisFault;
+        }
+        catch (Exception e) {
+            throw new AxisFault(e.getMessage(), new Throwable(e));
         }
 
     }
