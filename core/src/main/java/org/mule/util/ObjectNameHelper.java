@@ -33,8 +33,10 @@ public class ObjectNameHelper
         }
         else
         {
-            String name = ENDPOINT_PREFIX + SEPARATOR
-                   + replaceObjectNameChars(endpoint.getEndpointURI().getAddress());
+            String address = endpoint.getEndpointURI().getAddress();
+            //Make sure we include the endpoint scheme in the name
+            address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme() + SEPARATOR + address);
+            String name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
             int i = 0;
 
