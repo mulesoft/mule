@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+	
+	<mule-environment-properties synchronous="true"/>
+
+    <model name="test">
+		<mule-descriptor name="TestServiceUMO" implementation="org.mule.test.integration.service.TestServiceComponent">
+			<inbound-router>
+				<endpoint address="vm://service"/>
+			</inbound-router>	   
+		</mule-descriptor>	
+	</model> 
+</mule-configuration>
