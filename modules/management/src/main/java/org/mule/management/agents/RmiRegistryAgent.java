@@ -25,10 +25,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
 
 /**
- * todo document
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Binds to an existing RMI registry or creates a new one on a defined URI.
+ * The default is <code>rmi://localhost:1099</code>
  */
 public class RmiRegistryAgent  implements UMOAgent
 {

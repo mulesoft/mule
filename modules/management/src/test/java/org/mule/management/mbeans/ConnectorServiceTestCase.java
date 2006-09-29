@@ -10,7 +10,7 @@
 package org.mule.management.mbeans;
 
 import org.mule.management.agents.JmxAgent;
-import org.mule.tck.AbstractMuleJmxTestCase;
+import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 

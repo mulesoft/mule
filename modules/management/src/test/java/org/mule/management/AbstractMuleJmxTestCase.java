@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,25 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.management;
 
-package org.mule.tck;
+import org.mule.tck.AbstractMuleTestCase;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-
-import java.util.Iterator;
+import javax.management.ObjectInstance;
 import java.util.List;
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  * This base test case will create a new <code>MBean Server</code> if necessary, and
  * will clean up any registered MBeans in its <code>tearDown()</code> method.
- * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * 
- * $Id$
+ *
  */
 public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 {

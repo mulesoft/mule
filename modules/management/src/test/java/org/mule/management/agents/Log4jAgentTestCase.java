@@ -10,15 +10,10 @@
 package org.mule.management.agents;
 
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
-import org.mule.tck.AbstractMuleJmxTestCase;
+import org.mule.management.AbstractMuleJmxTestCase;
 
 import javax.management.ObjectName;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * 
- * $Id$
- */
 public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
 {
     public void testRedeploy() throws Exception

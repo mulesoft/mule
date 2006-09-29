@@ -15,6 +15,7 @@ import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
+import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -23,12 +24,13 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
-import org.apache.commons.logging.LogFactory;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.net.URI;
@@ -39,11 +41,11 @@ import java.util.Map;
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
  * statistics and configuration viewing of a Mule instance..
  *
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class Mx4jAgent implements UMOAgent
 {
+    public static final String HTTP_ADAPTER_OBJECT_NAME = "Mule:name=Mx4jHttpAdapter";
+
     private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
 
     private String name = "MX4J Agent";
@@ -114,8 +116,11 @@ public class Mx4jAgent implements UMOAgent
     public void initialise() throws InitialisationException {
         try {
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            
             adaptor = createAdaptor();
-            adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
+            adaptorName = new ObjectName(HTTP_ADAPTER_OBJECT_NAME);
+            
+            unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(adaptor, adaptorName);
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e, this);
@@ -148,6 +153,17 @@ public class Mx4jAgent implements UMOAgent
         }
     }
 
+    /**
+     * Unregister all log4j MBeans if there are any left over the old deployment
+     */
+    protected void unregisterMBeansIfNecessary()
+            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+    {
+        if (mBeanServer.isRegistered(ObjectName.getInstance(HTTP_ADAPTER_OBJECT_NAME))) {
+            mBeanServer.unregisterMBean(adaptorName);
+        }
+    }
+
     /* @see org.mule.umo.lifecycle.Disposable#dispose() */
     public void dispose() {
         try {
@@ -157,7 +173,7 @@ public class Mx4jAgent implements UMOAgent
         } finally {
             try
             {
-                mBeanServer.unregisterMBean(adaptorName);
+                unregisterMBeansIfNecessary();
             } catch (Exception e)
             {
                 logger.error("Couldn't unregister MBean: " + adaptorName.getCanonicalName(), e);

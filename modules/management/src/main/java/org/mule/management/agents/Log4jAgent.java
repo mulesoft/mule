@@ -31,8 +31,6 @@ import java.util.Set;
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance
  * running in Mule for Jmx management
  * 
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class Log4jAgent implements UMOAgent
 {

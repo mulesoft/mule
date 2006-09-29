@@ -9,37 +9,34 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.impl.MuleDescriptor;
-import org.mule.tck.AbstractMuleJmxTestCase;
-import org.mule.umo.manager.UMOManager;
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
+import org.mule.management.AbstractMuleJmxTestCase;
 
 import javax.management.ObjectName;
 
 import java.util.Set;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- *
- * $Id$$
- */
-public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
+
+public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        UMOManager manager = getManager(true);
-        final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
-        descriptor.setImplementation(new Object());
-        manager.getModel().registerComponent(descriptor);
+        // inbound/outbound router statistics are required
 
-        manager.start();
-        final ComponentService service = new ComponentService("TEST_SERVICE");
-        final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
-        mBeanServer.registerMBean(service, name);
+        final ComponentStatistics statistics = new ComponentStatistics("TEST_IN", 0, 0);
+        statistics.setInboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_INBOUND));
+        statistics.setOutboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
+        ComponentStats stats = new ComponentStats(statistics);
+
+        final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_NAME");
+        mBeanServer.registerMBean(stats, name);
+
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
 
-        assertEquals("Unexpected number of components registered in the domain.", 4, mbeans.size());
+        assertEquals("Unexpected components registered in the domain.", 3, mbeans.size());
 
         mBeanServer.unregisterMBean(name);
 
