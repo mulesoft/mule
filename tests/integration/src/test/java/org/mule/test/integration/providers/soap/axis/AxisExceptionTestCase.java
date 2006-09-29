@@ -56,8 +56,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
             Throwable t = dispatchExc.getCause();
             
             assertNotNull(t);
-            assertEquals(TestComponentException.class.getCanonicalName() + ": " + TestComponentException.MESSAGE_PREFIX + TestComponent.EXCEPTION_MESSAGE, t.getMessage());
-            
+            assertEquals(TestComponentException.class.getName() + ": " + TestComponentException.MESSAGE_PREFIX + TestComponent.EXCEPTION_MESSAGE, t.getMessage());
         }  
     }
     
