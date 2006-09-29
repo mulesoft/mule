@@ -674,6 +674,15 @@ Assembly descriptor for the full Mule distribution.
             Mule Examples: Webapp
         ============================
       -->
+      <!-- now just copy a readme to explain that the example should be built
+           from Ant -->
+      <fileSet>
+          <directory>../../../examples/webapp/dist</directory>
+          <outputDirectory>examples/maven/webapp</outputDirectory>
+          <includes>
+              <include>MAVEN_README.txt</include>
+          </includes>
+      </fileSet>
       <!-- Maven-style example : TODO
       <fileSet>
           <directory>../../../examples/webapp</directory>
