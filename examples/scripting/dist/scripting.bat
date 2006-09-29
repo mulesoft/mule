@@ -10,10 +10,4 @@ echo This example requires additional libraries which need to be downloaded by t
 goto :eof
 
 :mule
-ECHO The Scripting example is available in two variations:
-ECHO   1. Binary HTTP
-ECHO   2. Text file
-SET /P Choice=Select the one you wish to execute and press Enter...
-
-IF '%Choice%'=='1' call %MULE_HOME%\bin\mule.bat -main org.mule.samples.scripting.BinaryHttpExample
-IF '%Choice%'=='2' call %MULE_HOME%\bin\mule.bat -main org.mule.samples.scripting.TextFileExample
+call %MULE_HOME%\bin\mule.bat -config .\conf\scripting-config.xml

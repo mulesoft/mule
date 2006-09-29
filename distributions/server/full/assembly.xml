@@ -469,14 +469,6 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/scripting/conf</directory>
           <outputDirectory>examples/maven/scripting/conf</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/src</directory>
-          <outputDirectory>examples/maven/scripting/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/test-data</directory>
-          <outputDirectory>examples/maven/scripting/test-data</outputDirectory>
-      </fileSet>
 
       <!-- Ant-style example -->
       <fileSet>
@@ -505,18 +497,6 @@ Assembly descriptor for the full Mule distribution.
       <fileSet>
           <directory>../../../examples/scripting/conf</directory>
           <outputDirectory>examples/ant/scripting/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/src/main/java</directory>
-          <outputDirectory>examples/ant/scripting/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/src/main/resources</directory>
-          <outputDirectory>examples/ant/scripting/resources</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/test-data</directory>
-          <outputDirectory>examples/maven/scripting/test-data</outputDirectory>
       </fileSet>
 
       <!--

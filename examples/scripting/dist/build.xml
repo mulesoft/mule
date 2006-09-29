@@ -5,13 +5,11 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Error Handler" default="deploy">
+<project name="Mule Examples: Scripting" default="deploy">
 
     <property name="app.name" value="mule-example-scripting"/>
 
-    <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.resources" value="resources"/>
     <property name="dir.build" value="build"/>
     <property name="dir.classes" value="build/classes"/>
 
@@ -27,7 +25,7 @@
         <property environment="env"/>
         <property name="dir.mule.home" value="${env.MULE_HOME}"/>
         <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-        
+
         <fail message="MULE_HOME environment variable has not been set.">
             <condition>
                 <or>
@@ -43,7 +41,7 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries"
             depends="sanity.check">
-            
+
         <get src="${url.maven.repo}/groovy/groovy-all-1.0-jsr/06/groovy-all-1.0-jsr-06.jar"
              dest="${dir.user.lib}/groovy.jar"
              verbose="true"
@@ -56,7 +54,7 @@
 
     <target name="init"
             depends="sanity.check, get.libraries">
-            
+
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -81,36 +79,27 @@
     <target name="compile"
             depends="init"
             description="Compile the application.">
-            
-        <javac srcdir="${dir.java}"
-               destdir="${dir.classes}"
-               debug="true"
-               source="1.4"
-               target="1.4">
-            <classpath refid="classpath.mule"/>
-        </javac>
-        
+
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
-            <fileset dir="${dir.resources}"/>
         </copy>
     </target>
 
-   <target name="package" 
-           depends="compile" 
+   <target name="package"
+           depends="compile"
            description="Package the application">
-           
-        <jar jarfile="${dir.build}/${app.name}.jar" 
+
+        <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
    </target>
 
-   <target name="deploy" 
-           depends="package" 
+   <target name="deploy"
+           depends="package"
            description="Deploy the application to the Mule server">
-           
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
+
+        <copy file="${dir.build}/${app.name}.jar"
+              todir="${dir.user.lib}"
               overwrite="true"
               verbose="true"/>
    </target>
