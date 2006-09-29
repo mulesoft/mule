@@ -70,10 +70,10 @@ public class Main
                 System.out.println(StringMessageUtils.getBoilerPlate("Welcome to the Mule Loan Broker ESB example. This example demonstrates using JMS, Web Services, Http/Rest and EJBs using an ESB architecture." +
                         "\nFor more information see http://mule.codehaus.org/LoanBroker." +
                         "\n\nThe example demonstrates integrating EJB applications in 2 ways -" +
-                        "\n1. Calling out to a remote EJB using a Mule Endpoint." +
-                        "\n2. Managing an EJB as a Mule component.  This Allows a remote EJB to be used in the same way as a local Mule component." +
-                        "\nBoth behave the same way but but the second method enabled tighter integration." +
-                        "\nPlease select [1], [2] or [q]uit", '*', 90));
+                        "\n  1. Calling out to a remote EJB using a Mule Endpoint." +
+                        "\n  2. Managing an EJB as a Mule component." +
+                        "\n\nBoth have the same behavior but the second method allows a remote EJB to be used as if it were a local Mule component, thereby enabling tighter integration." +
+                        "\n\nPlease select [1], [2] or [q]uit", '*', 90));
 
 
                 response = getSelection();
