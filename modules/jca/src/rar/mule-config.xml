@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="DummyJCA" version="1.0">
+
+    <description>A dummy Mule config, serves as a placeholder to make JCA deployable only.</description>
+
+    <agents>
+        <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
+    </agents>
+
+    <model name="Dummy">
+
+    </model>
+
+</mule-configuration>
