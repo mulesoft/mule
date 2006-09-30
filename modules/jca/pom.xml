@@ -12,9 +12,9 @@
     <name>JCA Resource Adapter</name>
     <packaging>jar</packaging>
     <description>
-    	A Resource Adapter implementation that allows a Mule instance to
-    	be deployed to a J2ee application server and exposes Mule
-    	services via the JCA connector architecture.
+        A Resource Adapter implementation that allows a Mule instance to
+        be deployed to a J2ee application server and exposes Mule
+        services via the JCA connector architecture.
     </description>
     <dependencies>
         <dependency>
