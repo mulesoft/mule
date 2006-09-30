@@ -44,7 +44,7 @@ public class MuleService implements MuleServiceMBean
     private String os;
     private String buildDate;
     //TODO
-    private String copyright = "Copyright (c) 2003-2006 SymphonySoft Limited. All rights reserved.";
+    private String copyright = "Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com";
     private String license;
 
     public MuleService() {
