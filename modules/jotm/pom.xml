@@ -22,7 +22,11 @@
 					<groupId>javax.resource</groupId>
 					<artifactId>connector</artifactId>
 				</exclusion>
-			</exclusions>
+                <exclusion>
+					<groupId>javax.transaction</groupId>
+					<artifactId>jta</artifactId>
+				</exclusion>
+            </exclusions>
         </dependency>
 		<!--Instead of the javax.resource j2ee connector-->
 		<dependency>
