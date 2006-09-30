@@ -13,6 +13,22 @@
     <packaging>rar</packaging>
     <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-rar-plugin</artifactId>
+                <!--
+                    Download a fix for http://jira.codehaus.org/browse/MRAR-8 , not yet released.
+                    Otherwise all kinds of garbage end up in the RA.
+                -->
+                <version>2.2-20060926.202808-1</version>
+                <configuration>
+                    <rarSourceDirectory>../../modules/jca/src/rar</rarSourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
