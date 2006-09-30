@@ -165,10 +165,6 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/ant/errorhandler/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/errorhandler/src/main/resources</directory>
-          <outputDirectory>examples/ant/errorhandler/resources</outputDirectory>
-      </fileSet>
-      <fileSet>
           <directory>../../../examples/errorhandler/test-data</directory>
           <outputDirectory>examples/ant/errorhandler/test-data</outputDirectory>
       </fileSet>
@@ -243,10 +239,6 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/hello/src/main/java</directory>
           <outputDirectory>examples/ant/hello/src</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/src/main/resources</directory>
-          <outputDirectory>examples/ant/hello/resources</outputDirectory>
-      </fileSet>
 
       <!--
         ===============================
@@ -318,10 +310,6 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/src/main/java</directory>
           <outputDirectory>examples/ant/loanbroker/src</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/src/main/resources</directory>
-          <outputDirectory>examples/ant/loanbroker/resources</outputDirectory>
-      </fileSet>
 
       <!--
         ===================================
@@ -376,10 +364,10 @@ Assembly descriptor for the full Mule distribution.
               <include>pom.xml</include>
           </includes>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/credit-agency/conf</outputDirectory>
-      </fileSet>
+      <!--<fileSet>-->
+          <!--<directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>-->
+          <!--<outputDirectory>examples/maven/loanbroker-esb/credit-agency/conf</outputDirectory>-->
+      <!--</fileSet>-->
       <fileSet>
           <directory>../../../examples/loanbroker-esb/credit-agency/src</directory>
           <outputDirectory>examples/maven/loanbroker-esb/credit-agency/src</outputDirectory>
@@ -423,10 +411,10 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/ant/loanbroker-esb/loanbroker/resources</outputDirectory>
       </fileSet>
       <!-- EJB sub-project -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/credit-agency/conf</outputDirectory>
-      </fileSet>
+      <!--<fileSet>-->
+          <!--<directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>-->
+          <!--<outputDirectory>examples/ant/loanbroker-esb/credit-agency/conf</outputDirectory>-->
+      <!--</fileSet>-->
       <fileSet>
           <directory>../../../examples/loanbroker-esb/credit-agency/src/main/java</directory>
           <outputDirectory>examples/ant/loanbroker-esb/credit-agency/src</outputDirectory>
@@ -643,10 +631,6 @@ Assembly descriptor for the full Mule distribution.
       <fileSet>
           <directory>../../../examples/voipservice/src/main/java</directory>
           <outputDirectory>examples/ant/voipservice/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/src/main/resources</directory>
-          <outputDirectory>examples/ant/voipservice/resources</outputDirectory>
       </fileSet>
 
       <!--
