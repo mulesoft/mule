@@ -48,7 +48,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
     private Map entryPoints = new HashMap();
     private Method currentMethod;
 
-    //we dot wan tto match these methods when looking for a service method to
+    //we don't want to match these methods when looking for a service method to
     //invoke
     protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
 

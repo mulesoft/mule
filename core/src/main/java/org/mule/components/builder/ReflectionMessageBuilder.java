@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ReflectionMessageBuilder extends AbstractMessageBuilder {
 
-    //we dot wan tto match these methods when looking for a method
+    // we don't want to match these methods when looking for a method
     protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
 
     public Object buildMessage( UMOMessage request, UMOMessage response) throws MessageBuilderException {
