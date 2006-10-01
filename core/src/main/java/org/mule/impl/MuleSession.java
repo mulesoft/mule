@@ -10,10 +10,6 @@
 
 package org.mule.impl;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -39,12 +35,13 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * <code>MuleSession</code> manages the interaction and distribution of events
  * for Mule UMOs.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public final class MuleSession implements UMOSession
@@ -190,6 +187,7 @@ public final class MuleSession implements UMOSession
 
         if(result!=null) {
             RequestContext.rewriteEvent(result);
+            processResponse(result);
         }
 
         return result;
@@ -270,7 +268,10 @@ public final class MuleSession implements UMOSession
                     logger.warn("A session handler could not be obtained, using default.");
                     new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 }
-                return dispatcher.send(event);
+                UMOMessage response = dispatcher.send(event);
+                processResponse(response);
+                return response;
+
             } catch (UMOException e) {
                 throw e;
             } catch (Exception e) {
@@ -289,6 +290,18 @@ public final class MuleSession implements UMOSession
                                         event.getMessage(),
                                         event.getEndpoint());
         }
+    }
+
+    /**
+     * Once an event has been processed we need to romove certain properties so that
+     * they not propagated to the next request
+     * @param response The response from the previous request
+     */
+    protected void processResponse(UMOMessage response)
+    {
+        if(response==null) return;
+        response.removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        response.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
     }
 
     /*
