@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Tests the Echo example using Axis
  */
 public class AxisEchoTestCase extends FunctionalTestCase {
 
@@ -32,6 +31,11 @@ public class AxisEchoTestCase extends FunctionalTestCase {
             "</echoResponse>" +
             "</soap:Body>" +
             "</soap:Envelope>";
+
+    public AxisEchoTestCase()
+    {
+        this.setDisposeManagerPerSuite(true);
+    }
 
     protected String getConfigResources() {
         return "echo-axis-config.xml";

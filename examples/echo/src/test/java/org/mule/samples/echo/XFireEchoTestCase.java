@@ -11,8 +11,7 @@ package org.mule.samples.echo;
 
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Tests the echo example using Xfire
  */
 public class XFireEchoTestCase extends AxisEchoTestCase {
 

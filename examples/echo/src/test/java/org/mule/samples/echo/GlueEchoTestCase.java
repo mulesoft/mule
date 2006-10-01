@@ -11,11 +11,10 @@ package org.mule.samples.echo;
 
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Tests the echo example using GLUE
  */
-public class GlueEchoTestCase extends AxisEchoTestCase {
-
+public class GlueEchoTestCase extends AxisEchoTestCase 
+{
 
     protected String getConfigResources() {
         return "echo-glue-config.xml";
