@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -24,8 +24,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 // @Immutable
+/**
+ * Mule input/output utilities.
+ */
 public class IOUtils extends org.apache.commons.io.IOUtils
 {
+    /** Logger. */
     private static final Log logger = LogFactory.getLog(IOUtils.class);
 
     /**
@@ -35,6 +39,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return the requested resource as a string
+     * @throws java.io.IOException IO error
      */
     public static String getResourceAsString(final String resourceName, final Class callingClass)
         throws IOException
@@ -57,6 +62,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return an InputStream to the resource or null if resource not found
+     * @throws java.io.IOException IO error
      */
     public static InputStream getResourceAsStream(final String resourceName, final Class callingClass)
         throws IOException
@@ -73,6 +79,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @param tryAsFile - try to load the resource from the local file system
      * @param tryAsUrl - try to load the resource as a URL
      * @return an InputStream to the resource or null if resource not found
+     * @throws java.io.IOException IO error
      */
     public static InputStream getResourceAsStream(final String resourceName,
                                                   final Class callingClass,
@@ -83,7 +90,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile);
 
         // Try to load the resource itself as a URL.
-        if ((url == null) && (tryAsUrl == true))
+        if ((url == null) && (tryAsUrl))
         {
             try
             {
@@ -111,7 +118,6 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
-     * @param tryAsFile - try to load the resource from the local file system
      * @return an URL to the resource or null if resource not found
      */
     public static URL getResourceAsUrl(final String resourceName, final Class callingClass)
@@ -162,7 +168,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             try
             {
-                url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+                url = (URL) AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
                     {
