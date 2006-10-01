@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,7 +67,7 @@ public abstract class JdbcUtils
     /**
      * Parse the given statement filling the parameter list and return the ready to
      * use statement.
-     * 
+     *
      * @param stmt
      * @param params
      * @return
@@ -160,16 +161,16 @@ public abstract class JdbcUtils
                     // ignore
                 }
             }
-            else
-            {
-                try
-                {
-                    value = PropertyUtils.getProperty(root, name);
-                    foundValue = (value != null);
-                }
-                catch (Exception ignored)
-                {
-                    // ignore
+
+             else {
+                try {
+                    if ((PropertyUtils.getPropertyDescriptor(root, name)!= null)
+                            || ( (root instanceof Map) && (((Map)root).containsKey(name)))){
+                        foundValue = true;
+                        value = PropertyUtils.getProperty(root, name);
+                    }
+                } catch (Exception ignored) {
+				    value = null;
                 }
             }
             if (value == null)
