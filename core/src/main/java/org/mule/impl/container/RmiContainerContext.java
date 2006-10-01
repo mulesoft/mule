@@ -41,8 +41,6 @@ public class RmiContainerContext extends JndiContainerContext
         if(securityPolicy!=null) {
             if(ClassUtils.getResource(securityPolicy, getClass())!=null) {
                 System.setProperty("java.security.policy", securityPolicy);
-            } else {
-                System.out.println("");
             }
         }
 
