@@ -24,6 +24,7 @@ import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.soap.MethodFixInterceptor;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOComponent;
@@ -272,6 +273,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
                     if (xfireDescriptor == null) {
                         xfireDescriptor = createxfireDescriptor();
                     }
+                    xfireDescriptor.addInterceptor(new MethodFixInterceptor());
+
                     if (xfireDescriptor.getProperties().get("xfire") == null) {
                         xfireDescriptor.getProperties().put("xfire", xfire);
                     }

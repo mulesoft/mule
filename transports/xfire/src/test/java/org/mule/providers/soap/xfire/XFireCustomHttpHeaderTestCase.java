@@ -52,7 +52,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         assertEquals(msgNotification.getProperty(MuleProperties.MULE_USER_PROPERTY), "alan");
 
         //mule properties should be removed
-        assertNull(msgNotification.getProperty(MuleProperties.MULE_METHOD_PROPERTY));
+        assertNull(msgNotification.getProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         //custom properties should be allowed in
         assertEquals(msgNotification.getProperty(myProperty),myProperty);

@@ -13,6 +13,8 @@ package org.mule.model;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.NullPayload;
@@ -60,20 +62,27 @@ public class DynamicEntryPoint implements UMOEntryPoint
         return currentMethod.getParameterTypes();
     }
 
-    public Object invoke(Object component, UMOEventContext context) throws Exception
+    public synchronized Object invoke(Object component, UMOEventContext context) throws Exception
     {
         Object payload = null;
-
-        // Check for method override and remove it from the event
-        Object methodOverride = context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
         Method method = null;
-        if (methodOverride instanceof Method) {
-            method = (Method) methodOverride;
-        } else if (methodOverride != null) {
-            payload = context.getTransformedMessage();
-            //Get the method that matches the method name with the current argument types
-            method = ClassUtils.getMethod(methodOverride.toString(), ClassUtils.getClassTypes(payload), component.getClass());
-            validateMethod(component, method, methodOverride.toString());
+
+        // Transports such as Soap need he method property to be ignorred
+        Boolean ignoreMethod = (Boolean)context.getMessage().removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
+        boolean ignore = (ignoreMethod == null ? false : ignoreMethod.booleanValue());
+
+        if(!ignore)
+        {
+            // Check for method override and remove it from the event
+            Object methodOverride = context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            if (methodOverride instanceof Method) {
+                method = (Method) methodOverride;
+            } else if (methodOverride != null) {
+                payload = context.getTransformedMessage();
+                //Get the method that matches the method name with the current argument types
+                method = ClassUtils.getMethod(methodOverride.toString(), ClassUtils.getClassTypes(payload), component.getClass());
+                validateMethod(component, method, methodOverride.toString());
+            }
         }
 
         if (method == null) {
@@ -156,7 +165,8 @@ public class DynamicEntryPoint implements UMOEntryPoint
     {
         boolean fallback = component instanceof Callable;
         if(method==null && !fallback) {
-            throw new NoSuchMethodException(methodName);
+            throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X, methodName, 
+                    "unknown", component.getClass().getName()).toString());
         }
         //This will throw NoSuchMethodException if it doesn't exist
         try {
