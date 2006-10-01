@@ -13,10 +13,7 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
- * <code>RmiMessageAdapter</code> TODO
- * 
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
+ * Wraps an object obtained by calling a method on a Remote object
  */
 
 public class RmiMessageAdapter extends AbstractMessageAdapter

@@ -15,10 +15,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>RmiMessageDispatcherFactory</code> TODO
- * 
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
+ * Creates and RmiMessageDispatcher
  */
 
 public class RmiMessageDispatcherFactory implements UMOMessageDispatcherFactory

@@ -9,39 +9,47 @@
  */
 package org.mule.providers.rmi;
 
-import java.net.URL;
-import java.rmi.RMISecurityManager;
-import java.util.List;
-
+import org.apache.commons.collections.MapUtils;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractJndiConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+
+import javax.naming.NamingException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.URL;
+import java.rmi.NotBoundException;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
 
 /**
  * <code>RmiConnector</code> can bind or send to a given rmi port on a given
  * host.
  *
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
  */
 public class RmiConnector extends AbstractJndiConnector
 {
-    //////////////////////////////////////////////////
-    //  Receiver data
-    /////////////////////////////////////////////////
+    //Messages
+    public static final int MSG_PARAM_SERVICE_METHOD_NOT_SET = 1;
+    public static final int MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET = 2;
     public static final int NO_RMI_SERVICECLASS_SET = 10;
-
     public static final int RMI_SERVICECLASS_INVOCATION_FAILED = 11;
-
-    private String serviceClassName = null;
-    /////////////////////////////////////////////////
 
     public static final int DEFAULT_RMI_REGISTRY_PORT = 1099;
 
-    public static final int MSG_PARAM_SERVICE_METHOD_NOT_SET = 1;
-
-    public static final int MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET = 2;
 
     public static final String PROPERTY_RMI_SECURITY_POLICY = "securityPolicy";
 
@@ -49,8 +57,23 @@ public class RmiConnector extends AbstractJndiConnector
 
     public static final String PROPERTY_SERVER_CLASS_NAME = "serverClassName";
 
+    /**
+     * The property name that explicitly defines which argument types should be passed
+     * to a remote object method invocation. This is a comma-separate list for fully qualified
+     * classnames. If this property is not set on an outbound endpoint, the argument types
+     * will be determined automatically from the payload of the current message
+     */
     public static final String PROPERTY_SERVICE_METHOD_PARAM_TYPES = "methodArgumentTypes";
 
+    /**
+     * The property name for a list of objects used to call a Remote object via an RMI or
+     * EJB MessageReceiver
+     */
+    public static final String PROPERTY_SERVICE_METHOD_PARAMS_LIST = "methodArgumentsList";
+
+    /**
+     * The property name for specifying which method to cal on a remote object
+     */
     public static final String PARAM_SERVICE_METHOD = "method";
 
     private String securityPolicy = null;
@@ -59,30 +82,10 @@ public class RmiConnector extends AbstractJndiConnector
 
     private String serverClassName = null;
 
-    private List methodArgumentTypes = null;
-
-    private Class[] argumentClasses = null;
+    protected long pollingFrequency = 1000L;
 
     private SecurityManager securityManager = new RMISecurityManager();
 
-    /////////////////////////////////////////////////////////
-    // Receiver meths
-    /////////////////////////////////////////////////////////
-    public String getServiceClassName()
-    {
-        return serviceClassName;
-    }
-
-    /**
-     * Sets RmiAble & java.rmi.Remote implementing serviceclass name
-     *
-     * @param serviceClassName
-     */
-    public void setServiceClassName(String serviceClassName)
-    {
-        this.serviceClassName = serviceClassName;
-    }
-    /////////////////////////////////////////////////////////
 
     public String getProtocol()
     {
@@ -152,59 +155,6 @@ public class RmiConnector extends AbstractJndiConnector
         this.serverClassName = serverClassName;
     }
 
-    /**
-     * Method getMethodArgumentTypes
-     *
-     * @return
-     */
-    public List getMethodArgumentTypes()
-    {
-        return (this.methodArgumentTypes);
-    }
-
-    /**
-     * Method setMethodArgumentTypes
-     *
-     * @param methodArgumentTypes
-     */
-    public void setMethodArgumentTypes(List methodArgumentTypes) throws ClassNotFoundException
-    {
-        Class argumentClasses[] = null;
-
-        this.methodArgumentTypes = methodArgumentTypes;
-
-        if (getMethodArgumentTypes() != null) {
-            argumentClasses = new Class[methodArgumentTypes.size()];
-
-            for (int i = 0; i < methodArgumentTypes.size(); i++) {
-                String className = (String) methodArgumentTypes.get(i);
-                argumentClasses[i] = ClassUtils.loadClass(className.trim(), this.getClass());
-            }
-        }
-
-        setArgumentClasses(argumentClasses);
-    }
-
-    /**
-     * Method getArgumentClasses
-     *
-     * @return
-     */
-    public Class[] getArgumentClasses()
-    {
-        return (this.argumentClasses);
-    }
-
-    /**
-     * Method setArgumentClasses
-     *
-     * @param argumentClasses
-     */
-    public void setArgumentClasses(Class[] argumentClasses)
-    {
-        this.argumentClasses = argumentClasses;
-    }
-
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
@@ -217,6 +167,7 @@ public class RmiConnector extends AbstractJndiConnector
         if (securityManager != null) {
             System.setSecurityManager(securityManager);
         }
+        initJndiContext();
     }
 
     public SecurityManager getSecurityManager()
@@ -227,5 +178,121 @@ public class RmiConnector extends AbstractJndiConnector
     public void setSecurityManager(SecurityManager securityManager)
     {
         this.securityManager = securityManager;
+    }
+
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    {
+        final Object[] args = new Object[]{new Long(pollingFrequency)};
+        return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);
+    }
+
+    /**
+     * Helper method for Dispatchers and Receives to extract the correct method from a Remote object
+     *
+     * @param remoteObject The remote object on which to invoke the method
+     * @param event The current event being processed
+     * @return
+     * @throws org.mule.umo.UMOException
+     * @throws NoSuchMethodException
+     * @throws ClassNotFoundException
+     */
+     public Method getMethodObject(Remote remoteObject, UMOEvent event) throws UMOException, NoSuchMethodException, ClassNotFoundException {
+        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+
+        String methodName = MapUtils.getString(endpointUri.getParams(),
+                RmiConnector.PARAM_SERVICE_METHOD, null);
+
+        if (null == methodName) {
+            methodName = (String) event.getMessage().removeProperty(RmiConnector.PARAM_SERVICE_METHOD);
+
+            if (null == methodName) {
+                throw new DispatchException(new org.mule.config.i18n.Message("rmi",
+                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(), event.getEndpoint());
+            }
+        }
+
+        Class [] argTypes;
+
+        // Parse method args
+        String arguments = (String) event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+
+        if (null != arguments) {
+            String[] split = arguments.split(",");
+            argTypes = new Class[split.length];
+            for (int i = 0; i < split.length; i++) {
+                argTypes[i] = ClassUtils.loadClass(split[i].trim(), getClass());
+
+            }
+        } else
+        {
+            argTypes =  ClassUtils.getClassTypes(event.getTransformedMessage());
+        }
+
+        try
+        {
+            return remoteObject.getClass().getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException e)
+        {
+            throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X, methodName,
+                    ArrayUtils.toString(argTypes), remoteObject.getClass().getName()).toString());
+        } catch (SecurityException e)
+        {
+            throw e;
+        }
+    }
+
+
+    protected Object getRemoteRef(UMOImmutableEndpoint endpoint) throws IOException,
+            NotBoundException, NamingException, InitialisationException
+    {
+
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
+
+        String serviceName = endpointUri.getPath();
+        try
+        {
+            //Test if we can find the object locally
+            return (Remote)getJndiContext().lookup(serviceName);
+        } catch (NamingException e)
+        {
+            //Strip path seperator
+        }
+
+        try
+        {
+            serviceName = serviceName.substring(1);
+            return (Remote)getJndiContext().lookup(serviceName);
+        } catch (NamingException e)
+        {
+            //Try with full host and path
+        }
+
+        int port = endpointUri.getPort();
+        if (port < 1) {
+            if(logger.isWarnEnabled()) {
+                logger.warn("RMI port not set on URI: " + endpointUri + ". Using default port: " + RmiConnector.DEFAULT_RMI_REGISTRY_PORT);
+            }
+            port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
+        }
+
+        InetAddress inetAddress = InetAddress.getByName(endpointUri.getHost());
+
+        return getJndiContext(inetAddress.getHostAddress() + ":" + port).lookup(serviceName);
+    }
+
+    public Remote getRemoteObject(UMOImmutableEndpoint endpoint) throws IOException,
+            NotBoundException, NamingException, InitialisationException
+    {
+        return (Remote)getRemoteRef(endpoint);
+    }
+
+    public long getPollingFrequency()
+    {
+        return pollingFrequency;
+    }
+
+    public void setPollingFrequency(long pollingFrequency)
+    {
+        this.pollingFrequency = pollingFrequency;
     }
 }

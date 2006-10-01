@@ -43,7 +43,7 @@ public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnec
 
     protected Map jndiProviderProperties = null;
 
-    protected void initJndiContext() throws NamingException, InitialisationException {
+    protected void initJndiContext() throws InitialisationException {
         if (null == jndiContext) {
             Hashtable props = new Hashtable();
 
@@ -62,7 +62,13 @@ public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnec
             if(jndiProviderProperties!=null) {
                 props.putAll(jndiProviderProperties);
             }
-            jndiContext = new InitialContext(props);
+            try
+            {
+                jndiContext = new InitialContext(props);
+            } catch (NamingException e)
+            {
+                throw new InitialisationException(e, this);
+            }
         }
     }
 
@@ -77,6 +83,12 @@ public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnec
 
         return jndiContext;
     }
+
+    public Context getJndiContext() {
+
+        return jndiContext;
+    }
+
 
     public void setJndiContext(Context jndiContext) {
         this.jndiContext = jndiContext;

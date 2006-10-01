@@ -10,168 +10,111 @@
 
 package org.mule.providers.rmi;
 
-import javax.naming.Context;
-
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-
+import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
-import org.mule.umo.MessagingException;
+import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
+
+import java.lang.reflect.Method;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.util.List;
 
 /**
- * Code by (c) 2005 P.Oikari.
- *
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- * @version $Revision$
+ * Will repeatedly call a method on a Remote object. If the method takes parameters
+ * A List of objects can be specified on the endpoint called <code>methodArgumentsList</code>,
+ * If this property is ommitted it is assumed that the method takes no parameters
  */
 
-public class RmiMessageReceiver extends AbstractMessageReceiver
+public class RmiMessageReceiver extends PollingMessageReceiver
 {
     protected RmiConnector connector;
 
-    protected RmiAble remoteObject = null;
+    protected Remote remoteObject;
 
-    private Context jndi = null;
+    protected Method invokeMethod;
 
-    private String bindName = null;
+    protected Object[] methodArguments = null;
 
-    public RmiMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException
+
+    public RmiMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, Long frequency) throws InitialisationException
     {
-        super(connector, component, endpoint);
+        super(connector, component, endpoint, frequency);
 
         this.connector = (RmiConnector) connector;
     }
 
-    /**
-     * Actual initialization. Attempts to rebind service object to Jndi Tree for discovery
-     *
-     * @param endpoint
-     * @throws InitialisationException
-     */
-    private void initialize(UMOEndpoint endpoint) throws InitialisationException
+    public void doConnect() throws Exception
     {
-        logger.debug("Initializing with endpoint " + endpoint);
+        System.setProperty("java.security.policy", connector.getSecurityPolicy());
 
-        String rmiPolicyPath = connector.getSecurityPolicy();
-
-        System.setProperty("java.security.policy", rmiPolicyPath);
-
-        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
-
-        int port = endpointUri.getPort();
-
-        if (port < 1) {
-            port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
+        // Set security manager
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
         }
 
-        try {
-            InetAddress inetAddress = InetAddress.getByName(endpointUri.getHost());
+        String methodName = MapUtils.getString(endpoint.getEndpointURI().getParams(),
+                        RmiConnector.PARAM_SERVICE_METHOD, null);
 
-            bindName = endpointUri.getPath();
+        if (null == methodName) {
+            methodName = (String) endpoint.getProperty(RmiConnector.PARAM_SERVICE_METHOD);
 
-            remoteObject = getRmiObject();
-
-            Method theMethod = remoteObject.getClass().getMethod("setReceiver", new Class[]{RmiMessageReceiver.class});
-            theMethod.invoke(remoteObject, new Object[]{this});
-
-            jndi = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port);
-
-            jndi.rebind(bindName, remoteObject);
-        }
-        catch (Exception e) {
-            throw new InitialisationException(e, this);
+            if (null == methodName) {
+                throw new ConnectException(new org.mule.config.i18n.Message("rmi",
+                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), this);
+            }
         }
 
-        logger.debug("Initialized successfully");
+
+        remoteObject = connector.getRemoteObject(getEndpoint());
+
+        List args = (List)endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST);
+
+        Class[] argTypes = new Class[]{};
+
+        if(args==null) {
+            logger.info(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST + " not set on endpoint, assuming method call has no arguments");
+            methodArguments = ClassUtils.NO_ARGS;
+        } else {
+            argTypes = ClassUtils.getClassTypes(methodArguments);
+            methodArguments = new Object[args.size()];
+            methodArguments = args.toArray(methodArguments);
+        }
+        invokeMethod = remoteObject.getClass().getMethod(methodName, argTypes);
     }
 
-    /**
-     * Initializes endpoint
-     *
-     * @throws ConnectException
-     */
-    public void doConnect() throws ConnectException
+    public void doDisconnect()
+    {
+        invokeMethod = null;
+        remoteObject = null;
+    }
+
+    public void poll()
     {
         try {
-            // Do not reinit if RMI is already bound to JNDI!!!
-            // TODO Test how things work under heavy load!!!
-            // Do we need threadlocals or so!?!?
+            Object result = invokeMethod.invoke(remoteObject, getMethodArguments());
 
-            // TODO [aperepel] consider AtomicBooleans here
-            // for 'initialised/initialising' status, etc.
-            if (null == remoteObject) {
-                initialize(getEndpoint());
+            if (null != result) {
+                final Object payload = connector.getMessageAdapter(result).getPayload();
+                routeMessage(new MuleMessage(payload), endpoint.isSynchronous());
             }
         }
         catch (Exception e) {
-            throw new ConnectException(e, this);
+            handleException(e);
         }
     }
 
     /**
-     * Unbinds Rmi class from registry
-     */
-    public void doDisconnect()
-    {
-        logger.debug("Disconnecting...");
-
-        try {
-            jndi.unbind(bindName);
-        }
-        catch (Exception e) {
-            logger.error(e);
-        }
-
-        logger.debug("Disconnected successfully.");
-    }
-
-    /**
-     * Gets RmiAble objetc for registry to add in.
-     *
-     * @return java.rmi.Remote and RmiAble implementing class
-     * @throws InitialisationException
-     */
-    private RmiAble getRmiObject() throws InitialisationException
-    {
-        String className = connector.getServiceClassName();
-
-        if (null == className) {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi", RmiConnector.NO_RMI_SERVICECLASS_SET), this);
-        }
-
-        RmiAble remote = null;
-
-        try {
-            remote = (RmiAble) Class.forName(className).newInstance();
-        }
-        catch (Exception e) {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi", RmiConnector.RMI_SERVICECLASS_INVOCATION_FAILED), e);
-        }
-
-        return (remote);
-    }
-
-    /**
-     * Routes message forward
-     *
-     * @param message
+     * Returns the method arguments to use when invoking the method on the Remote object.
+     * This method can be overloaded to enable dynamic method arguments
      * @return
-     * @throws MessagingException
-     * @throws UMOException
      */
-    public Object routeMessage(Object message) throws MessagingException, UMOException
-    {
-        UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-
-        return (routeMessage(new MuleMessage(adapter)));
+    protected Object[] getMethodArguments() {
+        return methodArguments;
     }
 }

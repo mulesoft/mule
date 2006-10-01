@@ -11,10 +11,7 @@ package org.mule.providers.rmi;
 
 
 /**
- * Code by (c) 2005 P.Oikari.
- *
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- * @version $Revision$
+ * A callback proxy for binding a RmiMessage receiver to a Remote object
  */
 
 public interface RmiAble
