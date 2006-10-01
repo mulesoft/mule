@@ -244,7 +244,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         }
         if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Message Payload: \n" + StringMessageUtils.truncate(message.getPayloadAsString(), 200, false));
+                logger.trace("Message Payload: \n" + StringMessageUtils.truncate(
+                        StringMessageUtils.toString(message.getPayload()), 200, false));
             } catch (Exception e) {
                 // ignore
             }

@@ -226,7 +226,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             logger.debug("Applying transformer " + getName() + " (" + getClass().getName() + ")");
             logger.debug("Object before transform: "
-                         + StringMessageUtils.truncate(src.toString(), 200, false));
+                         + StringMessageUtils.truncate(StringMessageUtils.toString(src), 200, false));
         }
 
         Object result = doTransform(src, encoding);
@@ -238,7 +238,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         if (logger.isDebugEnabled())
         {
             logger.debug("Object after transform: "
-                         + StringMessageUtils.truncate(result.toString(), 200, false));
+                         + StringMessageUtils.truncate(StringMessageUtils.toString(result), 200, false));
         }
 
         result = checkReturnClass(result);

@@ -20,6 +20,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -74,6 +75,18 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
                     break;
                 } else {
                     responseMessage = eventContext.sendEvent(requestMessage, endpoint);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Response Message Received from: " + endpoint.getEndpointURI());
+                        logger.debug(responseMessage);
+                    }
+                    if (logger.isTraceEnabled()) {
+                        try {
+                            logger.trace("Message Payload: \n" + StringMessageUtils.truncate(
+                                    StringMessageUtils.toString(responseMessage.getPayload()), 200, false));
+                        } catch (Exception e) {
+                            // ignore
+                        }
+                    }
                     builtMessage = buildMessage(requestMessage, responseMessage);
                     responseMessage = new MuleMessage(builtMessage, responseMessage);
                     requestMessage = responseMessage;
