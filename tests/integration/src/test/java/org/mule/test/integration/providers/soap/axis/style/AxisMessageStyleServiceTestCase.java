@@ -17,6 +17,7 @@ import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.config.MuleProperties;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -128,9 +129,9 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
             if(useSoapMethod) {
                 SoapMethod soapMethod = new SoapMethod(method);
                 soapMethod.addNamedParameter(new QName(method.getNamespaceURI(), method.getLocalPart()), NamedParameter.XSD_STRING, ParameterMode.IN);
-                props.put("method", soapMethod);
+                props.put(MuleProperties.MULE_METHOD_PROPERTY, soapMethod);
             }else if(useQNameMethod) {
-                props.put("method", method);
+                props.put(MuleProperties.MULE_METHOD_PROPERTY, method);
             } else {
                 endpoint += "?method=" + method.getLocalPart();
                 if(StringUtils.isNotBlank(method.getNamespaceURI())) {

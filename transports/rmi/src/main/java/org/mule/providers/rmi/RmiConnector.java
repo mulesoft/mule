@@ -12,6 +12,7 @@ package org.mule.providers.rmi;
 import org.apache.commons.collections.MapUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractJndiConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -70,11 +71,6 @@ public class RmiConnector extends AbstractJndiConnector
      * EJB MessageReceiver
      */
     public static final String PROPERTY_SERVICE_METHOD_PARAMS_LIST = "methodArgumentsList";
-
-    /**
-     * The property name for specifying which method to cal on a remote object
-     */
-    public static final String PARAM_SERVICE_METHOD = "method";
 
     private String securityPolicy = null;
 
@@ -200,10 +196,10 @@ public class RmiConnector extends AbstractJndiConnector
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
         String methodName = MapUtils.getString(endpointUri.getParams(),
-                RmiConnector.PARAM_SERVICE_METHOD, null);
+                MuleProperties.MULE_METHOD_PROPERTY, null);
 
         if (null == methodName) {
-            methodName = (String) event.getMessage().removeProperty(RmiConnector.PARAM_SERVICE_METHOD);
+            methodName = (String) event.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
 
             if (null == methodName) {
                 throw new DispatchException(new org.mule.config.i18n.Message("rmi",

@@ -36,8 +36,6 @@ import org.mule.umo.model.UMOEntryPointResolver;
  * this can provide additional lifecycle methods triggered by an external
  * source.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 {
@@ -201,9 +199,6 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             } else {
                 resultMessage = new MuleMessage(result, RequestContext.getEventContext().getMessage());
             }
-        }
-        if(resultMessage!=null) {
-            resultMessage.removeProperty("method");
         }
         return resultMessage;
     }

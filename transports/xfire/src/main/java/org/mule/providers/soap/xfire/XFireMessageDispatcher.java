@@ -10,18 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
@@ -44,6 +32,17 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.TemplateParser;
+
+import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * The XfireMessageDispatcher is used for making Soap client requests to remote services
@@ -102,10 +101,10 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     protected String getMethod(UMOEvent event) throws DispatchException
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        String method = (String)endpointUri.getParams().get("method");
+        String method = (String)endpointUri.getParams().get(MuleProperties.MULE_METHOD_PROPERTY);
 
         if (method == null) {
-            method = (String)event.getEndpoint().getProperties().get("method");
+            method = (String)event.getEndpoint().getProperties().get(MuleProperties.MULE_METHOD_PROPERTY);
             if (method == null) {
                 throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event
                                 .getMessage(), event.getEndpoint());
@@ -223,7 +222,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         client.setTimeout((int)timeout);
         client.setEndpointUri(endpoint.getEndpointURI().toString());
 
-        String method = (String)endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+        String method = (String)endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         OperationInfo op = service.getServiceInfo().getOperation(method);
 
         Properties params = endpoint.getEndpointURI().getUserParams();
@@ -283,7 +282,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             String propertyKey = (String)iterator.next();
             properties.put(propertyKey, msg.getProperty(propertyKey));
         }
-        properties.put("method", method.getLocalPart());
+        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());
         properties.put("address", endpointURI.getAddress());
         properties.put("scheme", endpointURI.getScheme());

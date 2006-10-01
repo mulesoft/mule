@@ -12,11 +12,7 @@ package org.mule.providers.ejb;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
-
-/**
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
- */
+import org.mule.config.MuleProperties;
 
 public class EjbEndpointTestCase extends AbstractMuleTestCase
 {
@@ -43,7 +39,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
         assertEquals("localhost", url.getHost());
         assertEquals("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod", url.toString());
         assertEquals(1, url.getParams().size());
-        assertEquals("testMethod", url.getParams().getProperty("method"));
+        assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
     }
 
     public void testQueryParams2() throws Exception
@@ -60,7 +56,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
                      url.toString());
         assertEquals("method=testMethod&endpointName=ejbProvider&blankParam=", url.getQuery());
         assertEquals(3, url.getParams().size());
-        assertEquals("testMethod", url.getParams().getProperty("method"));
+        assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }
 }

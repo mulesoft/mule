@@ -55,8 +55,7 @@ import java.util.Properties;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
- * Axis soap client. <p/> <at> author <a href="mailto:ross.mason@...">Ross Mason</a>
- * <at> version $Revision$
+ * Axis soap client. 
  */
 public class AxisMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -154,9 +153,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected Call getCall(UMOEvent event, Object[] args) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        Object method = event.getMessage().getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+        Object method = event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null) {
-            method = event.getEndpoint().getEndpointURI().getParams().getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+            method = event.getEndpoint().getEndpointURI().getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
         if (method == null) {
             throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
@@ -382,7 +381,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTargetEndpointAddress(uri);
 
         Properties params = endpoint.getEndpointURI().getUserParams();
-        String method = (String)params.remove(SoapConstants.SOAP_METHOD_PROPERTY);
+        String method = (String)params.remove(MuleProperties.MULE_METHOD_PROPERTY);
         call.setOperationName(method);
 
         String args[] = new String[params.size()];
@@ -408,7 +407,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             endpoint = "axis:" + endpoint;
         }
         UMOEndpointURI ep = new MuleEndpointURI(endpoint);
-        String method = (String)ep.getParams().remove("method");
+        String method = (String)ep.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
         call.setOperationName(method);
 
         call.setOperationName(method);
@@ -459,7 +458,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             String propertyKey = (String)iterator.next();
             properties.put(propertyKey, msg.getProperty(propertyKey));
         }
-        properties.put("method", method.getLocalPart());
+        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());
         properties.put("address", endpointURI.getAddress());
         properties.put("scheme", endpointURI.getScheme());

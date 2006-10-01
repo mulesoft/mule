@@ -10,9 +10,9 @@
 
 package org.mule.providers.soap.transformers;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.soap.SoapConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
@@ -73,10 +73,10 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         String query = request.substring(i + 1);
         Properties p = PropertiesUtils.getPropertiesFromQueryString(query);
 
-        String method = (String)p.remove(SoapConstants.SOAP_METHOD_PROPERTY);
+        String method = (String)p.remove(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null) {
             throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    SoapConstants.SOAP_METHOD_PROPERTY), this);
+                    MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
         if (httpMethod.equals("POST")) {
@@ -107,7 +107,7 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         }
         else {
             throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    SoapConstants.SOAP_METHOD_PROPERTY), this);
+                    MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
         return result.toString();

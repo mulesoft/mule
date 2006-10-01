@@ -30,6 +30,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -264,7 +265,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         Properties params = endpointUri.getUserParams();
 
-        String method = (String) params.remove("method");
+        String method = (String) params.remove(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null) {
             method = endpointUri.getPath().substring(endpointUri.getPath().lastIndexOf("/") + 1);
         }

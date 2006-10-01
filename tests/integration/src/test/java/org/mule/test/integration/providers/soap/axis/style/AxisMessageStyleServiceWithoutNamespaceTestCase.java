@@ -10,20 +10,20 @@
 
 package org.mule.test.integration.providers.soap.axis.style;
 
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;
+import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Andrew Rutter
@@ -129,9 +129,9 @@ public class AxisMessageStyleServiceWithoutNamespaceTestCase extends FunctionalT
             if(useSoapMethod) {
                 SoapMethod soapMethod = new SoapMethod(method);
                 soapMethod.addNamedParameter(new QName(method.getNamespaceURI(), method.getLocalPart()), NamedParameter.XSD_STRING, ParameterMode.IN);
-                props.put("method", soapMethod);
+                props.put(MuleProperties.MULE_METHOD_PROPERTY, soapMethod);
             }else if(useQNameMethod) {
-                props.put("method", method);
+                props.put(MuleProperties.MULE_METHOD_PROPERTY, method);
             } else {
                 endpoint += "?method=" + method.getLocalPart();
                 if(StringUtils.isNotBlank(method.getNamespaceURI())) {

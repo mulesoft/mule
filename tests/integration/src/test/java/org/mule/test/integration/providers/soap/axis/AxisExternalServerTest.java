@@ -11,6 +11,7 @@ package org.mule.test.integration.providers.soap.axis;
 
 import junit.framework.TestCase;
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
@@ -64,7 +65,7 @@ public class AxisExternalServerTest extends TestCase {
         Map props = new HashMap();
         props.put("style", "wrapped");
         props.put("use", "literal");
-        props.put("method", method);
+        props.put(MuleProperties.MULE_METHOD_PROPERTY, method);
         UMOMessage result = client.send(URL, new Object[]{new Integer(3), new Integer(3)}, props);
         assertNotNull(result);
 

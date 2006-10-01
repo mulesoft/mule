@@ -19,6 +19,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
+import org.mule.config.MuleProperties;
 
 import java.lang.reflect.Method;
 import java.rmi.RMISecurityManager;
@@ -59,10 +60,10 @@ public class RmiMessageReceiver extends PollingMessageReceiver
         }
 
         String methodName = MapUtils.getString(endpoint.getEndpointURI().getParams(),
-                        RmiConnector.PARAM_SERVICE_METHOD, null);
+                        MuleProperties.MULE_METHOD_PROPERTY, null);
 
         if (null == methodName) {
-            methodName = (String) endpoint.getProperty(RmiConnector.PARAM_SERVICE_METHOD);
+            methodName = (String) endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
 
             if (null == methodName) {
                 throw new ConnectException(new org.mule.config.i18n.Message("rmi",

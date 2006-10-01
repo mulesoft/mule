@@ -14,11 +14,9 @@ import electric.glue.context.ProxyContext;
 import electric.glue.context.ThreadContext;
 import electric.proxy.IProxy;
 import electric.registry.Registry;
-
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -33,9 +31,6 @@ import java.util.Map;
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
  * Glue invoking mechanism.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class GlueMessageDispatcher extends AbstractMessageDispatcher
@@ -51,7 +46,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     {
         if (proxy == null) {
             String bindAddress = endpoint.getEndpointURI().getAddress();
-            String method = (String)endpoint.getProperty(SoapConstants.SOAP_METHOD_PROPERTY);
+            String method = (String)endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
             if (bindAddress.indexOf(".wsdl") == -1 && method != null) {
                 bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
             }
@@ -86,7 +81,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
 
-        String method = event.getMessage().getStringProperty("method", null);
+        String method = event.getMessage().getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
         setContext(event);
 
         Object payload = event.getTransformedMessage();
@@ -138,7 +133,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     {
         Map props = new HashMap();
         props.putAll(endpoint.getProperties());
-        String method = (String)props.remove(SoapConstants.SOAP_METHOD_PROPERTY);
+        String method = (String)props.remove(MuleProperties.MULE_METHOD_PROPERTY);
         try {
             Object result = proxy.invoke(method, props.values().toArray());
             return new MuleMessage(result);

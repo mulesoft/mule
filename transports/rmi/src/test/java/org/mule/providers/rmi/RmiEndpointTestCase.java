@@ -12,6 +12,7 @@ package org.mule.providers.rmi;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.config.MuleProperties;
 
 /**
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
@@ -43,7 +44,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
         assertEquals("localhost", url.getHost());
         assertEquals("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod", url.toString());
         assertEquals(1, url.getParams().size());
-        assertEquals("testMethod", url.getParams().getProperty("method"));
+        assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
     }
 
     public void testQueryParams2() throws Exception
@@ -60,7 +61,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
                      url.toString());
         assertEquals("method=testMethod&endpointName=rmiProvider&blankParam=", url.getQuery());
         assertEquals(3, url.getParams().size());
-        assertEquals("testMethod", url.getParams().getProperty("method"));
+        assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }
 }

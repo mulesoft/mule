@@ -14,6 +14,7 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.service.ConnectorServiceDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.config.MuleProperties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -29,14 +30,14 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
+        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
         url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url);
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
+        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
     }
 
@@ -48,7 +49,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
+        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUsername());
@@ -63,7 +64,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
+        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
         ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor("soap");
