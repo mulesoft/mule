@@ -29,6 +29,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.TransactionException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
@@ -165,6 +166,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     public final UMOMessage send(UMOEvent event) throws DispatchException
     {
         try {
+            //No point continuing if the component has rolledback the transaction
+            if(isTransactionRollback()) {
+                return event.getMessage();
+            }
             event.setSynchronous(true);
             event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
@@ -497,5 +502,24 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             // nothing to do
         }
+    }
+
+    /**
+     * Checks to see if the current transaction has been rolled back
+     * @return
+     */
+    protected boolean isTransactionRollback()
+    {
+        try
+        {
+            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+            if(tx!=null && tx.isRollbackOnly()) {
+                return true;
+            }
+        } catch (TransactionException e)
+        {
+            logger.warn(e.getMessage());
+        }
+        return false;
     }
 }
