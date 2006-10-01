@@ -7,7 +7,7 @@
 
     <description>Mule Universal Resource Adapter</description>
     <display-name>Mule Universal Resource Adapter</display-name>
-    <vendor-name>SymphonySoft Ltd</vendor-name>
+    <vendor-name>MuleSource Inc.</vendor-name>
     <eis-type>MULE</eis-type>
     <resourceadapter-version>1.3</resourceadapter-version>
     <license>
