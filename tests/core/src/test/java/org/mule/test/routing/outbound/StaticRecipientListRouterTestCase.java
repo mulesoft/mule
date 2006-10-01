@@ -53,16 +53,19 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
         // note this router clones endpoints so that the endpointUri can be
         // changed
-        session.expect("dispatchEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)));
-        session.expect("dispatchEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)));
+
+        //The static recipient list router duplicates the message for each endpoint so we can't
+        //check for equality on the arguments passed to the dispatch / send methods
+        session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
+        session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event");
         router.getRecipients().add("test://recipient3");
-        session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
-        session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
-        session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
         UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);

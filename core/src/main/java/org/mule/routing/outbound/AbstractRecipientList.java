@@ -70,7 +70,8 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
         {
             String recipient = (String) iterator.next();
-            //Clone message
+            //Make a copy of the message. Question is do we do a proper clone? in which case there
+            //would potentially be multiple messages with the same id...
             request = new MuleMessage(message.getPayload(), message);
             endpoint = getRecipientEndpoint(request, recipient);
 
