@@ -15,10 +15,8 @@ import javax.ejb.EJBHome;
 import java.rmi.RemoteException;
 
 /**
- * <code>DummyHome</code> TODO
+ * <code>DummyHome</code> Test EJB
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface DummyEjbHome extends EJBHome
 {

@@ -30,6 +30,7 @@ import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.soap.MethodFixInterceptor;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
@@ -422,48 +423,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         this.beanTypes = beanTypes;
     }
 
-    public void onNotification(UMOServerNotification notification) {
-        if (notification.getAction() == ModelNotification.MODEL_STARTED) {
-            // We need to register the Axis service component once the model
-            // starts because
-            // when the model starts listeners on components are started, thus
-            // all listener
-            // need to be registered for this connector before the Axis service
-            // component
-            // is registered.
-            // The implication of this is that to add a new service and a
-            // different http port the
-            // model needs to be restarted before the listener is available
-            if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
-                try {
-                    //Descriptor might be null if no inbound endpoints have been register for the Axis connector
-                    if(axisDescriptor==null) {
-                        axisDescriptor = createAxisDescriptor();
-                    }
-                    MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
-                    //We have to perform a small hack here to rewrite servlet:// endpoints with the
-                    //real http:// address
-                    for (Iterator iterator = servletServices.iterator(); iterator.hasNext();) {
-                        SOAPService service = (SOAPService) iterator.next();
-                        ServletConnector servletConnector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
-                        String url = servletConnector.getServletUrl();
-                        if(url!=null) {
-                            service.getServiceDescription().setEndpointURL(url + "/" + service.getName());
-                        } else {
-                            logger.error("The servletUrl property on the ServletConntector has not been set this means that wsdl generation for service '" + service.getName() + "' may be incorrect");
-                        }
-                    }
-                    servletServices.clear();
-                    servletServices = null;
-
-
-                } catch (UMOException e) {
-                    handleException(e);
-                }
-            }
-        }
-    }
-
     public String getClientConfig() {
         return clientConfig;
     }
@@ -549,4 +508,48 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public void setTreatMapAsNamedParams(boolean treatMapAsNamedParams) {
         this.treatMapAsNamedParams = treatMapAsNamedParams;
     }
-}
+
+
+     public void onNotification(UMOServerNotification notification) {
+        if (notification.getAction() == ModelNotification.MODEL_STARTED) {
+            // We need to register the Axis service component once the model
+            // starts because
+            // when the model starts listeners on components are started, thus
+            // all listener
+            // need to be registered for this connector before the Axis service
+            // component
+            // is registered.
+            // The implication of this is that to add a new service and a
+            // different http port the
+            // model needs to be restarted before the listener is available
+            if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
+                try {
+                    //Descriptor might be null if no inbound endpoints have been register for the Axis connector
+                    if(axisDescriptor==null) {
+                        axisDescriptor = createAxisDescriptor();
+                    }
+                    axisDescriptor.addInterceptor(new MethodFixInterceptor());
+                    MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
+                    //We have to perform a small hack here to rewrite servlet:// endpoints with the
+                    //real http:// address
+                    for (Iterator iterator = servletServices.iterator(); iterator.hasNext();) {
+                        SOAPService service = (SOAPService) iterator.next();
+                        ServletConnector servletConnector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
+                        String url = servletConnector.getServletUrl();
+                        if(url!=null) {
+                            service.getServiceDescription().setEndpointURL(url + "/" + service.getName());
+                        } else {
+                            logger.error("The servletUrl property on the ServletConntector has not been set this means that wsdl generation for service '" + service.getName() + "' may be incorrect");
+                        }
+                    }
+                    servletServices.clear();
+                    servletServices = null;
+
+
+                } catch (UMOException e) {
+                    handleException(e);
+                }
+            }
+        }
+    }
+ }

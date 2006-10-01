@@ -11,71 +11,44 @@
 package org.mule.providers.ejb;
 
 import org.mule.providers.rmi.RmiConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.ClassUtils;
+
+import javax.ejb.EJBObject;
+import java.lang.reflect.Method;
+import java.net.UnknownHostException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
- * Code by (c) 2005 P.Oikari.
- *
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- * @version $Revision$
+ * Provides Connection configurstion for EJB endpoints
  */
 
 public class EjbConnector extends RmiConnector
 {
-    ////////////////////////////////////////////
     // Errorcodes
-    ///////////////////////////////////////////
     public static final int EJB_SERVICECLASS_INVOCATION_FAILED = 2;
-
-    private long pollingFrequency = 1000;
-
-    private String receiverArgumentClass = null;
-
-    private EjbAble ejbAble = null;
 
     public String getProtocol()
     {
         return "ejb";
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public Remote getRemoteObject(UMOImmutableEndpoint endpoint) throws RemoteException, UnknownHostException
     {
-        final Object[] args = new Object[]{new Long(pollingFrequency)};
-        return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);
-    }
+        EJBObject remoteObj;
 
-    ////////////////////////////////////////////////////
-    //  Receiver method + args
-    ///////////////////////////////////////////////////
-    public long getPollingFrequency()
-    {
-        return pollingFrequency;
-    }
+        try {
+            Object ref = getRemoteRef(endpoint);
 
-    public void setPollingFrequency(long pollingFrequency)
-    {
-        this.pollingFrequency = pollingFrequency;
-    }
+            Method method = ClassUtils.getMethod("create", null, ref.getClass());
 
-    public String getReceiverArgumentClass()
-    {
-        return receiverArgumentClass;
-    }
+            remoteObj = (EJBObject) method.invoke(ref, ClassUtils.NO_ARGS);
+        }
+        catch (Exception e) {
+            throw new RemoteException("Remote EJBObject lookup failed for '" + endpoint.getEndpointURI(), e);
+        }
 
-    public void setReceiverArgumentClass(String className) throws Exception
-    {
-        this.receiverArgumentClass = className;
-    }
-
-    public EjbAble getEjbAble()
-    {
-        return ejbAble;
-    }
-
-    public void setEjbAble(EjbAble ejbAble)
-    {
-        this.ejbAble = ejbAble;
+        return remoteObj;
     }
 }

@@ -12,9 +12,6 @@ package org.mule.providers.ejb;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class EjbConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception
@@ -47,25 +44,6 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
         assertNotNull(c.getSecurityPolicy());
         c.setServerCodebase(serverCodebase);
         assertEquals(serverCodebase, c.getServerCodebase());
-    }
-
-    public void testSetMethodArgumentTypes() throws Exception
-    {
-        EjbConnector c = (EjbConnector) connector;
-
-        ArrayList list = null;
-
-        c.setMethodArgumentTypes(list);
-
-        list = new ArrayList(Arrays.asList(new Object[] { "java.lang.String", "java.rmi.Remote" }));
-        c.setMethodArgumentTypes(list);
-
-        Class classes[] = c.getArgumentClasses();
-
-        for (int i = 0; i < classes.length; i++) {
-            String argTypeString = (String) list.get(i);
-            assertEquals(argTypeString, classes[i].getName());
-        }
     }
 
 }

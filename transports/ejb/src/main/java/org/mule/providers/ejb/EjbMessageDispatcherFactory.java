@@ -17,8 +17,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 /**
  * <code>EjbMessageDispatcherFactory</code> creates a dispatcher for marshalling requests to an EJB Session bean
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EjbMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

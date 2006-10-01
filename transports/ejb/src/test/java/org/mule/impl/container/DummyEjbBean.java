@@ -10,6 +10,8 @@
 
 package org.mule.impl.container;
 
+import org.mule.util.StringUtils;
+
 import javax.ejb.EJBException;
 import javax.ejb.EJBHome;
 import javax.ejb.EJBObject;
@@ -21,10 +23,8 @@ import javax.ejb.SessionContext;
 import java.rmi.RemoteException;
 
 /**
- * A fake ejb (and invalid) used for testing MUle ejb lookup
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A fake (and invalid) EJB used for testing MUle ejb lookup
+ *
  */
 public class DummyEjbBean implements SessionBean, DummyEjb
 {
@@ -61,6 +61,14 @@ public class DummyEjbBean implements SessionBean, DummyEjb
     public void dummy()
     {
         // nothing to do
+    }
+
+    public String reverseString(String string) {
+        return StringUtils.reverse(string);
+    }
+
+    public String upperCaseString(String string) {
+        return string.toUpperCase();
     }
 
     public EJBHome getEJBHome() throws RemoteException

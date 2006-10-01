@@ -13,10 +13,7 @@ import org.mule.providers.rmi.RmiMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /*
- * Code by (c) 2005 P.Oikari.
- *
- * @author <a href="mailto:pnirvin@hotmail.com">P.Oikari</a>
- * @version $Revision$
+ * Wraps an object obtained by calling a method on an EJB object
  */
 
 public class EjbMessageAdapter extends RmiMessageAdapter

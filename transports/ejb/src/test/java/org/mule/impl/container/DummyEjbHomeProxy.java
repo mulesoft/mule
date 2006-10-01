@@ -19,8 +19,7 @@ import javax.ejb.RemoveException;
 import java.rmi.RemoteException;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Test EJB Home impl
  */
 public class DummyEjbHomeProxy implements DummyEjbHome
 {

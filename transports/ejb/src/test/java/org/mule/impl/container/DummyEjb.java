@@ -10,16 +10,17 @@
 package org.mule.impl.container;
 
 import javax.ejb.EJBObject;
-
 import java.rmi.RemoteException;
 
 /**
- * <code>Sender</code> TODO
+ * A test EJB object
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface DummyEjb extends EJBObject
 {
     public void dummy() throws RemoteException;
+
+    public String reverseString(String string) throws RemoteException;
+
+    public String upperCaseString(String string) throws RemoteException;
 }
