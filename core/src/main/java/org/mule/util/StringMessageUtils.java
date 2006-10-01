@@ -10,16 +10,18 @@
 
 package org.mule.util;
 
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.SystemUtils;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
+
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * <code>StringMessageHelper</code> contains some useful methods for formatting
@@ -250,5 +252,25 @@ public class StringMessageUtils
         // encoding other than UTF-8 before the Manager is invoked, you can set this
         // property on the JVM
         return System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, DEFAULT_OS_ENCODING);
+    }
+
+    public static String toString(Object o)
+    {
+        if(o==null) return null;
+
+        if(o instanceof Map)
+        {
+            return PropertiesUtils.propertiesToString((Map)o, false);
+        }
+        else if (o.getClass().isArray())
+        {
+            return ArrayUtils.toString(o);
+        }
+        else if(o instanceof Collection) {
+            return CollectionUtils.toString((Collection)o, false);
+        }
+        else {
+            return o.toString();
+        }
     }
 }

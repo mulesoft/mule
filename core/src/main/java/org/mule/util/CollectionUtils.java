@@ -10,8 +10,20 @@
 
 package org.mule.util;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 // @Immutable
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
-    // nothing here (yet :)
+    public static String toString(Collection c, boolean newLine)
+    {
+        StringBuffer buf = new StringBuffer(128);
+        for (Iterator iterator = c.iterator(); iterator.hasNext();)
+        {
+            buf.append(iterator.next()).append(", ");
+            if(newLine) buf.append("\n");
+        }
+        return buf.toString();
+    }
 }

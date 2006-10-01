@@ -181,8 +181,9 @@ public class EndpointReference
             ep.initialise();
             Method m = object.getClass().getMethod(propertyName, new Class[] { UMOEndpoint.class });
             if (m == null) {
-                throw new InitialisationException(new Message(Messages.METHOD_X_NOT_FOUND_ON_X,
+                throw new InitialisationException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X,
                                                               propertyName,
+                                                              UMOEndpoint.class.getName(),
                                                               object.getClass().getName()), this);
             }
 
