@@ -154,7 +154,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     protected void removeGroup(Object id)
     {
-        eventGroups.remove(id);
+        EventGroup eg = (EventGroup)eventGroups.remove(id);
+        eg.clear();
+        eg=null;
     }
 
     /**

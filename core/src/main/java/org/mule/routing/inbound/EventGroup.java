@@ -80,6 +80,10 @@ public class EventGroup implements Serializable
         return events.size();
     }
 
+    public void clear() {
+        events.clear();
+    }
+
     public int expectedSize()
     {
         return expectedSize;
