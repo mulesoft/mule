@@ -10,26 +10,16 @@
 
 package org.mule.impl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.EventObject;
-import java.util.Iterator;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
@@ -44,6 +34,15 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.UUID;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.EventObject;
+import java.util.Iterator;
+
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
  * environment. All data sent or received within the Mule environment will be
@@ -52,8 +51,6 @@ import org.mule.util.UUID;
  * receiving Mule UMO understands. The event can also maintain any number of
  * properties that can be set and retrieved by Mule UMO components.
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleEvent extends EventObject implements UMOEvent
@@ -95,7 +92,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     private UMOCredentials credentials = null;
 
-    protected String[] ignoredPropertyOverrides = new String[]{"method"};
+    protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
     /**
      * Properties cache that only reads properties once from the inbound message
@@ -209,7 +206,7 @@ public class MuleEvent extends EventObject implements UMOEvent
                     String prop = (String)iterator.next();
                     Object value = msg.getProperty(prop);
                     // don't overwrite property on the message
-                    if (!ignoreProperty(prop, value)) {
+                    if (!ignoreProperty(prop)) {
                         message.setProperty(prop, value);
                     }
 
@@ -229,7 +226,7 @@ public class MuleEvent extends EventObject implements UMOEvent
                 String prop = (String)iterator.next();
                 Object value = endpoint.getProperties().get(prop);
                 // don't overwrite property on the message
-                if (!ignoreProperty(prop, value)) {
+                if (!ignoreProperty(prop)) {
                     message.setProperty(prop, value);
                 }
 
@@ -246,14 +243,18 @@ public class MuleEvent extends EventObject implements UMOEvent
         setCredentials();
     }
 
-    // TODO this method is pretty confusing and could need some documentation.
-    // value is not used at all, instead the value for the passed key is looked up twice.
-    protected boolean ignoreProperty(String key, Object value) {
-        if (key == null || value == null) {
-            return true;
-        }
-
-        if (key.startsWith(MuleProperties.PROPERTY_PREFIX) && message.getProperty(key) != null) {
+    /**
+     * This method is used to determine if a property on the previous event should be ignorred for the
+     * next event. This method is here because we don't have proper scoped handlng of meta data yet
+     * The rules are -
+     * 1. If a property is already set on the currect event don't verwrite with the previous event value
+     * 2. If the propery name appears in the ignorredPropertyOverrides list, then we always set it on the
+     * new event
+     * @param key
+     * @return
+     */
+    protected boolean ignoreProperty(String key) {
+        if (key == null) {
             return true;
         }
 
@@ -262,8 +263,9 @@ public class MuleEvent extends EventObject implements UMOEvent
                 return false;
             }
         }
+        Object value = message.getProperty(key);
 
-        if (message.getProperty(key) != null) {
+        if (value != null) {
             return true;
         }
 
