@@ -16,6 +16,20 @@
         be deployed to a J2ee application server and exposes Mule
         services via the JCA connector architecture.
     </description>
+
+    <build>
+        <resources>
+            <!--
+                Need to inject the final RAR name into some
+                vendor-specific deployment descriptors.
+             -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

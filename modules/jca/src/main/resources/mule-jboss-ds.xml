@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ The software in this package is published under the terms of the MuleSource MPL
+ license, a copy of which has been included with this distribution in the
+ LICENSE.txt file.
+
+ NOTE: this file HAS to end with -ds.xml
+
+ $Id$
+-->
+
+<connection-factories>
+    <tx-connection-factory>
+        <jndi-name>mule/ConnectionFactory</jndi-name>
+        <!--
+            Bind to a global JNDI, otherwise a container-local 'java:'
+            namespace will be used.
+        -->
+        <use-java-context>false</use-java-context>
+        <!-- This should go in sync with the currently built Mule version -->
+        <rar-name>mule-jca-${version}.rar</rar-name>
+        <connection-definition>org.mule.ra.MuleConnectionFactory</connection-definition>
+        <local-transaction/>
+        <xa-transaction/>
+        <!-- Maintain a 1:1 relationship between a TX and connection -->
+        <track-connection-by-tx/>
+    </tx-connection-factory>
+</connection-factories> 
