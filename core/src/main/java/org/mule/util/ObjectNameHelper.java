@@ -93,6 +93,7 @@ public class ObjectNameHelper
         value = value.replaceAll("&", SEPARATOR);
         value = value.replaceAll(":", SEPARATOR);
         value = value.replaceAll("=", "-");
+        value = value.replaceAll("\\" +SEPARATOR + "\\" + SEPARATOR, SEPARATOR);
         return value;
     }
 
