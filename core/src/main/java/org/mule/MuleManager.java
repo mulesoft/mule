@@ -262,52 +262,45 @@ public class MuleManager implements UMOManager
     }
 
     /**
-     * ObjectFactory method to create the singleton MuleManager instance
-     */
-    protected static synchronized UMOManager createInstance()
-    {
-        Class clazz = SpiUtils.findService(UMOManager.class, MuleManager.class.getName(), MuleManager.class);
-        Object obj;
-        try {
-            obj = clazz.newInstance();
-        } catch (Exception e) {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X, clazz.getName()),
-                                           e);
-        }
-
-        MuleManager.setInstance((UMOManager) obj);
-
-        // HACK hit the model, so it's created and initialized
-        MuleManager.getInstance().getModel();
-
-        return MuleManager.getInstance();
-    }
-
-    /**
      * Getter method for the current singleton MuleManager
-     *
+     * 
      * @return the current singleton MuleManager
      */
-    public static UMOManager getInstance()
+    public static synchronized UMOManager getInstance()
     {
-        if (instance == null) {
-            logger.info("Manager instance is Null, creating new instance");
-            instance = createInstance();
+        if (instance == null)
+        {
+            logger.info("Creating new MuleManager instance");
+
+            Class clazz = SpiUtils.findService(UMOManager.class, MuleManager.class.getName(),
+                MuleManager.class);
+            try
+            {
+                instance = (UMOManager)clazz.newInstance();
+                // HACK hit the model, so it's created and initialized
+                instance.getModel();
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X,
+                    clazz.getName()), e);
+            }
         }
+
         return instance;
     }
 
     /**
-     * A static method to determine if there is an instance of the MuleManager.
-     * This should be used instead of <code>
+     * A static method to determine if there is an instance of the MuleManager. This
+     * should be used instead of <code>
      * if(MuleManager.getInstance()!=null)
      * </code>
-     * because getInstance never returns a null. If an istance is not available
-     * one is created. This method queries the instance directly.
-     *
+     * because getInstance never returns a null. If an istance is not available one
+     * is created. This method queries the instance directly.
+     * 
      * @return true if the manager is instanciated
      */
-    public static boolean isInstanciated()
+    public static synchronized boolean isInstanciated()
     {
         return (instance != null);
     }
@@ -318,7 +311,8 @@ public class MuleManager implements UMOManager
     public static synchronized void setInstance(UMOManager manager)
     {
         instance = manager;
-        if (instance == null) {
+        if (instance == null)
+        {
             config = new MuleConfiguration();
         }
     }
@@ -344,27 +338,29 @@ public class MuleManager implements UMOManager
     }
 
     /**
-     * @return the MuleConfiguration for this MuleManager. This object is
-     *         immutable once the manager has initialised.
+     * @return the MuleConfiguration for this MuleManager. This object is immutable
+     *         once the manager has initialised.
      */
-    public static MuleConfiguration getConfiguration()
+    public static synchronized MuleConfiguration getConfiguration()
     {
         return config;
-
     }
 
     /**
      * Sets the configuration for the <code>MuleManager</code>.
-     *
+     * 
      * @param config the configuration object
-     * @throws IllegalAccessError if the <code>MuleManager</code> has already
-     *             been initialised.
+     * @throws IllegalAccessError if the <code>MuleManager</code> has already been
+     *             initialised.
      */
-    public static void setConfiguration(MuleConfiguration config)
+    public static synchronized void setConfiguration(MuleConfiguration config)
     {
-        if (config == null) {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "MuleConfiguration object").getMessage());
+        if (config == null)
+        {
+            throw new IllegalArgumentException(
+                new Message(Messages.X_IS_NULL, "MuleConfiguration object").getMessage());
         }
+
         MuleManager.config = config;
     }
 
