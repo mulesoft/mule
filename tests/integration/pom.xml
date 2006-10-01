@@ -258,23 +258,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Used by ActiveMQJmsXaTransactionFunctionalTestCase -->
-        <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm-carol</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm-jrmp-stubs</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-
         <dependency>
             <groupId>net.sf.hibernate</groupId>
             <artifactId>hibernate</artifactId>
