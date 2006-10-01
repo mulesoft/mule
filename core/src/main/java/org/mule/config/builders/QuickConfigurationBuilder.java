@@ -9,9 +9,6 @@
  */
 package org.mule.config.builders;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -19,6 +16,7 @@ import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelFactory;
@@ -35,6 +33,10 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.StringUtils;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can
@@ -80,6 +82,19 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
+        }
+    }
+
+    public void disableAdminAgent() {
+        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        if(manager!=null) {
+            try
+            {
+                manager.unregisterAgent(MuleAdminAgent.AGENT_NAME);
+            } catch (UMOException e)
+            {
+                //ignore
+            }
         }
     }
 
