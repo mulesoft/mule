@@ -60,8 +60,10 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer {
         AdtMessage message = null;
         XMLType xmltype = null;
 
+        throw new TransformerException(Message.createStaticMessage("This transformer is currently unsupported until issue MULE-1079 is resolved."), this);
         try {
             // Get the Oracle AQ session for this event.
+            // TODO This property is no longer set by JmsMessageDispatcher, see MULE-1079
             session = (Session) context.getMessage().getProperty(MuleProperties.MULE_JMS_SESSION);
             if (session == null) {
                 throw new TransformerException(Message.createStaticMessage("The current JMS session should have been stored as a property for this event."), this);
