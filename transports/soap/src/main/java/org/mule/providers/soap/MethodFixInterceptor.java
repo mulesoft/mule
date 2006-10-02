@@ -33,6 +33,9 @@ public class MethodFixInterceptor extends EnvelopeInterceptor
 
         public void after(Invocation invocation) throws UMOException
         {
-            invocation.getMessage().removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
+            if(invocation.getMessage()!=null)
+            {
+                invocation.getMessage().removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
+            }
         }
     }
