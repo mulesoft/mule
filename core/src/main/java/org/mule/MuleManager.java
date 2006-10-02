@@ -307,6 +307,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets the current singleton MuleManager
+     * @deprecated this will go away soon.
      */
     public static synchronized void setInstance(UMOManager manager)
     {
@@ -352,6 +353,7 @@ public class MuleManager implements UMOManager
      * @param config the configuration object
      * @throws IllegalAccessError if the <code>MuleManager</code> has already been
      *             initialised.
+     * @deprecated this will go away soon.
      */
     public static synchronized void setConfiguration(MuleConfiguration config)
     {
