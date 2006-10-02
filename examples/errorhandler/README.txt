@@ -25,8 +25,9 @@ not configured your build tool to use your HTTP proxy.  Please refer to the foll
 +---------------------+
 | Running the example |
 +---------------------+
-Simply use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run 
-the example.
+You will need two shell windows in order to run this application.
+
+In the first window, use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run the example.
 
 Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
 can run the example from the command line as follows:
@@ -38,6 +39,8 @@ can run the example from the command line as follows:
     Windows
     -------
     mule.bat -config .\conf\error-config.xml
+
+In the second window, copy the files (one by one so you can see the results) from the test-data/out directory to the test-data/in directory. Note that for the FatalException.xml file, Mule will attempt to construct and send an alert email using the SMTP configurations you should specify as show below.
 
 +-----------------+
 | E-mail settings |
