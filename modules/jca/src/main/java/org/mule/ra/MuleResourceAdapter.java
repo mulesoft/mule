@@ -43,7 +43,7 @@ import java.util.Map;
 
 /**
  * <code>MuleResourceAdapter</code> TODO
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -69,7 +69,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     public MuleResourceAdapter()
     {
-        MuleManager.getConfiguration().setModelType("jca");        
+        MuleManager.getConfiguration().setModelType("jca");
     }
 
     /**
@@ -181,7 +181,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec) activationSpec);
             UMODescriptor descriptor = (UMODescriptor) endpoints.get(key);
             if (descriptor == null) {
-                logger.warn("No endpoint was rgistered with key: " + key);
+                logger.warn("No endpoint was registered with key: " + key);
                 return;
             }
             try {
@@ -197,7 +197,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     /**
      * We only connect to one resource manager per ResourceAdapter instance, so
      * any ActivationSpec will return the same XAResource.
-     * 
+     *
      * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
      */
     public XAResource[] getXAResources(ActivationSpec[] activationSpecs) throws ResourceException
