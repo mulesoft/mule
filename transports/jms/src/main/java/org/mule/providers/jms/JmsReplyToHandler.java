@@ -75,7 +75,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 logger.error(StringMessageUtils.getBoilerPlate("ReplyTo destination implements both Queue and Topic " +
                         "while complying with JMS 1.0.2b specification. " +
                         "Please report your application server or JMS vendor name and version " +
-                        "to dev<_at_>mule.codehaus.org or http://jira.symphonysoft.com"));
+                        "to dev<_at_>mule.codehaus.org or http://jira.mulesource.org"));
             }
             boolean topic = replyToDestination instanceof Topic;
             session = connector.getSession(false, topic);

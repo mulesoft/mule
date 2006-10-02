@@ -160,7 +160,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * See http://jira.muleumo.org/browse/MULE-384 for details.
+     * See http://mule.mulesource.org/jira/browse/MULE-384 for details.
      */
     public void testNoPasswordNoNullPointerException() throws Exception
     {

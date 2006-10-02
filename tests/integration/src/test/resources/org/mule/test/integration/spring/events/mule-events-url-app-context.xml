@@ -28,7 +28,7 @@
             <value>receiver</value>
         </property>
         <property name="address">
-            <value>pop3://mule@muleumo.org</value>
+            <value>pop3://user@lotsofmail.org</value>
         </property>
     </bean>
 

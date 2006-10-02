@@ -26,11 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2656 $
- */
-
 public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
     public void testMessageSpltterRouter() throws Exception

@@ -25,12 +25,12 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreatePop3Connector() throws Exception
     {
-        MuleEndpointURI url = new MuleEndpointURI("pop3://ross:password@pop3.muleumo.org");
+        MuleEndpointURI url = new MuleEndpointURI("pop3://user:password@pop3.lotsofmail.org");
         UMOConnector cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof Pop3Connector);
         Pop3Connector pop3 = (Pop3Connector) cnn;
 
-        url = new MuleEndpointURI("pop3://ross:password@pop3.muleumo.org:123?checkFrequency=3001");
+        url = new MuleEndpointURI("pop3://user:password@pop3.lotsofmail.org:123?checkFrequency=3001");
         cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof Pop3Connector);
         pop3 = (Pop3Connector) cnn;
@@ -39,18 +39,18 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateSmtpConnector() throws Exception
     {
-        MuleEndpointURI url = new MuleEndpointURI("smtp://ross:password@smtp.muleumo.org");
+        MuleEndpointURI url = new MuleEndpointURI("smtp://user:password@smtp.lotsofmail.org");
         UMOConnector cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof SmtpConnector);
         SmtpConnector smtp = (SmtpConnector) cnn;
 
 
-        url = new MuleEndpointURI("smtp://ross:password@smtp.muleumo.org:1023?fromAddress=admin@muleumo.org&subject=Hello");
+        url = new MuleEndpointURI("smtp://user:password@smtp.lotsofmail.org:1023?fromAddress=admin@somewhere.com&subject=Hello");
         cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof SmtpConnector);
         smtp = (SmtpConnector) cnn;
         
-        assertEquals("admin@muleumo.org", smtp.getFromAddress());
+        assertEquals("admin@somewhere.com", smtp.getFromAddress());
         assertEquals("Hello", smtp.getSubject());
     }
 }

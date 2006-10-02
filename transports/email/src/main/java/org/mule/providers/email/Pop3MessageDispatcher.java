@@ -127,7 +127,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     * Endpoint can be in the form of pop3://username:password@pop3.muleumo.org
+     * Endpoint can be in the form of pop3://username:password@pop3.lotsofmail.org
      *
      * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout  the maximum time the operation should block before returning. The call should

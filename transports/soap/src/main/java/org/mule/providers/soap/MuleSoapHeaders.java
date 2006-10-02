@@ -28,9 +28,6 @@ import java.util.Iterator;
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing
  * Mule header properties to s Soap message
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleSoapHeaders
 {
@@ -91,7 +88,7 @@ public class MuleSoapHeaders
         	
     		Object elementObject = elements.next();
 
-            //Fixed MULE-770 (http://jira.symphonysoft.com/browse/MULE-770)
+            //Fixed MULE-770 (http://mule.mulesource.org/jira/browse/MULE-770)
     		if (elementObject instanceof SOAPElement) 
     		// if not, means that it is a value not an element, therefore we cannot look for correlation_id ...
     		{
