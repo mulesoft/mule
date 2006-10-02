@@ -11,10 +11,8 @@
 package org.mule.routing.response;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,21 +46,20 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * The collection of messages that are ready to be returned to the callee. Keyed
      * by Message ID
      */
-    protected Map responseEvents = new ConcurrentHashMap();
+    protected ConcurrentMap responseEvents = new ConcurrentHashMap();
 
     /**
      * A map of locks used to synchronize operations on an eventGroup or response
      * message for a given Message ID.
      */
-    // @GuardedBy(itself)
-    private Map locks = new HashMap();
+    private ConcurrentMap locks = new ConcurrentHashMap();
 
     /**
      * Map of EventGroup objects. These represent one or mre messages to be
      * agregated. These are keyed on Message ID. There will be one responseEvent for
      * every EventGroup.
      */
-    protected Map eventGroups = new ConcurrentHashMap();
+    protected final ConcurrentMap eventGroups = new ConcurrentHashMap();
 
     public void process(UMOEvent event) throws RoutingException
     {
@@ -79,31 +76,39 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
             // remove the eventGroup as no further message will be received for this
             // group once we aggregate
-            removeGroup(id);
+            removeEventGroup(id);
 
             // add the new response message so that it can be collected by the
             // response Thread
-            responseEvents.put(id, returnMessage);
+            UMOMessage previousResult = (UMOMessage)responseEvents.putIfAbsent(id, returnMessage);
+            if (previousResult != null)
+            {
+                // this would indicate that we need a better way to prevent continued
+                // aggregation for a group that is currently being processed. Can
+                // this actually happen?
+                throw new IllegalStateException("Detected duplicate aggregation result message with id: "
+                                                + id);
+            }
 
             // will get/create a latch for the response Message ID and release it,
             // notifying other threads that the response message is available
-            synchronized (locks)
+            Latch l = (Latch)locks.get(id);
+            if (l == null)
             {
-                Latch l = (Latch)locks.get(id);
-
-                if (l == null)
+                if (logger.isDebugEnabled())
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Creating latch for " + id + " in " + this);
-                    }
-
-                    l = new Latch();
-                    locks.put(id, l);
+                    logger.debug("Creating latch for " + id + " in " + this);
                 }
 
-                l.countDown();
+                l = new Latch();
+                Latch previous = (Latch)locks.putIfAbsent(id, l);
+                if (previous != null)
+                {
+                    l = previous;
+                }
             }
+
+            l.countDown();
         }
     }
 
@@ -136,13 +141,14 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         if (eg == null)
         {
             eg = createEventGroup(cId, event);
-            eg.addEvent(event);
-            eventGroups.put(eg.getGroupId(), eg);
+            EventGroup previous = (EventGroup)eventGroups.putIfAbsent(eg.getGroupId(), eg);
+            if (previous != null)
+            {
+                eg = previous;
+            }
         }
-        else
-        {
-            eg.addEvent(event);
-        }
+
+        eg.addEvent(event);
 
         return eg;
     }
@@ -157,10 +163,14 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected EventGroup createEventGroup(Object id, UMOEvent event)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Creating new event group: " + id + " in " + this);
+        }
         return new EventGroup(id);
     }
 
-    protected void removeGroup(Object id)
+    protected void removeEventGroup(Object id)
     {
         eventGroups.remove(id);
     }
@@ -182,21 +192,20 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Waiting for response for message id: " + responseId + " in " + this);
         }
 
-        Latch l;
-        synchronized (locks)
+        Latch l = (Latch)locks.get(responseId);
+        if (l == null)
         {
-            l = (Latch)locks.get(responseId);
-
-            if (l == null)
+            if (logger.isDebugEnabled())
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-                                 + responseId + " in " + this);
-                }
+                logger.debug("Got response but no one is waiting for it yet. Creating latch for "
+                             + responseId + " in " + this);
+            }
 
-                l = new Latch();
-                locks.put(responseId, l);
+            l = new Latch();
+            Latch previous = (Latch)locks.putIfAbsent(responseId, l);
+            if (previous != null)
+            {
+                l = previous;
             }
         }
 
@@ -205,7 +214,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Got latch for message: " + responseId);
         }
 
+        // the final result message
+        UMOMessage result;
+
+        // indicates whether waiting for the result timed out
         boolean b = false;
+
         try
         {
             if (logger.isDebugEnabled())
@@ -213,7 +227,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 logger.debug("Waiting for response to message: " + responseId);
             }
 
-            // How long should we wait for the lock?
+            // how long should we wait for the lock?
             if (getTimeout() <= 0)
             {
                 l.await();
@@ -228,34 +242,22 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             logger.error(e.getMessage(), e);
         }
+        finally
+        {
+            locks.remove(responseId);
+            result = (UMOMessage)responseEvents.remove(responseId);
+        }
 
         if (!b)
         {
             if (logger.isTraceEnabled())
             {
-                synchronized (responseEvents)
-                {
-                    logger.trace("Current responses are: \n"
-                                 + PropertiesUtils.propertiesToString(responseEvents, true));
-                }
-            }
-
-            responseEvents.remove(responseId);
-
-            synchronized (locks)
-            {
-                locks.remove(responseId);
+                logger.trace("Current responses are: \n"
+                             + PropertiesUtils.propertiesToString(responseEvents, true));
             }
 
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
                 String.valueOf(getTimeout()), responseId), message, null);
-        }
-
-        UMOMessage result = (UMOMessage)responseEvents.remove(responseId);
-
-        synchronized (locks)
-        {
-            locks.remove(responseId);
         }
 
         if (result == null)

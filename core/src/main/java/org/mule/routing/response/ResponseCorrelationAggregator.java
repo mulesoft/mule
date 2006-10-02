@@ -40,10 +40,7 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
 
         if (logger.isDebugEnabled())
         {
-            synchronized (eventGroups)
-            {
-                logger.info("Aggregator: EventGroups size = " + eventGroups.size());
-            }
+            logger.info("Aggregator: EventGroups size = " + eventGroups.size());
             logger.info("Correlation size is " + expected + ". current event group size is " + events.size()
                         + " for correlation " + events.getGroupId());
         }
