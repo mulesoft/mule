@@ -9,6 +9,8 @@ an Enterprise Service Network approach (no shared message type and components in
 directly).  The example demonstrates Synchronous and Asynchronous message processing
 styles.
 
+For more information, refer to http://mule.mulesource.org/Examples
+
 +---------------------+
 | Running the example |
 +---------------------+
