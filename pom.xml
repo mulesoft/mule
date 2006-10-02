@@ -11,7 +11,7 @@
 
     <!-- Organization -->
     <organization>
-        <name>MuleSource Inc.</name>
+        <name>MuleSource, Inc.</name>
         <url>http://www.mulesource.com</url>
     </organization>
 
@@ -25,17 +25,17 @@
     <url>http://mule.mulesource.org</url>
     <inceptionYear>2003</inceptionYear>
     <mailingLists>
-        <!-- Refer to http://muleumo.org/Mailing+Lists -->
+        <!-- Refer to http://mule.mulesource.org/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://muleumo.org/Team -->
+        <!-- Refer to http://mule.mulesource.org/Team -->
     </developers>
     <contributors>
-        <!-- Refer to http://muleumo.org/Team -->
+        <!-- Refer to http://mule.mulesource.org/Team -->
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://dev.mulesource.com/jira/browse/MULE</url>
+        <url>http://dev.mulesource.org/jira/browse/MULE</url>
     </issueManagement>
 
     <!-- Build -->
@@ -57,7 +57,7 @@
         </notifiers>
     </ciManagement>
     <distributionManagement>
-        <downloadUrl>http://muleumo.org/Download</downloadUrl>
+        <downloadUrl>http://mule.mulesource.org/Download</downloadUrl>
         <repository>
             <id>mule-releases</id>
             <name>Mule Release Repository</name>
@@ -467,9 +467,9 @@
         <module>tests</module>
         <module>examples</module>
         <!-- see:
-            http://jira.symphonysoft.com/browse/MULETOOLS-2
-            http://jira.symphonysoft.com/browse/MULETOOLS-21
-            http://jira.symphonysoft.com/browse/MULETOOLS-22            
+            http://mule.mulesource.org/jira/browse/MULETOOLS-2
+            http://mule.mulesource.org/jira/browse/MULETOOLS-21
+            http://mule.mulesource.org/jira/browse/MULETOOLS-22            
         -->
         <!-- <module>tools</module> -->
     </modules>
