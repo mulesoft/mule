@@ -61,6 +61,7 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer {
         XMLType xmltype = null;
 
         throw new TransformerException(Message.createStaticMessage("This transformer is currently unsupported until issue MULE-1079 is resolved."), this);
+        /*
         try {
             // Get the Oracle AQ session for this event.
             // TODO This property is no longer set by JmsMessageDispatcher, see MULE-1079
@@ -110,5 +111,6 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer {
         catch (JMSException e) { throw new TransformerException(this, e); }
         catch (SQLException e) { throw new TransformerException(this, e); }
         catch (IOException e) { throw new TransformerException(this, e); }
+        */
     }
 }
