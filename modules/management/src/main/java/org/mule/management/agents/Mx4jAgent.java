@@ -176,7 +176,7 @@ public class Mx4jAgent implements UMOAgent
                 unregisterMBeansIfNecessary();
             } catch (Exception e)
             {
-                logger.error("Couldn't unregister MBean: " + adaptorName.getCanonicalName(), e);
+                logger.error("Couldn't unregister MBean: " + (adaptorName!=null ? adaptorName.getCanonicalName() : "null"), e);
             }
         }
     }
