@@ -69,7 +69,7 @@ public class Main
         try {
                  System.out.println("******************"+ 
 			"\nWelcome to the Mule Loan Broker ESB example. This example demonstrates using JMS, Web Services,\n Http/Rest and EJBs using an ESB architecture." +
-                        "\nFor more information see http://mule.codehaus.org/LoanBroker." +
+                        "\nFor more information see http://mule.mulesource.org/LoanBroker." +
                         "\n\nThe example demonstrates integrating EJB applications in 2 ways -" +
                         "\n  1. Calling out to a remote EJB using a Mule Endpoint." +
                         "\n  2. Managing an EJB as a Mule component." +

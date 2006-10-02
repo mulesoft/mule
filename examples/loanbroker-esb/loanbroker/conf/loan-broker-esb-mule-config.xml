@@ -4,13 +4,13 @@
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <!--  This is the configuration for the Loan Broker ESB example -->
-<!-- See http://mule.codehaus.org/LoanBroker  for more information, diagrams and even a presentation! -->
+<!-- See http://mule.mulesource.org/LoanBroker  for more information, diagrams and even a presentation! -->
 
 <mule-configuration id="Mule_Loan_broker_ESB" version="1.0">
 
     <description>
     The Loan Broker ESB example implements the Loan Broker Example using an ESB topology.
-    See http://mule.codehaus.org/LoanBroker+ESB for details.
+    See http://mule.mulesource.org/LoanBroker+ESB for details.
     </description>
 
     <connector name="ejbConnector" className="org.mule.providers.ejb.EjbConnector">

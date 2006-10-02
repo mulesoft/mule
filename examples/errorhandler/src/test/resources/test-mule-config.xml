@@ -26,13 +26,13 @@
 
     <connector name="EmailConnector" className="org.mule.providers.email.SmtpConnector">
         <properties>
-            <property name="fromAddress" value="eh@muleumo.org"/>
-            <property name="hostname" value="mail.muleumo.org"/>
-            <!--property name="smtpUsername" value="rossmason1"/>-->
+            <property name="fromAddress" value="eh@lotsofmail.org"/>
+            <property name="hostname" value="mail.lotsofmail.org"/>
+            <!--property name="smtpUsername" value="user"/>-->
             <!--<property name="smtpPassword" value="xxxx"/-->
-            <!--<property name="ccAddresses" value="ross.mason@symphonysoft.com"/>-->
-            <!--<property name="bccAddresses" value="ross.mason@another.com"/>-->
-            <!--<property name="toAddresses" value="ross.mason@yet-another.com"/>-->
+            <!--<property name="ccAddresses" value="someone@somewhere.com"/>-->
+            <!--<property name="bccAddresses" value="someone@somewhere-else.com"/>-->
+            <!--<property name="toAddresses" value="someone@nowhere.com"/>-->
         </properties>
     </connector>
 
@@ -107,7 +107,7 @@
                 </router>
 
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException">
-                    <endpoint address="smtp://exceptions@symphonysoft.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
+                    <endpoint address="smtp://exceptions@somewhere.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
                 </router>
 
