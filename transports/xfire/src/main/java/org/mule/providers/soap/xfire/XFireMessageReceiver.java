@@ -11,6 +11,7 @@
 package org.mule.providers.soap.xfire;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mule.util.MapUtils;
@@ -33,6 +34,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
     protected XFireConnector connector;
     protected Service service;
+    
+    protected List serviceInterfaces;
 
     public XFireMessageReceiver(UMOConnector umoConnector,
                                 UMOComponent component,
@@ -79,9 +82,26 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "scope");
                 rewriteProperty(props, "schemas");
             }
-
-            service = connector.getServiceFactory().create(
-                    component.getDescriptor().getImplementationClass(),
+            
+            serviceInterfaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
+            Class exposedInterface;
+            
+            if (serviceInterfaces == null)
+                exposedInterface = component.getDescriptor().getImplementationClass();
+            
+            else
+            {
+                String className = (String)serviceInterfaces.get(0);
+                exposedInterface = Class.forName(className);
+                logger.info(className + " class was used to expose your service");
+                
+                if (serviceInterfaces.size() > 1)
+                {
+                    logger.info("Only the first class was used to expose your method");
+                }
+            }
+            
+            service = connector.getServiceFactory().create(exposedInterface,
                     component.getDescriptor().getName(), namespace, props);
 
             boolean sync = endpoint.isSynchronous();
@@ -94,6 +114,11 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
         }
         catch (UMOException e) {
+            throw new InitialisationException(e, this);
+        }
+        catch (ClassNotFoundException e)
+        {
+            //will be thrown in the case that the forName() does not find the class to load
             throw new InitialisationException(e, this);
         }
     }
