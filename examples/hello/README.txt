@@ -29,6 +29,10 @@ can run the example from the command line as follows:
     mule.bat -config .\conf\hello-http-config.xml
     mule.bat -config .\conf\hello-spring-config.xml -builder spring
 
+To invoke the hello component over http, hit the following URL
+
+    http://localhost:8888/?name=Ross
+
 +----------------------+
 | Building the example |
 +----------------------+
