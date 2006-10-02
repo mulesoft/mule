@@ -33,9 +33,6 @@
                         <exclude>org/mule/test/integration/providers/soap/xfire/XFireConnectorVMFunctionalTestCase.java</exclude>
 
                         <exclude>org/mule/test/integration/providers/email/EMailFunctionalTestCase.java</exclude>
-                        <!-- spitting out exceptions, see MULE-1076 -->
-                        <exclude>org/mule/samples/loanbroker/GlueLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-
                         
                         <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration2TestCase.java</exclude>
                         <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration4TestCase.java</exclude>
