@@ -53,13 +53,13 @@ The distribution you have downloaded contains the following:
 | GETTING STARTED |
 +-----------------+
 Take a look at the latest documentation on our website:
-http://www.muleumo.org/Getting+Started+Guide
+http://mule.mulesource.org/Getting+Started+Guide
 
 User Guide:
-http://www.muleumo.org/User+Guide
+http://mule.mulesource.org/User+Guide
 
 Example Applications:
-http://www.muleumo.org/Mule+Examples
+http://mule.mulesource.org/Mule+Examples
 
 +----------+
 | FEEDBACK |
@@ -67,7 +67,7 @@ http://www.muleumo.org/Mule+Examples
 We hope you enjoy using Mule. To help us make it a better product please tell
 us about any issues (no matter how small), suggestions or other comments you have.
 You can post on the mailing list - user@mule.codehaus.org or raise
-issues at http://jira.muleumo.org, or drop in to our IRC channel on irc.codehaus.org#mule
+issues at http://jira.mulesource.org, or drop in to our IRC channel on irc.codehaus.org#mule
 
 Enjoy!
 The Mule Team
