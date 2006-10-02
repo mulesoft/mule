@@ -143,8 +143,15 @@ public final class MuleSession implements UMOSession
             logger.debug("Session has received asynchronous event on: " + endpoint);
         }
 
-        UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
+        UMOEvent event = createOutboundEvent(message, endpoint, null);
+
         dispatchEvent(event);
+        processResponse(event.getMessage());
+       // RequestContext.writeResponse(event.getMessage());
+
+
+        //Clear the current event context, since we're done with the message
+        //RequestContext.setEvent(null);
     }
 
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
@@ -154,16 +161,27 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
     {
+        //Clear the current event context, since we're done with the message as far as custom code
+        //is concerned
+        //RequestContext.setEvent(null);
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
         if (router == null) {
             throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
                                                             component.getDescriptor().getName()));
         }
-        return router.route(message, this, true);
+        UMOMessage result = router.route(message, this, true);
+        if(result!=null) processResponse(result);
+        //RequestContext.writeResponse(result);
+
+        return result;
     }
 
     public UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
+        //Clear the current event context, since we're done with the message as far as custom code
+        //is concerned
+        //RequestContext.setEvent(null);
+
         if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         }
@@ -176,7 +194,7 @@ public final class MuleSession implements UMOSession
             logger.debug("Session has received synchronous event on endpoint: " + endpoint);
         }
 
-        UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
+        UMOEvent event = createOutboundEvent(message, endpoint, null);
         UMOMessage result = sendEvent(event);
 
         // Handles the situation where a response has been received via a remote ReplyTo channel.
@@ -186,10 +204,13 @@ public final class MuleSession implements UMOSession
         }
 
         if(result!=null) {
-            RequestContext.rewriteEvent(result);
+            //todo remove
+            //RequestContext.rewriteEvent(result);
+            RequestContext.writeResponse(result);
             processResponse(result);
         }
 
+        //RequestContext.writeResponse(result);
         return result;
     }
 
@@ -201,6 +222,9 @@ public final class MuleSession implements UMOSession
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
         if (event.getEndpoint().canSend()) {
+            //Clear the current event context, since we're done with the message as far as custom code
+            //is concerned
+           // RequestContext.setEvent(null);
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug("dispatching event: " + event);
@@ -217,6 +241,7 @@ public final class MuleSession implements UMOSession
                     new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 }
                 dispatcher.dispatch(event);
+
             } catch (Exception e) {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
@@ -226,6 +251,9 @@ public final class MuleSession implements UMOSession
                         + ", event is: " + event);
             }
             component.dispatchEvent(event);
+            processResponse(event.getMessage());
+            //RequestContext.writeResponse(event.getMessage());
+
         } else {
             throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
                                         event.getMessage(),
@@ -270,6 +298,8 @@ public final class MuleSession implements UMOSession
                 }
                 UMOMessage response = dispatcher.send(event);
                 processResponse(response);
+                //RequestContext.writeResponse(response);
+
                 return response;
 
             } catch (UMOException e) {
