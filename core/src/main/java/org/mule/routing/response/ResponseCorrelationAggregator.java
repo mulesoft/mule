@@ -7,26 +7,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.response;
 
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 
 /**
- * <code>ResponseCorrelationAggregator</code> Correlates one or more events on
- * a response flow using the Correlation Id to group events
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a
+ * response flow using the Correlation Id to group events.
  */
 
 public abstract class ResponseCorrelationAggregator extends AbstractResponseAggregator
 {
     /**
-     * Determines if the event group is ready to be aggregated. if the group is
-     * ready to be aggregated (this is entirely up to the application. it could
-     * be determined by volume, last modified time or some oher criteria based
-     * on the last event received)
+     * Determines if the event group is ready to be aggregated. if the group is ready
+     * to be aggregated (this is entirely up to the application. it could be
+     * determined by volume, last modified time or some oher criteria based on the
+     * last event received)
      * 
      * @param events
      * @return true if the event group is ready of aggregation
@@ -40,25 +38,29 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
             return true;
         }
 
-        if (logger.isInfoEnabled())
+        if (logger.isDebugEnabled())
         {
-            logger.info("Aggregator: Current EventGroup size = " + eventGroups.size());
-            logger.info("correlation size is " + expected + ". current event group size is " + events.size()
+            synchronized (eventGroups)
+            {
+                logger.info("Aggregator: EventGroups size = " + eventGroups.size());
+            }
+            logger.info("Correlation size is " + expected + ". current event group size is " + events.size()
                         + " for correlation " + events.getGroupId());
         }
 
         return expected == events.size();
     }
 
-
     /**
      * Creates the event group with a specific correlation size based on the Mule
      * Correlation support
-     * @param id  The group id
+     * 
+     * @param id The group id
      * @param event the current event
      * @return a new event group of a fixed size
      */
-    protected EventGroup createEventGroup(Object id, UMOEvent event) {
+    protected EventGroup createEventGroup(Object id, UMOEvent event)
+    {
         int groupSize = event.getMessage().getCorrelationGroupSize();
         return new EventGroup(id, groupSize);
     }
