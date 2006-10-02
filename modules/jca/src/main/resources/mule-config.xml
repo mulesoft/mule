@@ -11,8 +11,8 @@
 -->
 
 
-<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="DummyJCA" version="1.0">
 
