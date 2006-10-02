@@ -12,7 +12,7 @@ For more information, refer to http://www.muleumo.org/Examples
 +----------------------+
 First, make sure you have set the MULE_HOME environment variable as recommended in INSTALL.txt
 
-Depending on the build tool you are using (Ant or Maven), you can build the example by simply 
+Depending on the build tool you are using (Ant 1.6.5 or greater, or Maven), you can build the example by simply 
 running "ant" or "mvn".  This will download any additional libraries, compile the example classes, 
 produce a jar file, and copy everything to $MULE_HOME/lib/user, which is where your custom classes 
 and configuration files should go.  
