@@ -1,14 +1,12 @@
 <!--
-    Mule - Universal Message Objects <font size="-2">(TM)</font>
-    This DTD describes the grammar of the mule configuration properties
-    <p>
-    Author: Ross Mason, SymphonySoft Limited &#169; 2003-2005
-    </p>
-    The mule is the root element of a <i>mule-config.xml</i> file.
-    It consists of one connection-descriptor and at least one
-    mule-model element.
-    @root mule-configuration
+ Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
 
+ The software in this package is published under the terms of the MuleSource MPL
+ license, a copy of which has been included with this distribution in the
+ LICENSE.txt file.
+
+ This DTD describes the grammar of the Mule configuration properties
+ @root mule-configuration
 -->
 <!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
  transaction-manager?,agents?,connector*,endpoint-identifiers?,transformers?,global-endpoints?,
