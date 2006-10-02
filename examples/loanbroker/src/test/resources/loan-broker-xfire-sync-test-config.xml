@@ -79,10 +79,6 @@
             inboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultLenderService">
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote"
-                        className="org.mule.routing.filters.PayloadTypeFilter" />
-                </router>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
                     <reply-to address="LoanBrokerQuotes"/>
                     <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
