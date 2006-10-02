@@ -166,12 +166,12 @@ public class MuleService implements MuleServiceMBean
     public String getLicense() {
         if(license==null) {
             try {
-                license = IOUtils.getResourceAsString("LICENSE.txt", getClass());
+                license = IOUtils.getResourceAsString("MULE_LICENSE.txt", getClass());
                 license = StringMessageUtils.getBoilerPlate(license, ' ', 80);
             } catch (IOException e) {
                 logger.warn("Failed to load LICENSE.txt", e);
             }
-            if(license==null) {
+            if(license == null) {
                 license = "Failed to load license";
             }
         }
