@@ -7,17 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker;
 
+public class GlueLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerSynchronousFunctionalTestCase
+{
 
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-public class GlueLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerSynchronousFunctionalTestCase {
-
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "loan-broker-glue-sync-test-config.xml";
     }
+
 }

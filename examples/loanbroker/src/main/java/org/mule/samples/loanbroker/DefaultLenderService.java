@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.RequestContext;
+import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.umo.UMOMessage;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class DefaultLenderService
         }
 
         UMOMessage m = RequestContext.getEventContext().getMessage();
-        m.setProperty("recipients", recipients);
+        m.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
         return lenders;
     }
 
