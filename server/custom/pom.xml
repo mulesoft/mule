@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-server</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>mule-custom</artifactId>
     <packaging>pom</packaging>
