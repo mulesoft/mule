@@ -11,18 +11,16 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.mule.umo.UMOMessage;
-import org.mule.util.StringUtils;
 
 import java.util.List;
 
+import org.mule.umo.UMOMessage;
+import org.mule.util.StringUtils;
+
 /**
- * <code>StaticRecipientList</code> is used to dispatch a single event to
- * multiple recipients over the same transport. The recipient endpoints for this
- * router can be configured statically on the router itself.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
+ * recipients over the same transport. The recipient endpoints for this router can be
+ * configured statically on the router itself.
  */
 
 public class StaticRecipientList extends AbstractRecipientList
@@ -33,23 +31,23 @@ public class StaticRecipientList extends AbstractRecipientList
 
     protected CopyOnWriteArrayList getRecipients(UMOMessage message)
     {
-        CopyOnWriteArrayList list = createList(message.removeProperty(RECIPIENTS_PROPERTY));
-        if(list==null) {
+        Object msgRecipients = message.removeProperty(RECIPIENTS_PROPERTY);
+        CopyOnWriteArrayList list;
+
+        if (msgRecipients == null)
+        {
             list = recipients;
         }
-        return list;
-    }
+        else if (msgRecipients instanceof String)
+        {
+            list = new CopyOnWriteArrayList(StringUtils.split(msgRecipients.toString(), ","));
+        }
+        else
+        {
+            list = new CopyOnWriteArrayList((List)msgRecipients);
+        }
 
-    private CopyOnWriteArrayList createList(Object list) {
-        if(list==null) {
-            return null;
-        }
-        if(list instanceof String) {
-            String[] temp = StringUtils.split(list.toString(), ",");
-             return new CopyOnWriteArrayList(temp);
-        } else {
-            return new CopyOnWriteArrayList((List)list);
-        }
+        return list;
     }
 
     public List getRecipients()
@@ -59,9 +57,12 @@ public class StaticRecipientList extends AbstractRecipientList
 
     public void setRecipients(List recipients)
     {
-        if (recipients != null) {
+        if (recipients != null)
+        {
             this.recipients = new CopyOnWriteArrayList(recipients);
-        } else {
+        }
+        else
+        {
             this.recipients = null;
         }
     }

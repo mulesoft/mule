@@ -7,23 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.inbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.mule.umo.UMOEvent;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mule.umo.UMOEvent;
+
 /**
- * <code>EventGroup</code> is a holder over events grouped by a common group
- * Id. This can be used by components such as routers to managed related events
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>EventGroup</code> is a holder over events grouped by a common group Id.
+ * This can be used by components such as routers to managed related events.
  */
-//@ThreadSafe
+// @ThreadSafe
 public class EventGroup implements Serializable
 {
     /**
@@ -80,7 +79,8 @@ public class EventGroup implements Serializable
         return events.size();
     }
 
-    public void clear() {
+    public void clear()
+    {
         events.clear();
     }
 
@@ -91,14 +91,18 @@ public class EventGroup implements Serializable
 
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuffer buf = new StringBuffer(80);
         buf.append("Event Group Id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
         buf.append(", current events (").append(events.size()).append(")");
-        for (Iterator iterator = events.iterator(); iterator.hasNext();) {
-            UMOEvent event = (UMOEvent) iterator.next();
+
+        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+        {
+            UMOEvent event = (UMOEvent)iterator.next();
             buf.append(", ").append(event.getMessage().getUniqueId());
         }
+
         return buf.toString();
     }
+
 }

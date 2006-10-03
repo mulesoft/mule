@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
@@ -23,17 +24,47 @@ import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
 
 /**
- * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses
- * a few different pools i.e. for component threds and message dispatchers. This
- * object makes it easier to configure the pool.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a
+ * few different pools i.e. for component threds and message dispatchers. This object
+ * makes it easier to configure the pool.
  */
 
 public class ThreadingProfile
 {
 
+    /**
+     * Default value for MAX_THREADS_ACTIVE
+     */
+    public static final int DEFAULT_MAX_THREADS_ACTIVE = 8;
+
+    /**
+     * Default value for MAX_THREADS_IDLE
+     */
+    public static final int DEFAULT_MAX_THREADS_IDLE = 4;
+
+    /**
+     * Default value for MAX_BUFFER_SIZE
+     */
+    public static final int DEFAULT_MAX_BUFFER_SIZE = 0;
+
+    /**
+     * Default value for MAX_THREAD_TTL
+     */
+    public static final long DEFAULT_MAX_THREAD_TTL = 60000;
+
+    /**
+     * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
+     */
+    public static final long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
+
+    /**
+     * Default value for do threading
+     */
+    public static final boolean DEFAULT_DO_THREADING = true;
+
+    /**
+     * Actions to perform on pool exhaustion
+     */
     public static final int WHEN_EXHAUSTED_WAIT = 0;
     public static final int WHEN_EXHAUSTED_DISCARD = 1;
     public static final int WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
@@ -41,31 +72,7 @@ public class ThreadingProfile
     public static final int WHEN_EXHAUSTED_RUN = 4;
 
     /**
-     * Default value for MAX_THREADS_ACTIVE
-     */
-    public static final int DEFAULT_MAX_THREADS_ACTIVE = 8;
-    /**
-     * Default value for MAX_THREADS_IDLE
-     */
-    public static final int DEFAULT_MAX_THREADS_IDLE = 4;
-    /**
-     * Default value for MAX_BUFFER_SIZE
-     */
-    public static final int DEFAULT_MAX_BUFFER_SIZE = 0;
-    /**
-     * Default value for MAX_THREAD_TTL
-     */
-    public static final long DEFAULT_MAX_THREAD_TTL = 60000;
-    /**
-     * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
-     */
-    public static final long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
-    /**
-     * Default value for do threading
-     */
-    public static final boolean DEFAULT_DO_THREADING = true;
-    /**
-     * Default value for DEFAULT_POOL_EXHAUST_ACTION
+     * Default action to perform on pool exhaustion
      */
     public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
@@ -113,7 +120,7 @@ public class ThreadingProfile
         this.threadWaitTimeout = tp.getThreadWaitTimeout();
         this.poolExhaustPolicy = tp.getPoolExhaustedAction();
         this.doThreading = tp.isDoThreading();
-        this.threadPriority = tp.getThreadPriority();        
+        this.threadPriority = tp.getThreadPriority();
         this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
         this.threadFactory = tp.getThreadFactory();
         this.workManagerFactory = tp.getWorkManagerFactory();
@@ -191,16 +198,26 @@ public class ThreadingProfile
 
     public void setPoolExhaustedActionString(String poolExhaustPolicy)
     {
-        if (poolExhaustPolicy != null) {
-            if ("WAIT".equals(poolExhaustPolicy)) {
+        if (poolExhaustPolicy != null)
+        {
+            if ("WAIT".equals(poolExhaustPolicy))
+            {
                 this.poolExhaustPolicy = WHEN_EXHAUSTED_WAIT;
-            } else if ("ABORT".equals(poolExhaustPolicy)) {
+            }
+            else if ("ABORT".equals(poolExhaustPolicy))
+            {
                 this.poolExhaustPolicy = WHEN_EXHAUSTED_ABORT;
-            } else if ("DISCARD".equals(poolExhaustPolicy)) {
+            }
+            else if ("DISCARD".equals(poolExhaustPolicy))
+            {
                 this.poolExhaustPolicy = WHEN_EXHAUSTED_DISCARD;
-            } else if ("DISCARD_OLDEST".equals(poolExhaustPolicy)) {
+            }
+            else if ("DISCARD_OLDEST".equals(poolExhaustPolicy))
+            {
                 this.poolExhaustPolicy = WHEN_EXHAUSTED_DISCARD_OLDEST;
-            } else {
+            }
+            else
+            {
                 this.poolExhaustPolicy = WHEN_EXHAUSTED_RUN;
             }
         }
@@ -250,50 +267,63 @@ public class ThreadingProfile
     {
         BlockingQueue buffer;
 
-        if (maxBufferSize > 0 && maxThreadsActive > 1) {
+        if (maxBufferSize > 0 && maxThreadsActive > 1)
+        {
             buffer = new ArrayBlockingQueue(maxBufferSize);
-        } else {
+        }
+        else
+        {
             buffer = new SynchronousQueue();
         }
 
-        if (maxThreadsActive < maxThreadsIdle) {
+        if (maxThreadsActive < maxThreadsIdle)
+        {
             maxThreadsIdle = maxThreadsActive;
         }
 
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive,
-                        threadTTL, TimeUnit.MILLISECONDS, buffer);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive, threadTTL,
+            TimeUnit.MILLISECONDS, buffer);
 
-        if (rejectedExecutionHandler != null) {
+        if (rejectedExecutionHandler != null)
+        {
             pool.setRejectedExecutionHandler(rejectedExecutionHandler);
         }
 
-        if (name != null) {
+        if (name != null)
+        {
             threadFactory = new NamedThreadFactory(name, threadPriority);
             pool.setThreadFactory(threadFactory);
         }
-        
-        switch (poolExhaustPolicy) {
-            case WHEN_EXHAUSTED_DISCARD_OLDEST: {
+
+        switch (poolExhaustPolicy)
+        {
+            case WHEN_EXHAUSTED_DISCARD_OLDEST :
+            {
                 pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
                 break;
             }
-            case WHEN_EXHAUSTED_RUN: {
+            case WHEN_EXHAUSTED_RUN :
+            {
                 pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
                 break;
             }
-            case WHEN_EXHAUSTED_ABORT: {
+            case WHEN_EXHAUSTED_ABORT :
+            {
                 pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
                 break;
             }
-            case WHEN_EXHAUSTED_DISCARD: {
+            case WHEN_EXHAUSTED_DISCARD :
+            {
                 pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
                 break;
             }
-            case WHEN_EXHAUSTED_WAIT: {
+            case WHEN_EXHAUSTED_WAIT :
+            {
                 pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
                 break;
             }
-            default: {
+            default :
+            {
                 pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
                 break;
             }
@@ -315,12 +345,11 @@ public class ThreadingProfile
     public String toString()
     {
         return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
-                + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
-                + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
-                + threadWaitTimeout + ", doThreading=" + doThreading + ", threadPriority="
-                + threadPriority + ", workManagerFactory=" + workManagerFactory
-                + ", rejectedExecutionHandler=" + rejectedExecutionHandler + ", threadFactory="
-                + threadFactory + "}";
+               + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
+               + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout=" + threadWaitTimeout
+               + ", doThreading=" + doThreading + ", threadPriority=" + threadPriority
+               + ", workManagerFactory=" + workManagerFactory + ", rejectedExecutionHandler="
+               + rejectedExecutionHandler + ", threadFactory=" + threadFactory + "}";
     }
 
     public static interface WorkManagerFactory
