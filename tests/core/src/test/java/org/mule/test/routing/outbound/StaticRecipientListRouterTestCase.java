@@ -7,10 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.mule.impl.MuleMessage;
 import org.mule.routing.outbound.StaticRecipientList;
@@ -20,14 +24,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2656 $
- */
 
 public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 {
@@ -54,22 +50,26 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         // note this router clones endpoints so that the endpointUri can be
         // changed
 
-        //The static recipient list router duplicates the message for each endpoint so we can't
-        //check for equality on the arguments passed to the dispatch / send methods
+        // The static recipient list router duplicates the message for each endpoint
+        // so we can't
+        // check for equality on the arguments passed to the dispatch / send methods
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event");
         router.getRecipients().add("test://recipient3");
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+            message);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
-        assertEquals(3, ((List) result.getPayload()).size());
+        assertEquals(3, ((List)result.getPayload()).size());
         session.verify();
 
     }
@@ -94,12 +94,16 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         UMOMessage message = new MuleMessage("test event");
         assertTrue(router.isMatch(message));
-        try {
-            router.route(message, (UMOSession) session.proxy(), false);
+        try
+        {
+            router.route(message, (UMOSession)session.proxy(), false);
             fail("Should not allow malformed endpointUri");
-        } catch (RoutingException e) {
+        }
+        catch (RoutingException e)
+        {
             // ignore
         }
         session.verify();
     }
+
 }
