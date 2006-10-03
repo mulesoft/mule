@@ -11,7 +11,7 @@
     <description>Is a simple component example that demostrates how to expose a component over multiple transports (soap and stream).</description>
 
     <properties>
-        <muleVersion>1.3-SNAPSHOT</muleVersion>
+        <muleVersion>1.4-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>

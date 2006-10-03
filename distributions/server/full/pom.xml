@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-server</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>mule-full</artifactId>
     <!-- This should be "pom" not "jar" but if it is set to "pom", the list of dependencies gets ignored
