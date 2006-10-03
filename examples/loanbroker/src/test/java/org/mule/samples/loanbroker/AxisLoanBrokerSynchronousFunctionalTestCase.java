@@ -17,8 +17,7 @@ import org.mule.umo.UMOMessage;
 
 public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestCase
 {
-
-    public static final int REQUESTS = 1;
+    public static final int REQUESTS = 1000;
 
     protected String getConfigResources()
     {
