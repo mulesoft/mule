@@ -7,8 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.service;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,23 +23,15 @@ import org.mule.components.simple.EchoService;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.lifecycle.Disposable;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
- * <code>TestServiceComponent</code> is a test WebServices component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>TestServiceComponent</code> is a test WebServices component.
  */
-public class TestServiceComponent extends FunctionalTestComponent implements EchoService,
-        DateService, PeopleService, Disposable
+public class TestServiceComponent extends FunctionalTestComponent
+    implements EchoService, DateService, PeopleService, Disposable
 {
     private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
 
-    private static Map people = new HashMap();
+    private final Map people = Collections.synchronizedMap(new HashMap());
 
     public TestServiceComponent()
     {
@@ -53,30 +52,27 @@ public class TestServiceComponent extends FunctionalTestComponent implements Ech
 
     public Person getPerson(String firstName)
     {
-        if(StringUtils.isEmpty(firstName)) {
+        if (StringUtils.isEmpty(firstName))
+        {
             throw new NullPointerException("Name parameter cannot be null");
         }
-        Person p = (Person) people.get(firstName);
+        Person p = (Person)people.get(firstName);
         return p;
     }
 
     public Person[] getPeople()
     {
-        Person[] p = new Person[people.size()];
-        int i = 0;
-        for (Iterator iterator = people.values().iterator(); iterator.hasNext(); i++) {
-            p[i] = (Person) iterator.next();
-
-        }
-        return p;
+        return (Person[])IteratorUtils.toArray(people.values().iterator(), Person.class);
     }
 
     public void addPerson(Person person) throws Exception
     {
-        if (person == null || person.getFirstName() == null || person.getLastName() == null) {
+        if (person == null || person.getFirstName() == null || person.getLastName() == null)
+        {
             throw new IllegalArgumentException("null person, first name or last name");
         }
-        if (person.getFirstName().equals("Ross")) {
+        if (person.getFirstName().equals("Ross"))
+        {
             throw new Exception("Ross is banned");
         }
         people.put(person.getFirstName(), person);
@@ -92,12 +88,13 @@ public class TestServiceComponent extends FunctionalTestComponent implements Ech
     }
 
     /**
-     * A lifecycle method where implementor should free up any resources If an
-     * exception is thrown it should just be logged and processing should
-     * continue. This method should not throw Runtime exceptions
+     * A lifecycle method where implementor should free up any resources. If an
+     * exception is thrown it should just be logged and processing should continue.
+     * This method should not throw RuntimeExceptions.
      */
     public void dispose()
     {
         people.clear();
     }
+
 }

@@ -11,10 +11,7 @@
 package org.mule.test.integration.service;
 
 /**
- * <code>Address</code> is a persons address
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Address</code> is a Persons address
  */
 
 public class Address
@@ -52,4 +49,5 @@ public class Address
     {
         this.postcode = postcode;
     }
+
 }

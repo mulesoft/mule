@@ -11,10 +11,7 @@
 package org.mule.test.integration.service;
 
 /**
- * <code>Person</code> part of the test PeopleService
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Person</code> part of the PeopleService
  */
 
 public class Person
@@ -68,4 +65,5 @@ public class Person
     {
         this.address = address;
     }
+
 }
