@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.mail</groupId>
@@ -58,12 +58,12 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-aegis</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-annotations</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>qdox</groupId>
