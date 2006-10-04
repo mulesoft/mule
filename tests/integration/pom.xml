@@ -48,9 +48,8 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
@@ -172,7 +171,7 @@
             <artifactId>mule-transport-xmpp</artifactId>
             <version>${version}</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
@@ -218,15 +217,15 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
-
+        
         <!-- Transitive dependencies for non-m2 projects -->
-
+        
         <dependency>
             <groupId>activemq</groupId>
             <artifactId>activemq</artifactId>
             <version>3.2.4</version>
             <!-- These transitive dependencies are not found on ibiblio and cause
-                the build to fail. -->
+            the build to fail. -->
             <exclusions>
                 <exclusion>
                     <groupId>javacc</groupId>
@@ -258,19 +257,28 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
+        <!-- mule-module-spring does not pull in spring-hibernate2, therefore we
+            have to include it for the tests. spring-2.0-all supports hibernate3 OOTB,
+            so we should probably upgrade to that. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-hibernate2</artifactId>
+            <version>2.0-rc2</version>
+        </dependency>
 
         <dependency>
             <groupId>net.sf.hibernate</groupId>
             <artifactId>hibernate</artifactId>
             <version>2.1.7c</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
             <version>1.0.1</version>
         </dependency>
-
+        
         <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
