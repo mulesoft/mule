@@ -16,6 +16,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.test.integration.service.TestReceiver;
 import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.NoReceiverForEndpointException;
