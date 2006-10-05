@@ -7,15 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.spring.events;
 
 import java.io.Serializable;
 
 /**
- * <code>Order</code> TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Order</code> is a bean that gets sent back and forth between Mule and
+ * Spring.
  */
 
 public class Order implements Serializable
@@ -43,4 +42,5 @@ public class Order implements Serializable
     {
         this.order = order;
     }
+
 }

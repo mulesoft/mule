@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
@@ -14,14 +15,11 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleClientTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/client/test-client-mule-config.xml";
     }
 
@@ -71,7 +69,8 @@ public class MuleClientTestCase extends FunctionalTestCase
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().setRemoteSync(true);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
             assertNotNull(message);
             assertEquals("Test Client Send message " + i + " Received", message.getPayload());
@@ -87,11 +86,12 @@ public class MuleClientTestCase extends FunctionalTestCase
         // to init
         client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         long start = System.currentTimeMillis();
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 100; i++)
+        {
             client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         }
         long time = System.currentTimeMillis() - start;
-        System.out.println(i + " took " + time + "ms to process");
+        logger.debug(i + " took " + time + "ms to process");
         Thread.sleep(1000);
     }
 

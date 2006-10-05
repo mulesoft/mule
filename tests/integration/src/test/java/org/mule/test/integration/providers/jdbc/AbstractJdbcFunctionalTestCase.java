@@ -32,10 +32,6 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCase
 {
 

@@ -18,16 +18,15 @@ public class DummyTransformer extends AbstractEventAwareTransformer
 {
     private static final long serialVersionUID = 8536127232968197199L;
 
-    public Object transform(Object src, String encoding, UMOEventContext context)
-            throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        System.out.println("org.mule.test.usecases.props.DummyTransformer");
+        logger.debug("transform() starting.");
 
         PropsComponent.assertEquals("param1", context.getMessage().getProperty("stringParam"));
-        PropsComponent.assertEquals(PropsComponent.testObjectProperty,
-                context.getMessage().getProperty("objectParam"));
+        PropsComponent.assertEquals(PropsComponent.testObjectProperty, context.getMessage().getProperty(
+            "objectParam"));
 
-        System.out.println("org.mule.test.usecases.props.DummyTransformer done.");
+        logger.debug("transform() done.");
         return src;
     }
 }

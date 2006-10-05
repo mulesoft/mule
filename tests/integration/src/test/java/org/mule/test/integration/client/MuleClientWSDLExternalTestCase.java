@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.extras.client.MuleClient;
@@ -18,18 +21,12 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
 {
     public void testRequestResponse() throws Throwable
     {
-        if (isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) {
+        if (isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()"))
+        {
             return;
         }
 
@@ -41,17 +38,20 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
         UMOMessage result = null;
         String resultPayload = StringUtils.EMPTY;
 
-        try {
+        try
+        {
             MuleClient client = new MuleClient();
             result = client.send(url, input, properties);
             resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
         }
-        catch (UMOException e) {
+        catch (UMOException e)
+        {
             fail(ExceptionUtils.getStackTrace(e));
         }
 
-        if (result != null) {
-            System.out.println("The quote for " + input + " is: " + result.getPayload());
+        if (result != null)
+        {
+            logger.debug("The quote for " + input + " is: " + result.getPayload());
         }
 
         assertNotNull(result);

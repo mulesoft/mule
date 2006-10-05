@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.components.simple.EchoService;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.lifecycle.Disposable;
@@ -29,8 +27,6 @@ import org.mule.umo.lifecycle.Disposable;
 public class TestServiceComponent extends FunctionalTestComponent
     implements EchoService, DateService, PeopleService, Disposable
 {
-    private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
-
     private final Map people = Collections.synchronizedMap(new HashMap());
 
     public TestServiceComponent()
@@ -76,14 +72,14 @@ public class TestServiceComponent extends FunctionalTestComponent
             throw new Exception("Ross is banned");
         }
         people.put(person.getFirstName(), person);
-        logger.info("Added Person: " + person);
+        logger.debug("Added Person: " + person);
     }
 
     public Person addPerson(String firstname, String surname) throws Exception
     {
         Person p = new Person(firstname, surname);
         addPerson(p);
-        logger.info("Added Person: " + p);
+        logger.debug("Added Person: " + p);
         return p;
     }
 

@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.lifecycle.Disposable;
 
@@ -27,8 +25,6 @@ import org.mule.umo.lifecycle.Disposable;
 public class TestNamedServiceComponent extends FunctionalTestComponent
     implements org.mule.components.simple.EchoService, DateService, PeopleService, Disposable
 {
-    private static final Log logger = LogFactory.getLog(FunctionalTestComponent.class);
-
     private final Map people = Collections.synchronizedMap(new HashMap());
 
     public TestNamedServiceComponent()

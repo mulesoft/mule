@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.spring.events;
 
 import org.mule.extras.spring.events.MuleApplicationEvent;
@@ -14,13 +15,11 @@ import org.mule.extras.spring.events.MuleSubscriptionEventListener;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * <code>OrderManagerBean</code> receives order beans from Mule and dispatches
- * process relsults back through Mule via the applicationContext
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>OrderManagerBean</code> receives Order beans from Mule and dispatches
+ * processed results back through Mule via the applicationContext
  */
-public class OrderManagerBean extends TestMuleEventBean implements OrderManager, MuleSubscriptionEventListener
+public class OrderManagerBean extends TestMuleEventBean
+    implements OrderManager, MuleSubscriptionEventListener
 {
     private String[] subscriptions;
 
@@ -28,11 +27,11 @@ public class OrderManagerBean extends TestMuleEventBean implements OrderManager,
     {
         super.onApplicationEvent(event);
         // Get the order
-        Order order = (Order) event.getSource();
+        Order order = (Order)event.getSource();
         String result = processOrder(order);
 
         // Cast the event to a Mule event, we'll use this to get the AppContext
-        MuleApplicationEvent muleEvent = (MuleApplicationEvent) event;
+        MuleApplicationEvent muleEvent = (MuleApplicationEvent)event;
 
         // Create a new MuleEvent. This will be sent to the replyTo
         // address
@@ -59,4 +58,5 @@ public class OrderManagerBean extends TestMuleEventBean implements OrderManager,
     {
         this.subscriptions = subscriptions;
     }
+
 }

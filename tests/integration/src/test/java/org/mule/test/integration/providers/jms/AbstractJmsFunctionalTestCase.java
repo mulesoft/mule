@@ -102,7 +102,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 //    protected void drainDestinations() throws Exception
 //    {
 //        if (!useTopics()) {
-//            System.out.println("@@@@ Draining Queues @@@@");
+//            logger.debug("@@@@ Draining Queues @@@@");
 //            JmsTestUtils.drainQueue((QueueConnection) cnn, getInDest().getAddress());
 //            assertNull(receive(getInDest().getAddress(), 10));
 //            JmsTestUtils.drainQueue((QueueConnection) cnn, getOutDest().getAddress());
