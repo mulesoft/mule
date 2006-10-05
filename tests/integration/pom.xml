@@ -43,6 +43,150 @@
         </plugins>
     </build>
 
+        <profiles>
+        <profile>
+            <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+            </activation>
+            <dependencies>
+                <!--
+                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
+                Unfortunately it is very buggy and does not support validation
+                against an XML Schema, so we have to unconditionally include
+                both xml-apis and xerces (in matching versions!) for JDK 1.4.
+                -->
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                    <version>1.3.03</version>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                    <version>2.8.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>activemq</groupId>
+                    <artifactId>activemq</artifactId>
+                    <version>3.2.4</version>
+                    <!-- These transitive dependencies are not found on ibiblio and cause
+                    the build to fail. -->
+                    <exclusions>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>activemq-core-test</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>smack</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>smackx</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activesoap</groupId>
+                            <artifactId>jaxp-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javacc</groupId>
+                            <artifactId>javacc</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activecluster</groupId>
+                            <artifactId>activecluster</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>incubator-derby</groupId>
+                            <artifactId>derby</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>incubator-derby</groupId>
+                            <artifactId>derbynet</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xerces</groupId>
+                            <artifactId>xmlParserAPIs</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xmlbeans</groupId>
+                            <artifactId>xmlbeans-jsr173-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>java5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>activemq</groupId>
+                    <artifactId>activemq</artifactId>
+                    <version>3.2.4</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>activemq-core-test</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>smack</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>smackx</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activesoap</groupId>
+                            <artifactId>jaxp-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javacc</groupId>
+                            <artifactId>javacc</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>activecluster</groupId>
+                            <artifactId>activecluster</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>incubator-derby</groupId>
+                            <artifactId>derby</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>incubator-derby</groupId>
+                            <artifactId>derbynet</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xerces</groupId>
+                            <artifactId>xmlParserAPIs</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xmlbeans</groupId>
+                            <artifactId>xmlbeans-jsr173-api</artifactId>
+                        </exclusion>
+                        <!-- IMPORTANT for JDK5 -->
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xerces</groupId>
+                            <artifactId>xercesImpl</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -217,47 +361,7 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
-        
-        <!-- Transitive dependencies for non-m2 projects -->
-        
-        <dependency>
-            <groupId>activemq</groupId>
-            <artifactId>activemq</artifactId>
-            <version>3.2.4</version>
-            <!-- These transitive dependencies are not found on ibiblio and cause
-            the build to fail. -->
-            <exclusions>
-                <exclusion>
-                    <groupId>javacc</groupId>
-                    <artifactId>javacc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>activecluster</groupId>
-                    <artifactId>activecluster</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>incubator-derby</groupId>
-                    <artifactId>derby</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>incubator-derby</groupId>
-                    <artifactId>derbynet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xmlbeans</groupId>
-                    <artifactId>xmlbeans-jsr173-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>activemq</groupId>
-                    <artifactId>activemq-core-test</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
+
         <!-- mule-module-spring does not pull in spring-hibernate2, therefore we
             have to include it for the tests. spring-2.0-all supports hibernate3 OOTB,
             so we should probably upgrade to that. -->
