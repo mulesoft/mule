@@ -18,16 +18,11 @@ import org.mortbay.util.InetAddrPort;
 import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.test.integration.providers.soap.AbstractSoapFunctionalTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
-    private Server httpServer;
     public static final int HTTP_PORT = 18088;
-    
-    
+
+    private Server httpServer;
 
     protected void suitePostSetUp() throws Exception
     {
@@ -39,57 +34,70 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet",  "/services/*", MuleReceiverServlet.class.getName());
+        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
 
         context.addHandler(handler);
         httpServer.start();
     }
 
-    protected void suiteTearDown() throws Exception {
+    protected void suiteTearDown() throws Exception
+    {
         httpServer.stop();
     }
 
-    public String getConfigResources() {
+    public String getConfigResources()
+    {
         return "org/mule/test/integration/providers/soap/axis/axis-test-servlet-mule-config.xml";
     }
 
-    protected String getRequestResponseEndpoint() {
+    protected String getRequestResponseEndpoint()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=echo";
     }
 
-    protected String getReceiveEndpoint() {
+    protected String getReceiveEndpoint()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 
-    protected String getReceiveComplexEndpoint() {
+    protected String getReceiveComplexEndpoint()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Fred";
     }
 
-    protected String getSendReceiveComplexEndpoint1() {
+    protected String getSendReceiveComplexEndpoint1()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
-    protected String getSendReceiveComplexEndpoint2() {
+    protected String getSendReceiveComplexEndpoint2()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Dino";
     }
 
-    protected String getReceiveComplexCollectionEndpoint() {
+    protected String getReceiveComplexCollectionEndpoint()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPeople";
     }
 
-    protected String getDispatchAsyncComplexEndpoint1() {
+    protected String getDispatchAsyncComplexEndpoint1()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
-    protected String getDispatchAsyncComplexEndpoint2() {
+    protected String getDispatchAsyncComplexEndpoint2()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Betty";
     }
 
-    protected String getTestExceptionEndpoint() {
+    protected String getTestExceptionEndpoint()
+    {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 
-    protected String getWsdlEndpoint() {
+    protected String getWsdlEndpoint()
+    {
         return "http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl";
     }
+
 }

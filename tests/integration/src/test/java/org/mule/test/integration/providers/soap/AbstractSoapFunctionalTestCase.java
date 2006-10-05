@@ -7,43 +7,47 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.providers.soap;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.http.HttpConnector;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOMessage;
+package org.mule.test.integration.providers.soap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.test.integration.service.Person;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.DispatchException;
+
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
-    protected AbstractSoapFunctionalTestCase() {
-        setDisposeManagerPerSuite(true);
+    protected transient final Log logger = LogFactory.getLog(getClass());
+
+    protected AbstractSoapFunctionalTestCase()
+    {
+        super.setDisposeManagerPerSuite(true);
     }
 
     protected abstract String getRequestResponseEndpoint();
-    
+
     protected abstract String getReceiveEndpoint();
-    
+
     protected abstract String getReceiveComplexEndpoint();
-    
+
     protected abstract String getSendReceiveComplexEndpoint1();
-    
+
     protected abstract String getSendReceiveComplexEndpoint2();
-    
+
     protected abstract String getReceiveComplexCollectionEndpoint();
-    
+
     protected abstract String getDispatchAsyncComplexEndpoint1();
-    
+
     protected abstract String getDispatchAsyncComplexEndpoint2();
 
     protected abstract String getTestExceptionEndpoint();
@@ -57,7 +61,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         List results = new ArrayList();
         int number = 1;
         Map props = new HashMap();
-        for (int i = 0; i < number; i++) {
+        for (int i = 0; i < number; i++)
+        {
             props.put("X-Message-Number", String.valueOf(i));
             UMOMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, props);
             assertNotNull(msg);
@@ -65,7 +70,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         }
 
         assertEquals(number, results.size());
-        for (int i = 0; i < number; i++) {
+        for (int i = 0; i < number; i++)
+        {
             assertEquals("Message " + i, results.get(i).toString());
         }
     }
@@ -85,27 +91,28 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         UMOMessage result = client.receive(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
+        assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
 
         result = client.receive(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
+        assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
     }
 
     public void testSendAndReceiveComplex() throws Throwable
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"), null);
+        UMOMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"),
+            null);
         assertNull(result);
 
         result = client.receive(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Dino", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
+        assertEquals("Dino", ((Person)result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
     }
 
     public void testReceiveComplexCollection() throws Throwable
@@ -114,53 +121,72 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         UMOMessage result = client.receive(getReceiveComplexCollectionEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(4, ((Person[]) result.getPayload()).length);
+        assertEquals(4, ((Person[])result.getPayload()).length);
     }
 
     public void testDispatchAsyncComplex() throws Throwable
     {
         MuleClient client = new MuleClient();
 
-        client.dispatch(getDispatchAsyncComplexEndpoint1(),new Person("Betty", "Rubble"), null);
+        client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), null);
         Thread.sleep(4000);
 
         // lets get our newly added person
         UMOMessage result = client.receive(getDispatchAsyncComplexEndpoint2(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
     }
 
-    public void testException() throws Throwable
+    public void testException() throws Exception
     {
         MuleClient client = new MuleClient();
-        try {
+        try
+        {
             client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
-            fail("An Fault should have been raised");
-        } catch (Exception e) {
-            e.printStackTrace();
+            fail("A nested Fault should have been raised");
+        }
+        catch (UMOException e)
+        {
+            // toplevel
+            assertTrue(e instanceof DispatchException);
+            // the nested Axis fault
+            assertTrue(e.getCause() instanceof Exception);
         }
     }
 
-    public void testLocationUrlInWSDL() throws Exception {
+    public void testLocationUrlInWSDL() throws Exception
+    {
         Map props = new HashMap();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient();
         UMOMessage result = client.send(getWsdlEndpoint(), null, props);
         assertNotNull(result);
-        System.out.println(result.getPayloadAsString());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(result.getPayloadAsString());
+        }
 
         String location = getWsdlEndpoint();
         location = location.substring(0, location.length() - 5);
-        if(location.endsWith("/")) {
+        if (location.endsWith("/"))
+        {
             location = location.substring(0, location.length() - 1);
         }
-        if(result.getPayloadAsString().indexOf("location=\"" + location) == -1) {
+        if (result.getPayloadAsString().indexOf("location=\"" + location) == -1)
+        {
             assertTrue(result.getPayloadAsString().indexOf("location='" + location) > -1);
-        } else {
+        }
+        else
+        {
             assertTrue(result.getPayloadAsString().indexOf("location=\"" + location) > -1);
         }
-        System.out.println(result.getPayloadAsString());
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(result.getPayloadAsString());
+        }
     }
+
 }
