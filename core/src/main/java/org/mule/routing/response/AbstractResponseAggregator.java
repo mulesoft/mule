@@ -14,8 +14,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
@@ -37,11 +35,6 @@ import org.mule.util.concurrent.Latch;
  */
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected transient final Log logger = LogFactory.getLog(getClass());
-
     /**
      * The collection of messages that are ready to be returned to the callee. Keyed
      * by Message ID
@@ -264,6 +257,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             // this should never happen, just using it as a safe guard for now
             throw new IllegalStateException("Response Message is null");
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("remaining locks  : " + locks.keySet());
+            logger.debug("remaining results: " + responseEvents.keySet());
         }
 
         return result;
