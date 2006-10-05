@@ -27,18 +27,25 @@ public class TestReceiver
 
     public String receive(String message) throws Exception
     {
-        logger.info(StringMessageUtils.getBoilerPlate("Received: " + message + " Number: " + inc()
-                                                      + " in thread: " + Thread.currentThread().getName()));
-        logger.info("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelationId());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(StringMessageUtils.getBoilerPlate("Received: " + message + " Number: " + inc()
+                                                           + " in thread: "
+                                                           + Thread.currentThread().getName()));
+            logger.debug("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelationId());
+        }
 
         return "Received: " + message;
     }
 
     public String receive(TextMessage message) throws Exception
     {
-        logger.info("Received: " + message.getText() + " Number: " + inc() + " in thread: "
-                    + Thread.currentThread().getName());
-        logger.info("Message ID is: " + message.getJMSMessageID());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Received: " + message.getText() + " Number: " + inc() + " in thread: "
+                         + Thread.currentThread().getName());
+            logger.debug("Message ID is: " + message.getJMSMessageID());
+        }
 
         return "Received: " + message.getText();
     }
