@@ -24,15 +24,12 @@ import org.mule.util.StringMessageUtils;
  * <code>FunctionalTestComponent</code> is a component that can be used by
  * functional tests. This component accepts an EventCallback that can be used to
  * assert the state of the current event.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see EventCallback
  */
 
 public class FunctionalTestComponent implements Callable
 {
-    private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private EventCallback eventCallback;
     private String returnMessage = null;
@@ -43,29 +40,35 @@ public class FunctionalTestComponent implements Callable
         String contents = context.getTransformedMessageAsString();
         String msg = null;
         msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                                                + context.getComponentDescriptor().getName()
+                                                + ". Content is: "
+                                                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
-
-        if (eventCallback != null) {
+        if (eventCallback != null)
+        {
             eventCallback.eventReceived(context, this);
         }
         String replyMessage;
-        if(returnMessage!=null) {
+        if (returnMessage != null)
+        {
             replyMessage = returnMessage;
-        } else {
+        }
+        else
+        {
             replyMessage = contents + " Received";
         }
 
-        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+        MuleManager.getInstance().fireNotification(
+            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
-        if(throwException) {
+        if (throwException)
+        {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
         }
         return replyMessage;
     }
-    
+
     public Object onReceive(Object data) throws Exception
     {
         String contents = data.toString();
@@ -73,28 +76,35 @@ public class FunctionalTestComponent implements Callable
 
         String msg = null;
         msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                                                + context.getComponentDescriptor().getName()
+                                                + ". Content is: "
+                                                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
-        if (eventCallback != null) {
+        if (eventCallback != null)
+        {
             eventCallback.eventReceived(context, this);
         }
 
         String replyMessage;
 
-        if(returnMessage!=null) {
+        if (returnMessage != null)
+        {
             replyMessage = returnMessage;
-        } else {
+        }
+        else
+        {
             replyMessage = contents + " Received";
         }
 
-        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
- 
-        if(throwException) {
+        MuleManager.getInstance().fireNotification(
+            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+
+        if (throwException)
+        {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
         }
-        
+
         return replyMessage;
     }
 
@@ -108,19 +118,24 @@ public class FunctionalTestComponent implements Callable
         this.eventCallback = eventCallback;
     }
 
-    public String getReturnMessage() {
+    public String getReturnMessage()
+    {
         return returnMessage;
     }
 
-    public void setReturnMessage(String returnMessage) {
+    public void setReturnMessage(String returnMessage)
+    {
         this.returnMessage = returnMessage;
     }
 
-    public boolean isThrowException() {
+    public boolean isThrowException()
+    {
         return throwException;
     }
 
-    public void setThrowException(boolean throwException) {
+    public void setThrowException(boolean throwException)
+    {
         this.throwException = throwException;
     }
+
 }
