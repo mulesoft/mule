@@ -10,18 +10,17 @@
 
 package org.mule.providers.soap.axis.functional;
 
-import org.mule.tck.functional.FunctionalTestComponent;
-
 import javax.activation.DataHandler;
 
-/**
- * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
- * @version $Revision$
- */
-public class SoapAttachmentsFunctionalTestComponent extends FunctionalTestComponent implements SoapAttachmentsFunctionalTest
+import org.mule.tck.functional.FunctionalTestComponent;
+
+public class SoapAttachmentsFunctionalTestComponent extends FunctionalTestComponent
+    implements SoapAttachmentsFunctionalTest
 {
-    public String receiveMessageWithAttachments(String payload, DataHandler[] attachments) {
-        if(payload != null && attachments != null && attachments.length > 0) {
+    public String receiveMessageWithAttachments(String payload, DataHandler[] attachments)
+    {
+        if (payload != null && attachments != null && attachments.length > 0)
+        {
             return "Done";
         }
 
