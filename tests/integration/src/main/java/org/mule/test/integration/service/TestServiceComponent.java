@@ -50,15 +50,17 @@ public class TestServiceComponent extends FunctionalTestComponent
     {
         if (StringUtils.isEmpty(firstName))
         {
-            throw new NullPointerException("Name parameter cannot be null");
+            throw new IllegalArgumentException("Name parameter cannot be null");
         }
-        Person p = (Person)people.get(firstName);
-        return p;
+        return (Person)people.get(firstName);
     }
 
     public Person[] getPeople()
     {
-        return (Person[])IteratorUtils.toArray(people.values().iterator(), Person.class);
+        synchronized (people)
+        {
+            return (Person[])IteratorUtils.toArray(people.values().iterator(), Person.class);
+        }
     }
 
     public void addPerson(Person person) throws Exception
