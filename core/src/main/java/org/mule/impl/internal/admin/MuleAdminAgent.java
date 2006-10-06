@@ -27,9 +27,6 @@ import org.mule.umo.provider.UMOConnector;
 /**
  * <code>MuleAdminAgent</code> manages the server endpoint that receives Admin
  * and remote client requests
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleAdminAgent implements UMOAgent
 {
@@ -124,6 +121,8 @@ public class MuleAdminAgent implements UMOAgent
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
+                //Check to see if we have an endpoint identifier
+                serverEndpoint = MuleManager.getInstance().lookupEndpointIdentifier(serverEndpoint, serverEndpoint);
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverEndpoint);
                 UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
                 // If this connector has already been initialised i.e. it's a
