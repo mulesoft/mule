@@ -7,66 +7,78 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.soap;
 
-
-
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractSoapResourceEndpointFunctionalTestCase extends AbstractSoapFunctionalTestCase
- {
-    public String getConfigResources() {
-        return "org/mule/test/integration/providers/soap/axis/axis-"+ getTransportProtocol() + "-mule-config.xml";
+{
+
+    public String getConfigResources()
+    {
+        return "org/mule/test/integration/providers/soap/axis/axis-" + getTransportProtocol()
+               + "-mule-config.xml";
     }
 
     protected abstract String getTransportProtocol();
 
     protected abstract String getSoapProvider();
 
-    protected String getRequestResponseEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent?method=echo";
+    protected String getRequestResponseEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent?method=echo";
     }
 
-    protected String getReceiveEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent2?method=getDate";
+    protected String getReceiveEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent2?method=getDate";
     }
 
-    protected String getReceiveComplexEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=getPerson&param=Fred";
+    protected String getReceiveComplexEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol()
+               + "://mycomponent3?method=getPerson&param=Fred";
     }
 
-    protected String getSendReceiveComplexEndpoint1() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=addPerson";
+    protected String getSendReceiveComplexEndpoint1()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent3?method=addPerson";
     }
 
-    protected String getSendReceiveComplexEndpoint2() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=getPerson&param=Dino";
+    protected String getSendReceiveComplexEndpoint2()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol()
+               + "://mycomponent3?method=getPerson&param=Dino";
     }
 
-    protected String getReceiveComplexCollectionEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=getPeople";
+    protected String getReceiveComplexCollectionEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent3?method=getPeople";
     }
 
-    protected String getDispatchAsyncComplexEndpoint1() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent4?method=addPerson";
+    protected String getDispatchAsyncComplexEndpoint1()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent4?method=addPerson";
     }
 
-    protected String getDispatchAsyncComplexEndpoint2() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=getPerson&param=Betty";
+    protected String getDispatchAsyncComplexEndpoint2()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol()
+               + "://mycomponent3?method=getPerson&param=Betty";
     }
 
-    protected String getTestExceptionEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent3?method=addPerson";
+    protected String getTestExceptionEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent3?method=addPerson";
     }
 
-    protected String getWsdlEndpoint() {
-        return getSoapProvider() + ":"+ getTransportProtocol() + "://mycomponent?wsdl";
+    protected String getWsdlEndpoint()
+    {
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent?wsdl";
     }
 
-    public void testLocationUrlInWSDL() throws Exception {
-        //Only works with socket based protocols
+    public void testLocationUrlInWSDL() throws Exception
+    {
+        // Only works with socket based protocols
     }
+
 }

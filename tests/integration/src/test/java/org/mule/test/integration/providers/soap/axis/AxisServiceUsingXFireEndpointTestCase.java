@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -24,11 +22,10 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class TestAxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
+public class AxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
 {
-    protected static transient Log logger = LogFactory.getLog(TestAxisServiceUsingXFireEndpointTestCase.class);
 
-    public TestAxisServiceUsingXFireEndpointTestCase()
+    public AxisServiceUsingXFireEndpointTestCase()
     {
         super();
         this.setDisposeManagerPerSuite(true);
@@ -64,7 +61,7 @@ public class TestAxisServiceUsingXFireEndpointTestCase extends FunctionalTestCas
 
     protected String getConfigResources()
     {
-
         return "org/mule/test/integration/providers/soap/axis/mule-config-axis-using-xfire.xml";
     }
+
 }

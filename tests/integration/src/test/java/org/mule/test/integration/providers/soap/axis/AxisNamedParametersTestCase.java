@@ -34,12 +34,8 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
     public void testNamedParameters() throws Exception
     {
         MuleClient client = new MuleClient();
-        // The component itself with throw an exceptin if the parameters in the
-        // request
-        // soap message are not named
-        // UMOMessage result =
-        // client.send("axis:http://localhost:38011/mule/mycomponent2?method=echo",
-        // "Hello Named", null);
+        // The component itself will throw an exception if the parameters in the
+        // request SOAP message are not named
         UMOMessage result = client.send("vm://mycomponent1", "Hello Named", null);
         assertEquals("Hello Named", result.getPayload());
     }
