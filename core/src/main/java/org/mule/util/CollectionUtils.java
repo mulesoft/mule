@@ -19,9 +19,15 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
     public static String toString(Collection c, boolean newLine)
     {
         StringBuffer buf = new StringBuffer(128);
+        Object item;
         for (Iterator iterator = c.iterator(); iterator.hasNext();)
         {
-            buf.append(iterator.next()).append(", ");
+            item = iterator.next();
+            if(item instanceof Class) {
+                buf.append(((Class)item).getName()).append(", ");                
+            } else {
+                buf.append(item).append(", ");
+            }
             if(newLine) buf.append("\n");
         }
         return buf.toString();

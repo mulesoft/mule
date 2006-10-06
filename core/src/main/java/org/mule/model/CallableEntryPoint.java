@@ -30,7 +30,7 @@ public class CallableEntryPoint implements UMOEntryPoint
         if(component instanceof Callable) {
             return ((Callable)component).onCall(context);
         } else {
-            throw new NoSatisfiableMethodsException(component);
+            throw new NoSatisfiableMethodsException(component, UMOEventContext.class);
         }
     }
 

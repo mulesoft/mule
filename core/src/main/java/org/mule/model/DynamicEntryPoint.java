@@ -149,7 +149,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                 addMethod(component, (Method) methods.get(0), payload.getClass());
                 return invokeCurrent(component, payload);
             } else {
-                throw  new NoSatisfiableMethodsException(component.getClass());
+                throw  new NoSatisfiableMethodsException(component.getClass(), ClassUtils.getClassTypes(payload));
             }
         }
     }
