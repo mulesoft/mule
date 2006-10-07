@@ -23,7 +23,6 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
  *
  * @see MuleBeanDefinitionReader
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
@@ -63,17 +62,5 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
         initBeanDefinitionReader(beanDefinitionReader);
         loadBeanDefinitions(beanDefinitionReader);
-    }
-
-
-    /**
-     * Create the Mule bean factory for this context.
-     *
-     * @return the bean factory for this context
-     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
-     * @see #getInternalParentBeanFactory
-     */
-    protected DefaultListableBeanFactory createBeanFactory() {
-        return new MuleBeanFactory(getInternalParentBeanFactory());
     }
 }

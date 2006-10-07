@@ -18,11 +18,12 @@ import org.mule.umo.UMOTransactionFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.jms.connection.JmsResourceHolder;
+import org.springframework.jdbc.datasource.ConnectionHolder;
 
 /**
  * TODO: document this class
  * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 public class SpringTransactionFactory implements UMOTransactionFactory
@@ -66,11 +67,15 @@ public class SpringTransactionFactory implements UMOTransactionFactory
         {
             Object res = TransactionSynchronizationManager.getResource(key);
             if (res != null) {
-                if (res instanceof org.springframework.jdbc.datasource.ConnectionHolder) {
-                    return ((org.springframework.jdbc.datasource.ConnectionHolder) res).getConnection();
-                }
-                if (res instanceof org.springframework.jms.connection.ConnectionHolder) {
-                    return ((org.springframework.jms.connection.ConnectionHolder) res).getConnection();
+                if (!(res instanceof ConnectionHolder))
+                {
+                    if (res instanceof JmsResourceHolder)
+                    {
+                        return ((JmsResourceHolder) res).getConnection();
+                    }
+                } else
+                {
+                    return ((ConnectionHolder) res).getConnection();
                 }
             }
             return res;
