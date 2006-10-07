@@ -134,12 +134,18 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     {
         if (resourceName == null)
         {
+            // no name
             return null;
         }
+
         URL url = IOUtils.getResourceAsUrl(resourceName, callingClass);
+        if (url == null)
+        {
+            // not found
+            return null;
+        }
 
         String resource = URLDecoder.decode(url.toExternalForm(), encoding);
-
         if (resource != null)
         {
             if (resource.startsWith("file:/"))
