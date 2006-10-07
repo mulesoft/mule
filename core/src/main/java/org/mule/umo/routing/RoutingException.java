@@ -17,12 +17,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>RoutingException</code> is a base class for al routing exceptions.
+ * <code>RoutingException</code> is a base class for all routing exceptions.
  * Routing exceptions are only thrown for InboundMessageRouter and
  * OutboundMessageRouter and deriving types. Mule itself does not throw routing
  * exceptions when routing internal events.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class RoutingException extends MessagingException
