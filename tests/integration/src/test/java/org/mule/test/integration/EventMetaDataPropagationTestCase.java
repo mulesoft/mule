@@ -61,7 +61,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
     }
 
 
-    public void testEventMetaDataProporgation() throws UMOException
+    public void testEventMetaDataPropagation() throws UMOException
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("component1");
         UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), session.getComponent()
