@@ -34,4 +34,6 @@ public interface MuleConnection
     void close() throws ResourceException;
 
     void associateConnection(MuleManagedConnection newMc) throws ResourceException;
+
+    UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException;
 }

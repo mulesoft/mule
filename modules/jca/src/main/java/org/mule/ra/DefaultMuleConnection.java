@@ -36,7 +36,6 @@ import java.util.Map;
 /**
  * <code>MuleConnection</code> TODO
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class DefaultMuleConnection implements MuleConnection
@@ -83,6 +82,42 @@ public class DefaultMuleConnection implements MuleConnection
     }
 
     /**
+     * Sends an object (payload) synchronous to the given url and returns a
+     * UMOMessage response back.
+     *
+     * @param url               the Mule url used to determine the destination and transport
+     *                          of the message
+     * @param payload           the object that is the payload of the event
+     * @param messageProperties any properties to be associated with the
+     *                          payload. In the case of Jms you could set the JMSReplyTo
+     *                          property in these properties.
+     * @return a umomessage response.
+     * @throws org.mule.umo.UMOException
+     */
+    public UMOMessage send(String url, Object payload, Map messageProperties)
+            throws UMOException
+    {
+        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
+        UMOMessage message = new MuleMessage(payload, messageProperties);
+        UMOEvent event = getEvent(message, muleEndpoint, true);
+
+        UMOMessage response;
+        try
+        {
+            response = event.getSession().sendEvent(event);
+        }
+        catch (UMOException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
+        }
+        return response;
+    }
+
+    /**
      * Will receive an event from an endpointUri determined by the url
      * 
      * @param url the Mule url used to determine the destination and transport
@@ -113,7 +148,7 @@ public class DefaultMuleConnection implements MuleConnection
      * @param uri the destination endpointUri
      * @param synchronous whether the event will be synchronously processed
      * @return the UMOEvent
-     * @throws UMOException
+     * @throws UMOException in case of Mule error
      */
     protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous) throws UMOException
     {
@@ -183,6 +218,7 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Checks the validity of the physical connection to the EIS.
+     * @throws javax.resource.ResourceException in case of any error
      */
 
     void checkIfValid() throws ResourceException

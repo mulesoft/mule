@@ -25,9 +25,12 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <code>MuleManagedConnection</code> TODO
@@ -39,7 +42,7 @@ public class MuleManagedConnection implements ManagedConnection
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleManagedConnection.class);
+    private static final transient Log logger = LogFactory.getLog(MuleManagedConnection.class);
 
     private MuleManagedConnectionFactory mcf;
     private List listeners = new ArrayList();
@@ -88,7 +91,8 @@ public class MuleManagedConnection implements ManagedConnection
 
         PasswordCredential pc = RaHelper.getPasswordCredential(mcf, subject, connectionRequestInfo);
 
-        if (!passCred.equals(pc)) {
+        if (!passCred.equals(pc))
+        {
             // TODO change the message, we are not dealing with an endpoint here
             throw new javax.resource.spi.SecurityException(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, this).getMessage());
         }
@@ -99,14 +103,17 @@ public class MuleManagedConnection implements ManagedConnection
 
         user = info.getUserName();
         password = info.getPassword();
-        if (user == null) {
+        if (user == null)
+        {
             // Use default values
             user = mcf.getUsername();
             password = mcf.getPassword();
         }
         MuleCredentials creds = null;
-        if (user != null) {
-            if (password == null) {
+        if (user != null)
+        {
+            if (password == null)
+            {
                 password = "";
             }
             creds = new MuleCredentials(user, password.toCharArray());
@@ -125,7 +132,8 @@ public class MuleManagedConnection implements ManagedConnection
 
     public void destroy() throws ResourceException
     {
-        if (destroyed) {
+        if (destroyed)
+        {
             return;
         }
         destroyed = true;
@@ -151,7 +159,8 @@ public class MuleManagedConnection implements ManagedConnection
     private void invalidateConnections()
     {
         Iterator it = connectionSet.iterator();
-        while (it.hasNext()) {
+        while (it.hasNext())
+        {
             DefaultMuleConnection connection = (DefaultMuleConnection) it.next();
             connection.invalidate();
         }
@@ -172,10 +181,13 @@ public class MuleManagedConnection implements ManagedConnection
     {
         checkIfDestroyed();
 
-        if (connection instanceof MuleConnection) {
+        if (connection instanceof MuleConnection)
+        {
             MuleConnection cnn = (MuleConnection) connection;
             cnn.associateConnection(this);
-        } else {
+        }
+        else
+        {
             throw new IllegalStateException(new Message(Messages.OBJECT_X_MARKED_INVALID, DefaultMuleConnection.class.getName()
                     + ": " + (connection == null ? "null" : connection.getClass().getName())).toString());
         }
@@ -292,10 +304,12 @@ public class MuleManagedConnection implements ManagedConnection
 
     public String getUsername()
     {
-        if (passCred != null) {
+        if (passCred != null)
+        {
             return passCred.getUserName();
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -331,7 +345,8 @@ public class MuleManagedConnection implements ManagedConnection
 
     private void checkIfDestroyed() throws ResourceException
     {
-        if (destroyed) {
+        if (destroyed)
+        {
             throw new ResourceException(new Message(Messages.X_IS_DISPOSED, "MuleManagedConnection").toString());
         }
     }
@@ -376,7 +391,8 @@ public class MuleManagedConnection implements ManagedConnection
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
                                                     ConnectionEvent.LOCAL_TRANSACTION_STARTED);
         Iterator iterator = listeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
             l.localTransactionStarted(event);
         }
@@ -387,7 +403,8 @@ public class MuleManagedConnection implements ManagedConnection
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
                                                     ConnectionEvent.LOCAL_TRANSACTION_COMMITTED);
         Iterator iterator = listeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
             l.localTransactionCommitted(event);
         }
@@ -398,7 +415,8 @@ public class MuleManagedConnection implements ManagedConnection
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
                                                     ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK);
         Iterator iterator = listeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
             l.localTransactionRolledback(event);
         }
@@ -410,7 +428,8 @@ public class MuleManagedConnection implements ManagedConnection
         event.setConnectionHandle(connection);
 
         Iterator iterator = listeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
             l.connectionClosed(event);
         }
@@ -422,7 +441,8 @@ public class MuleManagedConnection implements ManagedConnection
                                                     ConnectionEvent.CONNECTION_ERROR_OCCURRED,
                                                     error);
         Iterator iterator = listeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
             l.connectionErrorOccurred(event);
         }
