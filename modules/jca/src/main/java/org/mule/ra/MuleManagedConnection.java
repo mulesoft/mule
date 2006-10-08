@@ -89,7 +89,8 @@ public class MuleManagedConnection implements ManagedConnection
         PasswordCredential pc = RaHelper.getPasswordCredential(mcf, subject, connectionRequestInfo);
 
         if (!passCred.equals(pc)) {
-            throw new SecurityException(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, this).getMessage());
+            // TODO change the message, we are not dealing with an endpoint here
+            throw new javax.resource.spi.SecurityException(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, this).getMessage());
         }
 
         String user;
