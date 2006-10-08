@@ -23,8 +23,8 @@
         <!-- This should go in sync with the currently built Mule version -->
         <rar-name>mule-jca-${version}.rar</rar-name>
         <connection-definition>org.mule.ra.MuleConnectionFactory</connection-definition>
-        <local-transaction/>
-        <xa-transaction/>
+        <!--<local-transaction/>-->
+        <!--<xa-transaction/>-->
         <!-- Maintain a 1:1 relationship between a TX and connection -->
         <track-connection-by-tx/>
     </tx-connection-factory>
