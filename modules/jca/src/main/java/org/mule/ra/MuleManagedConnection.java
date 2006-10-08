@@ -27,15 +27,11 @@ import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <code>MuleManagedConnection</code> TODO
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleManagedConnection implements ManagedConnection
@@ -46,12 +42,12 @@ public class MuleManagedConnection implements ManagedConnection
     protected static transient Log logger = LogFactory.getLog(MuleManagedConnection.class);
 
     private MuleManagedConnectionFactory mcf;
-    private ArrayList listeners = new ArrayList();
-    private Set connectionSet; // set of Mail Server Connections
+    private List listeners = new ArrayList();
+    private Set connectionSet;
     private PrintWriter logWriter;
     private boolean destroyed;
 
-    private PasswordCredential passCred = null;
+    private PasswordCredential passCred;
 
     /**
      * Constructor.
@@ -59,6 +55,7 @@ public class MuleManagedConnection implements ManagedConnection
      * @param mcf the ManagedConnectionFactory that created this instance
      * @param subject security context as JAAS subject
      * @param cxRequestInfo ConnectionRequestInfo instance
+     * @throws javax.resource.ResourceException in case of any error
      */
 
     MuleManagedConnection(MuleManagedConnectionFactory mcf, Subject subject, ConnectionRequestInfo cxRequestInfo)
@@ -91,11 +88,10 @@ public class MuleManagedConnection implements ManagedConnection
 
         PasswordCredential pc = RaHelper.getPasswordCredential(mcf, subject, connectionRequestInfo);
 
-        if (!pc.equals(passCred)) {
+        if (!passCred.equals(pc)) {
             throw new SecurityException(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, this).getMessage());
         }
 
-        // We only need the Folder name as all the connections share the store
         String user;
         String password;
         MuleConnectionRequestInfo info = (MuleConnectionRequestInfo) connectionRequestInfo;
