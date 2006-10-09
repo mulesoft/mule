@@ -12,8 +12,8 @@ package org.mule.components.rest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.config.PropertyExtractor;
-import org.mule.config.SimplePropertyExtractor;
+import org.mule.config.properties.PropertyExtractor;
+import org.mule.config.properties.SimplePropertyExtractor;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;

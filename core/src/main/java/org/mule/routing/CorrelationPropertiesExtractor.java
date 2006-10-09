@@ -10,7 +10,7 @@
 package org.mule.routing;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.SimplePropertyExtractor;
+import org.mule.config.properties.SimplePropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**

@@ -5,7 +5,8 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 
- This DTD describes the grammar of the Mule configuration properties
+ This DTD describes the grammar of the Mule configuration properties
+
  @root mule-configuration
 -->
 <!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
@@ -1091,7 +1092,7 @@ Is a fully qualified class name of the catch all strategy class
 
 <!--
     propertyExtractor
-    Is a fully qualified classname of a class that implements org.mule.config.PropertyExtractor
+    Is a fully qualified classname of a class that implements org.mule.config.properties.PropertyExtractor
     This object will be used to extract properties such as CorrelationId from the incoming message
 -->
 

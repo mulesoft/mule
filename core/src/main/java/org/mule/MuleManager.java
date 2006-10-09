@@ -93,6 +93,7 @@ import java.util.jar.Manifest;
  */
 public class MuleManager implements UMOManager
 {
+    public static final String DEFAULT_MODEL_NAME = "_default";
     /**
      * singleton instance
      */
@@ -894,6 +895,7 @@ public class MuleManager implements UMOManager
         //todo in version two we must not assume the model
         if(model==null) {
             model = new SedaModel();
+            model.setName(DEFAULT_MODEL_NAME);
         }
         return model;
     }

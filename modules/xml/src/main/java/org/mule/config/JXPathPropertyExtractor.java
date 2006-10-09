@@ -16,6 +16,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOMessage;
+import org.mule.config.properties.SimplePropertyExtractor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +30,8 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JXPathPropertyExtractor extends SimplePropertyExtractor {
+public class JXPathPropertyExtractor extends SimplePropertyExtractor
+{
 
     /**
      * logger used by this class
