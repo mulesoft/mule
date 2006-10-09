@@ -11,6 +11,12 @@ Assembly descriptor for the minimal Mule distribution.
     <fileSet>
       <directory>../src/main/resources</directory>
       <outputDirectory></outputDirectory>
+      <!-- TODO These excludes don't work for some reason. -->
+      <excludes>
+        <exclude>docs/*</exclude>
+        <exclude>src/*</exclude>
+        <exclude>examples/*</exclude>
+      </excludes>
     </fileSet>
 
     <!-- Make binary directories executable. -->
@@ -25,4 +31,17 @@ Assembly descriptor for the minimal Mule distribution.
       <fileMode>744</fileMode>
     </fileSet>
   </fileSets>
+
+  <dependencySets>
+    <!-- Mule bootstrap -->
+    <dependencySet>
+      <outputDirectory>lib/boot</outputDirectory>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <includes>
+        <include>org.mule.modules:mule-module-boot</include>
+        <include>tanukisoft:wrapper</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
 </assembly>
