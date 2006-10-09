@@ -106,7 +106,10 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         UMOEndpoint ep = getEndpoint(t);
         if (ep != null) {
             super.routeException(message, failedEndpoint, t);
-            statistics.getOutboundRouterStat().incrementRoutedMessage(ep);
+            if(statistics!=null)
+            {
+                statistics.getOutboundRouterStat().incrementRoutedMessage(ep);
+            }
         }
     }
 
@@ -114,7 +117,10 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
     {
         this.component = component;
         if (component instanceof AbstractComponent) {
-            this.statistics = ((AbstractComponent) component).getStatistics();
+            if(statistics!=null)
+            {
+                this.statistics = ((AbstractComponent) component).getStatistics();
+            }
         }
     }
 }
