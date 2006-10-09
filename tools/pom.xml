@@ -13,5 +13,18 @@
     <packaging>pom</packaging>
     <name>Mule Tools</name>
     <description>Tools for building and working with Mule projects.</description>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${mule.current.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+    </dependencies>
 </project>
