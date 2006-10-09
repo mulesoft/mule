@@ -10,31 +10,31 @@
 
 package org.mule.impl;
 
+import java.util.Iterator;
+
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.provider.UMOMessageReceiver;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class MuleComponentTestCase extends AbstractMuleTestCase
 {
-    protected void doSetUp() throws Exception {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-        builder.createStartedManager(true, "");
-        builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
-    }
-
     public void testSendToPausedComponent() throws Exception
     {
-        UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
-        final UMOComponent comp = session.getComponent();
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
+        UMOManager manager = builder.createStartedManager(true, "");
+
+        final UMOComponent comp =
+            manager.getModel().getComponentSession("orangeComponent").getComponent();
         assertTrue(comp.isStarted());
         comp.pause();
         new Thread(new Runnable() {
@@ -62,6 +62,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     {
         MuleDescriptor descriptor = getTestDescriptor("myComponent", "org.mule.components.simple.EchoComponent");
         UMOComponent comp = getTestComponent(descriptor);
+        // Component is stopped because it has not been registered.
         assertTrue(!comp.isStarted());
 
         try {
@@ -77,5 +78,78 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         } catch (ComponentException e) {
             // expected
         }
+    }
+
+    // MULE-494
+    public void testInitialStateStopped() throws Exception {
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        // Test connector
+        builder.getManager().registerConnector(getTestConnector());
+        // Test component
+        UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", builder.createEndpoint("test://in", null, true), null, null);
+        d.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
+        builder.registerComponent(d);
+
+        // Start model
+        UMOManager manager = builder.createStartedManager(true, "");
+
+        UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
+        final UMOComponent c = session.getComponent();
+        // Component initially stopped
+        assertFalse(c.isStarted());
+
+        // The connector should be started, but with no listeners registered.
+        AbstractConnector connector =
+            (AbstractConnector) manager.lookupConnector("testConnector");
+        assertTrue(connector.isStarted());
+        assertTrue(connector.getReceivers().isEmpty());
+
+        // Start the component.
+        c.start();
+
+        // The listeners should now be registered and started.
+        assertTrue(connector.isStarted());
+        assertFalse(connector.getReceivers().isEmpty());
+
+        assertTrue(c.isStarted());
+        Iterator it = connector.getReceivers().values().iterator();
+        while (it.hasNext()) {
+            assertTrue(((UMOMessageReceiver) it.next()).isConnected());
+        }
+    }
+
+    // MULE-503
+    public void testStoppingComponentStopsEndpoints() throws Exception {
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        // Test connector
+        builder.getManager().registerConnector(getTestConnector());
+        // Test component
+        builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
+
+        // Start model
+        UMOManager manager = builder.createStartedManager(true, "");
+
+        UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
+        final UMOComponent c = session.getComponent();
+        assertTrue(c.isStarted());
+
+        // The listeners should be registered and started.
+        AbstractConnector connector =
+            (AbstractConnector) manager.lookupConnector("testConnector");
+        assertTrue(connector.isStarted());
+        assertFalse(connector.getReceivers().isEmpty());
+
+        Iterator it = connector.getReceivers().values().iterator();
+        while (it.hasNext()) {
+            assertTrue(((UMOMessageReceiver) it.next()).isConnected());
+        }
+
+        // Stop component
+        c.stop();
+
+        assertFalse(c.isStarted());
+        // Connector is still started, but no more receivers.
+        assertTrue(connector.isStarted());
+        assertTrue(connector.getReceivers().isEmpty());
     }
 }
