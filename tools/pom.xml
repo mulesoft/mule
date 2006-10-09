@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.current.version}</version>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>
