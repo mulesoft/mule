@@ -10,16 +10,6 @@
 
 package org.mule.config.builders;
 
-import java.beans.ExceptionListener;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.digester.AbstractObjectCreationFactory;
 import org.apache.commons.digester.Digester;
@@ -90,6 +80,16 @@ import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
+
+import java.beans.ExceptionListener;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
@@ -576,6 +576,12 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         digester.addRule(path, new Rule() {
             public void begin(String string, String string1, Attributes attributes) throws Exception {
                 UMOModel model = manager.getModel();
+                //The Model is the default one created by the manager, then be can
+                //dispose it.  This is a non-issue in Mule 2.0
+                if(MuleManager.DEFAULT_MODEL_NAME.equals(model.getName()))
+                {
+                    model = null;
+                }
                 if (model == null) {
                     String modelType = attributes.getValue("type");
                     if(modelType==null) {
