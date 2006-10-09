@@ -721,9 +721,13 @@ public class MuleManager implements UMOManager
             disable = true;
         }
 
-        if (!disable) {
+        if (disable) {
             unregisterAgent(MuleAdminAgent.AGENT_NAME);
-            registerAgent(new MuleAdminAgent());
+        } else {
+            if(lookupAgent(MuleAdminAgent.AGENT_NAME) == null)
+            {
+                registerAgent(new MuleAdminAgent());
+            }
         }
     }
 

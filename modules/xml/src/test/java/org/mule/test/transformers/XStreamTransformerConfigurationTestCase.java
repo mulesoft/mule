@@ -16,8 +16,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import junit.framework.TestCase;
 
 import org.mule.transformers.xml.XmlToObject;
+import org.mule.transformers.xml.XStreamFactory;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.XStreamFactory;
 
 /**
  * Tests configuration and creation of XStream-based transformers

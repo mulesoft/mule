@@ -9,6 +9,14 @@
         synchronous="true"
         serverUrl="tcp://localhost:38100"/>
 
+    <agents>
+        <agent name="Mule Admin" className="org.mule.impl.internal.admin.MuleAdminAgent">
+            <properties>
+                <factory-property name="wireFormat" factory="org.mule.transformers.xml.wire.XStreamWireFormat"/>
+            </properties>
+        </agent>
+    </agents>
+
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.test.integration.service.TestServiceComponent"

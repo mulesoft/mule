@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,14 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.util;
+package org.mule.transformers.xml;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
+import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +48,7 @@ public class XStreamFactory
         // We must always register this converter as the Mule Message uses
         // ConcurrentHashMaps, but XStream currently does not support them out of the
         // box
-        xstream.registerConverter(new ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
+        xstream.registerConverter(new XStreamFactory.ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
 
         if (aliases != null)
         {

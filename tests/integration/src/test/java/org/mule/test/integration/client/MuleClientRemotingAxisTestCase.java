@@ -15,6 +15,7 @@ import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOMessage;
+import org.mule.transformers.xml.wire.XStreamWireFormat;
 
 public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
@@ -32,6 +33,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
+        dispatcher.setWireFormat(new XStreamWireFormat());
         try
         {
             UMOMessage result = dispatcher.sendRemote(
@@ -49,6 +51,8 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
+        dispatcher.setWireFormat(new XStreamWireFormat());
+
         try
         {
             UMOMessage result = dispatcher.sendRemote(
@@ -69,6 +73,8 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
+        dispatcher.setWireFormat(new XStreamWireFormat());
+        
         try
         {
             String[] args = new String[]{"Betty", "Rubble"};

@@ -52,7 +52,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo", null);
         assertNotNull(message);
-        assertEquals("received from remote", message.getPayload());
+        assertEquals("received from remote", message.getPayloadAsString());
     }
 
 //    public void testClientSendAndReceiveRemote() throws Exception

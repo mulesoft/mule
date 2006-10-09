@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,19 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.test.util;
-
-import com.thoughtworks.xstream.XStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
-import java.util.Map;
+package org.mule.test.transformers;
 
 import junit.framework.TestCase;
-
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import com.thoughtworks.xstream.XStream;
 import org.mule.util.StringUtils;
-import org.mule.util.XStreamFactory;
+import org.mule.transformers.xml.XStreamFactory;
+
+import java.util.Map;
 
 public class XStreamFactoryTestCase extends TestCase
 {

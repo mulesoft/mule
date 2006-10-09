@@ -11,14 +11,12 @@
 package org.mule.transformers.xml;
 
 import com.thoughtworks.xstream.XStream;
-
-import java.util.List;
-import java.util.Map;
-
 import org.mule.config.i18n.Message;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.XStreamFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream based

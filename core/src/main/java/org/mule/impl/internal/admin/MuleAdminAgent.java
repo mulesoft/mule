@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.transformers.wire.WireFormat;
+import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
@@ -40,6 +42,8 @@ public class MuleAdminAgent implements UMOAgent
     protected static transient Log logger = LogFactory.getLog(MuleAdminAgent.class);
 
     private String serverEndpoint;
+
+    private WireFormat wireFormat;
 
     /**
      * Gets the name of this agent
@@ -98,6 +102,10 @@ public class MuleAdminAgent implements UMOAgent
 
     public void initialise() throws InitialisationException
     {
+        if(wireFormat==null)
+        {
+            wireFormat = new SerializationWireFormat();
+        }
         serverEndpoint = MuleManager.getConfiguration().getServerUrl();
         UMOManager manager = MuleManager.getInstance();
 
@@ -134,7 +142,7 @@ public class MuleAdminAgent implements UMOAgent
                 }
 
                 logger.info("Registering Admin listener on: " + serverEndpoint);
-                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri);
+                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri, wireFormat);
                 manager.getModel().registerComponent(descriptor);
             }
         } catch (UMOException e) {
@@ -145,5 +153,16 @@ public class MuleAdminAgent implements UMOAgent
     public String toString()
     {
         return "MuleAdminAgent{" + "serverEndpoint='" + serverEndpoint + "'" + "}";
+    }
+
+
+    public WireFormat getWireFormat()
+    {
+        return wireFormat;
+    }
+
+    public void setWireFormat(WireFormat wireFormat)
+    {
+        this.wireFormat = wireFormat;
     }
 }

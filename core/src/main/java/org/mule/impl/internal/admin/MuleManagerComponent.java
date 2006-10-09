@@ -12,7 +12,6 @@ package org.mule.impl.internal.admin;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.thoughtworks.xstream.XStream;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -28,6 +27,7 @@ import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
+import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -41,20 +41,17 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.XStreamFactory;
 
-import java.lang.Exception;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * <code>MuleManagerComponent</code> is a MuleManager interal server component
  * responsible for receiving remote requests and dispatching them locally.  This allows
  * developer to tunnel requests through http ssl to a Mule instance behind a firewall
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleManagerComponent implements Callable, Initialisable
@@ -67,23 +64,25 @@ public class MuleManagerComponent implements Callable, Initialisable
     public static final String MANAGER_COMPONENT_NAME = "_muleManagerComponent";
     public static final String MANAGER_ENDPOINT_NAME = "_muleManagerEndpoint";
 
-    private XStream xstream = null;
+
+    /**
+     * Use Serialization by default
+     */
+    protected WireFormat wireFormat;
 
     public void initialise() throws InitialisationException
     {
-    	try {
-    		xstream = new XStreamFactory().getInstance();
-    	} catch (Exception e) {
-            throw new InitialisationException(Message.createStaticMessage("Unable to initialize XStream"), e);
-    	}
+        if(wireFormat==null) {
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "wireFormat"), this);
+        }
     }
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        Object result = null;
-        String xml = context.getMessageAsString();
+        Object result;
         logger.debug("Message received by MuleManagerComponent");
-        AdminNotification action = (AdminNotification) xstream.fromXML(xml);
+        ByteArrayInputStream in = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
+        AdminNotification action = (AdminNotification) wireFormat.read(in);
         if (AdminNotification.ACTION_INVOKE == action.getAction()) {
             result = invokeAction(action, context);
         } else if (AdminNotification.ACTION_SEND == action.getAction()) {
@@ -122,7 +121,9 @@ public class MuleManagerComponent implements Callable, Initialisable
 
             if (context.isSynchronous()) {
                 result = session.getComponent().sendEvent(event);
-                return xstream.toXML(result);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                wireFormat.write(out, result);
+                return out.toByteArray();
             } else {
                 session.getComponent().dispatchEvent(event);
                 return null;
@@ -148,7 +149,9 @@ public class MuleManagerComponent implements Callable, Initialisable
                 if (result == null) {
                     return null;
                 } else {
-                    return xstream.toXML(result);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    wireFormat.write(out, result);
+                    return out.toByteArray();
                 }
             }
         } catch (Exception e) {
@@ -178,7 +181,9 @@ public class MuleManagerComponent implements Callable, Initialisable
                     Object payload = trans.transform(result.getPayload());
                     result = new MuleMessage(payload, result);
                 }
-                return xstream.toXML(result);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                wireFormat.write(out, result);
+                return out.toByteArray();
             } else {
                 return null;
             }
@@ -188,7 +193,7 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     }
 
-    public static final UMODescriptor getDescriptor(UMOConnector connector, UMOEndpointURI endpointUri)
+    public static final UMODescriptor getDescriptor(UMOConnector connector, UMOEndpointURI endpointUri, WireFormat wireFormat)
             throws UMOException
     {
         UMOEndpoint endpoint = new MuleEndpoint();
@@ -202,6 +207,9 @@ public class MuleManagerComponent implements Callable, Initialisable
         descriptor.setInboundEndpoint(endpoint);
         descriptor.setImplementation(MuleManagerComponent.class.getName());
         descriptor.setContainerManaged(false);
+        Map props = new HashMap();
+        props.put("wireFormat", wireFormat);
+        descriptor.setProperties(props);
         return descriptor;
     }
 
@@ -218,11 +226,22 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
         result.setExceptionPayload(new ExceptionPayload(e));
         try {
-            return xstream.toXML(result);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            wireFormat.write(out, result);
+            return out.toString(MuleManager.getConfiguration().getEncoding());
         } catch (Exception e1) {
             logger.error(e.toString(), e);
             return e.getMessage();
         }
     }
 
+    public WireFormat getWireFormat()
+    {
+        return wireFormat;
+    }
+
+    public void setWireFormat(WireFormat wireFormat)
+    {
+        this.wireFormat = wireFormat;
+    }
 }

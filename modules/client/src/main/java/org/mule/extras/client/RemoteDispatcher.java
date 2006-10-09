@@ -12,9 +12,6 @@ package org.mule.extras.client;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -22,13 +19,15 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
+import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToObject;
+import org.mule.transformers.wire.SerializationWireFormat;
+import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -39,6 +38,11 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.util.MuleObjectHelper;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * <code>RemoteDispatcher</code> is used to make and receive requests to a remote
@@ -69,10 +73,9 @@ public class RemoteDispatcher implements Disposable
     private ExecutorService executor;
 
     /**
-     * calls made to a remote server are serialised using xstream
+     * calls made to a remote server are serialised using a wireformat
      */
-    private ObjectToXml objectToXml;
-    private XmlToObject xmlToObject;
+    private WireFormat wireFormat;
 
     protected RemoteDispatcher(String endpoint, UMOCredentials credentials) throws UMOException
     {
@@ -83,8 +86,7 @@ public class RemoteDispatcher implements Disposable
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
         serverEndpoint = new MuleEndpoint(endpoint, true);
-        objectToXml = new ObjectToXml();
-        xmlToObject = new XmlToObject();
+        wireFormat = new SerializationWireFormat();
     }
 
     protected void setExecutorService(ExecutorService e)
@@ -284,17 +286,21 @@ public class RemoteDispatcher implements Disposable
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint.getEndpointURI(),
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setRemoteSync(synchronous);
+        updateContext(new MuleMessage(action), endpoint, synchronous);
 
-        String xml = (String)objectToXml.transform(action);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        wireFormat.write(out, action);
+        byte[] payload = out.toByteArray();
+
         UMOMessage message = action.getMessage();
 
         if (message == null)
         {
-            message = new MuleMessage(xml);
+            message = new MuleMessage(payload);
         }
         else
         {
-            message = new MuleMessage(xml, message);
+            message = new MuleMessage(payload, message);
         }
 
         message.addProperties(action.getProperties());
@@ -326,18 +332,23 @@ public class RemoteDispatcher implements Disposable
             }
             if (result != null)
             {
-                String resultXml = result.getPayloadAsString();
-                if (resultXml != null && resultXml.length() > 0)
+                if (result.getPayload() != null)
                 {
-                    Object obj = xmlToObject.transform(resultXml);
-                    if (obj instanceof AdminNotification)
-                    {
-                        result = ((AdminNotification)obj).getMessage();
+                    Object response;
+                    if(result.getPayload() instanceof InputStream) {
+                        response = wireFormat.read((InputStream)result.getPayload());
                     }
                     else
                     {
-                        result = (UMOMessage)obj;
+                        ByteArrayInputStream in = new ByteArrayInputStream(result.getPayloadAsBytes());
+                        response = wireFormat.read(in);
                     }
+
+                    if (response instanceof AdminNotification)
+                    {
+                        response = ((AdminNotification)response).getMessage();
+                    }
+                    return (UMOMessage)response;
                 }
                 else
                 {
@@ -372,5 +383,24 @@ public class RemoteDispatcher implements Disposable
             message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
                 credentials.getUsername(), credentials.getPassword()));
         }
+    }
+
+
+    public WireFormat getWireFormat()
+    {
+        return wireFormat;
+    }
+
+    public void setWireFormat(WireFormat wireFormat)
+    {
+        this.wireFormat = wireFormat;
+    }
+
+    protected void updateContext(UMOMessage message, UMOEndpoint endpoint, boolean synchronous) throws UMOException
+    {
+
+        RequestContext.setEvent(
+                new MuleEvent(
+                        message, endpoint, new MuleSession(message, new MuleSessionHandler()), synchronous));
     }
 }
