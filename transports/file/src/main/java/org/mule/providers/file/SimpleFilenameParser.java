@@ -13,6 +13,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.DateUtils;
 import org.mule.util.UUID;
+import org.mule.util.TemplateParser;
 
 /**
  * <code>SimpleFilenameParser</code> understands a limited set of tokens,
@@ -25,6 +26,7 @@ import org.mule.util.UUID;
  * <li>${ORIGINALNAME} : The origial file name if the file being written was
  * read from another location</li>
  * <li>${COUNT} : An incremental counter</li>
+ * <li>${<Message Property Name>} : A name of a property on the message</li>
  * </ul>
  * 
  * Note that square brackets can be used instead of curl brackets, this is
@@ -41,61 +43,54 @@ public class SimpleFilenameParser implements FilenameParser
 
     private AtomicLong count = new AtomicLong(0);
 
+    private TemplateParser antParser = TemplateParser.createAntStyleParser();
+    private TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
+
     public String getFilename(UMOMessageAdapter adapter, String pattern)
     {
-        String result = null;
-        if (pattern != null && pattern.indexOf('{') > -1) {
-            result = getFilename(adapter, pattern, '{', '}');
+        if (pattern == null) {
+            return System.currentTimeMillis() + ".dat";
         } else {
-            result = getFilename(adapter, pattern, '[', ']');
+        String result;
+        if (pattern.indexOf('{') > -1) {
+            result = getFilename(adapter, pattern, antParser);
+        } else {
+            result = getFilename(adapter, pattern, squareParser);
         }
 
         return result;
+        }
     }
 
-    protected String getFilename(UMOMessageAdapter adapter, String pattern, char left, char right)
+    protected String getFilename(final UMOMessageAdapter adapter, String pattern, TemplateParser parser)
     {
-        String filename = pattern;
-        if (pattern == null) {
-            filename = System.currentTimeMillis() + ".dat";
-        } else {
-            int index = pattern.indexOf("$" + left + "DATE" + right);
-            if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "DATE\\" + right,
-                                               DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT));
-            }
-            index = pattern.indexOf("$" + left + "DATE:");
-            if (index > -1) {
-                int curl = pattern.indexOf(right, index);
-                if (curl == -1) {
-                    filename = filename.replaceAll("\\$\\" + left + "DATE:", DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT));
-                } else {
-                    String dateformat = pattern.substring(index + 7, curl);
-                    filename = filename.replaceAll("\\$\\" + left + "DATE:" + dateformat + "\\" + right,
-                                                   DateUtils.getTimeStamp(dateformat));
+        return parser.parse(new TemplateParser.TemplateCallback() {
+
+            public Object match(String token)
+            {
+                if(token.equals("DATE")){
+                    return DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT);
+                } else if(token.startsWith("DATE:")){
+                    token = token.substring(5);
+                    return DateUtils.getTimeStamp(token);
+                } else if(token.startsWith("UUID")){
+                    return UUID.getUUID();
+                } else if(token.startsWith("SYSTIME")){
+                    return String.valueOf(System.currentTimeMillis());
+                } else if(token.startsWith("COUNT")){
+                    return String.valueOf(String.valueOf(count.getAndIncrement()));
+                } else if(adapter!=null) {
+                    if(token.startsWith("ORIGINALNAME"))
+                    {
+                        return adapter.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+                    } else
+                    {
+                        return adapter.getStringProperty(token, null);
+                    }
                 }
+                return null;
+
             }
-            index = pattern.indexOf("$" + left + "UUID" + right);
-            if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "UUID\\" + right, UUID.getUUID());
-            }
-            index = pattern.indexOf("$" + left + "SYSTIME" + right);
-            if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "SYSTIME\\" + right,
-                                               String.valueOf(System.currentTimeMillis()));
-            }
-            index = pattern.indexOf("$" + left + "COUNT" + right);
-            if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "COUNT\\" + right, String.valueOf(count.getAndIncrement()));
-            }
-            index = pattern.indexOf("$" + left + "ORIGINALNAME" + right);
-            if (index > -1 && adapter != null) {
-                String name = (String) adapter.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
-                if (name != null) {
-                    filename = filename.replaceAll("\\$\\" + left + "ORIGINALNAME\\" + right, name);
-                }
-            }
-        }
-        return filename;
+        }, pattern);
     }
 }

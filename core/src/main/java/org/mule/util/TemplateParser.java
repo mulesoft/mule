@@ -10,6 +10,9 @@
 
 package org.mule.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute
@@ -80,15 +80,42 @@ public class TemplateParser
      */
     public String parse(Map props, String template)
     {
+        return parse(props, template, null);
+    }
+
+    /**
+     * Matches one or more templates against a Map of key value pairs. If a value for
+     * a template is not found in the map the template is left as is in the return
+     * String
+     *
+     * @param callback a callback used to resolve the property name
+     * @param template the string containing the template place holders i.e. My name
+     *            is ${name}
+     * @return the parsed String
+     */
+    public String parse(TemplateCallback callback, String template)
+    {
+        return parse(null, template, callback);
+    }
+
+    protected String parse(Map props, String template, TemplateCallback callback)
+    {
         String result = template;
         Matcher m = pattern.matcher(template);
         String match, propname;
-        Object value;
+        Object value = null;
         while (m.find())
         {
             match = m.group();
             propname = match.substring(pre, match.length() - post);
-            value = props.get(propname);
+            if(callback!=null)
+            {
+                value = callback.match(propname);
+            }
+            else if(props!=null)
+            {
+                value = props.get(propname);
+            }
             if (value == null)
             {
                 if (logger.isWarnEnabled()) logger.warn("Value " + propname + " not found in context");
@@ -96,6 +123,7 @@ public class TemplateParser
             else
             {
                 match = escape(match);
+
                 result = result.replaceAll(match, value.toString());
             }
         }
@@ -191,6 +219,11 @@ public class TemplateParser
     {
         Matcher m = pattern.matcher(value);
         return m.find();
+    }
+
+    public static interface TemplateCallback
+    {
+        public Object match(String token);
     }
 
 }
