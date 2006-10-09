@@ -32,8 +32,8 @@ import java.util.Properties;
 
 /**
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Receives Http requests via a Servlet and routes the to listeners with
+ * servlet:// endpoints
  */
 
 public class MuleReceiverServlet extends AbstractReceiverServlet
@@ -51,11 +51,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         if (connector == null) {
             throw new ServletException("No servlet connector found using protocol: servlet");
         }
-    }
-
-    protected void doInit() throws ServletException
-    {
-        super.doInit();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -82,8 +77,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             UMOMessage responseMessage = null;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-            responseMessage = receiver.routeMessage(requestMessage, receiver.getEndpoint()
-                    .isSynchronous());
+            responseMessage = receiver.routeMessage(requestMessage, true);
             if (responseMessage != null) {
                 writeResponse(response, responseMessage);
             }
