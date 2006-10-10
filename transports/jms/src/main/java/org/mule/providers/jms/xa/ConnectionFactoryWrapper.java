@@ -283,47 +283,36 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
                         if (logger.isDebugEnabled()) {
                             logger.debug("Invoking " + method);
                         }
-                        /*
-                         * In jotm version 1.5.3, it first was making a call to method
-                         * end, and then followed by either commit,rollback or prepare.
-                         * 
-                         * In jotm version 2.0.10, the end method is not called before commit
-                         * rollback or prepare, and thus an exception with error code -6 was
-                         * being thrown. In order to solve this, the method being invoked is
-                         * checked, if it is either commit,rollback or prepare, the end method
-                         * is called beforehand.                  
-                         */
-                        
-                        //not relevent with jotm 2.0.10
-                        /*if (method.getName().equals("end")) {
+                        if (method.getName().equals("end")) {
                             tx = null;
-                        }*/
+                        }
                         
-                        //new methods to cater for jotm 2.0.10 not calling the end method. 
-                        if(method.getName().equals("commit"))
+                        /*
+                         * This has been added, since JOTM checks if the resource has actually
+                         * been enlisted & tries to compare two proxy classes with eachother.
+                         * Since the equals method is proxied, it will effectivly compare a proxy
+                         * with the ConnectionFactory & this will fail. To solve this, if the object
+                         * passed as a parameter is actually another proxy, call equals on the proxy
+                         * passing this class as a parameter, effictively we would be comparing the two
+                         * proxied classes.
+                         */
+                        if(method.getName().equals("equals"))
                         {
-                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
-                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMSUCCESS)});
-                            tx=null;
+                            if(Proxy.isProxyClass(args[0].getClass()))
+                            {
+                                return new Boolean(args[0].equals(this));
+                            }else
+                            {
+                                return new Boolean(this.equals(args[0]));
+                            }
                         }
-                        if(method.getName().equals("rollback"))
-                        {
-                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
-                            //not sure if the flag should be TMFAIL or TMSUCCESS...
-                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMFAIL)});
-                            tx=null;
-                        }
-                        if(method.getName().equals("prepare"))
-                        {
-                            Method m=xares.getClass().getMethod("end", new Class[] {Xid.class,int.class});
-                            m.invoke(xares, new Object[] {args[0],new Integer(XAResource.TMSUCCESS)});
-                            tx=null;
-                        }
+                        
                         return method.invoke(xares, args);
                     } catch (InvocationTargetException e) {
                         throw e.getCause();
                     }
                 }
+                
             }
 
             protected class ConsumerProducerInvocationHandler implements InvocationHandler
