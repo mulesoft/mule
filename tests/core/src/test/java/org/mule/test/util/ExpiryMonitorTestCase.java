@@ -7,16 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.util;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
     private boolean expired = false;
@@ -29,7 +26,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     public void testExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable() {
+        Expirable e = new Expirable()
+        {
             public void expired()
             {
                 expired = true;
@@ -44,7 +42,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     public void testNotExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable() {
+        Expirable e = new Expirable()
+        {
             public void expired()
             {
                 expired = true;
@@ -61,7 +60,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     public void testExpiryWithReset() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable() {
+        Expirable e = new Expirable()
+        {
             public void expired()
             {
                 expired = true;
@@ -82,7 +82,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
     public void testNotExpiryWithRemove() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable() {
+        Expirable e = new Expirable()
+        {
             public void expired()
             {
                 expired = true;
@@ -97,4 +98,5 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         assertTrue(!expired);
         assertTrue(!monitor.isRegistered(e));
     }
+
 }

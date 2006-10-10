@@ -10,7 +10,13 @@
 
 package org.mule.test.util;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -20,20 +26,11 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ClassUtils;
 
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ClassUtilsTestCase extends TestCase
 {
 
-    //we dot wan tto match these methods when looking for a service method to
-    //invoke
+    // we do not want to match these methods when looking for a service method to
+    // invoke
     protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
 
     public void testIsConcrete() throws Exception
@@ -42,10 +39,13 @@ public class ClassUtilsTestCase extends TestCase
         assertTrue(!ClassUtils.isConcrete(Fruit.class));
         assertTrue(!ClassUtils.isConcrete(AbstractFruit.class));
 
-        try {
+        try
+        {
             ClassUtils.isConcrete(null);
             fail("Class cannot be null, exception should be thrown");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
     }
@@ -57,10 +57,13 @@ public class ClassUtilsTestCase extends TestCase
 
         assertEquals(clazz.getName(), "java.lang.String");
 
-        try {
+        try
+        {
             ClassUtils.loadClass("java.lang.Bing", getClass());
             fail("ClassNotFoundException should be thrown");
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e)
+        {
             // expected
         }
 
@@ -68,24 +71,27 @@ public class ClassUtilsTestCase extends TestCase
 
     public void testInstanciateClass() throws Exception
     {
-        Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[] {});
+        Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[]{});
         assertNotNull(object);
         assertTrue(object instanceof Orange);
 
-        object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[] { new Apple(),
-                new Banana() });
+        object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[]{
+            new Apple(), new Banana()});
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
 
-        FruitBowl bowl = (FruitBowl) object;
+        FruitBowl bowl = (FruitBowl)object;
 
         assertTrue(bowl.hasApple());
         assertTrue(bowl.hasBanana());
 
-        try {
-            ClassUtils.instanciateClass("java.lang.Bing", new Object[] {});
-            fail("Class does not exist, exception should have been thrown");
-        } catch (Exception e) {
+        try
+        {
+            ClassUtils.instanciateClass("java.lang.Bing", new Object[]{});
+            fail("Class does not exist, ClassNotFoundException should have been thrown");
+        }
+        catch (ClassNotFoundException e)
+        {
             // expected
         }
 
@@ -116,7 +122,6 @@ public class ClassUtilsTestCase extends TestCase
 
     public void testLoadingResourceEnumeration() throws Exception
     {
-
         Enumeration enumeration = ClassUtils.getResources("test-dummy.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(enumeration.hasMoreElements());
@@ -128,39 +133,47 @@ public class ClassUtilsTestCase extends TestCase
 
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, ignoreMethods);
+        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
+            true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
 
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, ignoreMethods);
+        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true,
+            ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
-        //Test object param being unacceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, false, ignoreMethods);
+        // Test object param being unacceptible
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
+            false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
-        //Test object param being acceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, ignoreMethods);
+        // Test object param being acceptible
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
+            true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
-        //Test object param being acceptible but not void
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, ignoreMethods);
+        // Test object param being acceptible but not void
+        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false,
+            true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());
     }
 
-    private static class DummyObject {
-
-        public void doSomething(Object object) {
-            //do nothing
+    private static class DummyObject
+    {
+        public void doSomething(Object object)
+        {
+            // do nothing
         }
 
-        public Object doSomethingElse(Object object) {
+        public Object doSomethingElse(Object object)
+        {
             return object;
         }
     }
+
 }

@@ -16,10 +16,6 @@ import junit.framework.TestCase;
 
 import org.mule.util.FileUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class FileUtilsTestCase extends TestCase
 {
     private final String TEST_FILE = "testFile.txt";
@@ -27,7 +23,8 @@ public class FileUtilsTestCase extends TestCase
     public void testFileTools() throws Exception
     {
         File file = null;
-        try {
+        try
+        {
             file = FileUtils.stringToFile(TEST_FILE, "this is a test file");
             assertNotNull(file);
             assertTrue(file.exists());
@@ -71,8 +68,10 @@ public class FileUtilsTestCase extends TestCase
             dir.delete();
 
         }
-        finally {
-            if (file != null) {
+        finally
+        {
+            if (file != null)
+            {
                 file.delete();
             }
         }

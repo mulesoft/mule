@@ -26,13 +26,13 @@ public class SystemUtilsTestCase extends TestCase
         assertFalse(env.isEmpty());
 
         String envVarToTest = (SystemUtils.IS_OS_WINDOWS ? "Path" : "PATH");
-	// This is a hack to catch Cygwin environments
-	// It won't work in cases where the user has 
-	// a different term from /etc/termcaps
-	if (SystemUtils.IS_OS_WINDOWS) {
-	    String term = (String)env.get("TERM");
-	    if (term != null && term.equals("cygwin")) envVarToTest = "PATH";
-	}
+        // This is a hack to catch Cygwin environments; it won't work in cases where
+        // the user has a different term from /etc/termcaps
+        if (SystemUtils.IS_OS_WINDOWS)
+        {
+            String term = (String)env.get("TERM");
+            if (term != null && term.equals("cygwin")) envVarToTest = "PATH";
+        }
         assertNotNull(env.get(envVarToTest));
     }
 

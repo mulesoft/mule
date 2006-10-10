@@ -10,21 +10,12 @@
 
 package org.mule.test.util;
 
-import org.mule.util.UUID;
-
 import junit.framework.TestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.mule.util.UUID;
+
 public class UUIDTestCase extends TestCase
 {
-
-    public UUIDTestCase()
-    {
-        super();
-    }
 
     public void testUUID()
     {

@@ -10,16 +10,12 @@
 
 package org.mule.test.util;
 
-import org.mule.util.DateUtils;
-
 import java.util.Date;
 
 import junit.framework.TestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.mule.util.DateUtils;
+
 public class DateUtilsTestCase extends TestCase
 {
     private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";

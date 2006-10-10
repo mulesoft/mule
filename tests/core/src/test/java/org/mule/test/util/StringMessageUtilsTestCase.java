@@ -10,25 +10,16 @@
 
 package org.mule.test.util;
 
-import org.apache.commons.lang.SystemUtils;
-import org.mule.util.StringMessageUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.apache.commons.lang.SystemUtils;
+import org.mule.util.StringMessageUtils;
+
 public class StringMessageUtilsTestCase extends TestCase
 {
-
-    public StringMessageUtilsTestCase()
-    {
-        super();
-    }
 
     public void testGetObjectValue() throws Exception
     {
@@ -58,11 +49,11 @@ public class StringMessageUtilsTestCase extends TestCase
         result = StringMessageUtils.getFormattedMessage(msg1, null);
         assertEquals(msg1, result);
 
-        result = StringMessageUtils.getFormattedMessage(msg1, new Object[] {});
+        result = StringMessageUtils.getFormattedMessage(msg1, new Object[]{});
         assertEquals(msg1, result);
 
         String msg2 = "There should be a variable {0}, {1} and {2}";
-        result = StringMessageUtils.getFormattedMessage(msg2, new Object[] { "here", "there", "everywhere" });
+        result = StringMessageUtils.getFormattedMessage(msg2, new Object[]{"here", "there", "everywhere"});
         assertEquals("There should be a variable here, there and everywhere", result);
     }
 
@@ -74,9 +65,10 @@ public class StringMessageUtilsTestCase extends TestCase
         msgs.add("Boiler Plate");
 
         String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
-        assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR + "* This     *" +
-                     SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR + "* Boiler   *" +
-                     SystemUtils.LINE_SEPARATOR + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "************", plate);
+        assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR
+                     + "* This     *" + SystemUtils.LINE_SEPARATOR + "* is a     *"
+                     + SystemUtils.LINE_SEPARATOR + "* Boiler   *" + SystemUtils.LINE_SEPARATOR
+                     + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "************", plate);
 
     }
 
@@ -88,16 +80,18 @@ public class StringMessageUtilsTestCase extends TestCase
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
         String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
-        assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR +
-                     "* This     *" + SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR +
-                     "* Boiler   *" + SystemUtils.LINE_SEPARATOR + "* Plate    *" + SystemUtils.LINE_SEPARATOR +
-                     "* Message  *" + SystemUtils.LINE_SEPARATOR + "* that     *" + SystemUtils.LINE_SEPARATOR +
-                     "* should   *" + SystemUtils.LINE_SEPARATOR + "* get      *" + SystemUtils.LINE_SEPARATOR +
-                     "* wrapped  *" + SystemUtils.LINE_SEPARATOR + "* to the   *" + SystemUtils.LINE_SEPARATOR +
-                     "* next     *" + SystemUtils.LINE_SEPARATOR + "* line if  *" + SystemUtils.LINE_SEPARATOR +
-                     "* it is    *" + SystemUtils.LINE_SEPARATOR + "* working  *" + SystemUtils.LINE_SEPARATOR +
-                     "* properly *" + SystemUtils.LINE_SEPARATOR + "************",
-                     plate);
+        assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR
+                     + "* This     *" + SystemUtils.LINE_SEPARATOR + "* is a     *"
+                     + SystemUtils.LINE_SEPARATOR + "* Boiler   *" + SystemUtils.LINE_SEPARATOR
+                     + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "* Message  *"
+                     + SystemUtils.LINE_SEPARATOR + "* that     *" + SystemUtils.LINE_SEPARATOR
+                     + "* should   *" + SystemUtils.LINE_SEPARATOR + "* get      *"
+                     + SystemUtils.LINE_SEPARATOR + "* wrapped  *" + SystemUtils.LINE_SEPARATOR
+                     + "* to the   *" + SystemUtils.LINE_SEPARATOR + "* next     *"
+                     + SystemUtils.LINE_SEPARATOR + "* line if  *" + SystemUtils.LINE_SEPARATOR
+                     + "* it is    *" + SystemUtils.LINE_SEPARATOR + "* working  *"
+                     + SystemUtils.LINE_SEPARATOR + "* properly *" + SystemUtils.LINE_SEPARATOR
+                     + "************", plate);
     }
 
     public void testTruncate()

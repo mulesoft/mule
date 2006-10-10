@@ -30,11 +30,13 @@ public class ArrayUtilsTestCase extends TestCase
         assertSame(a2, a);
 
         // null component type is not allowed
-        try {
+        try
+        {
             ArrayUtils.toArrayOfComponentType(a, null);
             fail();
         }
-        catch (IllegalArgumentException iex) {
+        catch (IllegalArgumentException iex)
+        {
             // ok
         }
 
@@ -45,11 +47,13 @@ public class ArrayUtilsTestCase extends TestCase
         assertSame(a[0], cs[0]);
 
         // incompatible element types are not a good idea either
-        try {
+        try
+        {
             ArrayUtils.toArrayOfComponentType(a, List.class);
             fail();
         }
-        catch (ArrayStoreException asx) {
+        catch (ArrayStoreException asx)
+        {
             // ok
         }
 

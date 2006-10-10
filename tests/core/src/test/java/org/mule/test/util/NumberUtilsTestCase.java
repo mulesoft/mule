@@ -16,12 +16,8 @@ import junit.framework.TestCase;
 
 import org.mule.util.NumberUtils;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
 public class NumberUtilsTestCase extends TestCase
 {
-
     static final long l = 1000000000;
 
     public void testStringToLong()
@@ -41,25 +37,30 @@ public class NumberUtilsTestCase extends TestCase
 
     public void testIncompatible()
     {
-        try {
+        try
+        {
             NumberUtils.toLong(Calendar.getInstance().getTime());
             fail();
         }
-        catch (IllegalArgumentException e) {
+        catch (IllegalArgumentException e)
+        {
             // expected
         }
     }
 
     public void testNull()
     {
-        try {
+        try
+        {
             // need to cast to Object, otherwise compiler would resolve method to
             // superclass' implementation
             NumberUtils.toLong((Object)null);
             fail();
         }
-        catch (IllegalArgumentException e) {
+        catch (IllegalArgumentException e)
+        {
             // expected
         }
     }
+
 }
