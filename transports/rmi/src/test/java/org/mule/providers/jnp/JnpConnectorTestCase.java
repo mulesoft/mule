@@ -17,7 +17,7 @@ import org.mule.umo.provider.UMOConnector;
  * @version $Revision: 3330 $
  */
 
-public class JniConnectorTestCase extends AbstractConnectorTestCase
+public class JnpConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception
     {
