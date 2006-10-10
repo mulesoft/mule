@@ -10,6 +10,8 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,9 +26,9 @@ import javax.resource.spi.work.WorkException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireException;
@@ -39,13 +41,12 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Session;
 import org.codehaus.xfire.util.STAXUtils;
 import org.mule.MuleException;
+import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.soap.xfire.XFireConnector;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.StringUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * todo document
@@ -340,12 +341,25 @@ public class MuleLocalChannel extends AbstractChannel
             receive(context, in);
 
             Object result = null;
-            if (context.getExchange().hasOutMessage()) {
-                try {
-                    result = resultStream.toString(context.getOutMessage().getEncoding());
-                } catch (UnsupportedEncodingException e1) {
-                    throw new MuleException(e1);
+            
+            try 
+            {
+                // we need to check if there is a fault message.
+                // If it's the case, we need to send back the fault to the client
+                if (context.getExchange().hasFaultMessage()) 
+                {
+                    result = resultStream.toString(context.getExchange().getFaultMessage().getEncoding());
+                    ExceptionPayload exceptionPayload = new ExceptionPayload(new Exception(result.toString()));
+                    ctx.getMessage().setExceptionPayload(exceptionPayload);
+                } 
+                else if (context.getExchange().hasOutMessage()) 
+                {
+                    result = resultStream.toString(context.getExchange().getOutMessage().getEncoding());
                 }
+             } 
+            catch (UnsupportedEncodingException e1) 
+            {
+                throw new MuleException(e1);
             }
 
             // TODO Should this be an error?   Probably not
