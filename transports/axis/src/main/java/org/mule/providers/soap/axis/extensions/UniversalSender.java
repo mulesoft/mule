@@ -125,18 +125,21 @@ public class UniversalSender extends BasicHandler
             
             //add all custom headers, filter out all mule headers (such as MULE_SESSION) except
             // for MULE_USER header. Filter out other headers like "soapMethods" and MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
-            UMOMessage currentMessage = RequestContext.getEvent().getMessage();
-            final String SOAP_METHODS = "soapMethods";
-
-            for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
+            if((RequestContext.getEvent() != null) && (RequestContext.getEvent().getMessage() != null))
             {
-                String name = (String)iterator.next();
-                if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
-                        && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
-                        && (!name.startsWith(MuleProperties.PROPERTY_PREFIX)
-                        || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                UMOMessage currentMessage = RequestContext.getEvent().getMessage();
+                final String SOAP_METHODS = "soapMethods";
+
+                for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
                 {
-                    props.put(name, currentMessage.getProperty(name));
+                    String name = (String)iterator.next();
+                    if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
+                            && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
+                            && (!name.startsWith(MuleProperties.PROPERTY_PREFIX)
+                            || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                    {
+                        props.put(name, currentMessage.getProperty(name));
+                    }
                 }
             }
             
