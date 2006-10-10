@@ -7,22 +7,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.util.TemplateParser;
+package org.mule.test.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import junit.framework.TestCase;
+
+import org.mule.util.TemplateParser;
+
 public class TemplateParserTestCase extends TestCase
 {
+
     public void testStringParserSquareBraces()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
@@ -35,7 +34,6 @@ public class TemplateParserTestCase extends TestCase
         string = "smtp://[toAddress]";
         result = tp.parse(props, string);
         assertEquals("smtp://[toAddress]", result);
-
     }
 
     public void testStringParserAntBraces()
@@ -44,14 +42,29 @@ public class TemplateParserTestCase extends TestCase
         Map props = new HashMap();
         props.put("prop1", "value1");
         props.put("prop2", "value2");
-        String string = "Some String with ${prop1} and ${prop2} in it";
 
+        String string = "Some String with ${prop1} and ${prop2} in it";
         String result = tp.parse(props, string);
         assertEquals("Some String with value1 and value2 in it", result);
+
         string = "${prop1}${prop1}${prop2}";
         result = tp.parse(props, string);
         assertEquals("value1value1value2", result);
 
+
+//        // MULE-978: a property with backslashes (on Windows)
+//        String homeDir = System.getProperty("user.home");
+//        props.put("homeDir", homeDir);
+//        string = "${homeDir}/foo";
+//        result = tp.parse(props, string);
+//        assertEquals(homeDir + "/foo", result);
+
+        // whitespace is really popular too ("C:\Documents and Settings\..")
+        String whitespaceValue = "|white space|";
+        props.put("whitespaceValue", whitespaceValue);
+        string = "start${whitespaceValue}end";
+        result = tp.parse(props, string);
+        assertEquals("start" + whitespaceValue + "end", result);
     }
 
     public void testListParserAntBraces()
@@ -105,6 +118,6 @@ public class TemplateParserTestCase extends TestCase
         string = "A${prop1-2}B${prop1}C${prop2}";
         result = tp.parse(props, string);
         assertEquals("Avalue2Bvalue1C${prop2}", result);
-
     }
+
 }
