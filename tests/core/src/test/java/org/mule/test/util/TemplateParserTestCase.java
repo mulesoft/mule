@@ -51,16 +51,15 @@ public class TemplateParserTestCase extends TestCase
         result = tp.parse(props, string);
         assertEquals("value1value1value2", result);
 
+        // MULE-978: a property with backslashes (on Windows)
+        String homeDir = System.getProperty("user.home");
+        props.put("homeDir", homeDir);
+        string = "${homeDir}/foo";
+        result = tp.parse(props, string);
+        assertEquals(homeDir + "/foo", result);
 
-//        // MULE-978: a property with backslashes (on Windows)
-//        String homeDir = System.getProperty("user.home");
-//        props.put("homeDir", homeDir);
-//        string = "${homeDir}/foo";
-//        result = tp.parse(props, string);
-//        assertEquals(homeDir + "/foo", result);
-
-        // whitespace is really popular too ("C:\Documents and Settings\..")
-        String whitespaceValue = "|white space|";
+        // whitespace is really popular too
+        String whitespaceValue = "C:\\Documents and Settings\\";
         props.put("whitespaceValue", whitespaceValue);
         string = "start${whitespaceValue}end";
         result = tp.parse(props, string);
