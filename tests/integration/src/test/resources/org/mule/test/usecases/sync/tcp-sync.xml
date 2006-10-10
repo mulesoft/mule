@@ -13,12 +13,14 @@
 
     <transformers>
         <transformer name="transformer" className="org.mule.transformers.xml.ObjectToXml"></transformer>
+		<transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"></transformer>
     </transformers>
 
     <model name="model">
         <mule-descriptor name="TcpReceiver"
             implementation="org.mule.components.simple.EchoComponent"
             inboundEndpoint="tcp://localhost:4444/?synchronous=true"
+			inboundTransformer="inboundtransformer"
             responseTransformer="transformer">
         </mule-descriptor>
 
