@@ -235,7 +235,7 @@
                             <License>MulesSource MPL http://www.mulesource.com/MSPL/</License>
                             <Vendor-Url>${pom.organization.url}</Vendor-Url>
                             <Product-Url>${pom.url}</Product-Url>
-                            <Dtd-Public-Id>-//${pom.organisation.nae} //DTD mule-configuration XML V1.0//EN</Dtd-Public-Id>
+                            <Dtd-Public-Id>-//${pom.organisation.name} //DTD mule-configuration XML V1.0//EN</Dtd-Public-Id>
                             <Dtd-System-Id>${pom.url}/dtds</Dtd-System-Id>
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
