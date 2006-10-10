@@ -33,7 +33,6 @@ public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
         assertEquals(reply.getPayloadAsString(), "Received: Testing String");
-        logger.info(reply.getPayloadAsString());
     }
 
     public void testRequestWsdl() throws Exception
