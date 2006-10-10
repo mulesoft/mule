@@ -102,13 +102,13 @@ public class TemplateParser
     {
         String result = template;
         Matcher m = pattern.matcher(template);
-        String match, propname;
+
         while (m.find())
         {
             Object value = null;
 
-            match = m.group();
-            propname = match.substring(pre, match.length() - post);
+            String match = m.group();
+            String propname = match.substring(pre, match.length() - post);
 
             if (callback != null)
             {
@@ -128,9 +128,15 @@ public class TemplateParser
             }
             else
             {
-                match = escape(match);
-                String escapedValue = value.toString().replaceAll("\\\\", "\\\\\\\\");
-                result = result.replaceAll(match, escapedValue);
+                String matchRegex = escape(match);
+                String valueString = value.toString();
+
+                if (valueString.indexOf('\\') != -1)
+                {
+                    valueString = valueString.replaceAll("\\\\", "\\\\\\\\");
+                }
+
+                result = result.replaceAll(matchRegex, valueString);
             }
         }
         return result;
