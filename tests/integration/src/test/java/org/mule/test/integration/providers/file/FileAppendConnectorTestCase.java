@@ -30,6 +30,13 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase
         File myDir = new File(myDirName);
         if (myDir.isDirectory())
         {
+            //Delete Any Existing Files
+            File[] files=myDir.listFiles();
+            for(int i=0;i<files.length;i++)
+            {
+                assertTrue(files[i].delete());
+            }           
+            //This may fail if this directory contains other directories.
             assertTrue(myDir.delete());
         }
 
