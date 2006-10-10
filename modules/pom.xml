@@ -20,7 +20,6 @@
         <module>boot</module>
         <module>client</module>
         <module>hivemind</module>
-        <module>i18n</module>
         <module>jaas</module>
         <module>jca</module>
         <module>jotm</module>
@@ -28,7 +27,6 @@
         <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
-        <module>plexus</module>
         <module>registry</module>
         <module>scripting</module>
         <module>spring</module>
