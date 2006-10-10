@@ -7,20 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.providers.file;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.providers.file.SimpleFilenameParser;
-import org.mule.providers.file.FileConnector;
 import org.mule.providers.DefaultMessageAdapter;
+import org.mule.providers.file.FileConnector;
+import org.mule.providers.file.SimpleFilenameParser;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * Test the syntax of the SimpleFilename parser
  */
 public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 {
-    public void testAntStyleParsing() {
 
+    public void testAntStyleParsing()
+    {
         SimpleFilenameParser parser = new SimpleFilenameParser();
         DefaultMessageAdapter adapter = new DefaultMessageAdapter("hello");
         adapter.setProperty("foo", "bar");
@@ -54,8 +56,8 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 
     }
 
-    public void testSquareStyleParsing() {
-
+    public void testSquareStyleParsing()
+    {
         SimpleFilenameParser parser = new SimpleFilenameParser();
         DefaultMessageAdapter adapter = new DefaultMessageAdapter("hello");
         adapter.setProperty("foo", "bar");
@@ -64,10 +66,10 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test1_0.txt", result);
 
         result = parser.getFilename(adapter, "Test2_[DATE:yyMMdd].txt");
-        assertEquals(16, result.length());
+        assertEquals("got result: " + result, 16, result.length());
 
         result = parser.getFilename(adapter, "Test3_[DATE].txt");
-        assertEquals(31, result.length());
+        assertEquals("got result: '" + result, 31, result.length());
 
         result = parser.getFilename(adapter, "Test4_[SYSTIME].txt");
         assertFalse(result.equals("Test4_[SYSTIME].txt"));
@@ -86,6 +88,6 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 
         result = parser.getFilename(adapter, "Test9_[xxx].txt");
         assertEquals("Test9_[xxx].txt", result);
-
     }
+
 }
