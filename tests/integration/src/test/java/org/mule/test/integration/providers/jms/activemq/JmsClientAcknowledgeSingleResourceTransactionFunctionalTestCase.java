@@ -1,13 +1,11 @@
 /*
- * $Id: JmsClientAcknowledgeTransactionFunctionalTestCase.java 2181 2006-06-04 23:09:23Z holger $
- * ------------------------------------------------------------------------------------------------------
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
- * http://www.symphonysoft.com
- *
- * The software in this package is published under the terms of the BSD
- * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file.
+ * The software in this package is published under the terms of the BSD style
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.test.integration.providers.jms.activemq;
 
@@ -20,13 +18,6 @@ import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
 import org.mule.umo.UMOTransactionFactory;
 
 import javax.jms.Session;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2181 $
- */
-
-//todo check ActiveMqJmsTransactionFunctionalTest
 
 public class JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase extends ActiveMQJmsTransactionFunctionalTestCase
 {
