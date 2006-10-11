@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.XMLAssert;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
@@ -80,7 +80,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         // TODO: MULE-1113
         // assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertTrue(XMLUnit.compareXML(expectedPostResponse, result.getPayloadAsString()).identical());
+        XMLAssert.assertXMLEqual(expectedPostResponse, result.getPayloadAsString());
     }
 
     public void testGetEcho() throws Exception
@@ -93,7 +93,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         // TODO: MULE-1113
         // assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertTrue(XMLUnit.compareXML(expectedGetResponse, result.getPayloadAsString()).identical());
+        XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
 
     public void testSoapPostEcho() throws Exception
