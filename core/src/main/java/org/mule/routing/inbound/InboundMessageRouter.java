@@ -9,9 +9,7 @@
  */
 package org.mule.routing.inbound;
 
-import java.util.Iterator;
-import java.util.List;
-
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
@@ -26,7 +24,8 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.util.StringMessageUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>InboundMessageRouter</code> is a collection of routers that will be
@@ -94,7 +93,9 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
                             logger.debug("Message did not match any routers on: " + componentName
                                     + " - invoking catch all strategy");
                         }
-                        getStatistics().incrementCaughtMessage();
+                        if (getStatistics().isEnabled()) {
+                            getStatistics().incrementCaughtMessage();
+                        }
                         return getCatchAllStrategy().catchMessage(event.getMessage(),
                                                                   event.getSession(),
                                                                   event.isSynchronous());
