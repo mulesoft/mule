@@ -15,7 +15,10 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-
+/*
+ * In this Test Case we make use of a Custom Catch All Strategy in order to 
+ * show how to send the transformed message instead of the non-transformed message.
+ */
 public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 {
     
