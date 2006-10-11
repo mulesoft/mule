@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soap:Body><echoResponse xmlns="http://www.muleumo.org"><out>hello</out></echoResponse></soap:Body></soap:Envelope>

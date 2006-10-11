@@ -7,20 +7,33 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.samples.echo;
 
+package org.mule.samples.echo;
 
 /**
  * Tests the echo example using Xfire
  */
-public class XFireEchoTestCase extends AxisEchoTestCase {
+public class XFireEchoTestCase extends AxisEchoTestCase
+{
 
-
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "echo-xfire-config.xml";
     }
 
-    protected String getProtocol() {
+    protected String getExpectedGetResponseResource()
+    {
+        return "echo-xfire-response.xml";
+    }
+
+    protected String getExpectedPostResponseResource()
+    {
+        return "echo-xfire-response.xml";
+    }
+
+    protected String getProtocol()
+    {
         return "xfire";
     }
+
 }
