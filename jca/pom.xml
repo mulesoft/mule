@@ -34,6 +34,45 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jca</artifactId>
             <version>${version}</version>
+            <!-- Exclude example jars -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-echo</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-errorhandler</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-hello</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker-esb</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-scripting</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-stockquote</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-voipservice</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
