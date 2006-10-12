@@ -14,16 +14,17 @@ import java.util.Collection;
 
 import org.apache.commons.lang.SystemUtils;
 
-// @Immutable
+// @ThreadSafe
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
 
     /**
-     * TODO
+     * Creates a String representation of the given Collection, with optional
+     * newlines between elements. Class objects are represented by their full names.
      * 
-     * @param c
-     * @param newline
-     * @return
+     * @param c the Collection to format
+     * @param newline indicates whether elements are to be split across lines
+     * @return the formatted String
      */
     public static String toString(Collection c, boolean newline)
     {

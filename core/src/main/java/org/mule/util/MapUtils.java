@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.SystemUtils;
 
-// @Immutable
+// @ThreadSafe
 public class MapUtils extends org.apache.commons.collections.MapUtils
 {
 
@@ -83,11 +83,12 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
     }
 
     /**
-     * TODO
+     * Creates a String representation of the given Map, with optional newlines
+     * between elements.
      * 
-     * @param props
-     * @param newline
-     * @return
+     * @param props the map to format
+     * @param newline indicates whether elements are to be split across lines
+     * @return the formatted String
      */
     public static String toString(Map props, boolean newline)
     {
