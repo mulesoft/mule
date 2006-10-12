@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.SystemUtils;
+
 // @Immutable
 public class MapUtils extends org.apache.commons.collections.MapUtils
 {
@@ -78,6 +80,63 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
         }
 
         return m;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param props
+     * @param newline
+     * @return
+     */
+    public static String toString(Map props, boolean newline)
+    {
+        if (props == null || props.isEmpty())
+        {
+            return "{}";
+        }
+
+        StringBuffer buf = new StringBuffer(props.size() * 32);
+        buf.append('{');
+
+        if (newline)
+        {
+            buf.append(SystemUtils.LINE_SEPARATOR);
+        }
+
+        Object[] entries = props.entrySet().toArray();
+        int i;
+
+        for (i = 0; i < entries.length - 1; i++)
+        {
+            Map.Entry property = (Map.Entry)entries[i];
+            buf.append(property.getKey());
+            buf.append('=');
+            buf.append(PropertiesUtils.maskedPropertyValue(property));
+
+            if (newline)
+            {
+                buf.append(SystemUtils.LINE_SEPARATOR);
+            }
+            else
+            {
+                buf.append(',').append(' ');
+            }
+        }
+
+        // don't forget the last one
+        Map.Entry lastProperty = (Map.Entry)entries[i];
+        buf.append(lastProperty.getKey().toString());
+        buf.append('=');
+        buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));
+
+        if (newline)
+        {
+            buf.append(SystemUtils.LINE_SEPARATOR);
+        }
+
+        buf.append('}');
+        return buf.toString();
     }
 
 }

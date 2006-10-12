@@ -13,15 +13,14 @@ package org.mule.providers;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
-import javax.activation.DataHandler;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.MapUtils;
+import javax.activation.DataHandler;
+
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -33,16 +32,13 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesUtils;
+import org.mule.util.MapUtils;
 import org.mule.util.UUID;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
  * simple message types that maybe don't normally allow for meta information,
- * such as File or tcp.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * such as a File or TCP.
  */
 public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 {
@@ -71,7 +67,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
         buf.append(", exceptionPayload=").append(exceptionPayload);
-        buf.append(", properties=").append(PropertiesUtils.propertiesToString(properties, true));
+        buf.append(", properties=").append(MapUtils.toString(properties, true));
         buf.append('}');
         return buf.toString();
     }

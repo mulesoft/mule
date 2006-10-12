@@ -14,7 +14,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,10 +21,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOMessage;
 
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and filtering
@@ -41,14 +38,46 @@ public class PropertiesUtils
     {
         // When printing property lists mask password fields
         // Users can register their own fields to mask
-        registeredMaskedPropertyName("password");
+        registerMaskedPropertyName("password");
     }
 
-    public static void registeredMaskedPropertyName(String name)
+    /**
+     * Register a property name for masking. This will prevent certain values from
+     * leaking e.g. into debugging output or logfiles.
+     * 
+     * @param name the key of the property to be masked.
+     * @throws IllegalArgumentException is name is null or empty.
+     */
+    public static void registerMaskedPropertyName(String name)
     {
-        if (name != null)
+        if (StringUtils.isNotEmpty(name))
         {
             maskedProperties.add(name);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Cannot mask empty property name.");
+        }
+    }
+
+    /**
+     * Returns the String representation of the property value or a masked String if
+     * the property key has been registered previously via
+     * {@link #registerMaskedPropertyName(String)}.
+     * 
+     * @param property a key/value pair
+     * @return String of the property value or a "masked" String that hides the
+     *         contents.
+     */
+    public static String maskedPropertyValue(Map.Entry property)
+    {
+        if (maskedProperties.contains(property.getKey()))
+        {
+            return ("*****");
+        }
+        else
+        {
+            return property.getValue().toString();
         }
     }
 
@@ -226,90 +255,12 @@ public class PropertiesUtils
         return i2;
     }
 
+    /**
+     * @deprecated Use {@link MapUtils#toString(Map, boolean)} instead
+     */
     public static String propertiesToString(Map props, boolean newline)
     {
-        if (props == null || props.isEmpty())
-        {
-            return "{}";
-        }
-
-        StringBuffer buf = new StringBuffer(props.size() * 32);
-        buf.append('{');
-
-        if (newline)
-        {
-            buf.append(SystemUtils.LINE_SEPARATOR);
-        }
-
-        Object[] entries = props.entrySet().toArray();
-        int i, numEntries = entries.length;
-        for (i = 0; i < numEntries - 1; i++)
-        {
-            appendMaskedProperty(buf, (Map.Entry)entries[i]);
-            if (newline)
-            {
-                buf.append(SystemUtils.LINE_SEPARATOR);
-            }
-            else
-            {
-                buf.append(',').append(' ');
-            }
-        }
-
-        // don't forget the last one
-        appendMaskedProperty(buf, (Map.Entry)entries[i]);
-
-        if (newline)
-        {
-            buf.append(SystemUtils.LINE_SEPARATOR);
-        }
-
-        buf.append('}');
-        return buf.toString();
+        return MapUtils.toString(props, newline);
     }
 
-    private static void appendMaskedProperty(StringBuffer buffer, Map.Entry property)
-    {
-        String key = property.getKey().toString();
-        buffer.append(key).append('=');
-
-        if (maskedProperties.contains(key))
-        {
-            buffer.append("*****");
-        }
-        else
-        {
-            buffer.append(property.getValue());
-        }
-    }
-
-    public static Map getMessageProperties(UMOMessage message)
-    {
-        return getMessageProperties(new ArrayList(message.getPropertyNames()), message, /* prefixToExclude */
-        null);
-    }
-
-    public static Map getMessageProperties(List propertyNames, UMOMessage message)
-    {
-        return getMessageProperties(propertyNames, message, /* prefixToExclude */null);
-    }
-
-    /**
-     * Returns a map of property names/values for the given message.
-     * 
-     * @param prefixToExclude - will exclude all properties starting with this prefix
-     */
-    public static Map getMessageProperties(List propertyNames, UMOMessage message, String prefixToExclude)
-    {
-        Map props = new HashMap();
-        for (Iterator iterator = propertyNames.iterator(); iterator.hasNext();)
-        {
-            String prop = (String)iterator.next();
-            if (prefixToExclude == null || prop.startsWith(prefixToExclude) == false)
-            {
-                props.put(prop, message.getProperty(prop));
-            }
-        }
-        return props;
-    }
 }
