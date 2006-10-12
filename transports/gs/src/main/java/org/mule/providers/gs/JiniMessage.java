@@ -10,17 +10,15 @@
 
 package org.mule.providers.gs;
 
-import net.jini.core.entry.Entry;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.util.PropertiesUtils;
-
 import java.util.Map;
+
+import net.jini.core.entry.Entry;
+
+import org.mule.umo.UMOExceptionPayload;
+import org.mule.util.MapUtils;
 
 /**
  * The default wrapper Template for a GigaSpace entry
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JiniMessage implements Entry
 {
@@ -41,7 +39,6 @@ public class JiniMessage implements Entry
     public UMOExceptionPayload exceptionPayload;
     public String payloadType;
 
-
     public JiniMessage()
     {
         super();
@@ -58,43 +55,53 @@ public class JiniMessage implements Entry
         setPayload(payload);
     }
 
-    public String getCorrelationId() {
+    public String getCorrelationId()
+    {
         return correlationId;
     }
 
-    public void setCorrelationId(String correlationId) {
+    public void setCorrelationId(String correlationId)
+    {
         this.correlationId = correlationId;
     }
 
-    public Integer getCorrelationSequence() {
+    public Integer getCorrelationSequence()
+    {
         return correlationSequence;
     }
 
-    public void setCorrelationSequence(Integer correlationSequence) {
+    public void setCorrelationSequence(Integer correlationSequence)
+    {
         this.correlationSequence = correlationSequence;
     }
 
-    public Integer getCorrelationGroupSize() {
+    public Integer getCorrelationGroupSize()
+    {
         return correlationGroupSize;
     }
 
-    public void setCorrelationGroupSize(Integer correlationGroupSize) {
+    public void setCorrelationGroupSize(Integer correlationGroupSize)
+    {
         this.correlationGroupSize = correlationGroupSize;
     }
 
-    public Object getReplyTo() {
+    public Object getReplyTo()
+    {
         return replyTo;
     }
 
-    public void setReplyTo(Object replyTo) {
+    public void setReplyTo(Object replyTo)
+    {
         this.replyTo = replyTo;
     }
 
-    public String getMessageId() {
+    public String getMessageId()
+    {
         return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    public void setMessageId(String messageId)
+    {
         this.messageId = messageId;
     }
 
@@ -107,8 +114,7 @@ public class JiniMessage implements Entry
     }
 
     /**
-     * @param destination
-     *            The destination to set.
+     * @param destination The destination to set.
      */
     public void setDestination(Object destination)
     {
@@ -124,48 +130,58 @@ public class JiniMessage implements Entry
     }
 
     /**
-     * @param payload
-     *            The payload to set.
+     * @param payload The payload to set.
      */
     public void setPayload(Object payload)
     {
         this.payload = payload;
-        if(payload!=null) {
+        if (payload != null)
+        {
             payloadType = payload.getClass().getName();
-        } else {
+        }
+        else
+        {
             payloadType = null;
         }
     }
 
-    public Map getProperties() {
+    public Map getProperties()
+    {
         return properties;
     }
 
-    public void setProperties(Map properties) {
+    public void setProperties(Map properties)
+    {
         this.properties = properties;
     }
 
-    public String getEncoding() {
+    public String getEncoding()
+    {
         return encoding;
     }
 
-    public void setEncoding(String encoding) {
+    public void setEncoding(String encoding)
+    {
         this.encoding = encoding;
     }
 
-    public UMOExceptionPayload getExceptionPayload() {
+    public UMOExceptionPayload getExceptionPayload()
+    {
         return exceptionPayload;
     }
 
-    public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+    public void setExceptionPayload(UMOExceptionPayload exceptionPayload)
+    {
         this.exceptionPayload = exceptionPayload;
     }
 
-    public String getPayloadType() {
+    public String getPayloadType()
+    {
         return payloadType;
     }
 
-    public void setPayloadType(String payloadType) {
+    public void setPayloadType(String payloadType)
+    {
         this.payloadType = payloadType;
     }
 
@@ -181,7 +197,7 @@ public class JiniMessage implements Entry
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
         buf.append(", exceptionPayload=").append(getExceptionPayload());
-        buf.append(", properties=").append(PropertiesUtils.propertiesToString(properties, true));
+        buf.append(", properties=").append(MapUtils.toString(properties, true));
         buf.append('}');
         return buf.toString();
     }
