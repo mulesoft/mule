@@ -31,16 +31,13 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesUtils;
+import org.mule.util.MapUtils;
 import org.mule.util.TemplateParser;
 
 /**
- * <code>StringToEmailMessage</code> will convert a string to a java mail
- * Message, using the string as the contents. This implementation uses
- * properties on the transformer to determine the to and subject fields.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StringToEmailMessage</code> will convert a String to a JavaMail Message,
+ * using the String as the contents. This implementation uses properties on the
+ * transformer to determine the To: and Subject: fields.
  */
 public class StringToEmailMessage extends AbstractEventAwareTransformer
 {
@@ -73,31 +70,40 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         SmtpConnector connector = (SmtpConnector)endpoint.getConnector();
         UMOMessage eventMsg = context.getMessage();
         String to = eventMsg.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
-        String cc = eventMsg.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
-        String bcc = eventMsg.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
-        String from = eventMsg.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
-        String replyTo = eventMsg.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
+        String cc = eventMsg.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY,
+            connector.getCcAddresses());
+        String bcc = eventMsg.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY,
+            connector.getBccAddresses());
+        String from = eventMsg.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY,
+            connector.getFromAddress());
+        String replyTo = eventMsg.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
+            connector.getReplyToAddresses());
         String subject = eventMsg.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
-        String contentType = eventMsg.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
+        String contentType = eventMsg.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY,
+            connector.getContentType());
 
         Properties headers = new Properties();
         Properties customHeaders = connector.getCustomHeaders();
 
-        if (customHeaders != null && !customHeaders.isEmpty()) {
+        if (customHeaders != null && !customHeaders.isEmpty())
+        {
             headers.putAll(customHeaders);
         }
 
         Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
-        if (otherHeaders != null && !otherHeaders.isEmpty()) {
+        if (otherHeaders != null && !otherHeaders.isEmpty())
+        {
             Map props = new HashMap(MuleManager.getInstance().getProperties());
-            for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
+            {
                 String propertyKey = (String)iterator.next();
                 props.put(propertyKey, eventMsg.getProperty(propertyKey));
             }
             headers.putAll(templateParser.parse(props, otherHeaders));
         }
 
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             StringBuffer buf = new StringBuffer(256);
             buf.append("Constructing email using:\n");
             buf.append("To: ").append(to);
@@ -108,37 +114,45 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             buf.append("ReplyTo: ").append(replyTo);
             buf.append("Content type: ").append(contentType);
             buf.append("Payload type: ").append(src.getClass().getName());
-            buf.append("Custom Headers: ").append(PropertiesUtils.propertiesToString(headers, false));
+            buf.append("Custom Headers: ").append(MapUtils.toString(headers, false));
             logger.debug(buf.toString());
         }
 
-        try {
-            Message email = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpoint).getDelegateSession());
+        try
+        {
+            Message email = new MimeMessage((Session)endpoint.getConnector()
+                .getDispatcher(endpoint)
+                .getDelegateSession());
 
             email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 
             // sent date
             email.setSentDate(Calendar.getInstance().getTime());
 
-            if (StringUtils.isNotBlank(from)) {
+            if (StringUtils.isNotBlank(from))
+            {
                 email.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
             }
 
-            if (StringUtils.isNotBlank(cc)) {
+            if (StringUtils.isNotBlank(cc))
+            {
                 email.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
             }
 
-            if (StringUtils.isNotBlank(bcc)) {
+            if (StringUtils.isNotBlank(bcc))
+            {
                 email.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
             }
 
-            if (StringUtils.isNotBlank(replyTo)) {
+            if (StringUtils.isNotBlank(replyTo))
+            {
                 email.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 
             email.setSubject(subject);
 
-            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            {
                 Map.Entry entry = (Map.Entry)iterator.next();
                 email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
@@ -146,12 +160,16 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             setContent(src, email, contentType, context);
 
             return email;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
     }
 
-    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context) throws Exception {
+    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
+        throws Exception
+    {
         msg.setContent(payload, contentType);
     }
 
