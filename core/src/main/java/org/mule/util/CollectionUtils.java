@@ -11,25 +11,79 @@
 package org.mule.util;
 
 import java.util.Collection;
-import java.util.Iterator;
+
+import org.apache.commons.lang.SystemUtils;
 
 // @Immutable
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
-    public static String toString(Collection c, boolean newLine)
+
+    /**
+     * TODO
+     * 
+     * @param c
+     * @param newline
+     * @return
+     */
+    public static String toString(Collection c, boolean newline)
     {
-        StringBuffer buf = new StringBuffer(128);
-        Object item;
-        for (Iterator iterator = c.iterator(); iterator.hasNext();)
+        if (c == null || c.isEmpty())
         {
-            item = iterator.next();
-            if(item instanceof Class) {
-                buf.append(((Class)item).getName()).append(", ");                
-            } else {
-                buf.append(item).append(", ");
-            }
-            if(newLine) buf.append("\n");
+            return "[]";
         }
+
+        StringBuffer buf = new StringBuffer(c.size() * 32);
+        buf.append('[');
+
+        if (newline)
+        {
+            buf.append(SystemUtils.LINE_SEPARATOR);
+        }
+
+        Object[] items = c.toArray();
+        int i;
+
+        for (i = 0; i < items.length - 1; i++)
+        {
+            Object item = items[i];
+
+            if (item instanceof Class)
+            {
+                buf.append(((Class)item).getName());
+            }
+            else
+            {
+                buf.append(item);
+            }
+
+            if (newline)
+            {
+                buf.append(SystemUtils.LINE_SEPARATOR);
+            }
+            else
+            {
+                buf.append(',').append(' ');
+            }
+        }
+
+        // don't forget the last one
+        Object lastItem = items[i];
+        if (lastItem instanceof Class)
+        {
+            buf.append(((Class)lastItem).getName());
+        }
+        else
+        {
+            buf.append(lastItem);
+        }
+
+        if (newline)
+        {
+            buf.append(SystemUtils.LINE_SEPARATOR);
+        }
+
+        buf.append(']');
         return buf.toString();
     }
+
 }
