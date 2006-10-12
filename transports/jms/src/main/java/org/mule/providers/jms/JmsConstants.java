@@ -10,9 +10,10 @@
 
 package org.mule.providers.jms;
 
-// @Immutable
+// @ThreadSafe
 public class JmsConstants
 {
+
     public static final String JMS_SPECIFICATION_102B = "1.0.2b";
     public static final String JMS_SPECIFICATION_11 = "1.1";
 
