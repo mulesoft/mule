@@ -55,21 +55,21 @@ public class MapUtilsTestCase extends TestCase
         assertEquals("foo", m.get("FOO"));
     }
 
-    public void testMapNull() throws Exception
+    public void testToStringNull() throws Exception
     {
         Map props = null;
         assertEquals("{}", MapUtils.toString(props, false));
         assertEquals("{}", MapUtils.toString(props, true));
     }
 
-    public void testMapEmpty() throws Exception
+    public void testToStringEmpty() throws Exception
     {
         Map props = new HashMap();
         assertEquals("{}", MapUtils.toString(props, false));
         assertEquals("{}", MapUtils.toString(props, true));
     }
 
-    public void testMapSingleElement() throws Exception
+    public void testToStringSingleElement() throws Exception
     {
         Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"}, new Object[]{"bar"});
 
@@ -78,7 +78,7 @@ public class MapUtilsTestCase extends TestCase
             MapUtils.toString(props, true));
     }
 
-    public void testMapTwoElements() throws Exception
+    public void testToStringMultipleElements() throws Exception
     {
         Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo", "foozle"}, new Object[]{
             "bar", "doozle"});

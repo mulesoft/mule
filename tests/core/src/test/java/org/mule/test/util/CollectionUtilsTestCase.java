@@ -22,21 +22,21 @@ import org.mule.util.CollectionUtils;
 public class CollectionUtilsTestCase extends TestCase
 {
 
-    public void testCollectionNull() throws Exception
+    public void testToStringNull() throws Exception
     {
         Collection c = null;
         assertEquals("[]", CollectionUtils.toString(c, false));
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
 
-    public void testCollectionEmpty() throws Exception
+    public void testToStringEmpty() throws Exception
     {
         Collection c = new ArrayList();
         assertEquals("[]", CollectionUtils.toString(c, false));
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
 
-    public void testCollectionSingleElement() throws Exception
+    public void testToStringSingleElement() throws Exception
     {
         Collection c = Arrays.asList(new Object[]{"foo"});
 
@@ -45,11 +45,11 @@ public class CollectionUtilsTestCase extends TestCase
             CollectionUtils.toString(c, true));
     }
 
-    public void ctestCollectionTwoElements() throws Exception
+    public void testToStringMultipleElements() throws Exception
     {
         Collection c = Arrays.asList(new Object[]{"foo", this.getClass()});
 
-        assertEquals("[foo, " + this.getClass().getName(), CollectionUtils.toString(c, false));
+        assertEquals("[foo, " + this.getClass().getName() + "]", CollectionUtils.toString(c, false));
 
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR
                      + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]",
