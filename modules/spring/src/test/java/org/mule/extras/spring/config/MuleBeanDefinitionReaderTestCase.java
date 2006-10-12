@@ -11,10 +11,14 @@ package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.providers.vm.VMConnector;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.List;
@@ -31,7 +35,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
     public String getConfigResources()
     {
         // A Mule Xml config file and a Spring context file
-        return "test-xml-mule-config-split-with-beans.xml,test-xml-mule-config.xml,test-application-context.xml,test-xml-mule-config-split.xml";
+        return "test-xml-mule-config-split-with-beans.xml,test-xml-mule-config.xml,test-application-context.xml,test-xml-mule-config-split.xml,test-mule-to-spring-with-xslt.xml";
     }
 
     public ConfigurationBuilder getBuilder()
@@ -90,5 +94,10 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         assertNotNull(set);
         assertEquals(2, set.size());
         assertNotNull(d.getProperties().get("springBean"));
+    }
+    
+    public void testConvertedSpringBeans() throws UMOException
+    {
+        assertNotNull(MuleManager.getInstance().getContainerContext().getComponent("TestComponent"));
     }
 }
