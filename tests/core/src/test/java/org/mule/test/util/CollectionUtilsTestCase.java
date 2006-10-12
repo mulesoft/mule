@@ -10,14 +10,50 @@
 
 package org.mule.test.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 import junit.framework.TestCase;
+
+import org.apache.commons.lang.SystemUtils;
+import org.mule.util.CollectionUtils;
 
 public class CollectionUtilsTestCase extends TestCase
 {
 
-    public void testDummy()
+    public void testCollectionNull() throws Exception
     {
-        // this method only exists to silence the test runner
+        Collection c = null;
+        assertEquals("[]", CollectionUtils.toString(c, false));
+        assertEquals("[]", CollectionUtils.toString(c, true));
+    }
+
+    public void testCollectionEmpty() throws Exception
+    {
+        Collection c = new ArrayList();
+        assertEquals("[]", CollectionUtils.toString(c, false));
+        assertEquals("[]", CollectionUtils.toString(c, true));
+    }
+
+    public void testCollectionSingleElement() throws Exception
+    {
+        Collection c = Arrays.asList(new Object[]{"foo"});
+
+        assertEquals("[foo]", CollectionUtils.toString(c, false));
+        assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR + "]",
+            CollectionUtils.toString(c, true));
+    }
+
+    public void ctestCollectionTwoElements() throws Exception
+    {
+        Collection c = Arrays.asList(new Object[]{"foo", this.getClass()});
+
+        assertEquals("[foo, " + this.getClass().getName(), CollectionUtils.toString(c, false));
+
+        assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR
+                     + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]",
+            CollectionUtils.toString(c, true));
     }
 
 }
