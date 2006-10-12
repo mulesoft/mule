@@ -20,7 +20,7 @@ import java.util.Map;
  * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils
  * works
  */
-// @Immutable
+// @ThreadSafe
 public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
 {
     public static final String SET_PROPERTIES_METHOD = "setProperties";

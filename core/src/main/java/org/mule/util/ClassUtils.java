@@ -30,7 +30,7 @@ import java.util.List;
  * that works across different applications servers. The resource and classloading
  * methods are SecurityManager friendly.
  */
-// @Immutable
+// @ThreadSafe
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
     public static final Object[] NO_ARGS = new Object[]{};

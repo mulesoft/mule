@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * The Encoder contains methods that convert characters to Character entities as
  * defined by http://www.w3.org/TR/REC-html40/sgml/entities.html.
  */
-// @Immutable
+// @ThreadSafe
 public class SgmlCodec
 {
     private static final Map decoder = new HashMap(300);

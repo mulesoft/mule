@@ -27,7 +27,7 @@ import org.mule.config.i18n.Message;
  * <code>StringMessageHelper</code> contains some useful methods for formatting
  * message strings for logging or exceptions.
  */
-// @Immutable
+// @ThreadSafe
 public class StringMessageUtils
 {
     public static final String DEFAULT_ENCODING = "UTF-8";

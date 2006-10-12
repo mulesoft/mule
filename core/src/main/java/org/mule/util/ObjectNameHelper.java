@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Generates consistent objects names for Mule components
  */
-// @Immutable
+// @ThreadSafe
 public class ObjectNameHelper
 {
     public static final String SEPARATOR = ".";

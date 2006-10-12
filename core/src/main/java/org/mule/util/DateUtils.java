@@ -21,7 +21,7 @@ import org.mule.config.i18n.Messages;
  * <code>DateUtils</code> contains some useful methods dealing date/time
  * conversion, formatting etc.
  */
-// @Immutable
+// @ThreadSafe
 public class DateUtils extends org.apache.commons.lang.time.DateUtils
 {
 

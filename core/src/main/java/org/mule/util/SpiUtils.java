@@ -22,7 +22,7 @@ import org.apache.commons.discovery.tools.DiscoverClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-// @Immutable
+// @ThreadSafe
 public class SpiUtils
 {
     private static final Log logger = LogFactory.getLog(SpiUtils.class);

@@ -17,7 +17,7 @@ import org.mule.config.i18n.Messages;
  * <code>ComponentException</code> should be thrown when some action on a component
  * fails, such as starting or stopping
  */
-// @Immutable
+// @ThreadSafe
 public class ComponentException extends MessagingException
 {
     /**

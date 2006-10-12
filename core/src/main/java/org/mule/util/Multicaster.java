@@ -24,7 +24,7 @@ import java.util.List;
  * method returns a proxy that can be cast to any of the the interfaces passed and be
  * used like a single object.
  */
-// @Immutable
+// @ThreadSafe
 public class Multicaster
 {
 

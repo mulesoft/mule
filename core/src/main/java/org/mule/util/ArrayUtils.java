@@ -12,7 +12,7 @@ package org.mule.util;
 
 import java.lang.reflect.Array;
 
-// @Immutable
+// @ThreadSafe
 public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 {
 

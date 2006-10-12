@@ -13,7 +13,7 @@ package org.mule.util;
 /**
  * <code>NumberUtils</code> contains useful methods for manipulating numbers.
  */
-// @Immutable
+// @ThreadSafe
 public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
 {
 

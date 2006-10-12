@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Useful for enumerating debug information about the current Java environment
  */
-// @Immutable
+// @ThreadSafe
 public class DebugUtils
 {
 

@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 /**
  * <code>StringUtils</code> contains useful methods for manipulating Strings.
  */
-// @Immutable
+// @ThreadSafe
 public class StringUtils extends org.apache.commons.lang.StringUtils
 {
 

@@ -31,7 +31,7 @@ import org.mule.umo.transformer.UMOTransformer;
  * <code>MuleObjectHelper</code> is a helper class to assist in finding mule server
  * objects, such as endpoint and transformers
  */
-// @Immutable
+// @ThreadSafe
 public class MuleObjectHelper
 {
 

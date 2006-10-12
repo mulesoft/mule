@@ -30,7 +30,7 @@ import org.mule.MuleManager;
  * <code>FileUtils</code> contains useful methods for dealing with files &
  * directories.
  */
-// @Immutable
+// @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
 

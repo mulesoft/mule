@@ -13,7 +13,6 @@ package org.mule.util;
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects
  */
-// @Immutable
 public interface ObjectPool
 {
     /**

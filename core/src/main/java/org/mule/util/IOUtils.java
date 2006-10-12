@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
-// @Immutable
+// @ThreadSafe
 /**
  * Mule input/output utilities.
  */
