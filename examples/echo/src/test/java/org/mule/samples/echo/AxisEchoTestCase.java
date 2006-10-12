@@ -78,7 +78,10 @@ public class AxisEchoTestCase extends FunctionalTestCase
         UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
         // TODO: MULE-1113
-        // assertNull(result.getExceptionPayload());
+        if (!(this instanceof XFireEchoTestCase))
+        {
+            assertNull(result.getExceptionPayload());
+        }
         assertFalse(result.getPayload() instanceof NullPayload);
         XMLAssert.assertXMLEqual(expectedPostResponse, result.getPayloadAsString());
     }
@@ -91,7 +94,10 @@ public class AxisEchoTestCase extends FunctionalTestCase
         UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", props);
         assertNotNull(result);
         // TODO: MULE-1113
-        // assertNull(result.getExceptionPayload());
+        if (!(this instanceof XFireEchoTestCase))
+        {
+            assertNull(result.getExceptionPayload());
+        }
         assertFalse(result.getPayload() instanceof NullPayload);
         XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
@@ -99,10 +105,14 @@ public class AxisEchoTestCase extends FunctionalTestCase
     public void testSoapPostEcho() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.send(getProtocol() + ":http://localhost:8082/services/EchoUMO?method=echo", "hello", null);
+        UMOMessage result = client.send(
+            getProtocol() + ":http://localhost:8082/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
         // TODO: MULE-1113
-        // assertNull(result.getExceptionPayload());
+        if (!(this instanceof XFireEchoTestCase))
+        {
+            assertNull(result.getExceptionPayload());
+        }
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("hello", result.getPayload());
     }
