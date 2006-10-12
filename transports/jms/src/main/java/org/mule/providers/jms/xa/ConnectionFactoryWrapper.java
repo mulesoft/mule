@@ -40,17 +40,12 @@ import javax.jms.XATopicSession;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
-import javax.transaction.xa.Xid;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
 {
 
