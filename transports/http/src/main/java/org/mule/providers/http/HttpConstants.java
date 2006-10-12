@@ -19,11 +19,8 @@ import java.util.Map;
 
 /**
  * <code>HttpConstants</code> for request and response headers
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-
+// @ThreadSafe
 public class HttpConstants
 {
     // HTTP prefix
@@ -103,6 +100,9 @@ public class HttpConstants
     public static final String HEADER_WARNING = "Warning";// [General]
     public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";// [Response]
 
+    // This is a POST-related request header value
+    public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue";// [Request]
+
     // Chunked transfer encoding indicator
     public static final String TRANSFER_ENCODING_CHUNKED = "chunked";
 
@@ -164,43 +164,41 @@ public class HttpConstants
     public static final int SC_HTTP_VERSION_NOT_SUPPORTED = 505;
     public static final int SC_INSUFFICIENT_STORAGE = 507;
 
-    static {
-        synchronized (HttpConstants.class) {
-            String[] strings = new String[]{HEADER_ACCEPT,HEADER_ACCEPT_CHARSET,HEADER_ACCEPT_ENCODING,
-                HEADER_ACCEPT_LANGUAGE,HEADER_AUTHORIZATION,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
-                HEADER_COOKIE,HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
-                HEADER_IF_MODIFIED_SINCE,HEADER_IF_NONE_MATCH,HEADER_IF_RANGE,
-                HEADER_IF_UNMODIFIED_SINCE,HEADER_MAX_FORWARDS,HEADER_PRAGMA,HEADER_PROXY_AUTHORIZATION,
-                HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
-                HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING};
+    static
+    {
+        String[] strings = new String[]{HEADER_ACCEPT,HEADER_ACCEPT_CHARSET,HEADER_ACCEPT_ENCODING,
+            HEADER_ACCEPT_LANGUAGE,HEADER_AUTHORIZATION,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
+            HEADER_COOKIE,HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
+            HEADER_IF_MODIFIED_SINCE,HEADER_IF_NONE_MATCH,HEADER_IF_RANGE,
+            HEADER_IF_UNMODIFIED_SINCE,HEADER_MAX_FORWARDS,HEADER_PRAGMA,HEADER_PROXY_AUTHORIZATION,
+            HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
+            HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING};
 
-            REQUEST_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
-                    CaseInsensitiveMap.class, strings, strings));
+        REQUEST_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
+                CaseInsensitiveMap.class, strings, strings));
 
-            strings = new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,HEADER_CACHE_CONTROL,
-                HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,HEADER_COOKIE_SET,
-                HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_DATE,HEADER_ETAG,
-                HEADER_EXPIRES,HEADER_LAST_MODIFIED,HEADER_LOCATION,HEADER_PRAGMA,
-                HEADER_PROXY_AUTHENTICATE,HEADER_RETRY_AFTER,HEADER_SERVER,HEADER_TRAILER,
-                HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VARY,HEADER_VIA,HEADER_WARNING,
-                HEADER_WWW_AUTHENTICATE};
+        strings = new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,HEADER_CACHE_CONTROL,
+            HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,HEADER_COOKIE_SET,
+            HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_DATE,HEADER_ETAG,
+            HEADER_EXPIRES,HEADER_LAST_MODIFIED,HEADER_LOCATION,HEADER_PRAGMA,
+            HEADER_PROXY_AUTHENTICATE,HEADER_RETRY_AFTER,HEADER_SERVER,HEADER_TRAILER,
+            HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VARY,HEADER_VIA,HEADER_WARNING,
+            HEADER_WWW_AUTHENTICATE};
 
-            RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
-                    CaseInsensitiveMap.class, strings, strings));
+        RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
+                CaseInsensitiveMap.class, strings, strings));
 
-            strings = new String[]{HEADER_ALLOW,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
-                HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,HEADER_CONTENT_LENGTH,
-                HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_CONTENT_TYPE,
-                HEADER_DATE,HEADER_EXPIRES,HEADER_KEEP_ALIVE,HEADER_LAST_MODIFIED,HEADER_PRAGMA,
-                HEADER_TRAILER,HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VIA,HEADER_WARNING};
+        strings = new String[]{HEADER_ALLOW,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
+            HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,HEADER_CONTENT_LENGTH,
+            HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_CONTENT_TYPE,
+            HEADER_DATE,HEADER_EXPIRES,HEADER_KEEP_ALIVE,HEADER_LAST_MODIFIED,HEADER_PRAGMA,
+            HEADER_TRAILER,HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VIA,HEADER_WARNING};
 
-            Map allHeaders = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings,
-                    strings);
-            allHeaders.putAll(REQUEST_HEADER_NAMES);
-            allHeaders.putAll(RESPONSE_HEADER_NAMES);
-            ALL_HEADER_NAMES = Collections.unmodifiableMap(allHeaders);
-        }
+        Map allHeaders = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings,
+                strings);
+        allHeaders.putAll(REQUEST_HEADER_NAMES);
+        allHeaders.putAll(RESPONSE_HEADER_NAMES);
+        ALL_HEADER_NAMES = Collections.unmodifiableMap(allHeaders);
     }
 
-    public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue";
 }
