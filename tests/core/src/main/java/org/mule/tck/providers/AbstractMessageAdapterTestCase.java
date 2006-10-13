@@ -69,10 +69,9 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         adapter.setProperty("TestString", "Test1");
         adapter.setProperty("TestLong", new Long(20000000));
         adapter.setProperty("TestInt", new Integer(200000));
-        Object prop;
         assertNotNull(adapter.getPropertyNames());
 
-        prop = adapter.getProperty("TestString");
+        Object prop = adapter.getProperty("TestString");
         assertNotNull(prop);
         assertEquals("Test1", prop);
 
