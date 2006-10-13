@@ -103,7 +103,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         {
             // The session can be closed by the dispatcher closing so its more
             // reliable to get it from the dispatcher each time
-            if (requireNewSession && getEndpoint() != null)
+            if (requireNewSession || getEndpoint() != null)
             {
                 UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
                 session = (Session)dispatcher.getDelegateSession();
