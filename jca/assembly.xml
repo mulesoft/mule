@@ -1,0 +1,105 @@
+<!--
+Assembly descriptor for the Mule JCA distribution.
+-->
+<assembly>
+  <id>jca</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+    <!-- Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
+       replace the following lists with some clever wildcards. -->
+  <dependencySets>
+
+    <!-- Mule libraries -->
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <scope>runtime</scope>
+      <includes>
+        <!-- Core -->
+        <include>org.mule:mule-core</include>
+        <!-- Transports -->
+        <include>org.mule.transports:mule-transport-axis</include>
+        <include>org.mule.transports:mule-transport-dq</include>
+        <include>org.mule.transports:mule-transport-ejb</include>
+        <include>org.mule.transports:mule-transport-email</include>
+        <include>org.mule.transports:mule-transport-file</include>
+        <include>org.mule.transports:mule-transport-ftp</include>
+        <include>org.mule.transports:mule-transport-gigaspaces</include>
+        <include>org.mule.transports:mule-transport-glue</include>
+        <include>org.mule.transports:mule-transport-http</include>
+        <include>org.mule.transports:mule-transport-jbi</include>
+        <include>org.mule.transports:mule-transport-jdbc</include>
+        <include>org.mule.transports:mule-transport-jms</include>
+        <include>org.mule.transports:mule-transport-multicast</include>
+        <include>org.mule.transports:mule-transport-oracleaq</include>
+        <include>org.mule.transports:mule-transport-quartz</include>
+        <include>org.mule.transports:mule-transport-rmi</include>
+        <include>org.mule.transports:mule-transport-soap</include>
+        <include>org.mule.transports:mule-transport-space</include>
+        <include>org.mule.transports:mule-transport-ssl</include>
+        <include>org.mule.transports:mule-transport-stream</include>
+        <include>org.mule.transports:mule-transport-tcp</include>
+        <include>org.mule.transports:mule-transport-udp</include>
+        <include>org.mule.transports:mule-transport-vm</include>
+        <include>org.mule.transports:mule-transport-xfire</include>
+        <include>org.mule.transports:mule-transport-xmpp</include>
+        <!-- Modules -->
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-builders</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-hivemind</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+
+        <include>org.mule.modules:mule-module-management</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-picocontainer</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-xml</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <scope>compile</scope>
+      <includes>
+        <include>org.mule.modules:mule-module-jca</include>
+      </includes>
+    </dependencySet>
+
+    <!--
+         Maven fighting chronicles: if excludes are not specified in a
+         dedicated dependencySet, they simply don't work.
+    -->
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <scope>runtime</scope>
+      <excludes>
+        <!-- Just omitting these from the includes list is not enough =:< -->
+        <exclude>org.mule.modules:mule-module-jotm</exclude>
+        <exclude>org.mule.modules:mule-module-plexus</exclude>
+        <exclude>org.mule.modules:mule-module-i18n</exclude>
+        <!-- 3rd-party libs -->
+        <exclude>junit:junit</exclude>
+        <!-- Examples -->
+        <exclude>org.mule.examples:mule-example-echo</exclude>
+        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
+        <exclude>org.mule.examples:mule-example-hello</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb-credit-agency</exclude>
+        <exclude>org.mule.examples:mule-example-scripting</exclude>
+        <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <exclude>org.mule.examples:mule-example-voipservice</exclude>
+
+        <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
+        <exclude>org.mule.distributions:mule-jca</exclude>
+      </excludes>
+    </dependencySet>
+
+  </dependencySets>
+</assembly>
