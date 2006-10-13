@@ -29,8 +29,8 @@ public class DefaultJmxSupportAgent implements UMOAgent {
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
 
     private String name = "Default Jmx";
-    private boolean loadJmdkAgent = false;
-    private boolean loadMX4JAgent = false;
+    private boolean loadJdmkAgent = false;
+    private boolean loadMx4jAgent = false;
 
     /**
      * Gets the name of this agent
@@ -119,14 +119,14 @@ public class DefaultJmxSupportAgent implements UMOAgent {
             if (!isAgentRegistered(agent)) {
                 MuleManager.getInstance().registerAgent(agent);
             }
-            if (loadJmdkAgent) {
+            if (loadJdmkAgent) {
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent)) {
                     MuleManager.getInstance().registerAgent(agent);
                 }
             }
 
-            if (loadMX4JAgent) {
+            if (loadMx4jAgent) {
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent)) {
                     MuleManager.getInstance().registerAgent(agent);
@@ -173,19 +173,19 @@ public class DefaultJmxSupportAgent implements UMOAgent {
         return MuleManager.getInstance().lookupAgent(agent.getName()) != null;
     }
 
-    public boolean isLoadJmdkAgent() {
-        return loadJmdkAgent;
+    public boolean isLoadJdmkAgent() {
+        return loadJdmkAgent;
     }
 
-    public void setLoadJmdkAgent(boolean loadJmdkAgent) {
-        this.loadJmdkAgent = loadJmdkAgent;
+    public void setLoadJdmkAgent(boolean loadJdmkAgent) {
+        this.loadJdmkAgent = loadJdmkAgent;
     }
 
-    public boolean isLoadMX4JAgent() {
-        return loadMX4JAgent;
+    public boolean isLoadMx4jAgent() {
+        return loadMx4jAgent;
     }
 
-    public void setLoadMX4JAgent(boolean loadMX4JAgent) {
-        this.loadMX4JAgent = loadMX4JAgent;
+    public void setLoadMx4jAgent(boolean loadMx4jAgent) {
+        this.loadMx4jAgent = loadMx4jAgent;
     }
 }
