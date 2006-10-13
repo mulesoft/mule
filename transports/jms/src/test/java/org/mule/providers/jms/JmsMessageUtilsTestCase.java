@@ -12,20 +12,19 @@ package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.Mock;
 
-import org.mule.tck.AbstractMuleTestCase;
-
 import javax.jms.TextMessage;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
-public class JmsMessageUtilsTestCase extends AbstractMuleTestCase {
+import org.mule.tck.AbstractMuleTestCase;
 
-    public void testTextMessageNullContent() throws Exception {
+public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
+{
+
+    public void testTextMessageNullContent() throws Exception
+    {
         Mock mockMessage = new Mock(TextMessage.class);
         mockMessage.expectAndReturn("getText", null);
 
-        TextMessage mockTextMessage = (TextMessage) mockMessage.proxy();
+        TextMessage mockTextMessage = (TextMessage)mockMessage.proxy();
 
         byte[] result = JmsMessageUtils.getBytesFromMessage(mockTextMessage);
         assertNotNull(result);
@@ -33,4 +32,5 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase {
 
         mockMessage.verify();
     }
+
 }

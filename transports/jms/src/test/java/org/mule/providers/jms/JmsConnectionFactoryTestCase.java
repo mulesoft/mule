@@ -10,31 +10,30 @@
 
 package org.mule.providers.jms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * $Id$
- */
 public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
 {
+
     /**
-     * Test providerProperties set on JmsConnector
-     * are not passed to the underlying ConnectionFactory.
+     * Test providerProperties set on JmsConnector are not passed to the underlying
+     * ConnectionFactory.
      */
     public void testProviderPropertiesNotPassed() throws Exception
     {
-        //needed so that when the connecotr is initialsied the manage eventing
-        //model will be available. This is used by Jms for reconnection notifications
+        // needed so that when the connecotr is initialsied the manage eventing
+        // model will be available. This is used by Jms for reconnection
+        // notifications
         ((MuleManager)MuleManager.getInstance()).initialise();
 
         JmsConnector connector = new JmsConnector();
@@ -49,22 +48,21 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
 
         connector.initialise();
 
-        assertEquals(
-                "Provider properties should not be passed to the ConnectionFactory.",
-                "NOT_SET",
-                ((TestConnectionFactory) cf).getProviderProperty());
+        assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
+            ((TestConnectionFactory)cf).getProviderProperty());
     }
 
     /**
-     * Test connectionFactoryProperties set on JmsConnector
-     * are actually passed to the underlying ConnectionFactory.
+     * Test connectionFactoryProperties set on JmsConnector are actually passed to
+     * the underlying ConnectionFactory.
      */
     public void testConnectionFactoryPropertiesPassed() throws Exception
     {
-        //needed so that when the connecotr is initialsied the manage eventing
-        //model will be available. This is used by Jms for reconnection notifications
+        // needed so that when the connecotr is initialsied the manage eventing
+        // model will be available. This is used by Jms for reconnection
+        // notifications
         ((MuleManager)MuleManager.getInstance()).initialise();
-        
+
         JmsConnector connector = new JmsConnector();
         Map connectionFactoryProperties = new HashMap(1);
         final String testConnectionFactoryProperty = "connectionFactoryProperty";
@@ -78,10 +76,8 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         connector.initialise();
         connector.startConnector();
 
-        assertEquals(
-                "ConnectionFactory properties should be passed to the ConnectionFactory.",
-                "TEST_VALUE",
-                ((TestConnectionFactory) cf).getConnectionFactoryProperty());
+        assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",
+            ((TestConnectionFactory)cf).getConnectionFactoryProperty());
     }
 
     public static final class TestConnectionFactory implements QueueConnectionFactory
@@ -135,4 +131,5 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
             return null;
         }
     }
+
 }

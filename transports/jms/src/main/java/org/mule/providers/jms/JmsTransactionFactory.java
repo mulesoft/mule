@@ -16,14 +16,11 @@ import org.mule.umo.UMOTransactionFactory;
 
 /**
  * <p>
- * <code>JmsTransactionFactory</code> Creates a Jms local transaction
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
+ * <code>JmsTransactionFactory</code> creates a JMS local transaction
  */
 public class JmsTransactionFactory implements UMOTransactionFactory
 {
+
     /*
      * (non-Javadoc)
      * 

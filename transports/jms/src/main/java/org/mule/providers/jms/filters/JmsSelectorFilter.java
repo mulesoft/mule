@@ -7,18 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms.filters;
 
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>JmsSelectorFilter</code> is a wrapper for a Jms Selector. This filter
+ * <code>JmsSelectorFilter</code> is a wrapper for a JMS Selector. This filter
  * should not be called. Instead the JmsConnector sets the selector on the
  * destionation to the expression set on this filer.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JmsSelectorFilter implements UMOFilter
 {
@@ -39,4 +37,5 @@ public class JmsSelectorFilter implements UMOFilter
     {
         this.expression = expression;
     }
+
 }

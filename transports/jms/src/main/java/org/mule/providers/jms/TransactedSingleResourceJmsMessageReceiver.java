@@ -7,7 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.resource.spi.work.Work;
 
 import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
@@ -26,56 +36,56 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.resource.spi.work.Work;
-
-public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageReceiver implements MessageListener
+public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageReceiver
+    implements MessageListener
 {
-	 protected JmsConnector connector;
-	 protected RedeliveryHandler redeliveryHandler;
-     protected MessageConsumer consumer;
-     protected Session session;
-	 protected boolean startOnConnect = false;
-	 
+    protected JmsConnector connector;
+    protected RedeliveryHandler redeliveryHandler;
+    protected MessageConsumer consumer;
+    protected Session session;
+    protected boolean startOnConnect = false;
 
-	 /** determines whether messages will be received in a transaction template */
-	 protected boolean receiveMessagesInTransaction = true;
+    /** determines whether messages will be received in a transaction template */
+    protected boolean receiveMessagesInTransaction = true;
 
-	 /** determines whether Multiple receivers are created to improve throughput */
-	 protected boolean useMultipleReceivers = true;
+    /** determines whether Multiple receivers are created to improve throughput */
+    protected boolean useMultipleReceivers = true;
 
-	/**
-	 * @param connector
-	 * @param component
-	 * @param endpoint
-	 * @throws InitialisationException
-	 */
-	public TransactedSingleResourceJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException {
-		super(connector, component, endpoint);
-        this.connector = (JmsConnector) connector;
-        
-        //TODO check which properties being set in the TransecteJmsMessage receiver are needed...
+    /**
+     * @param connector
+     * @param component
+     * @param endpoint
+     * @throws InitialisationException
+     */
+    public TransactedSingleResourceJmsMessageReceiver(UMOConnector connector,
+                                                      UMOComponent component,
+                                                      UMOEndpoint endpoint) throws InitialisationException
+    {
+        super(connector, component, endpoint);
+        this.connector = (JmsConnector)connector;
 
-        try {
+        // TODO check which properties being set in the TransecteJmsMessage receiver
+        // are needed...
+
+        try
+        {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(e, this);
         }
-	}
+    }
 
     public void doConnect() throws Exception
     {
-        try {
+        try
+        {
             JmsSupport jmsSupport = this.connector.getJmsSupport();
             // Create session if none exists
-            if (session == null) {
+            if (session == null)
+            {
                 session = this.connector.getSession(endpoint);
             }
 
@@ -83,87 +93,112 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
             boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
-            //todo MULE20 remove resource Info support
-            if(!topic) {
-                topic = MapUtils.getBooleanValue(endpoint.getProperties(),
-                        JmsConstants.TOPIC_PROPERTY, false);
+            // todo MULE20 remove resource Info support
+            if (!topic)
+            {
+                topic = MapUtils.getBooleanValue(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);
             }
 
-            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
+            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
+                topic);
 
             // Extract jms selector
             String selector = null;
-            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-            } else if (endpoint.getProperties() != null) {
+            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+            {
+                selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
+            }
+            else if (endpoint.getProperties() != null)
+            {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
-                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
-            String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            String tempDurable = (String)endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
-            if (tempDurable != null) {
+            if (tempDurable != null)
+            {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 
             // Get the durable subscriber name if there is one
-            String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
-            if (durableName == null && durable && dest instanceof Topic) {
+            String durableName = (String)endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
+            if (durableName == null && durable && dest instanceof Topic)
+            {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                        + durableName);
+                             + durableName);
             }
 
             // Create consumer
-            consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName, topic);
-        } catch (JMSException e) {
+            consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
+                topic);
+        }
+        catch (JMSException e)
+        {
             throw new ConnectException(e, this);
         }
     }
 
     public void onMessage(Message message)
     {
-        try {
+        try
+        {
             getWorkManager().scheduleWork(new MessageReceiverWorker(message));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             handleException(e);
         }
     }
 
-	
-    public void doStart() throws UMOException {
-        try {
-            //We ned to register the listener when start is called in order to only start receiving messages after
-            //start/
-            //If the consumer is null it means that the connection strategy is being run in a separate thread
-            //And hasn't managed to connect yet.
-            if(consumer==null)  {
-                startOnConnect=true;
-            } else {
-                startOnConnect=false;
-                
+    public void doStart() throws UMOException
+    {
+        try
+        {
+            // We ned to register the listener when start is called in order to only
+            // start receiving messages after
+            // start/
+            // If the consumer is null it means that the connection strategy is being
+            // run in a separate thread
+            // And hasn't managed to connect yet.
+            if (consumer == null)
+            {
+                startOnConnect = true;
+            }
+            else
+            {
+                startOnConnect = false;
+
                 this.consumer.setMessageListener(this);
             }
-        } catch (JMSException e) {
+        }
+        catch (JMSException e)
+        {
             throw new LifecycleException(e, this);
         }
     }
 
-    public void doStop() throws UMOException {
-        try {
-            if(consumer!=null) {
+    public void doStop() throws UMOException
+    {
+        try
+        {
+            if (consumer != null)
+            {
                 consumer.setMessageListener(null);
             }
-        } catch (JMSException e) {
+        }
+        catch (JMSException e)
+        {
             throw new LifecycleException(e, this);
         }
     }
-	
+
     public void doDisconnect() throws Exception
     {
         closeConsumer();
     }
-    
+
     protected void closeConsumer()
     {
         connector.closeQuietly(consumer);
@@ -171,84 +206,95 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         connector.closeQuietly(session);
         session = null;
     }
-	
-	
-	
-	protected class MessageReceiverWorker implements Work
-	{
+
+    protected class MessageReceiverWorker implements Work
+    {
         Message message;
-		
-	    
-	    public MessageReceiverWorker(Message message)
-	    {
-	    	this.message=message;
-	    }
 
+        public MessageReceiverWorker(Message message)
+        {
+            this.message = message;
+        }
 
-		public void run() {
-			try {
-            	TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                        connector.getExceptionListener());
+        public void run()
+        {
+            try
+            {
+                TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
+                    connector.getExceptionListener());
 
-            	if (receiveMessagesInTransaction) {
-            		TransactionCallback cb = new MessageTransactionCallback(message) {
+                if (receiveMessagesInTransaction)
+                {
+                    TransactionCallback cb = new MessageTransactionCallback(message)
+                    {
 
-						public Object doInTransaction() throws Exception {
-							//Get Transaction & Bind Session
-							UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-							if (tx != null) {
-					            tx.bindResource(connector.getConnection(), session);
-					        }
-							if(tx instanceof JmsClientAcknowledgeTransaction)
-							{
-								tx.bindResource(message, message);
-							}
-							
-							if (logger.isDebugEnabled()) {
-				                logger.debug("Message received it is of type: " + message.getClass().getName());
-				                if (message.getJMSDestination() != null) {
-				                    logger.debug("Message received on " + message.getJMSDestination() + " ("
-				                            + message.getJMSDestination().getClass().getName() + ")");
-				                } else {
-				                    logger.debug("Message received on unknown destination");
-				                }
-				                logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
-				                logger.debug("Jms Message Id is: " + message.getJMSMessageID());
-				            }
+                        public Object doInTransaction() throws Exception
+                        {
+                            // Get Transaction & Bind Session
+                            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+                            if (tx != null)
+                            {
+                                tx.bindResource(connector.getConnection(), session);
+                            }
+                            if (tx instanceof JmsClientAcknowledgeTransaction)
+                            {
+                                tx.bindResource(message, message);
+                            }
 
-				            if (message.getJMSRedelivered()) {
-				                if (logger.isDebugEnabled()) {
-				                    logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-				                            + " is redelivered. handing off to Exception Handler");
-				                }
-				                redeliveryHandler.handleRedelivery(message);
-				            }
-							
-							UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-			                routeMessage(new MuleMessage(adapter));
-							return null;
-						}
-            		};
-            		tt.execute(cb);
-            	}else
-            	{
-            		UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-	                routeMessage(new MuleMessage(adapter));
-            	}
-            			
-                
-            } catch (Exception e) {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Message received it is of type: "
+                                             + message.getClass().getName());
+                                if (message.getJMSDestination() != null)
+                                {
+                                    logger.debug("Message received on " + message.getJMSDestination() + " ("
+                                                 + message.getJMSDestination().getClass().getName() + ")");
+                                }
+                                else
+                                {
+                                    logger.debug("Message received on unknown destination");
+                                }
+                                logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
+                                logger.debug("Jms Message Id is: " + message.getJMSMessageID());
+                            }
+
+                            if (message.getJMSRedelivered())
+                            {
+                                if (logger.isDebugEnabled())
+                                {
+                                    logger.debug("Message with correlationId: "
+                                                 + message.getJMSCorrelationID()
+                                                 + " is redelivered. handing off to Exception Handler");
+                                }
+                                redeliveryHandler.handleRedelivery(message);
+                            }
+
+                            UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                            routeMessage(new MuleMessage(adapter));
+                            return null;
+                        }
+                    };
+                    tt.execute(cb);
+                }
+                else
+                {
+                    UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                    routeMessage(new MuleMessage(adapter));
+                }
+
+            }
+            catch (Exception e)
+            {
                 getConnector().handleException(e);
             }
-			
-		}
+
+        }
 
         public void release()
         {
             // Nothing to release.
-            
         }
-		
-	}
-	
+
+    }
+
 }

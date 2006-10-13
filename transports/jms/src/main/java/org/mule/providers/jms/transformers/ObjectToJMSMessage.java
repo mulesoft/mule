@@ -16,8 +16,8 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>ObjectToJMSMessage</code> will convert any object to a
- * <code>javax.jms.Message</code> or sub-type into an object. One of the 5
- * types of JMS message will be created based on the type of Object passed in.
+ * <code>javax.jms.Message</code> or sub-type into an object. One of the 5 types of
+ * JMS message will be created based on the type of Object passed in.
  * <ul>
  * <li>java.lang.String - javax.jms.TextMessage</li>
  * <li>byte[] - javax.jms.BytesMessage</li>
@@ -25,11 +25,8 @@ import org.mule.umo.transformer.TransformerException;
  * <li>java.io.InputStream - javax.jms.StreamMessage</li>
  * <li>javalang.Object - javax.jms.ObjectMessage</li>
  * </ul>
- * Note that if compression is turned on then a
- * <code>javax.jms.BytesMessage</code> is always sent
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Note that if compression is turned on then a <code>javax.jms.BytesMessage</code>
+ * is sent.
  */
 
 public class ObjectToJMSMessage extends AbstractJmsTransformer
@@ -48,17 +45,22 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
     {
         Object result = null;
 
-        try {
-            if (logger.isDebugEnabled()) {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Source object is " + src.getClass().getName());
             }
 
             result = transformToMessage(src);
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Resulting object is " + result.getClass().getName());
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
         return result;

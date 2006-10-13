@@ -12,6 +12,9 @@ package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.Mock;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -21,26 +24,19 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     private JmsConnector connector;
 
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         MuleManager.getInstance().registerConnector(getConnector());
         super.doSetUp();
     }
 
     public void testReceive() throws Exception
     {
-        JmsMessageReceiver receiver = (JmsMessageReceiver) getMessageReceiver();
+        JmsMessageReceiver receiver = (JmsMessageReceiver)getMessageReceiver();
         assertNotNull(receiver.getComponent());
         assertNotNull(receiver.getConnector());
         assertNotNull(receiver.getEndpoint());
@@ -61,7 +57,8 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOConnector getConnector() throws Exception
     {
-        if (connector == null) {
+        if (connector == null)
+        {
             connector = new JmsConnector();
             connector.setName("TestConnector");
             connector.setSpecification("1.1");
@@ -72,7 +69,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             connection.expect("close");
             connection.expect("start");
             connection.expect("stop");
-            connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
+            connector.setConnectionFactory((ConnectionFactory)connectionFactory.proxy());
         }
         return connector;
     }
@@ -88,4 +85,5 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         endpoint.setConnector(getConnector());
         return endpoint;
     }
+
 }

@@ -14,13 +14,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class JmsEndpointTestCase extends AbstractMuleTestCase
 {
+
     public void testWithoutFullUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("jms:/my.queue");
@@ -111,4 +107,5 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("password", url.getPassword());
         assertEquals("jms://user:password@jmsProvider/topic:topic1", url.toString());
     }
+
 }

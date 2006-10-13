@@ -14,13 +14,9 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
+
     /*
      * (non-Javadoc)
      * 
@@ -35,4 +31,5 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return JmsConnectorTestCase.getMessage();
     }
+
 }

@@ -10,25 +10,20 @@
 
 package org.mule.providers.jms;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Session;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
-
 /**
- * <p>
- * <code>JmsTransaction</code> is a wrapper for a Jms local transaction. This
- * object holds the jms session and controls the when the transaction committed
- * or rolled back.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
+ * <code>JmsTransaction</code> is a wrapper for a JMS local transaction. This
+ * object holds the JMS session and controls when the transaction is committed or
+ * rolled back.
  */
 public class JmsTransaction extends AbstractSingleResourceTransaction
 {
@@ -41,18 +36,25 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
      */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
-        if (!(key instanceof Connection) || !(resource instanceof Session)) {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES,
-                                                                   "javax.jms.Connection/javax.jms.Session"));
+        if (!(key instanceof Connection) || !(resource instanceof Session))
+        {
+            throw new IllegalTransactionStateException(new Message(
+                Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "javax.jms.Connection/javax.jms.Session"));
         }
-        Session session = (Session) resource;
-        try {
-            if (!session.getTransacted()) {
+
+        Session session = (Session)resource;
+        try
+        {
+            if (!session.getTransacted())
+            {
                 throw new IllegalTransactionStateException(new Message("jms", 4));
             }
-        } catch (JMSException e) {
+        }
+        catch (JMSException e)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_READ_STATE), e);
         }
+
         super.bindResource(key, resource);
     }
 
@@ -73,9 +75,12 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
      */
     protected void doCommit() throws TransactionException
     {
-        try {
-            ((Session) resource).commit();
-        } catch (JMSException e) {
+        try
+        {
+            ((Session)resource).commit();
+        }
+        catch (JMSException e)
+        {
             throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
         }
     }
@@ -87,9 +92,12 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
      */
     protected void doRollback() throws TransactionException
     {
-        try {
-            ((Session) resource).rollback();
-        } catch (JMSException e) {
+        try
+        {
+            ((Session)resource).rollback();
+        }
+        catch (JMSException e)
+        {
             throw new TransactionException(new Message(Messages.TX_ROLLBACK_FAILED), e);
         }
     }

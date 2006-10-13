@@ -33,14 +33,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- *
- */
-public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiver {
-
+public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
+{
     protected JmsConnector connector;
     protected boolean reuseConsumer;
     protected boolean reuseSession;
@@ -50,8 +44,6 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /**
      * Holder receiving the session and consumer for this thread.
-     *
-     * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
      */
     protected static class JmsThreadContext
     {
@@ -61,8 +53,6 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /**
      * Strongly typed ThreadLocal for ThreadContext.
-     *
-     * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
      */
     protected static class ThreadContextLocal extends ThreadLocal
     {

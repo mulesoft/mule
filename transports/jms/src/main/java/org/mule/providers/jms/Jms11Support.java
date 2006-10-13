@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms;
 
 import javax.jms.Connection;
@@ -23,11 +24,8 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 
 /**
- * <code>Jms11Support</code> is a template class to provide an absstraction to
- * to the Jms 1.1 api specification.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Jms11Support</code> is a template class to provide an abstraction to to
+ * the JMS 1.1 API specification.
  */
 
 public class Jms11Support implements JmsSupport
@@ -37,7 +35,10 @@ public class Jms11Support implements JmsSupport
     protected boolean forceJndiDestinations = false;
     protected JmsConnector connector;
 
-    public Jms11Support(JmsConnector connector, Context context, boolean jndiDestinations, boolean forceJndiDestinations)
+    public Jms11Support(JmsConnector connector,
+                        Context context,
+                        boolean jndiDestinations,
+                        boolean forceJndiDestinations)
     {
         this.connector = connector;
         this.context = context;
@@ -46,9 +47,10 @@ public class Jms11Support implements JmsSupport
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
-            throws JMSException
+        throws JMSException
     {
-        if (connectionFactory == null) {
+        if (connectionFactory == null)
+        {
             throw new IllegalArgumentException("connectionFactory cannot be null");
         }
         return connectionFactory.createConnection(username, password);
@@ -56,24 +58,30 @@ public class Jms11Support implements JmsSupport
 
     public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
     {
-        if (connectionFactory == null) {
+        if (connectionFactory == null)
+        {
             throw new IllegalArgumentException("connectionFactory cannot be null");
         }
         return connectionFactory.createConnection();
     }
 
-    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
-            throws JMSException
+    public Session createSession(Connection connection,
+                                 boolean topic,
+                                 boolean transacted,
+                                 int ackMode,
+                                 boolean noLocal) throws JMSException
     {
         return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
     }
 
-    public MessageProducer createProducer(Session session, Destination destination, boolean topic) throws JMSException
+    public MessageProducer createProducer(Session session, Destination destination, boolean topic)
+        throws JMSException
     {
         return session.createProducer(destination);
     }
 
-    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic) throws JMSException
+    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic)
+        throws JMSException
     {
         return createConsumer(session, destination, null, false, null, topic);
     }
@@ -85,45 +93,67 @@ public class Jms11Support implements JmsSupport
                                           String durableName,
                                           boolean topic) throws JMSException
     {
-        if (durableName == null) {
-            if (topic) {
+        if (durableName == null)
+        {
+            if (topic)
+            {
                 return session.createConsumer(destination, messageSelector, noLocal);
-            } else {
+            }
+            else
+            {
                 return session.createConsumer(destination, messageSelector);
             }
-        } else {
-            if (topic) {
-                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
-            } else {
-                throw new JMSException("A durable subscriber name was set but the destination was not a Topic");
+        }
+        else
+        {
+            if (topic)
+            {
+                return session.createDurableSubscriber((Topic)destination, durableName, messageSelector,
+                    noLocal);
+            }
+            else
+            {
+                throw new JMSException(
+                    "A durable subscriber name was set but the destination was not a Topic");
             }
         }
     }
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException
     {
-        if (session == null) {
+        if (session == null)
+        {
             throw new IllegalArgumentException("Session cannot be null when creating a destination");
         }
-        if (name == null) {
+        if (name == null)
+        {
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (jndiDestinations) {
-            if (context == null) {
-                throw new IllegalArgumentException("Jndi Context name cannot be null when looking up a destination");
+        if (jndiDestinations)
+        {
+            if (context == null)
+            {
+                throw new IllegalArgumentException(
+                    "Jndi Context name cannot be null when looking up a destination");
             }
             Destination dest = getJndiDestination(name);
-            if (dest != null) {
+            if (dest != null)
+            {
                 return dest;
-            } else if (forceJndiDestinations) {
+            }
+            else if (forceJndiDestinations)
+            {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
         }
 
-        if (topic) {
+        if (topic)
+        {
             return session.createTopic(name);
-        } else {
+        }
+        else
+        {
             return session.createQueue(name);
         }
     }
@@ -131,15 +161,22 @@ public class Jms11Support implements JmsSupport
     protected Destination getJndiDestination(String name) throws JMSException
     {
         Object temp;
-        try {
+        try
+        {
             temp = context.lookup(name);
-        } catch (NamingException e) {
+        }
+        catch (NamingException e)
+        {
             throw new JMSException("Failed to look up destination: " + e.getMessage());
         }
-        if (temp != null) {
-            if (temp instanceof Destination) {
-                return (Destination) temp;
-            } else if (forceJndiDestinations) {
+        if (temp != null)
+        {
+            if (temp instanceof Destination)
+            {
+                return (Destination)temp;
+            }
+            else if (forceJndiDestinations)
+            {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
         }
@@ -148,42 +185,43 @@ public class Jms11Support implements JmsSupport
 
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException
     {
-        if (session == null) {
+        if (session == null)
+        {
             throw new IllegalArgumentException("Session cannot be null when creating a destination");
         }
 
-        if (topic) {
+        if (topic)
+        {
             return session.createTemporaryTopic();
-        } else {
+        }
+        else
+        {
             return session.createTemporaryQueue();
         }
     }
 
     public void send(MessageProducer producer, Message message, boolean topic) throws JMSException
     {
-        send(producer,
-             message,
-             connector.isPersistentDelivery(),
-             Message.DEFAULT_PRIORITY,
-             Message.DEFAULT_TIME_TO_LIVE,
-             topic);
+        send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
+            Message.DEFAULT_TIME_TO_LIVE, topic);
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest, boolean topic) throws JMSException
+    public void send(MessageProducer producer, Message message, Destination dest, boolean topic)
+        throws JMSException
     {
-        send(producer,
-             message,
-             dest,
-             connector.isPersistentDelivery(),
-             Message.DEFAULT_PRIORITY,
-             Message.DEFAULT_TIME_TO_LIVE,
-             topic);
+        send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
+            Message.DEFAULT_TIME_TO_LIVE, topic);
     }
 
-    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic)
-            throws JMSException
+    public void send(MessageProducer producer,
+                     Message message,
+                     boolean persistent,
+                     int priority,
+                     long ttl,
+                     boolean topic) throws JMSException
     {
-        producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+        producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+            priority, ttl);
     }
 
     public void send(MessageProducer producer,
@@ -194,11 +232,8 @@ public class Jms11Support implements JmsSupport
                      long ttl,
                      boolean topic) throws JMSException
     {
-        producer.send(dest,
-                      message,
-                      (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-                      priority,
-                      ttl);
+        producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
+            priority, ttl);
     }
 
 }

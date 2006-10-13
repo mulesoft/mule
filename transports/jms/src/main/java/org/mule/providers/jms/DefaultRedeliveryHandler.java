@@ -7,24 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms;
+
+import java.util.Collections;
+import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.MessagingException;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
-import java.util.Collections;
-import java.util.Map;
-
 /**
  * <code>DefaultRedeliveryHandler</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultRedeliveryHandler implements RedeliveryHandler
 {
@@ -56,36 +54,46 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
     /**
      * process the redelivered message. If the Jms receiver should process the
      * message, it should be returned. Otherwise the connector should throw a
-     * <code>MessageRedeliveredException</code> to indicate that the message
-     * should be handled by the connector Exception Handler.
+     * <code>MessageRedeliveredException</code> to indicate that the message should
+     * be handled by the connector Exception Handler.
      * 
      * @param message
      */
     public void handleRedelivery(Message message) throws JMSException, MessagingException
     {
-        if (connector.getMaxRedelivery() <= 0) {
+        if (connector.getMaxRedelivery() <= 0)
+        {
             return;
         }
 
         String id = message.getJMSMessageID();
-        Integer i = (Integer) messages.remove(id);
-        if (i == null) {
-            if (logger.isDebugEnabled()) {
+        Integer i = (Integer)messages.remove(id);
+        if (i == null)
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Message with id: " + id + " has been redelivered for the fist time");
             }
             messages.put(id, new Integer(1));
             return;
-        } else if (i.intValue() == connector.getMaxRedelivery()) {
-            if (logger.isDebugEnabled()) {
+        }
+        else if (i.intValue() == connector.getMaxRedelivery())
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Message with id: " + id + " has been redelivered " + (i.intValue() + 1)
-                        + " times, which exceeds the maxRedelivery setting on the connector");
+                             + " times, which exceeds the maxRedelivery setting on the connector");
             }
-            JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
-            throw new MessageRedeliveredException(new org.mule.config.i18n.Message("jms", 11, id, String.valueOf(i.intValue() + 1)), adapter);
+            JmsMessageAdapter adapter = (JmsMessageAdapter)connector.getMessageAdapter(message);
+            throw new MessageRedeliveredException(new org.mule.config.i18n.Message("jms", 11, id,
+                String.valueOf(i.intValue() + 1)), adapter);
 
-        } else {
+        }
+        else
+        {
             messages.put(id, new Integer(i.intValue() + 1));
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Message with id: " + id + " has been redelivered " + i.intValue() + " times");
             }
         }

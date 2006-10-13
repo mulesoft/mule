@@ -16,15 +16,15 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will dsend Jms messages
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will
+ * send JMS messages
  */
 public class JmsMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
+
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new JmsMessageDispatcher( endpoint);
+        return new JmsMessageDispatcher(endpoint);
     }
+
 }

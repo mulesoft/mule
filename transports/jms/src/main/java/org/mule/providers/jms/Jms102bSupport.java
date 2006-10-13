@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms;
 
 import javax.jms.Connection;
@@ -31,15 +32,13 @@ import javax.jms.TopicSession;
 import javax.naming.Context;
 
 /**
- * <code>Jms102bSupport</code> is a template class to provide an absstraction
- * to to the Jms 1.0.2b api specification.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>Jms102bSupport</code> is a template class to provide an abstraction to the
+ * JMS 1.0.2b API specification.
  */
 
 public class Jms102bSupport extends Jms11Support
 {
+
     public Jms102bSupport(JmsConnector connector,
                           Context context,
                           boolean jndiDestinations,
@@ -49,44 +48,64 @@ public class Jms102bSupport extends Jms11Support
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
-            throws JMSException
+        throws JMSException
     {
-        if (connectionFactory == null) {
+        if (connectionFactory == null)
+        {
             throw new IllegalArgumentException("connectionFactory cannot be null");
         }
-        if (connectionFactory instanceof QueueConnectionFactory) {
-            return ((QueueConnectionFactory) connectionFactory).createQueueConnection(username, password);
-        } else if (connectionFactory instanceof TopicConnectionFactory) {
-            return ((TopicConnectionFactory) connectionFactory).createTopicConnection(username, password);
-        } else {
+        if (connectionFactory instanceof QueueConnectionFactory)
+        {
+            return ((QueueConnectionFactory)connectionFactory).createQueueConnection(username, password);
+        }
+        else if (connectionFactory instanceof TopicConnectionFactory)
+        {
+            return ((TopicConnectionFactory)connectionFactory).createTopicConnection(username, password);
+        }
+        else
+        {
             throw new IllegalArgumentException("Unsupported ConnectionFactory type: "
-                    + connectionFactory.getClass().getName());
+                                               + connectionFactory.getClass().getName());
         }
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
     {
-        if (connectionFactory == null) {
+        if (connectionFactory == null)
+        {
             throw new IllegalArgumentException("connectionFactory cannot be null");
         }
-        if (connectionFactory instanceof QueueConnectionFactory) {
-            return ((QueueConnectionFactory) connectionFactory).createQueueConnection();
-        } else if (connectionFactory instanceof TopicConnectionFactory) {
-            return ((TopicConnectionFactory) connectionFactory).createTopicConnection();
-        } else {
+        if (connectionFactory instanceof QueueConnectionFactory)
+        {
+            return ((QueueConnectionFactory)connectionFactory).createQueueConnection();
+        }
+        else if (connectionFactory instanceof TopicConnectionFactory)
+        {
+            return ((TopicConnectionFactory)connectionFactory).createTopicConnection();
+        }
+        else
+        {
             throw new IllegalArgumentException("Unsupported ConnectionFactory type: "
-                    + connectionFactory.getClass().getName());
+                                               + connectionFactory.getClass().getName());
         }
     }
 
-    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
-            throws JMSException
+    public Session createSession(Connection connection,
+                                 boolean topic,
+                                 boolean transacted,
+                                 int ackMode,
+                                 boolean noLocal) throws JMSException
     {
-        if (topic && connection instanceof TopicConnection) {
-            return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
-        } else if (connection instanceof QueueConnection) {
-            return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
-        } else {
+        if (topic && connection instanceof TopicConnection)
+        {
+            return ((TopicConnection)connection).createTopicSession(noLocal, ackMode);
+        }
+        else if (connection instanceof QueueConnection)
+        {
+            return ((QueueConnection)connection).createQueueSession(transacted, ackMode);
+        }
+        else
+        {
             throw new IllegalArgumentException("Connection and domain type do not match");
         }
     }
@@ -98,78 +117,110 @@ public class Jms102bSupport extends Jms11Support
                                           String durableName,
                                           boolean topic) throws JMSException
     {
-        if (topic && session instanceof TopicSession) {
-            if (durableName == null) {
-                return ((TopicSession) session).createSubscriber((Topic) destination, messageSelector, noLocal);
-            } else {
-                return ((TopicSession) session).createDurableSubscriber((Topic) destination, messageSelector, durableName, noLocal);
+        if (topic && session instanceof TopicSession)
+        {
+            if (durableName == null)
+            {
+                return ((TopicSession)session).createSubscriber((Topic)destination, messageSelector, noLocal);
             }
-        } else if (session instanceof QueueSession) {
-            if (messageSelector != null) {
-                return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
-            } else {
-                return ((QueueSession) session).createReceiver((Queue) destination);
+            else
+            {
+                return ((TopicSession)session).createDurableSubscriber((Topic)destination, messageSelector,
+                    durableName, noLocal);
             }
-        } else {
+        }
+        else if (session instanceof QueueSession)
+        {
+            if (messageSelector != null)
+            {
+                return ((QueueSession)session).createReceiver((Queue)destination, messageSelector);
+            }
+            else
+            {
+                return ((QueueSession)session).createReceiver((Queue)destination);
+            }
+        }
+        else
+        {
             throw new IllegalArgumentException("Session and domain type do not match");
         }
     }
 
-    public MessageProducer createProducer(Session session, Destination dest, boolean topic) throws JMSException
+    public MessageProducer createProducer(Session session, Destination dest, boolean topic)
+        throws JMSException
     {
-        if (topic && session instanceof TopicSession) {
-            return ((TopicSession) session).createPublisher((Topic) dest);
-        } else if (session instanceof QueueSession) {
-            return ((QueueSession) session).createSender((Queue) dest);
-        } else {
+        if (topic && session instanceof TopicSession)
+        {
+            return ((TopicSession)session).createPublisher((Topic)dest);
+        }
+        else if (session instanceof QueueSession)
+        {
+            return ((QueueSession)session).createSender((Queue)dest);
+        }
+        else
+        {
             throw new IllegalArgumentException("Session and domain type do not match");
         }
     }
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException
     {
-        if (session == null) {
+        if (session == null)
+        {
             throw new IllegalArgumentException("Session cannot be null when creating a destination");
         }
-        if (name == null) {
+        if (name == null)
+        {
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (jndiDestinations) {
-            if (context == null) {
-                throw new IllegalArgumentException("Jndi Context name cannot be null when looking up a destination");
+        if (jndiDestinations)
+        {
+            if (context == null)
+            {
+                throw new IllegalArgumentException(
+                    "Jndi Context name cannot be null when looking up a destination");
             }
             Destination dest = getJndiDestination(name);
-            if (dest != null) {
+            if (dest != null)
+            {
                 return dest;
-            } else if (forceJndiDestinations) {
+            }
+            else if (forceJndiDestinations)
+            {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
         }
 
-        if (topic) {
-            return ((TopicSession) session).createTopic(name);
-        } else {
-            return ((QueueSession) session).createQueue(name);
+        if (topic)
+        {
+            return ((TopicSession)session).createTopic(name);
+        }
+        else
+        {
+            return ((QueueSession)session).createQueue(name);
         }
     }
 
-    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic)
-            throws JMSException
+    public void send(MessageProducer producer,
+                     Message message,
+                     boolean persistent,
+                     int priority,
+                     long ttl,
+                     boolean topic) throws JMSException
     {
-        if (topic && producer instanceof TopicPublisher) {
-            ((TopicPublisher) producer).publish(
-                    message,
-                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-                    priority,
-                    ttl);
-        } else if (producer instanceof QueueSender) {
-            ((QueueSender) producer).send(
-                    message,
-                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-                    priority,
-                    ttl);
-        } else {
+        if (topic && producer instanceof TopicPublisher)
+        {
+            ((TopicPublisher)producer).publish(message, (persistent
+                            ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+        }
+        else if (producer instanceof QueueSender)
+        {
+            ((QueueSender)producer).send(message, (persistent
+                            ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+        }
+        else
+        {
             throw new IllegalArgumentException("Producer and domain type do not match");
         }
     }
@@ -182,22 +233,20 @@ public class Jms102bSupport extends Jms11Support
                      long ttl,
                      boolean topic) throws JMSException
     {
-        if (topic && producer instanceof TopicPublisher) {
-            ((TopicPublisher) producer).publish(
-                    (Topic) dest,
-                    message,
-                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-                    priority,
-                    ttl);
-        } else if (producer instanceof QueueSender) {
-            ((QueueSender) producer).send(
-                    (Queue) dest,
-                    message,
-                    (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-                    priority,
-                    ttl);
-        } else {
+        if (topic && producer instanceof TopicPublisher)
+        {
+            ((TopicPublisher)producer).publish((Topic)dest, message, (persistent
+                            ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+        }
+        else if (producer instanceof QueueSender)
+        {
+            ((QueueSender)producer).send((Queue)dest, message, (persistent
+                            ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+        }
+        else
+        {
             throw new IllegalArgumentException("Producer and domain type do not match");
         }
     }
+
 }
