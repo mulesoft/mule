@@ -844,6 +844,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-hivemind</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
+        <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
