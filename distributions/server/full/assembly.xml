@@ -792,14 +792,14 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-hivemind</include>
-        <include>org.mule.modules:mule-module-i18n</include>
+        <!--<include>org.mule.modules:mule-module-i18n</include>-->
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-picocontainer</include>
-        <include>org.mule.modules:mule-module-plexus</include>
+        <!--<include>org.mule.modules:mule-module-plexus</include>-->
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
         <include>org.mule.modules:mule-module-xml</include>
@@ -845,14 +845,12 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-hivemind</exclude>
-        <exclude>org.mule.modules:mule-module-i18n</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
         <exclude>org.mule.modules:mule-module-picocontainer</exclude>
-        <exclude>org.mule.modules:mule-module-plexus</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
