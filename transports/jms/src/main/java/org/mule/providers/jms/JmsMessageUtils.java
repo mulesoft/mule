@@ -35,8 +35,6 @@ import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.compression.CompressionHelper;
 
 /**
@@ -45,10 +43,6 @@ import org.mule.util.compression.CompressionHelper;
  */
 public class JmsMessageUtils
 {
-    /**
-     * The logger for this class
-     */
-    private static final transient Log logger = LogFactory.getLog(JmsMessageUtils.class);
 
     public static Message getMessageForObject(Object object, Session session) throws JMSException
     {
@@ -58,35 +52,34 @@ public class JmsMessageUtils
         }
         else if (object instanceof String)
         {
-            TextMessage text = session.createTextMessage((String)object);
-            return text;
+            return session.createTextMessage((String)object);
         }
         else if (object instanceof Map)
         {
-            MapMessage map = session.createMapMessage();
-            Map.Entry entry;
-            Map temp = (Map)object;
+            MapMessage mMsg = session.createMapMessage();
+            Map src = (Map)object;
 
-            for (Iterator i = temp.entrySet().iterator(); i.hasNext();)
+            for (Iterator i = src.entrySet().iterator(); i.hasNext();)
             {
-                entry = (Map.Entry)i.next();
-                map.setObject(entry.getKey().toString(), entry.getValue());
+                Map.Entry entry = (Map.Entry)i.next();
+                mMsg.setObject(entry.getKey().toString(), entry.getValue());
             }
 
-            return map;
+            return mMsg;
         }
         else if (object instanceof InputStream)
         {
-            StreamMessage stream = session.createStreamMessage();
+            StreamMessage sMsg = session.createStreamMessage();
             InputStream temp = (InputStream)object;
 
-            byte[] buffer = new byte[1024 * 4];
+            byte[] buffer = new byte[4096];
             int len;
+
             try
             {
                 while ((len = temp.read(buffer)) != -1)
                 {
-                    stream.writeBytes(buffer, 0, len);
+                    sMsg.writeBytes(buffer, 0, len);
                 }
             }
             catch (IOException e)
@@ -94,18 +87,13 @@ public class JmsMessageUtils
                 throw new JMSException("Failed to read input stream to create a stream message: " + e);
             }
 
-            return stream;
+            return sMsg;
         }
         else if (object instanceof byte[])
         {
-            BytesMessage bytes = session.createBytesMessage();
-            byte[] buf = (byte[])object;
-            for (int i = 0; i < buf.length; i++)
-            {
-                bytes.writeByte(buf[i]);
-            }
-
-            return bytes;
+            BytesMessage bMsg = session.createBytesMessage();
+            bMsg.writeBytes((byte[])object);
+            return bMsg;
         }
         else if (object instanceof Serializable)
         {
@@ -120,94 +108,60 @@ public class JmsMessageUtils
         }
     }
 
-    public static Object getObjectForMessage(Message source) throws JMSException
+    public static Object getObjectForMessage(Message source) throws JMSException, IOException
     {
-        Object result;
-        try
+        if (source instanceof ObjectMessage)
         {
-            if (source instanceof ObjectMessage)
-            {
-                result = ((ObjectMessage)source).getObject();
-            }
-            else if (source instanceof MapMessage)
-            {
-                Hashtable map = new Hashtable();
-                MapMessage m = (MapMessage)source;
+            return ((ObjectMessage)source).getObject();
+        }
+        else if (source instanceof MapMessage)
+        {
+            Hashtable map = new Hashtable();
+            MapMessage m = (MapMessage)source;
 
-                for (Enumeration e = m.getMapNames(); e.hasMoreElements();)
-                {
-                    String name = (String)e.nextElement();
-                    Object obj = m.getObject(name);
-                    map.put(name, obj);
-                }
+            for (Enumeration e = m.getMapNames(); e.hasMoreElements();)
+            {
+                String name = (String)e.nextElement();
+                Object obj = m.getObject(name);
+                map.put(name, obj);
+            }
 
-                result = map;
-            }
-            else if (source instanceof BytesMessage)
+            return map;
+        }
+        else if (source instanceof TextMessage)
+        {
+            return ((TextMessage)source).getText();
+        }
+        else if (source instanceof BytesMessage)
+        {
+            byte[] bytes = getBytesFromMessage(source);
+            return CompressionHelper.getDefaultCompressionStrategy().uncompressByteArray(bytes);
+        }
+        else if (source instanceof StreamMessage)
+        {
+            try
             {
-                BytesMessage bm = (BytesMessage)source;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-                byte[] buffer = new byte[1024 * 4];
-                int len;
-                bm.reset();
-                while ((len = bm.readBytes(buffer)) != -1)
+                StreamMessage sMsg = (StreamMessage)source;
+                Vector result = new Vector();
+                Object obj;
+                while ((obj = sMsg.readObject()) != null)
                 {
-                    baos.write(buffer, 0, len);
+                    result.addElement(obj);
                 }
-                baos.flush();
-                result = baos.toByteArray();
-                baos.close();
-                if (result != null)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("JMSToObject: extracted " + ((byte[])result).length
-                                     + " bytes from JMS BytesMessage");
-                    }
-                }
+                return result;
             }
-            else if (source instanceof TextMessage)
+            catch (MessageEOFException eof)
             {
-                result = ((TextMessage)source).getText();
+                // ignored
             }
-            else if (source instanceof BytesMessage)
+            catch (Exception e)
             {
-                byte[] bytes = getBytesFromMessage(source);
-                return CompressionHelper.getDefaultCompressionStrategy().uncompressByteArray(bytes);
-            }
-            else if (source instanceof StreamMessage)
-            {
-                StreamMessage sm = (StreamMessage)source;
-
-                result = new Vector();
-                try
-                {
-                    Object obj;
-                    while ((obj = sm.readObject()) != null)
-                    {
-                        ((Vector)result).addElement(obj);
-                    }
-                }
-                catch (MessageEOFException eof)
-                {
-                    // ignored
-                }
-                catch (Exception e)
-                {
-                    throw new JMSException("Failed to extract information from JMS Stream Message: " + e);
-                }
-            }
-            else
-            {
-                result = source;
+                throw new JMSException("Failed to extract information from JMS Stream Message: " + e);
             }
         }
-        catch (Exception e)
-        {
-            throw new JMSException("Failed to transform message: " + e.getMessage());
-        }
-        return result;
+
+        // what else is there to do?
+        return source;
     }
 
     /**
@@ -221,39 +175,47 @@ public class JmsMessageUtils
      */
     public static byte[] getBytesFromMessage(Message message) throws JMSException, IOException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024 * 4];
-        int len;
-
         if (message instanceof BytesMessage)
         {
             BytesMessage bMsg = (BytesMessage)message;
-            // put message in read-only mode
             bMsg.reset();
-            while ((len = bMsg.readBytes(buffer)) != -1)
+
+            long bmBodyLength = bMsg.getBodyLength();
+            if (bmBodyLength > Integer.MAX_VALUE)
             {
-                baos.write(buffer, 0, len);
+                throw new JMSException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
+                                       + "please consider using JMS StreamMessage instead");
             }
+
+            byte[] bytes = new byte[(int)bmBodyLength];
+            bMsg.readBytes(bytes);
+            return bytes;
         }
         else if (message instanceof StreamMessage)
         {
             StreamMessage sMsg = (StreamMessage)message;
             sMsg.reset();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int len;
+
             while ((len = sMsg.readBytes(buffer)) != -1)
             {
                 baos.write(buffer, 0, len);
             }
+
+            return baos.toByteArray();
         }
         else if (message instanceof ObjectMessage)
         {
             ObjectMessage oMsg = (ObjectMessage)message;
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(bs);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(baos);
             os.writeObject(oMsg.getObject());
             os.flush();
-            baos.write(bs.toByteArray());
             os.close();
-            bs.close();
+            return baos.toByteArray();
         }
         else if (message instanceof TextMessage)
         {
@@ -262,26 +224,19 @@ public class JmsMessageUtils
 
             if (null == tMsgText)
             {
-                // Avoid creating new instances of byte arrays,
-                // even empty ones. The load on this part of the
-                // code can be high.
-                baos.write(ArrayUtils.EMPTY_BYTE_ARRAY);
+                // Avoid creating new instances of byte arrays, even empty ones. The
+                // load on this part of the code can be high.
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
             else
             {
-                baos.write(tMsgText.getBytes());
-
+                return tMsgText.getBytes();
             }
         }
         else
         {
             throw new JMSException("Cannot get bytes from Map Message");
         }
-
-        baos.flush();
-        byte[] bytes = baos.toByteArray();
-        baos.close();
-        return bytes;
     }
 
     public static String getNameForDestination(Destination dest) throws JMSException
