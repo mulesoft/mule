@@ -19,18 +19,17 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.notifications.ConnectionNotification;
-import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
 
@@ -41,84 +40,68 @@ import org.mule.util.compression.CompressionStrategy;
  */
 
 public abstract class AbstractJmsTransformer extends AbstractTransformer
-    implements ConnectionNotificationListener
 {
     public static final char REPLACEMENT_CHAR = '_';
 
-    protected boolean requireNewSession = true;
+    /**
+     * Encode a String so that is is a valid Java identifier
+     * 
+     * @param name the String to encode
+     * @return a valid JMS header name
+     */
+    public static String encodeHeader(String name)
+    {
+        if (StringUtils.isEmpty(name))
+        {
+            throw new IllegalArgumentException("Header name to encode must not be null or empty");
+        }
 
-    private Session session = null;
+        int i = 0, length = name.length();
+        while (i < length && Character.isJavaIdentifierPart(name.charAt(i)))
+        {
+            // zip through
+            i++;
+        }
+
+        if (i == length)
+        {
+            // String is already valid
+            return name;
+        }
+        else
+        {
+            // make a copy, fix up remaining characters
+            StringBuffer sb = new StringBuffer(name);
+            for (int j = i; j < length; j++)
+            {
+                if (!Character.isJavaIdentifierPart(sb.charAt(j)))
+                {
+                    sb.setCharAt(j, REPLACEMENT_CHAR);
+                }
+            }
+            return sb.toString();
+        }
+    }
 
     public AbstractJmsTransformer()
     {
         super();
     }
 
-    /**
-     * Transforms the object.
-     * 
-     * @param src The source object to transform.
-     * @param session
-     * @return The transformed object as an XMLMessage
-     */
-    // TODO This method never seems to get called by anyone...
-    public Object transform(Object src, Session session) throws TransformerException
-    {
-        if (session == null && this.session == null)
-        {
-            throw new TransformerException(new org.mule.config.i18n.Message("jms", 1), this);
-        }
-
-        if (session != null)
-        {
-            this.session = session;
-            requireNewSession = false;
-        }
-
-        if (src == null)
-        {
-            throw new TransformerException(new org.mule.config.i18n.Message(
-                Messages.TRANSFORM_FAILED_FROM_X_TO_X, "null", "Object"), this);
-        }
-
-        Object ret = transform(src);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Transformed message from type: " + src.getClass().getName() + " to type: "
-                         + ret.getClass().getName());
-        }
-
-        return ret;
-    }
-
-    /**
-     * @param src The source data to compress
-     * @return
-     * @throws TransformerException
-     */
     protected Message transformToMessage(Object src) throws TransformerException
     {
         try
         {
-            // The session can be closed by the dispatcher closing so its more
-            // reliable to get it from the dispatcher each time
-            if (requireNewSession || getEndpoint() != null)
-            {
-                UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
-                session = (Session)dispatcher.getDelegateSession();
-                requireNewSession = (session == null);
-            }
+            Message result;
 
-            Message msg = null;
             if (src instanceof Message)
             {
-                msg = (Message)src;
-                msg.clearProperties();
+                result = (Message)src;
+                result.clearProperties();
             }
             else
             {
-                msg = JmsMessageUtils.getMessageForObject(src, session);
+                result = JmsMessageUtils.getMessageForObject(src, this.getSession());
             }
 
             // set the event properties on the Message
@@ -126,12 +109,57 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
             if (ctx == null)
             {
                 logger.warn("There is no current event context");
-                return msg;
+                return result;
             }
 
-            setJmsProperties(ctx.getMessage(), msg);
+            this.setJmsProperties(ctx.getMessage(), result);
 
-            return msg;
+            return result;
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
+    }
+
+    protected Object transformFromMessage(Message source) throws TransformerException
+    {
+        try
+        {
+            Object result;
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message type received is: " + source.getClass().getName());
+            }
+
+            if (source instanceof BytesMessage)
+            {
+                byte[] bytes = JmsMessageUtils.getBytesFromMessage(source);
+                CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
+
+                if (strategy.isCompressed(bytes))
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Received Message is compressed");
+                    }
+
+                    // uncompress
+                    result = strategy.uncompressByteArray(bytes);
+                }
+                else
+                {
+                    // bytes are already uncompressed
+                    result = JmsMessageUtils.getObjectForMessage(source);
+                }
+            }
+            else
+            {
+                result = JmsMessageUtils.getObjectForMessage(source);
+            }
+
+            return result;
         }
         catch (Exception e)
         {
@@ -144,13 +172,16 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         for (Iterator iterator = umoMessage.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String key = iterator.next().toString();
+
             if (!JmsConstants.JMS_PROPERTY_NAMES.contains(key))
             {
                 Object value = umoMessage.getProperty(key);
+
                 if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key))
                 {
                     msg.setJMSCorrelationID(umoMessage.getCorrelationId());
                 }
+
                 // We dont want to set the ReplyTo property again as it will be set
                 // using JMSReplyTo
                 if (!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination))
@@ -175,91 +206,21 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         }
     }
 
-    /**
-     * Encode a string so that is is a valid java identifier
-     * 
-     * @param name
-     * @return A valid Jms header name
-     */
-    public static String encodeHeader(String name)
+    protected Session getSession() throws UMOException
     {
-        int length = name.length();
-        StringBuffer sb = new StringBuffer(length);
-        for (int i = 0; i < length; i++)
+        // The session can be closed together with the dispatcher, so it is more
+        // reliable to get it from the dispatcher each time
+        UMOImmutableEndpoint endpoint = this.getEndpoint();
+        if (endpoint != null)
         {
-            char c = name.charAt(i);
-            if (!Character.isJavaIdentifierPart(c))
-            {
-                c = REPLACEMENT_CHAR;
-            }
-            sb.append(c);
+            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
+            return (Session)dispatcher.getDelegateSession();
         }
-        return sb.toString();
-    }
-
-    protected Object transformFromMessage(Message source) throws TransformerException
-    {
-        Object result = null;
-        try
+        else
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Message type received is: " + source.getClass().getName());
-            }
-            if (source instanceof BytesMessage)
-            {
-                // If this bytes Message is not compressed it will throw a
-                // NotGZipFormatException
-                // It would be nice if we could check the custom JMS compression
-                // property here. However
-                // When jms bridging other, non-JMS-compliant message servers
-                // occur, there is no guarantee that
-                // Custom properties will be propagated
-                byte[] bytes = JmsMessageUtils.getBytesFromMessage(source);
-                CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
-                if (strategy.isCompressed(bytes))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Message received is compressed");
-                    }
-                    result = strategy.uncompressByteArray(bytes);
-                }
-                else
-                {
-                    // If the message is not compressed, handle it the standard
-                    // way
-                    result = JmsMessageUtils.getObjectForMessage(source);
-                }
-            }
-            else
-            {
-                result = JmsMessageUtils.getObjectForMessage(source);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-        return result;
-    }
-
-    public Session getSession()
-    {
-        return session;
-    }
-
-    public void setSession(Session session)
-    {
-        this.session = session;
-    }
-
-    public void onNotification(UMOServerNotification notification)
-    {
-        if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED)
-        {
-            session = null;
-            requireNewSession = true;
+            throw new TransformerException(this, new IllegalStateException(
+                "This transformer needs a valid endpoint"));
         }
     }
+
 }

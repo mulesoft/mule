@@ -45,8 +45,6 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        Object result = null;
-
         try
         {
             if (logger.isDebugEnabled())
@@ -54,18 +52,19 @@ public class JMSMessageToObject extends AbstractJmsTransformer
                 logger.debug("Source object is " + src.getClass().getName());
             }
 
-            result = transformFromMessage((Message)src);
+            Object result = transformFromMessage((Message)src);
 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Resulting object is " + result.getClass().getName());
             }
+
+            return result;
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
-        return result;
     }
 
 }
