@@ -64,7 +64,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(getTestEvent("test"));
 
         ObjectMessage oMsg = session.createObjectMessage();
-        File f = new File("C:/testdata/tests.txt");
+        File f = new File("some/path");
         oMsg.setObject(f);
         AbstractJmsTransformer trans = new JMSMessageToObject();
         Object result = trans.transform(oMsg);
@@ -131,7 +131,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
         Object result = trans2.transform(bMsg);
         assertTrue("Transformed object should be a byte[]", result instanceof byte[]);
         String res = new String((byte[])result);
-        assertTrue("source and result messages should be the same", text.equals(res));
+        assertEquals("source and result messages should be the same", text, res);
     }
 
     /*
