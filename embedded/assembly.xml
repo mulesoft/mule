@@ -54,7 +54,6 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-picocontainer</include>
-        <include>org.mule.modules:mule-module-plexus</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
         <include>org.mule.modules:mule-module-xml</include>
