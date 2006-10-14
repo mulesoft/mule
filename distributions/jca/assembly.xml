@@ -52,7 +52,7 @@ Assembly descriptor for the Mule JCA distribution.
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-hivemind</include>
         <include>org.mule.modules:mule-module-jaas</include>
-
+        <include>org.mule.modules:mule-module-jca</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
@@ -62,15 +62,7 @@ Assembly descriptor for the Mule JCA distribution.
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
-
-    <dependencySet>
-      <outputDirectory>/</outputDirectory>
-      <scope>compile</scope>
-      <includes>
-        <include>org.mule.modules:mule-module-jca</include>
-      </includes>
-    </dependencySet>
-
+      
     <!--
          Maven fighting chronicles: if excludes are not specified in a
          dedicated dependencySet, they simply don't work.
@@ -79,10 +71,8 @@ Assembly descriptor for the Mule JCA distribution.
       <outputDirectory>/</outputDirectory>
       <scope>runtime</scope>
       <excludes>
-        <!-- Just omitting these from the includes list is not enough =:< -->
-        <exclude>org.mule.modules:mule-module-jotm</exclude>
-        <exclude>org.mule.modules:mule-module-plexus</exclude>
-        <exclude>org.mule.modules:mule-module-i18n</exclude>
+        <!-- Transaction manager will usually be provided by the container -->
+        <!--<exclude>org.mule.modules:mule-module-jotm</exclude>-->
         <!-- 3rd-party libs -->
         <exclude>junit:junit</exclude>
         <!-- Examples -->
@@ -100,6 +90,5 @@ Assembly descriptor for the Mule JCA distribution.
         <exclude>org.mule.distributions:mule-jca</exclude>
       </excludes>
     </dependencySet>
-
   </dependencySets>
 </assembly>

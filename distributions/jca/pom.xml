@@ -47,5 +47,16 @@
         </plugins>
     </build>
 
+    <!--
+        HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project object never
+        sees it as a module nor dependency, and assembly inclusion filters then just skip it.
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jca</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
