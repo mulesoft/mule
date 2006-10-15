@@ -35,11 +35,12 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class JmsTransformersTestCase extends AbstractMuleTestCase
 {
+    private static ActiveMQConnectionFactory factory = null;
     private static Session session = null;
 
     protected void suitePreSetUp() throws Exception
     {
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+        factory = new ActiveMQConnectionFactory();
         factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
         factory.setUseEmbeddedBroker(true);
         factory.setBrokerURL("vm://localhost");
@@ -57,6 +58,8 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
     {
         session.close();
         session = null;
+        factory.stop();
+        factory = null;
     }
 
     public void testTransObjectMessage() throws Exception
