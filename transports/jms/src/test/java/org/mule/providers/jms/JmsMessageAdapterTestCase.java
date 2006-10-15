@@ -27,9 +27,33 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return new JmsMessageAdapter(payload);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
+     */
     public Object getValidMessage() throws Exception
     {
         return JmsConnectorTestCase.getMessage();
+    }
+
+    public void testIllegalSpecification() throws Exception
+    {
+        JmsMessageAdapter a = (JmsMessageAdapter)this.createAdapter(this.getValidMessage());
+
+        // these will work
+        a.setSpecification(JmsConstants.JMS_SPECIFICATION_102B);
+        a.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
+
+        try
+        {
+            // this will not :)
+            a.setSpecification("1.2");
+        }
+        catch (IllegalArgumentException iax)
+        {
+            // OK
+        }
     }
 
 }

@@ -41,19 +41,21 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     public JmsMessageAdapter(Object message) throws MessagingException
     {
         super();
-        this.setSpecification(JmsConstants.JMS_SPECIFICATION_102B);
         this.setMessage(message);
     }
 
     public void setSpecification(String newSpec)
     {
-        if (JmsConstants.JMS_SPECIFICATION_11.equals(newSpec))
+        if (JmsConstants.JMS_SPECIFICATION_11.equals(newSpec)
+            || (JmsConstants.JMS_SPECIFICATION_102B.equals(newSpec)))
         {
             this.jmsSpec = newSpec;
         }
         else
+
         {
-            this.jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
+            throw new IllegalArgumentException(
+                "JMS specification needs to be one of the defined values in JmsConstants but was:" + newSpec);
         }
     }
 
