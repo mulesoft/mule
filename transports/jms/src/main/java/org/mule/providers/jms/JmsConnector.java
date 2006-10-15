@@ -372,7 +372,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
         JmsMessageAdapter adapter = (JmsMessageAdapter)super.getMessageAdapter(message);
-        adapter.setJmsSpecification(this.getSpecification());
+        adapter.setSpecification(this.getSpecification());
         return adapter;
     }
 
