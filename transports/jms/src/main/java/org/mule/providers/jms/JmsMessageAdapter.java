@@ -55,7 +55,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
         {
             throw new IllegalArgumentException(
-                "JMS specification needs to be one of the defined values in JmsConstants but was:" + newSpec);
+                "JMS specification needs to be one of the defined values in JmsConstants but was: " + newSpec);
         }
     }
 
