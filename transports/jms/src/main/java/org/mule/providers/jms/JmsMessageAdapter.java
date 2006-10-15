@@ -33,13 +33,29 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -5979930419887129835L;
+    private static final long serialVersionUID = -8151716840620558143L;
 
-    private Message jmsMessage = null;
+    private String jmsSpec;
+    private Message jmsMessage;
 
     public JmsMessageAdapter(Object message) throws MessagingException
     {
-        setMessage(message);
+        super();
+        this.setJmsSpecification(JmsConstants.JMS_SPECIFICATION_102B);
+        this.setMessage(message);
+    }
+
+    public void setJmsSpecification(String newSpec)
+    {
+        if (JmsConstants.JMS_SPECIFICATION_11.equals(newSpec)
+            || (JmsConstants.JMS_SPECIFICATION_102B.equals(newSpec)))
+        {
+            this.jmsSpec = newSpec;
+        }
+        else
+        {
+            this.jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
+        }
     }
 
     /**
@@ -63,7 +79,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return JmsMessageUtils.getBytesFromMessage(jmsMessage);
+        return JmsMessageUtils.toByteArray(jmsMessage, jmsSpec);
     }
 
     /**

@@ -46,6 +46,7 @@ import org.mule.providers.FatalConnectException;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.MessagingException;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -55,6 +56,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
@@ -365,6 +367,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             // connectionFactory = null;
             connection = null;
         }
+    }
+
+    public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
+    {
+        JmsMessageAdapter adapter = (JmsMessageAdapter)super.getMessageAdapter(message);
+        adapter.setJmsSpecification(this.getSpecification());
+        return adapter;
     }
 
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)

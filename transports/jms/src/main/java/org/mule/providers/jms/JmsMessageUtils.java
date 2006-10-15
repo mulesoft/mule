@@ -34,17 +34,17 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.ArrayUtils;
+import org.mule.util.ArrayUtils;
 import org.mule.util.compression.CompressionHelper;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
- * messages in Mule
+ * messages in Mule.
  */
 public class JmsMessageUtils
 {
 
-    public static Message getMessageForObject(Object object, Session session) throws JMSException
+    public static Message toMessage(Object object, Session session) throws JMSException
     {
         if (object instanceof Message)
         {
@@ -108,7 +108,7 @@ public class JmsMessageUtils
         }
     }
 
-    public static Object getObjectForMessage(Message source) throws JMSException, IOException
+    public static Object toObject(Message source, String jmsSpec) throws JMSException, IOException
     {
         if (source instanceof ObjectMessage)
         {
@@ -134,7 +134,7 @@ public class JmsMessageUtils
         }
         else if (source instanceof BytesMessage)
         {
-            byte[] bytes = getBytesFromMessage(source);
+            byte[] bytes = toByteArray(source, jmsSpec);
             return CompressionHelper.getDefaultCompressionStrategy().uncompressByteArray(bytes);
         }
         else if (source instanceof StreamMessage)
@@ -167,36 +167,71 @@ public class JmsMessageUtils
     /**
      * @param message the message to receive the bytes from. Note this only works for
      *            TextMessge, ObjectMessage, StreamMessage and BytesMessage.
+     * @param jmsSpec indicates the JMS API version, either
+     *            {@link JmsConstants#JMS_SPECIFICATION_102B} or
+     *            {@link JmsConstants#JMS_SPECIFICATION_11}. Any other value
+     *            including <code>null</code> is treated as fallback to
+     *            {@link JmsConstants#JMS_SPECIFICATION_102B}.
      * @return a byte array corresponding with the message payload
      * @throws JMSException if the message can't be read or if the message passed is
      *             a MapMessage
-     * @throws java.io.IOException if a failiare occurs while stream and converting
-     *             the message data
+     * @throws java.io.IOException if a failure occurs while reading the stream and
+     *             converting the message data
      */
-    public static byte[] getBytesFromMessage(Message message) throws JMSException, IOException
+    public static byte[] toByteArray(Message message, String jmsSpec) throws JMSException, IOException
     {
         if (message instanceof BytesMessage)
         {
             BytesMessage bMsg = (BytesMessage)message;
             bMsg.reset();
 
-            long bmBodyLength = bMsg.getBodyLength();
-            if (bmBodyLength > Integer.MAX_VALUE)
+            if (JmsConstants.JMS_SPECIFICATION_11.equals(jmsSpec))
             {
-                throw new JMSException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
-                                       + "please consider using JMS StreamMessage instead");
-            }
+                long bmBodyLength = bMsg.getBodyLength();
+                if (bmBodyLength > Integer.MAX_VALUE)
+                {
+                    throw new JMSException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
+                                           + "please consider using JMS StreamMessage instead");
+                }
 
-            byte[] bytes = new byte[(int)bmBodyLength];
-            bMsg.readBytes(bytes);
-            return bytes;
+                if (bmBodyLength > 0)
+                {
+                    byte[] bytes = new byte[(int)bmBodyLength];
+                    bMsg.readBytes(bytes);
+                    return bytes;
+                }
+                else
+                {
+                    return ArrayUtils.EMPTY_BYTE_ARRAY;
+                }
+            }
+            else
+            {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+                byte[] buffer = new byte[4096];
+                int len;
+
+                while ((len = bMsg.readBytes(buffer)) != -1)
+                {
+                    baos.write(buffer, 0, len);
+                }
+
+                if (baos.size() > 0)
+                {
+                    return baos.toByteArray();
+                }
+                else
+                {
+                    return ArrayUtils.EMPTY_BYTE_ARRAY;
+                }
+            }
         }
         else if (message instanceof StreamMessage)
         {
             StreamMessage sMsg = (StreamMessage)message;
             sMsg.reset();
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
             byte[] buffer = new byte[4096];
             int len;
 

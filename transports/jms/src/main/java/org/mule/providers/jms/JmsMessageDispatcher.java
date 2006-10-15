@@ -267,7 +267,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     UMOMessageAdapter adapter = connector.getMessageAdapter(result);
-                    return new MuleMessage(JmsMessageUtils.getObjectForMessage(result), adapter);
+                    return new MuleMessage(JmsMessageUtils.toObject(result,
+                        connector.getSpecification()), adapter);
                 }
             }
             else
@@ -286,7 +287,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     else
                     {
                         UMOMessageAdapter adapter = connector.getMessageAdapter(result);
-                        return new MuleMessage(JmsMessageUtils.getObjectForMessage(result), adapter);
+                        return new MuleMessage(JmsMessageUtils.toObject(result,
+                            connector.getSpecification()), adapter);
                     }
                 }
             }
@@ -298,8 +300,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             connector.closeQuietly(producer);
 
             // TODO I wonder if those temporary destinations also implement BOTH
-            // interfaces...
-            // keep it 'simple' for now
+            // interfaces...keep it 'simple' for now
             if (replyTo != null && (replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
             {
                 if (replyTo instanceof TemporaryQueue)
@@ -308,7 +309,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    // hope there are no more non-standard tricks from jms vendors
+                    // hope there are no more non-standard tricks from JMS vendors
                     // here ;)
                     connector.closeQuietly((TemporaryTopic)replyTo);
                 }

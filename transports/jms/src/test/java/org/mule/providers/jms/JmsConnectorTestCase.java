@@ -10,11 +10,7 @@
 
 package org.mule.providers.jms;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.constraint.IsEqual;
 import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.ConstraintMatcher;
-import com.mockobjects.dynamic.FullConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
 
 import javax.jms.Connection;
@@ -41,7 +37,7 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
         {
             connector = new JmsConnector();
             connector.setName("TestConnector");
-            connector.setSpecification("1.1");
+            connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
 
             Mock connectionFactory = new Mock(ConnectionFactory.class);
             Mock connection = new Mock(Connection.class);
@@ -86,19 +82,10 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
         message.expectAndReturn("getJMSTimestamp", new Long(0));
         message.expectAndReturn("getJMSType", null);
 
-        message.expectAndReturn("toString", "MockJMSMessage");
-        message.expectAndReturn("toString", "MockJMSMessage");
-
-        message.expect("clearProperties");
+        message.expect("toString");
 
         message.expectAndReturn("getPropertyNames",
             IteratorUtils.asEnumeration(IteratorUtils.emptyIterator()));
-
-        message.expectAndReturn("getObjectProperty", "JMS_CUSTOM_PROPERTY", "customValue");
-
-        ConstraintMatcher setPropertyMatcher = new FullConstraintMatcher(new Constraint[]{
-            new IsEqual("JMS_CUSTOM_PROPERTY"), new IsEqual("customValue")});
-        message.expect("setObjectProperty", setPropertyMatcher);
 
         return message.proxy();
     }

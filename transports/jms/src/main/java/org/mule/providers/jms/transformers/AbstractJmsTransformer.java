@@ -20,6 +20,7 @@ import javax.jms.Session;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
+import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
@@ -27,6 +28,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
@@ -101,7 +103,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
             }
             else
             {
-                result = JmsMessageUtils.getMessageForObject(src, this.getSession());
+                result = JmsMessageUtils.toMessage(src, this.getSession());
             }
 
             // set the event properties on the Message
@@ -126,16 +128,25 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
     {
         try
         {
-            Object result;
-
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message type received is: " + source.getClass().getName());
             }
 
+            String jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
+            UMOImmutableEndpoint endpoint = this.getEndpoint();
+            if (endpoint != null)
+            {
+                UMOConnector connector = endpoint.getConnector();
+                if (connector instanceof JmsConnector)
+                {
+                    jmsSpec = ((JmsConnector)connector).getSpecification();
+                }
+            }
+
             if (source instanceof BytesMessage)
             {
-                byte[] bytes = JmsMessageUtils.getBytesFromMessage(source);
+                byte[] bytes = JmsMessageUtils.toByteArray(source, jmsSpec);
                 CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
 
                 if (strategy.isCompressed(bytes))
@@ -146,20 +157,18 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                     }
 
                     // uncompress
-                    result = strategy.uncompressByteArray(bytes);
+                    return strategy.uncompressByteArray(bytes);
                 }
                 else
                 {
                     // bytes are already uncompressed
-                    result = JmsMessageUtils.getObjectForMessage(source);
+                    return JmsMessageUtils.toObject(source, jmsSpec);
                 }
             }
             else
             {
-                result = JmsMessageUtils.getObjectForMessage(source);
+                return JmsMessageUtils.toObject(source, jmsSpec);
             }
-
-            return result;
         }
         catch (Exception e)
         {
