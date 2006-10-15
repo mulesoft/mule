@@ -9,6 +9,13 @@ Assembly descriptor for the Mule JCA distribution.
 
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <fileSets>
+        <fileSet>
+            <directory>../../modules/jca/src/rar</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+
     <!--
         Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
         replace the following lists with some clever wildcards.
