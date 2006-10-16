@@ -531,6 +531,11 @@ public abstract class AbstractConnector
 
     public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
     {
+        return getDispatcher(endpoint, /*createDispatcherIfNotExists*/true);
+    }
+
+    public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint, boolean createDispatcherIfNotExists) throws UMOException
+    {
         checkDisposed();
 
         if (endpoint == null) {
@@ -551,7 +556,8 @@ public abstract class AbstractConnector
             String endpointUriKey = endpoint.getEndpointURI().toString();
             UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.get(endpointUriKey);
 
-            if (dispatcher == null || dispatcher.isDisposed()) {
+            if ((dispatcher == null || dispatcher.isDisposed())
+                    && createDispatcherIfNotExists) {
                 dispatcher = createDispatcher(endpoint);
                 dispatchers.put(endpointUriKey, dispatcher);
             }
@@ -559,6 +565,16 @@ public abstract class AbstractConnector
             return dispatcher;
         }
     }
+
+    public UMOMessageDispatcher lookupDispatcher(String key)
+    {
+        if (key != null) {
+            return (UMOMessageDispatcher) dispatchers.get(key);
+        } else {
+            throw new IllegalArgumentException("Dispatcher key must not be null");
+        }
+    }
+
 
     protected void checkDisposed() throws DisposeException
     {
@@ -862,6 +878,16 @@ public abstract class AbstractConnector
         return Collections.unmodifiableMap(receivers);
     }
 
+    public UMOMessageReceiver lookupReceiver(String key)
+    {
+        if (key != null) {
+            return (UMOMessageReceiver)receivers.get(key);
+        } else {
+            throw new IllegalArgumentException("Receiver key must not be null");
+        }
+    }
+
+    /** @deprecated Use lookupReceiver instead */
     public AbstractMessageReceiver getReceiver(String key)
     {
         if (key != null) {

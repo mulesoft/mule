@@ -10,7 +10,22 @@
 
 package org.mule;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Manifest;
+
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -71,20 +86,7 @@ import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
-import javax.transaction.TransactionManager;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.Manifest;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -244,7 +246,7 @@ public class MuleManager implements UMOManager
         notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
         notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
         notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
-        
+
         // This is obviously just a workaround until extension modules can register
         // their own classes for notifications. Need to revisit this when the
         // ManagementContext has been implanted properly.
@@ -264,7 +266,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Getter method for the current singleton MuleManager
-     * 
+     *
      * @return the current singleton MuleManager
      */
     public static synchronized UMOManager getInstance()
@@ -298,7 +300,7 @@ public class MuleManager implements UMOManager
      * </code>
      * because getInstance never returns a null. If an istance is not available one
      * is created. This method queries the instance directly.
-     * 
+     *
      * @return true if the manager is instanciated
      */
     public static synchronized boolean isInstanciated()
@@ -350,7 +352,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets the configuration for the <code>MuleManager</code>.
-     * 
+     *
      * @param config the configuration object
      * @throws IllegalAccessError if the <code>MuleManager</code> has already been
      *             initialised.
@@ -498,6 +500,22 @@ public class MuleManager implements UMOManager
         } else {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOEndpoint lookupEndpointByAddress(String address) {
+        UMOEndpoint endpoint = null;
+        if (address != null) {
+            boolean found = false;
+            Iterator iterator = endpoints.keySet().iterator();
+            while (!found && iterator.hasNext()) {
+                endpoint = (UMOEndpoint) endpoints.get(iterator.next());
+                found = (address.equals(endpoint.getEndpointURI().toString()));
+            }
+        }
+        return endpoint;
     }
 
     /**
