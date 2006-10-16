@@ -7,7 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jms.activemq;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jms.ConnectionFactory;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
@@ -19,24 +25,14 @@ import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.umo.UMOTransactionFactory;
 
-import javax.jms.ConnectionFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
- */
-
 public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransactionFunctionalTest
 {
     protected ActiveMQConnectionFactory factory = null;
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if(factory==null) {
+        if (factory == null)
+        {
             factory = new ActiveMQConnectionFactory();
             factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
             factory.setUseEmbeddedBroker(true);
@@ -46,9 +42,10 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         return factory;
     }
 
-     protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         factory.stop();
-        factory=null;
+        factory = null;
         super.doTearDown();
     }
 
@@ -67,13 +64,13 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         Map overrides = new HashMap();
         overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
         connector.setServiceOverrides(overrides);
-        
-        //The following comment seems like doesn't count anymore
+
+        // The following comment seems like doesn't count anymore
         /*
-        //Using multiple receiver threads with ActiveMQ causes the DLQ test case to fail
-        //because of ActiveMQ prefetch. Disabling this feature fixes the problem
-        //connector.setCreateMultipleTransactedReceivers(false);
-        */
+         * //Using multiple receiver threads with ActiveMQ causes the DLQ test case
+         * to fail //because of ActiveMQ prefetch. Disabling this feature fixes the
+         * problem //connector.setCreateMultipleTransactedReceivers(false);
+         */
         return connector;
     }
 

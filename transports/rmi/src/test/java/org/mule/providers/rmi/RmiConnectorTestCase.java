@@ -7,18 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.rmi;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
- */
-
 public class RmiConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         RmiConnector c = new RmiConnector();
@@ -40,7 +37,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        RmiConnector c = (RmiConnector) connector;
+        RmiConnector c = (RmiConnector)connector;
 
         String securityPolicy = "rmi.policy";
         String serverCodebase = "file:///E:/projects/MyTesting/JAVA/rmi/classes/";

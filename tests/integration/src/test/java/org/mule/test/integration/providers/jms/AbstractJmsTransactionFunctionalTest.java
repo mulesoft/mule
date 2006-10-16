@@ -195,8 +195,8 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         };
 
         initialiseComponent(descriptor, (transactionAvailable
-                                                             ? UMOTransactionConfig.ACTION_ALWAYS_BEGIN
-                                                             : UMOTransactionConfig.ACTION_NONE), callback);
+                        ? UMOTransactionConfig.ACTION_ALWAYS_BEGIN : UMOTransactionConfig.ACTION_NONE),
+            callback);
 
         // Start the server
         MuleManager.getInstance().start();

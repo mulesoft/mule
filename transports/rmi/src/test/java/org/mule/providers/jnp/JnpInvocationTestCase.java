@@ -7,27 +7,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jnp;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.services.MatchingMethodsComponent;
-import org.mule.providers.rmi.RmiConnector;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.i18n.Messages;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.impl.jndi.MuleInitialContextFactory;
-import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
+import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.util.Hashtable;
+
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.jndi.MuleInitialContextFactory;
+import org.mule.providers.rmi.RmiConnector;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.services.MatchingMethodsComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOMessageDispatcher;
 
 /**
  * test RMI object invocations
@@ -42,27 +44,26 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         return null;
     }
 
-
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.disableAdminAgent();
 
-        //create JNP connector
+        // create JNP connector
         jnpConnector = new JnpConnector();
         jnpConnector.setName("jnp");
         jnpConnector.setJndiInitialFactory(MuleInitialContextFactory.class.getName());
         jnpConnector.setSecurityPolicy("rmi.policy");
 
-        //Required if connectoring to a Remote Jndi context
-        //builder.getManager().registerAgent(new RmiRegistryAgent());
+        // Required if connectoring to a Remote Jndi context
+        // builder.getManager().registerAgent(new RmiRegistryAgent());
 
-        //Create a local Jndi Context
+        // Create a local Jndi Context
         Hashtable env = new Hashtable();
-        //env.put(Context.PROVIDER_URL, "rmi://localhost:1099");
+        // env.put(Context.PROVIDER_URL, "rmi://localhost:1099");
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         InitialContext ic = new InitialContext(env);
-        //Bind our servcie object
+        // Bind our servcie object
         ic.bind("TestService", new MatchingMethodsComponent());
 
         jnpConnector.setJndiContext(ic);
@@ -70,11 +71,10 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         return builder;
     }
 
-
-
     public void testReverseString() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jnp://localhost/TestService?method=reverseString", false);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "jnp://localhost/TestService?method=reverseString", false);
         UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
@@ -83,7 +83,8 @@ public class JnpInvocationTestCase extends FunctionalTestCase
 
     public void testUpperCaseString() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jnp://localhost/TestService?method=upperCaseString", false);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "jnp://localhost/TestService?method=upperCaseString", false);
         UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
@@ -98,10 +99,12 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         {
             dispatcher.send(getTestEvent("hello", ep));
 
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e instanceof DispatchException);
-            assertTrue(e.getMessage().startsWith(Messages.get("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET)));
+            assertTrue(e.getMessage().startsWith(
+                Messages.get("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET)));
         }
     }
 
@@ -112,7 +115,8 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
@@ -126,7 +130,8 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
@@ -140,7 +145,8 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }

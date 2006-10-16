@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.transaction.TransactionManager;
+
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.ActiveMQXAConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
@@ -21,22 +25,14 @@ import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.transaction.TransactionManager;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTransactionFunctionalTestCase
 {
     private TransactionManager txManager;
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if(factory==null) {
+        if (factory == null)
+        {
             factory = new ActiveMQXAConnectionFactory();
             factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
             factory.setUseEmbeddedBroker(true);
@@ -60,7 +56,8 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
         // check for already active JOTM instance
         txManager = Current.getCurrent();
         // if none found, create new local JOTM instance
-        if (txManager == null) {
+        if (txManager == null)
+        {
             new Jotm(true, false);
             txManager = Current.getCurrent();
         }

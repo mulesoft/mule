@@ -7,7 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jms.activemq;
+
+import java.util.HashMap;
+
+import javax.jms.ConnectionFactory;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
@@ -16,22 +21,14 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 
-import javax.jms.ConnectionFactory;
-
-import java.util.HashMap;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
     protected ActiveMQConnectionFactory factory = null;
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if(factory==null) {
+        if (factory == null)
+        {
             factory = new ActiveMQConnectionFactory();
             factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
             factory.setUseEmbeddedBroker(true);
@@ -41,9 +38,10 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
         return factory;
     }
 
-    protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         factory.stop();
-        factory=null;
+        factory = null;
         super.doTearDown();
     }
 

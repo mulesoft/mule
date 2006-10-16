@@ -3,11 +3,17 @@
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * The software in this package is published under the terms of the BSD style
+ * The software in this package is published under the terms of the MuleSource MPL
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jms.activemq;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jms.ConnectionFactory;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
@@ -19,18 +25,15 @@ import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.umo.UMOTransactionFactory;
 
-import javax.jms.ConnectionFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends AbstractJmsTransactionFunctionalTest
+public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends
+    AbstractJmsTransactionFunctionalTest
 {
     protected ActiveMQConnectionFactory factory = null;
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if(factory==null) {
+        if (factory == null)
+        {
             factory = new ActiveMQConnectionFactory();
             factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
             factory.setUseEmbeddedBroker(true);
@@ -40,9 +43,10 @@ public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends Abst
         return factory;
     }
 
-     protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         factory.stop();
-        factory=null;
+        factory = null;
         super.doTearDown();
     }
 
@@ -60,8 +64,9 @@ public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends Abst
         /** Always use the transacted Jms Message receivers for these test cases */
         Map overrides = new HashMap();
         overrides.put("message.receiver", TransactedSingleResourceJmsMessageReceiver.class.getName());
-        overrides.put("transacted.message.receiver", TransactedSingleResourceJmsMessageReceiver.class.getName());
-        
+        overrides.put("transacted.message.receiver",
+            TransactedSingleResourceJmsMessageReceiver.class.getName());
+
         connector.setServiceOverrides(overrides);
         return connector;
     }
