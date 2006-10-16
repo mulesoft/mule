@@ -8,7 +8,7 @@
 	<connector name="rmi" className="org.mule.providers.rmi.RmiConnector">
 	    <properties>
 			<property name="jndiInitialContextFactory" value="org.mule.impl.jndi.MuleInitialContextFactory"/>
-			<factory-property name="jndiContext" factory="org.mule.factory.rmi.MuleRMIFactory"/>	
+			<factory-property name="jndiContext" factory="org.mule.providers.rmi.MuleRMIFactory"/>	
 			<property name="securityPolicy" value="rmi.policy"/>
 		</properties>
 	</connector> 
