@@ -12,4 +12,14 @@
     <packaging>jar</packaging>
     <name>Rmi Transport</name>
     <description>A Mule transport for Rmi Connectivity.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>
