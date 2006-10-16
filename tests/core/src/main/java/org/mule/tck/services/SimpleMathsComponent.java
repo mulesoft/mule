@@ -16,8 +16,8 @@ public class SimpleMathsComponent implements Remote
 {
     public Integer addTen(Integer number){
         int num = number.intValue();
-        return Integer.valueOf(num + 10);
-    } 
+        return new Integer(num + 10);
+    }
 }
 
 
