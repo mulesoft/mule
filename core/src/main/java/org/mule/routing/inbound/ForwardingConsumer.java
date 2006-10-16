@@ -9,6 +9,7 @@
  */
 package org.mule.routing.inbound;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.MessagingException;
@@ -17,12 +18,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.util.StringUtils;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
  * another transport without invoking a component. This can be used to implement
  * a bridge accross defferent transports.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,12 +44,27 @@ public class ForwardingConsumer extends SelectiveConsumer
                 return new UMOEvent[] { event };
             } else {
                 try {
-                    UMOMessage msg = router.route(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event.getSession(), event.isSynchronous());
-                    // what's the correct behaviour for async endpoints?
+                    UMOMessage message = new MuleMessage(event.getTransformedMessage(), event.getMessage());
+
+                    // If the previous message already had the originating endpoint set,
+                    // just propagate it, otherwise set the originating endpoint.
+                    String originatingEndpoint =
+                        event.getMessage().getStringProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, null);
+                    if (StringUtils.isEmpty(originatingEndpoint)) {
+                        // Use the endpoint's "name" or "address" if "name" is blank.
+                        originatingEndpoint = event.getEndpoint().getEndpointURI().getEndpointName();
+                        if (StringUtils.isEmpty(originatingEndpoint)) {
+                            originatingEndpoint = event.getEndpoint().getEndpointURI().toString();
+                        }
+                    }
+                    message.setStringProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, originatingEndpoint);
+
+                    UMOMessage response = router.route(message, event.getSession(), event.isSynchronous());
+                    // TODO What's the correct behaviour for async endpoints?
                     // maybe let router.route() return a Future for the returned
                     // msg?
-                    if (msg != null) {
-                        return new UMOEvent[] { new MuleEvent(msg, event) };
+                    if (response != null) {
+                        return new UMOEvent[] { new MuleEvent(response, event) };
                     } else {
                         return null;
                     }
