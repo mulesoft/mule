@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.factory.rmi;
+package org.mule.providers.rmi;
 
 import java.util.Map;
 import javax.naming.InitialContext;
