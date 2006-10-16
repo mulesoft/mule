@@ -1,5 +1,5 @@
 /*
- * $Id: EndpointSelectorTestCase.java 2736 2006-08-20 12:42:23 +0000 (Sun, 20 Aug 2006) holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: SelectiveConsumerTestCase.java 2656 2006-08-10 02:35:05Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -31,7 +31,7 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2656 $
+ * @version $Revision$
  */
 
 public class SelectiveConsumerTestCase extends AbstractMuleTestCase

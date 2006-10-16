@@ -1,5 +1,5 @@
 /*
- * $Id: MulticastingRouterTestCase.java 2656 2006-08-10 02:35:05 +0000 (Thu, 10 Aug 2006) holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision: 2656 $
+ * @version $Revision$
  */
 
 public class MulticastingRouterTestCase extends AbstractMuleTestCase

@@ -1,5 +1,5 @@
 /*
- * $Id: ExceptionBasedRouterTestCase.java 2683 2006-08-11 20:29:08 +0000 (Fri, 11 Aug 2006) aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -36,7 +36,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  *
- * @version $Revision: 2683 $
+ * @version $Revision$
  */
 
 public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase

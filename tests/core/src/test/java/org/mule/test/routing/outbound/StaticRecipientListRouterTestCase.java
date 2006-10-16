@@ -1,5 +1,5 @@
 /*
- * $Id: StaticRecipientListRouterTestCase.java 2656 2006-08-10 02:35:05 +0000 (Thu, 10 Aug 2006) holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
