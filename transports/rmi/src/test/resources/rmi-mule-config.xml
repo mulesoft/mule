@@ -5,6 +5,8 @@
 
 <mule-configuration id="Mule_Login_Sample" version="1.0"> 
 
+    <mule-environment-properties embedded="true"/>
+
 	<connector name="rmi" className="org.mule.providers.rmi.RmiConnector">
 	    <properties>
 			<property name="jndiInitialContextFactory" value="org.mule.impl.jndi.MuleInitialContextFactory"/>
