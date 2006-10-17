@@ -28,6 +28,7 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisConnector;
@@ -123,8 +124,9 @@ public class UniversalSender extends BasicHandler
                 }
             }
             
-            //add all custom headers, filter out all mule headers (such as MULE_SESSION) except
+            // add all custom headers, filter out all mule headers (such as MULE_SESSION) except
             // for MULE_USER header. Filter out other headers like "soapMethods" and MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
+            // and also filter out any http related header
             if((RequestContext.getEvent() != null) && (RequestContext.getEvent().getMessage() != null))
             {
                 UMOMessage currentMessage = RequestContext.getEvent().getMessage();
@@ -136,7 +138,9 @@ public class UniversalSender extends BasicHandler
                     if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
                             && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
                             && (!name.startsWith(MuleProperties.PROPERTY_PREFIX)
-                            || StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY)))
+                            		|| StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY))
+                            && !HttpConstants.ALL_HEADER_NAMES.containsValue(name)
+                            && !StringUtils.equals(name, HttpConnector.HTTP_STATUS_PROPERTY))
                     {
                         props.put(name, currentMessage.getProperty(name));
                     }
