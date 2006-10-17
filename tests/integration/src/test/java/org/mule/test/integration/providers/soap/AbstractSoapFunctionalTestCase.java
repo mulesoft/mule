@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.FunctionalTestCase;
@@ -27,7 +25,6 @@ import org.mule.umo.provider.DispatchException;
 
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
-    protected transient final Log logger = LogFactory.getLog(getClass());
 
     protected AbstractSoapFunctionalTestCase()
     {
