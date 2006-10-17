@@ -98,5 +98,10 @@
             <artifactId>geronimo-javamail_1.3.1_spec</artifactId>
             <version>1.1</version>
         </dependency>
+        <dependency>
+            <groupId>woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
 </project>
