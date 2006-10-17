@@ -103,10 +103,23 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!--
         <repository>
             <id>sateh.com</id>
             <name>Mirror of http://repo1.maven.org/maven2/</name>
             <url>http://maven.sateh.com/repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        -->
+        <repository>
+            <id>sunsite.dk</id>
+            <name>Mirror of http://repo1.maven.org/maven2/</name>
+            <url>http://mirrors.sunsite.dk/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -394,6 +407,7 @@
                         <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                         <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
                         <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
+                        <link>http://jakarta.apache.org/commons/logging/commons-logging-1.0.4/docs/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
                         <link>http://logging.apache.org/log4j/docs/api/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
