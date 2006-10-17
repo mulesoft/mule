@@ -186,11 +186,17 @@
             <artifactId>xpp3_min</artifactId>
             <version>1.1.3.4.O</version>
         </dependency>
+        <!-- StAX in the future -->
         <!--
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
         <dependency>
             <groupId>woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
-            <version>2.9.3</version>
+            <version>3.0.2</version>
         </dependency>
         -->
     </dependencies>
