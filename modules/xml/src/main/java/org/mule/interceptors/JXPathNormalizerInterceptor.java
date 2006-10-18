@@ -84,7 +84,7 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
     public void setBeforeExpressions(String beforeExpressions)
     {
         this.beforeExpressions = beforeExpressions;
-        String[] exp = StringUtils.split(beforeExpressions, ",");
+        String[] exp = StringUtils.splitAndTrim(beforeExpressions, ",");
         this.beforeExpressionsList = new ArrayList(exp.length);
         for (int i = 0; i < exp.length; i++) {
             this.beforeExpressionsList.add(exp[i]);
