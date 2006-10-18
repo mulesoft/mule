@@ -12,8 +12,9 @@ package org.mule.util;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class StringMessageUtils
 
     public static String getBoilerPlate(String message, char c, int maxlength)
     {
-        return getBoilerPlate(Collections.singletonList(message), c, maxlength);
+        return getBoilerPlate(new ArrayList(Arrays.asList(new String[]{message})), c, maxlength);
     }
 
     public static String getBoilerPlate(List messages, char c, int maxlength)
