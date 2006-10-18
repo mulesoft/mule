@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.lang.SystemUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.StringUtils;
 
 public class CollectionUtilsTestCase extends TestCase
 {
@@ -54,6 +55,20 @@ public class CollectionUtilsTestCase extends TestCase
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR
                      + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]",
             CollectionUtils.toString(c, true));
+    }
+
+    public void testToStringTooManyElements()
+    {
+        Collection test = new ArrayList(100);
+        for (int i = 0; i < 100; i++)
+        {
+            test.add(new Integer(i));
+        }
+
+        // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
+        String result = CollectionUtils.toString(test, 10);
+        assertTrue(result.endsWith("[..]]"));
+        assertEquals(9, StringUtils.countMatches(result, ","));
     }
 
 }

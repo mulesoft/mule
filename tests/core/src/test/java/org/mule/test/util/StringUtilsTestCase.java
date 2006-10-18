@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
+import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
 
 public class StringUtilsTestCase extends TestCase
@@ -21,8 +22,18 @@ public class StringUtilsTestCase extends TestCase
 
     public void testSplitWithTrimming()
     {
-        String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
+        String[] result = StringUtils.splitAndTrim(null, ",,");
+        assertNull(result);
 
+        result = StringUtils.splitAndTrim("", ",");
+        assertNotNull(result);
+        assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+
+        result = StringUtils.splitAndTrim(" ", ",");
+        assertNotNull(result);
+        assertTrue(Arrays.equals(new String[]{""}, result));
+
+        String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
         String inputString = new StringBuffer(40).append(inputValues[0])
             .append(" ,")
             .append(",  ")
@@ -34,7 +45,7 @@ public class StringUtilsTestCase extends TestCase
             .append(" ")
             .toString();
 
-        assertTrue(Arrays.equals(inputValues, StringUtils.split(inputString, ",")));
+        assertTrue(Arrays.equals(inputValues, StringUtils.splitAndTrim(inputString, ",")));
     }
 
     public void testHexStringToByteArray()

@@ -15,6 +15,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.mule.util.ArrayUtils;
+import org.mule.util.StringUtils;
 
 public class ArrayUtilsTestCase extends TestCase
 {
@@ -57,6 +58,20 @@ public class ArrayUtilsTestCase extends TestCase
             // ok
         }
 
+    }
+
+    public void testToStringMaxLength()
+    {
+        Object test = new byte[100];
+        for (int i = 0; i < ((byte[])test).length; i++)
+        {
+            ((byte[])test)[i] = (byte)i;
+        }
+
+        // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
+        String result = ArrayUtils.toString(test, 10);
+        assertTrue(result.endsWith("[..]}"));
+        assertEquals(9, StringUtils.countMatches(result, ","));
     }
 
 }

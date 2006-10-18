@@ -28,7 +28,8 @@ import java.util.List;
 
 public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
-    public void testMessageSpltterRouter() throws Exception
+
+    public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
 
@@ -46,7 +47,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
             protected void initialise(UMOMessage message)
             {
                 multimatch = false;
-                parts = Arrays.asList(StringUtils.split(message.getPayload().toString(), ","));
+                parts = Arrays.asList(StringUtils.splitAndTrim(message.getPayload().toString(), ","));
             }
 
             protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
