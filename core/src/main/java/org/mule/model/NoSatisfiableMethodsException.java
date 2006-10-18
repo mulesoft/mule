@@ -40,6 +40,7 @@ public class NoSatisfiableMethodsException extends ModelException
     public NoSatisfiableMethodsException(Object component, Object args, Exception cause)
     {
         super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X_WITH_ARGS_X,
-                StringMessageUtils.getObjectValue(component), StringMessageUtils.toString(args)), cause);
+            StringMessageUtils.toString(component), StringMessageUtils.toString(args)), cause);
     }
+
 }

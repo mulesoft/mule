@@ -109,7 +109,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     public void setPattern(String pattern)
     {
         this.pattern = pattern;
-        this.patterns = StringUtils.split(pattern, ",");
+        this.patterns = StringUtils.splitAndTrim(pattern, ",");
     }
 
     public boolean isCaseSensitive() {

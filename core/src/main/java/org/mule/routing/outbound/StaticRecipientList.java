@@ -40,7 +40,7 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            list = new CopyOnWriteArrayList(StringUtils.split(msgRecipients.toString(), ","));
+            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(), ","));
         }
         else
         {

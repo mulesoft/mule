@@ -183,7 +183,7 @@ public class ExceptionHelper {
             errorMappings.put(protocol, p);
             String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
             if (applyTo != null) {
-                String[] protocols = StringUtils.split(applyTo, ",");
+                String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
                 for (int i = 0; i < protocols.length; i++) {
                     errorMappings.put(protocols[i], p);
                 }

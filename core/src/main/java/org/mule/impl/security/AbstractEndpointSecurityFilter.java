@@ -67,7 +67,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         // security providers
         if (securityProviders != null) {
             UMOSecurityManager localManager = new MuleSecurityManager();
-            String[] sp = StringUtils.split(securityProviders, ",");
+            String[] sp = StringUtils.splitAndTrim(securityProviders, ",");
             for (int i = 0; i < sp.length; i++) {
                 UMOSecurityProvider provider = securityManager.getProvider(sp[i]);
                 if (provider != null) {

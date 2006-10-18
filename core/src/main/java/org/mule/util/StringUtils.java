@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import java.util.StringTokenizer;
+import org.apache.commons.lang.CharUtils;
 
 /**
  * <code>StringUtils</code> contains useful methods for manipulating Strings.
@@ -19,16 +19,32 @@ import java.util.StringTokenizer;
 public class StringUtils extends org.apache.commons.lang.StringUtils
 {
 
-    public static String[] split(String string, String delim)
+    /**
+     * Like {@link org.apache.commons.lang.StringUtils#split(String, String)}, but
+     * additionally trims whitespace from the result tokens.
+     */
+    public static String[] splitAndTrim(String string, String delim)
     {
-        StringTokenizer st = new StringTokenizer(string, delim);
-        String[] results = new String[st.countTokens()];
-        int i = 0;
-        while (st.hasMoreTokens())
+        if (string == null)
         {
-            results[i++] = st.nextToken().trim();
+            return null;
         }
-        return results;
+
+        if (isEmpty(string))
+        {
+            return ArrayUtils.EMPTY_STRING_ARRAY;
+        }
+
+        String[] tokens = split(string, delim);
+        if (tokens != null)
+        {
+            for (int i = 0; i < tokens.length; i++)
+            {
+                tokens[i] = trim(tokens[i]);
+            }
+        }
+
+        return tokens;
     }
 
     /**
@@ -61,6 +77,14 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         return result;
+    }
+
+    /**
+     * Like {@link #repeat(String, int)} but with a single character as argument. 
+     */
+    public static String repeat(char c, int len)
+    {
+        return repeat(CharUtils.toString(c), len);
     }
 
     /**

@@ -49,7 +49,7 @@ public class ReaderResource
     }
 
     public static ReaderResource[] parseResources(String configResources, String encoding) throws IOException {
-        String[] resources = StringUtils.split(configResources, ",");
+        String[] resources = StringUtils.splitAndTrim(configResources, ",");
         MuleManager.getConfiguration().setConfigResources(resources);
         ReaderResource[] readers = new ReaderResource[resources.length];
         for (int i = 0; i < resources.length; i++) {

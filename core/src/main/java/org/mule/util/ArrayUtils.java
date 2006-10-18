@@ -17,6 +17,67 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 {
 
     /**
+     * Like {@link #toString(Object)} but considers at most <code>maxElements</code>
+     * values; overflow is indicated by an appended "[..]" ellipsis.
+     */
+    public static String toString(Object array, int maxElements)
+    {
+        String result;
+
+        Class componentType = array.getClass().getComponentType();
+        if (componentType.equals(Object.class))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((Object[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Boolean.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((boolean[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Byte.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((byte[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Character.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((char[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Short.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((short[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Integer.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((int[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Long.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((long[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Float.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((float[])array, 0, maxElements)));
+        }
+        else if (componentType.equals(Double.TYPE))
+        {
+            result = ArrayUtils.toString((ArrayUtils.subarray((double[])array, 0, maxElements)));
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unknown array component type: " + componentType.getName());
+        }
+
+        if (Array.getLength(array) > maxElements)
+        {
+            StringBuffer buf = new StringBuffer(result);
+            buf.insert(buf.length() - 1, " [..]");
+            result = buf.toString();
+        }
+
+        return result;
+
+    }
+
+    /**
      * Creates a copy of the given array, but with the given <code>Class</code> as
      * element type. Useful for arrays of objects that implement multiple interfaces
      * and a "typed view" onto these objects is required.
@@ -42,7 +103,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 
         if (clazz == null)
         {
-            throw new IllegalArgumentException("Class must not be null!");
+            throw new IllegalArgumentException("Array target class must not be null");
         }
 
         Object[] result = (Object[])Array.newInstance(clazz, objects.length);

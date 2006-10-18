@@ -12,8 +12,8 @@ package org.mule.util;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +30,12 @@ import org.mule.config.i18n.Message;
 // @ThreadSafe
 public class StringMessageUtils
 {
+    // Character encoding properties
     public static final String DEFAULT_ENCODING = "UTF-8";
     public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
+
+    // The maximum number of Collection and Array elements used for messages
+    public static final int MAX_ELEMENTS = 50;
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -39,30 +43,10 @@ public class StringMessageUtils
         {
             for (int i = 0; i < arguments.length; i++)
             {
-                arguments[i] = getObjectValue(arguments[i]);
+                arguments[i] = toString(arguments[i]);
             }
         }
         return MessageFormat.format(msg, arguments);
-    }
-
-    public static String getObjectValue(Object object)
-    {
-        if (object instanceof String)
-        {
-            return (String)object;
-        }
-        else if (object instanceof Class)
-        {
-            return ((Class)object).getName();
-        }
-        else if (object.toString().indexOf(String.valueOf(object.hashCode())) == -1)
-        {
-            return object.toString();
-        }
-        else
-        {
-            return object.getClass().getName();
-        }
     }
 
     public static String getBoilerPlate(String message)
@@ -72,9 +56,7 @@ public class StringMessageUtils
 
     public static String getBoilerPlate(String message, char c, int maxlength)
     {
-        List list = new ArrayList();
-        list.add(message);
-        return getBoilerPlate(list, c, maxlength);
+        return getBoilerPlate(Collections.singletonList(message), c, maxlength);
     }
 
     public static String getBoilerPlate(List messages, char c, int maxlength)
@@ -128,7 +110,7 @@ public class StringMessageUtils
         buf.append(SystemUtils.LINE_SEPARATOR);
         if (c != ' ')
         {
-            buf.append(charString(c, maxlength));
+            buf.append(StringUtils.repeat(c, maxlength));
         }
 
         for (int i = 0; i < messages.size(); i++)
@@ -153,9 +135,9 @@ public class StringMessageUtils
             }
             if (padding > 0)
             {
-                buf.append(charString(' ', padding));
+                buf.append(StringUtils.repeat(' ', padding));
             }
-            buf.append(" ");
+            buf.append(' ');
             if (c != ' ')
             {
                 buf.append(c);
@@ -164,17 +146,7 @@ public class StringMessageUtils
         buf.append(SystemUtils.LINE_SEPARATOR);
         if (c != ' ')
         {
-            buf.append(charString(c, maxlength));
-        }
-        return buf.toString();
-    }
-
-    public static String charString(char c, int len)
-    {
-        StringBuffer buf = new StringBuffer(len);
-        for (int i = 0; i < len; i++)
-        {
-            buf.append(c);
+            buf.append(StringUtils.repeat(c, maxlength));
         }
         return buf.toString();
     }
@@ -210,19 +182,6 @@ public class StringMessageUtils
         }
     }
 
-    public static String getString(byte[] bytes)
-    {
-        try
-        {
-            return new String(bytes, getEncoding());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            // We can ignore this as the encoding is validated on start up
-            return null;
-        }
-    }
-
     public static String getString(byte[] bytes, String encoding)
     {
         try
@@ -247,28 +206,39 @@ public class StringMessageUtils
 
     private static String getOSEncoding()
     {
-        // Note that the org.mule.encoding property will not be set by Mule until the
-        // MuleManager.initialise method is called, thus if you need to set an
+        // Note that the org.mule.osEncoding property will not be set by Mule until
+        // the MuleManager.initialise method is called, thus if you need to set an
         // encoding other than UTF-8 before the Manager is invoked, you can set this
         // property on the JVM
         return System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, DEFAULT_OS_ENCODING);
     }
 
+    /**
+     * @see {@link ArrayUtils#toString(Object, int)}
+     * @see {@link CollectionUtils#toString(Collection, int)}
+     * @see {@link MapUtils#toString(Map, boolean)}
+     */
     public static String toString(Object o)
     {
-        if (o == null) return null;
-
-        if (o instanceof Map)
+        if (o == null)
+        {
+            return "null";
+        }
+        else if (o instanceof Class)
+        {
+            return ((Class)o).getName();
+        }
+        else if (o instanceof Map)
         {
             return MapUtils.toString((Map)o, false);
         }
         else if (o.getClass().isArray())
         {
-            return ArrayUtils.toString(o);
+            return ArrayUtils.toString(o, MAX_ELEMENTS);
         }
         else if (o instanceof Collection)
         {
-            return CollectionUtils.toString((Collection)o, false);
+            return CollectionUtils.toString((Collection)o, MAX_ELEMENTS);
         }
         else
         {
