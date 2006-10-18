@@ -99,6 +99,14 @@ public class StringMessageUtilsTestCase extends TestCase
         assertEquals("There should be a variable here, there and everywhere", result);
     }
 
+    public void testBoilerPlateSingleLine()
+    {
+        String plate = StringMessageUtils.getBoilerPlate("Single message.", '*', 12);
+        assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR
+                     + "* Single   *" + SystemUtils.LINE_SEPARATOR + "* message. *"
+                     + SystemUtils.LINE_SEPARATOR + "************", plate);
+    }
+
     public void testBoilerPlate() throws Exception
     {
         List msgs = new ArrayList();
