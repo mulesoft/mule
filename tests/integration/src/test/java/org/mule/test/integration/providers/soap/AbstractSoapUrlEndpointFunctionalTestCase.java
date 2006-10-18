@@ -60,7 +60,7 @@ public abstract class AbstractSoapUrlEndpointFunctionalTestCase extends Abstract
     protected String getDispatchAsyncComplexEndpoint1()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:38010/mycomponent4?method=addPerson";
+               + "://localhost:38009/mycomponent3?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2()
