@@ -53,7 +53,7 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
 
     public String[] getConfigurationsAsArray()
     {
-        return StringUtils.split(configurations, ",");
+        return StringUtils.splitAndTrim(configurations, ",");
     }
 
     public void setConfigurations(String configurations)

@@ -57,7 +57,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
 
     public void setPropertiesMap(String properties)
     {
-        String[] pairs = StringUtils.split(properties, ",");
+        String[] pairs = StringUtils.splitAndTrim(properties, ",");
         propertiesMap = new Properties();
         for (int i = 0; i < pairs.length; i++) {
             String pair = pairs[i];
