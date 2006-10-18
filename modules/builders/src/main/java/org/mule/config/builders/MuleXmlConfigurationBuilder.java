@@ -183,7 +183,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException
     {
         try {
-            String[] resources = StringUtils.split(configResources, ",");
+            String[] resources = StringUtils.splitAndTrim(configResources, ",");
             MuleManager.getConfiguration().setConfigResources(resources);
             ReaderResource[] readers = new ReaderResource[resources.length];
             for (int i = 0; i < resources.length; i++) {

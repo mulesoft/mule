@@ -79,7 +79,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
         int i = 0;
 
         try {
-            resString = StringUtils.split(configResources, ",");
+            resString = StringUtils.splitAndTrim(configResources, ",");
             for (i = 0; i < resString.length; i++) {
                 url = Thread.currentThread().getContextClassLoader().getResource(resString[i]);
                 if (url == null) break;
