@@ -35,7 +35,6 @@ import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.util.ArrayUtils;
-import org.mule.util.compression.CompressionHelper;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -134,8 +133,7 @@ public class JmsMessageUtils
         }
         else if (source instanceof BytesMessage)
         {
-            byte[] bytes = toByteArray(source, jmsSpec);
-            return CompressionHelper.getDefaultCompressionStrategy().uncompressByteArray(bytes);
+            return toByteArray(source, jmsSpec);
         }
         else if (source instanceof StreamMessage)
         {

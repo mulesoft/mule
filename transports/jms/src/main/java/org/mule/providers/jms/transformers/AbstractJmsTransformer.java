@@ -12,7 +12,6 @@ package org.mule.providers.jms.transformers;
 
 import java.util.Iterator;
 
-import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -32,8 +31,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
-import org.mule.util.compression.CompressionHelper;
-import org.mule.util.compression.CompressionStrategy;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class that should be used for
@@ -133,6 +130,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 logger.debug("Message type received is: " + source.getClass().getName());
             }
 
+            // Try to figure out our endpoint's JMS Specification and fall back to
+            // 1.0.2 if none is set.
             String jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
             UMOImmutableEndpoint endpoint = this.getEndpoint();
             if (endpoint != null)
@@ -144,31 +143,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 }
             }
 
-            if (source instanceof BytesMessage)
-            {
-                byte[] bytes = JmsMessageUtils.toByteArray(source, jmsSpec);
-                CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
-
-                if (strategy.isCompressed(bytes))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Received Message is compressed");
-                    }
-
-                    // uncompress
-                    return strategy.uncompressByteArray(bytes);
-                }
-                else
-                {
-                    // bytes are already uncompressed
-                    return JmsMessageUtils.toObject(source, jmsSpec);
-                }
-            }
-            else
-            {
-                return JmsMessageUtils.toObject(source, jmsSpec);
-            }
+            return JmsMessageUtils.toObject(source, jmsSpec);
         }
         catch (Exception e)
         {
