@@ -89,20 +89,27 @@ public class AxisExternalServerTest extends TestCase
         assertEquals(result.getPayload(), new Integer(6));
     }
 
-    // Not supported
-    // public void testAxisServiceDocLit() throws Exception
-    // {
-    // String URL = "axis:http://localhost:8080/axis/Calculator.jws?method=add";
-    // MuleClient client = new MuleClient();
-    // Map props = new HashMap();
-    // props.put("style", "document");
-    // props.put("use", "literal");
-    // UMOMessage result = client.send(URL, new Object[]{new Integer(3), new
-    // Integer(3)}, props);
-    // assertNotNull(result);
-    //
-    // assertEquals(result.getPayload(), new Integer(6));
-    // }
+    // The service is not hosted as Doc/Lit, so Axis will not allow us
+    // to send a Doc/Lit request style soap message
+//     public void testAxisServiceDocLit() throws Exception
+//     {
+//         String URL = "axis:http://localhost:8080/axis/Calculator.jws";
+//         MuleClient client = new MuleClient();
+//         Map props = new HashMap();
+//         props.put("style", "document");
+//         props.put("use", "literal");
+//         
+//         SoapMethod method = new SoapMethod(new QName("http://localhost:8080/axis/Calculator.jws", "add"));
+//         method.addNamedParameter(new QName("i1"), NamedParameter.XSD_INT, "in");
+//         method.addNamedParameter(new QName("i2"), NamedParameter.XSD_INT, "in");
+//         method.setReturnType(NamedParameter.XSD_INT);
+//         props.put(MuleProperties.MULE_METHOD_PROPERTY, method);
+//         
+//         UMOMessage result = client.send(URL, new Object[]{new Integer(3), new Integer(3)}, props);
+//         assertNotNull(result);
+//        
+//         assertEquals(result.getPayload(), new Integer(6));
+//     }
 
     // wsdl-axis is currently disabled due to the problems axis had with this
     // feature
