@@ -27,9 +27,6 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 /**
  * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
  * use with the UMOSecurityManager
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AcegiProviderAdapter implements UMOSecurityProvider, AuthenticationProvider
 {

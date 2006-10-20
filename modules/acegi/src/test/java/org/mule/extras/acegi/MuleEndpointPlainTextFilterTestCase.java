@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
 
 import org.mule.extras.client.MuleClient;
@@ -15,13 +16,10 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleEndpointPlainTextFilterTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "test-acegi-encrypt-config.xml";
     }
 
@@ -51,4 +49,5 @@ public class MuleEndpointPlainTextFilterTestCase extends FunctionalTestCase
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
     }
+
 }

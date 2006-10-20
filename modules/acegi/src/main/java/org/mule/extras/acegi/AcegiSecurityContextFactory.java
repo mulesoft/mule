@@ -18,11 +18,8 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityContextFactory;
 
 /**
- * <code>AcegiSecurityContextFactory</code> creates an Acegisecuritycontext for the
- * a UMOAuthentication object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an
+ * UMOAuthentication object
  */
 public class AcegiSecurityContextFactory implements UMOSecurityContextFactory
 {
@@ -30,13 +27,15 @@ public class AcegiSecurityContextFactory implements UMOSecurityContextFactory
     {
         SecurityContext context = new SecurityContextImpl();
         context.setAuthentication(((AcegiAuthenticationAdapter)authentication).getDelegate());
-        
-        if (authentication.getProperties() != null){
+
+        if (authentication.getProperties() != null)
+        {
             if ((authentication.getProperties().containsKey("securityMode")))
             {
-                SecurityContextHolder.setStrategyName((String)authentication.getProperties().get("securityMode"));
+                SecurityContextHolder.setStrategyName((String)authentication.getProperties().get(
+                    "securityMode"));
             }
-        }   
+        }
         SecurityContextHolder.setContext(context);
         return new AcegiSecurityContext(context);
     }

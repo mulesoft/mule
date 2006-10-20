@@ -18,9 +18,6 @@ import org.mule.umo.security.UMOAuthentication;
 
 /**
  * <code>AcegiAuthenticationAdapter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AcegiAuthenticationAdapter implements UMOAuthentication
 {

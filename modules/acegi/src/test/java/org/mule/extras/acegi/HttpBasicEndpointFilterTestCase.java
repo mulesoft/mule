@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
 
 import org.acegisecurity.GrantedAuthority;
@@ -16,12 +17,10 @@ import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import org.acegisecurity.userdetails.User;
 import org.acegisecurity.userdetails.memory.InMemoryDaoImpl;
 import org.acegisecurity.userdetails.memory.UserMap;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.SystemUtils;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -33,18 +32,16 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "";
     }
 
-    protected ConfigurationBuilder getBuilder() throws Exception {
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
         MuleSecurityManager sm = new MuleSecurityManager();
         UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
         sm.addProvider(provider);
@@ -52,11 +49,8 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
         manager.setSecurityManager(sm);
-        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
-                                                   "echo",
-                                                   "http://localhost:4567",
-                                                   null,
-                                                   null);
+        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(), "echo",
+            "http://localhost:4567", null, null);
         d.getInboundEndpoint().setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
         builder.registerComponent(d);
 
@@ -68,26 +62,15 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         InMemoryDaoImpl dao = new InMemoryDaoImpl();
         UserMap map = new UserMap();
-        map.addUser(new User("ross",
-                             "ross",
-                             true,
-                             true,
-                             true,
-                             true,
-                             new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ADMIN") }));
-        map.addUser(new User("anon",
-                             "anon",
-                             true,
-                             true,
-                             true,
-                             true,
-                             new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ANONYOMUS") }));
+        map.addUser(new User("ross", "ross", true, true, true, true,
+            new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ADMIN")}));
+        map.addUser(new User("anon", "anon", true, true, true, true,
+            new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ANONYOMUS")}));
         dao.setUserMap(map);
         dao.afterPropertiesSet();
-        provider.setUserDetailsService(dao); //.setAuthenticationDao(dao);
+        provider.setUserDetailsService(dao); // .setAuthenticationDao(dao);
         return provider;
     }
-
 
     public void testAuthenticationFailureNoContext() throws Exception
     {
@@ -97,13 +80,14 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
 
         get.setDoAuthentication(false);
 
-        try {
+        try
+        {
             int status = client.executeMethod(get);
-
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            System.out.println(status + SystemUtils.LINE_SEPARATOR + get.getResponseBodyAsString());
-
-        } finally {
+            assertEquals("/index.html", get.getResponseBodyAsString());
+        }
+        finally
+        {
             get.releaseConnection();
         }
     }
@@ -130,7 +114,8 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
-        doRequest("mule-realm", "localhost", "ross", "ross", "http://localhost:4567/index.html", true, false, 200);
+        doRequest("mule-realm", "localhost", "ross", "ross", "http://localhost:4567/index.html", true, false,
+            200);
     }
 
     private void doRequest(String realm,
@@ -144,16 +129,18 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(preemtive);
-        client.getState().setCredentials(new AuthScope(host, -1, realm), new UsernamePasswordCredentials(user, pass));
+        client.getState().setCredentials(new AuthScope(host, -1, realm),
+            new UsernamePasswordCredentials(user, pass));
         GetMethod get = new GetMethod(url);
         get.setDoAuthentication(handshake);
 
-        try {
+        try
+        {
             int status = client.executeMethod(get);
             assertEquals(result, status);
-            System.out.println(status + SystemUtils.LINE_SEPARATOR + get.getResponseBodyAsString());
-
-        } finally {
+        }
+        finally
+        {
             get.releaseConnection();
         }
     }

@@ -35,11 +35,7 @@ import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-
 public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilter
 {
     /**
@@ -67,8 +63,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             if (isRealmRequired())
             {
-                throw new InitialisationException(new Message(
-                    Messages.AUTH_REALM_MUST_SET_ON_FILTER), this);
+                throw new InitialisationException(new Message(Messages.AUTH_REALM_MUST_SET_ON_FILTER), this);
             }
             else
             {
@@ -106,11 +101,9 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * @throws org.mule.umo.security.SecurityException if authentication fails
      */
     public void authenticateInbound(UMOEvent event)
-        throws SecurityException, SecurityProviderNotFoundException,
-        UnknownAuthenticationTypeException
+        throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
-        String header = event.getMessage().getStringProperty(HttpConstants.HEADER_AUTHORIZATION,
-            null);
+        String header = event.getMessage().getStringProperty(HttpConstants.HEADER_AUTHORIZATION, null);
 
         if (logger.isDebugEnabled())
         {
@@ -134,8 +127,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
                 username, password);
-            authRequest.setDetails(event.getMessage().getProperty(
-                MuleProperties.MULE_ENDPOINT_PROPERTY));
+            authRequest.setDetails(event.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
 
             UMOAuthentication authResult;
 
@@ -150,12 +142,10 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                 // Authentication failed
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Authentication request for user: " + username + " failed: "
-                                 + e.toString());
+                    logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
                 }
                 setUnauthenticated(event);
-                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X,
-                    username), e);
+                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, username), e);
             }
 
             // Authentication success
@@ -171,8 +161,8 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         else if (header == null)
         {
             setUnauthenticated(event);
-            throw new UnauthorisedException(event.getMessage(), event.getSession()
-                .getSecurityContext(), getEndpoint(), this);
+            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                getEndpoint(), this);
         }
         else
         {
@@ -208,8 +198,8 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event.getMessage(), event.getSession()
-                    .getSecurityContext(), event.getEndpoint(), this);
+                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                    event.getEndpoint(), this);
             }
             else
             {

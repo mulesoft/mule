@@ -7,7 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.acegi;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
@@ -22,16 +26,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
 import org.mule.umo.security.UnauthorisedException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+
+    protected String getConfigResources()
+    {
         return "test-acegi-encrypt-config.xml";
     }
 
@@ -41,21 +40,25 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
         UMOMessage m = client.send("vm://my.queue", "foo", null);
         assertNotNull(m);
         assertNotNull(m.getExceptionPayload());
-        assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload().getCode());
+        assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload()
+            .getCode());
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         assertNotNull(m.getExceptionPayload());
-        assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload().getCode());
+        assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload()
+            .getCode());
     }
 
     public void testAuthenticationAuthorised() throws Exception
@@ -63,8 +66,10 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
@@ -76,8 +81,10 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
+            .getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
@@ -92,7 +99,9 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
+            .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
@@ -101,4 +110,5 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
     }
+
 }

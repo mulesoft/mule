@@ -17,10 +17,7 @@ import org.mule.umo.security.UMOSecurityContext;
 
 /**
  * <code>AcegiSecurityContext</code> is a UMOSecurityContext wrapper used to
- * interface with an acegi Secure context
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * interface with an Acegi SecurityContext
  */
 
 public class AcegiSecurityContext implements UMOSecurityContext
