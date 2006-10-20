@@ -72,14 +72,14 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         filter.setCaseSensitive(false);
 
         filter = new MessagePropertyFilter("foo2 =null");
-        message.setProperty("foo2", null);
+        message.removeProperty("foo2");
         assertTrue(filter.accept(message));
 
         filter = new MessagePropertyFilter("foo2 =");
         message.setProperty("foo2", "");
         assertTrue(filter.accept(message));
 
-        message.setProperty("foo2", null);
+        message.removeProperty("foo2");
         assertTrue(!filter.accept(message));
     }
 }

@@ -13,11 +13,14 @@ package org.mule.tck.providers;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import java.beans.ExceptionListener;
+import java.util.HashMap;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -29,16 +32,9 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.beans.ExceptionListener;
-import java.util.HashMap;
-
 /**
- * <code>AbstractConnectorTestCase</code> tests common behaviour of all
- * endpoints and provides 'reminder' methods for implementation specific
- * interface methods
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints
+ * and provides 'reminder' methods for implementation specific interface methods
  */
 public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 {
@@ -61,7 +57,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     protected void doTearDown() throws Exception
     {
-        if (!connector.isDisposed()) {
+        if (!connector.isDisposed())
+        {
             connector.dispose();
         }
     }
@@ -76,21 +73,26 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
 
         assertNotNull(connector.getExceptionListener());
-        connector.setExceptionListener((ExceptionListener) ehandlerMock.proxy());
+        connector.setExceptionListener((ExceptionListener)ehandlerMock.proxy());
         connector.handleException(new MuleException(Message.createStaticMessage("Dummy")));
 
-        if (connector instanceof AbstractConnector) {
+        if (connector instanceof AbstractConnector)
+        {
             ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
-            ((AbstractConnector) connector).exceptionThrown(new MuleException(Message.createStaticMessage("Dummy")));
+            ((AbstractConnector)connector).exceptionThrown(new MuleException(
+                Message.createStaticMessage("Dummy")));
         }
 
         ehandlerMock.verify();
 
         connector.setExceptionListener(null);
-        try {
+        try
+        {
             connector.handleException(new MuleException(Message.createStaticMessage("Dummy")));
             fail("Should have thrown exception as no strategy is set");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
     }
@@ -111,22 +113,15 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertTrue(!connector.isStarted());
         assertTrue(connector.isDisposed());
 
-        try {
+        try
+        {
             connector.startConnector();
             fail("Connector cannot be restarted after being disposing");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
-
-        // try
-        // {
-        // connector.stop();
-        // fail("Connector cannot be stopped after being disposing");
-        // }
-        // catch (Exception e)
-        // {
-        // // expected
-        // }
     }
 
     public void testConnectorListenerSupport() throws Exception
@@ -136,30 +131,34 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
 
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint("test",
-                                                new MuleEndpointURI(getTestEndpointURI()),
-                                                connector,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0, null,
-                                                new HashMap());
+        UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,
+            null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
 
-        try {
+        try
+        {
             connector.registerListener(null, null);
             fail("cannot register null");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
 
-        try {
+        try
+        {
             connector.registerListener(null, endpoint);
             fail("cannot register null");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
 
-        try {
+        try
+        {
             connector.registerListener(component, null);
             fail("cannot register null");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
 
         connector.registerListener(component, endpoint);
@@ -167,23 +166,32 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         // this should work
         connector.unregisterListener(component, endpoint);
         // so should this
-        try {
+        try
+        {
             connector.unregisterListener(null, null);
             fail("cannot unregister null");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
-        try {
+        try
+        {
             connector.unregisterListener(component, null);
             fail("cannot unregister null");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             connector.unregisterListener(null, endpoint);
             fail("cannot unregister null");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
         connector.unregisterListener(component, endpoint);
@@ -194,10 +202,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     {
         assertNotNull(connector);
 
-        try {
+        try
+        {
             connector.setName(null);
             fail("Should throw IllegalArgumentException if name set to null");
-        } catch (IllegalArgumentException e) { /* expected */
+        }
+        catch (IllegalArgumentException e)
+        { /* expected */
         }
 
         connector.setName("Test");
@@ -220,9 +231,9 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOConnector connector = getConnector();
         assertNotNull(connector);
         assertNotNull(connector.getDispatcherFactory());
-        UMOMessageDispatcher dispatcher = connector.getDispatcher(new ImmutableMuleEndpoint(
-                "test", new MuleEndpointURI(getTestEndpointURI()), connector, null,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null));
+        UMOMessageDispatcher dispatcher = connector.getDispatcher(new ImmutableMuleEndpoint("test",
+            new MuleEndpointURI(getTestEndpointURI()), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0,
+            null, null));
         assertNotNull(dispatcher);
         assertEquals(connector, dispatcher.getConnector());
     }
@@ -231,10 +242,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     {
         UMOConnector connector = getConnector();
 
-        try {
+        try
+        {
             connector.initialise();
             fail("A connector cannot be initialised more than once");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
     }
