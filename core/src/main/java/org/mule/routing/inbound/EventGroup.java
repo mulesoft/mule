@@ -94,15 +94,33 @@ public class EventGroup implements Serializable
         StringBuffer buf = new StringBuffer(80);
         buf.append("Event Group Id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
-        buf.append(", current events (").append(events.size()).append(")");
 
-        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+        // COWArrayList synchronizes on itself so we can use that to prevent changes
+        // to the group while we iterate over it. This is only necessary to prevent
+        // output with size=1 and then printing 2 or more events because someone
+        // snuck in behind our back..
+        synchronized (events)
         {
-            UMOEvent event = (UMOEvent)iterator.next();
-            buf.append(", ").append(event.getMessage().getUniqueId());
-        }
+            int currentSize = events.size();
+            buf.append(", current events=").append(currentSize);
 
-        return buf.toString();
+            if (currentSize > 0)
+            {
+                buf.append(" [");
+                Iterator i = events.iterator();
+                while (i.hasNext())
+                {
+                    UMOEvent event = (UMOEvent)i.next();
+                    buf.append(event.getMessage().getUniqueId());
+                    if (i.hasNext())
+                    {
+                        buf.append(", ");
+                    }
+                }
+                buf.append(']');
+            }
+            return buf.toString();
+        }
     }
 
 }
