@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.udp;
 
 import org.mule.umo.UMOException;
@@ -15,10 +16,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>UdpMessageDispatcherFactory</code> creates a dispatcher for writing udp packets
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UdpMessageDispatcherFactory</code> creates a dispatcher for sending UDP
+ * packets.
  */
 
 public class UdpMessageDispatcherFactory implements UMOMessageDispatcherFactory

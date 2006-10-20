@@ -7,25 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.udp;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
 
 /**
- * <code>UdpConnector</code> can send and receive Mule events as Datagram
- * packets
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UdpConnector</code> can send and receive Mule events as Datagram packets.
  */
 public class UdpConnector extends AbstractServiceEnabledConnector
 {
     public static final int DEFAULT_SOCKET_TIMEOUT = 5000;
-
     public static final int DEFAULT_BUFFER_SIZE = 64 * 1024;
 
     private int timeout = DEFAULT_SOCKET_TIMEOUT;
-
     private int bufferSize = DEFAULT_BUFFER_SIZE;
 
     public String getProtocol()
@@ -40,7 +35,8 @@ public class UdpConnector extends AbstractServiceEnabledConnector
 
     public void setTimeout(int timeout)
     {
-        if (timeout < 1) {
+        if (timeout < 1)
+        {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
         this.timeout = timeout;
@@ -53,7 +49,8 @@ public class UdpConnector extends AbstractServiceEnabledConnector
 
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1) {
+        if (bufferSize < 1)
+        {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
         this.bufferSize = bufferSize;

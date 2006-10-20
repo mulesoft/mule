@@ -7,7 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.udp;
+
+import java.net.DatagramPacket;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -17,15 +20,9 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
-import java.net.DatagramPacket;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class UdpConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         UdpConnector c = new UdpConnector();
@@ -52,32 +49,44 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        {
+            /* expected */
         }
         endpoint.setEndpointURI(null);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        {
+            /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("udp://localhost:3456"));
         connector.registerListener(component, endpoint);
-        try {
-            // connector.registerListener(component, endpoint);
-            // fail("cannot register on the same endpointUri");
-        } catch (Exception e) { /* expected */
+        try
+        {
+            connector.registerListener(component, endpoint);
+            fail("cannot register on the same endpointUri");
+        }
+        catch (Exception e)
+        {
+            /* expected */
         }
         connector.dispose();
     }
 
     public void testProperties() throws Exception
     {
-        UdpConnector connector = (UdpConnector) this.connector;
-        // connector.initialise();
+        UdpConnector connector = (UdpConnector)this.connector;
+
         connector.setBufferSize(1024);
         assertEquals(1024, connector.getBufferSize());
         connector.setBufferSize(0);
@@ -85,6 +94,6 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
 
         connector.setTimeout(-1);
         assertEquals(UdpConnector.DEFAULT_SOCKET_TIMEOUT, connector.getTimeout());
-
     }
+
 }

@@ -7,7 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.udp;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.UnknownHostException;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -22,46 +35,31 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.UnknownHostException;
-
 /**
- * <code>UdpMessageReceiver</code> receives UDP message packets
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UdpMessageReceiver</code> receives UDP message packets.
  */
 public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     protected DatagramSocket socket = null;
-
     protected InetAddress inetAddress;
-
     protected int bufferSize;
-
     private URI uri;
-
     protected UMOTransformer responseTransformer = null;
 
     public UdpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
-        bufferSize = ((UdpConnector) connector).getBufferSize();
+        bufferSize = ((UdpConnector)connector).getBufferSize();
 
         uri = endpoint.getEndpointURI().getUri();
 
-        try {
+        try
+        {
             inetAddress = InetAddress.getByName(uri.getHost());
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e)
+        {
             throw new InitialisationException(new Message("udp", 2, uri), e, this);
         }
 
@@ -70,18 +68,24 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     public void doConnect() throws Exception
     {
-        try {
+        try
+        {
             socket = createSocket(uri, inetAddress);
-            socket.setSoTimeout(((UdpConnector) connector).getTimeout());
+            socket.setSoTimeout(((UdpConnector)connector).getTimeout());
             socket.setReceiveBufferSize(bufferSize);
             socket.setSendBufferSize(bufferSize);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message("udp", 1, uri), e, this);
         }
 
-        try {
+        try
+        {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
-        } catch (WorkException e) {
+        }
+        catch (WorkException e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
     }
@@ -90,7 +94,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         // this will cause the server thread to quit
         disposing.set(true);
-        if (socket != null) {
+        if (socket != null)
+        {
             socket.close();
         }
 
@@ -99,7 +104,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected UMOTransformer getResponseTransformer() throws InitialisationException
     {
         UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
-        if (transformer == null) {
+        if (transformer == null)
+        {
             return connector.getDefaultResponseTransformer();
         }
         return transformer;
@@ -121,7 +127,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected DatagramPacket createPacket()
     {
         DatagramPacket packet = new DatagramPacket(new byte[bufferSize], bufferSize);
-        if (uri.getPort() > 0) {
+        if (uri.getPort() > 0)
+        {
             packet.setPort(uri.getPort());
         }
         packet.setAddress(inetAddress);
@@ -130,26 +137,38 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     public void run()
     {
-        while (!disposing.get()) {
-            if (connector.isStarted()) {
+        while (!disposing.get())
+        {
+            if (connector.isStarted())
+            {
 
-                try {
+                try
+                {
                     DatagramPacket packet = createPacket();
-                    try {
+                    try
+                    {
                         socket.receive(packet);
                         logger.trace("Received packet on: " + inetAddress.toString());
                         Work work = createWork(packet);
-                        try {
+                        try
+                        {
                             getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
-                        } catch (WorkException e) {
+                        }
+                        catch (WorkException e)
+                        {
                             logger.error("Udp receiver interrupted: " + e.getMessage(), e);
                         }
-                    } catch (SocketTimeoutException e) {
+                    }
+                    catch (SocketTimeoutException e)
+                    {
                         // ignore
                     }
 
-                } catch (Exception e) {
-                    if (!connector.isDisposed() && !disposing.get()) {
+                }
+                catch (Exception e)
+                {
+                    if (!connector.isDisposed() && !disposing.get())
+                    {
                         logger.debug("Accept failed on socket: " + e, e);
                         handleException(e);
                     }
@@ -165,7 +184,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected void doDispose()
     {
-        if (socket != null && !socket.isClosed()) {
+        if (socket != null && !socket.isClosed())
+        {
             logger.debug("Closing Udp connection: " + uri);
             socket.close();
             logger.info("Closed Udp connection: " + uri);
@@ -195,10 +215,14 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
         public void dispose()
         {
-            if (socket != null && !socket.isClosed()) {
-                try {
+            if (socket != null && !socket.isClosed())
+            {
+                try
+                {
                     socket.close();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     logger.error("Socket close failed", e);
                 }
             }
@@ -211,30 +235,44 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         public void run()
         {
             UMOMessage returnMessage = null;
-            try {
+            try
+            {
                 UMOMessageAdapter adapter = connector.getMessageAdapter(packet);
                 returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
 
-                if (returnMessage != null) {
+                if (returnMessage != null)
+                {
                     byte[] data;
-                    if (responseTransformer != null) {
+                    if (responseTransformer != null)
+                    {
                         Object response = responseTransformer.transform(returnMessage.getPayload());
-                        if (response instanceof byte[]) {
-                            data = (byte[]) response;
-                        } else {
+                        if (response instanceof byte[])
+                        {
+                            data = (byte[])response;
+                        }
+                        else
+                        {
                             data = response.toString().getBytes();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         data = returnMessage.getPayloadAsBytes();
                     }
-                    DatagramPacket result = new DatagramPacket(data, data.length, packet.getAddress(), packet.getPort());
+                    DatagramPacket result = new DatagramPacket(data, data.length, packet.getAddress(),
+                        packet.getPort());
                     socket.send(result);
                 }
-            } catch (Exception e) {
-                if (!disposing.get()) {
+            }
+            catch (Exception e)
+            {
+                if (!disposing.get())
+                {
                     handleException(e);
                 }
-            } finally {
+            }
+            finally
+            {
                 dispose();
             }
         }
