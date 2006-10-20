@@ -28,13 +28,9 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 
 import java.util.Iterator;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class EventAggregatorTestCase extends AbstractMuleTestCase
 {
+
     public void testMessageAggregator() throws Exception
     {
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));

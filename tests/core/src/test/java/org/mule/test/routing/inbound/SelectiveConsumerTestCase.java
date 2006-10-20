@@ -29,13 +29,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 {
+
     public void testSelectiveConsumer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

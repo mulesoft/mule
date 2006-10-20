@@ -30,13 +30,9 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 
 import java.util.Comparator;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class EventResequencerTestCase extends AbstractMuleTestCase
 {
+
     public void testMessageResequencer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

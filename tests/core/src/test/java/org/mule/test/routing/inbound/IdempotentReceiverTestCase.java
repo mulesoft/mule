@@ -28,13 +28,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
+
     public void testIdempotentReceiverWithoutPersistence() throws Exception
     {
         IdempotentReceiver router = new IdempotentReceiver();
