@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.components.simple.EchoService;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -27,13 +26,20 @@ import org.mule.umo.lifecycle.Disposable;
 public class TestServiceComponent extends FunctionalTestComponent
     implements EchoService, DateService, PeopleService, Disposable
 {
+    // we keep two collections - one static for testing the return of complex types
+    // and one for modifying by methods invoked on the TestComponent instance
+
+    private static final Person[] originalPeople = new Person[]{new Person("Barney", "Rubble"),
+        new Person("Fred", "Flintstone"), new Person("Wilma", "Flintstone")};
+
     private final Map people = Collections.synchronizedMap(new HashMap());
 
     public TestServiceComponent()
     {
-        people.put("Barney", new Person("Barney", "Rubble"));
-        people.put("Fred", new Person("Fred", "Flintstone"));
-        people.put("Wilma", new Person("Wilma", "Flintstone"));
+        super();
+        people.put("Barney", originalPeople[0]);
+        people.put("Fred", originalPeople[1]);
+        people.put("Wilma", originalPeople[2]);
     }
 
     public String echo(String echo)
@@ -57,10 +63,7 @@ public class TestServiceComponent extends FunctionalTestComponent
 
     public Person[] getPeople()
     {
-        synchronized (people)
-        {
-            return (Person[])IteratorUtils.toArray(people.values().iterator(), Person.class);
-        }
+        return originalPeople;
     }
 
     public void addPerson(Person person) throws Exception

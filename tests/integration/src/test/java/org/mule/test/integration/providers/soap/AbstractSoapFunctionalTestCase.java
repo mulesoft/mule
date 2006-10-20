@@ -118,7 +118,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         UMOMessage result = client.receive(getReceiveComplexCollectionEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(4, ((Person[])result.getPayload()).length);
+        assertEquals(3, ((Person[])result.getPayload()).length);
     }
 
     public void testDispatchAsyncComplex() throws Throwable
