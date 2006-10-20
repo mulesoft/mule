@@ -79,18 +79,14 @@ public class EndpointService implements EndpointServiceMBean
 
     public boolean isConnected()
     {
-        if (receiver == null) {
-            return true;
-        } else {
-            return receiver.isConnected();
-        }
+        return receiver == null || receiver.isConnected();
     }
 
     public void connect() throws Exception
     {
         if (receiver != null && !receiver.isConnected()) {
             receiver.connect();
-        } else {
+        } else if (logger.isDebugEnabled()) {
             logger.debug("Endpoint is already connected");
         }
     }
@@ -99,7 +95,7 @@ public class EndpointService implements EndpointServiceMBean
     {
         if (receiver != null && receiver.isConnected()) {
             receiver.disconnect();
-        } else {
+        } else if (logger.isDebugEnabled()) {
             logger.debug("Endpoint is already disconnected");
         }
     }
