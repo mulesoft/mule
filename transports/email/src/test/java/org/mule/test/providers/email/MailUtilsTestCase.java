@@ -7,16 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.providers.email;
+
+import javax.mail.internet.InternetAddress;
 
 import org.mule.providers.email.MailUtils;
 import org.mule.tck.AbstractMuleTestCase;
 
-import javax.mail.internet.InternetAddress;
-
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class MailUtilsTestCase extends AbstractMuleTestCase
 {
     private static final String EMAIL_1 = "vasya@pupkin.com";
@@ -25,7 +23,6 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
     private InternetAddress inetAddress2;
     private static final String MULTIPLE_EMAILS_WITH_WHITESPACE = EMAIL_1 + ", " + EMAIL_2;
     private static final String MULTIPLE_EMAILS_WITHOUT_WHITESPACE = EMAIL_1 + "," + EMAIL_2;
-
 
     protected void doSetUp() throws Exception
     {
@@ -41,8 +38,8 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
 
     public void testMultipleInternetAddressesToString()
     {
-        String result = MailUtils.internetAddressesToString(new InternetAddress[] {inetAddress1, inetAddress2});
-        assertEquals("Wrong internet address conversion.", MULTIPLE_EMAILS_WITH_WHITESPACE , result);
+        String result = MailUtils.internetAddressesToString(new InternetAddress[]{inetAddress1, inetAddress2});
+        assertEquals("Wrong internet address conversion.", MULTIPLE_EMAILS_WITH_WHITESPACE, result);
     }
 
     public void testStringToSingleInternetAddresses() throws Exception

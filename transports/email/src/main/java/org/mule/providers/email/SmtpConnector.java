@@ -10,6 +10,10 @@
 
 package org.mule.providers.email;
 
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -17,15 +21,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.mail.Authenticator;
-import java.util.Properties;
-
 /**
- * <code>SmtpConnector</code> is used to connect to and send data to an SMTP
- * mail server
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>SmtpConnector</code> is used to connect to and send data to an SMTP mail
+ * server
  */
 public class SmtpConnector extends AbstractServiceEnabledConnector implements MailConnector
 {
@@ -69,8 +67,9 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     private Properties customHeaders = new Properties();
 
     /**
-     * A custom authenticator to be used on any mail sessions created with this connector
-     * This will only be used if user name credentials are set on the endpoint
+     * A custom authenticator to be used on any mail sessions created with this
+     * connector This will only be used if user name credentials are set on the
+     * endpoint
      */
     private Authenticator authenticator = null;
 
@@ -83,7 +82,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.UMOConnector#registerListener(javax.jms.MessageListener,
      *      java.lang.String)
      */
@@ -102,7 +101,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.UMOConnector#stop()
      */
     public void doStop() throws UMOException
@@ -112,14 +111,17 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
     {
-        try {
+        try
+        {
             doStop();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             logger.error(e.getMessage(), e);
         }
     }
@@ -129,19 +131,19 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         return "smtp";
     }
 
-    /////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////////////
     // Getters and setters
-    /////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////////////
 
-     /**
-      * @return The default from address to use
-      */
-     public String getFromAddress()
-     {
-         return from;
-     }
+    /**
+     * @return The default from address to use
+     */
+    public String getFromAddress()
+    {
+        return from;
+    }
 
-     /**
+    /**
      * @return the default comma separated list of BCC addresses to use
      */
     public String getBccAddresses()
@@ -165,7 +167,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         return defaultSubject;
     }
 
-
     public void setBccAddresses(String string)
     {
         bcc = string;
@@ -186,79 +187,88 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         from = string;
     }
 
-    public String getReplyToAddresses() {
+    public String getReplyToAddresses()
+    {
         return replyTo;
     }
 
-    public void setReplyToAddresses(String replyTo) {
+    public void setReplyToAddresses(String replyTo)
+    {
         this.replyTo = replyTo;
     }
 
-    public Properties getCustomHeaders() {
+    public Properties getCustomHeaders()
+    {
         return customHeaders;
     }
 
-    public void setCustomHeaders(Properties customHeaders) {
+    public void setCustomHeaders(Properties customHeaders)
+    {
         this.customHeaders = customHeaders;
     }
 
-    public Authenticator getAuthenticator() {
+    public Authenticator getAuthenticator()
+    {
         return authenticator;
     }
 
-    public void setAuthenticator(Authenticator authenticator) {
+    public void setAuthenticator(Authenticator authenticator)
+    {
         this.authenticator = authenticator;
     }
 
-    public String getContentType() {
+    public String getContentType()
+    {
         return contentType;
     }
 
-    public void setContentType(String contentType) {
+    public void setContentType(String contentType)
+    {
         this.contentType = contentType;
     }
 
-    public int getDefaultPort() {
+    public int getDefaultPort()
+    {
         return DEFAULT_SMTP_PORT;
     }
 
-
-    public String getHost() {
+    public String getHost()
+    {
         return host;
     }
 
-
-    public void setHost(String host) {
+    public void setHost(String host)
+    {
         this.host = host;
     }
 
-
-    public String getPassword() {
+    public String getPassword()
+    {
         return password;
     }
 
-
-    public void setPassword(String password) {
+    public void setPassword(String password)
+    {
         this.password = password;
     }
 
-
-    public int getPort() {
+    public int getPort()
+    {
         return port;
     }
 
-
-    public void setPort(int port) {
+    public void setPort(int port)
+    {
         this.port = port;
     }
 
-
-    public String getUsername() {
+    public String getUsername()
+    {
         return username;
     }
 
-
-    public void setUsername(String username) {
+    public void setUsername(String username)
+    {
         this.username = username;
     }
 }

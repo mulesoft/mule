@@ -7,9 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.providers.email.transformers;
 
 import com.mockobjects.dynamic.Mock;
+
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -21,18 +29,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import java.util.Properties;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 
 public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 {
@@ -48,20 +44,25 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         StringToEmailMessage trans = new StringToEmailMessage();
         UMOEndpoint endpoint = new MuleEndpoint("smtp://a:a@a.com", false);
 
-        //We need to init the connect without actully connecting for this test case
-        try {
+        // We need to init the connector without actually connecting for this test
+        // case
+        try
+        {
             endpoint.getConnector().initialise();
-        } catch (AlreadyInitialisedException e) {
-            //ignore
+        }
+        catch (AlreadyInitialisedException e)
+        {
+            // ignore
         }
         final Mock mockDispatcher = new Mock(UMOMessageDispatcher.class);
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
 
-        endpoint.setConnector(new SmtpConnector() {
+        endpoint.setConnector(new SmtpConnector()
+        {
             public UMOMessageDispatcher getDispatcher() throws UMOException
             {
-                return (UMOMessageDispatcher) mockDispatcher.proxy();
+                return (UMOMessageDispatcher)mockDispatcher.proxy();
             }
         });
         trans.setEndpoint(endpoint);
@@ -71,11 +72,15 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 
     public Object getTestData()
     {
-        if (message == null) {
+        if (message == null)
+        {
             message = new MimeMessage(Session.getDefaultInstance(new Properties()));
-            try {
+            try
+            {
                 message.setContent(getResultData(), "text/plain");
-            } catch (MessagingException e) {
+            }
+            catch (MessagingException e)
+            {
                 throw new RuntimeException("Failed to create Mime Message: " + e.getMessage(), e);
             }
         }
@@ -89,16 +94,21 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src instanceof Message) {
+        if (src instanceof Message)
+        {
             Object objSrc = null;
             Object objRes = null;
-            try {
-                objSrc = ((Message) src).getContent();
-                objRes = ((Message) result).getContent();
-            } catch (Exception e) {
+            try
+            {
+                objSrc = ((Message)src).getContent();
+                objRes = ((Message)result).getContent();
+            }
+            catch (Exception e)
+            {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            if (objSrc == null || objRes == null) {
+            if (objSrc == null || objRes == null)
+            {
                 return false;
             }
             return objRes.equals(objSrc);

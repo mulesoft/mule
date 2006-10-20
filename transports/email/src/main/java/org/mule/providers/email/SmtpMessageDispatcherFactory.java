@@ -16,11 +16,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>SmtpMessageDispatcherFactory</code> creates an instance of an SmtpMessage dispatcher used for sending email events
- * via an smtp gateway
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>SmtpMessageDispatcherFactory</code> creates an instance of an SmtpMessage
+ * dispatcher used for sending email events via an SMTP gateway
  */
 public class SmtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

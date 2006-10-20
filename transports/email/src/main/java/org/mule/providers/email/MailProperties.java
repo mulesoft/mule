@@ -7,16 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.email;
 
 /**
- * Mail properties that are sent on the MuleMessage when recieing a Mail Message or
- * can be set on the endpoint or event to be added to outgoing mail
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Mail properties that are sent on the MuleMessage when receiving a Mail Message or
+ * which can be set on the endpoint or event to be added to outgoing mail
  */
-public interface MailProperties {
+public interface MailProperties
+{
     /**
      * Event properties
      */

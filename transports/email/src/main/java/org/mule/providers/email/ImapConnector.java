@@ -7,16 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.email;
 
 /**
- * Receives messages from an Imap mailbox
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Receives messages from an IMAP mailbox
  */
-public class ImapConnector extends Pop3Connector {
-
+public class ImapConnector extends Pop3Connector
+{
     public static final int DEFAULT_IMAP_PORT = 143;
 
     /** Default is INBOX. */
@@ -27,16 +25,18 @@ public class ImapConnector extends Pop3Connector {
         return "imap";
     }
 
-    public int getDefaultPort() {
+    public int getDefaultPort()
+    {
         return DEFAULT_IMAP_PORT;
     }
 
-
-    public String getMailboxFolder() {
+    public String getMailboxFolder()
+    {
         return mailboxFolder;
     }
 
-    public void setMailboxFolder(String mailboxFolder) {
+    public void setMailboxFolder(String mailboxFolder)
+    {
         this.mailboxFolder = mailboxFolder;
     }
 }

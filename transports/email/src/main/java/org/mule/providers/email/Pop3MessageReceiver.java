@@ -45,7 +45,7 @@ import org.mule.util.FileUtils;
 import org.mule.util.UUID;
 
 /**
- * <code>Pop3MessageReceiver</code> polls a pop3 mailbox for messages, removes the
+ * <code>Pop3MessageReceiver</code> polls a POP3 mailbox for messages, removes the
  * messages and routes them as events into Mule.
  */
 

@@ -10,10 +10,10 @@
 
 package org.mule.providers.email.transformers;
 
-import org.mule.providers.email.MailMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
@@ -21,16 +21,14 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map;
+
+import org.mule.providers.email.MailMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
 
 /**
- * Transforms a javax.mail.Message to a UMOMEssage and supports attachments
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Transforms a javax.mail.Message to a UMOMessage, with support for attachments
  */
 public class ObjectToMimeMessage extends StringToEmailMessage
 {
@@ -40,13 +38,17 @@ public class ObjectToMimeMessage extends StringToEmailMessage
     private static final long serialVersionUID = 7225142214620572674L;
 
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
-            throws Exception {
+        throws Exception
+    {
 
-        if (context.getMessage().getAttachmentNames().size() > 0) {
-            MimeMultipart multipart = new MimeMultipart("mixed"); // The contenttype must be multipart/mixed
+        if (context.getMessage().getAttachmentNames().size() > 0)
+        {
+            // The content type must be multipart/mixed
+            MimeMultipart multipart = new MimeMultipart("mixed");
             multipart.addBodyPart(getPayloadBodyPart(payload, contentType));
-            for (Iterator it = context.getMessage().getAttachmentNames().iterator(); it.hasNext();) {
-                String name = (String) it.next();
+            for (Iterator it = context.getMessage().getAttachmentNames().iterator(); it.hasNext();)
+            {
+                String name = (String)it.next();
                 BodyPart part = getBodyPartForAttachment(context.getMessage().getAttachment(name), name);
                 // Check message props for extra headers
                 addBodyPartHeaders(part, name, context);
@@ -58,26 +60,35 @@ public class ObjectToMimeMessage extends StringToEmailMessage
             contentType = multipart.getContentType();
             // content type
         }
-        // now the message will contain the multipart payload, and the multipart contentType
+        // now the message will contain the multipart payload, and the multipart
+        // contentType
         super.setContent(payload, msg, contentType, context);
     }
 
-    protected void addBodyPartHeaders(BodyPart part, String name, UMOEventContext context) {
+    protected void addBodyPartHeaders(BodyPart part, String name, UMOEventContext context)
+    {
 
-        Map headers =  (Map)context.getMessage().getProperty(name + MailMessageAdapter.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
-        if(null!=headers) {
-            for(Iterator it = headers.keySet().iterator();it.hasNext();) {
-                try {
+        Map headers = (Map)context.getMessage().getProperty(
+            name + MailMessageAdapter.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
+        if (null != headers)
+        {
+            for (Iterator it = headers.keySet().iterator(); it.hasNext();)
+            {
+                try
+                {
                     String key = (String)it.next();
                     part.setHeader(key, (String)headers.get(key));
-                } catch (MessagingException me) {
+                }
+                catch (MessagingException me)
+                {
                     logger.error("Failed to set bodypart header", me);
                 }
             }
         }
     }
 
-    protected BodyPart getBodyPartForAttachment(DataHandler handler, String name) throws MessagingException {
+    protected BodyPart getBodyPartForAttachment(DataHandler handler, String name) throws MessagingException
+    {
         BodyPart part = new MimeBodyPart();
         part.setDataHandler(handler);
         part.setDescription(name);
@@ -85,16 +96,26 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         return part;
     }
 
-    protected BodyPart getPayloadBodyPart(Object payload, String contentType) throws MessagingException, TransformerException, IOException {
+    protected BodyPart getPayloadBodyPart(Object payload, String contentType)
+        throws MessagingException, TransformerException, IOException
+    {
 
         DataHandler handler = null;
-        if(payload instanceof String) {
+        if (payload instanceof String)
+        {
             handler = new DataHandler(new PlainTextDataSource(contentType, payload.toString()));
-        } else if(payload instanceof Serializable) {
-            handler = new DataHandler(new ByteArrayDataSource((byte[])new SerializableToByteArray().transform(payload), contentType));
-        }else if(payload instanceof byte[]) {
+        }
+        else if (payload instanceof Serializable)
+        {
+            handler = new DataHandler(new ByteArrayDataSource(
+                (byte[])new SerializableToByteArray().transform(payload), contentType));
+        }
+        else if (payload instanceof byte[])
+        {
             handler = new DataHandler(new ByteArrayDataSource((byte[])payload, contentType));
-        } else {
+        }
+        else
+        {
             throw new IllegalArgumentException();
         }
         BodyPart part = new MimeBodyPart();
@@ -102,4 +123,5 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         part.setDescription("Payload");
         return part;
     }
+
 }

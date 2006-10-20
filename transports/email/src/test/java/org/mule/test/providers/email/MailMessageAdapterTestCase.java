@@ -10,21 +10,17 @@
 
 package org.mule.test.providers.email;
 
-import org.mule.providers.email.MailMessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.UMOMessageAdapter;
+import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import java.util.Properties;
+import org.mule.providers.email.MailMessageAdapter;
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private Message message;

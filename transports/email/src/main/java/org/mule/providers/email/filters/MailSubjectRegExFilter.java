@@ -7,19 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.providers.email.filters;
 
-import org.mule.routing.filters.RegExFilter;
+package org.mule.providers.email.filters;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import org.mule.routing.filters.RegExFilter;
+
 /**
  * <code>MailSubjectRegExFilter</code> applies a regular expression to a Mail
  * Message subject.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MailSubjectRegExFilter extends AbstractMailFilter
 {
@@ -27,9 +25,12 @@ public class MailSubjectRegExFilter extends AbstractMailFilter
 
     public boolean accept(Message message)
     {
-        try {
+        try
+        {
             return filter.accept(message.getSubject());
-        } catch (MessagingException e) {
+        }
+        catch (MessagingException e)
+        {
             logger.warn("Failed to read message subject: " + e.getMessage(), e);
             return false;
         }

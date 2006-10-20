@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.providers.email;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -14,6 +15,7 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class EmailEndpointsTestCase extends AbstractMuleTestCase
 {
+
     public void testPop3Url() throws Exception
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI("pop3://username:password@pop3.lotsofmail.org");
@@ -55,7 +57,8 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
 
     public void testImapUrlWithFolder() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("imap://username:password@imap.lotsofmail.org/MyMail");
+        MuleEndpointURI endpointUri = new MuleEndpointURI(
+            "imap://username:password@imap.lotsofmail.org/MyMail");
         assertEquals("imap", endpointUri.getScheme());
         assertEquals("username@lotsofmail.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -70,52 +73,62 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
 
     public void testSmtpUrlEmailUsernameAndParams() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI(
+            "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org");
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(3535, endpointUri.getPort());
         assertEquals("smtpout.secureserver.net", endpointUri.getHost());
         assertEquals("test@lotsofmail.org:password", endpointUri.getUserInfo());
-        assertEquals("smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org", endpointUri.toString());
+        assertEquals(
+            "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org",
+            endpointUri.toString());
         assertEquals(2, endpointUri.getParams().size());
         assertEquals("donkey@lotsofmail.org", endpointUri.getParams().get("ccAddresses"));
 
     }
 
     /**
-     * Mule will assume that the username is the from address as it has an @ symbol in it
+     * Mule will assume that the username is the from address as it has an @ symbol
+     * in it
      * @throws Exception
      */
     public void testSmtpUrlEmailUsernameWithoutAddressParam() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI(
+            "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@lotsofmail.org");
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(3535, endpointUri.getPort());
         assertEquals("smtpout.secureserver.net", endpointUri.getHost());
         assertEquals("test@lotsofmail.org:password", endpointUri.getUserInfo());
-        assertEquals("smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@lotsofmail.org", endpointUri.toString());
+        assertEquals(
+            "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@lotsofmail.org",
+            endpointUri.toString());
         assertEquals(1, endpointUri.getParams().size());
         assertEquals("donkey@lotsofmail.org", endpointUri.getParams().get("ccAddresses"));
 
     }
 
     /**
-     * Mule will assume that the username is the from address as it has an @ symbol in it
+     * Mule will assume that the username is the from address as it has an @ symbol
+     * in it
      * @throws Exception
      */
     public void testSmtpWithoutCredentials() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://smtpout.secureserver.net:3535?address=test@lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI(
+            "smtp://smtpout.secureserver.net:3535?address=test@lotsofmail.org");
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(3535, endpointUri.getPort());
         assertEquals("smtpout.secureserver.net", endpointUri.getHost());
         assertNull(endpointUri.getUserInfo());
-        assertEquals("smtp://smtpout.secureserver.net:3535?address=test@lotsofmail.org", endpointUri.toString());
+        assertEquals("smtp://smtpout.secureserver.net:3535?address=test@lotsofmail.org",
+            endpointUri.toString());
         assertEquals(1, endpointUri.getParams().size());
     }
 }
