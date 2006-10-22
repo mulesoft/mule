@@ -584,10 +584,11 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             }
 
             // Allow null values which may be acceptable to the user
-            if (value == null && !foundValue)
-            {
-                throw new IllegalArgumentException("Can not retrieve argument " + name);
-            }
+            //Why shouldn't nulls be allowed? Otherwise every null parameter has to be defined
+//            if (value == null && !foundValue)
+//            {
+//                throw new IllegalArgumentException("Can not retrieve argument " + name);
+//            }
             params[i] = value;
         }
         return params;
