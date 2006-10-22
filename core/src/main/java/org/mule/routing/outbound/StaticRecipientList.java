@@ -11,11 +11,10 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
-import java.util.List;
-
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
+
+import java.util.List;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
@@ -26,6 +25,8 @@ import org.mule.util.StringUtils;
 public class StaticRecipientList extends AbstractRecipientList
 {
     public static final String RECIPIENTS_PROPERTY = "recipients";
+
+    protected String delim = ",";
 
     private CopyOnWriteArrayList recipients = new CopyOnWriteArrayList();
 
@@ -40,7 +41,7 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(), ","));
+            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(), getListDelimiter()));
         }
         else
         {
@@ -65,6 +66,16 @@ public class StaticRecipientList extends AbstractRecipientList
         {
             this.recipients = null;
         }
+    }
+
+    /**
+     * Overloading classes can change the delimiter used to separate entries in the recipient list
+     * By default a ',' is used.
+     * @return The list delimiter to use
+     */
+    protected String getListDelimiter()
+    {
+        return delim;
     }
 
 }
