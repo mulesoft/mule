@@ -280,7 +280,7 @@ public class DefaultMuleProxy implements MuleProxy
             }
         } catch (Exception e) {
             event.getSession().setValid(false);
-            if(e instanceof UMOException) {
+            if(e instanceof MessagingException) {
                 handleException(e);
             } else {
                 handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
@@ -435,7 +435,7 @@ public class DefaultMuleProxy implements MuleProxy
             }
         } catch (Exception e) {
             event.getSession().setValid(false);
-            if (e instanceof UMOException) {
+            if (e instanceof MessagingException) {
                 handleException(e);
             } else {
                 handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,

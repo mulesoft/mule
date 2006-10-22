@@ -14,12 +14,13 @@ import org.apache.commons.lang.ObjectUtils;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.providers.NullPayload;
 
 /**
  * <code>DefaultExceptionStrategy</code> Provides a default exception handling
  * strategy. The class final thus to change exception handling behaviour the
  * user must reimplemented the ExceptionListener Interface
- * 
+ *
  * @author Ross Mason
  * @version $Revision$
  */
@@ -40,21 +41,32 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
 
     public void handleLifecycleException(Object component, Throwable t)
     {
-        defaultHandler(t);
+        //Do nothing special here. Overriding implmentations may want alter the behaviour
+        handleStandardException(t);
         logger.error("The object that failed was: \n" + ObjectUtils.toString(component, "null"));
-        markTransactionForRollback();
     }
 
     public void handleStandardException(Throwable t)
     {
         defaultHandler(t);
         markTransactionForRollback();
+        //Attempt to send the exception details to an endpoint i one is set
+        if (RequestContext.getEventContext() != null)
+        {
+            handleMessagingException(RequestContext.getEventContext().getMessage(), t);
+        }
+        else
+        {
+            logger.info("There is no current event available, routing Null message with the exception");
+            handleMessagingException(new MuleMessage(new NullPayload()), t);
+        }
     }
 
     protected void defaultHandler(Throwable t)
     {
         logException(t);
-        if (RequestContext.getEvent() != null) {
+        if (RequestContext.getEvent() != null)
+        {
             RequestContext.setExceptionPayload(new ExceptionPayload(t));
         }
     }

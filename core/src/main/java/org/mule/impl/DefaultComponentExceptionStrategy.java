@@ -9,7 +9,6 @@
  */
 package org.mule.impl;
 
-import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
@@ -64,7 +63,6 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
     protected void defaultHandler(Throwable t)
     {
-        logException(t);
         // Lazzy initialisation of the component
         // This strategy should be associated with only one component
         // and thus there is no concurrency problem
@@ -85,12 +83,10 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         if (component != null) {
             logger.error("Caught exception in Exception Strategy for: " + component.getDescriptor().getName() + ": "
                     + t, t);
-            //Users can overide this method if they do not want the transaction to roll back
-            markTransactionForRollback();
         }
-        if (RequestContext.getEvent() != null) {
-            RequestContext.setExceptionPayload(new ExceptionPayload(t));
-        }
+        super.defaultHandler(t);
+
+
     }
 
     protected void logFatal(UMOMessage message, Throwable t)
