@@ -1113,7 +1113,7 @@ Is a fully qualified class name of the catch all strategy class
 
 <!--
     propertyExtractor
-    Is a fully qualified classname of a class that implements org.mule.config.properties.PropertyExtractor
+    Is a fully qualified classname of a class that implements org.mule.util.properties.PropertyExtractor
     This object will be used to extract properties such as CorrelationId from the incoming message
 -->
 <!ATTLIST router propertyExtractor           NMTOKEN                                #IMPLIED>

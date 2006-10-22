@@ -81,8 +81,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             throw new IllegalArgumentException("Write statement should be an insert / update / delete sql statement");
         }
         List paramNames = new ArrayList();
-        writeStmt = JdbcUtils.parseStatement(writeStmt, paramNames);
-        Object[] paramValues = JdbcUtils.getParams(endpoint, paramNames, event.getTransformedMessage());
+        writeStmt = connector.parseStatement(writeStmt, paramNames);
+
+        Object[] paramValues = connector.getParams(endpoint, paramNames, new MuleMessage(event.getTransformedMessage()));
 
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
@@ -139,8 +140,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         String ackStmt = stmts[1];
         List readParams = new ArrayList();
         List ackParams = new ArrayList();
-        readStmt = JdbcUtils.parseStatement(readStmt, readParams);
-        ackStmt = JdbcUtils.parseStatement(ackStmt, ackParams);
+        readStmt = connector.parseStatement(readStmt, readParams);
+        ackStmt = connector.parseStatement(ackStmt, ackParams);
 
         Connection con = null;
         long t0 = System.currentTimeMillis();
@@ -149,11 +150,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             if (timeout < 0) {
                 timeout = Long.MAX_VALUE;
             }
-            Object result = null;
+            Object result;
             do {
                 result = connector.createQueryRunner().query(con,
                                                  readStmt,
-                                                 JdbcUtils.getParams(endpoint, readParams, null),
+                                                 connector.getParams(endpoint, readParams, null),
                                                  new MapHandler());
                 if (result != null) {
                     if (logger.isDebugEnabled()) {
@@ -173,7 +174,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                 }
             } while (true);
             if (ackStmt != null) {
-                int nbRows = connector.createQueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpoint, ackParams, result));
+                int nbRows = connector.createQueryRunner().update(con, ackStmt, connector.getParams(endpoint, ackParams, result));
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
                 }

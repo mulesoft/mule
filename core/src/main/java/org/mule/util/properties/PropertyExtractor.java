@@ -7,9 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.properties;
-
-import org.mule.umo.UMOMessage;
+package org.mule.util.properties;
 
 /**
  * <code>PropertyExtractor</code> extracts a property from the message in a
@@ -25,6 +23,6 @@ public interface PropertyExtractor
      * @param message the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    Object getProperty(String name, UMOMessage message);
+    Object getProperty(String name, Object message);
 
 }

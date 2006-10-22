@@ -12,8 +12,8 @@ package org.mule.components.rest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.config.properties.PropertyExtractor;
-import org.mule.config.properties.SimplePropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
+import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -62,7 +62,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     private UMOFilter errorFilter;
     private String errorExpression;
 
-    private PropertyExtractor propertyExtractor = new SimplePropertyExtractor();
+    private PropertyExtractor propertyExtractor = new MessagePropertyExtractor();
 
     public String getServiceUrl() {
         return serviceUrl;

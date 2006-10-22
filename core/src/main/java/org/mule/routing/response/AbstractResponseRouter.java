@@ -14,7 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.config.properties.PropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOMessage;

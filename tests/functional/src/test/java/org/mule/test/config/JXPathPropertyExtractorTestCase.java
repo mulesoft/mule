@@ -17,9 +17,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,21 +46,5 @@ public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
 
         value = e.getProperty("bar", msg);
         assertNull(value);
-
-        List exp = new ArrayList();
-        exp.add("apple/washed");
-        exp.add("apple/bitten");
-        exp.add("Message-Property");
-        exp.add("bar");
-
-        Map values = e.getProperties(exp, msg);
-        assertNotNull(values);
-        assertEquals(Boolean.TRUE, values.get("apple/washed"));
-        assertEquals(Boolean.FALSE, values.get("apple/bitten"));
-        assertEquals("foo", values.get("Message-Property"));
-        assertNull(values.get("bar"));
-
-        assertEquals(4, values.size());
-
     }
 }

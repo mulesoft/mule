@@ -10,19 +10,12 @@
 
 package org.mule.providers.jdbc;
 
-import org.apache.commons.beanutils.PropertyUtils;
-import org.dom4j.Node;
-import org.dom4j.io.DOMReader;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.properties.PropertyExtractor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -31,6 +24,18 @@ import java.util.regex.Pattern;
  */
 public abstract class JdbcUtils
 {
+
+    protected static Set extractors = new HashSet();
+
+    public static void addPropertyExtractor(PropertyExtractor extractor)
+    {
+        extractors.add(extractor);
+    }
+
+    public static void removePropertyExtractor(PropertyExtractor extractor)
+    {
+        extractors.remove(extractor);
+    }
 
     public static void close(Connection con) throws SQLException
     {
@@ -62,136 +67,6 @@ public abstract class JdbcUtils
             }
             con.close();
         }
-    }
-
-    /**
-     * Parse the given statement filling the parameter list and return the ready to
-     * use statement.
-     *
-     * @param stmt
-     * @param params
-     * @return
-     */
-    public static String parseStatement(String stmt, List params)
-    {
-        if (stmt == null)
-        {
-            return stmt;
-        }
-        Pattern p = Pattern.compile("\\$\\{[^\\}]*\\}");
-        Matcher m = p.matcher(stmt);
-        StringBuffer sb = new StringBuffer(200);
-        while (m.find())
-        {
-            String key = m.group();
-            m.appendReplacement(sb, "?");
-            params.add(key);
-        }
-        m.appendTail(sb);
-        return sb.toString();
-    }
-
-    public static Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object root)
-            throws Exception
-    {
-        Object[] params = new Object[paramNames.size()];
-        for (int i = 0; i < paramNames.size(); i++)
-        {
-            String param = (String)paramNames.get(i);
-            String name = param.substring(2, param.length() - 1);
-            Object value = null;
-            // If we find a value and it happens to be null, thats acceptable
-            boolean foundValue = false;
-
-            if ("NOW".equalsIgnoreCase(name))
-            {
-                value = new Timestamp(Calendar.getInstance().getTimeInMillis());
-                foundValue = true;
-            }
-            // TODO Document what this is all about.  What does parsing XML have to do with JDBC??
-            else if (root instanceof org.w3c.dom.Document)
-            {
-                org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document)root;
-                org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
-                try
-                {
-                    Node node = dom4jDoc.selectSingleNode(name);
-                    if (node != null)
-                    {
-                        value = node.getText();
-                        foundValue = true;
-                    }
-                }
-                catch (Exception ignored)
-                {
-                    // ignore
-                }
-            }
-            else if (root instanceof org.dom4j.Document)
-            {
-                org.dom4j.Document dom4jDoc = (org.dom4j.Document)root;
-                try
-                {
-                    Node node = dom4jDoc.selectSingleNode(name);
-                    if (node != null)
-                    {
-                        value = node.getText();
-                        foundValue = true;
-                    }
-                }
-                catch (Exception ignored)
-                {
-                    // ignore
-                }
-            }
-            else if (root instanceof org.dom4j.Node)
-            {
-                org.dom4j.Node dom4jNode = (org.dom4j.Node)root;
-                try
-                {
-                    Node node = dom4jNode.selectSingleNode(name);
-                    if (node != null)
-                    {
-                        value = node.getText();
-                        foundValue = true;
-                    }
-                }
-                catch (Exception ignored)
-                {
-                    // ignore
-                }
-            }
-
-             else {
-                try {
-                    if ((PropertyUtils.getPropertyDescriptor(root, name)!= null)
-                            || ( (root instanceof Map) && (((Map)root).containsKey(name)))){
-                        foundValue = true;
-                        value = PropertyUtils.getProperty(root, name);
-                    }
-                } catch (Exception ignored) {
-				    value = null;
-                }
-            }
-            if (value == null)
-            {
-                value = endpoint.getProperty(name);
-                foundValue = foundValue || endpoint.getProperties().containsKey(name);
-            }
-            if (name.equals("payload"))
-            {
-                value = root;
-                foundValue = true;
-            }
-            // Allow null values which may be acceptable to the user
-            if (value == null && !foundValue)
-            {
-                throw new IllegalArgumentException("Can not retrieve argument " + name);
-            }
-            params[i] = value;
-        }
-
-        return params;
     }
 
 }

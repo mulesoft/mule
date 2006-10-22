@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.properties;
+package org.mule.util.properties;
 
 import org.mule.umo.UMOMessage;
 
@@ -15,9 +15,14 @@ import org.mule.umo.UMOMessage;
  * Looks up the property on the message using the name given.
  *
  */
-public class SimplePropertyExtractor implements PropertyExtractor
+public class MessagePropertyExtractor implements PropertyExtractor
 {
-    public Object getProperty(String name, UMOMessage message) {
-        return message.getProperty(name);
+    public Object getProperty(String name, Object message)
+    {
+        if(message instanceof UMOMessage)
+        {
+            return ((UMOMessage)message).getProperty(name);
+        }
+        return null;
     }
 }

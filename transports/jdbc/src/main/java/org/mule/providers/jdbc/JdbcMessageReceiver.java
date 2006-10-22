@@ -53,9 +53,9 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         this.connector = (JdbcConnector) connector;
 
         this.readParams = new ArrayList();
-        this.readStmt = JdbcUtils.parseStatement(readStmt, this.readParams);
+        this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
-        this.ackStmt = JdbcUtils.parseStatement(ackStmt, this.ackParams);
+        this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 
     public void doConnect() throws Exception
@@ -81,16 +81,16 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         try {
             con = this.connector.getConnection();
-
+            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
+            UMOMessage umoMessage = new MuleMessage(msgAdapter);
             if (this.ackStmt != null) {
-                Object[] ackParams = JdbcUtils.getParams(endpoint, this.ackParams, message);
+
+                Object[] ackParams = connector.getParams(endpoint, this.ackParams, umoMessage);
                 int nbRows = connector.createQueryRunner().update(con, this.ackStmt, ackParams);
                 if (nbRows != 1) {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
                 }
             }
-            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
-            UMOMessage umoMessage = new MuleMessage(msgAdapter);
             routeMessage(umoMessage, tx, tx != null || endpoint.isSynchronous());
 
         } catch(Exception ex) {
@@ -124,7 +124,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 throw new ConnectException(e, this);
             }
 
-            Object[] readParams = JdbcUtils.getParams(endpoint, this.readParams, null);
+            Object[] readParams = connector.getParams(endpoint, this.readParams, null);
             Object results = connector.createQueryRunner().query(con, this.readStmt, readParams, connector.createResultSetHandler());
             return (List) results;
         } finally {

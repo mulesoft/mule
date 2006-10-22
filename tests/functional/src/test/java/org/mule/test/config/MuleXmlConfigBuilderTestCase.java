@@ -20,7 +20,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.pool.CommonsPoolFactory;
-import org.mule.config.properties.PropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.outbound.AbstractOutboundRouter;

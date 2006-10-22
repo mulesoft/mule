@@ -15,6 +15,11 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.util.properties.BeanPropertyExtractor;
+import org.mule.util.properties.MapPropertyExtractor;
+import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.PayloadPropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
@@ -24,15 +29,22 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -51,7 +63,8 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
 
     /* Register the SQL Exception reader if this class gets loaded*/
-    static {
+    static
+    {
         ExceptionHelper.registerExceptionReader(new SQLExceptionReader());
     }
 
@@ -65,6 +78,8 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     protected Map queries;
     protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
     protected String queryRunner = DEFAULT_QUERY_RUNNER;
+    protected Set queryValueExtractors;
+    protected Set propertyExtractors;
 
     /*
      * (non-Javadoc)
@@ -79,15 +94,18 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         Map props = endpoint.getProperties();
-        if (props != null) {
+        if (props != null)
+        {
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
-            if (tempPolling != null) {
+            if (tempPolling != null)
+            {
                 pollingFrequency = Long.parseLong(tempPolling);
             }
-	}
+        }
 
-        if (pollingFrequency <= 0) {
-           pollingFrequency = DEFAULT_POLLING_FREQUENCY;
+        if (pollingFrequency <= 0)
+        {
+            pollingFrequency = DEFAULT_POLLING_FREQUENCY;
         }
 
         String[] params = getReadAndAckStatements(endpoint);
@@ -96,15 +114,19 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
 
     protected void initJndiContext() throws NamingException
     {
-        if (this.jndiContext == null) {
+        if (this.jndiContext == null)
+        {
             Hashtable props = new Hashtable();
-            if (this.jndiInitialFactory != null) {
+            if (this.jndiInitialFactory != null)
+            {
                 props.put(Context.INITIAL_CONTEXT_FACTORY, this.jndiInitialFactory);
             }
-            if (this.jndiProviderUrl != null) {
+            if (this.jndiProviderUrl != null)
+            {
                 props.put(Context.PROVIDER_URL, jndiProviderUrl);
             }
-            if (this.providerProperties != null) {
+            if (this.providerProperties != null)
+            {
                 props.putAll(this.providerProperties);
             }
             this.jndiContext = new InitialContext(props);
@@ -115,11 +137,14 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     protected void createDataSource() throws InitialisationException, NamingException
     {
         Object temp = this.jndiContext.lookup(this.dataSourceJndiName);
-        if (temp instanceof DataSource) {
+        if (temp instanceof DataSource)
+        {
             dataSource = (DataSource) temp;
-        } else {
+        }
+        else
+        {
             throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, this.dataSourceJndiName),
-                                              this);
+                    this);
         }
     }
 
@@ -131,14 +156,43 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        try {
+        try
+        {
             // If we have a dataSource, there is no need to initialise
             // the JndiContext
-            if (dataSource == null) {
+            if (dataSource == null)
+            {
                 initJndiContext();
                 createDataSource();
             }
-        } catch (Exception e) {
+            //setup property Extractors for queries
+            if (queryValueExtractors == null)
+            {
+                //Add defaults
+                queryValueExtractors = new HashSet();
+                queryValueExtractors.add(MessagePropertyExtractor.class.getName());
+                queryValueExtractors.add(NowPropertyExtractor.class.getName());
+                queryValueExtractors.add(PayloadPropertyExtractor.class.getName());
+                queryValueExtractors.add(MapPropertyExtractor.class.getName());
+                queryValueExtractors.add(BeanPropertyExtractor.class.getName());
+                if (ClassUtils.isClassOnPath("org.mule.config.Dom4jPropertyExtractor", getClass()))
+                {
+                    queryValueExtractors.add("org.mule.config.Dom4jPropertyExtractor");
+                }
+                if (ClassUtils.isClassOnPath("org.mule.config.JDomPropertyExtractor", getClass()))
+                {
+                    queryValueExtractors.add("org.mule.config.JDomPropertyExtractor");
+                }
+            }
+            propertyExtractors = new HashSet();
+            for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
+            {
+                String s = (String) iterator.next();
+                propertyExtractors.add(ClassUtils.instanciateClass(s, ClassUtils.NO_ARGS));
+            }
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e, this);
         }
     }
@@ -148,57 +202,76 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         String str;
         // Find read statement
         String readStmt;
-        if ((str = (String)endpoint.getProperty("sql")) != null) {
+        if ((str = (String) endpoint.getProperty("sql")) != null)
+        {
             readStmt = str;
-        } else {
+        }
+        else
+        {
             readStmt = endpoint.getEndpointURI().getAddress();
         }
         // Find ack statement
         String ackStmt;
-        if ((str = (String)endpoint.getProperty("ack")) != null) {
+        if ((str = (String) endpoint.getProperty("ack")) != null)
+        {
             ackStmt = str;
-            if ((str = getQuery(endpoint, ackStmt)) != null) {
+            if ((str = getQuery(endpoint, ackStmt)) != null)
+            {
                 ackStmt = str;
             }
-        } else {
+        }
+        else
+        {
             ackStmt = readStmt + ".ack";
-            if ((str = getQuery(endpoint, ackStmt)) != null) {
+            if ((str = getQuery(endpoint, ackStmt)) != null)
+            {
                 ackStmt = str;
-            } else {
+            }
+            else
+            {
                 ackStmt = null;
             }
         }
         // Translate both using queries map
-        if ((str = getQuery(endpoint, readStmt)) != null) {
+        if ((str = getQuery(endpoint, readStmt)) != null)
+        {
             readStmt = str;
         }
-        if (readStmt == null) {
+        if (readStmt == null)
+        {
             throw new IllegalArgumentException("Read statement should not be null");
         }
-        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6))) {
+        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)))
+        {
             throw new IllegalArgumentException("Read statement should be a select sql statement");
         }
-        if (ackStmt != null) {
+        if (ackStmt != null)
+        {
             if (!"insert".equalsIgnoreCase(ackStmt.substring(0, 6))
                     && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
-                    && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6))) {
+                    && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
+            {
                 throw new IllegalArgumentException("Ack statement should be an insert / update / delete sql statement");
             }
         }
-        return new String[] { readStmt, ackStmt };
+        return new String[]{readStmt, ackStmt};
     }
 
     public String getQuery(UMOImmutableEndpoint endpoint, String stmt)
     {
         Object query = null;
-        if (endpoint != null && endpoint.getProperties() != null) {
+        if (endpoint != null && endpoint.getProperties() != null)
+        {
             Object queries = endpoint.getProperties().get("queries");
-            if (queries instanceof Map) {
+            if (queries instanceof Map)
+            {
                 query = ((Map) queries).get(stmt);
             }
         }
-        if (query == null) {
-            if (this.queries != null) {
+        if (query == null)
+        {
+            if (this.queries != null)
+            {
                 query = this.queries.get(stmt);
             }
         }
@@ -346,8 +419,10 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     public Connection getConnection() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null) {
-            if (tx.hasResource(dataSource)) {
+        if (tx != null)
+        {
+            if (tx.hasResource(dataSource))
+            {
                 logger.debug("Retrieving connection from current transaction");
                 return (Connection) tx.getResource(dataSource);
             }
@@ -355,11 +430,15 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         logger.debug("Retrieving new connection from data source");
         Connection con = dataSource.getConnection();
 
-        if (tx != null) {
+        if (tx != null)
+        {
             logger.debug("Binding connection to current transaction");
-            try {
+            try
+            {
                 tx.bindResource(dataSource, con);
-            } catch (TransactionException e) {
+            }
+            catch (TransactionException e)
+            {
                 throw new RuntimeException("Could not bind connection to current transaction", e);
             }
         }
@@ -369,55 +448,148 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     /**
      * @return Returns the resultSetHandler.
      */
-    public String getResultSetHandler() {
+    public String getResultSetHandler()
+    {
         return this.resultSetHandler;
     }
-    
+
     /**
-     * @param resultSetHandler The resultSetHandler class name to set. 
+     * @param resultSetHandler The resultSetHandler class name to set.
      */
-    public void setResultSetHandler(String resultSetHandler) {
+    public void setResultSetHandler(String resultSetHandler)
+    {
         this.resultSetHandler = resultSetHandler;
     }
 
     /**
      * @return a new instance of the ResultSetHandler class as defined in the JdbcConnector
      */
-    protected ResultSetHandler createResultSetHandler() {
-        try {
+    protected ResultSetHandler createResultSetHandler()
+    {
+        try
+        {
             return (ResultSetHandler) Class.forName(getResultSetHandler()).newInstance();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :" +
                     getResultSetHandler() + System.getProperty("line.separator") +
                     ExceptionUtils.getFullStackTrace(e));
         }
     }
-    
+
+
+    public Set getQueryValueExtractors()
+    {
+        return queryValueExtractors;
+    }
+
+    public void setQueryValueExtractors(Set queryValueExtractors)
+    {
+        this.queryValueExtractors = queryValueExtractors;
+    }
+
     /**
      * @return Returns the queryRunner.
      */
-    public String getQueryRunner() {
+    public String getQueryRunner()
+    {
         return this.queryRunner;
     }
 
     /**
      * @param queryRunner The QueryRunner class name to set.
      */
-    public void setQueryRunner(String queryRunner) {
+    public void setQueryRunner(String queryRunner)
+    {
         this.queryRunner = queryRunner;
     }
 
     /**
      * @return a new instance of the QueryRunner class as defined in the JdbcConnector
      */
-    protected QueryRunner createQueryRunner() {
-        try {
+    protected QueryRunner createQueryRunner()
+    {
+        try
+        {
             return (QueryRunner) Class.forName(getQueryRunner()).newInstance();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new IllegalArgumentException("Error creating instance of the queryRunner class :" +
                     getQueryRunner() + System.getProperty("line.separator") +
                     ExceptionUtils.getFullStackTrace(e));
         }
     }
 
+
+    /**
+     * Parse the given statement filling the parameter list and return the ready to
+     * use statement.
+     *
+     * @param stmt
+     * @param params
+     * @return
+     */
+    public static String parseStatement(String stmt, List params)
+    {
+        if (stmt == null)
+        {
+            return stmt;
+        }
+        Pattern p = Pattern.compile("\\$\\{[^\\}]*\\}");
+        Matcher m = p.matcher(stmt);
+        StringBuffer sb = new StringBuffer(200);
+        while (m.find())
+        {
+            String key = m.group();
+            m.appendReplacement(sb, "?");
+            params.add(key);
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    public Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object message)
+            throws Exception
+    {
+        Object[] params = new Object[paramNames.size()];
+        for (int i = 0; i < paramNames.size(); i++)
+        {
+            String param = (String) paramNames.get(i);
+            String name = param.substring(2, param.length() - 1);
+            Object value = null;
+            // If we find a value and it happens to be null, thats acceptable
+            boolean foundValue = false;
+            if(message!=null)
+            {
+                for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
+                {
+                    PropertyExtractor pe = (PropertyExtractor) iterator.next();
+                    value = pe.getProperty(name, message);
+                    if (value != null)
+                    {
+                        if (value.equals(StringUtils.EMPTY) && pe instanceof BeanPropertyExtractor)
+                        {
+                            value = null;
+                        }
+                        foundValue = true;
+                        break;
+                    }
+                }
+            }
+            if(!foundValue)
+            {
+                value = endpoint.getProperty(name);
+            }
+
+            // Allow null values which may be acceptable to the user
+            if (value == null && !foundValue)
+            {
+                throw new IllegalArgumentException("Can not retrieve argument " + name);
+            }
+            params[i] = value;
+        }
+        return params;
+    }
 }
