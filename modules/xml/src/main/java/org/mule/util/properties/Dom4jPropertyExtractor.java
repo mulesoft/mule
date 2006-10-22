@@ -7,11 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
+package org.mule.util.properties;
 
-import org.mule.util.properties.PropertyExtractor;
-import org.mule.umo.UMOMessage;
 import org.dom4j.Node;
+import org.mule.umo.UMOMessage;
 
 /**
  * Will select the text of a single node based on the property name

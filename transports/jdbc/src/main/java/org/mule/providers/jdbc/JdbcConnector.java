@@ -175,13 +175,13 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
                 queryValueExtractors.add(PayloadPropertyExtractor.class.getName());
                 queryValueExtractors.add(MapPropertyExtractor.class.getName());
                 queryValueExtractors.add(BeanPropertyExtractor.class.getName());
-                if (ClassUtils.isClassOnPath("org.mule.config.Dom4jPropertyExtractor", getClass()))
+                if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add("org.mule.config.Dom4jPropertyExtractor");
+                    queryValueExtractors.add("org.mule.util.properties.Dom4jPropertyExtractor");
                 }
-                if (ClassUtils.isClassOnPath("org.mule.config.JDomPropertyExtractor", getClass()))
+                if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add("org.mule.config.JDomPropertyExtractor");
+                    queryValueExtractors.add("org.mule.util.properties.JDomPropertyExtractor");
                 }
             }
             propertyExtractors = new HashSet();
