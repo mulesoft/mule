@@ -15,7 +15,7 @@ import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.JXPathPropertyExtractor;
+import org.mule.util.properties.JXPathPropertyExtractor;
 import org.mule.config.PoolingProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;

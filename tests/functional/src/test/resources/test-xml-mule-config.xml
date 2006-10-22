@@ -197,7 +197,7 @@
             <outbound-router>
                 <!-- Change property extractor to some non-default one for testing -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter"
-                        propertyExtractor="org.mule.config.JXPathPropertyExtractor">
+                        propertyExtractor="org.mule.util.properties.JXPathPropertyExtractor">
                 </router>
             </outbound-router>
 
@@ -211,7 +211,7 @@
             <response-router>
                 <!-- Change property extractor to some non-default one for testing -->
                 <router className="org.mule.routing.response.SingleResponseRouter"
-                        propertyExtractor="org.mule.config.JXPathPropertyExtractor"/>
+                        propertyExtractor="org.mule.util.properties.JXPathPropertyExtractor"/>
             </response-router>
 
         </mule-descriptor>

@@ -45,7 +45,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 
         //Test generating a unique name when there is a matching endpoint
         ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", true);
-        assertEquals("this.is.aWierd.Name.x.1", ep.getName());
+        assertEquals("this.is.aWierd.Name.x", ep.getName());
         ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::", true);
         assertEquals("this.is.another.Wierd.Name.x", ep.getName());
     }

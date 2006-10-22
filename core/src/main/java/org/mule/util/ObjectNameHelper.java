@@ -42,7 +42,11 @@ public class ObjectNameHelper
                 name = endpoint.getEndpointURI().getScheme() + SEPARATOR + name;
             }
             name = replaceObjectNameChars(name);
-            return ensureUniqueEndpoint(name);
+            //This causes a stack overflow because we call lookup endpoint
+            //Which causes a clone of the endpoint which in turn valudates the
+            //endpoint name with this method
+            return name;
+            //return ensureUniqueEndpoint(name);
 
         }
         else

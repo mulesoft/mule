@@ -10,15 +10,12 @@
 
 package org.mule.test.config;
 
-import org.mule.config.JXPathPropertyExtractor;
 import org.mule.impl.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.util.properties.JXPathPropertyExtractor;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -30,9 +27,7 @@ public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
         Apple apple = new Apple();
         apple.wash();
         FruitBowl payload = new FruitBowl(apple, new Banana());
-        Map props = new HashMap();
-        props.put("Message-Property", "foo");
-        MuleMessage msg = new MuleMessage(payload, props);
+        MuleMessage msg = new MuleMessage(payload);
 
         JXPathPropertyExtractor e = new JXPathPropertyExtractor();
         Object value = e.getProperty("apple/washed", msg);
@@ -40,9 +35,11 @@ public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
         assertTrue(value instanceof Boolean);
         assertTrue(((Boolean)value).booleanValue());
 
-        value = e.getProperty("Message-Property", msg);
+        value = e.getProperty("apple/washed", payload);
         assertNotNull(value);
-        assertEquals("foo", value.toString());
+        assertTrue(value instanceof Boolean);
+        assertTrue(((Boolean)value).booleanValue());
+
 
         value = e.getProperty("bar", msg);
         assertNull(value);
