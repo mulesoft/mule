@@ -521,9 +521,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public static UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
     {
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(uri, type);
-        if (uri.getEndpointName() != null) {
-            endpoint.setName(uri.getEndpointName());
-        }
         return endpoint;
     }
 

@@ -101,10 +101,11 @@ public class ConnectorFactory
         UMOEndpoint endpoint = new MuleEndpoint();
         endpoint.setConnector(connector);
         endpoint.setEndpointURI(uri);
-        String name = uri.getEndpointName();
-        if (name == null) {
-            name = ObjectNameHelper.getEndpointName(endpoint);
+        if (uri.getEndpointName() != null) {
+            endpoint.setName(uri.getEndpointName());
         }
+        String name = ObjectNameHelper.getEndpointName(endpoint);
+        
         endpoint.setName(name);
 
         if (type != null) {
@@ -222,9 +223,8 @@ public class ConnectorFactory
             throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", url), e);
         }
 
-        if (connector.getName() == null) {
-            connector.setName(ObjectNameHelper.getConnectorName(connector));
-        }
+        connector.setName(ObjectNameHelper.getConnectorName(connector));
+
         // set any manager default properties for the connector
         // these are set on the Manager with a protocol i.e.
         // jms.specification=1.1
