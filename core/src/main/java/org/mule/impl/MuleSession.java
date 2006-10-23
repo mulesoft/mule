@@ -40,8 +40,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * <code>MuleSession</code> manages the interaction and distribution of events
- * for Mule UMOs.
+ * <code>MuleSession</code> manages the interaction and distribution of events for
+ * Mule UMOs.
  */
 
 public final class MuleSession implements UMOSession
@@ -72,56 +72,74 @@ public final class MuleSession implements UMOSession
 
     private Map properties = null;
 
-    public MuleSession(UMOComponent component) {
+    public MuleSession(UMOComponent component)
+    {
         properties = new HashMap();
         id = UUID.getUUID();
         this.component = component;
     }
 
-    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler, UMOComponent component) throws UMOException {
+    public MuleSession(UMOMessage message,
+                       UMOSessionHandler requestSessionHandler,
+                       UMOComponent component) throws UMOException
+    {
         this(message, requestSessionHandler);
-        if (component == null) {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "component").toString());
+        if (component == null)
+        {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                "component").toString());
         }
         this.component = component;
     }
 
-    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler) throws UMOException
+    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler)
+        throws UMOException
     {
 
-        if (requestSessionHandler == null) {
+        if (requestSessionHandler == null)
+        {
             throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    "requestSessionHandler").toString());
+                "requestSessionHandler").toString());
         }
 
-        if (message == null) {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "message")
-                    .toString());
+        if (message == null)
+        {
+            throw new IllegalArgumentException(
+                new Message(Messages.PROPERTIES_X_NOT_SET, "message").toString());
         }
 
         properties = new HashMap();
         requestSessionHandler.retrieveSessionInfoFromMessage(message, this);
         id = (String)getProperty(requestSessionHandler.getSessionIDKey());
-        if (id == null) {
+        if (id == null)
+        {
             id = UUID.getUUID();
-            if (logger.isDebugEnabled()) {
-                logger
-                        .debug("There is no session id on the request using key: "
-                                + requestSessionHandler.getSessionIDKey()
-                                + ". Generating new session id: " + id);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("There is no session id on the request using key: "
+                             + requestSessionHandler.getSessionIDKey()
+                             + ". Generating new session id: " + id);
             }
         }
-        else if (logger.isDebugEnabled()) {
+        else if (logger.isDebugEnabled())
+        {
             logger.debug("Got session with id: " + id);
         }
     }
 
     public void dispatchEvent(UMOMessage message) throws UMOException
     {
+        if (component == null)
+        {
+            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component")
+                .getMessage());
+        }
+
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
-        if (router == null) {
+        if (router == null)
+        {
             throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
-                                                            component.getDescriptor().getName()));
+                component.getDescriptor().getName()));
         }
         router.route(message, this, false);
     }
@@ -131,15 +149,17 @@ public final class MuleSession implements UMOSession
         dispatchEvent(message, MuleManager.getInstance().lookupEndpoint(endpointName));
     }
 
-    public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
+    public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint)
+        throws UMOException
     {
-        if (component == null) {
-            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
-        } else if (endpoint == null) {
-            endpoint = component.getDescriptor().getOutboundEndpoint();
+        if (endpoint == null)
+        {
+            logger.warn("Endpoint argument is null, using outbound router to determine endpoint.");
+            dispatchEvent(message);
         }
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Session has received asynchronous event on: " + endpoint);
         }
 
@@ -157,13 +177,20 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
     {
+        if (component == null)
+        {
+            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component")
+                .getMessage());
+        }
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
-        if (router == null) {
+        if (router == null)
+        {
             throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
-                                                            component.getDescriptor().getName()));
+                component.getDescriptor().getName()));
         }
         UMOMessage result = router.route(message, this, true);
-        if(result!=null) {
+        if (result != null)
+        {
             RequestContext.writeResponse(result);
             processResponse(result);
         }
@@ -171,30 +198,33 @@ public final class MuleSession implements UMOSession
         return result;
     }
 
-    public UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
+    public UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint)
+        throws UMOException
     {
-        if (component == null) {
-            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
-        }
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             logger.warn("Endpoint argument is null, using outbound router to determine endpoint.");
             return sendEvent(message);
         }
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Session has received synchronous event on endpoint: " + endpoint);
         }
 
         UMOEvent event = createOutboundEvent(message, endpoint, null);
         UMOMessage result = sendEvent(event);
 
-        // Handles the situation where a response has been received via a remote ReplyTo channel.
-        if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null && result!=null) {
+        // Handles the situation where a response has been received via a remote
+        // ReplyTo channel.
+        if (endpoint.isRemoteSync() && endpoint.getResponseTransformer() != null && result != null)
+        {
             Object response = endpoint.getResponseTransformer().transform(result.getPayload());
             result = new MuleMessage(response, result);
         }
 
-        if(result!=null) {
+        if (result != null)
+        {
             RequestContext.writeResponse(result);
             processResponse(result);
         }
@@ -204,45 +234,58 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#dispatchEvent(org.mule.umo.UMOEvent)
      */
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
-        if (event.getEndpoint().canSend()) {
-            try {
-                if (logger.isDebugEnabled()) {
+        if (event.getEndpoint().canSend())
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("dispatching event: " + event);
                 }
 
                 UMOConnector connector = event.getEndpoint().getConnector();
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
-                if(connector instanceof AbstractConnector) {
-                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
-                } else {
+                if (connector instanceof AbstractConnector)
+                {
+                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(
+                        this, event.getMessage());
+                }
+                else
+                {
                     // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using  default");
                     new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
                 }
                 dispatcher.dispatch(event);
 
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
-        } else if (component != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
-                        + ", event is: " + event);
+        }
+        else if (component != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("dispatching event to component: "
+                             + component.getDescriptor().getName() + ", event is: " + event);
             }
             component.dispatchEvent(event);
             RequestContext.writeResponse(event.getMessage());
             processResponse(event.getMessage());
 
-        } else {
-            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
-                                        event.getMessage(),
-                                        event.getEndpoint());
+        }
+        else
+        {
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event
+                .getMessage(), event.getEndpoint());
         }
     }
 
@@ -253,30 +296,39 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#sendEvent(org.mule.umo.UMOEvent)
      */
     // TODO This method is practically the same as dispatchEvent(UMOEvent event),
     // so we could use some refactoring here.
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
-        int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
-        if (timeout >= 0) {
+        int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY,
+            -1);
+        if (timeout >= 0)
+        {
             event.setTimeout(timeout);
         }
 
-        if (event.getEndpoint().canSend()) {
-            try {
-                if (logger.isDebugEnabled()) {
+        if (event.getEndpoint().canSend())
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("sending event: " + event);
                 }
 
                 UMOConnector connector = event.getEndpoint().getConnector();
                 UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint());
 
-                if(connector instanceof AbstractConnector) {
-                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
-                } else {
+                if (connector instanceof AbstractConnector)
+                {
+                    ((AbstractConnector)connector).getSessionHandler().storeSessionInfoToMessage(
+                        this, event.getMessage());
+                }
+                else
+                {
                     // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using default.");
                     new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
@@ -287,41 +339,50 @@ public final class MuleSession implements UMOSession
 
                 return response;
 
-            } catch (UMOException e) {
+            }
+            catch (UMOException e)
+            {
                 throw e;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
 
-        } else if (component != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
-                        + " event is: " + event);
+        }
+        else if (component != null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("dispatching event to component: "
+                             + component.getDescriptor().getName() + " event is: " + event);
             }
             return component.sendEvent(event);
 
-        } else {
-            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
-                                        event.getMessage(),
-                                        event.getEndpoint());
+        }
+        else
+        {
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event
+                .getMessage(), event.getEndpoint());
         }
     }
 
     /**
      * Once an event has been processed we need to romove certain properties so that
      * they not propagated to the next request
+     * 
      * @param response The response from the previous request
      */
     protected void processResponse(UMOMessage response)
     {
-        if(response==null) return;
+        if (response == null) return;
         response.removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
         response.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#isValid()
      */
     public boolean isValid()
@@ -331,7 +392,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#setValid(boolean)
      */
     public void setValid(boolean value)
@@ -341,61 +402,80 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointName, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointName,
+            UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         return receiveEvent(endpoint, timeout);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
     public UMOMessage receiveEvent(UMOImmutableEndpoint endpoint, long timeout) throws UMOException
     {
-        try {
+        try
+        {
             UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
             return dispatcher.receive(endpoint, timeout);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new ReceiveException(endpoint, timeout, e);
         }
     }
 
-    public UMOEvent createOutboundEvent(UMOMessage message, UMOImmutableEndpoint endpoint, UMOEvent previousEvent)
-            throws UMOException
+    public UMOEvent createOutboundEvent(UMOMessage message,
+                                        UMOImmutableEndpoint endpoint,
+                                        UMOEvent previousEvent) throws UMOException
     {
-        if (endpoint == null) {
-            throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"), message, endpoint);
+        if (endpoint == null)
+        {
+            throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"),
+                message, endpoint);
         }
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
-                    + ", for endpoint: " + endpoint);
+                         + ", for endpoint: " + endpoint);
         }
 
         // Use default transformer if none is set
-        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint) {
-            if (endpoint.getConnector() instanceof AbstractConnector) {
-                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
-                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
+        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
+        {
+            if (endpoint.getConnector() instanceof AbstractConnector)
+            {
+                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector)endpoint.getConnector())
+                    .getDefaultOutboundTransformer());
+                logger.debug("Using default connector outbound transformer: "
+                             + endpoint.getTransformer());
             }
         }
-        try {
+        try
+        {
             UMOEvent event;
-            if (previousEvent != null) {
+            if (previousEvent != null)
+            {
                 event = new MuleEvent(message, endpoint, component, previousEvent);
-            } else {
+            }
+            else
+            {
                 event = new MuleEvent(message, endpoint, this, false, null);
             }
             return event;
-        } catch (Exception e) {
-            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Event"), message, endpoint, e);
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Event"), message,
+                endpoint, e);
         }
     }
 
@@ -413,9 +493,9 @@ public final class MuleSession implements UMOSession
     }
 
     /**
-     * The security context for this session. If not null outbound, inbound
-     * and/or method invocations will be authenticated using this context
-     *
+     * The security context for this session. If not null outbound, inbound and/or
+     * method invocations will be authenticated using this context
+     * 
      * @param context the context for this session or null if the request is not
      *            secure.
      */
@@ -425,11 +505,10 @@ public final class MuleSession implements UMOSession
     }
 
     /**
-     * The security context for this session. If not null outbound, inbound
-     * and/or method invocations will be authenticated using this context
-     *
-     * @return the context for this session or null if the request is not
-     *         secure.
+     * The security context for this session. If not null outbound, inbound and/or
+     * method invocations will be authenticated using this context
+     * 
+     * @return the context for this session or null if the request is not secure.
      */
     public UMOSecurityContext getSecurityContext()
     {
@@ -437,42 +516,48 @@ public final class MuleSession implements UMOSession
     }
 
     /**
-     * Will set a session level property.  These will either be stored and retrieved using the underlying
-     * transport mechanism of stored using a default mechanism
-     *
-     * @param key   the key for the object data being stored on the session
+     * Will set a session level property. These will either be stored and retrieved
+     * using the underlying transport mechanism of stored using a default mechanism
+     * 
+     * @param key the key for the object data being stored on the session
      * @param value the value of the session data
      */
-    public void setProperty(Object key, Object value) {
+    public void setProperty(Object key, Object value)
+    {
         properties.put(key, value);
     }
 
     /**
      * Will retrieve a session level property.
-     *
+     * 
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
-    public Object getProperty(Object key) {
+    public Object getProperty(Object key)
+    {
         return properties.get(key);
     }
 
     /**
      * Will retrieve a session level property and remove it from the session
-     *
+     * 
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
-    public Object removeProperty(Object key) {
+    public Object removeProperty(Object key)
+    {
         return properties.remove(key);
     }
 
     /**
-     * Returns an iterater of property keys for the session properties on this session
-     *
-     * @return an iterater of property keys for the session properties on this session
+     * Returns an iterater of property keys for the session properties on this
+     * session
+     * 
+     * @return an iterater of property keys for the session properties on this
+     *         session
      */
-    public Iterator getPropertyNames() {
+    public Iterator getPropertyNames()
+    {
         return properties.keySet().iterator();
     }
 
