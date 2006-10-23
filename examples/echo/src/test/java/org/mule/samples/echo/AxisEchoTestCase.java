@@ -77,11 +77,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
-        // TODO: MULE-1113
-        if (!(this instanceof XFireEchoTestCase))
-        {
-            assertNull(result.getExceptionPayload());
-        }
+        assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
         XMLAssert.assertXMLEqual(expectedPostResponse, result.getPayloadAsString());
     }
