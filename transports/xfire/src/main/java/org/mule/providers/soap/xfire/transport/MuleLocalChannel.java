@@ -33,6 +33,7 @@ import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireException;
 import org.codehaus.xfire.XFireRuntimeException;
+import org.codehaus.xfire.exchange.AbstractMessage;
 import org.codehaus.xfire.exchange.InMessage;
 import org.codehaus.xfire.exchange.OutMessage;
 import org.codehaus.xfire.service.Service;
@@ -50,7 +51,7 @@ import org.mule.util.StringUtils;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -82,21 +83,25 @@ public class MuleLocalChannel extends AbstractChannel
 
     public void send(final MessageContext context, final OutMessage message) throws XFireException
     {
-        if (message.getUri().equals(Channel.BACKCHANNEL_URI)) {
+        if (message.getUri().equals(Channel.BACKCHANNEL_URI))
+        {
             final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
-            if (out != null) {
-                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                        .getEncoding(), context);
+            if (out != null)
+            {
+                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
+                    context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
-            else {
+            else
+            {
                 MessageContext oldContext = (MessageContext)context.getProperty(OLD_CONTEXT);
 
                 sendViaNewChannel(context, oldContext, message, (String)context.getProperty(SENDER_URI));
             }
         }
-        else {
+        else
+        {
             MessageContext receivingContext = new MessageContext();
             receivingContext.setXFire(context.getXFire());
             receivingContext.setService(getService(context.getXFire(), message.getUri()));
@@ -110,21 +115,24 @@ public class MuleLocalChannel extends AbstractChannel
 
     protected Service getService(XFire xfire, String uri) throws XFireException
     {
-        if (null == xfire) {
+        if (null == xfire)
+        {
             logger.warn("No XFire instance in context, unable to determine service");
             return null;
         }
 
         int i = uri.indexOf("//");
 
-        if (i == -1) {
+        if (i == -1)
+        {
             throw new XFireException("Malformed service URI");
         }
 
         String name = uri.substring(i + 2);
         Service service = xfire.getServiceRegistry().getService(name);
 
-        if (null == service) {
+        if (null == service)
+        {
             // TODO this should be an exception...
             logger.warn("Unable to locate '" + name + "' in ServiceRegistry");
         }
@@ -133,39 +141,47 @@ public class MuleLocalChannel extends AbstractChannel
     }
 
     private void sendViaNewChannel(final MessageContext context,
-            final MessageContext receivingContext,
-            final OutMessage message,
-            final String uri) throws XFireException
+                                   final MessageContext receivingContext,
+                                   final OutMessage message,
+                                   final String uri) throws XFireException
     {
-        try {
+        try
+        {
             Channel channel;
             PipedInputStream stream = new PipedInputStream();
             PipedOutputStream outStream = new PipedOutputStream(stream);
-            try {
+            try
+            {
                 channel = getTransport().createChannel(uri);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 throw new XFireException("Couldn't create channel.", e);
             }
 
             Semaphore s = new Semaphore(2);
-            try {
+            try
+            {
                 getWorkManager().scheduleWork(new WriterWorker(outStream, message, context, s));
                 getWorkManager().scheduleWork(
-                        new ReaderWorker(stream, message, channel, uri, receivingContext, s));
+                    new ReaderWorker(stream, message, channel, uri, receivingContext, s));
             }
-            catch (WorkException e) {
+            catch (WorkException e)
+            {
                 throw new XFireException("Couldn't schedule worker threads. " + e.getMessage(), e);
             }
 
-            try {
+            try
+            {
                 s.acquire();
             }
-            catch (InterruptedException e) {
+            catch (InterruptedException e)
+            {
                 // ignore is ok
             }
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             throw new XFireRuntimeException("Couldn't create stream.", e);
         }
     }
@@ -217,9 +233,10 @@ public class MuleLocalChannel extends AbstractChannel
 
         public void run()
         {
-            try {
-                final XMLStreamReader reader = STAXUtils.createXMLStreamReader(stream, message
-                        .getEncoding(), context);
+            try
+            {
+                final XMLStreamReader reader = STAXUtils.createXMLStreamReader(stream, message.getEncoding(),
+                    context);
                 final InMessage inMessage = new InMessage(reader, uri);
                 inMessage.setEncoding(message.getEncoding());
 
@@ -228,10 +245,12 @@ public class MuleLocalChannel extends AbstractChannel
                 reader.close();
                 stream.close();
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 throw new XFireRuntimeException("Couldn't read stream.", e);
             }
-            finally {
+            finally
+            {
                 semaphore.release();
             }
         }
@@ -263,19 +282,22 @@ public class MuleLocalChannel extends AbstractChannel
 
         public void run()
         {
-            try {
-                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(stream, message
-                        .getEncoding(), context);
+            try
+            {
+                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(stream, message.getEncoding(),
+                    context);
                 message.getSerializer().writeMessage(message, writer, context);
 
                 writer.close();
                 stream.close();
 
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 throw new XFireRuntimeException("Couldn't write stream.", e);
             }
-            finally {
+            finally
+            {
                 semaphore.release();
             }
         }
@@ -293,7 +315,8 @@ public class MuleLocalChannel extends AbstractChannel
     {
         String pathInfo = context.getEndpointURI().getPath();
 
-        if (StringUtils.isEmpty(pathInfo)) {
+        if (StringUtils.isEmpty(pathInfo))
+        {
             return context.getEndpointURI().getHost();
         }
 
@@ -301,37 +324,50 @@ public class MuleLocalChannel extends AbstractChannel
 
         int i = pathInfo.lastIndexOf("/");
 
-        if (i > -1) {
+        if (i > -1)
+        {
             serviceName = pathInfo.substring(i + 1);
         }
-        else {
+        else
+        {
             serviceName = pathInfo;
         }
 
         return serviceName;
     }
 
-    public Object onCall(UMOEventContext ctx) throws UMOException {
+    public Object onCall(UMOEventContext ctx) throws UMOException
+    {
 
-        try {
+        try
+        {
             MessageContext context = new MessageContext();
-            XFire xfire = (XFire) ctx.getComponentDescriptor().getProperties().get(XFireConnector.XFIRE_PROPERTY);
+            XFire xfire = (XFire)ctx.getComponentDescriptor().getProperties().get(
+                XFireConnector.XFIRE_PROPERTY);
 
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
             context.setXFire(xfire);
 
-            ByteArrayOutputStream resultStream = new ByteArrayOutputStream(); //Channel.BACKCHANNEL_URI
-            context.setProperty(Channel.BACKCHANNEL_URI, resultStream); // Return the result to us, not to the sender.
+            // Channel.BACKCHANNEL_URI
+            ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+
+            // Return the result to us, not to the sender.
+            context.setProperty(Channel.BACKCHANNEL_URI, resultStream);
 
             XMLStreamReader reader;
 
             // TODO isStreaming()?
             Object payload = ctx.getMessage().getPayload();
-            if (payload instanceof InputStream) {
+            if (payload instanceof InputStream)
+            {
                 reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
-            } else if (payload instanceof Reader) {
+            }
+            else if (payload instanceof Reader)
+            {
                 reader = STAXUtils.createXMLStreamReader((Reader)payload, context);
-            } else {
+            }
+            else
+            {
                 String text = ctx.getTransformedMessageAsString(ctx.getEncoding());
                 reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
             }
@@ -341,32 +377,38 @@ public class MuleLocalChannel extends AbstractChannel
             receive(context, in);
 
             Object result = null;
-            
-            try 
+
+            try
             {
-                // we need to check if there is a fault message.
-                // If it's the case, we need to send back the fault to the client
-                if (context.getExchange().hasFaultMessage()) 
+                // We need to check if there is a fault message. If that's the case,
+                // we need to send back the fault to the client.
+                // TODO: see MULE-1113 for background about this workaround; I'm not
+                // even sure the fault reading is done correctly? (XFire API is a bit
+                // confusing)
+                AbstractMessage fault = context.getExchange().getFaultMessage();
+                if (fault != null && fault.getBody() != null)
                 {
-                    result = resultStream.toString(context.getExchange().getFaultMessage().getEncoding());
+                    result = resultStream.toString(fault.getEncoding());
                     ExceptionPayload exceptionPayload = new ExceptionPayload(new Exception(result.toString()));
                     ctx.getMessage().setExceptionPayload(exceptionPayload);
-                } 
-                else if (context.getExchange().hasOutMessage()) 
+                }
+                else if (context.getExchange().hasOutMessage())
                 {
                     result = resultStream.toString(context.getExchange().getOutMessage().getEncoding());
                 }
-             } 
-            catch (UnsupportedEncodingException e1) 
+            }
+            catch (UnsupportedEncodingException e1)
             {
                 throw new MuleException(e1);
             }
 
-            // TODO Should this be an error?   Probably not
+            // TODO Should this be an error? Probably not
             return result;
 
-        } catch (UMOException e) {
-            logger.warn("Could not dispatch message to XFire!",e);
+        }
+        catch (UMOException e)
+        {
+            logger.warn("Could not dispatch message to XFire!", e);
             throw e;
         }
     }
