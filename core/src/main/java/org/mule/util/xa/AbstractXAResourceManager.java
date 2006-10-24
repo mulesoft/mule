@@ -30,7 +30,6 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
         super();
     }
 
-
     protected boolean includeBranchInXid()
     {
         return true;
@@ -39,21 +38,24 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
     AbstractTransactionContext getTransactionalResource(Xid xid)
     {
         AbstractTransactionContext context = getActiveTransactionalResource(xid);
-        if (context != null) {
+        if (context != null)
+        {
             return context;
-        } else {
+        }
+        else
+        {
             return getSuspendedTransactionalResource(xid);
         }
     }
 
     AbstractTransactionContext getActiveTransactionalResource(Xid xid)
     {
-        return (AbstractTransactionContext) activeContexts.get(xid);
+        return (AbstractTransactionContext)activeContexts.get(xid);
     }
 
     AbstractTransactionContext getSuspendedTransactionalResource(Xid xid)
     {
-        return (AbstractTransactionContext) suspendedContexts.get(xid);
+        return (AbstractTransactionContext)suspendedContexts.get(xid);
     }
 
     void addActiveTransactionalResource(Xid xid, AbstractTransactionContext context)

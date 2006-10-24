@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.inbound;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -24,41 +25,48 @@ import java.util.List;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MessageChunkingAggregator extends CorrelationAggregator {
+public class MessageChunkingAggregator extends CorrelationAggregator
+{
 
     /**
-     * This method is invoked if the shouldAggregate method is called and
-     * returns true. Once this method returns an aggregated message the event
-     * group is removed from the router
-     *
+     * This method is invoked if the shouldAggregate method is called and returns
+     * true. Once this method returns an aggregated message the event group is
+     * removed from the router
+     * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.routing.AggregationException
-     *          if the aggregation fails. in this scenario the
-     *          whole event group is removed and passed to the exception
-     *          handler for this componenet
+     * @throws org.mule.routing.AggregationException if the aggregation fails. in
+     *             this scenario the whole event group is removed and passed to the
+     *             exception handler for this componenet
      */
-    protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException {
+    protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException
+    {
         List eventList = IteratorUtils.toList(events.iterator(), events.size());
         UMOEvent firstEvent = (UMOEvent)eventList.get(0);
         Collections.sort(eventList, SequenceComparator.getInstance());
         ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-        try {
-            for (Iterator iterator = eventList.iterator(); iterator.hasNext();) {
-                UMOEvent event = (UMOEvent) iterator.next();
+        try
+        {
+            for (Iterator iterator = eventList.iterator(); iterator.hasNext();)
+            {
+                UMOEvent event = (UMOEvent)iterator.next();
                 baos.write(event.getMessageAsBytes());
             }
             UMOMessage message = new MuleMessage(baos.toByteArray(), firstEvent.getMessage());
             message.setCorrelationGroupSize(-1);
             message.setCorrelationSequence(-1);
             return message;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new AggregationException(events, firstEvent.getEndpoint(), e);
-        } finally {
+        }
+        finally
+        {
             IOUtils.closeQuietly(baos);
         }
     }
@@ -66,7 +74,7 @@ public class MessageChunkingAggregator extends CorrelationAggregator {
     public static class SequenceComparator implements Comparator
     {
         private static SequenceComparator _instance = new SequenceComparator();
-        
+
         public static SequenceComparator getInstance()
         {
             return _instance;
@@ -77,12 +85,16 @@ public class MessageChunkingAggregator extends CorrelationAggregator {
             super();
         }
 
-        public int compare(Object o1, Object o2) {
+        public int compare(Object o1, Object o2)
+        {
             UMOEvent event1 = (UMOEvent)o1;
             UMOEvent event2 = (UMOEvent)o2;
-            if(event1.getMessage().getCorrelationSequence() > event2.getMessage().getCorrelationSequence()) {
+            if (event1.getMessage().getCorrelationSequence() > event2.getMessage().getCorrelationSequence())
+            {
                 return 1;
-            } else {
+            }
+            else
+            {
                 return -1;
             }
         }

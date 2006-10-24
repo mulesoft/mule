@@ -17,14 +17,14 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 
 /**
- * A mule component service model that uses Seda principals to
- * achieve high throughput by Quing events for compoonents and processing
- * them concurrently.
- *
+ * A mule component service model that uses Seda principals to achieve high
+ * throughput by Quing events for compoonents and processing them concurrently.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SedaModel extends AbstractModel {
+public class SedaModel extends AbstractModel
+{
 
     /**
      * The time out used for taking from the Seda Queue
@@ -44,39 +44,46 @@ public class SedaModel extends AbstractModel {
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
-     *
+     * 
      * @return the model type
      */
-    public String getType() {
+    public String getType()
+    {
         return "seda";
     }
 
-    protected UMOComponent createComponent(UMODescriptor descriptor) {
+    protected UMOComponent createComponent(UMODescriptor descriptor)
+    {
         return new SedaComponent((MuleDescriptor)descriptor, this);
     }
 
-
-    public int getQueueTimeout() {
+    public int getQueueTimeout()
+    {
         return queueTimeout;
     }
 
-    public void setQueueTimeout(int queueTimeout) {
+    public void setQueueTimeout(int queueTimeout)
+    {
         this.queueTimeout = queueTimeout;
     }
 
-    public boolean isEnablePooling() {
+    public boolean isEnablePooling()
+    {
         return enablePooling;
     }
 
-    public void setEnablePooling(boolean enablePooling) {
+    public void setEnablePooling(boolean enablePooling)
+    {
         this.enablePooling = enablePooling;
     }
 
-    public boolean isComponentPerRequest() {
+    public boolean isComponentPerRequest()
+    {
         return componentPerRequest;
     }
 
-    public void setComponentPerRequest(boolean componentPerRequest) {
+    public void setComponentPerRequest(boolean componentPerRequest)
+    {
         this.componentPerRequest = componentPerRequest;
     }
 }

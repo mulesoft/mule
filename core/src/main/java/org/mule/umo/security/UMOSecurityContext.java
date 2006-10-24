@@ -7,11 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 /**
- * <code>UMOSecurityContext</code> holds security information and is
- * associated with the UMOSession.
+ * <code>UMOSecurityContext</code> holds security information and is associated
+ * with the UMOSession.
  * 
  * @see org.mule.umo.UMOSession
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

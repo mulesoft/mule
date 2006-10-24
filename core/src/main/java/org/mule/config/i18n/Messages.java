@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.i18n;
 
 import org.apache.commons.logging.Log;
@@ -20,8 +21,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * <code>Messages</code> provides facilities for constructing
- * <code>Message</code> objects and access to core message constants.
+ * <code>Messages</code> provides facilities for constructing <code>Message</code>
+ * objects and access to core message constants.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,7 +38,7 @@ public class Messages implements CoreMessageConstants
 
     private static Map bundles = new HashMap();
 
-    private static Object[] emptyArgs = new Object[] {};
+    private static Object[] emptyArgs = new Object[]{};
 
     public static String get(int code)
     {
@@ -46,7 +47,8 @@ public class Messages implements CoreMessageConstants
 
     public static String get(int code, Object[] args)
     {
-        if (args == null) {
+        if (args == null)
+        {
             args = Messages.emptyArgs;
         }
         return getString(DEFAULT_BUNDLE, code, args);
@@ -54,35 +56,41 @@ public class Messages implements CoreMessageConstants
 
     public static String get(int code, Object arg1)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        return getString(DEFAULT_BUNDLE, code, new Object[] { arg1 });
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1});
     }
 
     public static String get(int code, Object arg1, Object arg2)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        if (arg2 == null) {
+        if (arg2 == null)
+        {
             arg2 = "null";
         }
-        return getString(DEFAULT_BUNDLE, code, new Object[] { arg1, arg2 });
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1, arg2});
     }
 
     public static String get(int code, Object arg1, Object arg2, Object arg3)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        if (arg2 == null) {
+        if (arg2 == null)
+        {
             arg2 = "null";
         }
-        if (arg3 == null) {
+        if (arg3 == null)
+        {
             arg3 = "null";
         }
-        return getString(DEFAULT_BUNDLE, code, new Object[] { arg1, arg2, arg3 });
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1, arg2, arg3});
     }
 
     public static String get(String bundle, int code)
@@ -92,7 +100,8 @@ public class Messages implements CoreMessageConstants
 
     public static String get(String bundle, int code, Object[] args)
     {
-        if (args == null) {
+        if (args == null)
+        {
             args = Messages.emptyArgs;
         }
         return getString(bundle, code, args);
@@ -100,41 +109,48 @@ public class Messages implements CoreMessageConstants
 
     public static String get(String bundle, int code, Object arg1)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        return getString(bundle, code, new Object[] { arg1 });
+        return getString(bundle, code, new Object[]{arg1});
     }
 
     public static String get(String bundle, int code, Object arg1, Object arg2)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        if (arg2 == null) {
+        if (arg2 == null)
+        {
             arg2 = "null";
         }
-        return getString(bundle, code, new Object[] { arg1, arg2 });
+        return getString(bundle, code, new Object[]{arg1, arg2});
     }
 
     public static String get(String bundle, int code, Object arg1, Object arg2, Object arg3)
     {
-        if (arg1 == null) {
+        if (arg1 == null)
+        {
             arg1 = "null";
         }
-        if (arg2 == null) {
+        if (arg2 == null)
+        {
             arg2 = "null";
         }
-        if (arg3 == null) {
+        if (arg3 == null)
+        {
             arg3 = "null";
         }
-        return getString(bundle, code, new Object[] { arg1, arg2, arg3 });
+        return getString(bundle, code, new Object[]{arg1, arg2, arg3});
     }
 
     public static String getString(String bundle, int code, Object[] args)
     {
         String m = getBundle(bundle).getString(String.valueOf(code));
-        if (m == null) {
+        if (m == null)
+        {
             logger.error("Failed to find message for id " + code + " in resource bundle " + bundle);
             return "";
         }
@@ -143,15 +159,20 @@ public class Messages implements CoreMessageConstants
 
     protected static ResourceBundle getBundle(String name)
     {
-        ResourceBundle bundle = (ResourceBundle) bundles.get(name);
-        if (bundle == null) {
+        ResourceBundle bundle = (ResourceBundle)bundles.get(name);
+        if (bundle == null)
+        {
             String path = "META-INF.services.org.mule.i18n." + name + "-messages";
             logger.debug("Loading resource bundle: " + path);
             Locale locale = Locale.getDefault();
-            try {
+            try
+            {
                 bundle = ResourceBundle.getBundle(path, locale);
-            } catch (MissingResourceException e) {
-                logger.warn("Failed to find resource bundle using default Locale: " + locale.toString() + ", defaulting to Locale.US. Error was: " + e.getMessage());
+            }
+            catch (MissingResourceException e)
+            {
+                logger.warn("Failed to find resource bundle using default Locale: " + locale.toString()
+                            + ", defaulting to Locale.US. Error was: " + e.getMessage());
                 bundle = ResourceBundle.getBundle(path);
             }
             bundles.put(name, bundle);

@@ -14,9 +14,9 @@ import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 
 /**
- * A filter that accepts messages that have an exception payload. An Exception
- * type can also be set on this filter to allow it to accept Exception messages
- * of a particular Exception class only.
+ * A filter that accepts messages that have an exception payload. An Exception type
+ * can also be set on this filter to allow it to accept Exception messages of a
+ * particular Exception class only.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -36,21 +36,23 @@ public class ExceptionTypeFilter extends PayloadTypeFilter
     /**
      * Check a given message against this filter.
      * 
-     * @param message
-     *            a non null message to filter.
+     * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
     public boolean accept(UMOMessage message)
     {
         UMOExceptionPayload epl = message.getExceptionPayload();
 
-        if (getExpectedType() == null) {
+        if (getExpectedType() == null)
+        {
             return epl != null;
         }
-        else if (epl != null) {
+        else if (epl != null)
+        {
             return getExpectedType().isAssignableFrom(epl.getException().getClass());
         }
-        else {
+        else
+        {
             return false;
         }
     }

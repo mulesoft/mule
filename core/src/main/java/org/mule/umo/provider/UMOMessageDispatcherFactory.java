@@ -14,9 +14,9 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>UMOMessageDispatcherFactory</code> is a factory interface for creating a Message Dispatcher
- * for the underlying transport
- *
+ * <code>UMOMessageDispatcherFactory</code> is a factory interface for creating a
+ * Message Dispatcher for the underlying transport
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

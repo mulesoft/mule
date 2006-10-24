@@ -21,35 +21,47 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Will locate the model service in  META-INF/service using the model type as the
- * key. Then construct the model
- *
+ * Will locate the model service in META-INF/service using the model type as the key.
+ * Then construct the model
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ModelFactory {
+public class ModelFactory
+{
 
     public static final String MODEL_SERVICE_PATH = "org/mule/models";
 
-    public static UMOModel createModel(String type) throws ModelServiceNotFoundException {
+    public static UMOModel createModel(String type) throws ModelServiceNotFoundException
+    {
         String location = SpiUtils.SERVICE_ROOT + MODEL_SERVICE_PATH;
         InputStream is = SpiUtils.findServiceDescriptor(MODEL_SERVICE_PATH, type, ConnectorFactory.class);
-        try {
-            if (is != null) {
+        try
+        {
+            if (is != null)
+            {
                 Properties props = new Properties();
                 props.load(is);
                 String clazz = props.getProperty("model");
-                try {
-                    UMOModel model = (UMOModel) ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS, ModelFactory.class );
+                try
+                {
+                    UMOModel model = (UMOModel)ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS,
+                        ModelFactory.class);
                     BeanUtils.populateWithoutFail(model, props, false);
                     return model;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     throw new ModelServiceNotFoundException(location + "/" + type, e);
                 }
-            } else {
+            }
+            else
+            {
                 throw new ModelServiceNotFoundException(location + "/" + type);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new ModelServiceNotFoundException(location + "/" + type, e);
         }
     }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.simple;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -18,9 +19,8 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.InputStream;
 
 /**
- * <code>ByteArrayToSerializable</code> converts a serialized object to its
- * object representation
- *
+ * <code>ByteArrayToSerializable</code> converts a serialized object to its object
+ * representation
  */
 public class ByteArrayToSerializable extends AbstractTransformer
 {
@@ -37,8 +37,9 @@ public class ByteArrayToSerializable extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try {
-            if(src instanceof byte[])
+        try
+        {
+            if (src instanceof byte[])
             {
                 return SerializationUtils.deserialize((byte[])src);
             }
@@ -48,9 +49,10 @@ public class ByteArrayToSerializable extends AbstractTransformer
 
             }
         }
-        catch (Exception e) {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
-                    "byte[]", "Object"), this, e);
+        catch (Exception e)
+        {
+            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "byte[]",
+                "Object"), this, e);
         }
     }
 

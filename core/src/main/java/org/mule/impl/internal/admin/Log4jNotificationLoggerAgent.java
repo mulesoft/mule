@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.admin;
 
 import org.apache.commons.collections.MapUtils;
@@ -31,8 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications and logs
- * them and can optionally route them to an endpoint
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
+ * and logs them and can optionally route them to an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -56,13 +57,16 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     public String getDescription()
     {
         StringBuffer buf = new StringBuffer(64);
-        if (StringUtils.isNotBlank(logFile)) {
+        if (StringUtils.isNotBlank(logFile))
+        {
             buf.append("Logging notifications to: ").append(logFile);
         }
-        if (chainsawPort > -1) {
+        if (chainsawPort > -1)
+        {
             buf.append(" Chainsaw: ").append(chainsawHost).append(":").append(chainsawPort);
         }
-        if (buf.length() == 0) {
+        if (buf.length() == 0)
+        {
             buf.append("No logging or event forwarding is configured");
         }
         return getName() + ": " + buf.toString();
@@ -80,36 +84,50 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
 
     public void doInitialise() throws InitialisationException
     {
-        if (logConfigFile != null) {
-            if (logConfigFile.endsWith(".xml")) {
+        if (logConfigFile != null)
+        {
+            if (logConfigFile.endsWith(".xml"))
+            {
                 DOMConfigurator.configure(logConfigFile);
-            } else {
+            }
+            else
+            {
                 PropertyConfigurator.configure(logConfigFile);
             }
-        } else {
-            try {
+        }
+        else
+        {
+            try
+            {
                 eventLogger = Logger.getLogger(logName);
-                if (logFile != null) {
+                if (logFile != null)
+                {
                     File f = new File(logFile);
-                    if (!f.exists()) {
+                    if (!f.exists())
+                    {
                         FileUtils.createFile(logFile);
                     }
                     Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"), logFile, true);
                     eventLogger.addAppender(file);
                 }
-                if (chainsawPort > -1) {
+                if (chainsawPort > -1)
+                {
                     Appender chainsaw = new SocketAppender(chainsawHost, chainsawPort);
                     eventLogger.addAppender(chainsaw);
                 }
-            } catch (IOException e) {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Log4j configuration"), e, this);
+            }
+            catch (IOException e)
+            {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Log4j configuration"),
+                    e, this);
             }
         }
     }
 
     protected void logEvent(UMOServerNotification e)
     {
-        if (eventLogger != null) {
+        if (eventLogger != null)
+        {
             String actionKey = e.EVENT_NAME + "." + e.getActionName();
             String level = MapUtils.getString(levelMappings, actionKey, e.getType());
 

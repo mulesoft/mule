@@ -32,10 +32,8 @@ public class LifecycleException extends UMOException
     private transient Object component;
 
     /**
-     * @param message
-     *            the exception message
-     * @param component
-     *            the object that failed during a lifecycle method call
+     * @param message the exception message
+     * @param component the object that failed during a lifecycle method call
      */
     public LifecycleException(Message message, Object component)
     {
@@ -44,12 +42,9 @@ public class LifecycleException extends UMOException
     }
 
     /**
-     * @param message
-     *            the exception message
-     * @param cause
-     *            the exception that cause this exception to be thrown
-     * @param component
-     *            the object that failed during a lifecycle method call
+     * @param message the exception message
+     * @param cause the exception that cause this exception to be thrown
+     * @param component the object that failed during a lifecycle method call
      */
     public LifecycleException(Message message, Throwable cause, Object component)
     {
@@ -58,10 +53,8 @@ public class LifecycleException extends UMOException
     }
 
     /**
-     * @param cause
-     *            the exception that cause this exception to be thrown
-     * @param component
-     *            the object that failed during a lifecycle method call
+     * @param cause the exception that cause this exception to be thrown
+     * @param component the object that failed during a lifecycle method call
      */
     public LifecycleException(Throwable cause, Object component)
     {

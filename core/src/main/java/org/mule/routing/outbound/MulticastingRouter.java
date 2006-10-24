@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.Message;
@@ -30,46 +31,66 @@ import org.mule.umo.routing.RoutingException;
 public class MulticastingRouter extends FilteringOutboundRouter
 {
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
     {
         UMOMessage result = null;
-        if (endpoints == null || endpoints.size() == 0) {
+        if (endpoints == null || endpoints.size() == 0)
+        {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
+        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
+            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
-            } else {
+            }
+            else
+            {
                 // the correlationId will be set by the AbstractOutboundRouter
                 message.setCorrelationGroupSize(endpoints.size());
             }
         }
 
-        try {
+        try
+        {
             UMOEndpoint endpoint;
-            synchronized (endpoints) {
-                for (int i = 0; i < endpoints.size(); i++) {
-                    endpoint = (UMOEndpoint) endpoints.get(i);
-                    if (synchronous) {
+            synchronized (endpoints)
+            {
+                for (int i = 0; i < endpoints.size(); i++)
+                {
+                    endpoint = (UMOEndpoint)endpoints.get(i);
+                    if (synchronous)
+                    {
                         // Were we have multiple outbound endpoints
-                        if (result == null) {
+                        if (result == null)
+                        {
                             result = send(session, message, endpoint);
-                        } else {
-                            String def = (String) endpoint.getProperties().get("default");
-                            if (def != null) {
+                        }
+                        else
+                        {
+                            String def = (String)endpoint.getProperties().get("default");
+                            if (def != null)
+                            {
                                 result = send(session, message, endpoint);
-                            } else {
+                            }
+                            else
+                            {
                                 send(session, message, endpoint);
                             }
                         }
-                    } else {
+                    }
+                    else
+                    {
                         dispatch(session, message, endpoint);
                     }
                 }
             }
-        } catch (UMOException e) {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
+        }
+        catch (UMOException e)
+        {
+            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint)endpoints.get(0), e);
         }
         return result;
     }

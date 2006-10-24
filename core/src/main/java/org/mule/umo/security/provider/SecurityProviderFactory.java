@@ -14,17 +14,18 @@ import java.security.Provider;
 
 /**
  * Determines and initializes JDK-specific security provider.
- *
+ * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public interface SecurityProviderFactory {
+public interface SecurityProviderFactory
+{
 
     SecurityProviderInfo getSecurityProviderInfo();
 
     /**
      * @return an instance of a security provider
-     * @throws org.mule.MuleRuntimeException if there was a problem with the security provider
-     *
+     * @throws org.mule.MuleRuntimeException if there was a problem with the security
+     *             provider
      * @see #getSecurityProviderInfo()
      */
     Provider getProvider();

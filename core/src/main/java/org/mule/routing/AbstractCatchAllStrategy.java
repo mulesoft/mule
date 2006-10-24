@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import org.apache.commons.logging.Log;
@@ -16,10 +17,10 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 
 /**
- * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router
- * for any events not caught by the router this strategy is associated with.
- * Users can assign an endpoint to this strategy to forward all events to. This
- * is similar to a dead letter queue in messaging.
+ * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for
+ * any events not caught by the router this strategy is associated with. Users can
+ * assign an endpoint to this strategy to forward all events to. This is similar to a
+ * dead letter queue in messaging.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

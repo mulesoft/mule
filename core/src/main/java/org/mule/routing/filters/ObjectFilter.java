@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 /**
@@ -14,7 +15,7 @@ package org.mule.routing.filters;
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
- **/
+ */
 public interface ObjectFilter
 {
     boolean accept(Object object);

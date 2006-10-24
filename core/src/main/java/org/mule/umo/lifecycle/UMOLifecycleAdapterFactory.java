@@ -24,5 +24,5 @@ import org.mule.umo.model.UMOEntryPointResolver;
 public interface UMOLifecycleAdapterFactory
 {
     UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolver resolver)
-            throws UMOException;
+        throws UMOException;
 }

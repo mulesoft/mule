@@ -30,8 +30,8 @@ package org.mule.impl.work;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
- * Defines the operations that a pool in charge of the execution of Work
- * instances must expose.
+ * Defines the operations that a pool in charge of the execution of Work instances
+ * must expose.
  * 
  * @version $Rev$ $Date$
  */

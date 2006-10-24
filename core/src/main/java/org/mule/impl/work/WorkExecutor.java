@@ -46,7 +46,6 @@ public interface WorkExecutor
      * method.
      * 
      * @param work Work to be executed.
-     * 
      * @throws javax.resource.spi.work.WorkException Indicates that the work has
      *             failed.
      * @throws InterruptedException Indicates that the thread in charge of the

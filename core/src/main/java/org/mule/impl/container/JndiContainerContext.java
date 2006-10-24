@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import org.mule.config.i18n.Message;
@@ -24,9 +25,9 @@ import java.io.Reader;
 import java.util.Map;
 
 /**
- * <code>JndiContainerContext</code> is a container implementaiton that
- * exposes a jndi context. What ever properties are set on the container in
- * configuration will be passed to the initial context.
+ * <code>JndiContainerContext</code> is a container implementaiton that exposes a
+ * jndi context. What ever properties are set on the container in configuration will
+ * be passed to the initial context.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
@@ -57,28 +58,39 @@ public class JndiContainerContext extends AbstractContainerContext
         this.environment = environment;
     }
 
-    public Context getContext() {
+    public Context getContext()
+    {
         return context;
     }
 
-    public void setContext(InitialContext context) {
+    public void setContext(InitialContext context)
+    {
         this.context = context;
     }
 
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        try {
-            if(key==null) {
+        try
+        {
+            if (key == null)
+            {
                 throw new ObjectNotFoundException("null");
             }
-            if (key instanceof Name) {
-                return context.lookup((Name) key);
-            } else if(key instanceof Class){
+            if (key instanceof Name)
+            {
+                return context.lookup((Name)key);
+            }
+            else if (key instanceof Class)
+            {
                 return context.lookup(((Class)key).getName());
-            } else {
+            }
+            else
+            {
                 return context.lookup(key.toString());
             }
-        } catch (NamingException e) {
+        }
+        catch (NamingException e)
+        {
             throw new ObjectNotFoundException(key.toString(), e);
         }
     }
@@ -90,12 +102,17 @@ public class JndiContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException
     {
-        try {
-            if (context == null) {
+        try
+        {
+            if (context == null)
+            {
                 context = JndiContextHelper.initialise(getEnvironment());
             }
-        } catch (NamingException e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e, this);
+        }
+        catch (NamingException e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e,
+                this);
         }
     }
 }

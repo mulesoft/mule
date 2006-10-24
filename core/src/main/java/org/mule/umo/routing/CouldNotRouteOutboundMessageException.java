@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
@@ -14,8 +15,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to
- * route the current outbound event
+ * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route
+ * the current outbound event
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

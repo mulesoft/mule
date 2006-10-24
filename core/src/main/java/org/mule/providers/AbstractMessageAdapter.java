@@ -36,9 +36,9 @@ import org.mule.util.MapUtils;
 import org.mule.util.UUID;
 
 /**
- * <code>AbstractMessageAdapter</code> provides a base implementation for
- * simple message types that maybe don't normally allow for meta information,
- * such as a File or TCP.
+ * <code>AbstractMessageAdapter</code> provides a base implementation for simple
+ * message types that maybe don't normally allow for meta information, such as a File
+ * or TCP.
  */
 public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 {
@@ -74,10 +74,13 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void addProperties(Map props)
     {
-        if (props != null) {
-            synchronized(props) {
-                for (Iterator iter = props.entrySet().iterator(); iter.hasNext();) {
-                    Map.Entry entry = (Map.Entry) iter.next();
+        if (props != null)
+        {
+            synchronized (props)
+            {
+                for (Iterator iter = props.entrySet().iterator(); iter.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry)iter.next();
                     setProperty((String)entry.getKey(), entry.getValue());
                 }
             }
@@ -92,8 +95,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     /**
      * Removes an associated property from the message
      * 
-     * @param key
-     *            the key of the property to remove
+     * @param key the key of the property to remove
      */
     public Object removeProperty(String key)
     {
@@ -128,18 +130,25 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
      */
     public void setProperty(String key, Object value)
     {
-        if (key != null) {
-            if (value != null) {
+        if (key != null)
+        {
+            if (value != null)
+            {
                 properties.put(key, value);
             }
-            else {
+            else
+            {
                 logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                        + "; please report the following stack trace to dev@mule.codehaus.org.", new Throwable());
+                            + "; please report the following stack trace to dev@mule.codehaus.org.",
+                    new Throwable());
                 properties.remove(key);
             }
-        } else {
+        }
+        else
+        {
             logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                    + "; please report the following stack trace to dev@mule.codehaus.org.", new Throwable());
+                        + "; please report the following stack trace to dev@mule.codehaus.org.",
+                new Throwable());
         }
     }
 
@@ -210,9 +219,12 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void setReplyTo(Object replyTo)
     {
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
-        } else {
+        }
+        else
+        {
             removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
     }
@@ -224,16 +236,19 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public void setCorrelationId(String correlationId)
     {
-        if (StringUtils.isNotBlank(correlationId)) {
+        if (StringUtils.isNotBlank(correlationId))
+        {
             setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
-        } else {
+        }
+        else
+        {
             removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         }
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the the
-     * correlation group (as defined by the correlationId)
+     * Gets the sequence or ordering number for this message in the the correlation
+     * group (as defined by the correlationId)
      * 
      * @return the sequence number or -1 if the sequence is not important
      */
@@ -243,11 +258,10 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the the
-     * correlation group (as defined by the correlationId)
+     * Gets the sequence or ordering number for this message in the the correlation
+     * group (as defined by the correlationId)
      * 
-     * @param sequence
-     *            the sequence number or -1 if the sequence is not important
+     * @param sequence the sequence number or -1 if the sequence is not important
      */
     public void setCorrelationSequence(int sequence)
     {
@@ -267,9 +281,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     /**
      * Determines how many messages are in the correlation group
      * 
-     * @param size
-     *            the total messages in this group or -1 if the size is not
-     *            known
+     * @param size the total messages in this group or -1 if the size is not known
      */
     public void setCorrelationGroupSize(int size)
     {
@@ -313,48 +325,53 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     /**
      * Sets the encoding for this message
-     *
+     * 
      * @param encoding the encoding to use
      */
-    public void setEncoding(String encoding) {
+    public void setEncoding(String encoding)
+    {
         this.encoding = encoding;
     }
 
     /**
-     * Converts the message implementation into a String representation. If
-     * encoding is required it will use the encoding set on the message
+     * Converts the message implementation into a String representation. If encoding
+     * is required it will use the encoding set on the message
      * 
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public final String getPayloadAsString() throws Exception
     {
         return getPayloadAsString(getEncoding());
     }
 
-    protected byte[] convertToBytes(Object object) throws TransformerException,
-            UnsupportedEncodingException
+    protected byte[] convertToBytes(Object object) throws TransformerException, UnsupportedEncodingException
     {
-        if (object instanceof String) {
+        if (object instanceof String)
+        {
             return object.toString().getBytes(getEncoding());
         }
 
-        if (object instanceof byte[]) {
+        if (object instanceof byte[])
+        {
             return (byte[])object;
         }
-        else if (object instanceof Serializable) {
-            try {
+        else if (object instanceof Serializable)
+        {
+            try
+            {
                 return SerializationUtils.serialize((Serializable)object);
             }
-            catch (Exception e) {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, object
-                        .getClass().getName(), "byte[]"), e);
+            catch (Exception e)
+            {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
+                    object.getClass().getName(), "byte[]"), e);
             }
         }
-        else {
+        else
+        {
             throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
-                    object.getClass().getName(), "byte[] or " + Serializable.class.getName()));
+                object.getClass().getName(), "byte[] or " + Serializable.class.getName()));
         }
     }
 }

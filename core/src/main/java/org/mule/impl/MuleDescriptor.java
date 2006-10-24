@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
- * New Mule UMOs can be initialised as needed from their descriptor.
+ * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
+ * Mule UMOs can be initialised as needed from their descriptor.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -61,8 +61,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /**
-     * Default constructor. Initalises common properties for the
-     * MuleConfiguration object
+     * Default constructor. Initalises common properties for the MuleConfiguration
+     * object
      * 
      * @see MuleConfiguration
      */
@@ -83,7 +83,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      */
     public void setExceptionListener(ExceptionListener listener)
     {
-        if (listener == null) {
+        if (listener == null)
+        {
             throw new IllegalArgumentException("Exception Strategy cannot be null");
         }
         this.exceptionListener = listener;
@@ -97,7 +98,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      */
     public void setName(String newName)
     {
-        if (newName == null) {
+        if (newName == null)
+        {
             throw new IllegalArgumentException("Name cannot be null");
         }
         name = newName;
@@ -131,16 +133,20 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setProperties(Map props)
     {
         properties = props;
-        String delegate = (String) properties.get(MULE_PROPERTY_DOT_PROPERTIES);
-        if (delegate != null) {
-            try {
+        String delegate = (String)properties.get(MULE_PROPERTY_DOT_PROPERTIES);
+        if (delegate != null)
+        {
+            try
+            {
                 FileInputStream is = new FileInputStream(new File(delegate));
                 Properties dProps = new Properties();
                 dProps.load(is);
                 properties.putAll(dProps);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 logger.warn(MULE_PROPERTY_DOT_PROPERTIES + " was set  to " + delegate
-                        + " but the file could not be read, exception is: " + e.getMessage());
+                            + " but the file could not be read, exception is: " + e.getMessage());
             }
         }
     }
@@ -163,9 +169,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setInboundEndpoint(UMOEndpoint endpoint) throws MuleException
     {
         inboundEndpoint = endpoint;
-        if (inboundEndpoint != null) {
+        if (inboundEndpoint != null)
+        {
             inboundEndpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-            if (inboundEndpoint.getTransformer() != null) {
+            if (inboundEndpoint.getTransformer() != null)
+            {
                 inboundTransformer = inboundEndpoint.getTransformer();
             }
         }
@@ -180,9 +188,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setOutboundEndpoint(UMOEndpoint endpoint) throws MuleException
     {
         outboundEndpoint = endpoint;
-        if (outboundEndpoint != null) {
+        if (outboundEndpoint != null)
+        {
             outboundEndpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
-            if (outboundEndpoint.getTransformer() != null) {
+            if (outboundEndpoint.getTransformer() != null)
+            {
                 outboundTransformer = outboundEndpoint.getTransformer();
             }
         }
@@ -206,7 +216,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      */
     public void addInterceptor(UMOInterceptor inteceptor)
     {
-        if (inteceptor != null) {
+        if (inteceptor != null)
+        {
             intecerptorList.add(inteceptor);
         }
     }
@@ -238,7 +249,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      */
     public void setImplementation(Object reference)
     {
-        if (reference == null) {
+        if (reference == null)
+        {
             throw new IllegalArgumentException("ImplementationReference cannot be null");
         }
         implementationReference = reference;
@@ -246,7 +258,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     public void setImplementationInstance(Object instance)
     {
-        if(name==null) {
+        if (name == null)
+        {
             throw new NullPointerException("UMODescriptor.name");
         }
         properties.put(DEFAULT_INSTANCE_REF_NAME, instance);
@@ -274,11 +287,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /**
-     * Response Routers control how events are returned in a request/response
-     * call. It cn be use to aggregate response events before returning, thus
-     * acting as a Join in a forked process. This can be used to make
-     * request/response calls a lot more efficient as independent tasks can be
-     * forked, execute concurrently and then join before the request completes
+     * Response Routers control how events are returned in a request/response call.
+     * It cn be use to aggregate response events before returning, thus acting as a
+     * Join in a forked process. This can be used to make request/response calls a
+     * lot more efficient as independent tasks can be forked, execute concurrently
+     * and then join before the request completes
      * 
      * @param router the response router for this component
      * @see org.mule.umo.routing.UMOResponseMessageRouter
@@ -289,38 +302,44 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /**
-     * Determines if only a single instance of this component is created.  This is useful when a
-     * component hands off event processing to another engine such as Rules processing or Bpel
-     * and the processing engine allocates and manages its own threads.
-     *
+     * Determines if only a single instance of this component is created. This is
+     * useful when a component hands off event processing to another engine such as
+     * Rules processing or Bpel and the processing engine allocates and manages its
+     * own threads.
+     * 
      * @param singleton true if this component is a singleton
      */
-    public void setSingleton(boolean singleton) {
+    public void setSingleton(boolean singleton)
+    {
         this.singleton = singleton;
     }
 
     /**
      * Sets the initial state of this component
-     *
+     * 
      * @param state the initial state of this component
      */
-    public void setInitialState(String state) {
+    public void setInitialState(String state)
+    {
         this.initialState = state;
     }
 
-    public void setEncoding(String encoding) {
+    public void setEncoding(String encoding)
+    {
         this.encoding = encoding;
     }
 
     /**
-     * Sets the name of the contaier where the object for this descriptor resides. If this value
-     * is 'none' the 'implementaiton' attributed is expected to be a fully qualified class name that
-     * will be instanciated.
-     *
-     * @param containerName the container name, or null if it is not known - in which case each container will be queried
-     *                      for the component implementation.
+     * Sets the name of the contaier where the object for this descriptor resides. If
+     * this value is 'none' the 'implementaiton' attributed is expected to be a fully
+     * qualified class name that will be instanciated.
+     * 
+     * @param containerName the container name, or null if it is not known - in which
+     *            case each container will be queried for the component
+     *            implementation.
      */
-    public void setContainer(String containerName) {
+    public void setContainer(String containerName)
+    {
         this.container = containerName;
     }
 }

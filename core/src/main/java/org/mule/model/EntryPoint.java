@@ -17,8 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * <code>EntryPoint</code> is a method on a Mule-managed component that is
- * invoked when an event for the component is received.
+ * <code>EntryPoint</code> is a method on a Mule-managed component that is invoked
+ * when an event for the component is received.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -54,16 +54,20 @@ public class EntryPoint
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public Object invoke(Object component, Object arg) throws InvocationTargetException, IllegalAccessException
+    public Object invoke(Object component, Object arg)
+        throws InvocationTargetException, IllegalAccessException
     {
         String methodCall = null;
-        if (logger.isDebugEnabled()) {
-            methodCall = component.getClass().getName() + "." + method.getName() + "(" + arg.getClass().getName() + ")";
+        if (logger.isDebugEnabled())
+        {
+            methodCall = component.getClass().getName() + "." + method.getName() + "("
+                         + arg.getClass().getName() + ")";
             logger.debug("Invoking " + methodCall);
         }
 
-        Object result = method.invoke(component, new Object[] { arg });
-        if (logger.isDebugEnabled()) {
+        Object result = method.invoke(component, new Object[]{arg});
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Result of call " + methodCall + " is " + result);
         }
         return result;
@@ -86,7 +90,8 @@ public class EntryPoint
      */
     public String getName()
     {
-        if (method == null) {
+        if (method == null)
+        {
             return null;
         }
         return method.getName();
@@ -109,9 +114,12 @@ public class EntryPoint
      */
     public Class getReturnType()
     {
-        if (isVoid()) {
+        if (isVoid())
+        {
             return null;
-        } else {
+        }
+        else
+        {
             return method.getReturnType();
         }
     }

@@ -16,26 +16,28 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 
 /**
- * A mule component service model that uses Seda principals to
- * achieve high throughput by Quing events for compoonents and processing
- * them concurrently.
- *
+ * A mule component service model that uses Seda principals to achieve high
+ * throughput by Quing events for compoonents and processing them concurrently.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class OptimisedSedaModel extends SedaModel {
+public class OptimisedSedaModel extends SedaModel
+{
 
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
-     *
+     * 
      * @return the model type
      */
-    public String getType() {
+    public String getType()
+    {
         return "seda-optimised";
     }
 
-    protected UMOComponent createComponent(UMODescriptor descriptor) {
+    protected UMOComponent createComponent(UMODescriptor descriptor)
+    {
         return new OptimisedSedaComponent((MuleDescriptor)descriptor, this);
     }
 }

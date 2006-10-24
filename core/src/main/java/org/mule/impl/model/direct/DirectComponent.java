@@ -24,9 +24,9 @@ import org.mule.umo.model.UMOModel;
 import java.util.List;
 
 /**
- * A direct component invokes the service component directly without any
- * threading or pooling, even when the nvocation is asynchronous
- *
+ * A direct component invokes the service component directly without any threading or
+ * pooling, even when the nvocation is asynchronous
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,52 +40,67 @@ public class DirectComponent extends AbstractComponent
     protected List interceptorList = null;
     protected MuleProxy proxy;
 
-    public DirectComponent(MuleDescriptor descriptor, UMOModel model) {
+    public DirectComponent(MuleDescriptor descriptor, UMOModel model)
+    {
         super(descriptor, model);
     }
 
-    protected void doInitialise() throws InitialisationException {
+    protected void doInitialise() throws InitialisationException
+    {
 
-        try {
+        try
+        {
             Object component = lookupComponent();
             proxy = new DefaultMuleProxy(component, descriptor, null);
             proxy.setStatistics(getStatistics());
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new InitialisationException(e, this);
         }
     }
 
-    protected UMOMessage doSend(UMOEvent event) throws UMOException {
+    protected UMOMessage doSend(UMOEvent event) throws UMOException
+    {
 
         Object obj = proxy.onCall(event);
-        if(obj instanceof UMOMessage) {
+        if (obj instanceof UMOMessage)
+        {
             return (UMOMessage)obj;
-        } else {
+        }
+        else
+        {
             return new MuleMessage(obj, event.getMessage());
         }
     }
 
-    protected void doDispatch(UMOEvent event) throws UMOException {
+    protected void doDispatch(UMOEvent event) throws UMOException
+    {
         proxy.onCall(event);
     }
 
-    protected void doStop() throws UMOException {
+    protected void doStop() throws UMOException
+    {
         proxy.stop();
     }
 
-    protected void doStart() throws UMOException {
+    protected void doStart() throws UMOException
+    {
         proxy.start();
     }
 
-    protected void doPause() {
+    protected void doPause()
+    {
         proxy.suspend();
     }
 
-    protected void doResume() {
+    protected void doResume()
+    {
         proxy.resume();
     }
 
-    protected void doDispose() {
+    protected void doDispose()
+    {
         proxy.dispose();
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.builders;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -20,10 +21,10 @@ import org.mule.util.MuleObjectHelper;
 
 /**
  * <code>TransformerReference</code> maintains a transformer reference.
- * Transformers are clones when they are looked up, if there are container
- * properties set on the transformer the clone will have an inconsistent state
- * if container properties have not been resolved. This class holds the
- * refernece and is invoked after the thcontainer properties are resolved
+ * Transformers are clones when they are looked up, if there are container properties
+ * set on the transformer the clone will have an inconsistent state if container
+ * properties have not been resolved. This class holds the refernece and is invoked
+ * after the thcontainer properties are resolved
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -64,23 +65,28 @@ public class TransformerReference
     public void resolveTransformer() throws InitialisationException
     {
         UMOTransformer trans = null;
-        try {
+        try
+        {
             trans = MuleObjectHelper.getTransformer(transformerName, " ");
-            if (trans == null) {
-                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer '"
-                        + transformerName + "'"), object);
+            if (trans == null)
+            {
+                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
+                    "Transformer '" + transformerName + "'"), object);
             }
-            logger.info("Setting transformer: " + transformerName + " on " + object.getClass().getName() + "."
-                    + propertyName);
+            logger.info("Setting transformer: " + transformerName + " on " + object.getClass().getName()
+                        + "." + propertyName);
 
             BeanUtils.setProperty(object, propertyName, trans);
-        } catch (InitialisationException e) {
+        }
+        catch (InitialisationException e)
+        {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X,
-                                                          propertyName,
-                                                          (object!=null ? object.getClass().getName() : "null"),
-                                                          (trans!=null ? trans.getClass().getName() : "null")), e, this);
+                propertyName, (object != null ? object.getClass().getName() : "null"), (trans != null
+                                ? trans.getClass().getName() : "null")), e, this);
         }
     }
 }

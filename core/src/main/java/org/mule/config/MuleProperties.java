@@ -7,12 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule system
  * properties.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,12 +30,13 @@ public interface MuleProperties
      */
     public final String SYSTEM_PROPERTY_PREFIX = "org.mule.";
 
-    /***************************************************
+    /********************************************************************************
      * System properties that can be set as VM arguments
-     ***************************************************/
+     *******************************************************************************/
 
     /** Disable the Admin agent */
-    public final String DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "disable.server.connections";
+    public final String DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
+                                                                     + "disable.server.connections";
 
     /** Configuration parsing properties */
     public final String XML_VALIDATE_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "xml.validate";
@@ -48,20 +50,24 @@ public interface MuleProperties
     /** The operatirng system encoding */
     String MULE_OS_ENCODING_SYSTEM_PROPERTY = "org.mule.osEncoding";
 
-    /** whether a configuration builder should start the server after it has been configured, The default is true*/
-    public final String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + ".start.after.config";
+    /**
+     * whether a configuration builder should start the server after it has been
+     * configured, The default is true
+     */
+    public final String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
+                                                                  + ".start.after.config";
 
     // End System properties
 
-    /***************************************************
+    /********************************************************************************
      * Event Level properties
-     ***************************************************/
+     *******************************************************************************/
     public final String MULE_EVENT_PROPERTY = PROPERTY_PREFIX + "EVENT";
     public final String MULE_EVENT_TIMEOUT_PROPERTY = PROPERTY_PREFIX + "EVENT_TIMEOUT";
     public final String MULE_METHOD_PROPERTY = "method";
 
-    //Deprecated. 'method' is now used consistently for all transports
-    //public final String MULE_METHOD_PROPERTY = PROPERTY_PREFIX + "SERVICE_METHOD";
+    // Deprecated. 'method' is now used consistently for all transports
+    // public final String MULE_METHOD_PROPERTY = PROPERTY_PREFIX + "SERVICE_METHOD";
     public final String MULE_IGNORE_METHOD_PROPERTY = PROPERTY_PREFIX + "IGNORE_METHOD";
     public final String MULE_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ENDPOINT";
     public final String MULE_ORIGINATING_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ORIGINATING_ENDPOINT";
@@ -79,11 +85,11 @@ public interface MuleProperties
     public final String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     public final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     public final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
-    //End Event Level properties
+    // End Event Level properties
 
-    /***************************************************
+    /********************************************************************************
      * Connector Service descriptor properties
-     ***************************************************/
+     *******************************************************************************/
     public final String CONNECTOR_CLASS = "connector";
     public final String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
     public final String CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS = "transacted.message.receiver";

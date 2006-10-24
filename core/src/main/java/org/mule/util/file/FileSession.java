@@ -44,15 +44,15 @@ public interface FileSession
     /**
      * Delete the given file.
      * 
-     * @throw IllegalStateException if this transaction has already been
-     *        committed or rolled back
+     * @throw IllegalStateException if this transaction has already been committed or
+     *        rolled back
      * @throw FileNotFoundException if the file does not exist
      * @throw DeleteException if the deletion fails
      * @throw TransactionException if there is a problem maintaining transaction
      *        information
-     * @throw InconsistentStateException if this transaction cannot be restored
-     *        to a consistent state (either no effect or all effects); failure
-     *        of atomicity
+     * @throw InconsistentStateException if this transaction cannot be restored to a
+     *        consistent state (either no effect or all effects); failure of
+     *        atomicity
      */
     void delete(File f) throws IOException;
 

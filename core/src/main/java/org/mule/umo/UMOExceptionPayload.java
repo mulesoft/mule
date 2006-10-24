@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo;
 
 import java.util.Map;
 import java.io.Serializable;
 
 /**
- * <code>UMOExceptionPayload</code> is a message payload that contains
- * exception information that occurred during message processing
+ * <code>UMOExceptionPayload</code> is a message payload that contains exception
+ * information that occurred during message processing
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

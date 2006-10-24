@@ -35,8 +35,9 @@ public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactor
      * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory#create(java.lang.Object,
      *      org.mule.umo.UMODescriptor)
      */
-    public UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolver resolver)
-            throws UMOException
+    public UMOLifecycleAdapter create(Object component,
+                                      UMODescriptor descriptor,
+                                      UMOEntryPointResolver resolver) throws UMOException
     {
         return new DefaultLifecycleAdapter(component, descriptor, resolver);
     }

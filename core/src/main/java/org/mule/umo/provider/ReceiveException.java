@@ -17,8 +17,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>ReceiveException</code> is specifically thrown by the Provider
- * receive method if something fails in the underlying transport
+ * <code>ReceiveException</code> is specifically thrown by the Provider receive
+ * method if something fails in the underlying transport
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -33,8 +33,7 @@ public class ReceiveException extends UMOException
     private UMOImmutableEndpoint endpoint;
 
     /**
-     * @param message
-     *            the exception message
+     * @param message the exception message
      */
     public ReceiveException(Message message, UMOImmutableEndpoint endpoint, long timeout)
     {
@@ -45,10 +44,8 @@ public class ReceiveException extends UMOException
     }
 
     /**
-     * @param message
-     *            the exception message
-     * @param cause
-     *            the exception that cause this exception to be thrown
+     * @param message the exception message
+     * @param cause the exception that cause this exception to be thrown
      */
     public ReceiveException(Message message, UMOImmutableEndpoint endpoint, long timeout, Throwable cause)
     {
@@ -60,8 +57,8 @@ public class ReceiveException extends UMOException
 
     public ReceiveException(UMOImmutableEndpoint endpoint, long timeout, Throwable cause)
     {
-        this(new Message(Messages.FAILED_TO_RECEIVE_OVER_X_TIMEOUT_X, endpoint,
-                String.valueOf(timeout)), endpoint, timeout, cause);
+        this(new Message(Messages.FAILED_TO_RECEIVE_OVER_X_TIMEOUT_X, endpoint, String.valueOf(timeout)),
+            endpoint, timeout, cause);
     }
 
 }

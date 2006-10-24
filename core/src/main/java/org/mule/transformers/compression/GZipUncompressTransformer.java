@@ -35,22 +35,25 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
-        
+
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buffer = null;
 
-        try {
+        try
+        {
             buffer = getStrategy().uncompressByteArray((byte[])src);
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             logger.error("Failed to uncompress message:", e);
             throw new TransformerException(this, e);
         }
 
-        if (!getReturnClass().equals(byte[].class)) {
+        if (!getReturnClass().equals(byte[].class))
+        {
             return SerializationUtils.deserialize(buffer);
         }
 

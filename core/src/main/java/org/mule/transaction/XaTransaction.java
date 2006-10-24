@@ -60,13 +60,18 @@ public class XaTransaction extends AbstractTransaction
     protected void doBegin() throws TransactionException
     {
         TransactionManager txManager = MuleManager.getInstance().getTransactionManager();
-        if (txManager == null) {
-            throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transaction Manager").getMessage());
+        if (txManager == null)
+        {
+            throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
+                "Transaction Manager").getMessage());
         }
-        try {
+        try
+        {
             txManager.begin();
             transaction = txManager.getTransaction();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
         }
     }
@@ -78,13 +83,20 @@ public class XaTransaction extends AbstractTransaction
      */
     protected void doCommit() throws TransactionException
     {
-        try {
+        try
+        {
             transaction.commit();
-        } catch (RollbackException e) {
+        }
+        catch (RollbackException e)
+        {
             throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
-        } catch (HeuristicRollbackException e) {
+        }
+        catch (HeuristicRollbackException e)
+        {
             throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_COMMIT_FAILED), e);
         }
     }
@@ -96,9 +108,12 @@ public class XaTransaction extends AbstractTransaction
      */
     protected void doRollback() throws TransactionRollbackException
     {
-        try {
+        try
+        {
             transaction.rollback();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             throw new TransactionRollbackException(e);
         }
 
@@ -111,12 +126,16 @@ public class XaTransaction extends AbstractTransaction
      */
     public int getStatus() throws TransactionStatusException
     {
-        if (transaction == null) {
+        if (transaction == null)
+        {
             return STATUS_NO_TRANSACTION;
         }
-        try {
+        try
+        {
             return transaction.getStatus();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             throw new TransactionStatusException(e);
         }
     }
@@ -128,9 +147,12 @@ public class XaTransaction extends AbstractTransaction
      */
     public void setRollbackOnly()
     {
-        try {
+        try
+        {
             transaction.setRollbackOnly();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             throw new IllegalStateException("Failed to set transaction to rollback only: " + e.getMessage());
         }
     }
@@ -163,11 +185,14 @@ public class XaTransaction extends AbstractTransaction
      */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
-        if (resources == null) {
+        if (resources == null)
+        {
             resources = new HashMap();
         }
-        if (resources.containsKey(key)) {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
+        if (resources.containsKey(key))
+        {
+            throw new IllegalTransactionStateException(new Message(
+                Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
         }
         resources.put(key, resource);
     }

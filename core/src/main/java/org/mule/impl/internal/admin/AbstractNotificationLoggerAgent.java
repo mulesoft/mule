@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
@@ -34,8 +35,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications and logs
- * them and can optionally route them to an endpoint
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
+ * and logs them and can optionally route them to an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -46,7 +47,6 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
      * The logger used for this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
 
     private String name;
 
@@ -104,8 +104,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
 
     public void unregistered()
     {
-        for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-            UMOServerNotificationListener listener = (UMOServerNotificationListener) iterator.next();
+        for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
+        {
+            UMOServerNotificationListener listener = (UMOServerNotificationListener)iterator.next();
             MuleManager.getInstance().unregisterListener(listener);
         }
     }
@@ -194,135 +195,182 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
     {
         doInitialise();
         UMOManager manager = MuleManager.getInstance();
-        if (!ignoreManagerNotifications) {
-            UMOServerNotificationListener l = new ManagerNotificationListener() {
+        if (!ignoreManagerNotifications)
+        {
+            UMOServerNotificationListener l = new ManagerNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
-        if (!ignoreModelNotifications) {
-            UMOServerNotificationListener l = new ModelNotificationListener() {
+        if (!ignoreModelNotifications)
+        {
+            UMOServerNotificationListener l = new ModelNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
-        if (!ignoreComponentNotifications) {
-            UMOServerNotificationListener l = new ComponentNotificationListener() {
+        if (!ignoreComponentNotifications)
+        {
+            UMOServerNotificationListener l = new ComponentNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
-        if (!ignoreSecurityNotifications) {
-            UMOServerNotificationListener l = new SecurityNotificationListener() {
+        if (!ignoreSecurityNotifications)
+        {
+            UMOServerNotificationListener l = new SecurityNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
-                throw new InitialisationException(e, this);
             }
-            listeners.add(l);
-        }
-
-        if (!ignoreManagementNotifications) {
-            UMOServerNotificationListener l = new ManagementNotificationListener() {
-                public void onNotification(UMOServerNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try {
-                manager.registerListener(l);
-            } catch (NotificationException e) {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreCustomNotifications) {
-            UMOServerNotificationListener l = new CustomNotificationListener() {
-                public void onNotification(UMOServerNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try {
-                manager.registerListener(l);
-            } catch (NotificationException e) {
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
 
-        if (!ignoreConnectionNotifications) {
-            UMOServerNotificationListener l = new ConnectionNotificationListener() {
+        if (!ignoreManagementNotifications)
+        {
+            UMOServerNotificationListener l = new ManagementNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
 
-        if (!ignoreAdminNotifications) {
-            UMOServerNotificationListener l = new AdminNotificationListener() {
+        if (!ignoreCustomNotifications)
+        {
+            UMOServerNotificationListener l = new CustomNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);
         }
 
-        if(!ignoreMessageNotifications && !MuleManager.getConfiguration().isEnableMessageEvents()) {
+        if (!ignoreConnectionNotifications)
+        {
+            UMOServerNotificationListener l = new ConnectionNotificationListener()
+            {
+                public void onNotification(UMOServerNotification notification)
+                {
+                    logEvent(notification);
+                }
+            };
+            try
+            {
+                manager.registerListener(l);
+            }
+            catch (NotificationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            listeners.add(l);
+        }
+
+        if (!ignoreAdminNotifications)
+        {
+            UMOServerNotificationListener l = new AdminNotificationListener()
+            {
+                public void onNotification(UMOServerNotification notification)
+                {
+                    logEvent(notification);
+                }
+            };
+            try
+            {
+                manager.registerListener(l);
+            }
+            catch (NotificationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            listeners.add(l);
+        }
+
+        if (!ignoreMessageNotifications && !MuleManager.getConfiguration().isEnableMessageEvents())
+        {
             logger.warn("EventLogger agent has been asked to log message notifications, but the MuleManager is configured not to fire Message notifications");
-        } else if (!ignoreMessageNotifications) {
-            UMOServerNotificationListener l = new MessageNotificationListener() {
+        }
+        else if (!ignoreMessageNotifications)
+        {
+            UMOServerNotificationListener l = new MessageNotificationListener()
+            {
                 public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
             };
-            try {
+            try
+            {
                 manager.registerListener(l);
-            } catch (NotificationException e) {
+            }
+            catch (NotificationException e)
+            {
                 throw new InitialisationException(e, this);
             }
             listeners.add(l);

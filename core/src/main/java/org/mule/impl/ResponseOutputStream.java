@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -18,9 +19,9 @@ import java.net.Socket;
 
 /**
  * <code>ResponseOutputStream</code> is an output stream associated with the
- * currently received event. Note that if the stream is from a socket the socket
- * is also available on this stream so that the socket state can be validated
- * before writing.
+ * currently received event. Note that if the stream is from a socket the socket is
+ * also available on this stream so that the socket state can be validated before
+ * writing.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -59,7 +60,8 @@ public class ResponseOutputStream extends BufferedOutputStream
 
     public byte[] getBytes() throws IOException
     {
-        if (isDefault) {
+        if (isDefault)
+        {
             flush();
             return defaultStream.toByteArray();
         }

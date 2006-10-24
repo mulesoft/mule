@@ -29,7 +29,7 @@ import java.security.spec.KeySpec;
 /**
  * A JCE based encryption strategy. It also provides base64 encoding of
  * encrypted/decrypted data by setting the base64encoding attribute
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,32 +51,40 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
 
     public void initialise() throws InitialisationException
     {
-        if (algorithm == null) {
+        if (algorithm == null)
+        {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "Algorithm"), this);
-        } else {
+        }
+        else
+        {
             logger.debug("Using encryption algorithm: " + algorithm);
         }
 
         keySpec = createKeySpec();
-        try {
+        try
+        {
             secretKey = getSecretKey();
             // Create Ciphers
             encryptCipher = Cipher.getInstance(getAlgorithm());
             decryptCipher = Cipher.getInstance(getAlgorithm());
 
             AlgorithmParameterSpec paramSpec = createAlgorithmParameterSpec();
-            if(paramSpec!=null) {
+            if (paramSpec != null)
+            {
                 encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
                 decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
-            } else {
+            }
+            else
+            {
                 encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey);
                 decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
             }
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "encryption ciphers"),
-                                              e,
-                                              this);
+                e, this);
         }
     }
 
@@ -84,27 +92,37 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
 
     public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException
     {
-        try {
+        try
+        {
             byte[] buf = encryptCipher.doFinal(data);
-            if (base64Encoding) {
+            if (base64Encoding)
+            {
                 return Base64.encodeBytes(buf).getBytes();
-            } else {
+            }
+            else
+            {
                 return buf;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new CryptoFailureException(this, e);
         }
     }
 
     public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException
     {
-        try {
+        try
+        {
             byte[] dec = data;
-            if (base64Encoding) {
+            if (base64Encoding)
+            {
                 dec = Base64.decode(new String(data));
             }
             return decryptCipher.doFinal(dec);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new CryptoFailureException(this, e);
         }
     }

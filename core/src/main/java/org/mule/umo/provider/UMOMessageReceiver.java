@@ -16,15 +16,15 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Lifecycle;
 
 /**
- * <code>UMOMessageReceiver</code> is used to receive data from an external
- * system. Typically an implementation of this interface will also implement the
- * listener interface for the external system. For example to listen to a JMS
- * destination the developer would also implement javax.jms.MessageListener. The
- * endpoint (which creates the UMOMessageReceiver) will then register the
- * receiver with the JMS server. Where a listener interface is not availiable
- * the derived <code>UMOMessageReceiver</code> will implement the code
- * necessary to receive data from the external system. For example, the file
- * endpoint will poll a specified directory for it's data.
+ * <code>UMOMessageReceiver</code> is used to receive data from an external system.
+ * Typically an implementation of this interface will also implement the listener
+ * interface for the external system. For example to listen to a JMS destination the
+ * developer would also implement javax.jms.MessageListener. The endpoint (which
+ * creates the UMOMessageReceiver) will then register the receiver with the JMS
+ * server. Where a listener interface is not availiable the derived
+ * <code>UMOMessageReceiver</code> will implement the code necessary to receive
+ * data from the external system. For example, the file endpoint will poll a
+ * specified directory for it's data.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -53,8 +53,8 @@ public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
     void setEndpoint(UMOEndpoint endpoint);
 
     /**
-     * @param component the component to associate with the receiver. When data
-     *            is received the component <code>dispatchEvent</code> or
+     * @param component the component to associate with the receiver. When data is
+     *            received the component <code>dispatchEvent</code> or
      *            <code>sendEvent</code> is used to dispatch the data to the
      *            relivant UMO.
      */

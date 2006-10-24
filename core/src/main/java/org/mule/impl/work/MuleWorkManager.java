@@ -44,11 +44,10 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * <code>MuleWorkManager</code> is a Jca Work manager implementation used to
- * manage thread allocation for Mule components and connectors
- * 
- * This code has been adapted from the Geronimo implementation, and the
- * different pool executors have be used directly from Geronimo
+ * <code>MuleWorkManager</code> is a Jca Work manager implementation used to manage
+ * thread allocation for Mule components and connectors This code has been adapted
+ * from the Geronimo implementation, and the different pool executors have be used
+ * directly from Geronimo
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -92,7 +91,8 @@ public class MuleWorkManager implements UMOWorkManager
 
     public MuleWorkManager(ThreadingProfile profile, String name)
     {
-        if (name == null) {
+        if (name == null)
+        {
             name = "WorkManager#" + hashCode();
         }
         syncWorkExecutorPool = new NullWorkExecutorPool(profile, name);
@@ -116,9 +116,12 @@ public class MuleWorkManager implements UMOWorkManager
 
     public void dispose()
     {
-        try {
+        try
+        {
             stop();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             logger.warn("Error while disposing Work Manager: " + e.getMessage(), e);
 
         }
@@ -193,7 +196,7 @@ public class MuleWorkManager implements UMOWorkManager
      *      javax.resource.spi.work.WorkListener)
      */
     public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-            throws WorkException
+        throws WorkException
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
@@ -220,8 +223,10 @@ public class MuleWorkManager implements UMOWorkManager
      *      long, javax.resource.spi.work.ExecutionContext,
      *      javax.resource.spi.work.WorkListener)
      */
-    public long startWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-            throws WorkException
+    public long startWork(Work work,
+                          long startTimeout,
+                          ExecutionContext execContext,
+                          WorkListener workListener) throws WorkException
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
@@ -248,8 +253,10 @@ public class MuleWorkManager implements UMOWorkManager
      *      long, javax.resource.spi.work.ExecutionContext,
      *      javax.resource.spi.work.WorkListener)
      */
-    public void scheduleWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-            throws WorkException
+    public void scheduleWork(Work work,
+                             long startTimeout,
+                             ExecutionContext execContext,
+                             WorkListener workListener) throws WorkException
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
@@ -260,21 +267,24 @@ public class MuleWorkManager implements UMOWorkManager
      * Execute the specified Work.
      * 
      * @param work Work to be executed.
-     * 
      * @exception WorkException Indicates that the Work execution has been
      *                unsuccessful.
      */
     private void executeWork(WorkerContext work, WorkExecutor workExecutor, Executor pooledExecutor)
-            throws WorkException
+        throws WorkException
     {
         work.workAccepted(this);
-        try {
+        try
+        {
             workExecutor.doExecute(work, pooledExecutor);
             WorkException exception = work.getWorkException();
-            if (null != exception) {
+            if (null != exception)
+            {
                 throw exception;
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             WorkCompletedException wcj = new WorkCompletedException("The execution has been interrupted.", e);
             wcj.setErrorCode(WorkException.INTERNAL);
             throw wcj;

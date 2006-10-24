@@ -17,8 +17,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
 
 /**
- * This abstract class can be used as a base class for transactions that can
- * enlist only one resource (such as jms session or jdbc connection).
+ * This abstract class can be used as a base class for transactions that can enlist
+ * only one resource (such as jms session or jdbc connection).
  * 
  * @author Guillaume Nodet
  * @version $Revision$
@@ -74,16 +74,20 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
      */
     public int getStatus() throws TransactionStatusException
     {
-        if (rolledBack.get()) {
+        if (rolledBack.get())
+        {
             return STATUS_ROLLEDBACK;
         }
-        if (committed.get()) {
+        if (committed.get())
+        {
             return STATUS_COMMITTED;
         }
-        if (rollbackOnly.get()) {
+        if (rollbackOnly.get())
+        {
             return STATUS_MARKED_ROLLBACK;
         }
-        if (started.get()) {
+        if (started.get())
+        {
             return STATUS_ACTIVE;
         }
         return STATUS_NO_TRANSACTION;
@@ -117,13 +121,16 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
      */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
-        if (key == null) {
+        if (key == null)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_TO_NULL_KEY));
         }
-        if (resource == null) {
+        if (resource == null)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_NULL_RESOURCE));
         }
-        if (this.key != null) {
+        if (this.key != null)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_SINGLE_RESOURCE_ONLY));
         }
         this.key = key;

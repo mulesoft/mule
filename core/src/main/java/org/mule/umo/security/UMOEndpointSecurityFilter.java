@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.umo.UMOEvent;
@@ -14,8 +15,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 
 /**
- * <code>UMOEndpointSecurityFilter</code> is a base filter for secure
- * filtering of inbound and outbout event flow
+ * <code>UMOEndpointSecurityFilter</code> is a base filter for secure filtering of
+ * inbound and outbout event flow
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -23,7 +24,6 @@ import org.mule.umo.lifecycle.Initialisable;
 public interface UMOEndpointSecurityFilter extends Initialisable
 {
     /**
-     * 
      * @param manager
      */
     void setSecurityManager(UMOSecurityManager manager);
@@ -42,6 +42,7 @@ public interface UMOEndpointSecurityFilter extends Initialisable
 
     UMOCredentialsAccessor getCredentialsAccessor();
 
-    void authenticate(UMOEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-            CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException;
+    void authenticate(UMOEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException;
 }

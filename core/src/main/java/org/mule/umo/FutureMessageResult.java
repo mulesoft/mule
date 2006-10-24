@@ -52,8 +52,8 @@ public class FutureMessageResult extends FutureTask
      * out invocations are GC'ed so the problem is rather unlikely to occur.
      * </ul>
      */
-    private static final Executor DefaultExecutor =
-        Executors.newSingleThreadExecutor(new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
+    private static final Executor DefaultExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory(
+        "MuleDefaultFutureMessageExecutor"));
 
     // @GuardedBy(this)
     private Executor executor;

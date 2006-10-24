@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats.printers;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,23 +41,32 @@ public class HtmlTablePrinter extends AbstractTablePrinter
         println("<font size='8'><table valign='top'>");
         String[][] table = getTable(stats);
         boolean endpointStats = false;
-        for (int i = 0; i < table[0].length; i++) {
+        for (int i = 0; i < table[0].length; i++)
+        {
             println("<tr valign='top'>");
             boolean bold = false;
 
-            for (int j = 0; j < table.length; j++) {
-                if (j == 0 || i == 0 || "-".equals(table[j][i])) {
+            for (int j = 0; j < table.length; j++)
+            {
+                if (j == 0 || i == 0 || "-".equals(table[j][i]))
+                {
                     bold = true;
                     print("<td bgcolor='lightgray'><b>");
-                } else {
+                }
+                else
+                {
                     bold = false;
                     print("<td>");
                 }
-                if (endpointStats) {
+                if (endpointStats)
+                {
 
                     print(getProviderStatsHtml(table[j][i]));
-                } else {
-                    if (endpointStats) {
+                }
+                else
+                {
+                    if (endpointStats)
+                    {
                         bold = true;
                         print("<b>");
                     }
@@ -66,9 +76,12 @@ public class HtmlTablePrinter extends AbstractTablePrinter
                 print((bold ? "</b>" : "") + "</td>");
             }
             println("</tr>");
-            if ("By Provider".equals(table[0][i])) {
+            if ("By Provider".equals(table[0][i]))
+            {
                 endpointStats = true;
-            } else {
+            }
+            else
+            {
                 endpointStats = false;
             }
         }
@@ -77,7 +90,8 @@ public class HtmlTablePrinter extends AbstractTablePrinter
 
     protected String getProviderStatsHtml(String stats)
     {
-        if (StringUtils.isEmpty(StringUtils.trim(stats))) {
+        if (StringUtils.isEmpty(StringUtils.trim(stats)))
+        {
             return "";
         }
 
@@ -85,16 +99,20 @@ public class HtmlTablePrinter extends AbstractTablePrinter
         buf.append("<table>");
         StringTokenizer st = new StringTokenizer(stats, ";");
 
-        if (st.countTokens() == 0) {
+        if (st.countTokens() == 0)
+        {
             buf.append("<tr><td>");
             int i = stats.indexOf("=");
             buf.append(stats.substring(0, i)).append(": ");
             buf.append("</td><td align=\"right'>");
             buf.append(stats.substring(i + 1));
             buf.append("</td></tr>");
-        } else {
+        }
+        else
+        {
             String token;
-            while (st.hasMoreTokens()) {
+            while (st.hasMoreTokens())
+            {
                 token = st.nextToken();
                 buf.append("<tr><td>");
                 int i = token.indexOf("=");

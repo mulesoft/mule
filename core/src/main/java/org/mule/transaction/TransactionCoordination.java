@@ -40,7 +40,8 @@ public class TransactionCoordination
 
     public static TransactionCoordination getInstance()
     {
-        if (instance == null) {
+        if (instance == null)
+        {
             instance = new TransactionCoordination();
         }
         return instance;
@@ -48,27 +49,35 @@ public class TransactionCoordination
 
     public static void setInstance(TransactionCoordination txSync)
     {
-        if (instance == null || instance.txCounter == 0) {
+        if (instance == null || instance.txCounter == 0)
+        {
             instance = txSync;
-        } else {
-            throw new IllegalStateException("there are currently " + instance.txCounter
-                    + "transactions associated with this manager, cannot replace the manager");
+        }
+        else
+        {
+            throw new IllegalStateException(
+                "there are currently " + instance.txCounter
+                                + "transactions associated with this manager, cannot replace the manager");
         }
     }
 
     public UMOTransaction getTransaction()
     {
-        return (UMOTransaction) transactions.get();
+        return (UMOTransaction)transactions.get();
     }
 
     public void unbindTransaction(UMOTransaction transaction) throws TransactionException
     {
-        try {
-            UMOTransaction oldTx = (UMOTransaction) transactions.get();
-            if (oldTx!=null && !oldTx.equals(transaction)) {
+        try
+        {
+            UMOTransaction oldTx = (UMOTransaction)transactions.get();
+            if (oldTx != null && !oldTx.equals(transaction))
+            {
                 throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
             }
-        } finally {
+        }
+        finally
+        {
             transactions.set(null);
             decrementCounter();
         }
@@ -76,8 +85,9 @@ public class TransactionCoordination
 
     public void bindTransaction(UMOTransaction transaction) throws TransactionException
     {
-        UMOTransaction oldTx = (UMOTransaction) transactions.get();
-        if (oldTx != null) {
+        UMOTransaction oldTx = (UMOTransaction)transactions.get();
+        if (oldTx != null)
+        {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_ALREADY_BOUND));
         }
         transactions.set(transaction);
@@ -87,7 +97,8 @@ public class TransactionCoordination
 
     private synchronized void decrementCounter()
     {
-        if (txCounter > 0) {
+        if (txCounter > 0)
+        {
             txCounter--;
         }
     }

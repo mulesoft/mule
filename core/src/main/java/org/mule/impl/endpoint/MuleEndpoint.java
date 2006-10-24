@@ -29,8 +29,8 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.util.Map;
 
 /**
- * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A
- * endpoint is a grouping of an endpoint, an endpointUri and a transformer.
+ * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
+ * a grouping of an endpoint, an endpointUri and a transformer.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -44,15 +44,15 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
     public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";
     public static final String NEVER_CREATE_STRING = "NEVER_CREATE";
+
     /**
-     * Default constructor This is required right now for the Mule digester to
-     * set the properties through the classes mutators
+     * Default constructor This is required right now for the Mule digester to set
+     * the properties through the classes mutators
      */
     public MuleEndpoint()
     {
         super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, null, null);
     }
-
 
     public MuleEndpoint(String name,
                         UMOEndpointURI endpointUri,
@@ -79,31 +79,37 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public Object clone()
     {
         UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type,
-                createConnector, endpointEncoding, properties);
+            createConnector, endpointEncoding, properties);
 
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
         clone.setSecurityFilter(securityFilter);
 
-        if (remoteSync != null) {
+        if (remoteSync != null)
+        {
             clone.setRemoteSync(isRemoteSync());
         }
-        if (remoteSyncTimeout != null) {
+        if (remoteSyncTimeout != null)
+        {
             clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
         }
 
-        if (synchronous != null) {
+        if (synchronous != null)
+        {
             clone.setSynchronous(synchronous.booleanValue());
         }
 
         clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
 
         clone.setInitialState(initialState);
-        if (initialised.get()) {
-            try {
+        if (initialised.get())
+        {
+            try
+            {
                 clone.initialise();
             }
-            catch (InitialisationException e) {
+            catch (InitialisationException e)
+            {
                 // this really should never happen as the endpoint is already
                 // initialised
                 logger.error(e.getMessage(), e);
@@ -121,13 +127,15 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException
     {
         if (connector != null && endpointUri != null
-                && !connector.supportsProtocol(endpointUri.getFullScheme())) {
+            && !connector.supportsProtocol(endpointUri.getFullScheme()))
+        {
             throw new IllegalArgumentException(new Message(
-                    Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector
-                            .getProtocol(), endpointUri).getMessage());
+                Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector.getProtocol(),
+                endpointUri).getMessage());
         }
         this.endpointUri = endpointUri;
-        if (endpointUri != null) {
+        if (endpointUri != null)
+        {
             properties.putAll(endpointUri.getParams());
         }
     }
@@ -155,9 +163,11 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setConnector(UMOConnector connector)
     {
         if (connector != null && endpointUri != null
-                && !connector.supportsProtocol(endpointUri.getFullScheme())) {
-            throw new IllegalArgumentException(new Message(Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X,
-                    connector.getProtocol(), endpointUri).getMessage());
+            && !connector.supportsProtocol(endpointUri.getFullScheme()))
+        {
+            throw new IllegalArgumentException(new Message(
+                Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector.getProtocol(),
+                endpointUri).getMessage());
         }
         this.connector = connector;
     }
@@ -180,7 +190,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setTransformer(UMOTransformer trans)
     {
         transformer = trans;
-        if (transformer != null) {
+        if (transformer != null)
+        {
             transformer.setEndpoint(this);
         }
     }
@@ -222,11 +233,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     }
 
     /**
-     * If a filter is configured on this endpoint, this property will determine
-     * if message that are not excepted by the filter are deleted
+     * If a filter is configured on this endpoint, this property will determine if
+     * message that are not excepted by the filter are deleted
      * 
-     * @param delete
-     *            if message should be deleted, false otherwise
+     * @param delete if message should be deleted, false otherwise
      */
     public void setDeleteUnacceptedMessages(boolean delete)
     {
@@ -234,31 +244,29 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     }
 
     /**
-     * Sets an UMOEndpointSecurityFilter for this endpoint. If a filter is set
-     * all traffice via this endpoint with be subject to authentication.
+     * Sets an UMOEndpointSecurityFilter for this endpoint. If a filter is set all
+     * traffice via this endpoint with be subject to authentication.
      * 
-     * @param filter
-     *            the UMOSecurityFilter responsible for authenticating message
+     * @param filter the UMOSecurityFilter responsible for authenticating message
      *            flow via this endpoint.
      * @see org.mule.umo.security.UMOEndpointSecurityFilter
      */
     public void setSecurityFilter(UMOEndpointSecurityFilter filter)
     {
         securityFilter = filter;
-        if (securityFilter != null) {
+        if (securityFilter != null)
+        {
             securityFilter.setEndpoint(this);
         }
     }
 
     /**
-     * Determines if requests originating from this endpoint should be
-     * synchronous i.e. execute in a single thread and possibly return an
-     * result. This property is only used when the endpoint is of type
-     * 'receiver'.
+     * Determines if requests originating from this endpoint should be synchronous
+     * i.e. execute in a single thread and possibly return an result. This property
+     * is only used when the endpoint is of type 'receiver'.
      * 
-     * @param synchronous
-     *            whether requests on this endpoint should execute in a single
-     *            thread. This property is only used when the endpoint is of
+     * @param synchronous whether requests on this endpoint should execute in a
+     *            single thread. This property is only used when the endpoint is of
      *            type 'receiver'
      */
     public void setSynchronous(boolean synchronous)
@@ -273,30 +281,33 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
     public void setCreateConnectorAsString(String action)
     {
-        if (ALWAYS_CREATE_STRING.equals(action)) {
+        if (ALWAYS_CREATE_STRING.equals(action))
+        {
             createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
         }
-        else if (NEVER_CREATE_STRING.equals(action)) {
+        else if (NEVER_CREATE_STRING.equals(action))
+        {
             createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
         }
-        else {
+        else
+        {
             createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
         }
     }
 
     /**
-     * For certain providers that support the notion of a backchannel such as
-     * sockets (outputStream) or Jms (ReplyTo) Mule can automatically wait for a
-     * response from a backchannel when dispatching over these protocols. This
-     * is different for synchronous as synchronous behavior only applies to in
+     * For certain providers that support the notion of a backchannel such as sockets
+     * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
+     * from a backchannel when dispatching over these protocols. This is different
+     * for synchronous as synchronous behavior only applies to in
      * 
-     * @param value
-     *            whether the endpoint should perfrom sync receives
+     * @param value whether the endpoint should perfrom sync receives
      */
     public void setRemoteSync(boolean value)
     {
         this.remoteSync = Boolean.valueOf(value);
-        if (value) {
+        if (value)
+        {
             this.synchronous = Boolean.TRUE;
         }
     }
@@ -304,8 +315,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     /**
      * The timeout value for remoteSync invocations
      * 
-     * @param timeout
-     *            the timeout in milliseconds
+     * @param timeout the timeout in milliseconds
      */
     public void setRemoteSyncTimeout(int timeout)
     {
@@ -313,8 +323,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     }
 
     /**
-     * Sets the state the endpoint will be loaded in. The States are 'stopped'
-     * and 'started' (default)
+     * Sets the state the endpoint will be loaded in. The States are 'stopped' and
+     * 'started' (default)
      * 
      * @param state
      */
@@ -331,8 +341,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     /**
      * Determines whether the endpoint should deal with requests as streams
      * 
-     * @param stream
-     *            true if the request should be streamed
+     * @param stream true if the request should be streamed
      */
     public void setStreaming(boolean stream)
     {
@@ -341,11 +350,12 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
     /**
      * Sets a property on the endpoint
-     *
-     * @param key   the property key
+     * 
+     * @param key the property key
      * @param value the value of the property
      */
-    public void setProperty(String key, Object value) {
+    public void setProperty(String key, Object value)
+    {
         properties.put(key, value);
     }
 }

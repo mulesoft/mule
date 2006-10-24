@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import java.io.IOException;
@@ -21,17 +22,17 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * <code>MuleDtdResolver</code> attempts to locate the mule-configuration.dtd
- * on the classpath, regardless of the DOCTYPE declaration. If the dtd is not
- * found, it defaults to trying to download it using the systemId. <p/> This
- * resolve is responsible for associating an Xsl document if any with the Dtd.
- * It also allows for a delegate Entity resolver and delegate Xsl. This allows
- * Configuration builders to mix Mule Xml configuration with other document
- * based configuration and apply transformers to each of the configuration types
- * (if necessary) before constucting a Mule instance. <p/> Note that its up to
- * the Configuration builder implementation to do the actual transformations
- * this Resolver simply associates Xsl reosurces with dtds
- *
+ * <code>MuleDtdResolver</code> attempts to locate the mule-configuration.dtd on
+ * the classpath, regardless of the DOCTYPE declaration. If the dtd is not found, it
+ * defaults to trying to download it using the systemId. <p/> This resolve is
+ * responsible for associating an Xsl document if any with the Dtd. It also allows
+ * for a delegate Entity resolver and delegate Xsl. This allows Configuration
+ * builders to mix Mule Xml configuration with other document based configuration and
+ * apply transformers to each of the configuration types (if necessary) before
+ * constucting a Mule instance. <p/> Note that its up to the Configuration builder
+ * implementation to do the actual transformations this Resolver simply associates
+ * Xsl reosurces with dtds
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -77,7 +78,8 @@ public class MuleDtdResolver implements EntityResolver
         this.dtdName = dtdName;
         this.delegate = delegate;
         this.xsl = xsl;
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             StringBuffer buffer = new StringBuffer();
             buffer.append("Created Mule Dtd Resolver: ");
             buffer.append("dtd=").append(dtdName).append(", ");
@@ -89,20 +91,25 @@ public class MuleDtdResolver implements EntityResolver
 
     public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException
     {
-        logger.debug("Trying to resolve XML entity with public ID: " + publicId + " and system ID: " + systemId);
+        logger.debug("Trying to resolve XML entity with public ID: " + publicId + " and system ID: "
+                     + systemId);
 
         InputSource source = null;
         currentXsl = null;
-        if (delegate != null) {
+        if (delegate != null)
+        {
             source = delegate.resolveEntity(publicId, systemId);
         }
-        if ((source == null) && StringUtils.isNotBlank(systemId) && systemId.endsWith(".dtd")) {
+        if ((source == null) && StringUtils.isNotBlank(systemId) && systemId.endsWith(".dtd"))
+        {
             String[] tokens = systemId.split("/");
-            String dtdFile = tokens[tokens.length-1];
+            String dtdFile = tokens[tokens.length - 1];
             logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
-            InputStream is = IOUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass(), /*tryAsFile*/true, /*tryAsUrl*/false);
-            if (is != null) {
+            InputStream is = IOUtils.getResourceAsStream(SEARCH_PATH + dtdFile, getClass(), /* tryAsFile */
+                true, /* tryAsUrl */false);
+            if (is != null)
+            {
                 source = new InputSource(is);
                 source.setPublicId(publicId);
                 source.setSystemId(systemId);

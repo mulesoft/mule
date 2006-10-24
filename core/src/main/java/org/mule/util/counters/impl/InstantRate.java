@@ -30,9 +30,12 @@ public class InstantRate extends AggregateCounter
 
     public double nextValue()
     {
-        if (firstTime == 0 || firstTime == lastTime) {
+        if (firstTime == 0 || firstTime == lastTime)
+        {
             return Double.NaN;
-        } else {
+        }
+        else
+        {
             return value / (lastTime - firstTime) * 1000.0;
         }
     }

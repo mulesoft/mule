@@ -14,8 +14,8 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
- * Is fired by a connector when a connection is made, or disconnected of the connection
- * fails.
+ * Is fired by a connector when a connection is made, or disconnected of the
+ * connection fails.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -30,7 +30,8 @@ public class ConnectionNotification extends UMOServerNotification
     public static final int CONNECTION_FAILED = CONNECTION_EVENT_ACTION_START_RANGE + 2;
     public static final int CONNECTION_DISCONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 3;
 
-    private static final transient String[] ACTIONS = new String[] { "connected", "connect failed", "disconnected" };
+    private static final transient String[] ACTIONS = new String[]{"connected", "connect failed",
+        "disconnected"};
 
     public ConnectionNotification(UMOConnectable resource, String identifier, int action)
     {
@@ -40,8 +41,9 @@ public class ConnectionNotification extends UMOServerNotification
 
     protected String getPayloadToString()
     {
-        if (source instanceof UMOConnectable) {
-            return ((UMOConnectable) source).getConnectionDescription();
+        if (source instanceof UMOConnectable)
+        {
+            return ((UMOConnectable)source).getConnectionDescription();
         }
         return source.toString();
     }
@@ -49,17 +51,21 @@ public class ConnectionNotification extends UMOServerNotification
     protected String getActionName(int action)
     {
         int i = action - CONNECTION_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
         return ACTIONS[i - 1];
     }
 
-    public String getType() {
-        if(action == CONNECTION_DISCONNECTED) {
+    public String getType()
+    {
+        if (action == CONNECTION_DISCONNECTED)
+        {
             return TYPE_WARNING;
         }
-        if(action == CONNECTION_FAILED) {
+        if (action == CONNECTION_FAILED)
+        {
             return TYPE_ERROR;
         }
         return TYPE_INFO;

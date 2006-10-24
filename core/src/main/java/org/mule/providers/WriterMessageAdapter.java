@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers;
 
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -16,8 +17,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * <code>WriterMessageAdapter</code> wraps a java.io.StringWriter and allows meta information
- * to be associated with the writer
+ * <code>WriterMessageAdapter</code> wraps a java.io.StringWriter and allows meta
+ * information to be associated with the writer
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -33,27 +34,32 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
 
     public WriterMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
-        if (message instanceof String) {
+        if (message instanceof String)
+        {
             writer = new StringWriter();
-            writer.write((String) message);
-        } else if (message instanceof StringWriter) {
-            this.writer = (StringWriter) message;
-        } else {
+            writer.write((String)message);
+        }
+        else if (message instanceof StringWriter)
+        {
+            this.writer = (StringWriter)message;
+        }
+        else
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
 
     }
 
-
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
         return writer.toString();
     }
 
@@ -91,11 +97,13 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
         return writer;
     }
 
-    public void flush() {
+    public void flush()
+    {
         writer.flush();
     }
 
-    public void close() throws IOException {
+    public void close() throws IOException
+    {
         writer.close();
     }
 }

@@ -21,14 +21,13 @@ import org.mule.util.SystemUtils;
 import java.security.Provider;
 
 /**
- * Automatically discovers the JDK we are running on and returns a
- * corresponding {@link SecurityProviderInfo}.
- * <p/>
- * Implementations of this class are thread-safe.
- *
+ * Automatically discovers the JDK we are running on and returns a corresponding
+ * {@link SecurityProviderInfo}. <p/> Implementations of this class are thread-safe.
+ * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFactory {
+public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFactory
+{
 
     /**
      * Default is Sun's JSSE.
@@ -48,24 +47,28 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
     /**
      * Security provider properties for IBM JDK 1.4.2 and higher.
      */
-//    private static final SecurityProviderInfo IBM_SECURITY_PROVIDER_2 = new IBMSecurityProvider2Info();
+    // private static final SecurityProviderInfo IBM_SECURITY_PROVIDER_2 = new
+    // IBMSecurityProvider2Info();
 
-
-    public SecurityProviderInfo getSecurityProviderInfo() {
+    public SecurityProviderInfo getSecurityProviderInfo()
+    {
         SecurityProviderInfo info;
 
-        if (SystemUtils.isIbmJDK()) {
+        if (SystemUtils.isIbmJDK())
+        {
             // TODO test IBM JDK 1.4.2 more thoroughly and decide if
             // it's worth including this newer provider support.
             // switch to IBM's security provider
-//            if (SystemUtils.isJavaVersionAtLeast(142)) {
-                // IBM JSSE2
-//                info = IBM_SECURITY_PROVIDER_2;
-//            } else {
-                // older IBM JSSE
-                info = IBM_SECURITY_PROVIDER;
-//            }
-        } else {
+            // if (SystemUtils.isJavaVersionAtLeast(142)) {
+            // IBM JSSE2
+            // info = IBM_SECURITY_PROVIDER_2;
+            // } else {
+            // older IBM JSSE
+            info = IBM_SECURITY_PROVIDER;
+            // }
+        }
+        else
+        {
             info = DEFAULT_SECURITY_PROVIDER;
 
         }
@@ -75,20 +78,23 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
         return info;
     }
 
-    public Provider getProvider() {
+    public Provider getProvider()
+    {
         SecurityProviderInfo info = getSecurityProviderInfo();
 
-        if (logger.isInfoEnabled()) {
+        if (logger.isInfoEnabled())
+        {
             logger.info("Using " + info.getClass().getName());
         }
 
-        try {
-            return (Provider) ClassUtils.instanciateClass(info.getProviderClass(), null);
-        } catch (Exception ex) {
-            throw new MuleRuntimeException(
-                    new Message("core", CoreMessageConstants.FAILED_TO_INITIALIZE_SECURITY_PROVIDER,
-                                info.getProviderClass()),
-                    ex);
+        try
+        {
+            return (Provider)ClassUtils.instanciateClass(info.getProviderClass(), null);
+        }
+        catch (Exception ex)
+        {
+            throw new MuleRuntimeException(new Message("core",
+                CoreMessageConstants.FAILED_TO_INITIALIZE_SECURITY_PROVIDER, info.getProviderClass()), ex);
         }
     }
 }

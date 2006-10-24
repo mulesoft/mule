@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.security;
 
 import org.apache.commons.logging.Log;
@@ -30,9 +31,8 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.StringUtils;
 
 /**
- * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation
- * for all security filters, namely configuring the SecurityManager for this
- * instance
+ * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for
+ * all security filters, namely configuring the SecurityManager for this instance
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -54,40 +54,53 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
 
     public final void initialise() throws InitialisationException
     {
-        if (securityManager == null) {
+        if (securityManager == null)
+        {
             securityManager = MuleManager.getInstance().getSecurityManager();
         }
-        if (securityManager == null) {
+        if (securityManager == null)
+        {
             throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
         }
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "Endpoint"), this);
         }
         // This filter may only allow authentication on a subset of registered
         // security providers
-        if (securityProviders != null) {
+        if (securityProviders != null)
+        {
             UMOSecurityManager localManager = new MuleSecurityManager();
             String[] sp = StringUtils.splitAndTrim(securityProviders, ",");
-            for (int i = 0; i < sp.length; i++) {
+            for (int i = 0; i < sp.length; i++)
+            {
                 UMOSecurityProvider provider = securityManager.getProvider(sp[i]);
-                if (provider != null) {
+                if (provider != null)
+                {
                     localManager.addProvider(provider);
-                } else {
+                }
+                else
+                {
                     throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
-                                                                  "Security Provider '" + sp[i] + "'"), this);
+                        "Security Provider '" + sp[i] + "'"), this);
                 }
             }
             securityManager = localManager;
         }
-        if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER)) {
+        if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER))
+        {
             inbound = true;
-        } else if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER)) {
+        }
+        else if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER))
+        {
             inbound = false;
-        } else {
-            throw new InitialisationException(new Message(Messages.AUTH_ENDPOINT_TYPE_FOR_FILTER_MUST_BE_X_BUT_IS_X,
-                                                          UMOEndpoint.ENDPOINT_TYPE_SENDER + " or "
-                                                                  + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                                                          endpoint.getType()), this);
+        }
+        else
+        {
+            throw new InitialisationException(new Message(
+                Messages.AUTH_ENDPOINT_TYPE_FOR_FILTER_MUST_BE_X_BUT_IS_X,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
+                endpoint.getType()), this);
         }
         doInitialise();
     }
@@ -135,12 +148,16 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.endpoint = endpoint;
     }
 
-    public void authenticate(UMOEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-            CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException
+    public void authenticate(UMOEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException
     {
-        if (inbound) {
+        if (inbound)
+        {
             authenticateInbound(event);
-        } else {
+        }
+        else
+        {
             authenticateOutbound(event);
         }
     }
@@ -155,11 +172,12 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.credentialsAccessor = credentialsAccessor;
     }
 
-    protected abstract void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException,
-            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
+    protected abstract void authenticateInbound(UMOEvent event)
+        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
+        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
-    protected abstract void authenticateOutbound(UMOEvent event) throws SecurityException,
-            SecurityProviderNotFoundException, CryptoFailureException;
+    protected abstract void authenticateOutbound(UMOEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
     protected abstract void doInitialise() throws InitialisationException;
 

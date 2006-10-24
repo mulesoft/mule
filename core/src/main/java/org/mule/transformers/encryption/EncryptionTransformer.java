@@ -7,14 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.encryption;
 
 import org.mule.umo.security.CryptoFailureException;
 
 /**
- * <code>EncryptionTransformer</code> will transform an array of bytes or
- * string into an encrypted array of bytes
- * 
+ * <code>EncryptionTransformer</code> will transform an array of bytes or string
+ * into an encrypted array of bytes
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

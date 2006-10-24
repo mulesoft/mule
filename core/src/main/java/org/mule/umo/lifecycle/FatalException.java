@@ -14,8 +14,8 @@ import org.mule.config.i18n.Message;
 
 /**
  * <code>FatalException</code> can be thorwn during initialisation or during
- * execution to indicate that something fatal has occurred and the MuleManage
- * must shutdown
+ * execution to indicate that something fatal has occurred and the MuleManage must
+ * shutdown
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

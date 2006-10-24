@@ -56,13 +56,19 @@ public class WorkerContext implements Work
     /**
      * Null WorkListener used as the default WorkListener.
      */
-    private static final WorkListener NULL_WORK_LISTENER = new WorkAdapter() {
+    private static final WorkListener NULL_WORK_LISTENER = new WorkAdapter()
+    {
         public void workRejected(WorkEvent event)
         {
-            if (event.getException() != null) {
-                if (event.getException() instanceof WorkCompletedException && event.getException().getCause() != null) {
+            if (event.getException() != null)
+            {
+                if (event.getException() instanceof WorkCompletedException
+                    && event.getException().getCause() != null)
+                {
                     logger.error(event.getWork().toString(), event.getException().getCause());
-                } else {
+                }
+                else
+                {
                     logger.error(event.getWork().toString(), event.getException());
                 }
             }
@@ -84,7 +90,6 @@ public class WorkerContext implements Work
      */
     // Never read locally
     // private boolean isAccepted;
-
     /**
      * System.currentTimeMillis() when the wrapped Work has been accepted.
      */
@@ -143,18 +148,21 @@ public class WorkerContext implements Work
      * @param aWork Work to be wrapped.
      * @param aStartTimeout a time duration (in milliseconds) within which the
      *            execution of the Work instance must start.
-     * @param execContext an object containing the execution context with which
-     *            the submitted Work instance must be executed.
-     * @param workListener an object which would be notified when the various
-     *            Work processing events (work accepted, work rejected, work
-     *            started,
+     * @param execContext an object containing the execution context with which the
+     *            submitted Work instance must be executed.
+     * @param workListener an object which would be notified when the various Work
+     *            processing events (work accepted, work rejected, work started,
      */
-    public WorkerContext(Work aWork, long aStartTimeout, ExecutionContext execContext, WorkListener workListener)
+    public WorkerContext(Work aWork,
+                         long aStartTimeout,
+                         ExecutionContext execContext,
+                         WorkListener workListener)
     {
         worker = aWork;
         startTimeOut = aStartTimeout;
         executionContext = execContext;
-        if (null != workListener) {
+        if (null != workListener)
+        {
             this.workListener = workListener;
         }
     }
@@ -170,12 +178,12 @@ public class WorkerContext implements Work
     }
 
     /**
-     * Defines the thread priority level of the thread, which will be dispatched
-     * to process this work. This priority level must be the same one for a
-     * given resource adapter.
+     * Defines the thread priority level of the thread, which will be dispatched to
+     * process this work. This priority level must be the same one for a given
+     * resource adapter.
      * 
-     * @param aPriority Priority of the thread to be used to process the wrapped
-     *            Work instance.
+     * @param aPriority Priority of the thread to be used to process the wrapped Work
+     *            instance.
      */
     public void setThreadPriority(int aPriority)
     {
@@ -183,9 +191,9 @@ public class WorkerContext implements Work
     }
 
     /**
-     * Gets the priority level of the thread, which will be dispatched to
-     * process this work. This priority level must be the same one for a given
-     * resource adapter.
+     * Gets the priority level of the thread, which will be dispatched to process
+     * this work. This priority level must be the same one for a given resource
+     * adapter.
      * 
      * @return The priority level of the thread to be dispatched to process the
      *         wrapped Work instance.
@@ -196,11 +204,11 @@ public class WorkerContext implements Work
     }
 
     /**
-     * Call-back method used by a Work executor in order to notify this instance
-     * that the wrapped Work instance has been accepted.
+     * Call-back method used by a Work executor in order to notify this instance that
+     * the wrapped Work instance has been accepted.
      * 
-     * @param anObject Object on which the event initially occurred. It should
-     *            be the work executor.
+     * @param anObject Object on which the event initially occurred. It should be the
+     *            work executor.
      */
     public synchronized void workAccepted(Object anObject)
     {
@@ -210,8 +218,8 @@ public class WorkerContext implements Work
     }
 
     /**
-     * System.currentTimeMillis() when the Work has been accepted. This method
-     * can be used to compute the duration of a work.
+     * System.currentTimeMillis() when the Work has been accepted. This method can be
+     * used to compute the duration of a work.
      * 
      * @return When the work has been accepted.
      */
@@ -221,8 +229,8 @@ public class WorkerContext implements Work
     }
 
     /**
-     * Gets the time duration (in milliseconds) within which the execution of
-     * the Work instance must start.
+     * Gets the time duration (in milliseconds) within which the execution of the
+     * Work instance must start.
      * 
      * @return Time out duration.
      */
@@ -233,8 +241,8 @@ public class WorkerContext implements Work
 
     /**
      * Used by a Work executor in order to know if this work, which should be
-     * accepted but not started has timed out. This method MUST be called prior
-     * to retry the execution of a Work.
+     * accepted but not started has timed out. This method MUST be called prior to
+     * retry the execution of a Work.
      * 
      * @return true if the Work has timed out and false otherwise.
      */
@@ -243,16 +251,20 @@ public class WorkerContext implements Work
 
         // A value of 0 means that the work never times out.
         // ??? really?
-        if (0 == startTimeOut || startTimeOut == MuleWorkManager.INDEFINITE) {
+        if (0 == startTimeOut || startTimeOut == MuleWorkManager.INDEFINITE)
+        {
             return false;
         }
-        boolean isTimeout = acceptedTime + startTimeOut > 0 && System.currentTimeMillis() > acceptedTime + startTimeOut;
-        if (logger.isDebugEnabled()) {
+        boolean isTimeout = acceptedTime + startTimeOut > 0
+                            && System.currentTimeMillis() > acceptedTime + startTimeOut;
+        if (logger.isDebugEnabled())
+        {
             logger.debug(this + " accepted at " + acceptedTime
-                    + (isTimeout ? " has timed out." : " has not timed out. ") + retryCount
-                    + " retries have been performed.");
+                         + (isTimeout ? " has timed out." : " has not timed out. ") + retryCount
+                         + " retries have been performed.");
         }
-        if (isTimeout) {
+        if (isTimeout)
+        {
             workException = new WorkRejectedException(this + " has timed out.", WorkException.START_TIMED_OUT);
             workListener.workRejected(new WorkEvent(this, WorkEvent.WORK_REJECTED, worker, workException));
             return true;
@@ -278,7 +290,8 @@ public class WorkerContext implements Work
      */
     public void run()
     {
-        if (isTimedOut()) {
+        if (isTimedOut())
+        {
             // In case of a time out, one releases the start and end latches
             // to prevent a dead-lock.
             startLatch.countDown();
@@ -293,13 +306,18 @@ public class WorkerContext implements Work
         // Implementation note: we assume this is being called without an
         // interesting TransactionContext,
         // and ignore/replace whatever is associated with the current thread.
-        try {
-            if (executionContext == null || executionContext.getXid() == null) {
+        try
+        {
+            if (executionContext == null || executionContext.getXid() == null)
+            {
                 // TODO currently unused, see below
                 // ExecutionContext context = new ExecutionContext();
-                try {
+                try
+                {
                     worker.run();
-                } finally {
+                }
+                finally
+                {
                     // ExecutionContext returningContext = new
                     // ExecutionContext();
                     // if (context != returningContext) {
@@ -309,7 +327,9 @@ public class WorkerContext implements Work
                 }
                 // TODO should we commit the txContext to flush any leftover
                 // state???
-            } else {
+            }
+            else
+            {
                 // try {
                 // long transactionTimeout =
                 // executionContext.getTransactionTimeout();
@@ -334,26 +354,33 @@ public class WorkerContext implements Work
                 // for xid " + executionContext.getXid(),
                 // WorkCompletedException.TX_CONCURRENT_WORK_DISALLOWED);
                 // }
-                try {
+                try
+                {
                     worker.run();
-                } finally {
+                }
+                finally
+                {
                     // transactionContextManager.end(executionContext.getXid());
                 }
 
             }
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_COMPLETED, worker, null));
-        } catch (Throwable e) {
-            workException = (WorkException) (e instanceof WorkCompletedException ? e
-                    : new WorkCompletedException("Unknown error", WorkCompletedException.UNDEFINED).initCause(e));
+        }
+        catch (Throwable e)
+        {
+            workException = (WorkException)(e instanceof WorkCompletedException
+                            ? e : new WorkCompletedException("Unknown error",
+                                WorkCompletedException.UNDEFINED).initCause(e));
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_REJECTED, worker, workException));
-        } finally {
+        }
+        finally
+        {
             endLatch.countDown();
         }
     }
 
     /**
-     * Provides a latch, which can be used to wait the start of a work
-     * execution.
+     * Provides a latch, which can be used to wait the start of a work execution.
      * 
      * @return Latch that a caller can acquire to wait for the start of a work
      *         execution.

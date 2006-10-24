@@ -13,10 +13,10 @@ package org.mule.umo.lifecycle;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>InitialisationException</code> is thrown by the initialise method
- * defined in the <code>org.mule.umo.lifecycle.Initialisable</code> interface.
- * Init initialisation exceptions are fatal and will cause the current Mule
- * Instance to shutdown
+ * <code>InitialisationException</code> is thrown by the initialise method defined
+ * in the <code>org.mule.umo.lifecycle.Initialisable</code> interface. Init
+ * initialisation exceptions are fatal and will cause the current Mule Instance to
+ * shutdown
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

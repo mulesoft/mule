@@ -28,18 +28,21 @@ import javax.resource.spi.work.WorkException;
 public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 {
 
-   /**
-    * logger used by this class
-    */
-   protected transient Log logger = LogFactory.getLog(getClass());
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
 
-   private boolean doThreading = false;
+    private boolean doThreading = false;
 
     public final void connect(final UMOConnectable connectable) throws FatalConnectException
     {
-        if (doThreading) {
-            try {
-                MuleManager.getInstance().getWorkManager().scheduleWork(new Work() {
+        if (doThreading)
+        {
+            try
+            {
+                MuleManager.getInstance().getWorkManager().scheduleWork(new Work()
+                {
                     public void release()
                     {
                         // nothing to do
@@ -47,25 +50,36 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
                     public void run()
                     {
-                        try {
+                        try
+                        {
                             doConnect(connectable);
-                        } catch (FatalConnectException e) {
+                        }
+                        catch (FatalConnectException e)
+                        {
                             resetState();
                             // TODO: this cast is evil
-                            if (connectable instanceof AbstractMessageReceiver) {
-                                ((AbstractMessageReceiver) connectable).handleException(e);
+                            if (connectable instanceof AbstractMessageReceiver)
+                            {
+                                ((AbstractMessageReceiver)connectable).handleException(e);
                             }
                         }
                     }
                 });
-            } catch (WorkException e) {
+            }
+            catch (WorkException e)
+            {
                 resetState();
                 throw new FatalConnectException(e, connectable);
             }
-        } else {
-            try {
+        }
+        else
+        {
+            try
+            {
                 doConnect(connectable);
-            } finally {
+            }
+            finally
+            {
                 resetState();
             }
         }
@@ -88,10 +102,14 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
      */
     public abstract void resetState();
 
-    protected String getDescription(UMOConnectable connectable) {
-        if (connectable instanceof UMOMessageReceiver) {
-            return ((UMOMessageReceiver) connectable).getEndpointURI().toString();
-        } else {
+    protected String getDescription(UMOConnectable connectable)
+    {
+        if (connectable instanceof UMOMessageReceiver)
+        {
+            return ((UMOMessageReceiver)connectable).getEndpointURI().toString();
+        }
+        else
+        {
             return connectable.toString();
         }
     }

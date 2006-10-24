@@ -37,14 +37,17 @@ public class HexStringToByteArray extends AbstractTransformer
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src == null) {
+        if (src == null)
+        {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
-        try {
+        try
+        {
             return StringUtils.hexStringToByteArray((String)src);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new TransformerException(this, ex);
         }
     }

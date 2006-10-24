@@ -22,11 +22,13 @@ import javax.transaction.xa.XAResource;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FileManager extends AbstractXAResourceManager {
+public class FileManager extends AbstractXAResourceManager
+{
 
     private static Log logger = LogFactory.getLog(FileManager.class);
 
-    public synchronized FileSession createSession() {
+    public synchronized FileSession createSession()
+    {
         return new TransactedFileSession(this);
     }
 
@@ -35,7 +37,8 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#getLogger()
      */
-    protected Log getLogger() {
+    protected Log getLogger()
+    {
         return logger;
     }
 
@@ -44,7 +47,8 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#createTransactionContext(java.lang.Object)
      */
-    protected AbstractTransactionContext createTransactionContext(Object session) {
+    protected AbstractTransactionContext createTransactionContext(Object session)
+    {
         return new FileTransactionContext();
     }
 
@@ -53,7 +57,8 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#doBegin(org.mule.transaction.xa.AbstractTransactionContext)
      */
-    protected void doBegin(AbstractTransactionContext context) {
+    protected void doBegin(AbstractTransactionContext context)
+    {
         // template method
     }
 
@@ -62,7 +67,8 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#doPrepare(org.mule.transaction.xa.AbstractTransactionContext)
      */
-    protected int doPrepare(AbstractTransactionContext context) {
+    protected int doPrepare(AbstractTransactionContext context)
+    {
         return XAResource.XA_OK;
     }
 
@@ -71,7 +77,8 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#doCommit(org.mule.transaction.xa.AbstractTransactionContext)
      */
-    protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException {
+    protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
+    {
         // template method
     }
 
@@ -80,11 +87,13 @@ public class FileManager extends AbstractXAResourceManager {
      * 
      * @see org.mule.transaction.xa.AbstractResourceManager#doRollback(org.mule.transaction.xa.AbstractTransactionContext)
      */
-    protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException {
+    protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
+    {
         // template method
     }
 
-    protected class FileTransactionContext extends AbstractTransactionContext {
+    protected class FileTransactionContext extends AbstractTransactionContext
+    {
         // nothing here yet
     }
 

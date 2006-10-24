@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
@@ -17,8 +18,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>ComponentRoutingException</code> is thrown due to a routing exception
- * between the endpoint the event was received on and the component receiving
- * the event
+ * between the endpoint the event was received on and the component receiving the
+ * event
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -51,7 +52,9 @@ public class ComponentRoutingException extends RoutingException
         this.component = component;
     }
 
-    public ComponentRoutingException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, UMOComponent component)
+    public ComponentRoutingException(UMOMessage umoMessage,
+                                     UMOImmutableEndpoint endpoint,
+                                     UMOComponent component)
     {
         super(generateMessage(null, endpoint, component), umoMessage, endpoint);
         this.component = component;
@@ -67,16 +70,20 @@ public class ComponentRoutingException extends RoutingException
 
     }
 
-    private static Message generateMessage(Message message, UMOImmutableEndpoint endpoint, UMOComponent component)
+    private static Message generateMessage(Message message,
+                                           UMOImmutableEndpoint endpoint,
+                                           UMOComponent component)
     {
 
-        Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X,
-                                component.getDescriptor().getName(),
-                                endpoint.getEndpointURI());
-        if (message != null) {
+        Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X, component.getDescriptor()
+            .getName(), endpoint.getEndpointURI());
+        if (message != null)
+        {
             message.setNextMessage(m);
             return message;
-        } else {
+        }
+        else
+        {
             return m;
         }
     }

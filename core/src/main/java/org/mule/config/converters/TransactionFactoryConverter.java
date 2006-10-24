@@ -31,21 +31,26 @@ public class TransactionFactoryConverter implements Converter
      * 
      * @param type Data type to which this value should be converted
      * @param value The input value to be converted
-     * @throws org.apache.commons.beanutils.ConversionException if conversion
-     *             cannot be performed successfully
+     * @throws org.apache.commons.beanutils.ConversionException if conversion cannot
+     *             be performed successfully
      */
     public Object convert(Class type, Object value)
     {
-        if (value == null) {
+        if (value == null)
+        {
             throw new ConversionException("No value specified");
         }
-        if (value instanceof UMOTransactionFactory) {
+        if (value instanceof UMOTransactionFactory)
+        {
             return (value);
         }
-        try {
+        try
+        {
             Object factory = ClassUtils.loadClass(value.toString(), getClass()).newInstance();
             return factory;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new ConversionException(e);
         }
     }

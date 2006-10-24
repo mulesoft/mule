@@ -37,10 +37,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This component can used to proxy REST style services as local Mule Components. It can be configured with a
- * service URL plus a number of properties that allow you to configure the parameters and error conditions
- * on the service.
- *
+ * This component can used to proxy REST style services as local Mule Components. It
+ * can be configured with a service URL plus a number of properties that allow you to
+ * configure the parameters and error conditions on the service.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -64,87 +64,114 @@ public class RestServiceWrapper implements Callable, Initialisable
 
     private PropertyExtractor propertyExtractor = new MessagePropertyExtractor();
 
-    public String getServiceUrl() {
+    public String getServiceUrl()
+    {
         return serviceUrl;
     }
 
-    public void setServiceUrl(String serviceUrl) {
+    public void setServiceUrl(String serviceUrl)
+    {
         this.serviceUrl = serviceUrl;
     }
 
-    public boolean isUrlFromMessage() {
+    public boolean isUrlFromMessage()
+    {
         return urlFromMessage;
     }
 
-    public void setUrlFromMessage(boolean urlFromMessage) {
+    public void setUrlFromMessage(boolean urlFromMessage)
+    {
         this.urlFromMessage = urlFromMessage;
     }
 
-    public Map getReqiredParams() {
+    public Map getReqiredParams()
+    {
         return reqiredParams;
     }
 
-    public void setReqiredParams(Map reqiredParams) {
+    public void setReqiredParams(Map reqiredParams)
+    {
         this.reqiredParams = reqiredParams;
     }
 
-    public Map getOptionalParams() {
+    public Map getOptionalParams()
+    {
         return optionalParams;
     }
 
-    public void setOptionalParams(Map optionalParams) {
+    public void setOptionalParams(Map optionalParams)
+    {
         this.optionalParams = optionalParams;
     }
 
-    public String getHttpMethod() {
+    public String getHttpMethod()
+    {
         return httpMethod;
     }
 
-    public void setHttpMethod(String httpMethod) {
+    public void setHttpMethod(String httpMethod)
+    {
         this.httpMethod = httpMethod;
     }
 
-    public String getPayloadParameterName() {
+    public String getPayloadParameterName()
+    {
         return payloadParameterName;
     }
 
-    public void setPayloadParameterName(String payloadParameterName) {
+    public void setPayloadParameterName(String payloadParameterName)
+    {
         this.payloadParameterName = payloadParameterName;
     }
 
-    public UMOFilter getErrorFilter() {
+    public UMOFilter getErrorFilter()
+    {
         return errorFilter;
     }
 
-    public void setErrorFilter(UMOFilter errorFilter) {
+    public void setErrorFilter(UMOFilter errorFilter)
+    {
         this.errorFilter = errorFilter;
     }
 
-    public String getErrorExpression() {
+    public String getErrorExpression()
+    {
         return errorExpression;
     }
 
-    public void setErrorExpression(String errorExpression) {
+    public void setErrorExpression(String errorExpression)
+    {
         this.errorExpression = errorExpression;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException {
-        if(serviceUrl==null && !urlFromMessage) {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
+        if (serviceUrl == null && !urlFromMessage)
+        {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);
-        } else if(serviceUrl != null){
-            try {
+        }
+        else if (serviceUrl != null)
+        {
+            try
+            {
                 new URL(serviceUrl);
-            } catch (MalformedURLException e) {
+            }
+            catch (MalformedURLException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
 
-        if(errorFilter==null) {
-            if(errorExpression==null) {
-                //We'll set a default filter that checks the return code
+        if (errorFilter == null)
+        {
+            if (errorExpression == null)
+            {
+                // We'll set a default filter that checks the return code
                 errorFilter = new MessagePropertyFilter("http.status!=200");
                 logger.info("Setting default error filter to MessagePropertyFilter('http.status!=200')");
-            } else {
+            }
+            else
+            {
                 errorFilter = new RegExFilter(errorExpression);
             }
         }
@@ -155,19 +182,27 @@ public class RestServiceWrapper implements Callable, Initialisable
         String tempUrl;
         Object request = eventContext.getTransformedMessage();
         Object requestBody = request;
-        if(urlFromMessage) {
+        if (urlFromMessage)
+        {
             tempUrl = eventContext.getMessage().getStringProperty(REST_SERVICE_URL, null);
-            if(tempUrl==null) {
-                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, REST_SERVICE_URL).toString());
+            if (tempUrl == null)
+            {
+                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT,
+                    REST_SERVICE_URL).toString());
             }
-        } else {
+        }
+        else
+        {
             tempUrl = serviceUrl;
         }
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
 
-        if(payloadParameterName!=null) {
+        if (payloadParameterName != null)
+        {
             requestBody = new NullPayload();
-        } else if(request instanceof Map) {
+        }
+        else if (request instanceof Map)
+        {
             requestBody = new NullPayload();
         }
 
@@ -180,34 +215,41 @@ public class RestServiceWrapper implements Callable, Initialisable
         UMOEndpointURI endpointURI = new MuleEndpointURI(tempUrl);
         eventContext.getMessage().setProperty("http.method", httpMethod);
 
-        UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()), endpointURI);
+        UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()),
+            endpointURI);
 
-        if(isErrorPayload(result)) {
-            handleException(new RestServiceException(
-                    new Message(Messages.FAILED_TO_INVOKE_REST_SERVICE_X, tempUrl), result),
-                    result);
+        if (isErrorPayload(result))
+        {
+            handleException(new RestServiceException(new Message(Messages.FAILED_TO_INVOKE_REST_SERVICE_X,
+                tempUrl), result), result);
         }
         return result;
     }
 
-    private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional) {
+    private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional)
+    {
         char sep;
 
-        if(url.indexOf("?") > -1) {
+        if (url.indexOf("?") > -1)
+        {
             sep = '&';
-        } else {
+        }
+        else
+        {
             sep = '?';
         }
 
-        for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();)
+        {
             Map.Entry entry = (Map.Entry)iterator.next();
             String name = (String)entry.getKey();
             String exp = (String)entry.getValue();
             Object value = propertyExtractor.getProperty(exp, msg);
 
-            if (value == null && !optional) {
-                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT,
-                        exp).toString());
+            if (value == null && !optional)
+            {
+                throw new IllegalArgumentException(
+                    new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
             }
 
             url.append(sep);
@@ -215,20 +257,23 @@ public class RestServiceWrapper implements Callable, Initialisable
             url.append(name).append('=').append(value);
         }
 
-        if (!optional && payloadParameterName != null) {
+        if (!optional && payloadParameterName != null)
+        {
             url.append(sep).append(payloadParameterName).append('=').append(body.toString());
         }
     }
 
     protected boolean isErrorPayload(UMOMessage message)
     {
-        if(errorFilter!=null) {
+        if (errorFilter != null)
+        {
             return errorFilter.accept(message);
         }
         return false;
     }
 
-    protected void handleException(RestServiceException e, UMOMessage result) throws Exception {
+    protected void handleException(RestServiceException e, UMOMessage result) throws Exception
+    {
         throw e;
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -20,8 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>AbstractRouterCollection</code> provides common method
- * implementations of router collections for in and outbound routers.
+ * <code>AbstractRouterCollection</code> provides common method implementations of
+ * router collections for in and outbound routers.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
@@ -44,8 +45,9 @@ public abstract class AbstractRouterCollection implements UMORouterCollection
 
     public void setRouters(List routers)
     {
-        for (Iterator iterator = routers.iterator(); iterator.hasNext();) {
-            addRouter((UMORouter) iterator.next());
+        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        {
+            addRouter((UMORouter)iterator.next());
         }
     }
 
@@ -57,9 +59,12 @@ public abstract class AbstractRouterCollection implements UMORouterCollection
 
     public UMORouter removeRouter(UMORouter router)
     {
-        if (routers.remove(router)) {
+        if (routers.remove(router))
+        {
             return router;
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
@@ -77,8 +82,9 @@ public abstract class AbstractRouterCollection implements UMORouterCollection
     public void setCatchAllStrategy(UMORouterCatchAllStrategy catchAllStrategy)
     {
         this.catchAllStrategy = catchAllStrategy;
-        if (this.catchAllStrategy != null && catchAllStrategy instanceof AbstractCatchAllStrategy) {
-            ((AbstractCatchAllStrategy) this.catchAllStrategy).setStatistics(statistics);
+        if (this.catchAllStrategy != null && catchAllStrategy instanceof AbstractCatchAllStrategy)
+        {
+            ((AbstractCatchAllStrategy)this.catchAllStrategy).setStatistics(statistics);
         }
     }
 

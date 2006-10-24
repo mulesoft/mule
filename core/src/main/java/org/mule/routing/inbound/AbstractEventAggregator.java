@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.inbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +23,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.Map;
 
 /**
- * <code>AbstractEventAggregator</code> will aggregate a set of messages into
- * a single message.
+ * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
+ * single message.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,48 +43,55 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
         EventGroup eg = null;
         // synchronized (lock)
         // {
-        if (isMatch(event)) {
+        if (isMatch(event))
+        {
             eg = addEvent(event);
             doAggregate.compareAndSet(false, shouldAggregate(eg));
         }
         // }
-        if (doAggregate.get()) {
-            synchronized (lock) {
-                // TODO how should we handle EventGroup if still null? 
+        if (doAggregate.get())
+        {
+            synchronized (lock)
+            {
+                // TODO how should we handle EventGroup if still null?
                 UMOMessage returnMessage = aggregateEvents(eg);
                 removeGroup(eg.getGroupId());
                 UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
                 endpoint.setTransformer(null);
                 endpoint.setName(getClass().getName());
                 UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(), event);
-                return new UMOEvent[] { returnEvent };
+                return new UMOEvent[]{returnEvent};
             }
         }
         return null;
     }
 
     /**
-     * Adds the event to an event group. Groups are defined by the correlationId
-     * on the message. If no correlationId is set a default group is created for
-     * all events without a correlationId. If there is no group for the current
+     * Adds the event to an event group. Groups are defined by the correlationId on
+     * the message. If no correlationId is set a default group is created for all
+     * events without a correlationId. If there is no group for the current
      * correlationId one will be created and added to the router.
      * 
      * @param event
-     * @return returns either a new EventGroup with the new event added or an Existing EventGoup
-     * with the new event added
+     * @return returns either a new EventGroup with the new event added or an
+     *         Existing EventGoup with the new event added
      */
     protected EventGroup addEvent(UMOEvent event)
     {
         String cId = event.getMessage().getCorrelationId();
-        if (cId == null) {
+        if (cId == null)
+        {
             cId = NO_CORRELATION_ID;
         }
-        EventGroup eg = (EventGroup) eventGroups.get(cId);
-        if (eg == null) {
+        EventGroup eg = (EventGroup)eventGroups.get(cId);
+        if (eg == null)
+        {
             eg = new EventGroup(cId);
             eg.addEvent(event);
             eventGroups.put(eg.getGroupId(), eg);
-        } else {
+        }
+        else
+        {
             eg.addEvent(event);
         }
         return eg;
@@ -98,10 +106,10 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     }
 
     /**
-     * Determines if the event group is ready to be aggregated. if the group is
-     * ready to be aggregated (this is entirely up to the application. it could
-     * be determined by volume, last modified time or some oher criteria based
-     * on the last event received)
+     * Determines if the event group is ready to be aggregated. if the group is ready
+     * to be aggregated (this is entirely up to the application. it could be
+     * determined by volume, last modified time or some oher criteria based on the
+     * last event received)
      * 
      * @param events
      * @return true if the group is ready for aggregation
@@ -109,15 +117,15 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     protected abstract boolean shouldAggregate(EventGroup events);
 
     /**
-     * This method is invoked if the shouldAggregate method is called and
-     * returns true. Once this method returns an aggregated message the event
-     * group is removed from the router
+     * This method is invoked if the shouldAggregate method is called and returns
+     * true. Once this method returns an aggregated message the event group is
+     * removed from the router
      * 
      * @param events the event group for this request
      * @return an aggregated message
      * @throws AggregationException if the aggregation fails. in this scenario the
-     *             whole event group is removed and passed to the exception
-     *             handler for this componenet
+     *             whole event group is removed and passed to the exception handler
+     *             for this componenet
      */
     protected abstract UMOMessage aggregateEvents(EventGroup events) throws AggregationException;
 }

@@ -54,10 +54,12 @@ public class MessagingException extends UMOException
     public MessagingException(Message message, Object payload)
     {
         super();
-        if (payload == null) {
+        if (payload == null)
+        {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         }
-        else {
+        else
+        {
             this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
@@ -66,10 +68,12 @@ public class MessagingException extends UMOException
     public MessagingException(Message message, Object payload, Throwable cause)
     {
         super(cause);
-        if (payload == null) {
+        if (payload == null)
+        {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         }
-        else {
+        else
+        {
             this.umoMessage = new MuleMessage(payload, (Map)null);
         }
         setMessage(generateMessage(message));
@@ -79,20 +83,24 @@ public class MessagingException extends UMOException
     {
         StringBuffer buf = new StringBuffer(80);
 
-        if (message != null) {
+        if (message != null)
+        {
             buf.append(message.getMessage()).append(". ");
         }
 
-        if (umoMessage != null) {
+        if (umoMessage != null)
+        {
             Object payload = umoMessage.getPayload();
-            if (payload == null) {
+            if (payload == null)
+            {
                 payload = new NullPayload();
             }
 
             buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, payload.getClass().getName()));
             addInfo("Payload", payload.toString());
         }
-        else {
+        else
+        {
             buf.append("The current UMOMessage is null! Please report this to dev@mule.codehaus.org.");
             addInfo("Payload", new NullPayload().toString());
         }

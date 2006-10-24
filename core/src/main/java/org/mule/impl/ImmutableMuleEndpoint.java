@@ -41,9 +41,9 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server.
- * A endpoint is a grouping of an endpoint, an endpointUri and a transformer.
- *
+ * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
+ * endpoint is a grouping of an endpoint, an endpointUri and a transformer.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -122,25 +122,24 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected UMOEndpointSecurityFilter securityFilter = null;
 
     /**
-     * whether events received by this endpoint should execute in a single
-     * thread
+     * whether events received by this endpoint should execute in a single thread
      */
     protected Boolean synchronous = null;
 
     /**
-     * Determines whether a synchronous call should block to obtain a response
-     * from a remote server (if the transport supports it). For example for Jms
-     * endpoints, setting remote sync will cause a temporary destination to be
-     * set up as a replyTo destination and will send the message a wait for a
-     * response on the replyTo destination. If the JMSReplyTo is already set on
-     * the message that destination will be used instead.
+     * Determines whether a synchronous call should block to obtain a response from a
+     * remote server (if the transport supports it). For example for Jms endpoints,
+     * setting remote sync will cause a temporary destination to be set up as a
+     * replyTo destination and will send the message a wait for a response on the
+     * replyTo destination. If the JMSReplyTo is already set on the message that
+     * destination will be used instead.
      */
     protected Boolean remoteSync = null;
 
     /**
-     * How long to block when performing a remote synchronisation to a remote
-     * host. This property is optional and will be set to the default Synchonous
-     * Event time out value if not set
+     * How long to block when performing a remote synchronisation to a remote host.
+     * This property is optional and will be set to the default Synchonous Event time
+     * out value if not set
      */
     protected Integer remoteSyncTimeout = null;
 
@@ -187,28 +186,33 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         this.endpointEncoding = endpointEncoding;
         this.type = type;
 
-        if (endpointUri != null) {
+        if (endpointUri != null)
+        {
             this.endpointUri = new MuleEndpointURI(endpointUri);
         }
 
-        if (transformer != null) {
+        if (transformer != null)
+        {
             transformer.setEndpoint(this);
             this.transformer = transformer;
         }
 
         this.properties = new ConcurrentHashMap();
 
-        if (props != null) {
+        if (props != null)
+        {
             this.properties.putAll(props);
         }
 
-        if (endpointUri != null) {
+        if (endpointUri != null)
+        {
             properties.putAll(endpointUri.getParams());
         }
 
         // seal the properties if we are immutable to avoid
         // write-through aliasing problems with the exposed Map
-        if (!(this instanceof MuleEndpoint)) {
+        if (!(this instanceof MuleEndpoint))
+        {
             this.properties = Collections.unmodifiableMap(this.properties);
         }
 
@@ -232,51 +236,62 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     protected void initFromDescriptor(UMOImmutableEndpoint source)
     {
-        if (this.name == null) {
+        if (this.name == null)
+        {
             this.name = source.getName();
         }
 
-        if (this.endpointUri == null && source.getEndpointURI() != null) {
+        if (this.endpointUri == null && source.getEndpointURI() != null)
+        {
             this.endpointUri = new MuleEndpointURI(source.getEndpointURI());
         }
 
-        if (this.endpointEncoding == null) {
+        if (this.endpointEncoding == null)
+        {
             this.endpointEncoding = source.getEncoding();
         }
 
-        if (this.connector == null) {
+        if (this.connector == null)
+        {
             this.connector = source.getConnector();
         }
 
-        if (this.transformer == null) {
+        if (this.transformer == null)
+        {
             this.transformer = source.getTransformer();
         }
 
-        if (this.transformer != null) {
+        if (this.transformer != null)
+        {
             this.transformer.setEndpoint(this);
         }
 
-        if (this.responseTransformer == null) {
+        if (this.responseTransformer == null)
+        {
             this.responseTransformer = source.getResponseTransformer();
         }
 
-        if (responseTransformer != null) {
+        if (responseTransformer != null)
+        {
             this.responseTransformer.setEndpoint(this);
         }
 
         this.properties = new ConcurrentHashMap();
 
-        if (source.getProperties() != null) {
+        if (source.getProperties() != null)
+        {
             this.properties.putAll(source.getProperties());
         }
 
-        if (endpointUri != null && endpointUri.getParams() != null) {
+        if (endpointUri != null && endpointUri.getParams() != null)
+        {
             this.properties.putAll(endpointUri.getParams());
         }
 
         // seal the properties if we are immutable to avoid
         // write-through aliasing problems with the exposed Map
-        if (!(this instanceof MuleEndpoint)) {
+        if (!(this instanceof MuleEndpoint))
+        {
             this.properties = Collections.unmodifiableMap(this.properties);
         }
 
@@ -294,7 +309,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOEndpoint#getEndpointURI()
      */
     public UMOEndpointURI getEndpointURI()
@@ -309,7 +324,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getType()
      */
     public String getType()
@@ -319,7 +334,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getConnectorName()
      */
     public UMOConnector getConnector()
@@ -329,7 +344,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getName()
      */
     public String getName()
@@ -339,7 +354,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransformer()
      */
     public UMOTransformer getTransformer()
@@ -349,7 +364,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getParams()
      */
     public Map getProperties()
@@ -359,7 +374,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#clone()
      */
     // TODO this is the 'old' implementation of the clone() method which returns
@@ -368,31 +383,37 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public Object clone()
     {
         UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type,
-                createConnector, endpointEncoding, properties);
+            createConnector, endpointEncoding, properties);
 
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
         clone.setSecurityFilter(securityFilter);
 
-        if (remoteSync != null) {
+        if (remoteSync != null)
+        {
             clone.setRemoteSync(isRemoteSync());
         }
-        if (remoteSyncTimeout != null) {
+        if (remoteSyncTimeout != null)
+        {
             clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
         }
 
-        if (synchronous != null) {
+        if (synchronous != null)
+        {
             clone.setSynchronous(synchronous.booleanValue());
         }
 
         clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
 
         clone.setInitialState(initialState);
-        if (initialised.get()) {
-            try {
+        if (initialised.get())
+        {
+            try
+            {
                 clone.initialise();
             }
-            catch (InitialisationException e) {
+            catch (InitialisationException e)
+            {
                 // this really should never happen as the endpoint is already
                 // initialised
                 logger.error(e.getMessage(), e);
@@ -404,7 +425,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#isReadOnly()
      */
     public boolean isReadOnly()
@@ -415,19 +436,18 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public String toString()
     {
         return ClassUtils.getClassName(this.getClass()) + "{connector=" + connector + ", endpointUri="
-                + endpointUri + ", transformer=" + transformer + ", name='" + name + "'" + ", type='"
-                + type + "'" + ", properties=" + properties + ", transactionConfig=" + transactionConfig
-                + ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages
-                + ", initialised=" + initialised + ", securityFilter=" + securityFilter
-                + ", synchronous=" + synchronous + ", initialState=" + initialState
-                + ", createConnector=" + createConnector + ", remoteSync=" + remoteSync
-                + ", remoteSyncTimeout=" + remoteSyncTimeout + ", endpointEncoding=" + endpointEncoding
-                + "}";
+               + endpointUri + ", transformer=" + transformer + ", name='" + name + "'" + ", type='" + type
+               + "'" + ", properties=" + properties + ", transactionConfig=" + transactionConfig
+               + ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages
+               + ", initialised=" + initialised + ", securityFilter=" + securityFilter + ", synchronous="
+               + synchronous + ", initialState=" + initialState + ", createConnector=" + createConnector
+               + ", remoteSync=" + remoteSync + ", remoteSyncTimeout=" + remoteSyncTimeout
+               + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getProtocol()
      */
     public String getProtocol()
@@ -437,29 +457,28 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canReceive()
      */
     public boolean canReceive()
     {
         return (getType().equals(ENDPOINT_TYPE_RECEIVER) || getType().equals(
-                ENDPOINT_TYPE_SENDER_AND_RECEIVER));
+            ENDPOINT_TYPE_SENDER_AND_RECEIVER));
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canSend()
      */
     public boolean canSend()
     {
-        return (getType().equals(ENDPOINT_TYPE_SENDER) || getType().equals(
-                ENDPOINT_TYPE_SENDER_AND_RECEIVER));
+        return (getType().equals(ENDPOINT_TYPE_SENDER) || getType().equals(ENDPOINT_TYPE_SENDER_AND_RECEIVER));
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransactionConfig()
      */
     public UMOTransactionConfig getTransactionConfig()
@@ -469,33 +488,40 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public boolean equals(Object o)
     {
-        if (this == o) {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof ImmutableMuleEndpoint)) {
+        if (!(o instanceof ImmutableMuleEndpoint))
+        {
             return false;
         }
 
         final ImmutableMuleEndpoint immutableMuleProviderDescriptor = (ImmutableMuleEndpoint)o;
 
-        if (!connector.getName().equals(immutableMuleProviderDescriptor.connector.getName())) {
+        if (!connector.getName().equals(immutableMuleProviderDescriptor.connector.getName()))
+        {
             return false;
         }
         if (endpointUri != null && immutableMuleProviderDescriptor.endpointUri != null
-                ? !endpointUri.getAddress().equals(
-                        immutableMuleProviderDescriptor.endpointUri.getAddress())
-                : immutableMuleProviderDescriptor.endpointUri != null) {
+                        ? !endpointUri.getAddress().equals(
+                            immutableMuleProviderDescriptor.endpointUri.getAddress())
+                        : immutableMuleProviderDescriptor.endpointUri != null)
+        {
             return false;
         }
-        if (!name.equals(immutableMuleProviderDescriptor.name)) {
+        if (!name.equals(immutableMuleProviderDescriptor.name))
+        {
             return false;
         }
         if (transformer != null
-                ? !transformer.equals(immutableMuleProviderDescriptor.transformer)
-                : immutableMuleProviderDescriptor.transformer != null) {
+                        ? !transformer.equals(immutableMuleProviderDescriptor.transformer)
+                        : immutableMuleProviderDescriptor.transformer != null)
+        {
             return false;
         }
-        if (!type.equals(immutableMuleProviderDescriptor.type)) {
+        if (!type.equals(immutableMuleProviderDescriptor.type))
+        {
             return false;
         }
 
@@ -527,7 +553,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public static UMOEndpoint getEndpointFromUri(String uri)
     {
         UMOEndpoint endpoint = null;
-        if (uri != null) {
+        if (uri != null)
+        {
             String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
             endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
         }
@@ -537,12 +564,15 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public static UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
     {
         UMOEndpoint endpoint = null;
-        if (uri.getEndpointName() != null) {
-            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(
-                    uri.getEndpointName(), uri.getEndpointName());
+        if (uri.getEndpointName() != null)
+        {
+            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(uri.getEndpointName(),
+                uri.getEndpointName());
             endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
-            if (endpoint != null) {
-                if (uri.getAddress() != null && uri.getAddress().length() > 0) {
+            if (endpoint != null)
+            {
+                if (uri.getAddress() != null && uri.getAddress().length() > 0)
+                {
                     endpoint.setEndpointURI(uri);
                 }
             }
@@ -552,30 +582,35 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     }
 
     public static UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type)
-            throws UMOException
+        throws UMOException
     {
         UMOEndpoint endpoint = getEndpointFromUri(uriIdentifier);
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type);
         }
-        else {
-            if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER)) {
+        else
+        {
+            if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER))
+            {
                 endpoint.setType(type);
             }
-            else if (!endpoint.getType().equals(type)) {
+            else if (!endpoint.getType().equals(type))
+            {
                 throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
-                        + " is not of type: " + type + ". It is of type: " + endpoint.getType());
+                                                   + " is not of type: " + type + ". It is of type: "
+                                                   + endpoint.getType());
 
             }
         }
         return endpoint;
     }
 
-    public static UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type)
-            throws UMOException
+    public static UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException
     {
         UMOEndpoint endpoint = getEndpointFromUri(uri);
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             endpoint = createEndpointFromUri(uri, type);
         }
         return endpoint;
@@ -588,101 +623,128 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public void initialise() throws InitialisationException
     {
-        if (initialised.get()) {
+        if (initialised.get())
+        {
             logger.debug("Already initialised: " + toString());
             return;
         }
-        if (connector == null) {
-            if (endpointUri.getConnectorName() != null) {
+        if (connector == null)
+        {
+            if (endpointUri.getConnectorName() != null)
+            {
                 connector = MuleManager.getInstance().lookupConnector(endpointUri.getConnectorName());
-                if (connector == null) {
+                if (connector == null)
+                {
                     throw new IllegalArgumentException("Connector not found: "
-                            + endpointUri.getConnectorName());
+                                                       + endpointUri.getConnectorName());
                 }
             }
-            else {
-                try {
+            else
+            {
+                try
+                {
                     connector = ConnectorFactory.getOrCreateConnectorByProtocol(this);
-                    if (connector == null) {
+                    if (connector == null)
+                    {
                         throw new InitialisationException(new Message(
-                                Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri
-                                        .getScheme()), this);
+                            Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
                     }
                 }
-                catch (ConnectorFactoryException e) {
+                catch (ConnectorFactoryException e)
+                {
                     throw new InitialisationException(new Message(
-                            Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
+                        Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
                 }
             }
 
-            if (endpointUri.getEndpointName() != null && name == null) {
+            if (endpointUri.getEndpointName() != null && name == null)
+            {
                 name = endpointUri.getEndpointName();
             }
         }
         name = ObjectNameHelper.getEndpointName(this);
 
         String sync = endpointUri.getParams().getProperty("synchronous", null);
-        if (sync != null) {
+        if (sync != null)
+        {
             synchronous = Boolean.valueOf(sync);
         }
-        if (properties != null && endpointUri.getParams() != null) {
+        if (properties != null && endpointUri.getParams() != null)
+        {
             properties.putAll(endpointUri.getParams());
         }
 
-        if (endpointUri.getTransformers() != null) {
-            try {
+        if (endpointUri.getTransformers() != null)
+        {
+            try
+            {
                 transformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
             }
-            catch (MuleException e) {
+            catch (MuleException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
 
-        if (transformer == null) {
-            if (connector instanceof AbstractConnector) {
-                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type)) {
+        if (transformer == null)
+        {
+            if (connector instanceof AbstractConnector)
+            {
+                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+                {
                     transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
                 }
-                else {
+                else
+                {
                     transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
                 }
             }
         }
-        if (transformer != null) {
+        if (transformer != null)
+        {
             transformer.setEndpoint(this);
         }
 
-        if (endpointUri.getResponseTransformers() != null) {
-            try {
-                responseTransformer = MuleObjectHelper.getTransformer(endpointUri
-                        .getResponseTransformers(), ",");
+        if (endpointUri.getResponseTransformers() != null)
+        {
+            try
+            {
+                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(),
+                    ",");
             }
-            catch (MuleException e) {
+            catch (MuleException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
-        if (responseTransformer == null) {
-            if (connector instanceof AbstractConnector) {
+        if (responseTransformer == null)
+        {
+            if (connector instanceof AbstractConnector)
+            {
                 responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
             }
         }
-        if (responseTransformer != null) {
+        if (responseTransformer != null)
+        {
             responseTransformer.setEndpoint(this);
         }
 
-        if (securityFilter != null) {
+        if (securityFilter != null)
+        {
             securityFilter.setEndpoint(this);
             securityFilter.initialise();
         }
 
         // Allow remote sync values to be set as params on the endpoint URI
         String rs = (String)endpointUri.getParams().remove("remoteSync");
-        if (rs != null) {
+        if (rs != null)
+        {
             remoteSync = Boolean.valueOf(rs);
         }
 
         String rsTimeout = (String)endpointUri.getParams().remove("remoteSyncTimeout");
-        if (rsTimeout != null) {
+        if (rsTimeout != null)
+        {
             remoteSyncTimeout = Integer.valueOf(rsTimeout);
         }
 
@@ -690,11 +752,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     }
 
     /**
-     * Returns an UMOEndpointSecurityFilter for this endpoint. If one is not
-     * set, there will be no authentication on events sent via this endpoint
+     * Returns an UMOEndpointSecurityFilter for this endpoint. If one is not set,
+     * there will be no authentication on events sent via this endpoint
      * 
-     * @return UMOEndpointSecurityFilter responsible for authenticating message
-     *         flow via this endpoint.
+     * @return UMOEndpointSecurityFilter responsible for authenticating message flow
+     *         via this endpoint.
      * @see org.mule.umo.security.UMOEndpointSecurityFilter
      */
     public UMOEndpointSecurityFilter getSecurityFilter()
@@ -703,18 +765,17 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     }
 
     /**
-     * Determines if requests originating from this endpoint should be
-     * synchronous i.e. execute in a single thread and possibly return an
-     * result. This property is only used when the endpoint is of type
-     * 'receiver'
+     * Determines if requests originating from this endpoint should be synchronous
+     * i.e. execute in a single thread and possibly return an result. This property
+     * is only used when the endpoint is of type 'receiver'
      * 
-     * @return whether requests on this endpoint should execute in a single
-     *         thread. This property is only used when the endpoint is of type
-     *         'receiver'
+     * @return whether requests on this endpoint should execute in a single thread.
+     *         This property is only used when the endpoint is of type 'receiver'
      */
     public boolean isSynchronous()
     {
-        if (synchronous == null) {
+        if (synchronous == null)
+        {
             return MuleManager.getConfiguration().isSynchronous();
         }
         return synchronous.booleanValue();
@@ -731,20 +792,23 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     }
 
     /**
-     * For certain providers that support the notion of a backchannel such as
-     * sockets (outputStream) or Jms (ReplyTo) Mule can automatically wait for a
-     * response from a backchannel when dispatching over these protocols. This
-     * is different for synchronous as synchronous behavior only applies to in
+     * For certain providers that support the notion of a backchannel such as sockets
+     * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
+     * from a backchannel when dispatching over these protocols. This is different
+     * for synchronous as synchronous behavior only applies to in
      * 
      * @return
      */
     public boolean isRemoteSync()
     {
-        if (remoteSync == null) {
-            if (connector == null || connector.isRemoteSyncEnabled()) {
+        if (remoteSync == null)
+        {
+            if (connector == null || connector.isRemoteSyncEnabled())
+            {
                 remoteSync = Boolean.valueOf(MuleManager.getConfiguration().isRemoteSync());
             }
-            else {
+            else
+            {
                 remoteSync = Boolean.FALSE;
             }
         }
@@ -758,15 +822,16 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public int getRemoteSyncTimeout()
     {
-        if (remoteSyncTimeout == null) {
+        if (remoteSyncTimeout == null)
+        {
             remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getSynchronousEventTimeout());
         }
         return remoteSyncTimeout.intValue();
     }
 
     /**
-     * Sets the state the endpoint will be loaded in. The States are 'stopped'
-     * and 'started' (default)
+     * Sets the state the endpoint will be loaded in. The States are 'stopped' and
+     * 'started' (default)
      * 
      * @return the endpoint starting state
      */
@@ -790,9 +855,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return streaming;
     }
 
-    public Object getProperty(Object key) {
-        Object value =  properties.get(key);
-        if(value==null) {
+    public Object getProperty(Object key)
+    {
+        Object value = properties.get(key);
+        if (value == null)
+        {
             value = endpointUri.getParams().get(key);
         }
         return value;

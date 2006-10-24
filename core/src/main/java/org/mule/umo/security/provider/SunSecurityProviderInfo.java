@@ -13,7 +13,8 @@ package org.mule.umo.security.provider;
 /**
  * Sun JDK-specific security provider information.
  */
-public class SunSecurityProviderInfo implements SecurityProviderInfo {
+public class SunSecurityProviderInfo implements SecurityProviderInfo
+{
 
     private static final String KEY_MANAGER_ALGORITHM = "SunX509";
 
@@ -21,15 +22,18 @@ public class SunSecurityProviderInfo implements SecurityProviderInfo {
 
     private static final String PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
 
-    public String getKeyManagerAlgorithm() {
+    public String getKeyManagerAlgorithm()
+    {
         return KEY_MANAGER_ALGORITHM;
     }
 
-    public String getProtocolHandler() {
+    public String getProtocolHandler()
+    {
         return PROTOCOL_HANDLER;
     }
 
-    public String getProviderClass() {
+    public String getProviderClass()
+    {
         return PROVIDER_CLASS;
     }
 

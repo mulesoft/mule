@@ -80,7 +80,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
     }
 
     /**
-     * Like {@link #repeat(String, int)} but with a single character as argument. 
+     * Like {@link #repeat(String, int)} but with a single character as argument.
      */
     public static String repeat(char c, int len)
     {

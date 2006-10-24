@@ -50,18 +50,17 @@ public interface UMOManager extends Lifecycle
     UMOConnector lookupConnector(String logicalName);
 
     /**
-     * @param logicalName the logical mapping name for an endpointUri i.e.
-     *            rather than specifing an endpointUri to be someone@my.com you
-     *            can supply a more descriptive name such as <i>The System
-     *            Administrator</i>
+     * @param logicalName the logical mapping name for an endpointUri i.e. rather
+     *            than specifing an endpointUri to be someone@my.com you can supply a
+     *            more descriptive name such as <i>The System Administrator</i>
      * @param defaultName
      * @return the actual endpointUri value or null if it is not found
      */
     String lookupEndpointIdentifier(String logicalName, String defaultName);
 
     /**
-     * Getter for a global endpoint. Any endpoints returned from this method can
-     * be modified, as they are clones of the registered endpoints.
+     * Getter for a global endpoint. Any endpoints returned from this method can be
+     * modified, as they are clones of the registered endpoints.
      * 
      * @param logicalName the name of the endpoint
      * @return the <code>UMOEndpoint</code> or null if it doesn't exist
@@ -84,11 +83,9 @@ public interface UMOManager extends Lifecycle
     void registerConnector(UMOConnector connector) throws UMOException;
 
     /**
-     * UnRegisters a <code>UMOConnector</code> with the
-     * <code>MuleManager</code>.
+     * UnRegisters a <code>UMOConnector</code> with the <code>MuleManager</code>.
      * 
-     * @param connectorName the name of the <code>UMOConnector</code> to
-     *            unregister
+     * @param connectorName the name of the <code>UMOConnector</code> to unregister
      */
     void unregisterConnector(String connectorName) throws UMOException;
 
@@ -131,8 +128,7 @@ public interface UMOManager extends Lifecycle
     /**
      * UnRegisters a transformer with the <code>MuleManager</code>.
      * 
-     * @param transformerName the <code>UMOTransformer</code> name to
-     *            register.
+     * @param transformerName the <code>UMOTransformer</code> name to register.
      */
     void unregisterTransformer(String transformerName);
 
@@ -153,11 +149,11 @@ public interface UMOManager extends Lifecycle
     void setTransactionManager(TransactionManager manager) throws Exception;
 
     /**
-     * Returns the Jta transaction manager used by this Mule server instance. or
-     * null if a transaction manager has not been set
+     * Returns the Jta transaction manager used by this Mule server instance. or null
+     * if a transaction manager has not been set
      * 
-     * @return the Jta transaction manager used by this Mule server instance. or
-     *         null if a transaction manager has not been set
+     * @return the Jta transaction manager used by this Mule server instance. or null
+     *         if a transaction manager has not been set
      */
     TransactionManager getTransactionManager();
 
@@ -183,8 +179,7 @@ public interface UMOManager extends Lifecycle
     Map getProperties();
 
     /**
-     * Gets an unmodifiable collection of Connectors registered with the
-     * UMOManager
+     * Gets an unmodifiable collection of Connectors registered with the UMOManager
      * 
      * @return All connectors registered on the Manager
      * @see UMOConnector
@@ -192,16 +187,14 @@ public interface UMOManager extends Lifecycle
     Map getConnectors();
 
     /**
-     * Gets an unmodifiable collection of endpoints registered with the
-     * UMOManager
+     * Gets an unmodifiable collection of endpoints registered with the UMOManager
      * 
      * @return All endpoints registered on the Manager
      */
     Map getEndpointIdentifiers();
 
     /**
-     * Gets an unmodifiable collection of endpoints registered with the
-     * UMOManager
+     * Gets an unmodifiable collection of endpoints registered with the UMOManager
      * 
      * @return All endpoints registered on the Manager
      * @see org.mule.umo.endpoint.UMOEndpoint
@@ -209,8 +202,7 @@ public interface UMOManager extends Lifecycle
     Map getEndpoints();
 
     /**
-     * Gets an unmodifiable collection of transformers registered with the
-     * UMOManager
+     * Gets an unmodifiable collection of transformers registered with the UMOManager
      * 
      * @return All transformers registered on the Manager
      * @see UMOTransformer
@@ -218,8 +210,7 @@ public interface UMOManager extends Lifecycle
     Map getTransformers();
 
     /**
-     * registers a interceptor stack list that can be referenced by other
-     * components
+     * registers a interceptor stack list that can be referenced by other components
      * 
      * @param name the referenceable name for this stack
      * @param stack a List of interceptors
@@ -231,8 +222,8 @@ public interface UMOManager extends Lifecycle
      * Retrieves a configured interceptor stack.
      * 
      * @param name the name of the stack
-     * @return the interceptor stack requested or null if there wasn't one
-     *         configured for the given name
+     * @return the interceptor stack requested or null if there wasn't one configured
+     *         for the given name
      */
     UMOInterceptorStack lookupInterceptorStack(String name);
 
@@ -258,15 +249,17 @@ public interface UMOManager extends Lifecycle
     long getStartDate();
 
     /**
-     * Will register an agent object on this model. Agents can be server plugins
-     * such as Jms support
+     * Will register an agent object on this model. Agents can be server plugins such
+     * as Jms support
      * 
      * @param agent
      */
     void registerAgent(UMOAgent agent) throws UMOException;
 
     /**
-     * Will find a registered agent using its name, which is unique for all registered agents
+     * Will find a registered agent using its name, which is unique for all
+     * registered agents
+     * 
      * @param name the name of the Agent to find
      * @return the Agent or null if there is not agent registered with the given name
      */
@@ -281,39 +274,36 @@ public interface UMOManager extends Lifecycle
     UMOAgent unregisterAgent(String name) throws UMOException;
 
     /**
-     * Registers an intenal server event listener. The listener will be notified
-     * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an UMOEvent (although there is nothing
-     * stopping the implementation of this class triggering listeners when a
-     * UMOEvent is received).
-     * 
-     * The types of notifications fired is entirely defined by the implementation of
-     * this class
+     * Registers an intenal server event listener. The listener will be notified when
+     * a particular event happens within the server. Typically this is not an event
+     * in the same sense as an UMOEvent (although there is nothing stopping the
+     * implementation of this class triggering listeners when a UMOEvent is
+     * received). The types of notifications fired is entirely defined by the
+     * implementation of this class
      * 
      * @param l the listener to register
      */
     void registerListener(UMOServerNotificationListener l) throws NotificationException;
 
     /**
-     * Registers an intenal server event listener. The listener will be notified
-     * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an UMOEvent (although there is nothing
-     * stopping the implementation of this class triggering listeners when a
-     * UMOEvent is received).
-     * 
-     * The types of notifications fired is entirely defined by the implementation of
-     * this class
+     * Registers an intenal server event listener. The listener will be notified when
+     * a particular event happens within the server. Typically this is not an event
+     * in the same sense as an UMOEvent (although there is nothing stopping the
+     * implementation of this class triggering listeners when a UMOEvent is
+     * received). The types of notifications fired is entirely defined by the
+     * implementation of this class
      * 
      * @param l the listener to register
-     * @param resourceIdentifier a particular resource name for the given type
-     *            of listener For example, the resourceName could be the name of
-     *            a component if the listener was a ComponentNotificationListener
+     * @param resourceIdentifier a particular resource name for the given type of
+     *            listener For example, the resourceName could be the name of a
+     *            component if the listener was a ComponentNotificationListener
      */
-    void registerListener(UMOServerNotificationListener l, String resourceIdentifier) throws NotificationException;
+    void registerListener(UMOServerNotificationListener l, String resourceIdentifier)
+        throws NotificationException;
 
     /**
-     * Unregisters a previously registered listener. If the listener has not
-     * already been registered, this method should return without exception
+     * Unregisters a previously registered listener. If the listener has not already
+     * been registered, this method should return without exception
      * 
      * @param l the listener to unregister
      */
@@ -343,18 +333,16 @@ public interface UMOManager extends Lifecycle
     UMOContainerContext getContainerContext();
 
     /**
-     * Sets the unique Id for this Manager instance. this id can be used to
-     * assign an identy to the manager so it can be identified in a network of
-     * Mule nodes
+     * Sets the unique Id for this Manager instance. this id can be used to assign an
+     * identy to the manager so it can be identified in a network of Mule nodes
      * 
      * @param id the unique Id for this manager in the network
      */
     void setId(String id);
 
     /**
-     * Gets the unique Id for this Manager instance. this id can be used to
-     * assign an identy to the manager so it can be identified in a network of
-     * Mule nodes
+     * Gets the unique Id for this Manager instance. this id can be used to assign an
+     * identy to the manager so it can be identified in a network of Mule nodes
      * 
      * @return the unique Id for this manager in the network
      */
@@ -365,8 +353,8 @@ public interface UMOManager extends Lifecycle
      * authorise incoming and outgoing event traffic and service invocations
      * 
      * @param securityManager the security manager used by this Mule instance to
-     *            authenticate and authorise incoming and outgoing event traffic
-     *            and service invocations
+     *            authenticate and authorise incoming and outgoing event traffic and
+     *            service invocations
      */
     void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException;
 
@@ -374,18 +362,16 @@ public interface UMOManager extends Lifecycle
      * Gets the security manager used by this Mule instance to authenticate and
      * authorise incoming and outgoing event traffic and service invocations
      * 
-     * @return he security manager used by this Mule instance to authenticate
-     *         and authorise incoming and outgoing event traffic and service
-     *         invocations
+     * @return he security manager used by this Mule instance to authenticate and
+     *         authorise incoming and outgoing event traffic and service invocations
      */
     UMOSecurityManager getSecurityManager();
 
     /**
-     * Obtains a workManager instance that can be used to schedule work in a
-     * thread pool. This will be used primarially by UMOAgents wanting to
-     * schedule work. This work Manager must <b>never</b> be used by provider
-     * implementations as they have their own workManager accible on the
-     * connector.
+     * Obtains a workManager instance that can be used to schedule work in a thread
+     * pool. This will be used primarially by UMOAgents wanting to schedule work.
+     * This work Manager must <b>never</b> be used by provider implementations as
+     * they have their own workManager accible on the connector.
      * 
      * @return a workManager instance used by the current MuleManager
      */
@@ -393,27 +379,25 @@ public interface UMOManager extends Lifecycle
 
     /**
      * Sets a workManager instance that can be used to schedule work in a thread
-     * pool. This will be used primarially by UMOAgents wanting to schedule
-     * work. This work Manager must <b>never</b> be used by provider
-     * implementations as they have their own workManager accible on the
-     * connector.
+     * pool. This will be used primarially by UMOAgents wanting to schedule work.
+     * This work Manager must <b>never</b> be used by provider implementations as
+     * they have their own workManager accible on the connector.
      * 
-     * @param workManager the workManager instance used by the current
-     *            MuleManager
+     * @param workManager the workManager instance used by the current MuleManager
      */
     void setWorkManager(UMOWorkManager workManager);
 
     /**
-     * Sets the queue manager used by mule for queuing events. This is used by
-     * both components and vm provider.
+     * Sets the queue manager used by mule for queuing events. This is used by both
+     * components and vm provider.
      * 
      * @param queueManager
      */
     void setQueueManager(QueueManager queueManager);
 
     /**
-     * Gets the queue manager used by mule for queuing events. This is used by
-     * both components and vm provider.
+     * Gets the queue manager used by mule for queuing events. This is used by both
+     * components and vm provider.
      * 
      * @return
      */

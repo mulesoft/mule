@@ -14,9 +14,8 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>NoActionTransformer</code> doesn't do any transformation on the source
- * object and returns the source as the result.
- *
- * This can be used to overload the default transform for an endpoint
+ * object and returns the source as the result. This can be used to overload the
+ * default transform for an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -44,7 +43,8 @@ public final class NoActionTransformer extends AbstractTransformer
         return src;
     }
 
-    public boolean isAcceptNull() {
+    public boolean isAcceptNull()
+    {
         return true;
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
@@ -26,5 +27,6 @@ public interface UMORouterCatchAllStrategy
 
     UMOEndpoint getEndpoint();
 
-    UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
+    UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException;
 }

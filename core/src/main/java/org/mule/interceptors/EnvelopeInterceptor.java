@@ -16,8 +16,8 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>EnvelopeInterceptor</code> is an intercepter that will fire before
- * and after an event is received.
+ * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and
+ * after an event is received.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

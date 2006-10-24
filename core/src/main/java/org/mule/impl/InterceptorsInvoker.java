@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl;
 
 import org.mule.umo.Invocation;
@@ -43,8 +44,9 @@ public class InterceptorsInvoker extends Invocation
     public UMOMessage execute() throws UMOException
     {
         UMOMessage message = null;
-        if (cursor < interceptors.size()) {
-            UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
+        if (cursor < interceptors.size())
+        {
+            UMOInterceptor interceptor = (UMOInterceptor)interceptors.get(cursor);
             incCursor();
             message = interceptor.intercept(this);
             return message;

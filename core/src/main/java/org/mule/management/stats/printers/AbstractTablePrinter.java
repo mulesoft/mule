@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats.printers;
 
 import org.mule.management.stats.ComponentStatistics;
@@ -84,7 +85,8 @@ public class AbstractTablePrinter extends PrintWriter
 
     protected void getColumn(ComponentStatistics stats, String[] col)
     {
-        if (stats == null) {
+        if (stats == null)
+        {
             return;
         }
 
@@ -118,9 +120,12 @@ public class AbstractTablePrinter extends PrintWriter
 
     protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
     {
-        if (stats.isInbound()) {
+        if (stats.isInbound())
+        {
             col[index++] = "-";
-        } else {
+        }
+        else
+        {
             col[index++] = "-";
         }
 
@@ -132,16 +137,20 @@ public class AbstractTablePrinter extends PrintWriter
         Map routed = stats.getRouted();
 
         col[index++] = "-";
-        if (!routed.isEmpty()) {
+        if (!routed.isEmpty())
+        {
             Iterator it = routed.keySet().iterator();
 
             StringBuffer buf = new StringBuffer();
-            while (it.hasNext()) {
-                String name = (String) it.next();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
                 buf.append(name).append("=").append(routed.get(name)).append(";");
             }
             col[index++] = buf.toString();
-        } else {
+        }
+        else
+        {
             col[index++] = "";
         }
         return index;
@@ -151,28 +160,34 @@ public class AbstractTablePrinter extends PrintWriter
     {
         String[] cols = getHeaders();
         String[][] table = new String[stats.size() + 1][cols.length];
-        for (int i = 0; i < cols.length; i++) {
+        for (int i = 0; i < cols.length; i++)
+        {
             table[0][i] = cols[i];
 
         }
 
         int i = 1;
-        for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++) {
-            getColumn((ComponentStatistics) iterator.next(), table[i]);
+        for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++)
+        {
+            getColumn((ComponentStatistics)iterator.next(), table[i]);
         }
         return table;
     }
 
-
     public void print(Object obj)
     {
-        if (obj instanceof Collection) {
-            print((Collection) obj);
-        } else if (obj instanceof ComponentStatistics) {
+        if (obj instanceof Collection)
+        {
+            print((Collection)obj);
+        }
+        else if (obj instanceof ComponentStatistics)
+        {
             List l = new ArrayList();
             l.add(obj);
             print(l);
-        } else {
+        }
+        else
+        {
             super.print(obj);
         }
     }
@@ -190,14 +205,16 @@ public class AbstractTablePrinter extends PrintWriter
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
-    public void println(String string) {
-        this.println((Object) string);
+    public void println(String string)
+    {
+        this.println((Object)string);
     }
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
-    public void print(String string) {
-        this.print((Object) string);
+    public void print(String string)
+    {
+        this.print((Object)string);
     }
 
 }

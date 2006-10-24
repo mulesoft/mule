@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import org.mule.umo.UMOEvent;
@@ -20,7 +21,7 @@ public class EventMemoryPersistenceStrategy extends MemoryPersistenceStrategy
 
     protected Object getId(Object obj)
     {
-        return ((UMOEvent) obj).getId();
+        return ((UMOEvent)obj).getId();
     }
 
 }

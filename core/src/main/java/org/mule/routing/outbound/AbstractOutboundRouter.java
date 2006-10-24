@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
  * statistics about message processing through the router.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -63,17 +64,25 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     {
         setMessageProperties(session, message, endpoint);
 
-        if (logger.isDebugEnabled()) {
-            try {
-                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n" + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false));
-            } catch (Exception e) {
-                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n(unable to retrieve payload: " + e.getMessage());
+        if (logger.isDebugEnabled())
+        {
+            try
+            {
+                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n"
+                             + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false));
+            }
+            catch (Exception e)
+            {
+                logger.debug("Message being sent to: " + endpoint.getEndpointURI()
+                             + " Message payload: \n(unable to retrieve payload: " + e.getMessage());
             }
         }
 
         session.dispatchEvent(message, endpoint);
-        if (routerStatistics != null) {
-            if (routerStatistics.isEnabled()) {
+        if (routerStatistics != null)
+        {
+            if (routerStatistics.isEnabled())
+            {
                 routerStatistics.incrementRoutedMessage(endpoint);
             }
         }
@@ -82,39 +91,52 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public UMOMessage send(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
 
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using asynchronous dispatch");
             dispatch(session, message, endpoint);
             return null;
         }
         setMessageProperties(session, message, endpoint);
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Message being sent to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
-        if (logger.isTraceEnabled()) {
-            try {
+        if (logger.isTraceEnabled())
+        {
+            try
+            {
                 logger.trace("Message payload: \n" + message.getPayloadAsString());
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // ignore
             }
         }
         UMOMessage result = session.sendEvent(message, endpoint);
-        if (routerStatistics != null) {
-            if (routerStatistics.isEnabled()) {
+        if (routerStatistics != null)
+        {
+            if (routerStatistics.isEnabled())
+            {
                 routerStatistics.incrementRoutedMessage(endpoint);
             }
         }
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Response message from sending to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
-         if (logger.isTraceEnabled()) {
-            try {
+        if (logger.isTraceEnabled())
+        {
+            try
+            {
                 logger.trace("Message payload: \n" + message.getPayloadAsString());
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // ignore
             }
         }
@@ -123,45 +145,61 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     protected void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint)
     {
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             // if replyTo is set we'll probably want the correlationId set as
             // well
             message.setReplyTo(replyTo);
             message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, session.getComponent()
-                                                                                        .getDescriptor()
-                                                                                        .getName());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: " + endpoint.getEndpointURI());
+                .getDescriptor()
+                .getName());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "
+                             + endpoint.getEndpointURI());
             }
         }
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
+        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "' , not setting it again");
+            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
+                                 + "' , not setting it again");
                 }
                 return;
-            } else if (correlationSet) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "', but router is configured to overwrite it");
+            }
+            else if (correlationSet)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
+                                 + "', but router is configured to overwrite it");
                 }
-            } else {
-                if(logger.isDebugEnabled()) {
+            }
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("No CorrelationId is set on the message, will set a new Id");
                 }
             }
 
             String correlation;
             Object o = propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Extracted correlation Id as: " + o);
             }
             correlation = o.toString();
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 StringBuffer buf = new StringBuffer();
-                buf.append("Setting Correlation info on Outbound router for endpoint: ")
-                   .append(endpoint.getEndpointURI());
+                buf.append("Setting Correlation info on Outbound router for endpoint: ").append(
+                    endpoint.getEndpointURI());
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
@@ -180,9 +218,10 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void setEndpoints(List endpoints)
     {
-        //this.endpoints = new CopyOnWriteArrayList(endpoints);
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
-            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+        // this.endpoints = new CopyOnWriteArrayList(endpoints);
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        {
+            UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
             addEndpoint(umoEndpoint);
         }
     }
@@ -205,9 +244,12 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void setReplyTo(String replyTo)
     {
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             this.replyTo = MuleManager.getInstance().lookupEndpointIdentifier(replyTo, replyTo);
-        } else {
+        }
+        else
+        {
             this.replyTo = null;
         }
     }
@@ -234,15 +276,24 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void setEnableCorrelationAsString(String enableCorrelation)
     {
-        if (enableCorrelation != null) {
-            if (enableCorrelation.equals("ALWAYS")) {
+        if (enableCorrelation != null)
+        {
+            if (enableCorrelation.equals("ALWAYS"))
+            {
                 this.enableCorrelation = ENABLE_CORRELATION_ALWAYS;
-            } else if (enableCorrelation.equals("NEVER")) {
+            }
+            else if (enableCorrelation.equals("NEVER"))
+            {
                 this.enableCorrelation = ENABLE_CORRELATION_NEVER;
-            } else if (enableCorrelation.equals("IF_NOT_SET")) {
+            }
+            else if (enableCorrelation.equals("IF_NOT_SET"))
+            {
                 this.enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
-            } else {
-                throw new IllegalArgumentException("Value for enableCorrelation not recognised: " + enableCorrelation);
+            }
+            else
+            {
+                throw new IllegalArgumentException("Value for enableCorrelation not recognised: "
+                                                   + enableCorrelation);
             }
         }
     }
@@ -257,13 +308,16 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         this.propertyExtractor = propertyExtractor;
     }
 
-    public void setPropertyExtractorAsString(String className) {
-        try {
-            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(
-                                                                    className, null, getClass());
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("Couldn't instanciate property extractor class " +
-                                               className);
+    public void setPropertyExtractorAsString(String className)
+    {
+        try
+        {
+            this.propertyExtractor = (PropertyExtractor)ClassUtils.instanciateClass(className, null,
+                getClass());
+        }
+        catch (Exception ex)
+        {
+            throw new IllegalArgumentException("Couldn't instanciate property extractor class " + className);
         }
     }
 
@@ -277,7 +331,8 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         this.transactionConfig = transactionConfig;
     }
 
-    public boolean isDynamicEndpoints() {
+    public boolean isDynamicEndpoints()
+    {
         return false;
     }
 }

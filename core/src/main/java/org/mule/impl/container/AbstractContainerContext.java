@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import org.apache.commons.lang.SystemUtils;
@@ -62,19 +63,25 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         // noop
     }
 
-    public final void configure(Reader configuration, String doctype, String encoding) throws ContainerException
+    public final void configure(Reader configuration, String doctype, String encoding)
+        throws ContainerException
     {
         String decl = getXmlDeclaration(encoding);
         logger.debug("Using Xml declaration: " + decl);
-        if (doctype == null) {
+        if (doctype == null)
+        {
             doctype = getDefaultDocType();
         }
-        if (doctype != null) {
-            if (!doctype.startsWith("<!DOCTYPE")) {
+        if (doctype != null)
+        {
+            if (!doctype.startsWith("<!DOCTYPE"))
+            {
                 doctype = "<!DOCTYPE " + doctype + ">";
             }
             logger.info("Using doctype: " + doctype);
-        } else {
+        }
+        else
+        {
             doctype = "";
         }
         StringReader declaration = new StringReader(decl + SystemUtils.LINE_SEPARATOR + doctype);
@@ -85,7 +92,8 @@ public abstract class AbstractContainerContext implements UMOContainerContext
 
     protected String getXmlDeclaration(String encoding)
     {
-        if (encoding == null) {
+        if (encoding == null)
+        {
             encoding = getDefaultEncoding();
         }
         return "<?xml version=\"1.0\" encoding=\"" + encoding.toUpperCase() + "\"?>";

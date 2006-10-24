@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * <code>GZipCompressTransformer</code> is a transformer compressing objects
- * into byte arrays
+ * <code>GZipCompressTransformer</code> is a transformer compressing objects into
+ * byte arrays
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,17 +42,21 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try {
+        try
+        {
             byte[] data = null;
-            if (src instanceof byte[]) {
+            if (src instanceof byte[])
+            {
                 data = (byte[])src;
             }
-            else {
+            else
+            {
                 data = SerializationUtils.serialize((Serializable)src);
             }
             return this.getStrategy().compressByteArray(data);
         }
-        catch (IOException ioex) {
+        catch (IOException ioex)
+        {
             throw new TransformerException(this, ioex);
         }
     }

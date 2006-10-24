@@ -7,11 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.i18n;
 
 /**
- * <code>CoreMessageConstants</code> contians contants for all Mule core
- * exception messages and other string.
+ * <code>CoreMessageConstants</code> contians contants for all Mule core exception
+ * messages and other string.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -180,7 +181,7 @@ public interface CoreMessageConstants
     int RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X = 164;
     int CANT_SET_X_ONCE_IT_HAS_BEEN_SET = 165;
     int EVENT_TYPE_X_NOT_RECOGNISED = 166;
-    
+
     int COMPONENT_X_IS_STOPPED = 167;
     int X_PROPERTY_IS_NOT_SET_ON_EVENT = 168;
     int EJB_OBJECT_X_MISSING_CREATE = 169;
@@ -199,29 +200,29 @@ public interface CoreMessageConstants
     int TOO_MANY_MATCHING_METHODS_FOR_X_ON_X = 182;
     int PROPERTIES_X_NOT_SET = 183;
     int SCRIPT_ENGINE_MUST_BE_COMPILABLE = 184;
-    int OBJECT_X_NOT_OF_CORRECT_TYPE_SHOULD_BE_X=185;
-    int OBJECT_X_MARKED_INVALID=186;
-    int SYSTEM_PROPERTY_X_NOT_SET=187;
-    int FAILED_TO_CONVERT_STRING_USING_X_ENCODING=188;
-    int PROPERTY_X_HAS_INVALID_VALUE_X=189;
+    int OBJECT_X_NOT_OF_CORRECT_TYPE_SHOULD_BE_X = 185;
+    int OBJECT_X_MARKED_INVALID = 186;
+    int SYSTEM_PROPERTY_X_NOT_SET = 187;
+    int FAILED_TO_CONVERT_STRING_USING_X_ENCODING = 188;
+    int PROPERTY_X_HAS_INVALID_VALUE_X = 189;
 
-    //Post 1.2 message
-    int SPACE_ACTION_X_INTERRUPTED=190;
-    int SPACE_FAILED_TO_CREATE=191;
-    int SCHEME_CANT_CHANGE_FOR_ROUTER_X_X=192;
-    int DAYS=193;
-    int HOURS=194;
-    int MINS=195;
-    int SEC=196;
+    // Post 1.2 message
+    int SPACE_ACTION_X_INTERRUPTED = 190;
+    int SPACE_FAILED_TO_CREATE = 191;
+    int SCHEME_CANT_CHANGE_FOR_ROUTER_X_X = 192;
+    int DAYS = 193;
+    int HOURS = 194;
+    int MINS = 195;
+    int SEC = 196;
 
-    //Post mule_1_3 branch merge
-    int TEMPLATE_X_CAUSED_MALFORMED_ENDPOINT_X=197;
-    int COULD_NOT_DETERMINE_DESTINATION_COMPONENT_FROM_ENDPOINT_X=198;
-    int COULD_NOT_FIND_SOAP_PROVIDER_X=199;
-    int TX_NO_CURRENT_TRANSACTION=200;
-    int SESSION_VALUE_X_IS_MALFORMED=201;
+    // Post mule_1_3 branch merge
+    int TEMPLATE_X_CAUSED_MALFORMED_ENDPOINT_X = 197;
+    int COULD_NOT_DETERMINE_DESTINATION_COMPONENT_FROM_ENDPOINT_X = 198;
+    int COULD_NOT_FIND_SOAP_PROVIDER_X = 199;
+    int TX_NO_CURRENT_TRANSACTION = 200;
+    int SESSION_VALUE_X_IS_MALFORMED = 201;
 
-    //post Mule 1.3-rc1
+    // post Mule 1.3-rc1
     int ROUTER_CAN_ONLY_HAVE_ONE_ENDPOINT = 202;
     int ENDPOINT_X_IS_NOT_STREAMING = 203;
     int ENDPOINT_X_DOES_NOT_SUPPORT_STREAMING = 204;
@@ -229,6 +230,6 @@ public interface CoreMessageConstants
     int CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X = 206;
     int FAILED_TO_READ_ATTACHMENT_X = 207;
 
-    //post Mule 1.3-rc2
+    // post Mule 1.3-rc2
     int FAILED_TO_INITIALIZE_SECURITY_PROVIDER = 208;
 }

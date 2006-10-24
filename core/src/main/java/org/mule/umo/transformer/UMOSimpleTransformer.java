@@ -15,12 +15,11 @@ import org.mule.umo.lifecycle.Initialisable;
 import java.io.Serializable;
 
 /**
- * <code>UMOSimpleTransformer</code> manages the transformation and or
- * translation of one type of data to the other. Source data is received, then
- * processed and returned via the <code>transform()</code> method. <p/> The
- * return Class is specifed so that the return message is validated defore it is
- * returned.
- *
+ * <code>UMOSimpleTransformer</code> manages the transformation and or translation
+ * of one type of data to the other. Source data is received, then processed and
+ * returned via the <code>transform()</code> method. <p/> The return Class is
+ * specifed so that the return message is validated defore it is returned.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,12 +34,11 @@ public interface UMOSimpleTransformer extends Initialisable, Serializable, Clone
 
     /**
      * Thransforms the supllied data and returns the result
-     *
+     * 
      * @param src the data to transform
      * @return the transformed data
-     * @throws TransformerException if a error occurs transforming the data or
-     *             if the expected returnClass isn't the same as the transformed
-     *             data
+     * @throws TransformerException if a error occurs transforming the data or if the
+     *             expected returnClass isn't the same as the transformed data
      */
     Object transform(Object src) throws TransformerException;
 
@@ -55,10 +53,10 @@ public interface UMOSimpleTransformer extends Initialisable, Serializable, Clone
     String getName();
 
     /**
-     * Sets the expected return type for the transformed data. If the
-     * transformed data is not of this class type a
-     * <code>TransformerException</code> will be thrown.
-     *
+     * Sets the expected return type for the transformed data. If the transformed
+     * data is not of this class type a <code>TransformerException</code> will be
+     * thrown.
+     * 
      * @param theClass the expected return type class
      */
     void setReturnClass(Class theClass);

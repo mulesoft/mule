@@ -7,17 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.endpoint;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 /**
- * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI
- * class if it fails to parse a Url
+ * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI class
+ * if it fails to parse a Url
  * 
  * @see org.mule.impl.endpoint.MuleEndpointURI
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

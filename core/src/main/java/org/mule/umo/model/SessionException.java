@@ -13,8 +13,8 @@ package org.mule.umo.model;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>SessionException</code> is thrown when errors occur in the
- * MuleSession or Seession Manager
+ * <code>SessionException</code> is thrown when errors occur in the MuleSession or
+ * Seession Manager
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

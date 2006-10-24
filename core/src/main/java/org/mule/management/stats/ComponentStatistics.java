@@ -49,7 +49,6 @@ public class ComponentStatistics implements Statistics
     private RouterStatistics outboundRouterStat = null;
 
     /**
-     * 
      * The constructor
      * 
      * @param name
@@ -79,10 +78,12 @@ public class ComponentStatistics implements Statistics
     {
         enabled = b;
 
-        if (inboundRouterStat != null) {
+        if (inboundRouterStat != null)
+        {
             inboundRouterStat.setEnabled(b);
         }
-        if (outboundRouterStat != null) {
+        if (outboundRouterStat != null)
+        {
             outboundRouterStat.setEnabled(b);
         }
     }
@@ -126,7 +127,8 @@ public class ComponentStatistics implements Statistics
     {
         queuedEvent++;
         totalQueuedEvent++;
-        if (queuedEvent > maxQueuedEvent) {
+        if (queuedEvent > maxQueuedEvent)
+        {
             maxQueuedEvent = queuedEvent;
         }
         // if(queuedEvent > 1) {
@@ -145,10 +147,12 @@ public class ComponentStatistics implements Statistics
 
         totalExecTime += (time == 0 ? 1 : time);
 
-        if (minExecutionTime == 0 || time < minExecutionTime) {
+        if (minExecutionTime == 0 || time < minExecutionTime)
+        {
             minExecutionTime = time;
         }
-        if (maxExecutionTime == 0 || time > maxExecutionTime) {
+        if (maxExecutionTime == 0 || time > maxExecutionTime)
+        {
             maxExecutionTime = time;
         }
         averageExecutionTime = Math.round(totalExecTime / executedEvent);
@@ -286,10 +290,12 @@ public class ComponentStatistics implements Statistics
         minExecutionTime = 0;
         maxExecutionTime = 0;
 
-        if (getInboundRouterStat() != null) {
+        if (getInboundRouterStat() != null)
+        {
             getInboundRouterStat().clear();
         }
-        if (getOutboundRouterStat() != null) {
+        if (getOutboundRouterStat() != null)
+        {
             getOutboundRouterStat().clear();
         }
 
@@ -349,7 +355,8 @@ public class ComponentStatistics implements Statistics
     public synchronized void setComponentPoolSize(int componentPoolSize)
     {
         this.componentPoolSize = componentPoolSize;
-        if (componentPoolSize > componentPoolAbsoluteMaxSize) {
+        if (componentPoolSize > componentPoolAbsoluteMaxSize)
+        {
             componentPoolAbsoluteMaxSize = componentPoolSize;
         }
     }

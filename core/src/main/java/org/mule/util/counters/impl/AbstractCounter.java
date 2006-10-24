@@ -55,7 +55,8 @@ public abstract class AbstractCounter implements Counter
 
     protected void addAggregate(AggregateCounter counter)
     {
-        if (this.aggregates == null) {
+        if (this.aggregates == null)
+        {
             this.aggregates = new ArrayList();
         }
         this.aggregates.add(counter);
@@ -63,10 +64,12 @@ public abstract class AbstractCounter implements Counter
 
     protected void propagate()
     {
-        if (this.aggregates != null) {
+        if (this.aggregates != null)
+        {
             Iterator it = this.aggregates.iterator();
-            while (it.hasNext()) {
-                AggregateCounter agg = (AggregateCounter) it.next();
+            while (it.hasNext())
+            {
+                AggregateCounter agg = (AggregateCounter)it.next();
                 agg.compute();
             }
         }

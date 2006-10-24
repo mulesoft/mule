@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats.printers;
 
 import java.io.OutputStream;
@@ -36,19 +37,25 @@ public class CSVPrinter extends AbstractTablePrinter
 
     public void print(Collection stats)
     {
-        try {
+        try
+        {
             String[][] table = getTable(stats);
             int i = (printHeaders ? 0 : 1);
-            for (; i < table.length; i++) {
-                for (int j = 0; j < table[0].length; j++) {
+            for (; i < table.length; i++)
+            {
+                for (int j = 0; j < table[0].length; j++)
+                {
                     print(table[i][j]);
-                    if (j + 1 != table[i].length) {
+                    if (j + 1 != table[i].length)
+                    {
                         print(delim);
                     }
                 }
                 println();
             }
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }

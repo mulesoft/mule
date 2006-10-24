@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.security;
 
 import org.mule.config.MuleProperties;
@@ -14,8 +15,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.security.UMOCredentialsAccessor;
 
 /**
- * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user
- * credentials as Mule property headers
+ * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user credentials
+ * as Mule property headers
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

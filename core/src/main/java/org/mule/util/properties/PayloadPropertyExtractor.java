@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.properties;
 
 import org.mule.umo.UMOMessage;
@@ -18,8 +19,7 @@ import org.apache.commons.logging.Log;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Checks the payload object for a bean property matching the property
- * name
+ * Checks the payload object for a bean property matching the property name
  */
 public class PayloadPropertyExtractor implements PropertyExtractor
 {
@@ -31,7 +31,7 @@ public class PayloadPropertyExtractor implements PropertyExtractor
     public Object getProperty(String name, Object message)
     {
         Object payload = message;
-        if(message instanceof UMOMessage)
+        if (message instanceof UMOMessage)
         {
             payload = ((UMOMessage)message).getPayload();
         }
@@ -41,7 +41,7 @@ public class PayloadPropertyExtractor implements PropertyExtractor
             if ((PropertyUtils.getPropertyDescriptor(payload, name) != null))
             {
                 value = PropertyUtils.getProperty(payload, name);
-                if(value==null)
+                if (value == null)
                 {
                     value = StringUtils.EMPTY;
                 }
@@ -49,7 +49,7 @@ public class PayloadPropertyExtractor implements PropertyExtractor
         }
         catch (IllegalAccessException e)
         {
-            logger.warn("Failed to read property: " + name, e);            
+            logger.warn("Failed to read property: " + name, e);
         }
         catch (InvocationTargetException e)
         {
@@ -57,7 +57,7 @@ public class PayloadPropertyExtractor implements PropertyExtractor
         }
         catch (NoSuchMethodException e)
         {
-            //will never happen
+            // will never happen
         }
         return value;
     }

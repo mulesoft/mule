@@ -36,19 +36,24 @@ public class CompressionHelper
 
     synchronized public static CompressionStrategy getDefaultCompressionStrategy()
     {
-        if (defaultStrategy == null) {
-            defaultStrategy = (CompressionStrategy)AccessController.doPrivileged(new PrivilegedAction() {
+        if (defaultStrategy == null)
+        {
+            defaultStrategy = (CompressionStrategy)AccessController.doPrivileged(new PrivilegedAction()
+            {
                 public Object run()
                 {
-                    try {
+                    try
+                    {
                         Object o = ClassUtils.loadClass(CompressionStrategy.COMPRESSION_DEFAULT,
-                                CompressionHelper.class).newInstance();
-                        if (logger.isDebugEnabled()) {
+                            CompressionHelper.class).newInstance();
+                        if (logger.isDebugEnabled())
+                        {
                             logger.debug("Found CompressionStrategy: " + o.getClass().getName());
                         }
                         return o;
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         logger.warn("Failed to build compression strategy: " + e.getMessage());
                     }
                     return null;

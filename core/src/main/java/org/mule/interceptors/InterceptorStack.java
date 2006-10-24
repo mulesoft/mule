@@ -61,11 +61,14 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
 
         public UMOMessage execute() throws UMOException
         {
-            if (interceptors != null && cursor < interceptors.size()) {
-                UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
+            if (interceptors != null && cursor < interceptors.size())
+            {
+                UMOInterceptor interceptor = (UMOInterceptor)interceptors.get(cursor);
                 cursor++;
                 setMessage(interceptor.intercept(this));
-            } else {
+            }
+            else
+            {
                 invocation.setMessage(getMessage());
                 setMessage(invocation.execute());
             }
@@ -86,20 +89,24 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
 
     public void initialise() throws InitialisationException
     {
-        for (Iterator it = interceptors.iterator(); it.hasNext();) {
-            UMOInterceptor interceptor = (UMOInterceptor) it.next();
-            if (interceptor instanceof Initialisable) {
-                ((Initialisable) interceptor).initialise();
+        for (Iterator it = interceptors.iterator(); it.hasNext();)
+        {
+            UMOInterceptor interceptor = (UMOInterceptor)it.next();
+            if (interceptor instanceof Initialisable)
+            {
+                ((Initialisable)interceptor).initialise();
             }
         }
     }
 
     public void dispose()
     {
-        for (Iterator it = interceptors.iterator(); it.hasNext();) {
-            UMOInterceptor interceptor = (UMOInterceptor) it.next();
-            if (interceptor instanceof Disposable) {
-                ((Disposable) interceptor).dispose();
+        for (Iterator it = interceptors.iterator(); it.hasNext();)
+        {
+            UMOInterceptor interceptor = (UMOInterceptor)it.next();
+            if (interceptor instanceof Disposable)
+            {
+                ((Disposable)interceptor).dispose();
             }
         }
     }

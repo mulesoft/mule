@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats;
 
 import org.mule.management.stats.printers.AbstractTablePrinter;
@@ -46,12 +47,16 @@ public class AllStatistics
     public void logSummary(PrintWriter printer)
     {
 
-        if (printer instanceof AbstractTablePrinter) {
+        if (printer instanceof AbstractTablePrinter)
+        {
             printer.print(componentStat.values());
-        } else {
+        }
+        else
+        {
             Iterator it = componentStat.values().iterator();
 
-            while (it.hasNext()) {
+            while (it.hasNext())
+            {
                 printer.print(it.next());
             }
         }
@@ -65,8 +70,9 @@ public class AllStatistics
 
         Iterator it = getComponentStatistics().iterator();
 
-        while (it.hasNext()) {
-            ((Statistics) it.next()).clear();
+        while (it.hasNext())
+        {
+            ((Statistics)it.next()).clear();
         }
         startTime = System.currentTimeMillis();
     }
@@ -88,8 +94,9 @@ public class AllStatistics
 
         Iterator it = componentStat.values().iterator();
 
-        while (it.hasNext()) {
-            ((ComponentStatistics) it.next()).setEnabled(b);
+        while (it.hasNext())
+        {
+            ((ComponentStatistics)it.next()).setEnabled(b);
         }
     }
 
@@ -105,14 +112,16 @@ public class AllStatistics
 
     public synchronized void add(ComponentStatistics stat)
     {
-        if (stat != null) {
+        if (stat != null)
+        {
             componentStat.put(stat.getName(), stat);
         }
     }
 
     public synchronized void remove(ComponentStatistics stat)
     {
-        if (stat != null) {
+        if (stat != null)
+        {
             componentStat.remove(stat.getName());
         }
     }

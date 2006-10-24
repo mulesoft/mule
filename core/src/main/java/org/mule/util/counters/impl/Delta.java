@@ -29,9 +29,12 @@ public class Delta extends AggregateCounter
 
     public double nextValue()
     {
-        if (first == Double.NaN || second == Double.NaN) {
+        if (first == Double.NaN || second == Double.NaN)
+        {
             return Double.NaN;
-        } else {
+        }
+        else
+        {
             return second - first > 0.0 ? second - first : 0.0;
         }
     }

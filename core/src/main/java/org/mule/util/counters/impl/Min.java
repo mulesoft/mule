@@ -34,9 +34,12 @@ public class Min extends AggregateCounter
     public void doCompute()
     {
         double next = getBase().nextValue();
-        if (min == Double.NaN) {
+        if (min == Double.NaN)
+        {
             min = next;
-        } else if (next < min) {
+        }
+        else if (next < min)
+        {
             min = next;
         }
     }

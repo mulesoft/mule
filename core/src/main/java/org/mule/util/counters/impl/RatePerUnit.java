@@ -60,21 +60,32 @@ public class RatePerUnit extends AggregateCounter
     public RatePerUnit(String name, String p, Type type, AbstractCounter base)
     {
         super(name, type, base);
-        if (type == Type.RATE_PER_SECOND) {
+        if (type == Type.RATE_PER_SECOND)
+        {
             unit = 1000;
-        } else if (type == Type.RATE_PER_MINUTE) {
+        }
+        else if (type == Type.RATE_PER_MINUTE)
+        {
             unit = 60 * 1000;
-        } else if (type == Type.RATE_PER_HOUR) {
+        }
+        else if (type == Type.RATE_PER_HOUR)
+        {
             unit = 60 * 60 * 1000;
-        } else {
+        }
+        else
+        {
             throw new InvalidParameterException();
         }
-        try {
+        try
+        {
             length = Long.parseLong(p);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             length = 0;
         }
-        if (length <= 0) {
+        if (length <= 0)
+        {
             length = 128;
         }
         samples = new LinkedList();
@@ -83,16 +94,21 @@ public class RatePerUnit extends AggregateCounter
 
     public double nextValue()
     {
-        if (samples.isEmpty()) {
+        if (samples.isEmpty())
+        {
             return 0.0;
-        } else {
+        }
+        else
+        {
             double total = 0.0;
             long current = getTime();
             Iterator it = samples.iterator();
             Sample sample = null;
-            while (it.hasNext()) {
-                sample = (Sample) it.next();
-                if (current - sample.time > length) {
+            while (it.hasNext())
+            {
+                sample = (Sample)it.next();
+                if (current - sample.time > length)
+                {
                     break;
                 }
                 total += sample.value;
@@ -103,15 +119,19 @@ public class RatePerUnit extends AggregateCounter
 
     public void doCompute()
     {
-        Sample l = samples.isEmpty() ? null : (Sample) samples.getFirst();
+        Sample l = samples.isEmpty() ? null : (Sample)samples.getFirst();
         long t = getTime();
-        if (l == null || t > l.time) {
+        if (l == null || t > l.time)
+        {
             Sample s = new Sample(getBase().nextValue(), t);
             samples.addFirst(s);
-        } else {
+        }
+        else
+        {
             l.value += getBase().nextValue();
         }
-        while (samples.size() > length) {
+        while (samples.size() > length)
+        {
             samples.removeLast();
         }
     }

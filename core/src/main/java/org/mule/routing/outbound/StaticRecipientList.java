@@ -41,7 +41,8 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(), getListDelimiter()));
+            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(),
+                getListDelimiter()));
         }
         else
         {
@@ -69,8 +70,9 @@ public class StaticRecipientList extends AbstractRecipientList
     }
 
     /**
-     * Overloading classes can change the delimiter used to separate entries in the recipient list
-     * By default a ',' is used.
+     * Overloading classes can change the delimiter used to separate entries in the
+     * recipient list By default a ',' is used.
+     * 
      * @return The list delimiter to use
      */
     protected String getListDelimiter()

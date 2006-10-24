@@ -55,9 +55,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that
- * that can be executed in it's own thread.
- *
+ * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
+ * can be executed in it's own thread.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -100,12 +100,12 @@ public class DefaultMuleProxy implements MuleProxy
     /**
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO
      * itself
-     *
+     * 
      * @param component the underlying object that with receive events
-     * @param descriptor the UMOComponent descriptor associated with the
-     *            component
+     * @param descriptor the UMOComponent descriptor associated with the component
      */
-    public DefaultMuleProxy(Object component, MuleDescriptor descriptor, ObjectPool proxyPool) throws UMOException
+    public DefaultMuleProxy(Object component, MuleDescriptor descriptor, ObjectPool proxyPool)
+        throws UMOException
     {
         this.descriptor = new ImmutableMuleDescriptor(descriptor);
         this.proxyPool = proxyPool;
@@ -119,14 +119,19 @@ public class DefaultMuleProxy implements MuleProxy
         interceptorList.addAll(descriptor.getInterceptors());
         interceptorList.add(umo);
 
-        for (Iterator iter = interceptorList.iterator(); iter.hasNext();) {
-            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
-            if (interceptor instanceof Initialisable) {
-                try {
-                    ((Initialisable) interceptor).initialise();
-                } catch (Exception e) {
-                    throw new ModelException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component '"
-                            + descriptor.getName() + "'"), e);
+        for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
+        {
+            UMOInterceptor interceptor = (UMOInterceptor)iter.next();
+            if (interceptor instanceof Initialisable)
+            {
+                try
+                {
+                    ((Initialisable)interceptor).initialise();
+                }
+                catch (Exception e)
+                {
+                    throw new ModelException(new Message(Messages.X_FAILED_TO_INITIALISE,
+                        "Component '" + descriptor.getName() + "'"), e);
                 }
             }
         }
@@ -135,12 +140,16 @@ public class DefaultMuleProxy implements MuleProxy
     public void start() throws UMOException
     {
         checkDisposed();
-        if (!umo.isStarted()) {
-            try {
+        if (!umo.isStarted())
+        {
+            try
+            {
                 umo.start();
-            } catch (Exception e) {
-                throw new ModelException(new Message(Messages.FAILED_TO_START_X, "Component '" + descriptor.getName()
-                        + "'"), e);
+            }
+            catch (Exception e)
+            {
+                throw new ModelException(
+                    new Message(Messages.FAILED_TO_START_X, "Component '" + descriptor.getName() + "'"), e);
             }
         }
 
@@ -154,12 +163,16 @@ public class DefaultMuleProxy implements MuleProxy
     public void stop() throws UMOException
     {
         checkDisposed();
-        if (umo.isStarted()) {
-            try {
+        if (umo.isStarted())
+        {
+            try
+            {
                 umo.stop();
-            } catch (Exception e) {
-                throw new ModelException(new Message(Messages.FAILED_TO_STOP_X, "Component '" + descriptor.getName()
-                        + "'"), e);
+            }
+            catch (Exception e)
+            {
+                throw new ModelException(
+                    new Message(Messages.FAILED_TO_STOP_X, "Component '" + descriptor.getName() + "'"), e);
             }
         }
     }
@@ -167,14 +180,19 @@ public class DefaultMuleProxy implements MuleProxy
     public void dispose()
     {
         checkDisposed();
-        for (Iterator iter = interceptorList.iterator(); iter.hasNext();) {
-            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
-            if (interceptor instanceof Disposable) {
-                try {
-                    ((Disposable) interceptor).dispose();
-                } catch (Exception e) {
-                    logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"),
-                                 e);
+        for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
+        {
+            UMOInterceptor interceptor = (UMOInterceptor)iter.next();
+            if (interceptor instanceof Disposable)
+            {
+                try
+                {
+                    ((Disposable)interceptor).dispose();
+                }
+                catch (Exception e)
+                {
+                    logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '"
+                                                                           + descriptor.getName() + "'"), e);
                 }
             }
         }
@@ -182,14 +200,15 @@ public class DefaultMuleProxy implements MuleProxy
 
     private void checkDisposed()
     {
-        if (umo.isDisposed()) {
+        if (umo.isDisposed())
+        {
             throw new IllegalStateException("Component has already been disposed of");
         }
     }
 
     /**
      * Sets the current event being processed
-     *
+     * 
      * @param event the event being processed
      */
     public void onEvent(QueueSession session, UMOEvent event)
@@ -210,7 +229,7 @@ public class DefaultMuleProxy implements MuleProxy
 
     /**
      * Makes a synchronous call on the UMO
-     *
+     * 
      * @param event the event to pass to the UMO
      * @return the return event from the UMO
      * @throws UMOException if the call fails
@@ -220,78 +239,103 @@ public class DefaultMuleProxy implements MuleProxy
         logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
 
         UMOMessage returnMessage = null;
-        try {
-            if (event.getEndpoint().canReceive()) {
+        try
+        {
+            if (event.getEndpoint().canReceive())
+            {
                 RequestContext.setEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
+                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor,
+                    event.getMessage());
 
                 // stats
                 long startTime = 0;
-                if (stat.isEnabled()) {
+                if (stat.isEnabled())
+                {
                     startTime = System.currentTimeMillis();
                 }
                 returnMessage = invoker.execute();
 
                 // stats
-                if (stat.isEnabled()) {
+                if (stat.isEnabled())
+                {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
                 }
                 // this is the request event
                 event = RequestContext.getEvent();
-                if (event.isStopFurtherProcessing()) {
+                if (event.isStopFurtherProcessing())
+                {
                     logger.debug("Event stop further processing has been set, no outbound routing will be performed.");
                 }
-                if (returnMessage != null && !event.isStopFurtherProcessing()) {
-                    if(descriptor.getOutboundRouter().hasEndpoints()) {
-                        UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
-                        if(outboundReturnMessage!=null) {
+                if (returnMessage != null && !event.isStopFurtherProcessing())
+                {
+                    if (descriptor.getOutboundRouter().hasEndpoints())
+                    {
+                        UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(
+                            returnMessage, event.getSession(), event.isSynchronous());
+                        if (outboundReturnMessage != null)
+                        {
                             returnMessage = outboundReturnMessage;
                         }
-                    } else {
-                        logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured.");
+                    }
+                    else
+                    {
+                        logger.debug("Outbound router on component '" + descriptor.getName()
+                                     + "' doesn't have any endpoints configured.");
                     }
                 }
 
-                //Process Response Router
-                if (returnMessage != null && descriptor.getResponseRouter() != null) {
+                // Process Response Router
+                if (returnMessage != null && descriptor.getResponseRouter() != null)
+                {
                     logger.debug("Waiting for response router message");
                     returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
                 }
 
                 // process repltyTo if there is one
-                if (returnMessage != null && replyToHandler != null) {
-                    String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
+                if (returnMessage != null && replyToHandler != null)
+                {
+                    String requestor = (String)returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
+                    {
                         replyToHandler.processReplyTo(event, returnMessage, replyTo);
                     }
                 }
 
-
-            } else {
+            }
+            else
+            {
                 returnMessage = event.getSession().sendEvent(event);
                 processReplyTo(returnMessage);
             }
 
             // stats
-            if (stat.isEnabled()) {
+            if (stat.isEnabled())
+            {
                 stat.incSentEventSync();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             event.getSession().setValid(false);
-            if(e instanceof MessagingException) {
+            if (e instanceof MessagingException)
+            {
                 handleException(e);
-            } else {
+            }
+            else
+            {
                 handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
-                                                           descriptor.getName()), event.getMessage(), e));
+                    descriptor.getName()), event.getMessage(), e));
             }
 
-            if(returnMessage==null) {
+            if (returnMessage == null)
+            {
                 returnMessage = new MuleMessage(new NullPayload(), (Map)null);
             }
             UMOExceptionPayload exceptionPayload = RequestContext.getExceptionPayload();
-            if(exceptionPayload==null) {
+            if (exceptionPayload == null)
+            {
                 exceptionPayload = new ExceptionPayload(e);
             }
             returnMessage.setExceptionPayload(exceptionPayload);
@@ -300,8 +344,8 @@ public class DefaultMuleProxy implements MuleProxy
     }
 
     /**
-     * When an exception occurs this method can be called to invoke the
-     * configured UMOExceptionStrategy on the UMO
+     * When an exception occurs this method can be called to invoke the configured
+     * UMOExceptionStrategy on the UMO
      * 
      * @param exception If the UMOExceptionStrategy implementation fails
      */
@@ -346,13 +390,16 @@ public class DefaultMuleProxy implements MuleProxy
         suspended = false;
     }
 
-    protected ReplyToHandler getReplyToHandler(UMOMessage message, UMOImmutableEndpoint endpoint) {
+    protected ReplyToHandler getReplyToHandler(UMOMessage message, UMOImmutableEndpoint endpoint)
+    {
         Object replyTo = message.getReplyTo();
         ReplyToHandler replyToHandler = null;
-        if (replyTo != null) {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
-            //Use the response transformer for the event if one is set
-            if(endpoint.getResponseTransformer()!=null) {
+        if (replyTo != null)
+        {
+            replyToHandler = ((AbstractConnector)endpoint.getConnector()).getReplyToHandler();
+            // Use the response transformer for the event if one is set
+            if (endpoint.getResponseTransformer() != null)
+            {
                 replyToHandler.setTransformer(endpoint.getResponseTransformer());
             }
         }
@@ -361,12 +408,14 @@ public class DefaultMuleProxy implements MuleProxy
 
     private void processReplyTo(UMOMessage returnMessage) throws UMOException
     {
-        if (returnMessage != null && returnMessage.getReplyTo() != null) {
+        if (returnMessage != null && returnMessage.getReplyTo() != null)
+        {
             logger.info("sending reply to: " + returnMessage.getReplyTo());
             UMOEndpointURI endpointUri = new MuleEndpointURI(returnMessage.getReplyTo().toString());
 
             // get the endpointUri for this uri
-            UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
             // make sure remove the replyTo property as not cause a a forever
             // replyto loop
@@ -378,7 +427,8 @@ public class DefaultMuleProxy implements MuleProxy
             // queue the event
             onEvent(queueSession, replyToEvent);
             logger.info("reply to sent: " + returnMessage.getReplyTo());
-            if (stat.isEnabled()) {
+            if (stat.isEnabled())
+            {
                 stat.incSentReplyToEvent();
             }
         }
@@ -393,59 +443,79 @@ public class DefaultMuleProxy implements MuleProxy
     {
         logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
 
-        try {
-            if (event.getEndpoint().canReceive()) {
+        try
+        {
+            if (event.getEndpoint().canReceive())
+            {
                 // dispatch the next receiver
                 RequestContext.setEvent(event);
-                Object replyTo = event.getMessage().getReplyTo();                
+                Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
+                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor,
+                    event.getMessage());
 
                 // do stats
                 long startTime = 0;
-                if (stat.isEnabled()) {
+                if (stat.isEnabled())
+                {
                     startTime = System.currentTimeMillis();
                 }
                 UMOMessage result = invoker.execute();
-                if (stat.isEnabled()) {
+                if (stat.isEnabled())
+                {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
                 }
                 // processResponse(result, replyTo, replyToHandler);
                 event = RequestContext.getEvent();
-                if (result != null && !event.isStopFurtherProcessing()) {
+                if (result != null && !event.isStopFurtherProcessing())
+                {
                     descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }
 
                 // process repltyTo if there is one
-                if (result != null && replyToHandler != null) {
-                    String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
+                if (result != null && replyToHandler != null)
+                {
+                    String requestor = (String)result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
+                    {
                         replyToHandler.processReplyTo(event, result, replyTo);
                     }
                 }
-            } else {
-                UMOMessageDispatcher dispatcher = event.getEndpoint()
-                                                       .getConnector()
-                                                       .getDispatcher(event.getEndpoint());
+            }
+            else
+            {
+                UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(
+                    event.getEndpoint());
                 dispatcher.dispatch(event);
             }
 
-            if (stat.isEnabled()) {
+            if (stat.isEnabled())
+            {
                 stat.incSentEventASync();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             event.getSession().setValid(false);
-            if (e instanceof MessagingException) {
+            if (e instanceof MessagingException)
+            {
                 handleException(e);
-            } else {
-                handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
-                                                                   descriptor.getName()), event.getMessage(), e));
             }
-        } finally {
+            else
+            {
+                handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
+                    descriptor.getName()), event.getMessage(), e));
+            }
+        }
+        finally
+        {
 
-            try {
+            try
+            {
                 proxyPool.returnObject(this);
-            } catch (Exception e2) {
+            }
+            catch (Exception e2)
+            {
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
             getStatistics().setComponentPoolSize(proxyPool.getSize());

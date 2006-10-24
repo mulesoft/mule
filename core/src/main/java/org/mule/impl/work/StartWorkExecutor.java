@@ -34,10 +34,7 @@ import org.mule.util.concurrent.Latch;
 import javax.resource.spi.work.WorkException;
 
 /**
- * 
- * 
  * @version $Rev$ $Date$
- * 
  */
 public class StartWorkExecutor implements WorkExecutor
 {

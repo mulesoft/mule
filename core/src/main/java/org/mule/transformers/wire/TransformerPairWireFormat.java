@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.wire;
 
 import org.mule.umo.UMOException;
@@ -40,14 +41,16 @@ public class TransformerPairWireFormat implements WireFormat
         if (inboundTransformer.isSourceTypeSupported(InputStream.class))
         {
             return inboundTransformer.transform(in);
-        } else
+        }
+        else
         {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try
             {
                 IOUtils.copy(in, baos);
                 return inboundTransformer.transform(baos.toByteArray());
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD, e));
             }
@@ -58,7 +61,8 @@ public class TransformerPairWireFormat implements WireFormat
     {
         if (outboundTransformer == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "outboundTransformer").getMessage());
+            throw new NullPointerException(
+                new Message(Messages.X_IS_NULL, "outboundTransformer").getMessage());
         }
         try
         {
@@ -67,27 +71,31 @@ public class TransformerPairWireFormat implements WireFormat
             {
                 Object result = outboundTransformer.transform(o);
                 out.write(result.toString().getBytes(MuleManager.getConfiguration().getEncoding()));
-            } else if (returnClass.equals(byte[].class))
+            }
+            else if (returnClass.equals(byte[].class))
             {
-                byte[] b = (byte[]) outboundTransformer.transform(o);
+                byte[] b = (byte[])outboundTransformer.transform(o);
                 out.write(b);
-            } else
+            }
+            else
             {
                 if (returnClass != null && returnClass.equals(String.class))
                 {
-                    String s = (String) outboundTransformer.transform(o);
+                    String s = (String)outboundTransformer.transform(o);
                     out.write(s.getBytes(MuleManager.getConfiguration().getEncoding()));
-                } else
+                }
+                else
                 {
-                    throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()));
+                    throw new TransformerException(
+                        new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()));
                 }
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass(), e));
         }
     }
-
 
     public UMOTransformer getInboundTransformer()
     {

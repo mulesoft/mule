@@ -19,8 +19,8 @@ import org.mule.umo.provider.UMOConnectable;
 
 /**
  * A simple connection retry strategy where the a connection will be attempted X
- * number of retryCount every Y milliseconds. The <i>retryCount</i> and
- * <i>frequency</i> properties can be set to customise the behaviour.
+ * number of retryCount every Y milliseconds. The <i>retryCount</i> and <i>frequency</i>
+ * properties can be set to customise the behaviour.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,45 +42,60 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 
     public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
-        while (true) {
-            int currentCount = ((AtomicInteger) count.get()).incrementAndGet();
+        while (true)
+        {
+            int currentCount = ((AtomicInteger)count.get()).incrementAndGet();
 
-            try {
+            try
+            {
                 connectable.connect();
-                if (logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("Successfully connected to " + getDescription(connectable));
                 }
                 break;
-            } catch (InterruptedException ie) {
-                //If we were interrupted it's probably because the server is shutting down
+            }
+            catch (InterruptedException ie)
+            {
+                // If we were interrupted it's probably because the server is
+                // shutting down
                 throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                                                getClass().getName(),
-                                                                getDescription(connectable)), ie, connectable);
-            } catch (Exception e) {
-                if (currentCount == retryCount) {
-                    throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                                                getClass().getName(),
-                                                                getDescription(connectable)), e, connectable);
+                    getClass().getName(), getDescription(connectable)), ie, connectable);
+            }
+            catch (Exception e)
+            {
+                if (currentCount == retryCount)
+                {
+                    throw new FatalConnectException(new Message(
+                        Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, getClass().getName(),
+                        getDescription(connectable)), e, connectable);
                 }
 
-                if(logger.isErrorEnabled()) {
+                if (logger.isErrorEnabled())
+                {
                     StringBuffer msg = new StringBuffer(512);
-                    msg.append("Failed to connect/reconnect on endpoint: ").append(getDescription(connectable));
+                    msg.append("Failed to connect/reconnect on endpoint: ").append(
+                        getDescription(connectable));
                     Throwable t = ExceptionHelper.getRootException(e);
                     msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
                     logger.error(msg.toString(), e);
                 }
 
-                if (logger.isInfoEnabled()) {
-                    logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt " + currentCount + " of " + retryCount);
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt "
+                                + currentCount + " of " + retryCount);
                 }
 
-                try {
+                try
+                {
                     Thread.sleep(frequency);
-                } catch (InterruptedException e1) {
-                    throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                            getClass().getName(),
-                            getDescription(connectable)), e, connectable);
+                }
+                catch (InterruptedException e1)
+                {
+                    throw new FatalConnectException(new Message(
+                        Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, getClass().getName(),
+                        getDescription(connectable)), e, connectable);
                 }
             }
         }
@@ -89,8 +104,9 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     /**
      * Resets any state stored in the retry strategy
      */
-    public synchronized void resetState() {
-        ((AtomicInteger) count.get()).set(0);
+    public synchronized void resetState()
+    {
+        ((AtomicInteger)count.get()).set(0);
     }
 
     public int getRetryCount()

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.encryption;
 
 import org.mule.MuleManager;
@@ -21,9 +22,8 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * <code>EncryptionTransformer</code> will transform an array of bytes or
- * string into an encrypted array of bytes
- * 
+ * <code>EncryptionTransformer</code> will transform an array of bytes or string
+ * into an encrypted array of bytes
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -43,27 +43,42 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buf;
-        if (src instanceof String) {
+        if (src instanceof String)
+        {
             buf = src.toString().getBytes();
-        } else {
-            buf = (byte[]) src;
         }
-        try {
-          byte[] result = getTransformedBytes(buf);
-          if (getReturnClass().equals(String.class)) {
-            if (encoding != null) {
-              try {
-                return new String(result, encoding);
-              } catch (UnsupportedEncodingException ex){
-                return new String(result);
-              }
-            } else {
-              return new String(result);
+        else
+        {
+            buf = (byte[])src;
+        }
+        try
+        {
+            byte[] result = getTransformedBytes(buf);
+            if (getReturnClass().equals(String.class))
+            {
+                if (encoding != null)
+                {
+                    try
+                    {
+                        return new String(result, encoding);
+                    }
+                    catch (UnsupportedEncodingException ex)
+                    {
+                        return new String(result);
+                    }
+                }
+                else
+                {
+                    return new String(result);
+                }
             }
-          } else {
-            return result;
-          }
-        } catch (CryptoFailureException e) {
+            else
+            {
+                return result;
+            }
+        }
+        catch (CryptoFailureException e)
+        {
             throw new TransformerException(this, e);
         }
     }
@@ -75,21 +90,27 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * properties have been set on this transformer
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     * 
      */
     public void initialise() throws InitialisationException
     {
-        if (strategyName != null) {
-            if (MuleManager.getInstance().getSecurityManager() == null) {
-                if (strategy == null) {
-                    throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
+        if (strategyName != null)
+        {
+            if (MuleManager.getInstance().getSecurityManager() == null)
+            {
+                if (strategy == null)
+                {
+                    throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET),
+                        this);
 
                 }
-            } else {
+            }
+            else
+            {
                 strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
             }
         }
-        if (strategy == null) {
+        if (strategy == null)
+        {
             throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }

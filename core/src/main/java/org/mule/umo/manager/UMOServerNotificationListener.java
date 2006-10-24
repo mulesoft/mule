@@ -7,13 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.manager;
 
 /**
  * <code>UMOServerNotificationListener</code> is an observer interface that ojects
  * can implement and register themselves with the Mule Server to receive
- * notifications when the sevrver, model and components stop, start, initilise,
- * etc.
+ * notifications when the sevrver, model and components stop, start, initilise, etc.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

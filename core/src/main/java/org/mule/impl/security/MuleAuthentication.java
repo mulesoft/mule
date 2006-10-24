@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.security;
 
 import java.util.Map;
@@ -63,5 +64,4 @@ public class MuleAuthentication implements UMOAuthentication
         this.properties = properties;
     }
 
-   
 }

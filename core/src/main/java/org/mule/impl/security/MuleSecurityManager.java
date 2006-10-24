@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.security;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -30,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>MuleSecurityManager</code> is a default implementation security
- * manager for a Mule instance
+ * <code>MuleSecurityManager</code> is a default implementation security manager
+ * for a Mule instance
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -50,33 +51,38 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public void initialise() throws InitialisationException
     {
-        for (Iterator iterator = providers.values().iterator(); iterator.hasNext();) {
-            UMOSecurityProvider provider = (UMOSecurityProvider) iterator.next();
+        for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
+        {
+            UMOSecurityProvider provider = (UMOSecurityProvider)iterator.next();
             provider.initialise();
         }
 
-        for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();) {
-            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy) iterator.next();
+        for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();)
+        {
+            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy)iterator.next();
             strategy.initialise();
         }
     }
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException,
-            SecurityProviderNotFoundException
+    public UMOAuthentication authenticate(UMOAuthentication authentication)
+        throws SecurityException, SecurityProviderNotFoundException
     {
         Iterator iter = providers.values().iterator();
 
         Class toTest = authentication.getClass();
 
-        while (iter.hasNext()) {
-            UMOSecurityProvider provider = (UMOSecurityProvider) iter.next();
+        while (iter.hasNext())
+        {
+            UMOSecurityProvider provider = (UMOSecurityProvider)iter.next();
 
-            if (provider.supports(toTest)) {
+            if (provider.supports(toTest))
+            {
                 logger.debug("Authentication attempt using " + provider.getClass().getName());
 
                 UMOAuthentication result = provider.authenticate(authentication);
 
-                if (result != null) {
+                if (result != null)
+                {
                     return result;
                 }
             }
@@ -87,7 +93,8 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public void addProvider(UMOSecurityProvider provider)
     {
-        if (getProvider(provider.getName()) != null) {
+        if (getProvider(provider.getName()) != null)
+        {
             throw new IllegalArgumentException("Provider already registered: " + provider.getName());
         }
         providers.put(provider.getName(), provider);
@@ -95,15 +102,16 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public UMOSecurityProvider getProvider(String name)
     {
-        if (name == null) {
+        if (name == null)
+        {
             throw new NullPointerException("provider Name cannot be null");
         }
-        return (UMOSecurityProvider) providers.get(name);
+        return (UMOSecurityProvider)providers.get(name);
     }
 
     public UMOSecurityProvider removeProvider(String name)
     {
-        return (UMOSecurityProvider) providers.remove(name);
+        return (UMOSecurityProvider)providers.remove(name);
     }
 
     public List getProviders()
@@ -113,23 +121,26 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public void setProviders(List providers)
     {
-        for (Iterator iterator = providers.iterator(); iterator.hasNext();) {
-            UMOSecurityProvider provider = (UMOSecurityProvider) iterator.next();
+        for (Iterator iterator = providers.iterator(); iterator.hasNext();)
+        {
+            UMOSecurityProvider provider = (UMOSecurityProvider)iterator.next();
             addProvider(provider);
         }
     }
 
     public UMOSecurityContext createSecurityContext(UMOAuthentication authentication)
-            throws UnknownAuthenticationTypeException
+        throws UnknownAuthenticationTypeException
     {
         Iterator iter = providers.values().iterator();
 
         Class toTest = authentication.getClass();
 
-        while (iter.hasNext()) {
-            UMOSecurityProvider provider = (UMOSecurityProvider) iter.next();
+        while (iter.hasNext())
+        {
+            UMOSecurityProvider provider = (UMOSecurityProvider)iter.next();
 
-            if (provider.supports(toTest)) {
+            if (provider.supports(toTest))
+            {
                 return provider.createSecurityContext(authentication);
             }
         }
@@ -138,7 +149,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public UMOEncryptionStrategy getEncryptionStrategy(String name)
     {
-        return (UMOEncryptionStrategy) cryptoStrategies.get(name);
+        return (UMOEncryptionStrategy)cryptoStrategies.get(name);
     }
 
     public void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy)
@@ -148,7 +159,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public UMOEncryptionStrategy removeEncryptionStrategy(String name)
     {
-        return (UMOEncryptionStrategy) cryptoStrategies.remove(name);
+        return (UMOEncryptionStrategy)cryptoStrategies.remove(name);
 
     }
 

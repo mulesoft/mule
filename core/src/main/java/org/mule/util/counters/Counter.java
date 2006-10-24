@@ -11,16 +11,16 @@
 package org.mule.util.counters;
 
 /**
- * This interface is the interface implemented for all counter types. A Counter
- * can represent a real counter or a virtual counter that will be computed using
- * one or more other counters.<br/>
+ * This interface is the interface implemented for all counter types. A Counter can
+ * represent a real counter or a virtual counter that will be computed using one or
+ * more other counters.<br/>
  * <h3>Real counters</h3>
  * are counters which represent real values. The user will call methods of such
  * counters to modify the associated value of the counter.
  * <h3>Computed counters</h3>
  * are computed using one or more associated counters. Such counters represent
- * operations computed on associated counters. Usually, these counters will
- * never be used directly, but will only used to retrieve the computed values.
+ * operations computed on associated counters. Usually, these counters will never be
+ * used directly, but will only used to retrieve the computed values.
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$

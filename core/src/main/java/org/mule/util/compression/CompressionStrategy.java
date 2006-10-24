@@ -13,7 +13,8 @@ package org.mule.util.compression;
 import java.io.IOException;
 
 /**
- * <code>CompressionStrategy</code> is a base interface for Different compression strategies
+ * <code>CompressionStrategy</code> is a base interface for Different compression
+ * strategies
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -22,8 +23,8 @@ public interface CompressionStrategy
 {
     /**
      * The fully qualified class name of the fallback
-     * <code>CompressionStrategy</code> implementation class to use, if no
-     * other can be found. the default is
+     * <code>CompressionStrategy</code> implementation class to use, if no other
+     * can be found. the default is
      * <code>org.mule.util.compression.GZipCompression</code>
      */
     String COMPRESSION_DEFAULT = "org.mule.util.compression.GZipCompression";

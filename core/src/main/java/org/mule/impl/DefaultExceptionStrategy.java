@@ -18,9 +18,9 @@ import org.mule.providers.NullPayload;
 
 /**
  * <code>DefaultExceptionStrategy</code> Provides a default exception handling
- * strategy. The class final thus to change exception handling behaviour the
- * user must reimplemented the ExceptionListener Interface
- *
+ * strategy. The class final thus to change exception handling behaviour the user
+ * must reimplemented the ExceptionListener Interface
+ * 
  * @author Ross Mason
  * @version $Revision$
  */
@@ -41,7 +41,8 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
 
     public void handleLifecycleException(Object component, Throwable t)
     {
-        //Do nothing special here. Overriding implmentations may want alter the behaviour
+        // Do nothing special here. Overriding implmentations may want alter the
+        // behaviour
         handleStandardException(t);
         logger.error("The object that failed was: \n" + ObjectUtils.toString(component, "null"));
     }
@@ -50,7 +51,7 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
     {
         defaultHandler(t);
         markTransactionForRollback();
-        //Attempt to send the exception details to an endpoint i one is set
+        // Attempt to send the exception details to an endpoint i one is set
         if (RequestContext.getEventContext() != null)
         {
             handleMessagingException(RequestContext.getEventContext().getMessage(), t);

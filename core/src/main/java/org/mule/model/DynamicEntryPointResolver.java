@@ -18,14 +18,23 @@ import org.mule.umo.model.UMOEntryPointResolver;
 /**
  * <code>DynamicEntryPointResolver</code>
  * <OL>
- *  <LI> Checks to see if the component implements the Callable lifecycle interface, then the onCall(UMOEventContext) method will be used to receive the event.
- *  <LI> If the component has a transformer configured for it, the return type for the transformer will be matched against methods on the component to see if there is a method that accepts the transformer return type. If so this event will be used. Note if there is more than one match, an exception will be thrown.
- *  <LI> If there is a method on the component that accepts an org.mule.umo.UMOEventContext . If so this event will be used. Note if there is more than one match, an exception will be thrown.
- *  <LI> The last chack determines if there are any meothds on the component that accept a java.util.Event . If so this event will be used. Note if there is more than one match, an exception will be thrown.
- *  <LI> If none of the above find a match an exception will be thrown and the component registration will fail.
+ * <LI> Checks to see if the component implements the Callable lifecycle interface,
+ * then the onCall(UMOEventContext) method will be used to receive the event.
+ * <LI> If the component has a transformer configured for it, the return type for the
+ * transformer will be matched against methods on the component to see if there is a
+ * method that accepts the transformer return type. If so this event will be used.
+ * Note if there is more than one match, an exception will be thrown.
+ * <LI> If there is a method on the component that accepts an
+ * org.mule.umo.UMOEventContext . If so this event will be used. Note if there is
+ * more than one match, an exception will be thrown.
+ * <LI> The last chack determines if there are any meothds on the component that
+ * accept a java.util.Event . If so this event will be used. Note if there is more
+ * than one match, an exception will be thrown.
+ * <LI> If none of the above find a match an exception will be thrown and the
+ * component registration will fail.
  * </OL>
- * 
- * It allows also void methods where Mule assumes that the Payload itself of the message will be modified.
+ * It allows also void methods where Mule assumes that the Payload itself of the
+ * message will be modified.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,8 +51,8 @@ public class DynamicEntryPointResolver implements UMOEntryPointResolver
     }
 
     /**
-     * Determinse if a void Entrypoint can be accepted. This will always return
-     * true for this implementation
+     * Determinse if a void Entrypoint can be accepted. This will always return true
+     * for this implementation
      * 
      * @return true
      */

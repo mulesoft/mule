@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.umo.UMOEncryptionStrategy;
@@ -24,8 +25,8 @@ import java.util.List;
 
 public interface UMOSecurityManager extends Initialisable
 {
-    UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException,
-            SecurityProviderNotFoundException;
+    UMOAuthentication authenticate(UMOAuthentication authentication)
+        throws SecurityException, SecurityProviderNotFoundException;
 
     void addProvider(UMOSecurityProvider provider);
 
@@ -38,7 +39,7 @@ public interface UMOSecurityManager extends Initialisable
     void setProviders(List providers);
 
     UMOSecurityContext createSecurityContext(UMOAuthentication authentication)
-            throws UnknownAuthenticationTypeException;
+        throws UnknownAuthenticationTypeException;
 
     UMOEncryptionStrategy getEncryptionStrategy(String name);
 

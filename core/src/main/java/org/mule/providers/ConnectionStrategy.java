@@ -25,8 +25,8 @@ public interface ConnectionStrategy
      * Attempts to connect to a resource according the strategy implemented
      * 
      * @param connectable the object to connect to a resource
-     * @throws FatalConnectException is thrown if the strategy finally fails to
-     *             make a connection.
+     * @throws FatalConnectException is thrown if the strategy finally fails to make
+     *             a connection.
      */
     void connect(UMOConnectable connectable) throws FatalConnectException;
 }

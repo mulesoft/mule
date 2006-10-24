@@ -7,11 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.monitor;
 
 /**
- * <code>Expirable</code> implementing classes can be notified when they
- * expire
+ * <code>Expirable</code> implementing classes can be notified when they expire
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

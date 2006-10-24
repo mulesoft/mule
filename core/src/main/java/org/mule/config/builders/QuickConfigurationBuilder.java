@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.builders;
 
 import org.mule.MuleManager;
@@ -39,10 +40,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>QuickConfigurationBuilder</code> is a configuration helper that can
- * be used by clients, configuration scripts or test cases to quickly configure
- * a manager
- *
+ * <code>QuickConfigurationBuilder</code> is a configuration helper that can be
+ * used by clients, configuration scripts or test cases to quickly configure a
+ * manager
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -61,14 +62,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Will construct a new Quick Config builder with the option of disposing of
-     * the current Manager if one exists
-     *
+     * Will construct a new Quick Config builder with the option of disposing of the
+     * current Manager if one exists
+     * 
      * @param disposeCurrent true to dispose the current manager
      */
     public QuickConfigurationBuilder(boolean disposeCurrent)
     {
-        if (disposeCurrent) {
+        if (disposeCurrent)
+        {
             disposeCurrent();
         }
 
@@ -80,49 +82,58 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void disposeCurrent()
     {
-        if (MuleManager.isInstanciated()) {
+        if (MuleManager.isInstanciated())
+        {
             MuleManager.getInstance().dispose();
         }
     }
 
-    public void disableAdminAgent() {
+    public void disableAdminAgent()
+    {
         MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
-        if(manager!=null) {
+        if (manager != null)
+        {
             try
             {
                 manager.unregisterAgent(MuleAdminAgent.AGENT_NAME);
-            } catch (UMOException e)
+            }
+            catch (UMOException e)
             {
-                //ignore
+                // ignore
             }
         }
     }
 
-    public void setModel(String model) throws UMOException {
+    public void setModel(String model) throws UMOException
+    {
         manager.setModel(ModelFactory.createModel(model));
     }
+
     /**
-     * Configures a started manager. This method will throw
-     * InitialisationException if the current manager is already started
-     *
+     * Configures a started manager. This method will throw InitialisationException
+     * if the current manager is already started
+     * 
      * @param synchronous whether to start the manager in synchronous mode
      * @param serverUrl the url used to receive client requests, or null if the
      *            server listening components should not be set up
      * @return the configured manager
-     * @throws UMOException if the manager is already started or it fails to
-     *             start
+     * @throws UMOException if the manager is already started or it fails to start
      */
-    public UMOManager createStartedManager(boolean synchronous, String serverUrl, String modeltype) throws UMOException
+    public UMOManager createStartedManager(boolean synchronous, String serverUrl, String modeltype)
+        throws UMOException
     {
-        if (manager.isStarted()) {
+        if (manager.isStarted())
+        {
             throw new InitialisationException(new Message(Messages.MANAGER_ALREADY_STARTED), this);
         }
-        if (serverUrl == null) {
+        if (serverUrl == null)
+        {
             serverUrl = "";
         }
         MuleManager.getConfiguration().setServerUrl(serverUrl);
         MuleManager.getConfiguration().setSynchronous(synchronous);
-        if(!MODEL_NOT_SET.equals(modeltype)) {
+        if (!MODEL_NOT_SET.equals(modeltype))
+        {
             manager.setModel(ModelFactory.createModel(modeltype));
         }
         manager.start();
@@ -130,47 +141,51 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Configures a started manager. This method will throw
-     * InitialisationException if the current manager is already started
-     *
+     * Configures a started manager. This method will throw InitialisationException
+     * if the current manager is already started
+     * 
      * @param synchronous whether to start the manager in synchronous mode
      * @param serverUrl the url used to receive client requests, or null if the
      *            server listening components should not be set up
      * @return the configured manager
-     * @throws UMOException if the manager is already started or it fails to
-     *             start
+     * @throws UMOException if the manager is already started or it fails to start
      */
     public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
     {
         return createStartedManager(synchronous, serverUrl, MODEL_NOT_SET);
     }
+
     /**
-     * Configures a started manager. This method will throw
-     * InitialisationException if the current manager is already started
-     *
+     * Configures a started manager. This method will throw InitialisationException
+     * if the current manager is already started
+     * 
      * @param synchronous whether to start the manager in synchronous mode
      * @param serverUrl the url used to receive client requests, or null if the
      *            server listening components should not be set up
      * @param serverConnector The server connector to use for the serverUrl
      * @return the configured manager
-     * @throws UMOException if the manager is already started or it fails to
-     *             start
+     * @throws UMOException if the manager is already started or it fails to start
      */
     public UMOManager createStartedManager(boolean synchronous, String serverUrl, UMOConnector serverConnector)
-            throws UMOException
+        throws UMOException
     {
-        if (serverConnector != null) {
+        if (serverConnector != null)
+        {
             manager.registerConnector(serverConnector);
         }
-        else {
+        else
+        {
             throw new IllegalArgumentException("Cannot create started manager from null serverConnector");
         }
 
         // set the connector on the endpointUri
         int param = serverUrl.indexOf('?');
-        if (param == -1) {
+        if (param == -1)
+        {
             serverUrl += '?';
-        } else {
+        }
+        else
+        {
             serverUrl += '&';
         }
 
@@ -179,35 +194,33 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for events on
-     * the given url. By default the ThreadingProfile for the components will be
-     * set so that there will only be one thread of execution.
-     *
+     * Registers a java object as a Umo pcomponent that listens for events on the
+     * given url. By default the ThreadingProfile for the components will be set so
+     * that there will only be one thread of execution.
+     * 
      * @param component any java object, Mule will it's endpointUri discovery to
-     *            determine which event to invoke based on the evnet payload
-     *            type
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     *            determine which event to invoke based on the evnet payload type
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param listenerEndpointUri The url endpointUri to listen to
      * @throws org.mule.umo.UMOException
      */
-    public UMODescriptor registerComponentInstance(Object component, String name, UMOEndpointURI listenerEndpointUri)
-            throws UMOException
+    public UMODescriptor registerComponentInstance(Object component,
+                                                   String name,
+                                                   UMOEndpointURI listenerEndpointUri) throws UMOException
     {
         return registerComponentInstance(component, name, listenerEndpointUri, null);
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for and sends
-     * events on the given urls. By default the ThreadingProfile for the
-     * components will be set so that there will only be one thread of
-     * execution.
-     *
+     * Registers a java object as a Umo pcomponent that listens for and sends events
+     * on the given urls. By default the ThreadingProfile for the components will be
+     * set so that there will only be one thread of execution.
+     * 
      * @param component any java object, Mule will it's endpointUri discovery to
-     *            determine which event to invoke based on the evnet payload
-     *            type
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     *            determine which event to invoke based on the evnet payload type
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param listenerEndpointUri The url endpointUri to listen to
      * @param sendEndpointUri The url endpointUri to dispatch to
      * @throws UMOException
@@ -224,11 +237,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         // Create the endpoints
         UMOEndpoint inboundProvider = null;
         UMOEndpoint outboundProvider = null;
-        if (listenerEndpointUri != null) {
-            inboundProvider = ConnectorFactory.createEndpoint(listenerEndpointUri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        if (listenerEndpointUri != null)
+        {
+            inboundProvider = ConnectorFactory.createEndpoint(listenerEndpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         }
-        if (sendEndpointUri != null) {
-            outboundProvider = ConnectorFactory.createEndpoint(sendEndpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        if (sendEndpointUri != null)
+        {
+            outboundProvider = ConnectorFactory.createEndpoint(sendEndpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         descriptor.setInboundEndpoint(inboundProvider);
         descriptor.setOutboundEndpoint(outboundProvider);
@@ -246,15 +263,19 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOEndpoint inEndpoint = null;
         UMOEndpoint outEndpoint = null;
-        if (inboundEndpoint != null) {
+        if (inboundEndpoint != null)
+        {
             inEndpoint = manager.lookupEndpoint(inboundEndpoint);
-            if (inEndpoint == null) {
+            if (inEndpoint == null)
+            {
                 inEndpoint = createEndpoint(inboundEndpoint, null, true);
             }
         }
-        if (outboundEndpoint != null) {
+        if (outboundEndpoint != null)
+        {
             outEndpoint = manager.lookupEndpoint(outboundEndpoint);
-            if (outEndpoint == null) {
+            if (outEndpoint == null)
+            {
                 outEndpoint = createEndpoint(outboundEndpoint, null, false);
             }
         }
@@ -273,20 +294,18 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Registers a user configured MuleDescriptor of a components to the server.
-     * If users want to register object instances with the server rather than
-     * class names that get created at runtime or reference to objects in the
-     * container, the user must call the descriptors setImplementationInstance()
-     * method - <code>
+     * Registers a user configured MuleDescriptor of a components to the server. If
+     * users want to register object instances with the server rather than class
+     * names that get created at runtime or reference to objects in the container,
+     * the user must call the descriptors setImplementationInstance() method - <code>
      *     MyBean implementation = new MyBean();
      *     descriptor.setImplementationInstance(implementation);
      * </code>
-     * Calling this method is equivilent to calling
-     * UMOModel.registerComponent(..)
-     *
+     * Calling this method is equivilent to calling UMOModel.registerComponent(..)
+     * 
      * @param descriptor the componet descriptor to register
-     * @throws UMOException the descriptor is invalid or cannot be initialised
-     *             or started
+     * @throws UMOException the descriptor is invalid or cannot be initialised or
+     *             started
      * @see org.mule.umo.model.UMOModel
      */
     public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
@@ -295,34 +314,33 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for events on
-     * the given url. By default the ThreadingProfile for the components will be
-     * set so that there will only be one thread of execution.
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     * Registers a java object as a Umo pcomponent that listens for events on the
+     * given url. By default the ThreadingProfile for the components will be set so
+     * that there will only be one thread of execution.
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to
      * @throws org.mule.umo.UMOException
      */
-    public UMOComponent registerComponent(String implementation, String name, UMOEndpointURI inboundEndpointUri)
-            throws UMOException
+    public UMOComponent registerComponent(String implementation,
+                                          String name,
+                                          UMOEndpointURI inboundEndpointUri) throws UMOException
     {
         return registerComponent(implementation, name, inboundEndpointUri, null, null);
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for events on
-     * the given url. By default the ThreadingProfile for the components will be
-     * set so that there will only be one thread of execution.
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     * Registers a java object as a Umo pcomponent that listens for events on the
+     * given url. By default the ThreadingProfile for the components will be set so
+     * that there will only be one thread of execution.
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to
      * @param properties properties to set on the component
      * @throws org.mule.umo.UMOException
@@ -336,20 +354,17 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for and sends
-     * events on the given urls. By default the ThreadingProfile for the
-     * components will be set so that there will only be one thread of
-     * execution.
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation which event to invoke based on the evnet
-     *            payload type
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     * Registers a java object as a Umo pcomponent that listens for and sends events
+     * on the given urls. By default the ThreadingProfile for the components will be
+     * set so that there will only be one thread of execution.
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation which
+     *            event to invoke based on the evnet payload type
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to
      * @param outboundEndpointUri The url endpointUri to dispatch to
-     *
      * @throws UMOException
      */
     public UMOComponent registerComponent(String implementation,
@@ -361,17 +376,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Registers a java object as a Umo pcomponent that listens for and sends
-     * events on the given urls. By default the ThreadingProfile for the
-     * components will be set so that there will only be one thread of
-     * execution.
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation which event to invoke based on the evnet
-     *            payload type
-     * @param name The identifying name of the components. This can be used to
-     *            later unregister it
+     * Registers a java object as a Umo pcomponent that listens for and sends events
+     * on the given urls. By default the ThreadingProfile for the components will be
+     * set so that there will only be one thread of execution.
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation which
+     *            event to invoke based on the evnet payload type
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to
      * @param outboundEndpointUri The url endpointUri to dispatch to
      * @param properties properties to set on the component
@@ -383,23 +396,22 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                                           UMOEndpointURI outboundEndpointUri,
                                           Map properties) throws UMOException
     {
-        UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri, properties);
+        UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri,
+            properties);
         return manager.getModel().registerComponent(d);
     }
 
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation which event to invoke based on the evnet
-     *            payload type
-     * @param name The identifying name of the component. This can be used to
-     *            later unregister it
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation which
+     *            event to invoke based on the evnet payload type
+     * @param name The identifying name of the component. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to. Can be null
-     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be
-     *            null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
      * @param properties properties to set on the component. Can be null
      * @throws UMOException
      */
@@ -411,10 +423,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOEndpointURI inEndpointUri = null;
         UMOEndpointURI outEndpointUri = null;
-        if (inboundEndpointUri != null) {
+        if (inboundEndpointUri != null)
+        {
             inEndpointUri = new MuleEndpointURI(inboundEndpointUri);
         }
-        if (outboundEndpointUri != null) {
+        if (outboundEndpointUri != null)
+        {
             outEndpointUri = new MuleEndpointURI(outboundEndpointUri);
         }
 
@@ -424,16 +438,14 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation which event to invoke based on the evnet
-     *            payload type
-     * @param name The identifying name of the component. This can be used to
-     *            later unregister it
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation which
+     *            event to invoke based on the evnet payload type
+     * @param name The identifying name of the component. This can be used to later
+     *            unregister it
      * @param inboundEndpointUri The url endpointUri to listen to. Can be null
-     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be
-     *            null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
      * @param properties properties to set on the component. Can be null
      * @throws UMOException
      */
@@ -446,11 +458,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         // Create the endpoints
         UMOEndpoint inboundEndpoint = null;
         UMOEndpoint outboundEndpoint = null;
-        if (inboundEndpointUri != null) {
-            inboundEndpoint = ConnectorFactory.createEndpoint(inboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        if (inboundEndpointUri != null)
+        {
+            inboundEndpoint = ConnectorFactory.createEndpoint(inboundEndpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         }
-        if (outboundEndpointUri != null) {
-            outboundEndpoint = ConnectorFactory.createEndpoint(outboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        if (outboundEndpointUri != null)
+        {
+            outboundEndpoint = ConnectorFactory.createEndpoint(outboundEndpointUri,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         return createDescriptor(implementation, name, inboundEndpoint, outboundEndpoint, properties);
     }
@@ -458,13 +474,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     /**
      * Creates a Mule Descriptor that can be further maniputalted by the calling
      * class before registering it with the UMOModel
-     *
-     * @param implementation either a container refernece to an object or a
-     *            fully qualified class name to use as the component
-     *            implementation which event to invoke based on the evnet
-     *            payload type
-     * @param name The identifying name of the component. This can be used to
-     *            later unregister it
+     * 
+     * @param implementation either a container refernece to an object or a fully
+     *            qualified class name to use as the component implementation which
+     *            event to invoke based on the evnet payload type
+     * @param name The identifying name of the component. This can be used to later
+     *            unregister it
      * @param inboundEndpoint The endpoint to listen to. Can be null
      * @param outboundEndpoint The endpoint to dispatch to. Can be null
      * @param properties properties to set on the component. Can be null
@@ -479,7 +494,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setImplementation(implementation);
         descriptor.setName(name);
-        if (properties != null) {
+        if (properties != null)
+        {
             descriptor.getProperties().putAll(properties);
         }
 
@@ -490,9 +506,9 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Sets the component resolver on the model. Component resolver is used to
-     * look up components in an external container such as Spring or Pico
-     *
+     * Sets the component resolver on the model. Component resolver is used to look
+     * up components in an external container such as Spring or Pico
+     * 
      * @param ctx
      * @throws UMOException
      */
@@ -502,10 +518,10 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Unregisters a previously register components. This will also unregister
-     * any listeners for the components Calling this method is equivilent to
-     * calling UMOModel.unregisterComponent(..)
-     *
+     * Unregisters a previously register components. This will also unregister any
+     * listeners for the components Calling this method is equivilent to calling
+     * UMOModel.unregisterComponent(..)
+     * 
      * @param name the name of the componet to unregister
      * @throws UMOException if unregistering the components fails, i.e. The
      *             underlying transport fails to unregister a listener. If the
@@ -516,7 +532,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public void unregisterComponent(String name) throws UMOException
     {
         UMODescriptor descriptor = manager.getModel().getDescriptor(name);
-        if (descriptor != null) {
+        if (descriptor != null)
+        {
             manager.getModel().unregisterComponent(descriptor);
         }
     }
@@ -526,23 +543,30 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return createEndpoint(uri, name, inbound, null, null);
     }
 
-    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, String transformers) throws UMOException
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, String transformers)
+        throws UMOException
     {
         return createEndpoint(uri, name, inbound, transformers, null);
     }
 
-    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, UMOFilter filter) throws UMOException
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, UMOFilter filter)
+        throws UMOException
     {
         return createEndpoint(uri, name, inbound, null, filter);
     }
 
-    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, String transformers, UMOFilter filter) throws UMOException
+    public UMOEndpoint createEndpoint(String uri,
+                                      String name,
+                                      boolean inbound,
+                                      String transformers,
+                                      UMOFilter filter) throws UMOException
     {
         UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(new MuleEndpointURI(uri), (inbound
-                ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
+                        ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
         ep.setName(name);
-        if(transformers!=null) {
-            String delim = (transformers.indexOf(",") > - 1 ? "," : " ");
+        if (transformers != null)
+        {
+            String delim = (transformers.indexOf(",") > -1 ? "," : " ");
             ep.setTransformer(MuleObjectHelper.getTransformer(transformers, delim));
         }
         ep.setFilter(filter);
@@ -557,7 +581,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return ep;
     }
 
-    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties) throws UMOException
+    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties)
+        throws UMOException
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
         ep.getProperties().putAll(properties);
@@ -566,13 +591,19 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return ep;
     }
 
-    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties, UMOFilter filter) throws UMOException
+    public UMOEndpoint registerEndpoint(String uri,
+                                        String name,
+                                        boolean inbound,
+                                        Map properties,
+                                        UMOFilter filter) throws UMOException
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
-        if(properties!=null) {
+        if (properties != null)
+        {
             ep.getProperties().putAll(properties);
         }
-        if(filter!=null) {
+        if (filter != null)
+        {
             ep.setFilter(filter);
         }
         ep.initialise();
@@ -580,36 +611,48 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return ep;
     }
 
-    public void registerModel(UMOModel model) throws UMOException {
+    public void registerModel(UMOModel model) throws UMOException
+    {
         manager.setModel(model);
     }
 
-    public UMOManager getManager(){
+    public UMOManager getManager()
+    {
         return manager;
     }
 
-    public UMOManager configure(String configResources) throws ConfigurationException {
+    public UMOManager configure(String configResources) throws ConfigurationException
+    {
         return configure(configResources, null);
     }
 
-    public UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException {
+    public UMOManager configure(String configResources, String startupPropertiesFile)
+        throws ConfigurationException
+    {
         return configure(new ReaderResource[0], null);
     }
 
-    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
+    {
         return configure(configResources, null);
     }
 
-    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties) throws ConfigurationException {
-        try {
+    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties)
+        throws ConfigurationException
+    {
+        try
+        {
             manager.start();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new ConfigurationException(e);
         }
         return manager;
     }
 
-    public boolean isConfigured() {
-        return manager!=null;
+    public boolean isConfigured()
+    {
+        return manager != null;
     }
 }

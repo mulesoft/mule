@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.response;
 
 import java.util.Iterator;
@@ -28,10 +29,10 @@ import org.mule.umo.routing.UMORouter;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <code>ResponseMessageRouter</code> is a router that can be used to control
- * how the response in a request/response message flow is created. Main usecase
- * is to aggregate a set of asynchonous events into a single response
- *
+ * <code>ResponseMessageRouter</code> is a router that can be used to control how
+ * the response in a request/response message flow is created. Main usecase is to
+ * aggregate a set of asynchonous events into a single response
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,11 +55,13 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void route(UMOEvent event) throws RoutingException
     {
         UMOResponseRouter router = null;
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
-            router = (UMOResponseRouter) iterator.next();
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+        {
+            router = (UMOResponseRouter)iterator.next();
             router.process(event);
             // Update stats
-            if (getStatistics().isEnabled()) {
+            if (getStatistics().isEnabled())
+            {
                 getStatistics().incrementRoutedMessage(event.getEndpoint());
             }
         }
@@ -67,31 +70,38 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
         UMOMessage result = null;
-        if (routers.size() == 0) {
+        if (routers.size() == 0)
+        {
             logger.warn("There are no routers configured on the response router. Returning the current message");
             result = message;
-        } else {
+        }
+        else
+        {
             UMOResponseRouter router = null;
-            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
-                router = (UMOResponseRouter) iterator.next();
+            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+            {
+                router = (UMOResponseRouter)iterator.next();
                 result = router.getResponse(message);
             }
 
-            if (result == null) {
+            if (result == null)
+            {
                 // Update stats
-                if (getStatistics().isEnabled()) {
+                if (getStatistics().isEnabled())
+                {
                     getStatistics().incrementNoRoutedMessage();
                 }
             }
         }
 
-//        if (result != null && transformer != null) {
-//            try {
-//                result = new MuleMessage(transformer.transform(result.getPayload()), result.getProperties());
-//            } catch (TransformerException e) {
-//                throw new RoutingException(result, null);
-//            }
-//        }
+        // if (result != null && transformer != null) {
+        // try {
+        // result = new MuleMessage(transformer.transform(result.getPayload()),
+        // result.getProperties());
+        // } catch (TransformerException e) {
+        // throw new RoutingException(result, null);
+        // }
+        // }
         return result;
 
     }
@@ -104,18 +114,25 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     public UMOResponseRouter removeRouter(UMOResponseRouter router)
     {
-        if (routers.remove(router)) {
+        if (routers.remove(router))
+        {
             return router;
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint) {
-        if (endpoint != null) {
+    public void addEndpoint(UMOEndpoint endpoint)
+    {
+        if (endpoint != null)
+        {
             endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
             endpoints.add(endpoint);
-        } else {
+        }
+        else
+        {
             throw new NullPointerException("endpoint = null");
         }
     }
@@ -130,16 +147,21 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints) {
-        if (endpoints != null) {
+    public void setEndpoints(List endpoints)
+    {
+        if (endpoints != null)
+        {
             this.endpoints.clear();
             this.endpoints.addAll(endpoints);
 
             // Force all endpoints' type to RESPONSE just in case.
-            for (Iterator it = this.endpoints.iterator(); it.hasNext();) {
-                ((UMOEndpoint) it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
+            for (Iterator it = this.endpoints.iterator(); it.hasNext();)
+            {
+                ((UMOEndpoint)it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
             }
-        } else {
+        }
+        else
+        {
             throw new NullPointerException("List of endpoints = null");
         }
     }
@@ -152,20 +174,24 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public UMOEndpoint getEndpoint(String name)
     {
         UMOEndpoint endpointDescriptor;
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
-            endpointDescriptor = (UMOEndpoint) iterator.next();
-            if (endpointDescriptor.getName().equals(name)) {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        {
+            endpointDescriptor = (UMOEndpoint)iterator.next();
+            if (endpointDescriptor.getName().equals(name))
+            {
                 return endpointDescriptor;
             }
         }
         return null;
     }
 
-    public int getTimeout() {
+    public int getTimeout()
+    {
         return timeout;
     }
 
-    public void setTimeout(int timeout) {
+    public void setTimeout(int timeout)
+    {
         this.timeout = timeout;
     }
 

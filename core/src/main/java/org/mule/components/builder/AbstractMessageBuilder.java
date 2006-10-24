@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.builder;
 
 import org.apache.commons.logging.Log;
@@ -27,13 +28,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A component that will invoke all outbound endpoints configured on the component allow the
- * result of each endpoint invocation to be aggregated to a single message.
- *
+ * A component that will invoke all outbound endpoints configured on the component
+ * allow the result of each endpoint invocation to be aggregated to a single message.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractMessageBuilder implements UMODescriptorAware, Callable, MessageBuilder {
+public abstract class AbstractMessageBuilder implements UMODescriptorAware, Callable, MessageBuilder
+{
 
     /**
      * logger used by this class
@@ -42,48 +44,67 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
 
     protected UMODescriptor descriptor;
 
-    public void setDescriptor(UMODescriptor descriptor) {
+    public void setDescriptor(UMODescriptor descriptor)
+    {
         this.descriptor = descriptor;
     }
 
+    public Object onCall(UMOEventContext eventContext) throws Exception
+    {
 
-    public Object onCall(UMOEventContext eventContext) throws Exception {
-
-        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage(), eventContext.getMessage());
+        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage(),
+            eventContext.getMessage());
 
         UMOMessage responseMessage = requestMessage;
         Object builtMessage;
 
-        if(descriptor.getOutboundRouter().hasEndpoints() ) {
+        if (descriptor.getOutboundRouter().hasEndpoints())
+        {
             List endpoints = new ArrayList();
-            for (Iterator iterator = descriptor.getOutboundRouter().getRouters().iterator(); iterator.hasNext();) {
-                UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
+            for (Iterator iterator = descriptor.getOutboundRouter().getRouters().iterator(); iterator.hasNext();)
+            {
+                UMOOutboundRouter router = (UMOOutboundRouter)iterator.next();
                 endpoints.addAll(router.getEndpoints());
             }
-            for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
-                UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
+            for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+            {
+                UMOEndpoint endpoint = (UMOEndpoint)iterator.next();
                 boolean rsync = eventContext.getMessage().getBooleanProperty(
-                        MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
-                if(!rsync) {
-                    logger.info("Endpoint: " + endpoint + " is not remoteSync enabled. Message builder finishing");
-                    if(eventContext.isSynchronous()) {
+                    MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
+                if (!rsync)
+                {
+                    logger.info("Endpoint: " + endpoint
+                                + " is not remoteSync enabled. Message builder finishing");
+                    if (eventContext.isSynchronous())
+                    {
                         responseMessage = eventContext.sendEvent(requestMessage, endpoint);
-                    } else {
+                    }
+                    else
+                    {
                         eventContext.dispatchEvent(requestMessage, endpoint);
-                        responseMessage=null;
+                        responseMessage = null;
                     }
                     break;
-                } else {
+                }
+                else
+                {
                     responseMessage = eventContext.sendEvent(requestMessage, endpoint);
-                    if(logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled())
+                    {
                         logger.debug("Response Message Received from: " + endpoint.getEndpointURI());
                         logger.debug(responseMessage);
                     }
-                    if (logger.isTraceEnabled()) {
-                        try {
-                            logger.trace("Message Payload: \n" + StringMessageUtils.truncate(
-                                    StringMessageUtils.toString(responseMessage.getPayload()), 200, false));
-                        } catch (Exception e) {
+                    if (logger.isTraceEnabled())
+                    {
+                        try
+                        {
+                            logger.trace("Message Payload: \n"
+                                         + StringMessageUtils.truncate(
+                                             StringMessageUtils.toString(responseMessage.getPayload()), 200,
+                                             false));
+                        }
+                        catch (Exception e)
+                        {
                             // ignore
                         }
                     }
@@ -92,7 +113,9 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
                     requestMessage = responseMessage;
                 }
             }
-        } else {
+        }
+        else
+        {
             logger.info("There are currently no endpoints configured on component: " + descriptor.getName());
         }
         eventContext.setStopFurtherProcessing(true);

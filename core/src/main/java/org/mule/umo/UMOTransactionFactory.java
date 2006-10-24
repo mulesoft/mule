@@ -23,15 +23,14 @@ public interface UMOTransactionFactory
      * Create and begins a new transaction
      * 
      * @return a new Transaction
-     * @throws TransactionException if the transaction cannot be created or
-     *             begun
+     * @throws TransactionException if the transaction cannot be created or begun
      */
     UMOTransaction beginTransaction() throws TransactionException;
 
     /**
      * Determines whether this transaction factory creates transactions that are
-     * really transacted or if they are being used to simulate batch actions,
-     * such as using Jms Client Acknowledge.
+     * really transacted or if they are being used to simulate batch actions, such as
+     * using Jms Client Acknowledge.
      * 
      * @return
      */

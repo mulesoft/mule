@@ -43,13 +43,16 @@ public class AbstractTransactionContext
         StringBuffer sb = new StringBuffer();
         sb.append(id).append("[");
         sb.append(getStatusString());
-        if (suspended) {
+        if (suspended)
+        {
             sb.append(", suspended");
         }
-        if (readOnly) {
+        if (readOnly)
+        {
             sb.append(", readonly");
         }
-        if (finished) {
+        if (finished)
+        {
             sb.append(", finished");
         }
         sb.append("]");
@@ -58,29 +61,30 @@ public class AbstractTransactionContext
 
     private String getStatusString()
     {
-        switch (status) {
-        case Status.STATUS_ACTIVE:
-            return "active";
-        case Status.STATUS_MARKED_ROLLBACK:
-            return "marked rollback";
-        case Status.STATUS_PREPARED:
-            return "prepared";
-        case Status.STATUS_COMMITTED:
-            return "committed";
-        case Status.STATUS_ROLLEDBACK:
-            return "rolled back";
-        case Status.STATUS_UNKNOWN:
-            return "unknown";
-        case Status.STATUS_NO_TRANSACTION:
-            return "no transaction";
-        case Status.STATUS_PREPARING:
-            return "preparing";
-        case Status.STATUS_COMMITTING:
-            return "committing";
-        case Status.STATUS_ROLLING_BACK:
-            return "rolling back";
-        default:
-            return "undefined status";
+        switch (status)
+        {
+            case Status.STATUS_ACTIVE :
+                return "active";
+            case Status.STATUS_MARKED_ROLLBACK :
+                return "marked rollback";
+            case Status.STATUS_PREPARED :
+                return "prepared";
+            case Status.STATUS_COMMITTED :
+                return "committed";
+            case Status.STATUS_ROLLEDBACK :
+                return "rolled back";
+            case Status.STATUS_UNKNOWN :
+                return "unknown";
+            case Status.STATUS_NO_TRANSACTION :
+                return "no transaction";
+            case Status.STATUS_PREPARING :
+                return "preparing";
+            case Status.STATUS_COMMITTING :
+                return "committing";
+            case Status.STATUS_ROLLING_BACK :
+                return "rolling back";
+            default :
+                return "undefined status";
         }
     }
 

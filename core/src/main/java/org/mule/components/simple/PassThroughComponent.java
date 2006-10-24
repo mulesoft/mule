@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.simple;
 
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 
 /**
- * <code>PassThroughComponent</code> will simply return the payload back
- * as the result
+ * <code>PassThroughComponent</code> will simply return the payload back as the
+ * result
  * 
  * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
  * @version $Revision$

@@ -26,14 +26,13 @@ import javax.transaction.TransactionManager;
 import java.util.Map;
 
 /**
- * A factory performing a JNDI lookup for TransactionManager.
- * <p/>
- * NOTE: Java EE 1.4 specification does not mandate application server vendors
- * to expose a TransactionManager for direct use, nor does it name the
- * standard way to locate it. For some servers the TransactionManager is not
- * even available in the global JNDI namespace, so your only bet is to run Mule
- * in the same JVM as the application server.
- *
+ * A factory performing a JNDI lookup for TransactionManager. <p/> NOTE: Java EE 1.4
+ * specification does not mandate application server vendors to expose a
+ * TransactionManager for direct use, nor does it name the standard way to locate it.
+ * For some servers the TransactionManager is not even available in the global JNDI
+ * namespace, so your only bet is to run Mule in the same JVM as the application
+ * server.
+ * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory
@@ -89,48 +88,51 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
     }
 
     /**
-     *
      * @see org.mule.umo.manager.UMOTransactionManagerFactory#create()
      */
     public TransactionManager create() throws Exception
     {
         // implementing the Initilisable interface does not call it??
         initialise();
-        if (txManager == null) {
-            txManager = (TransactionManager) context.lookup(jndiName);
+        if (txManager == null)
+        {
+            txManager = (TransactionManager)context.lookup(jndiName);
         }
 
         return txManager;
     }
 
     /**
-     * Method used to perform any initialisation work. If a fatal error occurs
-     * during initialisation an <code>InitialisationException</code> should be
-     * thrown, causing the Mule instance to shutdown. If the error is
-     * recoverable, say by retrying to connect, a
-     * <code>RecoverableException</code> should be thrown. There is no
-     * guarantee that by throwing a Recoverable exception that the Mule instance
-     * will not shut down.
-     *
-     * @throws org.mule.umo.lifecycle.InitialisationException
-     *          if a fatal error occurs causing the Mule
-     *          instance to shutdown
-     * @throws org.mule.umo.lifecycle.RecoverableException
-     *          if an error occurs that can be recovered
-     *          from
+     * Method used to perform any initialisation work. If a fatal error occurs during
+     * initialisation an <code>InitialisationException</code> should be thrown,
+     * causing the Mule instance to shutdown. If the error is recoverable, say by
+     * retrying to connect, a <code>RecoverableException</code> should be thrown.
+     * There is no guarantee that by throwing a Recoverable exception that the Mule
+     * instance will not shut down.
+     * 
+     * @throws org.mule.umo.lifecycle.InitialisationException if a fatal error occurs
+     *             causing the Mule instance to shutdown
+     * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
+     *             can be recovered from
      */
     public void initialise() throws InitialisationException
     {
-        if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName))) {
+        if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName)))
+        {
             throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "jndiName"), this);
         }
 
-        try {
-            if (context == null) {
+        try
+        {
+            if (context == null)
+            {
                 context = JndiContextHelper.initialise(getEnvironment());
             }
-        } catch (NamingException e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e, this);
+        }
+        catch (NamingException e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e,
+                this);
         }
     }
 }

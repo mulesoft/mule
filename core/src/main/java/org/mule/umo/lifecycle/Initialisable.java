@@ -20,18 +20,16 @@ package org.mule.umo.lifecycle;
 public interface Initialisable
 {
     /**
-     * Method used to perform any initialisation work. If a fatal error occurs
-     * during initialisation an <code>InitialisationException</code> should be
-     * thrown, causing the Mule instance to shutdown. If the error is
-     * recoverable, say by retrying to connect, a
-     * <code>RecoverableException</code> should be thrown. There is no
-     * guarantee that by throwing a Recoverable exception that the Mule instance
-     * will not shut down.
+     * Method used to perform any initialisation work. If a fatal error occurs during
+     * initialisation an <code>InitialisationException</code> should be thrown,
+     * causing the Mule instance to shutdown. If the error is recoverable, say by
+     * retrying to connect, a <code>RecoverableException</code> should be thrown.
+     * There is no guarantee that by throwing a Recoverable exception that the Mule
+     * instance will not shut down.
      * 
      * @throws InitialisationException if a fatal error occurs causing the Mule
      *             instance to shutdown
-     * @throws RecoverableException if an error occurs that can be recovered
-     *             from
+     * @throws RecoverableException if an error occurs that can be recovered from
      */
     void initialise() throws InitialisationException, RecoverableException;
 }

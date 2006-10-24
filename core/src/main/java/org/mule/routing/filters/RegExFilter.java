@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import org.mule.umo.UMOFilter;
@@ -15,8 +16,8 @@ import org.mule.umo.UMOMessage;
 import java.util.regex.Pattern;
 
 /**
- * <code>RegExFilter</code> is used to match a rgular expression against a
- * string argument.
+ * <code>RegExFilter</code> is used to match a rgular expression against a string
+ * argument.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -43,7 +44,8 @@ public class RegExFilter implements UMOFilter, ObjectFilter
 
     public boolean accept(Object object)
     {
-        if (object == null) {
+        if (object == null)
+        {
             return false;
         }
         return pattern.matcher(object.toString()).find();

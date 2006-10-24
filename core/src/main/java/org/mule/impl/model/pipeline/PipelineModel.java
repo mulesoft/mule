@@ -17,22 +17,25 @@ import org.mule.umo.UMODescriptor;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PipelineModel extends AbstractModel {
-    protected UMOComponent createComponent(UMODescriptor descriptor) {
-        return new PipelineComponent((MuleDescriptor)descriptor,  this);
+public class PipelineModel extends AbstractModel
+{
+    protected UMOComponent createComponent(UMODescriptor descriptor)
+    {
+        return new PipelineComponent((MuleDescriptor)descriptor, this);
     }
 
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
-     *
+     * 
      * @return the model type
      */
-    public String getType() {
+    public String getType()
+    {
         return "pipeline";
     }
 }

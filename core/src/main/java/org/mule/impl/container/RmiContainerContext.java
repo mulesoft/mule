@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import org.mule.umo.lifecycle.InitialisationException;
@@ -16,9 +17,9 @@ import org.mule.util.ClassUtils;
 import javax.naming.NamingException;
 
 /**
- * <code>RmiContainerContext</code> is a container implementaiton that
- * allows RMi objects to be referenced either as components or properties on components
- *
+ * <code>RmiContainerContext</code> is a container implementaiton that allows RMi
+ * objects to be referenced either as components or properties on components
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,7 +28,8 @@ public class RmiContainerContext extends JndiContainerContext
     protected String securityPolicy = null;
     protected String securityManager = null;
 
-    protected RmiContainerContext(String name) {
+    protected RmiContainerContext(String name)
+    {
         super(name);
     }
 
@@ -36,58 +38,78 @@ public class RmiContainerContext extends JndiContainerContext
         super("rmi");
     }
 
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         super.initialise();
-        if(securityPolicy!=null) {
-            if(ClassUtils.getResource(securityPolicy, getClass())!=null) {
+        if (securityPolicy != null)
+        {
+            if (ClassUtils.getResource(securityPolicy, getClass()) != null)
+            {
                 System.setProperty("java.security.policy", securityPolicy);
             }
         }
 
         // Set security manager
-        if (System.getSecurityManager() == null) {
-            try {
-                if(securityManager!=null) {
+        if (System.getSecurityManager() == null)
+        {
+            try
+            {
+                if (securityManager != null)
+                {
                     Class clazz = ClassUtils.loadClass(securityManager, getClass());
                     System.setSecurityManager((SecurityManager)clazz.newInstance());
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
     }
 
-    public Object getComponent(Object key) throws ObjectNotFoundException {
+    public Object getComponent(Object key) throws ObjectNotFoundException
+    {
         Object object = null;
-        if(key==null) {
+        if (key == null)
+        {
             throw new ObjectNotFoundException("null");
         }
-        try {
+        try
+        {
             object = context.lookup(key.toString());
-        } catch (NamingException e) {
+        }
+        catch (NamingException e)
+        {
             throw new ObjectNotFoundException(key.toString(), e);
         }
 
-        if(object==null) {
+        if (object == null)
+        {
             throw new ObjectNotFoundException(key.toString());
-        } else {
+        }
+        else
+        {
             return object;
         }
     }
 
-    public String getSecurityPolicy() {
+    public String getSecurityPolicy()
+    {
         return securityPolicy;
     }
 
-    public void setSecurityPolicy(String securityPolicy) {
+    public void setSecurityPolicy(String securityPolicy)
+    {
         this.securityPolicy = securityPolicy;
     }
 
-    public String getSecurityManager() {
+    public String getSecurityManager()
+    {
         return securityManager;
     }
 
-    public void setSecurityManager(String securityManager) {
+    public void setSecurityManager(String securityManager)
+    {
         this.securityManager = securityManager;
     }
 }

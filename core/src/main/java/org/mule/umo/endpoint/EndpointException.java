@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.endpoint;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>EndpointException</code> is an abstract exception extended by
- * endpoint specific exceptions.
+ * <code>EndpointException</code> is an abstract exception extended by endpoint
+ * specific exceptions.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

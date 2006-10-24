@@ -45,12 +45,11 @@ import java.util.Iterator;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
- * environment. All data sent or received within the Mule environment will be
- * passed between components as an UMOEvent. <p/> The UMOEvent holds some data
- * and provides helper methods for obtaining the data in a format that the
- * receiving Mule UMO understands. The event can also maintain any number of
- * properties that can be set and retrieved by Mule UMO components.
- *
+ * environment. All data sent or received within the Mule environment will be passed
+ * between components as an UMOEvent. <p/> The UMOEvent holds some data and provides
+ * helper methods for obtaining the data in a format that the receiving Mule UMO
+ * understands. The event can also maintain any number of properties that can be set
+ * and retrieved by Mule UMO components.
  */
 
 public class MuleEvent extends EventObject implements UMOEvent
@@ -95,9 +94,9 @@ public class MuleEvent extends EventObject implements UMOEvent
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
     /**
-     * Properties cache that only reads properties once from the inbound message
-     * and merges them with any properties on the endpoint. The message
-     * properties take precedence over the endpoint properties
+     * Properties cache that only reads properties once from the inbound message and
+     * merges them with any properties on the endpoint. The message properties take
+     * precedence over the endpoint properties
      */
     public MuleEvent(UMOMessage message,
                      UMOImmutableEndpoint endpoint,
@@ -116,20 +115,20 @@ public class MuleEvent extends EventObject implements UMOEvent
         fillProperties(previousEvent);
     }
 
-    public MuleEvent(UMOMessage message, UMOImmutableEndpoint endpoint, UMOSession session, boolean synchronous)
+    public MuleEvent(UMOMessage message,
+                     UMOImmutableEndpoint endpoint,
+                     UMOSession session,
+                     boolean synchronous)
     {
         this(message, endpoint, session, synchronous, null);
     }
 
     /**
      * Contructor.
-     *
-     * @param message
-     *            the event payload
-     * @param endpoint
-     *            the endpoint to associate with the event
-     * @param session
-     *            the previous event if any
+     * 
+     * @param message the event payload
+     * @param endpoint the endpoint to associate with the event
+     * @param session the previous event if any
      * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message,
@@ -150,13 +149,10 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Contructor.
-     *
-     * @param message
-     *            the event payload
-     * @param endpoint
-     *            the endpoint to associate with the event
-     * @param session
-     *            the previous event if any
+     * 
+     * @param message the event payload
+     * @param endpoint the endpoint to associate with the event
+     * @param session the previous event if any
      * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message,
@@ -176,7 +172,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * A helper constructor used to rewrite an event payload
-     *
+     * 
      * @param message
      * @param rewriteEvent
      */
@@ -191,7 +187,8 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream)rewriteEvent.getOutputStream();
-        if (rewriteEvent instanceof MuleEvent) {
+        if (rewriteEvent instanceof MuleEvent)
+        {
             this.transformedMessage = ((MuleEvent)rewriteEvent).getCachedMessage();
         }
         fillProperties(rewriteEvent);
@@ -199,42 +196,53 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected void fillProperties(UMOEvent previousEvent)
     {
-        if (previousEvent != null) {
+        if (previousEvent != null)
+        {
             UMOMessage msg = previousEvent.getMessage();
-            synchronized (msg) {
-                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+            synchronized (msg)
+            {
+                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+                {
                     String prop = (String)iterator.next();
                     Object value = msg.getProperty(prop);
                     // don't overwrite property on the message
-                    if (!ignoreProperty(prop)) {
+                    if (!ignoreProperty(prop))
+                    {
                         message.setProperty(prop, value);
                     }
 
-                    if(logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled())
+                    {
                         Object currentValue = message.getProperty(prop);
-                        if(!value.equals(currentValue)) {
-                            logger.warn("Property on the current message " + prop +"=" + currentValue +
-                                " overrides property on the previous event: " + prop +"=" + value);
+                        if (!value.equals(currentValue))
+                        {
+                            logger.warn("Property on the current message " + prop + "=" + currentValue
+                                        + " overrides property on the previous event: " + prop + "=" + value);
                         }
                     }
                 }
             }
         }
 
-        if (endpoint != null && endpoint.getProperties() != null) {
-            for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();) {
+        if (endpoint != null && endpoint.getProperties() != null)
+        {
+            for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            {
                 String prop = (String)iterator.next();
                 Object value = endpoint.getProperties().get(prop);
                 // don't overwrite property on the message
-                if (!ignoreProperty(prop)) {
+                if (!ignoreProperty(prop))
+                {
                     message.setProperty(prop, value);
                 }
 
-                if(logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled())
+                {
                     Object currentValue = message.getProperty(prop);
-                    if(!value.equals(currentValue)) {
-                        logger.warn("Property on the current message " + prop +"=" + currentValue +
-                            " overrides property on the endpoint: " + prop +"=" + value);
+                    if (!value.equals(currentValue))
+                    {
+                        logger.warn("Property on the current message " + prop + "=" + currentValue
+                                    + " overrides property on the endpoint: " + prop + "=" + value);
                     }
                 }
             }
@@ -244,28 +252,34 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * This method is used to determine if a property on the previous event should be ignorred for the
-     * next event. This method is here because we don't have proper scoped handlng of meta data yet
-     * The rules are -
-     * 1. If a property is already set on the currect event don't verwrite with the previous event value
-     * 2. If the propery name appears in the ignorredPropertyOverrides list, then we always set it on the
-     * new event
+     * This method is used to determine if a property on the previous event should be
+     * ignorred for the next event. This method is here because we don't have proper
+     * scoped handlng of meta data yet The rules are - 1. If a property is already
+     * set on the currect event don't verwrite with the previous event value 2. If
+     * the propery name appears in the ignorredPropertyOverrides list, then we always
+     * set it on the new event
+     * 
      * @param key
      * @return
      */
-    protected boolean ignoreProperty(String key) {
-        if (key == null) {
+    protected boolean ignoreProperty(String key)
+    {
+        if (key == null)
+        {
             return true;
         }
 
-        for (int i = 0; i < ignoredPropertyOverrides.length; i++) {
-            if(key.equals(ignoredPropertyOverrides[i])) {
+        for (int i = 0; i < ignoredPropertyOverrides.length; i++)
+        {
+            if (key.equals(ignoredPropertyOverrides[i]))
+            {
                 return false;
             }
         }
         Object value = message.getProperty(key);
 
-        if (value != null) {
+        if (value != null)
+        {
             return true;
         }
 
@@ -274,10 +288,12 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected void setCredentials()
     {
-        if (endpoint.getEndpointURI().getUserInfo() != null) {
+        if (endpoint.getEndpointURI().getUserInfo() != null)
+        {
             final String userName = endpoint.getEndpointURI().getUsername();
             final String password = endpoint.getEndpointURI().getPassword();
-            if (password != null && userName != null) {
+            if (password != null && userName != null)
+            {
                 credentials = new MuleCredentials(userName, password.toCharArray());
             }
         }
@@ -295,7 +311,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getPayload()
      */
     public UMOMessage getMessage()
@@ -305,36 +321,42 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getPayloadAsBytes()
      */
     public byte[] getMessageAsBytes() throws MuleException
     {
-        try {
+        try
+        {
             return message.getPayloadAsBytes();
         }
-        catch (Exception e) {
-            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_BYTES_TYPE_IS_X, message
-                    .getPayload().getClass().getName()), e);
+        catch (Exception e)
+        {
+            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_BYTES_TYPE_IS_X,
+                message.getPayload().getClass().getName()), e);
         }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getTransformedMessage()
      */
     public Object getTransformedMessage() throws TransformerException
     {
-        if (isStreaming()) {
+        if (isStreaming())
+        {
             return message.getAdapter();
         }
-        if (transformedMessage == null) {
+        if (transformedMessage == null)
+        {
             UMOTransformer tran = endpoint.getTransformer();
-            if (tran != null) {
+            if (tran != null)
+            {
                 transformedMessage = tran.transform(message.getPayload());
             }
-            else {
+            else
+            {
                 transformedMessage = message.getPayload();
             }
         }
@@ -342,57 +364,63 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * This method will attempt to convert the transformed message into an array
-     * of bytes It will first check if the result of the transformation is a
-     * byte array and return that. Otherwise if the the result is a string it
-     * will serialized the CONTENTS of the string not the String object. finally
-     * it will check if the result is a Serializable object and convert that to
-     * an array of bytes.
-     *
+     * This method will attempt to convert the transformed message into an array of
+     * bytes It will first check if the result of the transformation is a byte array
+     * and return that. Otherwise if the the result is a string it will serialized
+     * the CONTENTS of the string not the String object. finally it will check if the
+     * result is a Serializable object and convert that to an array of bytes.
+     * 
      * @return a byte[] representation of the message
-     * @throws TransformerException
-     *             if an unsupported encoding is being used or if the result
-     *             message is not a String byte[] or Seializable object
+     * @throws TransformerException if an unsupported encoding is being used or if
+     *             the result message is not a String byte[] or Seializable object
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
     {
         Object msg = getTransformedMessage();
-        if (msg instanceof byte[]) {
+        if (msg instanceof byte[])
+        {
             return (byte[])msg;
         }
-        else if (msg instanceof String) {
-            try {
+        else if (msg instanceof String)
+        {
+            try
+            {
                 return msg.toString().getBytes(getEncoding());
             }
-            catch (UnsupportedEncodingException e) {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, msg
-                        .getClass().getName(), e));
+            catch (UnsupportedEncodingException e)
+            {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, msg.getClass()
+                    .getName(), e));
             }
         }
-        else if (msg instanceof Serializable) {
-            try {
+        else if (msg instanceof Serializable)
+        {
+            try
+            {
                 return SerializationUtils.serialize((Serializable)msg);
             }
-            catch (Exception e) {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, msg
-                        .getClass().getName(), "byte[]"), e);
+            catch (Exception e)
+            {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
+                    msg.getClass().getName(), "byte[]"), e);
             }
         }
-        else {
+        else
+        {
             throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
-                    msg.getClass().getName(), "byte[] or " + Serializable.class.getName()));
+                msg.getClass().getName(), "byte[] or " + Serializable.class.getName()));
         }
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected format
-     * and then into a String. The transformer used is the one configured on the
-     * endpoint through which this event was received.
-     *
-     * @return the message transformed into it's recognised or expected format
-     *         as a Strings.
-     * @throws org.mule.umo.transformer.TransformerException
-     *             if a failure occurs in the transformer
+     * Returns the message transformed into it's recognised or expected format and
+     * then into a String. The transformer used is the one configured on the endpoint
+     * through which this event was received.
+     * 
+     * @return the message transformed into it's recognised or expected format as a
+     *         Strings.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs in
+     *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
     public String getTransformedMessageAsString() throws TransformerException
@@ -402,7 +430,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getPayloadAsString()
      */
     public String getMessageAsString() throws UMOException
@@ -411,51 +439,53 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected format
-     * and then into a String. The transformer used is the one configured on the
-     * endpoint through which this event was received.
-     *
-     * @param encoding
-     *            the encoding to use when converting the message to string
-     * @return the message transformed into it's recognised or expected format
-     *         as a Strings.
-     * @throws org.mule.umo.transformer.TransformerException
-     *             if a failure occurs in the transformer
+     * Returns the message transformed into it's recognised or expected format and
+     * then into a String. The transformer used is the one configured on the endpoint
+     * through which this event was received.
+     * 
+     * @param encoding the encoding to use when converting the message to string
+     * @return the message transformed into it's recognised or expected format as a
+     *         Strings.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs in
+     *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
     public String getTransformedMessageAsString(String encoding) throws TransformerException
     {
-        try {
+        try
+        {
             return new String(getTransformedMessageAsBytes(), encoding);
         }
-        catch (UnsupportedEncodingException e) {
+        catch (UnsupportedEncodingException e)
+        {
             throw new TransformerException(endpoint.getTransformer(), e);
         }
     }
 
     /**
      * Returns the message contents as a string
-     *
-     * @param encoding
-     *            the encoding to use when converting the message to string
+     * 
+     * @param encoding the encoding to use when converting the message to string
      * @return the message contents as a string
-     * @throws org.mule.umo.UMOException
-     *             if the message cannot be converted into a string
+     * @throws org.mule.umo.UMOException if the message cannot be converted into a
+     *             string
      */
     public String getMessageAsString(String encoding) throws UMOException
     {
-        try {
+        try
+        {
             return message.getPayloadAsString(encoding);
         }
-        catch (Exception e) {
-            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_STRING_TYPE_IS_X, message
-                    .getClass().getName()), e);
+        catch (Exception e)
+        {
+            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_STRING_TYPE_IS_X,
+                message.getClass().getName()), e);
         }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getId()
      */
     public String getId()
@@ -464,7 +494,6 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     *
      * @param name
      * @return
      */
@@ -474,21 +503,18 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     *
      * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, boolean)
      */
-    public Object getProperty(String name, boolean exhaustiveSearch) {
-        return getProperty(name, /*defaultValue*/null, exhaustiveSearch);
+    public Object getProperty(String name, boolean exhaustiveSearch)
+    {
+        return getProperty(name, /* defaultValue */null, exhaustiveSearch);
     }
 
     /*
      * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String,
-     *      java.lang.Object)
-     * @param name
-     * @param defaultValue
-     * @return
+     * 
+     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, java.lang.Object)
+     *      @param name @param defaultValue @return
      */
     public Object getProperty(String name, Object defaultValue)
     {
@@ -497,24 +523,33 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, java.lang.Object, boolean)
+     * 
+     * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, java.lang.Object,
+     *      boolean)
      */
-    public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch) {
+    public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch)
+    {
         Object property = getProperty(name);
 
-        if (exhaustiveSearch) {
+        if (exhaustiveSearch)
+        {
             // Search the endpoint
-            if (property == null) {
+            if (property == null)
+            {
                 property = MapUtils.getObject(getEndpoint().getEndpointURI().getParams(), name, null);
             }
 
             // Search the connector
-            if (property == null) {
-                try {
+            if (property == null)
+            {
+                try
+                {
                     property = PropertyUtils.getProperty(getEndpoint().getConnector(), name);
-                } catch (Exception e) {
-                    // Ignore this exception, it just means that the connector has no such property.
+                }
+                catch (Exception e)
+                {
+                    // Ignore this exception, it just means that the connector has no
+                    // such property.
                 }
             }
         }
@@ -523,9 +558,8 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOEvent#setProperty(java.lang.String,
-     *      java.lang.Object)
+     * 
+     * @see org.mule.umo.UMOEvent#setProperty(java.lang.String, java.lang.Object)
      */
     public void setProperty(String name, Object value)
     {
@@ -534,7 +568,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.UMOEvent#getEndpoint()
      */
     public UMOImmutableEndpoint getEndpoint()
@@ -544,7 +578,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -583,7 +617,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the default processing for this event will be executed
-     *
+     * 
      * @return Returns the stopFurtherProcessing.
      */
     public boolean isStopFurtherProcessing()
@@ -592,16 +626,15 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * Setting this parameter will stop the Mule framework from processing this
-     * event in the standard way. This allow for client code to override default
-     * behaviour. The common reasons for doing this are - 1. The UMO has more
-     * than one send endpoint configured; the component must dispatch to other
-     * prviders programatically by using the component on the current event 2.
-     * The UMO doesn't send the current event out through a endpoint. i.e. the
-     * processing of the event stops in the uMO.
-     *
-     * @param stopFurtherProcessing
-     *            The stopFurtherProcessing to set.
+     * Setting this parameter will stop the Mule framework from processing this event
+     * in the standard way. This allow for client code to override default behaviour.
+     * The common reasons for doing this are - 1. The UMO has more than one send
+     * endpoint configured; the component must dispatch to other prviders
+     * programatically by using the component on the current event 2. The UMO doesn't
+     * send the current event out through a endpoint. i.e. the processing of the
+     * event stops in the uMO.
+     * 
+     * @param stopFurtherProcessing The stopFurtherProcessing to set.
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
@@ -610,16 +643,19 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public boolean equals(Object o)
     {
-        if (this == o) {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof MuleEvent)) {
+        if (!(o instanceof MuleEvent))
+        {
             return false;
         }
 
         final MuleEvent event = (MuleEvent)o;
 
-        if (message != null ? !message.equals(event.message) : event.message != null) {
+        if (message != null ? !message.equals(event.message) : event.message != null)
+        {
             return false;
         }
         return id.equals(event.id);
@@ -645,7 +681,8 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public int getTimeout()
     {
-        if (timeout == TIMEOUT_NOT_SET_VALUE) {
+        if (timeout == TIMEOUT_NOT_SET_VALUE)
+        {
             // If this is not set it will use the default timeout value
             timeout = endpoint.getRemoteSyncTimeout();
         }
@@ -659,7 +696,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets an int property on the nessage
-     *
+     * 
      * @param name
      */
     public int getIntProperty(String name, int defaultValue)
@@ -669,7 +706,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a long property on the nessage
-     *
+     * 
      * @param name
      */
     public long getLongProperty(String name, long defaultValue)
@@ -679,7 +716,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a double property on the nessage
-     *
+     * 
      * @param name
      */
     public double getDoubleProperty(String name, double defaultValue)
@@ -689,7 +726,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Gets a boolean property on the nessage
-     *
+     * 
      * @param name
      */
     public boolean getBooleanProperty(String name, boolean defaultValue)
@@ -699,7 +736,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a boolean property on the nessage
-     *
+     * 
      * @param name
      * @param value
      */
@@ -710,7 +747,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets an int property on the nessage
-     *
+     * 
      * @param name
      * @param value
      */
@@ -721,7 +758,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a long property on the nessage
-     *
+     * 
      * @param name
      * @param value
      */
@@ -732,7 +769,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Sets a double property on the nessage
-     *
+     * 
      * @param name
      * @param value
      */
@@ -742,11 +779,11 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * An outputstream the can optionally be used write response data to an
-     * incoming message.
-     *
-     * @return an output strem if one has been made available by the message
-     *         receiver that received the message
+     * An outputstream the can optionally be used write response data to an incoming
+     * message.
+     * 
+     * @return an output strem if one has been made available by the message receiver
+     *         that received the message
      */
     public OutputStream getOutputStream()
     {
@@ -755,11 +792,10 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Removes a property from the event
-     *
-     * @param key
-     *            the property key to remove
-     * @return the removed property or null if the property was not found or if
-     *         the underlying message does not return the removed property
+     * 
+     * @param key the property key to remove
+     * @return the removed property or null if the property was not found or if the
+     *         underlying message does not return the removed property
      */
     public Object removeProperty(String key)
     {
@@ -776,22 +812,22 @@ public class MuleEvent extends EventObject implements UMOEvent
     {
         in.defaultReadObject();
         String uri = (String)in.readObject();
-        try {
+        try
+        {
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
-        catch (UMOException e) {
+        catch (UMOException e)
+        {
             throw (IOException)new IOException().initCause(e);
         }
     }
 
     /**
-     * Will retrieve a string proerty form the event. If the property does not
-     * exist it will be substituted with the default value
-     *
-     * @param name
-     *            the name of the proerty to get
-     * @param defaultValue
-     *            the default value to return if the proerty is not set
+     * Will retrieve a string proerty form the event. If the property does not exist
+     * it will be substituted with the default value
+     * 
+     * @param name the name of the proerty to get
+     * @param defaultValue the default value to return if the proerty is not set
      * @return the property value or the defaultValue if the proerty is not set
      */
     public String getStringProperty(String name, String defaultValue)
@@ -806,7 +842,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the event flow is being streamed
-     *
+     * 
      * @return true if the request should be streamed
      */
     public boolean isStreaming()
@@ -815,20 +851,22 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /**
-     * Gets the encoding for this message. First it looks to see if encoding has
-     * been set on the endpoint, if not it will check the message itself and
-     * finally it will fall back to the Mule global configuration for encoding
-     * which cannot be null.
-     *
+     * Gets the encoding for this message. First it looks to see if encoding has been
+     * set on the endpoint, if not it will check the message itself and finally it
+     * will fall back to the Mule global configuration for encoding which cannot be
+     * null.
+     * 
      * @return the encoding for the event
      */
     public String getEncoding()
     {
         String encoding = endpoint.getEncoding();
-        if (encoding == null) {
+        if (encoding == null)
+        {
             encoding = message.getEncoding();
         }
-        if (encoding == null) {
+        if (encoding == null)
+        {
             encoding = MuleManager.getConfiguration().getEncoding();
         }
         return encoding;

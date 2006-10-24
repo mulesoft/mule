@@ -19,11 +19,10 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.Serializable;
 
 /**
- * <code>SerializableToByteArray</code> converts a serializable object or a
- * String to a byte array. If <code>UMOMessage</code> is added as a source
- * type on this transformer then the UMOMessage will be serialised. This is
- * useful for transports such as tcp where the message headers would normally be
- * lost.
+ * <code>SerializableToByteArray</code> converts a serializable object or a String
+ * to a byte array. If <code>UMOMessage</code> is added as a source type on this
+ * transformer then the UMOMessage will be serialised. This is useful for transports
+ * such as tcp where the message headers would normally be lost.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -41,25 +40,28 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         registerSourceType(byte[].class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context)
-            throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         // If the UMOMessage source type has been registered that we can assume
         // that the whole message is to be serialised, not just the payload.
         // This can be useful for protocols such as tcp where the protocol does
         // not support headers, thus the whole message needs to be serialized.
 
-        if (isSourceTypeSupported(UMOMessage.class, true)) {
+        if (isSourceTypeSupported(UMOMessage.class, true))
+        {
             src = context.getMessage();
         }
-        else if (src instanceof byte[]) {
+        else if (src instanceof byte[])
+        {
             return src;
         }
 
-        try {
+        try
+        {
             return SerializationUtils.serialize((Serializable)src);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
     }

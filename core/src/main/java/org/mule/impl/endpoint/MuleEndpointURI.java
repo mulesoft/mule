@@ -26,19 +26,14 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
- * <code>MuleEndpointURI</code> is used to determine how a message is sent of received.
- * The url defines the protocol, the endpointUri destination of the message and optionally
- * the endpoint to use when dispatching the event. Mule urls take the form of -
- * 
- * protocol://[host]:[port]/[provider]/endpointUri or protocol://[host]:[port]/endpointUri
- * i.e.
- * 
- * vm://localhost/vmProvider/my.object or vm://my.object
- * 
- * The protocol can be any of any connector registered with Mule. The endpoint name if
- * specified must be the name of a register global endpoint
- * 
- * The endpointUri can be any endpointUri recognised by the endpoint type.
+ * <code>MuleEndpointURI</code> is used to determine how a message is sent of
+ * received. The url defines the protocol, the endpointUri destination of the message
+ * and optionally the endpoint to use when dispatching the event. Mule urls take the
+ * form of - protocol://[host]:[port]/[provider]/endpointUri or
+ * protocol://[host]:[port]/endpointUri i.e. vm://localhost/vmProvider/my.object or
+ * vm://my.object The protocol can be any of any connector registered with Mule. The
+ * endpoint name if specified must be the name of a register global endpoint The
+ * endpointUri can be any endpointUri recognised by the endpoint type.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -85,8 +80,9 @@ public class MuleEndpointURI implements UMOEndpointURI
                     String userInfo)
     {
         this(address, endpointName, connectorName, transformers, responseTransformers, createConnector,
-                properties, uri);
-        if (userInfo != null) {
+            properties, uri);
+        if (userInfo != null)
+        {
             this.userInfo = userInfo;
         }
     }
@@ -110,7 +106,8 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.uri = uri;
         this.uriString = uri.toASCIIString();
         this.userInfo = uri.getUserInfo();
-        if (properties != null) {
+        if (properties != null)
+        {
             resourceInfo = (String)properties.remove("resourceInfo");
         }
     }
@@ -129,36 +126,43 @@ public class MuleEndpointURI implements UMOEndpointURI
     public MuleEndpointURI(String uri) throws MalformedEndpointException
     {
         String uriIdentifier = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
-        if (!uriIdentifier.equals(uri)) {
+        if (!uriIdentifier.equals(uri))
+        {
             endpointName = uri;
             uri = uriIdentifier;
         }
 
         uri = uri.trim().replaceAll(" ", "%20");
 
-        if (!validateUrl(uri)) {
+        if (!validateUrl(uri))
+        {
             throw new MalformedEndpointException(uri);
         }
-        try {
+        try
+        {
             schemeMetaInfo = retrieveSchemeMetaInfo(uri);
-            if (schemeMetaInfo != null) {
+            if (schemeMetaInfo != null)
+            {
                 uri = uri.replaceFirst(schemeMetaInfo + ":", "");
             }
             this.uri = new URI(uri);
             this.userInfo = this.uri.getRawUserInfo();
         }
-        catch (URISyntaxException e) {
+        catch (URISyntaxException e)
+        {
             throw new MalformedEndpointException(uri, e);
         }
 
-        try {
+        try
+        {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
             ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(scheme);
             EndpointBuilder builder = csd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
         }
-        catch (ConnectorFactoryException e) {
+        catch (ConnectorFactoryException e)
+        {
             throw new MalformedEndpointException(e);
         }
     }
@@ -166,13 +170,16 @@ public class MuleEndpointURI implements UMOEndpointURI
     private String retrieveSchemeMetaInfo(String url)
     {
         int i = url.indexOf(':');
-        if (i == -1) {
+        if (i == -1)
+        {
             return null;
         }
-        if (url.charAt(i + 1) == '/') {
+        if (url.charAt(i + 1) == '/')
+        {
             return null;
         }
-        else {
+        else
+        {
             return url.substring(0, i);
         }
     }
@@ -185,7 +192,8 @@ public class MuleEndpointURI implements UMOEndpointURI
     private void initialise(UMOEndpointURI endpointUri)
     {
         this.address = endpointUri.getAddress();
-        if (this.endpointName == null) {
+        if (this.endpointName == null)
+        {
             this.endpointName = endpointUri.getEndpointName();
         }
         this.connectorName = endpointUri.getConnectorName();
@@ -213,7 +221,8 @@ public class MuleEndpointURI implements UMOEndpointURI
     {
         // TODO fix this so that the query string properties are not lost.
         // not sure whats causing this at the moment
-        if (params.size() == 0 && getQuery() != null) {
+        if (params.size() == 0 && getQuery() != null)
+        {
             params = PropertiesUtils.getPropertiesFromQueryString(getQuery());
         }
         return params;
@@ -393,12 +402,15 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getUsername()
     {
-        if (StringUtils.isNotBlank(userInfo)) {
+        if (StringUtils.isNotBlank(userInfo))
+        {
             int i = userInfo.indexOf(':');
-            if (i == -1) {
+            if (i == -1)
+            {
                 return userInfo;
             }
-            else {
+            else
+            {
                 return userInfo.substring(0, i);
             }
         }
@@ -412,9 +424,11 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPassword()
     {
-        if (StringUtils.isNotBlank(userInfo)) {
+        if (StringUtils.isNotBlank(userInfo))
+        {
             int i = userInfo.indexOf(':');
-            if (i > -1) {
+            if (i > -1)
+            {
                 return userInfo.substring(i + 1);
             }
         }
@@ -423,60 +437,73 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public boolean equals(Object o)
     {
-        if (this == o) {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof MuleEndpointURI)) {
+        if (!(o instanceof MuleEndpointURI))
+        {
             return false;
         }
 
         final MuleEndpointURI muleEndpointURI = (MuleEndpointURI)o;
 
-        if (createConnector != muleEndpointURI.createConnector) {
+        if (createConnector != muleEndpointURI.createConnector)
+        {
             return false;
         }
-        if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null) {
+        if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null)
+        {
             return false;
         }
         if (connectorName != null
-                ? !connectorName.equals(muleEndpointURI.connectorName)
-                : muleEndpointURI.connectorName != null) {
+                        ? !connectorName.equals(muleEndpointURI.connectorName)
+                        : muleEndpointURI.connectorName != null)
+        {
             return false;
         }
         if (endpointName != null
-                ? !endpointName.equals(muleEndpointURI.endpointName)
-                : muleEndpointURI.endpointName != null) {
+                        ? !endpointName.equals(muleEndpointURI.endpointName)
+                        : muleEndpointURI.endpointName != null)
+        {
             return false;
         }
         if (filterAddress != null
-                ? !filterAddress.equals(muleEndpointURI.filterAddress)
-                : muleEndpointURI.filterAddress != null) {
+                        ? !filterAddress.equals(muleEndpointURI.filterAddress)
+                        : muleEndpointURI.filterAddress != null)
+        {
             return false;
         }
-        if (params != null ? !params.equals(muleEndpointURI.params) : muleEndpointURI.params != null) {
+        if (params != null ? !params.equals(muleEndpointURI.params) : muleEndpointURI.params != null)
+        {
             return false;
         }
         if (resourceInfo != null
-                ? !resourceInfo.equals(muleEndpointURI.resourceInfo)
-                : muleEndpointURI.resourceInfo != null) {
+                        ? !resourceInfo.equals(muleEndpointURI.resourceInfo)
+                        : muleEndpointURI.resourceInfo != null)
+        {
             return false;
         }
         if (schemeMetaInfo != null
-                ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo)
-                : muleEndpointURI.schemeMetaInfo != null) {
+                        ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo)
+                        : muleEndpointURI.schemeMetaInfo != null)
+        {
             return false;
         }
         if (transformers != null
-                ? !transformers.equals(muleEndpointURI.transformers)
-                : muleEndpointURI.transformers != null) {
+                        ? !transformers.equals(muleEndpointURI.transformers)
+                        : muleEndpointURI.transformers != null)
+        {
             return false;
         }
         if (responseTransformers != null
-                ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
-                : muleEndpointURI.responseTransformers != null) {
+                        ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
+                        : muleEndpointURI.responseTransformers != null)
+        {
             return false;
         }
-        if (uri != null ? !uri.equals(muleEndpointURI.uri) : muleEndpointURI.uri != null) {
+        if (uri != null ? !uri.equals(muleEndpointURI.uri) : muleEndpointURI.uri != null)
+        {
             return false;
         }
 

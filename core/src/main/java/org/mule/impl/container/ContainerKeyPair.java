@@ -7,13 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 /**
- * <code>ContainerKeyPair</code> is a key strategy that binds a container
- * reference with a container name. This object isn't used directly by users,
- * but it is used when the the Mule XML configuration is processed.
- *
+ * <code>ContainerKeyPair</code> is a key strategy that binds a container reference
+ * with a container name. This object isn't used directly by users, but it is used
+ * when the the Mule XML configuration is processed.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -46,7 +47,8 @@ public class ContainerKeyPair
         return key;
     }
 
-    public boolean isRequired() {
+    public boolean isRequired()
+    {
         return required;
     }
 
@@ -58,15 +60,18 @@ public class ContainerKeyPair
         return key.toString();
     }
 
-    public String toFullString() {
-        return "Container Key{key=" + key.toString() + ", container=" + containerName + ", required=" + required + "}";
+    public String toFullString()
+    {
+        return "Container Key{key=" + key.toString() + ", container=" + containerName + ", required="
+               + required + "}";
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final ContainerKeyPair that = (ContainerKeyPair) o;
+        final ContainerKeyPair that = (ContainerKeyPair)o;
 
         if (!containerName.equals(that.containerName)) return false;
         if (!key.equals(that.key)) return false;
@@ -74,7 +79,8 @@ public class ContainerKeyPair
         return true;
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         int result;
         result = containerName.hashCode();
         result = 29 * result + key.hashCode();

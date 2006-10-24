@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import org.mule.umo.UMOFilter;
@@ -32,7 +33,7 @@ public class EqualsFilter implements UMOFilter, ObjectFilter
     {
         this.pattern = compareTo;
     }
-    
+
     public boolean accept(UMOMessage message)
     {
         return accept(message.getPayload());
@@ -40,10 +41,12 @@ public class EqualsFilter implements UMOFilter, ObjectFilter
 
     public boolean accept(Object object)
     {
-        if (object == null && pattern == null) {
+        if (object == null && pattern == null)
+        {
             return true;
         }
-        if (object == null || pattern == null) {
+        if (object == null || pattern == null)
+        {
             return false;
         }
         return pattern.equals(object);

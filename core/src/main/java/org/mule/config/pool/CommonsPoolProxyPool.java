@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects.
- * This pool is a jakarta commons-pool implementation.
+ * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects. This
+ * pool is a jakarta commons-pool implementation.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -55,8 +55,8 @@ public class CommonsPoolProxyPool implements ObjectPool
     /**
      * Creates a new pool and an Object factory with the UMODescriptor
      * 
-     * @param descriptor the descriptor to use when constructing MuleProxy
-     *            objects in the pool
+     * @param descriptor the descriptor to use when constructing MuleProxy objects in
+     *            the pool
      */
     public CommonsPoolProxyPool(MuleDescriptor descriptor, ObjectFactory factory)
     {
@@ -66,7 +66,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
         config.maxActive = descriptor.getPoolingProfile().getMaxActive();
         config.maxWait = descriptor.getPoolingProfile().getMaxWait();
-        config.whenExhaustedAction = (byte) descriptor.getPoolingProfile().getExhaustedAction();
+        config.whenExhaustedAction = (byte)descriptor.getPoolingProfile().getExhaustedAction();
 
         init(descriptor, config);
     }
@@ -88,13 +88,15 @@ public class CommonsPoolProxyPool implements ObjectPool
     {
         components = new ArrayList();
 
-        if (factory == null) {
+        if (factory == null)
+        {
             setFactory(new CommonsPoolProxyFactory(descriptor));
         }
 
-        pool = new GenericObjectPool((PoolableObjectFactory) factory, config);
+        pool = new GenericObjectPool((PoolableObjectFactory)factory, config);
 
-        if (factory instanceof CommonsPoolProxyFactory) {
+        if (factory instanceof CommonsPoolProxyFactory)
+        {
             ((CommonsPoolProxyFactory)factory).setPool(this);
         }
     }
@@ -156,9 +158,11 @@ public class CommonsPoolProxyPool implements ObjectPool
      */
     public void clearPool()
     {
-        synchronized (components) {
-            for (Iterator i = components.iterator(); i.hasNext();) {
-                ((Disposable) i.next()).dispose();
+        synchronized (components)
+        {
+            for (Iterator i = components.iterator(); i.hasNext();)
+            {
+                ((Disposable)i.next()).dispose();
             }
             components.clear();
         }
@@ -167,35 +171,42 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     public void onAdd(Object proxy)
     {
-        synchronized (components) {
+        synchronized (components)
+        {
             components.add(proxy);
         }
     }
 
     public void onRemove(Object proxy)
     {
-        synchronized (components) {
+        synchronized (components)
+        {
             final boolean wasRemoved = components.remove(proxy);
-            if (wasRemoved) {
-                ((Disposable) proxy).dispose();
+            if (wasRemoved)
+            {
+                ((Disposable)proxy).dispose();
             }
         }
     }
 
     public void start() throws UMOException
     {
-        synchronized (components) {
-            for (Iterator i = components.iterator(); i.hasNext();) {
-                ((Startable) i.next()).start();
+        synchronized (components)
+        {
+            for (Iterator i = components.iterator(); i.hasNext();)
+            {
+                ((Startable)i.next()).start();
             }
         }
     }
 
     public void stop() throws UMOException
     {
-        synchronized (components) {
-            for (Iterator i = components.iterator(); i.hasNext();) {
-                ((Stoppable) i.next()).stop();
+        synchronized (components)
+        {
+            for (Iterator i = components.iterator(); i.hasNext();)
+            {
+                ((Stoppable)i.next()).stop();
             }
         }
     }

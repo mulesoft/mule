@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.admin;
 
 import org.mule.config.i18n.Message;
@@ -28,8 +29,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import java.util.Map;
 
 /**
- * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications to
- * a configurered endpoint uri.
+ * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications
+ * to a configurered endpoint uri.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -44,30 +45,42 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     protected void doInitialise() throws InitialisationException
     {
         // first see if we're logging notifications to an endpoint
-        try {
-            if (endpointAddress != null) {
-                logEndpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointAddress, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-            } else {
-                throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "endpointAddress"), this);
+        try
+        {
+            if (endpointAddress != null)
+            {
+                logEndpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointAddress,
+                    UMOEndpoint.ENDPOINT_TYPE_SENDER);
             }
-             // Create a session for sending notifications
+            else
+            {
+                throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                    "endpointAddress"), this);
+            }
+            // Create a session for sending notifications
             session = new MuleSession(new MuleMessage(new NullPayload(), (Map)null), new NullSessionHandler());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(e, this);
         }
     }
 
     protected void logEvent(UMOServerNotification e)
     {
-        if (logEndpoint != null) {
-            try {
+        if (logEndpoint != null)
+        {
+            try
+            {
                 UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher(logEndpoint);
                 UMOMessage msg = new MuleMessage(e.toString(), (Map)null);
                 UMOEvent event = new MuleEvent(msg, logEndpoint, session, false);
                 dispatcher.dispatch(event);
-            } catch (Exception e1) {
+            }
+            catch (Exception e1)
+            {
                 logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
-                        + ". Error is: " + e1.getMessage(), e1);
+                             + ". Error is: " + e1.getMessage(), e1);
             }
         }
     }
@@ -81,17 +94,20 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     {
         StringBuffer buf = new StringBuffer();
         buf.append(getName()).append(": ");
-        if (endpointAddress != null) {
+        if (endpointAddress != null)
+        {
             buf.append("Forwarding notifications to: " + endpointAddress);
         }
         return buf.toString();
     }
 
-    public String getEndpointAddress() {
+    public String getEndpointAddress()
+    {
         return endpointAddress;
     }
 
-    public void setEndpointAddress(String endpointAddress) {
+    public void setEndpointAddress(String endpointAddress)
+    {
         this.endpointAddress = endpointAddress;
     }
 }

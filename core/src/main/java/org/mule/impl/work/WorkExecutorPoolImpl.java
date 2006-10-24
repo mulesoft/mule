@@ -35,9 +35,8 @@ import org.mule.config.ThreadingProfile;
 import org.mule.util.concurrent.WaitPolicy;
 
 /**
- * Based class for WorkExecutorPool. Sub-classes define the synchronization
- * policy (should the call block until the end of the work; or when it starts et
- * cetera).
+ * Based class for WorkExecutorPool. Sub-classes define the synchronization policy
+ * (should the call block until the end of the work; or when it starts et cetera).
  * 
  * @version $Rev$ $Date$
  */
@@ -56,12 +55,11 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     private static final long SHUTDOWN_TIMEOUT = 5000L;
 
     /**
-     * Creates a pool with the specified minimum and maximum sizes. The Channel
-     * used to enqueue the submitted Work instances is queueless synchronous
-     * one.
+     * Creates a pool with the specified minimum and maximum sizes. The Channel used
+     * to enqueue the submitted Work instances is queueless synchronous one.
      * 
-     * @param profile The threading profile to use when creating a pool for this
-     *            work manager
+     * @param profile The threading profile to use when creating a pool for this work
+     *            manager
      * @param name The name to associate with the threads created in this pool
      */
     public WorkExecutorPoolImpl(ThreadingProfile profile, String name)
@@ -82,16 +80,16 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     {
         pooledExecutor = new ThreadPoolExecutor(0, maxSize, 60L, TimeUnit.SECONDS, queue);
         pooledExecutor.setCorePoolSize(maxSize);
-        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy(ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
+        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy(
+            ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     /**
      * Execute the specified Work.
      * 
      * @param work Work to be executed.
-     * 
-     * @exception InterruptedException Indicates that the Work execution has
-     *                been unsuccessful.
+     * @exception InterruptedException Indicates that the Work execution has been
+     *                unsuccessful.
      */
     public void execute(Runnable work)
     {
@@ -130,17 +128,19 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     }
 
     /**
-     * Stops this pool. Prior to stop this pool, all the enqueued Work instances
-     * are processed, if possible, in the allowed timeout. After what, all
-     * threads are interrupted and waited for. This is an mix orderly / abrupt
-     * shutdown.
+     * Stops this pool. Prior to stop this pool, all the enqueued Work instances are
+     * processed, if possible, in the allowed timeout. After what, all threads are
+     * interrupted and waited for. This is an mix orderly / abrupt shutdown.
      */
     public WorkExecutorPool stop()
     {
         pooledExecutor.shutdownNow();
-        try {
+        try
+        {
             pooledExecutor.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             // Continue
         }
         return new NullWorkExecutorPool(profile, name);

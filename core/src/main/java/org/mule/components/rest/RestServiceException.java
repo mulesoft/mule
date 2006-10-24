@@ -16,7 +16,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,11 +27,13 @@ public class RestServiceException extends MessagingException
      */
     private static final long serialVersionUID = -1026055907767407433L;
 
-    public RestServiceException(Message message, UMOMessage umoMessage) {
+    public RestServiceException(Message message, UMOMessage umoMessage)
+    {
         super(message, umoMessage);
     }
 
-    public RestServiceException(Message message, UMOMessage umoMessage, Throwable cause) {
+    public RestServiceException(Message message, UMOMessage umoMessage, Throwable cause)
+    {
         super(message, umoMessage, cause);
     }
 }

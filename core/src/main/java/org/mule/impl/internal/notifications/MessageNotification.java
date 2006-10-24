@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.notifications;
 
 import org.apache.commons.logging.Log;
@@ -18,8 +19,8 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
- * These notifications are fire when either a message is received via an endpoint, or dispatcher of if
- * a receive call is made on a dispatcher.
+ * These notifications are fire when either a message is received via an endpoint, or
+ * dispatcher of if a receive call is made on a dispatcher.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -41,11 +42,15 @@ public class MessageNotification extends UMOServerNotification
     public static final int MESSAGE_SENT = MESSAGE_EVENT_ACTION_START_RANGE + 3;
     public static final int MESSAGE_REQUESTED = MESSAGE_EVENT_ACTION_START_RANGE + 4;
 
-    private static final transient String[] ACTIONS = new String[] { "received", "dispatched", "sent", "requested" };
+    private static final transient String[] ACTIONS = new String[]{"received", "dispatched", "sent",
+        "requested"};
 
     private UMOImmutableEndpoint endpoint;
 
-    public MessageNotification(UMOMessage resource, UMOImmutableEndpoint endpoint, String identifier, int action)
+    public MessageNotification(UMOMessage resource,
+                               UMOImmutableEndpoint endpoint,
+                               String identifier,
+                               int action)
     {
         super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
@@ -53,8 +58,9 @@ public class MessageNotification extends UMOServerNotification
 
     }
 
-    protected static UMOMessage cloneMessage(UMOMessage message) {
-        //Todo we probably need to support deep cloning here
+    protected static UMOMessage cloneMessage(UMOMessage message)
+    {
+        // Todo we probably need to support deep cloning here
         Object clonePayload = message.getPayload();
         UMOMessage clone = new MuleMessage(clonePayload, message);
         return clone;
@@ -62,8 +68,9 @@ public class MessageNotification extends UMOServerNotification
 
     protected String getPayloadToString()
     {
-        if (source instanceof UMOConnectable) {
-            return ((UMOConnectable) source).getConnectionDescription();
+        if (source instanceof UMOConnectable)
+        {
+            return ((UMOConnectable)source).getConnectionDescription();
         }
         return source.toString();
     }
@@ -71,7 +78,8 @@ public class MessageNotification extends UMOServerNotification
     protected String getActionName(int action)
     {
         int i = action - MESSAGE_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
         return ACTIONS[i - 1];
@@ -80,10 +88,12 @@ public class MessageNotification extends UMOServerNotification
     public String toString()
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint.getEndpointURI()
-                + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp +  ", serverId=" + serverId + ", message: " + source + "}";
+               + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + ", serverId=" + serverId
+               + ", message: " + source + "}";
     }
 
-    public UMOImmutableEndpoint getEndpoint() {
+    public UMOImmutableEndpoint getEndpoint()
+    {
         return endpoint;
     }
 

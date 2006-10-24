@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.manager;
 
 import org.apache.commons.logging.Log;
@@ -17,48 +18,58 @@ import javax.resource.spi.work.WorkListener;
 
 /**
  * Default exception Handler used when executing work in the work manager
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultWorkListener implements WorkListener {
+public class DefaultWorkListener implements WorkListener
+{
 
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void workAccepted(WorkEvent event) {
+    public void workAccepted(WorkEvent event)
+    {
         handleWorkException(event, "workAccepted");
     }
 
-    public void workRejected(WorkEvent event) {
+    public void workRejected(WorkEvent event)
+    {
         handleWorkException(event, "workRejected");
     }
 
-    public void workStarted(WorkEvent event) {
+    public void workStarted(WorkEvent event)
+    {
         handleWorkException(event, "workStarted");
     }
 
-    public void workCompleted(WorkEvent event) {
+    public void workCompleted(WorkEvent event)
+    {
         handleWorkException(event, "workCompleted");
     }
 
-     protected void handleWorkException(WorkEvent event, String type) {
+    protected void handleWorkException(WorkEvent event, String type)
+    {
         Throwable e;
 
-        if (event != null && event.getException() != null) {
+        if (event != null && event.getException() != null)
+        {
             e = event.getException();
         }
-        else {
+        else
+        {
             return;
         }
 
-        if (event.getException().getCause() != null) {
+        if (event.getException().getCause() != null)
+        {
             e = event.getException().getCause();
         }
 
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: " + event.getWork().toString());
+        logger.error("Work caused exception on '" + type + "'. Work being executed was: "
+                     + event.getWork().toString());
         logger.error(e);
     }
 }

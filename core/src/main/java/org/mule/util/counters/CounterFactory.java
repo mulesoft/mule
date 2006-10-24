@@ -15,8 +15,8 @@ import org.mule.util.counters.impl.CounterFactoryImpl;
 import java.util.Iterator;
 
 /**
- * This class is the Counter's factory. It is the main entry point for
- * operations on counters. The user can:
+ * This class is the Counter's factory. It is the main entry point for operations on
+ * counters. The user can:
  * <ul>
  * <li>retrieve a counter by its name</li>
  * <li>create a counter</li>
@@ -81,7 +81,7 @@ public class CounterFactory
         {
             this.name = name;
         }
-        
+
         public String getName()
         {
             return this.name;

@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.service;
 
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ConnectorServiceException</code> is thrown if a
- * ProviderServicedescriptor has a service error set. This is usually because
- * the endpoint/connector cannot be created from a service descriptor
+ * <code>ConnectorServiceException</code> is thrown if a ProviderServicedescriptor
+ * has a service error set. This is usually because the endpoint/connector cannot be
+ * created from a service descriptor
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

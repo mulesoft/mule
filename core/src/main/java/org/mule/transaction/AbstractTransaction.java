@@ -19,7 +19,7 @@ import org.mule.umo.UMOTransaction;
 
 /**
  * This base class provides low level features for transactions
- *
+ * 
  * @author Guillaume Nodet
  * @version $Revision$
  */
@@ -76,9 +76,9 @@ public abstract class AbstractTransaction implements UMOTransaction
      */
     public void begin() throws TransactionException
     {
-           if(logger.isDebugEnabled()) logger.debug("Beginning transaction");
-           doBegin();
-           TransactionCoordination.getInstance().bindTransaction(this);
+        if (logger.isDebugEnabled()) logger.debug("Beginning transaction");
+        doBegin();
+        TransactionCoordination.getInstance().bindTransaction(this);
 
     }
 
@@ -89,14 +89,18 @@ public abstract class AbstractTransaction implements UMOTransaction
      */
     public void commit() throws TransactionException
     {
-        try {
-            if(logger.isDebugEnabled()) logger.debug("Committing transaction");
-            if (isRollbackOnly()) {
+        try
+        {
+            if (logger.isDebugEnabled()) logger.debug("Committing transaction");
+            if (isRollbackOnly())
+            {
                 throw new IllegalTransactionStateException(new Message(Messages.TX_MARKED_FOR_ROLLBACK));
             }
             doCommit();
-        } finally {
-           TransactionCoordination.getInstance().unbindTransaction(this);
+        }
+        finally
+        {
+            TransactionCoordination.getInstance().unbindTransaction(this);
         }
 
     }
@@ -108,32 +112,35 @@ public abstract class AbstractTransaction implements UMOTransaction
      */
     public void rollback() throws TransactionException
     {
-        try {
+        try
+        {
             logger.debug("Rolling back transaction");
             setRollbackOnly();
             doRollback();
-        } finally {
+        }
+        finally
+        {
             TransactionCoordination.getInstance().unbindTransaction(this);
         }
     }
 
     /**
      * Really begin the transaction. Note that resources are enlisted yet.
-     *
+     * 
      * @throws TransactionException
      */
     protected abstract void doBegin() throws TransactionException;
 
     /**
      * Commit the transaction on the underlying resource
-     *
+     * 
      * @throws TransactionException
      */
     protected abstract void doCommit() throws TransactionException;
 
     /**
      * Rollback the transaction on the underlying resource
-     *
+     * 
      * @throws TransactionException
      */
     protected abstract void doRollback() throws TransactionException;

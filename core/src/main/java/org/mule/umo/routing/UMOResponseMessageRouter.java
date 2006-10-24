@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.umo.UMOEvent;
@@ -17,9 +18,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.List;
 
 /**
- * <code>UMOResponseMessageRouter</code> is a router that can be used to
- * control how the response in a request/response message flow is created. Main
- * usecase is to aggregate a set of asynchonous events into a single response
+ * <code>UMOResponseMessageRouter</code> is a router that can be used to control
+ * how the response in a request/response message flow is created. Main usecase is to
+ * aggregate a set of asynchonous events into a single response
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

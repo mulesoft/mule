@@ -19,27 +19,29 @@ import java.util.Map;
 
 /**
  * Common code for initialising the JNDI context.
- *
+ * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class JndiContextHelper
 {
     /**
      * Create a new initial context.
-     *
-     * @param environment JNDI properties or <code>null</code>.
-     *        In the latter case a default constructor of
-     *        <code>InitialContext</code> will be called with
-     *        standard JNDI lookup properties semantics.
+     * 
+     * @param environment JNDI properties or <code>null</code>. In the latter case
+     *            a default constructor of <code>InitialContext</code> will be
+     *            called with standard JNDI lookup properties semantics.
      * @return jndi context
      * @throws NamingException if there was a JNDI error
      */
     public static Context initialise(final Map environment) throws NamingException
     {
         Context context;
-        if (environment != null && environment.size() > 0) {
+        if (environment != null && environment.size() > 0)
+        {
             context = new InitialContext(new Hashtable(environment));
-        } else {
+        }
+        else
+        {
             context = new InitialContext();
         }
 

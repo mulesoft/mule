@@ -17,8 +17,8 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Base64;
 
 /**
- * <code>Base64Encoder</code> transforms strings or byte arrays into Base64
- * encoded string
+ * <code>Base64Encoder</code> transforms strings or byte arrays into Base64 encoded
+ * string
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -46,26 +46,32 @@ public class Base64Encoder extends AbstractTransformer
     {
         byte[] buf;
 
-        try {
-            if (src instanceof String) {
+        try
+        {
+            if (src instanceof String)
+            {
                 buf = ((String)src).getBytes(encoding);
             }
-            else {
+            else
+            {
                 buf = (byte[])src;
             }
 
             String result = Base64.encodeBytes(buf, Base64.DONT_BREAK_LINES);
 
-            if (getReturnClass().equals(byte[].class)) {
+            if (getReturnClass().equals(byte[].class))
+            {
                 return result.getBytes(encoding);
             }
-            else {
+            else
+            {
                 return result;
             }
         }
-        catch (Exception ex) {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
-                    src.getClass().getName(), "base64"), this, ex);
+        catch (Exception ex)
+        {
+            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, src.getClass()
+                .getName(), "base64"), this, ex);
         }
     }
 

@@ -77,11 +77,15 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
     public void remove(String queue, Object id) throws IOException
     {
         File file = new File(store, queue + File.separator + id + EXTENSION);
-        if (file.exists()) {
-            if (!file.delete()) {
+        if (file.exists())
+        {
+            if (!file.delete())
+            {
                 throw new DeleteException(file);
             }
-        } else {
+        }
+        else
+        {
             throw new FileNotFoundException(file.toString());
         }
     }
@@ -95,14 +99,20 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
     {
         File file = new File(store, queue + File.separator + id + EXTENSION);
         ObjectInputStream ois = null;
-        try {
+        try
+        {
             ois = new ObjectInputStream(new FileInputStream(file));
             Object obj = ois.readObject();
             return obj;
-        } catch (ClassNotFoundException e) {
-            throw (IOException) new IOException("Error loading persistent object").initCause(e);
-        } finally {
-            if (ois != null) {
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw (IOException)new IOException("Error loading persistent object").initCause(e);
+        }
+        finally
+        {
+            if (ois != null)
+            {
                 ois.close();
             }
         }
@@ -116,30 +126,39 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
     public List restore() throws IOException
     {
         List msgs = new ArrayList();
-        if(store==null) {
+        if (store == null)
+        {
             logger.warn("No store has be set on the File Persistence Strategy. Not restoring at this time");
             return msgs;
         }
-        try {
+        try
+        {
             restoreFiles(store, msgs);
             logger.debug("Restore retrieved " + msgs.size() + " objects");
             return msgs;
-        } catch (ClassNotFoundException e) {
-            throw (IOException) new IOException("Could not restore").initCause(e);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw (IOException)new IOException("Could not restore").initCause(e);
         }
     }
 
     protected void restoreFiles(File dir, List msgs) throws IOException, ClassNotFoundException
     {
         File[] files = dir.listFiles();
-        if(files==null) {
+        if (files == null)
+        {
             return;
         }
 
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
+        for (int i = 0; i < files.length; i++)
+        {
+            if (files[i].isDirectory())
+            {
                 restoreFiles(files[i], msgs);
-            } else if (files[i].getName().endsWith(EXTENSION)) {
+            }
+            else if (files[i].getName().endsWith(EXTENSION))
+            {
                 String id = files[i].getCanonicalPath();
                 id = id.substring(store.getCanonicalPath().length() + 1, id.length() - EXTENSION.length());
                 String queue = id.substring(0, id.indexOf(File.separator));
@@ -157,7 +176,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
     public void open() throws IOException
     {
         String path = MuleManager.getConfiguration().getWorkingDirectory() + File.separator
-                + MuleConfiguration.DEFAULT_QUEUE_STORE;
+                      + MuleConfiguration.DEFAULT_QUEUE_STORE;
         store = new File(path).getCanonicalFile();
         store.mkdirs();
     }
@@ -194,7 +213,8 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
         }
     }
 
-    public boolean isTransient() {
+    public boolean isTransient()
+    {
         return false;
     }
 }

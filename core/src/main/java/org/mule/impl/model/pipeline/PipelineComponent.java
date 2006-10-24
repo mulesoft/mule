@@ -28,7 +28,7 @@ import org.mule.umo.provider.DispatchException;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,71 +41,96 @@ public class PipelineComponent extends DirectComponent
 
     private Callable callable;
 
-    public PipelineComponent(MuleDescriptor descriptor, UMOModel model) {
+    public PipelineComponent(MuleDescriptor descriptor, UMOModel model)
+    {
         super(descriptor, model);
     }
 
-    public void doInitialise() throws InitialisationException {
+    public void doInitialise() throws InitialisationException
+    {
 
         super.doInitialise();
         Object component = null;
-        try {
+        try
+        {
             component = lookupComponent();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new InitialisationException(e, this);
         }
-        if (component instanceof Callable) {
-            callable = (Callable) component;
-        } else {
+        if (component instanceof Callable)
+        {
+            callable = (Callable)component;
+        }
+        else
+        {
             throw new InitialisationException(new Message(Messages.OBJECT_X_NOT_OF_CORRECT_TYPE_SHOULD_BE_X,
-                    component.getClass().getName(), Callable.class.getName()), this);
+                component.getClass().getName(), Callable.class.getName()), this);
         }
 
-        if (component instanceof Initialisable) {
-            ((Initialisable) component).initialise();
+        if (component instanceof Initialisable)
+        {
+            ((Initialisable)component).initialise();
         }
-
 
     }
 
-    protected UMOMessage doSend(UMOEvent event) throws UMOException {
-        try {
+    protected UMOMessage doSend(UMOEvent event) throws UMOException
+    {
+        try
+        {
             Object result = callable.onCall(RequestContext.getEventContext());
             UMOMessage returnMessage = null;
-            if (result instanceof UMOMessage) {
-                returnMessage = (UMOMessage) result;
-            } else {
+            if (result instanceof UMOMessage)
+            {
+                returnMessage = (UMOMessage)result;
+            }
+            else
+            {
                 returnMessage = new MuleMessage(result, event.getMessage());
             }
-            if (!event.isStopFurtherProcessing()) {
-//                // TODO what about this code?
-//                Map context = RequestContext.clearProperties();
-//                if (context != null) {
-//                    returnMessage.addProperties(context);
-//                }
-                if (descriptor.getOutboundRouter().hasEndpoints()) {
-                    UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
-                    if (outboundReturnMessage != null) {
+            if (!event.isStopFurtherProcessing())
+            {
+                // // TODO what about this code?
+                // Map context = RequestContext.clearProperties();
+                // if (context != null) {
+                // returnMessage.addProperties(context);
+                // }
+                if (descriptor.getOutboundRouter().hasEndpoints())
+                {
+                    UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage,
+                        event.getSession(), event.isSynchronous());
+                    if (outboundReturnMessage != null)
+                    {
                         returnMessage = outboundReturnMessage;
                     }
-                } else {
-                    logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured.");
+                }
+                else
+                {
+                    logger.debug("Outbound router on component '" + descriptor.getName()
+                                 + "' doesn't have any endpoints configured.");
                 }
             }
 
             return returnMessage;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
-    protected void doDispatch(UMOEvent event) throws UMOException {
+    protected void doDispatch(UMOEvent event) throws UMOException
+    {
         sendEvent(event);
     }
 
-    protected void doDispose() {
-        if (callable instanceof Disposable) {
-            ((Disposable) callable).dispose();
+    protected void doDispose()
+    {
+        if (callable instanceof Disposable)
+        {
+            ((Disposable)callable).dispose();
         }
     }
 }

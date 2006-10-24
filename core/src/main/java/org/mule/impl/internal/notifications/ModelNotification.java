@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOServerNotification;
@@ -38,9 +39,9 @@ public class ModelNotification extends UMOServerNotification implements Blocking
     public static final int MODEL_DISPOSING = MODEL_EVENT_ACTION_START_RANGE + 9;
     public static final int MODEL_DISPOSED = MODEL_EVENT_ACTION_START_RANGE + 10;
 
-    private static final transient String[] ACTIONS = new String[] { "initialising", "initialised",
-            "initialising listeners", "initialised listeners", "starting", "started", "stopping", "stopped",
-            "disposing", "disposed" };
+    private static final transient String[] ACTIONS = new String[]{"initialising", "initialised",
+        "initialising listeners", "initialised listeners", "starting", "started", "stopping", "stopped",
+        "disposing", "disposed"};
 
     public ModelNotification(UMOModel message, int action)
     {
@@ -50,13 +51,14 @@ public class ModelNotification extends UMOServerNotification implements Blocking
 
     protected String getPayloadToString()
     {
-        return ((UMOModel) source).getName();
+        return ((UMOModel)source).getName();
     }
 
     protected String getActionName(int action)
     {
         int i = action - MODEL_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
         return ACTIONS[i - 1];

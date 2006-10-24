@@ -35,14 +35,18 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
      */
     public static void populateWithoutFail(Object object, Map props, boolean logWarnings)
     {
-        //Check to see if our object has a setProperties method where the properties map should be set
-        if(ClassUtils.getMethod(SET_PROPERTIES_METHOD, new Class[]{Map.class}, object.getClass()) !=null) {
-            try {
+        // Check to see if our object has a setProperties method where the properties
+        // map should be set
+        if (ClassUtils.getMethod(SET_PROPERTIES_METHOD, new Class[]{Map.class}, object.getClass()) != null)
+        {
+            try
+            {
                 BeanUtils.setProperty(object, "properties", props);
             }
             catch (Exception e)
             {
-                //this should never happen since we explicitly check for the method above
+                // this should never happen since we explicitly check for the method
+                // above
                 if (logWarnings)
                 {
                     logger.warn("Property: " + SET_PROPERTIES_METHOD + "=" + Map.class.getName()
@@ -50,7 +54,8 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
                 }
             }
         }
-        else {
+        else
+        {
             for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry)iterator.next();

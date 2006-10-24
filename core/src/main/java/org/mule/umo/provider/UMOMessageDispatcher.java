@@ -20,11 +20,12 @@ import org.mule.umo.lifecycle.Disposable;
 import java.io.OutputStream;
 
 /**
- * <code>UMOMessageDispatcher</code> is the interface responsible for distpatching events to a particular transport.
- * It implements the client code necessary to write data to the underlying protocol.
- * The dispatcher also exposes a receive method that allows users to make specific calls to the underlying transport to
- * receive an event.
- *
+ * <code>UMOMessageDispatcher</code> is the interface responsible for distpatching
+ * events to a particular transport. It implements the client code necessary to write
+ * data to the underlying protocol. The dispatcher also exposes a receive method that
+ * allows users to make specific calls to the underlying transport to receive an
+ * event.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -52,12 +53,14 @@ public interface UMOMessageDispatcher extends Disposable, UMOConnectable
 
     /**
      * Make a specific request to the underlying transport
+     * 
      * @param endpointUri the endpoint URI to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning. The call should
-     * return immediately if there is data available. If no data becomes available before the timeout
-     * elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     * avaialable
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      * @deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
      */
@@ -65,19 +68,23 @@ public interface UMOMessageDispatcher extends Disposable, UMOConnectable
 
     /**
      * Make a specific request to the underlying transport
+     * 
      * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning. The call should
-     * return immediately if there is data available. If no data becomes available before the timeout
-     * elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     * avaialable
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception;
 
     /**
-     * If the underlying transport has the notion of a client session when writing to it, the session should be
-     * obtainable using this method. If there is no session a null will be returned
+     * If the underlying transport has the notion of a client session when writing to
+     * it, the session should be obtainable using this method. If there is no session
+     * a null will be returned
+     * 
      * @return the transport specific session or null if there is no session
      * @throws UMOException
      */
@@ -85,22 +92,27 @@ public interface UMOMessageDispatcher extends Disposable, UMOConnectable
 
     /**
      * Gets the connector for this dispatcher
+     * 
      * @return the connector for this dispatcher
      */
     UMOConnector getConnector();
 
     /**
-     * Determines if this dispatcher has been disposed. Once disposed a dispatcher cannot be used again
+     * Determines if this dispatcher has been disposed. Once disposed a dispatcher
+     * cannot be used again
+     * 
      * @return true if this dispatcher has been disposed, false otherwise
      */
     boolean isDisposed();
 
     /**
-     * Well get the output stream (if any) for this type of transport.  Typically this will be called only when Streaming
-     * is being used on an outbound endpoint
+     * Well get the output stream (if any) for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint
+     * 
      * @param endpoint the endpoint that releates to this Dispatcher
      * @param message the current message being processed
-     * @return the output stream to use for this request or null if the transport does not support streaming
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
      * @throws UMOException
      */
     OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException;

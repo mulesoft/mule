@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters;
 
 import org.apache.commons.logging.Log;
@@ -17,16 +18,11 @@ import org.mule.util.StringUtils;
 
 /**
  * <code>WildcardFilter</code> is used to match wildcard string. It performs
- * matches with * i.e.
- * 
- * jms.events.* would catch jms.events.customer jms.events.receipts
- * 
- * This filter accepts a comma separented list of patterns so more than one
- * filter pattenr can be matched for a given argument i.e.-
- * 
- * jms.events.*, jms.actions.*
- * 
- * will match jms.events.system and jms.actions but not jms.queue
+ * matches with * i.e. jms.events.* would catch jms.events.customer
+ * jms.events.receipts This filter accepts a comma separented list of patterns so
+ * more than one filter pattenr can be matched for a given argument i.e.-
+ * jms.events.*, jms.actions.* will match jms.events.system and jms.actions but not
+ * jms.queue
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -49,12 +45,15 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     {
         setPattern(pattern);
     }
-    
+
     public boolean accept(UMOMessage message)
     {
-        try {
+        try
+        {
             return accept(message.getPayloadAsString());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             LOGGER.warn("An exception occured while filtering", e);
             return false;
         }
@@ -62,39 +61,52 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
 
     public boolean accept(Object object)
     {
-        if (object == null) {
+        if (object == null)
+        {
             return false;
         }
 
         boolean match = false;
-        for (int x = 0; x < patterns.length; x++) {
+        for (int x = 0; x < patterns.length; x++)
+        {
             String pattern = patterns[x];
-            
+
             String string = object.toString();
-            if ("*".equals(pattern) || "**".equals(pattern)) {
+            if ("*".equals(pattern) || "**".equals(pattern))
+            {
                 return true;
             }
 
             int i = pattern.indexOf('*');
 
-            if(!isCaseSensitive()) {
+            if (!isCaseSensitive())
+            {
                 pattern = pattern.toLowerCase();
                 string = string.toLowerCase();
             }
 
-            if (i == -1) {
+            if (i == -1)
+            {
                 match = pattern.equals(string);
-            } else {
+            }
+            else
+            {
                 int i2 = pattern.indexOf('*', i + 1);
-                if (i2 > 1) {
+                if (i2 > 1)
+                {
                     match = string.indexOf(pattern.substring(1, i2)) > -1;
-                } else if (i == 0) {
+                }
+                else if (i == 0)
+                {
                     match = string.endsWith(pattern.substring(1));
-                } else {
+                }
+                else
+                {
                     match = string.startsWith(pattern.substring(0, i));
                 }
             }
-            if (match) {
+            if (match)
+            {
                 return true;
             }
         }
@@ -112,11 +124,13 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         this.patterns = StringUtils.splitAndTrim(pattern, ",");
     }
 
-    public boolean isCaseSensitive() {
+    public boolean isCaseSensitive()
+    {
         return caseSensitive;
     }
 
-    public void setCaseSensitive(boolean caseSensitive) {
+    public void setCaseSensitive(boolean caseSensitive)
+    {
         this.caseSensitive = caseSensitive;
     }
 }

@@ -14,10 +14,9 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>MuleException</code> Is the base exception type for the Mule
- * application any other exceptions thrown by Mule code will be based on this
- * exception.
- *
+ * <code>MuleException</code> Is the base exception type for the Mule application
+ * any other exceptions thrown by Mule code will be based on this exception.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

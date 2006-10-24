@@ -34,10 +34,10 @@ import java.util.jar.Manifest;
 import java.util.Enumeration;
 
 /**
- * <code>MuleConfiguration</code> holds the runtime configuration specific to
- * the <code>MuleManager</code>. Once the <code>MuleManager</code> has been
+ * <code>MuleConfiguration</code> holds the runtime configuration specific to the
+ * <code>MuleManager</code>. Once the <code>MuleManager</code> has been
  * initialised this class is immutable.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,8 +54,8 @@ public class MuleConfiguration
     public static final String DEFAULT_SERVER_URL = "tcp://localhost:60504";
 
     /**
-     * Specifies that the transformer properties should be obtained from the
-     * Mule Manager properties
+     * Specifies that the transformer properties should be obtained from the Mule
+     * Manager properties
      */
     public static final String USE_MANAGER_PROPERTIES = "org.mule.useManagerProperties";
 
@@ -157,22 +157,21 @@ public class MuleConfiguration
     private QueuePersistenceStrategy persistenceStrategy = new EventFilePersistenceStrategy();
 
     /**
-     * When running sychonously, return events can be received over transports
-     * that support ack or replyTo This property determines how long to wait for
-     * a receive
+     * When running sychonously, return events can be received over transports that
+     * support ack or replyTo This property determines how long to wait for a receive
      */
     private int synchronousEventTimeout = DEFAULT_TIMEOUT;
 
     /**
-     * The default transaction timeout value used if no specific transaction
-     * time out has been set on the transaction config
+     * The default transaction timeout value used if no specific transaction time out
+     * has been set on the transaction config
      */
     private int transactionTimeout = DEFAULT_TRANSACTION_TIMEOUT;
 
     /**
      * Determines whether when running synchronously, return events are received
-     * before returning the call. i.e. in jms wait for a replyTo. Vm queues do
-     * this automatically
+     * before returning the call. i.e. in jms wait for a replyTo. Vm queues do this
+     * automatically
      */
     private boolean remoteSync = false;
 
@@ -196,12 +195,12 @@ public class MuleConfiguration
     /**
      * The configuration resources used to configure the MuleManager instance
      */
-    private String[] configResources = new String[] {};
+    private String[] configResources = new String[]{};
 
     /**
-     * This is the url used by the server itself to receive incomming requests.
-     * This enables clients such as the Mule Client to marshal remote requests
-     * to a MuleManager instance. The default value is tcp://localhost:61616
+     * This is the url used by the server itself to receive incomming requests. This
+     * enables clients such as the Mule Client to marshal remote requests to a
+     * MuleManager instance. The default value is tcp://localhost:61616
      */
     private String serverUrl = DEFAULT_SERVER_URL;
 
@@ -211,8 +210,8 @@ public class MuleConfiguration
     private Manifest manifest = null;
 
     /**
-     * Whether the server instance is running in client mode, which means that
-     * some services will not be started
+     * Whether the server instance is running in client mode, which means that some
+     * services will not be started
      */
     private boolean clientMode = false;
 
@@ -300,7 +299,8 @@ public class MuleConfiguration
 
     public void setDefaultThreadingProfile(ThreadingProfile defaultThreadingProfile)
     {
-        if (defaultThreadingProfile == null) {
+        if (defaultThreadingProfile == null)
+        {
             return;
         }
         this.defaultThreadingProfile = defaultThreadingProfile;
@@ -308,7 +308,8 @@ public class MuleConfiguration
 
     private ThreadingProfile getThreadingProfile(ThreadingProfile profile)
     {
-        if (profile != null) {
+        if (profile != null)
+        {
             return new ThreadingProfile(profile);
         }
         return new ThreadingProfile(defaultThreadingProfile);
@@ -362,7 +363,8 @@ public class MuleConfiguration
     public void setRecoverableMode(boolean recoverableMode)
     {
         this.recoverableMode = recoverableMode;
-        if (recoverableMode) {
+        if (recoverableMode)
+        {
             queueProfile.setPersistent(true);
         }
     }
@@ -384,13 +386,16 @@ public class MuleConfiguration
 
     public void setConfigResources(String[] configResources)
     {
-        if (configResources != null) {
+        if (configResources != null)
+        {
             int current = this.configResources.length;
             String[] newResources = new String[configResources.length + current];
             System.arraycopy(this.configResources, 0, newResources, 0, current);
             System.arraycopy(configResources, 0, newResources, current, configResources.length);
             this.configResources = newResources;
-        } else {
+        }
+        else
+        {
             this.configResources = configResources;
         }
     }
@@ -402,9 +407,12 @@ public class MuleConfiguration
 
     public void setServerUrl(String serverUrl)
     {
-        if(embedded) {
+        if (embedded)
+        {
             serverUrl = null;
-        } else {
+        }
+        else
+        {
             this.serverUrl = serverUrl;
         }
     }
@@ -461,27 +469,34 @@ public class MuleConfiguration
 
     public Manifest getManifest()
     {
-        if (manifest == null) {
+        if (manifest == null)
+        {
             manifest = new Manifest();
 
             InputStream is = null;
-            try {
-                //We want to load the MANIFEST.MF from the mule-core jar. Sine we don't the version we're using
-                //we have to search for the jar on the classpath
-                URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+            try
+            {
+                // We want to load the MANIFEST.MF from the mule-core jar. Sine we
+                // don't the version we're using
+                // we have to search for the jar on the classpath
+                URL url = (URL)AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
                     {
                         try
                         {
-                            Enumeration e = MuleConfiguration.class.getClassLoader().getResources(("META-INF/MANIFEST.MF"));
-                            while(e.hasMoreElements()) {
+                            Enumeration e = MuleConfiguration.class.getClassLoader().getResources(
+                                ("META-INF/MANIFEST.MF"));
+                            while (e.hasMoreElements())
+                            {
                                 URL url = (URL)e.nextElement();
-                                if(url.toExternalForm().indexOf("mule-core") > -1) {
+                                if (url.toExternalForm().indexOf("mule-core") > -1)
+                                {
                                     return url;
                                 }
                             }
-                        } catch (IOException e1)
+                        }
+                        catch (IOException e1)
                         {
                             e1.printStackTrace();
                         }
@@ -489,16 +504,21 @@ public class MuleConfiguration
                     }
                 });
 
-                if(url !=null)
+                if (url != null)
                 {
                     is = url.openStream();
                 }
 
+                if (is != null)
+                {
+                    manifest.read(is);
+                }
 
-                if (is != null) { manifest.read(is); }
-
-            } catch (IOException e) {
-                logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
+            }
+            catch (IOException e)
+            {
+                logger.warn("Failed to read manifest Info, Manifest information will not display correctly: "
+                            + e.getMessage());
             }
         }
         return manifest;
@@ -527,7 +547,8 @@ public class MuleConfiguration
     public void setClientMode(boolean clientMode)
     {
         this.clientMode = clientMode;
-        if(clientMode) {
+        if (clientMode)
+        {
             setServerUrl("");
         }
     }
@@ -543,26 +564,28 @@ public class MuleConfiguration
     }
 
     /**
-     * Returns a clone of the default Connection strategy. The clone ensures
-     * that the connection strategy can be manipulated without affecting other
-     * connectors using the same strategy
-     *
+     * Returns a clone of the default Connection strategy. The clone ensures that the
+     * connection strategy can be manipulated without affecting other connectors
+     * using the same strategy
+     * 
      * @return a clone of the default Connection strategy
      */
     public ConnectionStrategy getConnectionStrategy()
     {
-        try {
-            return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
-        } catch (Exception e) {
+        try
+        {
+            return (ConnectionStrategy)BeanUtils.cloneBean(connectionStrategy);
+        }
+        catch (Exception e)
+        {
             throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Connection Strategy"), e);
         }
     }
 
     /**
      * Sets the connection strategy used by all connectors managed in this Mule
-     * instance if the connector has no connection strategy specifically set on
-     * it.
-     *
+     * instance if the connector has no connection strategy specifically set on it.
+     * 
      * @param connectionStrategy the default strategy to use
      */
     public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
@@ -570,59 +593,74 @@ public class MuleConfiguration
         this.connectionStrategy = connectionStrategy;
     }
 
-    public boolean isEmbedded() {
+    public boolean isEmbedded()
+    {
         return embedded;
     }
 
-    public void setEmbedded(boolean embedded) {
+    public void setEmbedded(boolean embedded)
+    {
         this.embedded = embedded;
-        if(embedded) {
-            serverUrl=null;
+        if (embedded)
+        {
+            serverUrl = null;
         }
     }
 
-    public String getModelType() {
+    public String getModelType()
+    {
         return modelType;
     }
 
-    public void setModelType(String modelType) {
+    public void setModelType(String modelType)
+    {
         this.modelType = modelType;
     }
 
-    public String getEncoding() {
+    public String getEncoding()
+    {
         return encoding;
     }
 
-    public void setEncoding(String encoding) {
-        if (StringUtils.isEmpty(encoding)) {
+    public void setEncoding(String encoding)
+    {
+        if (StringUtils.isEmpty(encoding))
+        {
             logger.warn("Cannot set encoding to null or empty String");
             return;
         }
         this.encoding = encoding;
     }
 
-    public String getOSEncoding() {
+    public String getOSEncoding()
+    {
         return osEncoding;
     }
 
-    public void setOSEncoding(String osEncoding) {
+    public void setOSEncoding(String osEncoding)
+    {
         this.osEncoding = osEncoding;
     }
 
-    public boolean isEnableMessageEvents() {
+    public boolean isEnableMessageEvents()
+    {
         return enableMessageEvents;
     }
 
-    public void setEnableMessageEvents(boolean enableMessageEvents) {
+    public void setEnableMessageEvents(boolean enableMessageEvents)
+    {
         this.enableMessageEvents = enableMessageEvents;
     }
 
-    public WorkListener getWorkListener() {
+    public WorkListener getWorkListener()
+    {
         return workListener;
     }
 
-    public void setWorkListener(WorkListener workListener) {
-        if(workListener==null) {
+    public void setWorkListener(WorkListener workListener)
+    {
+        if (workListener == null)
+        {
             throw new NullPointerException("workListener");
         }
         this.workListener = workListener;

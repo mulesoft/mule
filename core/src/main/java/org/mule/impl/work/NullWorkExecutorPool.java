@@ -30,10 +30,7 @@ package org.mule.impl.work;
 import org.mule.config.ThreadingProfile;
 
 /**
- * 
- * 
  * @version $Rev$ $Date$
- * 
  */
 public class NullWorkExecutorPool implements WorkExecutorPool
 {

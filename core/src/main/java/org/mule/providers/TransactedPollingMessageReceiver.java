@@ -27,10 +27,9 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * The TransactedPollingMessageReceiver is an abstract receiver that handles
- * polling and transaction management. Derived implementations of these class
- * must be thread safe as several threads can be started at once for an
- * improveded throuput.
+ * The TransactedPollingMessageReceiver is an abstract receiver that handles polling
+ * and transaction management. Derived implementations of these class must be thread
+ * safe as several threads can be started at once for an improveded throuput.
  * 
  * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -51,23 +50,30 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
     {
         super(connector, component, endpoint, frequency);
 
-        if (endpoint.getTransactionConfig().getFactory() != null) {
+        if (endpoint.getTransactionConfig().getFactory() != null)
+        {
             receiveMessagesInTransaction = true;
-        } else {
+        }
+        else
+        {
             receiveMessagesInTransaction = false;
         }
     }
 
     public void doStart() throws UMOException
     {
-        //Connector property overrides any implied value
+        // Connector property overrides any implied value
         useMultipleReceivers = connector.isCreateMultipleTransactedReceivers();
         ThreadingProfile tp = connector.getReceiverThreadingProfile();
-        if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading()) {
-            for (int i = 0; i < tp.getMaxThreadsActive(); i++) {
+        if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading())
+        {
+            for (int i = 0; i < tp.getMaxThreadsActive(); i++)
+            {
                 super.doStart();
             }
-        } else {
+        }
+        else
+        {
             super.doStart();
         }
     }
@@ -75,19 +81,24 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
     public void poll() throws Exception
     {
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                                                         connector.getExceptionListener());
-        if (receiveMessagesInTransaction) {
+            connector.getExceptionListener());
+        if (receiveMessagesInTransaction)
+        {
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but serveral workers
             // may have been started
-            TransactionCallback cb = new TransactionCallback() {
+            TransactionCallback cb = new TransactionCallback()
+            {
                 public Object doInTransaction() throws Exception
                 {
                     List messages = getMessages();
-                    if (messages != null && messages.size() > 0) {
-                        for (Iterator it = messages.iterator(); it.hasNext();) {
+                    if (messages != null && messages.size() > 0)
+                    {
+                        for (Iterator it = messages.iterator(); it.hasNext();)
+                        {
                             Object message = it.next();
-                            if (logger.isTraceEnabled()) {
+                            if (logger.isTraceEnabled())
+                            {
                                 logger.trace("Received Message: " + message);
                             }
                             processMessage(message);
@@ -97,20 +108,28 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
                 }
             };
             tt.execute(cb);
-        } else {
+        }
+        else
+        {
             // Receive messages and launch a worker thread
             // for each message
             List messages = getMessages();
-            if (messages != null && messages.size() > 0) {
+            if (messages != null && messages.size() > 0)
+            {
                 final CountDownLatch countdown = new CountDownLatch(messages.size());
-                for (Iterator it = messages.iterator(); it.hasNext();) {
+                for (Iterator it = messages.iterator(); it.hasNext();)
+                {
                     final Object message = it.next();
-                    if (logger.isTraceEnabled()) {
+                    if (logger.isTraceEnabled())
+                    {
                         logger.trace("Received Message: " + message);
                     }
-                    try {
+                    try
+                    {
                         getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, message));
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         countdown.countDown();
                         throw e;
                     }
@@ -140,11 +159,16 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
 
         public void run()
         {
-            try {
+            try
+            {
                 tt.execute(this);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 handleException(e);
-            } finally {
+            }
+            finally
+            {
                 latch.countDown();
             }
         }

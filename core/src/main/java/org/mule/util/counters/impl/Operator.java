@@ -34,15 +34,25 @@ public class Operator extends AggregateCounter
     public double nextValue()
     {
         Type type = getType();
-        if (type == Type.PLUS) {
+        if (type == Type.PLUS)
+        {
             return val1 + val2;
-        } else if (type == Type.MINUS) {
+        }
+        else if (type == Type.MINUS)
+        {
             return val1 - val2;
-        } else if (type == Type.MULTIPLY) {
+        }
+        else if (type == Type.MULTIPLY)
+        {
             return val1 * val2;
-        } else if (type == Type.DIVIDE) {
-            return val2 == 0.0 ? (val1 >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY) : val1 / val2;
-        } else {
+        }
+        else if (type == Type.DIVIDE)
+        {
+            return val2 == 0.0 ? (val1 >= 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY) : val1
+                                                                                                     / val2;
+        }
+        else
+        {
             throw new IllegalStateException();
         }
     }

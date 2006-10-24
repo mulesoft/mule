@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.config.i18n.Message;
@@ -63,9 +64,12 @@ public class UnauthorisedException extends SecurityException
     {
 
         Message m = null;
-        if (context == null) {
+        if (context == null)
+        {
             m = new Message(Messages.AUTH_SET_TO_X_BUT_NO_CONTEXT, filter.getClass().getName());
-        } else {
+        }
+        else
+        {
             m = new Message(Messages.AUTH_FAILED_FOR_USER_X, context.getAuthentication().getPrincipal());
         }
         m.setNextMessage(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, endpoint.getEndpointURI()));

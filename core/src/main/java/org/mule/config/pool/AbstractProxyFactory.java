@@ -19,9 +19,9 @@ import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
 /**
- * <code>AbstractProxyFactory</code> provides common behaviour for creating
- * proxy objects
- *
+ * <code>AbstractProxyFactory</code> provides common behaviour for creating proxy
+ * objects
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,7 +37,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
     /**
      * Creates a pool factory using the descriptor as the basis for creating its
      * objects
-     *
+     * 
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see org.mule.umo.UMODescriptor
      */
@@ -46,13 +46,15 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         this.descriptor = descriptor;
     }
 
-    public Object create() throws UMOException {
+    public Object create() throws UMOException
+    {
         Object component = ComponentFactory.createComponent(descriptor);
         afterComponentCreate(component);
         return createProxy(component);
     }
 
-    protected Object createProxy(Object component) throws UMOException {
+    protected Object createProxy(Object component) throws UMOException
+    {
         return new DefaultMuleProxy(component, descriptor, pool);
     }
 
@@ -61,11 +63,13 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         // nothing to do
     }
 
-    public ObjectPool getPool() {
+    public ObjectPool getPool()
+    {
         return pool;
     }
 
-    public void setPool(ObjectPool pool) {
+    public void setPool(ObjectPool pool)
+    {
         this.pool = pool;
     }
 }

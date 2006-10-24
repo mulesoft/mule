@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.notifications;
 
 import org.mule.umo.UMOMessage;
@@ -33,8 +34,8 @@ public class AdminNotification extends UMOServerNotification
     public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
     public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;
 
-    private static final transient String[] ACTIONS = new String[] { "receive event", "dispatch event", "send event",
-            "invoke component" };
+    private static final transient String[] ACTIONS = new String[]{"receive event", "dispatch event",
+        "send event", "invoke component"};
 
     private Map properties = new HashMap();
     private UMOMessage message;
@@ -68,9 +69,10 @@ public class AdminNotification extends UMOServerNotification
     protected String getActionName(int action)
     {
         int i = action - ADMIN_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
-        return ACTIONS[i-1];
+        return ACTIONS[i - 1];
     }
 }

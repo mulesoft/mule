@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.security.filters;
 
 import org.mule.MuleManager;
@@ -47,35 +48,40 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
-    protected final void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException,
-            EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
+    protected final void authenticateInbound(UMOEvent event)
+        throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException,
+        UnknownAuthenticationTypeException
     {
-        String userHeader = (String) getCredentialsAccessor().getCredentials(event);
-        if (userHeader == null) {
-            throw new CredentialsNotSetException(event.getMessage(),
-                                                 event.getSession().getSecurityContext(),
-                                                 event.getEndpoint(),
-                                                 this);
+        String userHeader = (String)getCredentialsAccessor().getCredentials(event);
+        if (userHeader == null)
+        {
+            throw new CredentialsNotSetException(event.getMessage(), event.getSession().getSecurityContext(),
+                event.getEndpoint(), this);
         }
-        
+
         UMOCredentials user = new MuleCredentials(userHeader);
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new MuleAuthentication(user);
-        try {
+        try
+        {
             authResult = getSecurityManager().authenticate(umoAuthentication);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // Authentication failed
-            if (logger.isDebugEnabled()) {
-                logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Authentication request for user: " + user.getUsername() + " failed: "
+                             + e.toString());
             }
             throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()),
-                                            event.getMessage(),
-                                            e);
+                event.getMessage(), e);
         }
 
         // Authentication success
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Authentication success: " + authResult.toString());
         }
 
@@ -84,23 +90,27 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         event.getSession().setSecurityContext(context);
     }
 
-    protected void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,
-            CryptoFailureException
+    protected void authenticateOutbound(UMOEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
-        if (event.getSession().getSecurityContext() == null) {
-            if (isAuthenticate()) {
-                throw new UnauthorisedException(event.getMessage(),
-                                                event.getSession().getSecurityContext(),
-                                                event.getEndpoint(),
-                                                this);
-            } else {
+        if (event.getSession().getSecurityContext() == null)
+        {
+            if (isAuthenticate())
+            {
+                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                    event.getEndpoint(), this);
+            }
+            else
+            {
                 return;
             }
         }
         UMOAuthentication auth = event.getSession().getSecurityContext().getAuthentication();
-        if (isAuthenticate()) {
+        if (isAuthenticate())
+        {
             auth = getSecurityManager().authenticate(auth);
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Authentication success: " + auth.toString());
             }
         }
@@ -113,11 +123,13 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
     protected void doInitialise() throws InitialisationException
     {
-        if (strategyName != null) {
+        if (strategyName != null)
+        {
             strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
-        if (strategy == null) {
+        if (strategy == null)
+        {
             throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }

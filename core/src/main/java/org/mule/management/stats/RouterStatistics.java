@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats;
 
 import org.mule.management.stats.printers.SimplePrinter;
@@ -101,13 +102,16 @@ public class RouterStatistics implements Statistics
      */
     public void incrementRoutedMessage(Collection endpoints)
     {
-        if (endpoints == null || endpoints.isEmpty()) {
+        if (endpoints == null || endpoints.isEmpty())
+        {
             return;
         }
         List list = new ArrayList(endpoints);
-        synchronized (list) {
-            for (int i = 0; i < list.size(); i++) {
-                incrementRoutedMessage((UMOEndpoint) list.get(i));
+        synchronized (list)
+        {
+            for (int i = 0; i < list.size(); i++)
+            {
+                incrementRoutedMessage((UMOEndpoint)list.get(i));
             }
         }
     }
@@ -119,16 +123,18 @@ public class RouterStatistics implements Statistics
      */
     public synchronized void incrementRoutedMessage(UMOImmutableEndpoint endpoint)
     {
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             return;
         }
 
         String name = endpoint.getName();
 
-        Long cpt = (Long) routed.get(name);
+        Long cpt = (Long)routed.get(name);
         long count = 0;
 
-        if (cpt != null) {
+        if (cpt != null)
+        {
             count = cpt.longValue();
         }
 
@@ -194,11 +200,14 @@ public class RouterStatistics implements Statistics
      */
     public final long getRouted(String endpointName)
     {
-        Long l = (Long) routed.get(endpointName);
+        Long l = (Long)routed.get(endpointName);
 
-        if (l == null) {
+        if (l == null)
+        {
             return 0;
-        } else {
+        }
+        else
+        {
             return l.longValue();
         }
     }

@@ -17,23 +17,26 @@ import org.mule.umo.UMODescriptor;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DirectModel extends AbstractModel {
+public class DirectModel extends AbstractModel
+{
 
-    protected UMOComponent createComponent(UMODescriptor descriptor) {
+    protected UMOComponent createComponent(UMODescriptor descriptor)
+    {
         return new DirectComponent((MuleDescriptor)descriptor, this);
     }
 
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
-     *
+     * 
      * @return the model type
      */
-    public String getType() {
+    public String getType()
+    {
         return "direct";
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.message;
 
 import org.mule.config.ExceptionHelper;
@@ -38,16 +39,20 @@ public class ExceptionPayload implements UMOExceptionPayload
     {
         this.exception = exception;
         UMOException muleRoot = ExceptionHelper.getRootMuleException(exception);
-        if (muleRoot != null) {
+        if (muleRoot != null)
+        {
             message = muleRoot.getMessage();
             code = muleRoot.getExceptionCode();
             info = muleRoot.getInfo();
-        } else {
+        }
+        else
+        {
             message = exception.getMessage();
         }
     }
 
-    public Throwable getRootException() {
+    public Throwable getRootException()
+    {
         return ExceptionHelper.getRootException(exception);
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.interceptors;
 
 import org.mule.config.MuleProperties;
@@ -18,16 +19,15 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>MessageNormalizerInterceptor</code> can be used as a simple pre/post
- * message normalizer for a given component.
- * 
- * This is useful in situations where you have an existing component that may
- * accept a one or more child objects of the incoming object. For example, you
- * may Have a BankQuoteRequest object that contains customer, credit and loan
- * details, but one component is only interested in enriching the customer
- * information. Rather than have your component understand how to deal with a
- * BankLoanRequest this interceptor can be used to extract the customer and pass
- * that to the component. Once the component have finshed processing this
- * interceptor update the BankLoanRequest with the new customer information.
+ * message normalizer for a given component. This is useful in situations where you
+ * have an existing component that may accept a one or more child objects of the
+ * incoming object. For example, you may Have a BankQuoteRequest object that contains
+ * customer, credit and loan details, but one component is only interested in
+ * enriching the customer information. Rather than have your component understand how
+ * to deal with a BankLoanRequest this interceptor can be used to extract the
+ * customer and pass that to the component. Once the component have finshed
+ * processing this interceptor update the BankLoanRequest with the new customer
+ * information.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -57,7 +57,8 @@ public abstract class MessageNormalizerInterceptor implements UMOInterceptor
 
         // get the updated message
         UMOMessage bMessage = before(invocation);
-        if (bMessage != null) {
+        if (bMessage != null)
+        {
             // update the current event
             RequestContext.rewriteEvent(bMessage);
             // update the message in the invocation
@@ -71,9 +72,12 @@ public abstract class MessageNormalizerInterceptor implements UMOInterceptor
         // Update the message
         invocation.setMessage(message);
         UMOMessage aMessage = after(invocation);
-        if (aMessage == null) {
+        if (aMessage == null)
+        {
             return message;
-        } else {
+        }
+        else
+        {
             return aMessage;
         }
     }

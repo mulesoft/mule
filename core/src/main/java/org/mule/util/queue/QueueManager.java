@@ -13,8 +13,8 @@ package org.mule.util.queue;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 /**
- * A Queue manager is responsible for manageing one or more Queue resources and providing
- * common support fot transactions and persistence
+ * A Queue manager is responsible for manageing one or more Queue resources and
+ * providing common support fot transactions and persistence
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -35,10 +35,11 @@ public interface QueueManager
 
     void setQueueConfiguration(String queueName, QueueConfiguration config);
 
-     /**
+    /**
      * @return Returns the persistenceStrategy.
      */
     public QueuePersistenceStrategy getPersistenceStrategy();
+
     /**
      * @param persistenceStrategy The persistenceStrategy to set.
      */

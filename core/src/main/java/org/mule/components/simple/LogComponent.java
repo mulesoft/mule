@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.simple;
 
 import org.apache.commons.logging.Log;
@@ -16,9 +17,9 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;
 
 /**
- * <code>LogComponent</code> Simply logs the content (or content length if it
- * is a large message)
- *
+ * <code>LogComponent</code> Simply logs the content (or content length if it is a
+ * large message)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,7 +31,8 @@ public class LogComponent implements Callable, LogService
     {
         String contents = context.getMessageAsString();
         String msg = "Message received in component: " + context.getComponentDescriptor().getName();
-        msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '" + StringMessageUtils.truncate(contents, 100, true) + "'");
+        msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
+                                                + StringMessageUtils.truncate(contents, 100, true) + "'");
         log(msg);
         return null;
     }

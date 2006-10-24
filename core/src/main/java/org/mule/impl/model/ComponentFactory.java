@@ -23,44 +23,53 @@ import org.mule.util.BeanUtils;
 
 /**
  * Reusable methods for working with UMOComponents.
- *
  */
 public class ComponentFactory
 {
 
     /**
      * Creates a component based on its descriptor.
+     * 
      * @param descriptor the descriptor to create the component from
      * @return The newly created component
      * @throws UMOException
      */
-    public static Object createComponent(UMODescriptor descriptor) throws UMOException {
+    public static Object createComponent(UMODescriptor descriptor) throws UMOException
+    {
         UMOManager manager = MuleManager.getInstance();
         Object impl = descriptor.getImplementation();
         Object component;
 
-        if(impl instanceof String) {
+        if (impl instanceof String)
+        {
             impl = new ContainerKeyPair(null, impl);
         }
-        if (impl instanceof ContainerKeyPair) {
+        if (impl instanceof ContainerKeyPair)
+        {
             component = manager.getContainerContext().getComponent(impl);
 
-            if(descriptor.isSingleton()) {
+            if (descriptor.isSingleton())
+            {
                 descriptor.setImplementation(component);
             }
-        } else {
+        }
+        else
+        {
             component = impl;
         }
 
-        try {
+        try
+        {
             BeanUtils.populate(component, descriptor.getProperties());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '"
-                    + descriptor.getName() + "'"), e, descriptor);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
+                "Component '" + descriptor.getName() + "'"), e, descriptor);
         }
 
         // Call any custom initialisers
-        if(descriptor instanceof MuleDescriptor)
+        if (descriptor instanceof MuleDescriptor)
         {
             ((MuleDescriptor)descriptor).fireInitialisationCallbacks(component);
         }

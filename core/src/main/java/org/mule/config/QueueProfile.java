@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import org.mule.MuleManager;
@@ -14,8 +15,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.queue.QueueConfiguration;
 
 /**
- * <code>QueueProfile</code> determines how an internal queue for a component
- * will behave
+ * <code>QueueProfile</code> determines how an internal queue for a component will
+ * behave
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -59,8 +60,7 @@ public class QueueProfile
      * This specifies the number of messages that can be queued before it starts
      * blocking.
      * 
-     * @param maxOutstandingMessages the max number of messages that will be
-     *            queued
+     * @param maxOutstandingMessages the max number of messages that will be queued
      */
     public void setMaxOutstandingMessages(int maxOutstandingMessages)
     {

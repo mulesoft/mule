@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.provider;
 
 import org.mule.config.i18n.Message;
@@ -31,18 +32,16 @@ public class MessageTypeNotSupportedException extends MessagingException
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass)
     {
-        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
-                          (message != null ? message.getClass().getName() : "null"),
-                          (adapterClass != null ? adapterClass.getName() : "null class")),
-                          message);
+        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X, (message != null
+                        ? message.getClass().getName() : "null"), (adapterClass != null
+                        ? adapterClass.getName() : "null class")), message);
     }
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass, Throwable cause)
     {
-        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
-                (message != null ? message.getClass().getName() : "null"),
-                (adapterClass != null ? adapterClass.getName() : "null class")),
-                message, cause);
+        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X, (message != null
+                        ? message.getClass().getName() : "null"), (adapterClass != null
+                        ? adapterClass.getName() : "null class")), message, cause);
     }
 
 }

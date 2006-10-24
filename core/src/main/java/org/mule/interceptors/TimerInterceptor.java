@@ -42,7 +42,7 @@ public class TimerInterceptor implements UMOInterceptor
         UMOMessage result = invocation.execute();
         long executionTime = System.currentTimeMillis() - startTime;
         logger.info(invocation.getDescriptor().getName() + " took " + executionTime + "ms to process event ["
-                + invocation.getEvent().getId() + "]");
+                    + invocation.getEvent().getId() + "]");
         return result;
     }
 }

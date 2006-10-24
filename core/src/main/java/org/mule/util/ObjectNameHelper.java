@@ -37,23 +37,25 @@ public class ObjectNameHelper
         String name = endpoint.getName();
         if (name != null)
         {
-            //If the name is the same as the address, we need to add the scheme
-            if(name.equals(endpoint.getEndpointURI().getAddress())) {
+            // If the name is the same as the address, we need to add the scheme
+            if (name.equals(endpoint.getEndpointURI().getAddress()))
+            {
                 name = endpoint.getEndpointURI().getScheme() + SEPARATOR + name;
             }
             name = replaceObjectNameChars(name);
-            //This causes a stack overflow because we call lookup endpoint
-            //Which causes a clone of the endpoint which in turn valudates the
-            //endpoint name with this method
+            // This causes a stack overflow because we call lookup endpoint
+            // Which causes a clone of the endpoint which in turn valudates the
+            // endpoint name with this method
             return name;
-            //return ensureUniqueEndpoint(name);
+            // return ensureUniqueEndpoint(name);
 
         }
         else
         {
             String address = endpoint.getEndpointURI().getAddress();
-            //Make sure we include the endpoint scheme in the name
-            address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme() + SEPARATOR + address);
+            // Make sure we include the endpoint scheme in the name
+            address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme()
+                                                              + SEPARATOR + address);
             name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
             return ensureUniqueEndpoint(name);
@@ -64,9 +66,11 @@ public class ObjectNameHelper
     {
         int i = 0;
         String tempName = name;
-        //Check that the generated name does not conflict with an existing global endpoint.
-        //We can't check local edpoints right now but the chances of conflict are very small and will be
-        //reported during JMX object registration
+        // Check that the generated name does not conflict with an existing global
+        // endpoint.
+        // We can't check local edpoints right now but the chances of conflict are
+        // very small and will be
+        // reported during JMX object registration
         while (MuleManager.getInstance().lookupEndpoint(tempName) != null)
         {
             i++;
@@ -79,9 +83,11 @@ public class ObjectNameHelper
     {
         int i = 0;
         String tempName = name;
-        //Check that the generated name does not conflict with an existing global endpoint.
-        //We can't check local edpoints right now but the chances of conflict are very small and will be
-        //reported during JMX object registration
+        // Check that the generated name does not conflict with an existing global
+        // endpoint.
+        // We can't check local edpoints right now but the chances of conflict are
+        // very small and will be
+        // reported during JMX object registration
         while (MuleManager.getInstance().lookupConnector(tempName) != null)
         {
             i++;
@@ -109,10 +115,10 @@ public class ObjectNameHelper
     {
         String value = name.replaceAll("//", SEPARATOR);
         value = value.replaceAll("\\p{Punct}", SEPARATOR);
-        value = value.replaceAll("\\" +SEPARATOR + "{2,}", SEPARATOR);
-        if(value.endsWith(SEPARATOR))
+        value = value.replaceAll("\\" + SEPARATOR + "{2,}", SEPARATOR);
+        if (value.endsWith(SEPARATOR))
         {
-            value = value.substring(0, value.length() -1);
+            value = value.substring(0, value.length() - 1);
         }
         return value;
     }

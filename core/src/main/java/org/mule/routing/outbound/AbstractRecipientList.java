@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -48,16 +49,21 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     private Map recipientCache = new ConcurrentHashMap();
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
     {
         List list = getRecipients(message);
         List results = new ArrayList();
 
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
+        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        {
             boolean correlationSet = message.getCorrelationGroupSize() != -1;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
+            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
-            } else {
+            }
+            else
+            {
                 // the correlationId will be set by the AbstractOutboundRouter
                 message.setCorrelationGroupSize(list.size());
             }
@@ -69,35 +75,52 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
         {
-            String recipient = (String) iterator.next();
-            //Make a copy of the message. Question is do we do a proper clone? in which case there
-            //would potentially be multiple messages with the same id...
+            String recipient = (String)iterator.next();
+            // Make a copy of the message. Question is do we do a proper clone? in
+            // which case there
+            // would potentially be multiple messages with the same id...
             request = new MuleMessage(message.getPayload(), message);
             endpoint = getRecipientEndpoint(request, recipient);
 
-            try {
-                if (synchronous) {
+            try
+            {
+                if (synchronous)
+                {
                     result = send(session, request, endpoint);
-                    if (result != null) {
+                    if (result != null)
+                    {
                         results.add(result.getPayload());
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("No result was returned for sync call to: " + endpoint.getEndpointURI());
+                    }
+                    else
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("No result was returned for sync call to: "
+                                         + endpoint.getEndpointURI());
                         }
                     }
-                } else {
+                }
+                else
+                {
                     dispatch(session, request, endpoint);
                 }
-            } catch (UMOException e) {
+            }
+            catch (UMOException e)
+            {
                 throw new CouldNotRouteOutboundMessageException(request, endpoint, e);
             }
         }
 
-        if (results.size() == 1) {
+        if (results.size() == 1)
+        {
             return new MuleMessage(results.get(0), result);
-        } else if (results.size() == 0) {
+        }
+        else if (results.size() == 0)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             return new MuleMessage(results, (result == null ? null : result));
         }
     }
@@ -105,14 +128,18 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException
     {
         UMOEndpointURI endpointUri = null;
-        UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
-        if (endpoint != null) {
+        UMOEndpoint endpoint = (UMOEndpoint)recipientCache.get(recipient);
+        if (endpoint != null)
+        {
             return endpoint;
         }
-        try {
+        try
+        {
             endpointUri = new MuleEndpointURI(recipient);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new RoutingException(message, endpoint, e);
         }
         recipientCache.put(recipient, endpoint);
@@ -121,7 +148,8 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     protected abstract CopyOnWriteArrayList getRecipients(UMOMessage message);
 
-    public boolean isDynamicEndpoints() {
+    public boolean isDynamicEndpoints()
+    {
         return true;
     }
 }

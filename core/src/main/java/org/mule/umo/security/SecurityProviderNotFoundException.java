@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.config.i18n.Message;
@@ -15,8 +16,8 @@ import org.mule.umo.UMOException;
 
 /**
  * <code>SecurityProviderNotFoundException</code> is thrown by the
- * UMOSecurityManager when an authentication request is made but no suitable
- * security provider can be found to process the authentication
+ * UMOSecurityManager when an authentication request is made but no suitable security
+ * provider can be found to process the authentication
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

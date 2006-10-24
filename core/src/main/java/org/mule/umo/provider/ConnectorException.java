@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.provider;
 
 import org.mule.config.i18n.Message;
@@ -14,9 +15,10 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ConnectorException</code> Is thrown in the context of a UMOConnector, usually some sort of transport
- * level error where the connection has failed.  This exception maintains a reference to the connector. 
- *
+ * <code>ConnectorException</code> Is thrown in the context of a UMOConnector,
+ * usually some sort of transport level error where the connection has failed. This
+ * exception maintains a reference to the connector.
+ * 
  * @see UMOConnector
  */
 public class ConnectorException extends UMOException
@@ -55,7 +57,8 @@ public class ConnectorException extends UMOException
     private static Message generateMessage(Message message, UMOConnector connector)
     {
         Message m = new Message(Messages.CONNECTOR_CAUSED_ERROR, connector);
-        if (message != null) {
+        if (message != null)
+        {
             message.setNextMessage(m);
         }
         return m;

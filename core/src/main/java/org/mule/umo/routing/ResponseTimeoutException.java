@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
@@ -14,8 +15,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>ResponseTimeoutException</code> is thrown when a response is not
- * received in a given timeout in the Response Router.
+ * <code>ResponseTimeoutException</code> is thrown when a response is not received
+ * in a given timeout in the Response Router.
  * 
  * @see org.mule.umo.routing.UMOResponseRouter
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -33,7 +34,10 @@ public class ResponseTimeoutException extends RoutingException
         super(message, umoMessage, endpoint);
     }
 
-    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public ResponseTimeoutException(Message message,
+                                    UMOMessage umoMessage,
+                                    UMOEndpoint endpoint,
+                                    Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);
     }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.message;
 
 import org.mule.impl.RequestContext;
@@ -18,9 +19,8 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * <code>ExceptionMessage</code> is used by the
- * DefaultComponentExceptionStrategy for wrapping an exception with a message to
- * send via an endpointUri.
+ * <code>ExceptionMessage</code> is used by the DefaultComponentExceptionStrategy
+ * for wrapping an exception with a message to send via an endpointUri.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,9 +37,10 @@ public class ExceptionMessage extends BaseMessage
     private UMOEndpointURI endpointUri;
     private Date timeStamp;
 
-
-
-    public ExceptionMessage(Object message, Throwable exception, String componentName, UMOEndpointURI endpointUri)
+    public ExceptionMessage(Object message,
+                            Throwable exception,
+                            String componentName,
+                            UMOEndpointURI endpointUri)
     {
         super(message);
         this.exception = exception;
@@ -48,10 +49,12 @@ public class ExceptionMessage extends BaseMessage
         this.endpointUri = endpointUri;
 
         UMOEventContext ctx = RequestContext.getEventContext();
-        if(ctx!=null) {
+        if (ctx != null)
+        {
             UMOMessage msg = ctx.getMessage();
-            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
-                String propertyKey =  (String)iterator.next();
+            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+            {
+                String propertyKey = (String)iterator.next();
                 setProperty(propertyKey, msg.getProperty(propertyKey));
             }
         }
@@ -77,15 +80,10 @@ public class ExceptionMessage extends BaseMessage
         return exception;
     }
 
-
-    public String toString() {
-        return "ExceptionMessage{" +
-                 "message=" + message +
-                ", context=" + context +
-                "exception=" + exception +
-                ", componentName='" + componentName + "'" +
-                ", endpointUri=" + endpointUri +
-                ", timeStamp=" + timeStamp +
-                "}";
+    public String toString()
+    {
+        return "ExceptionMessage{" + "message=" + message + ", context=" + context + "exception=" + exception
+               + ", componentName='" + componentName + "'" + ", endpointUri=" + endpointUri + ", timeStamp="
+               + timeStamp + "}";
     }
 }

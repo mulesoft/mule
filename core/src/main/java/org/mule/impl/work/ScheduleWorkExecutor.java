@@ -32,10 +32,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import javax.resource.spi.work.WorkException;
 
 /**
- * 
- * 
  * @version $Rev$ $Date$
- * 
  */
 public class ScheduleWorkExecutor implements WorkExecutor
 {

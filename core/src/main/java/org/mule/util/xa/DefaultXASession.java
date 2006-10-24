@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.xa;
 
 import org.apache.commons.logging.Log;
@@ -19,11 +20,12 @@ import javax.transaction.xa.Xid;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultXASession implements XAResource {
+public class DefaultXASession implements XAResource
+{
 
     /**
      * logger used by this class
@@ -34,50 +36,66 @@ public class DefaultXASession implements XAResource {
     protected Xid localXid;
     protected AbstractXAResourceManager resourceManager;
 
-    public DefaultXASession(AbstractXAResourceManager resourceManager) {
+    public DefaultXASession(AbstractXAResourceManager resourceManager)
+    {
         this.localContext = null;
         this.localXid = null;
         this.resourceManager = resourceManager;
     }
 
-    public XAResource getXAResource() {
+    public XAResource getXAResource()
+    {
         return this;
     }
 
-    public Object getResourceManager() {
+    public Object getResourceManager()
+    {
         return resourceManager;
     }
 
     //
     // Local transaction implementation
     //
-    public void begin() throws ResourceManagerException {
-        if (localXid != null) {
-            throw new IllegalStateException("Cannot start local transaction. An XA transaction is already in progress.");
+    public void begin() throws ResourceManagerException
+    {
+        if (localXid != null)
+        {
+            throw new IllegalStateException(
+                "Cannot start local transaction. An XA transaction is already in progress.");
         }
-        if (localContext != null) {
-            throw new IllegalStateException("Cannot start local transaction. A local transaction already in progress.");
+        if (localContext != null)
+        {
+            throw new IllegalStateException(
+                "Cannot start local transaction. A local transaction already in progress.");
         }
         localContext = resourceManager.createTransactionContext(this);
         resourceManager.beginTransaction(localContext);
     }
 
-    public void commit() throws ResourceManagerException {
-        if (localXid != null) {
-            throw new IllegalStateException("Cannot commit local transaction as an XA transaction is in progress.");
+    public void commit() throws ResourceManagerException
+    {
+        if (localXid != null)
+        {
+            throw new IllegalStateException(
+                "Cannot commit local transaction as an XA transaction is in progress.");
         }
-        if (localContext == null) {
+        if (localContext == null)
+        {
             throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
         }
         resourceManager.commitTransaction(localContext);
         localContext = null;
     }
 
-    public void rollback() throws ResourceManagerException {
-        if (localXid != null) {
-            throw new IllegalStateException("Cannot rollback local transaction as an XA transaction is in progress.");
+    public void rollback() throws ResourceManagerException
+    {
+        if (localXid != null)
+        {
+            throw new IllegalStateException(
+                "Cannot rollback local transaction as an XA transaction is in progress.");
         }
-        if (localContext == null) {
+        if (localContext == null)
+        {
             throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
         }
         resourceManager.rollbackTransaction(localContext);
@@ -88,49 +106,56 @@ public class DefaultXASession implements XAResource {
     // XAResource implementation
     //
 
-    public boolean isSameRM(XAResource xares) throws XAException {
+    public boolean isSameRM(XAResource xares) throws XAException
+    {
         return xares instanceof DefaultXASession
-                && ((DefaultXASession) xares).getResourceManager().equals(resourceManager);
+               && ((DefaultXASession)xares).getResourceManager().equals(resourceManager);
     }
 
-    public Xid[] recover(int flag) throws XAException {
+    public Xid[] recover(int flag) throws XAException
+    {
         return null;
     }
 
-    public void start(Xid xid, int flags) throws XAException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(new StringBuffer(128).append("Thread ")
-                    .append(Thread.currentThread())
-                    .append(flags == TMNOFLAGS ? " starts" : flags == TMJOIN ? " joins"
-                    : " resumes")
-                    .append(" work on behalf of transaction branch ")
-                    .append(xid)
-                    .toString());
+    public void start(Xid xid, int flags) throws XAException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(new StringBuffer(128).append("Thread ").append(Thread.currentThread()).append(
+                flags == TMNOFLAGS ? " starts" : flags == TMJOIN ? " joins" : " resumes").append(
+                " work on behalf of transaction branch ").append(xid).toString());
         }
         // A local transaction is already begun
-        if (this.localContext != null) {
+        if (this.localContext != null)
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
         // This session has already been associated with an xid
-        if (this.localXid != null) {
+        if (this.localXid != null)
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
-        switch (flags) {
+        switch (flags)
+        {
             // a new transaction
-            case TMNOFLAGS:
-            case TMJOIN:
-            default:
-                try {
+            case TMNOFLAGS :
+            case TMJOIN :
+            default :
+                try
+                {
                     localContext = resourceManager.createTransactionContext(this);
                     resourceManager.beginTransaction(localContext);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     logger.error("Could not create new transactional resource", e);
                     throw new XAException(e.getMessage());
                 }
                 break;
-            case TMRESUME:
+            case TMRESUME :
                 localContext = resourceManager.getSuspendedTransactionalResource(xid);
-                if (localContext == null) {
+                if (localContext == null)
+                {
                     throw new XAException(XAException.XAER_NOTA);
                 }
                 // TODO: resume context
@@ -141,124 +166,158 @@ public class DefaultXASession implements XAResource {
         resourceManager.addActiveTransactionalResource(localXid, localContext);
     }
 
-    public void end(Xid xid, int flags) throws XAException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(new StringBuffer(128).append("Thread ")
-                    .append(Thread.currentThread())
-                    .append(flags == TMSUSPEND ? " suspends" : flags == TMFAIL ? " fails"
-                    : " ends")
-                    .append(" work on behalf of transaction branch ")
-                    .append(xid)
-                    .toString());
+    public void end(Xid xid, int flags) throws XAException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(new StringBuffer(128).append("Thread ").append(Thread.currentThread()).append(
+                flags == TMSUSPEND ? " suspends" : flags == TMFAIL ? " fails" : " ends").append(
+                " work on behalf of transaction branch ").append(xid).toString());
         }
         // No transaction is already begun
-        if (localContext == null) {
+        if (localContext == null)
+        {
             throw new XAException(XAException.XAER_NOTA);
         }
         // This session has already been associated with an xid
-        if (localXid == null || !localXid.equals(xid)) {
+        if (localXid == null || !localXid.equals(xid))
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
 
-        try {
-            switch (flags) {
-                case TMSUSPEND:
+        try
+        {
+            switch (flags)
+            {
+                case TMSUSPEND :
                     // TODO: suspend context
                     resourceManager.addSuspendedTransactionalResource(localXid, localContext);
                     resourceManager.removeActiveTransactionalResource(localXid);
                     break;
-                case TMFAIL:
+                case TMFAIL :
                     resourceManager.setTransactionRollbackOnly(localContext);
                     break;
-                case TMSUCCESS:
+                case TMSUCCESS :
                     break;
             }
-        } catch (ResourceManagerException e) {
-            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
+        }
+        catch (ResourceManagerException e)
+        {
+            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
         }
         localXid = null;
         localContext = null;
     }
 
-    public void commit(Xid xid, boolean onePhase) throws XAException {
-        if (xid == null) {
+    public void commit(Xid xid, boolean onePhase) throws XAException
+    {
+        if (xid == null)
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
         AbstractTransactionContext context = resourceManager.getActiveTransactionalResource(xid);
-        if (context == null) {
+        if (context == null)
+        {
             throw new XAException(XAException.XAER_NOTA);
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Committing transaction branch " + xid);
         }
-        if (context.status == Status.STATUS_MARKED_ROLLBACK) {
+        if (context.status == Status.STATUS_MARKED_ROLLBACK)
+        {
             throw new XAException(XAException.XA_RBROLLBACK);
         }
 
-        try {
-            if (context.status != Status.STATUS_PREPARED) {
-                if (onePhase) {
+        try
+        {
+            if (context.status != Status.STATUS_PREPARED)
+            {
+                if (onePhase)
+                {
                     resourceManager.prepareTransaction(context);
-                } else {
+                }
+                else
+                {
                     throw new XAException(XAException.XAER_PROTO);
                 }
             }
             resourceManager.commitTransaction(context);
-        } catch (ResourceManagerException e) {
-            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
+        }
+        catch (ResourceManagerException e)
+        {
+            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
         }
         resourceManager.removeActiveTransactionalResource(xid);
         resourceManager.removeSuspendedTransactionalResource(xid);
     }
 
-    public void rollback(Xid xid) throws XAException {
-        if (xid == null) {
+    public void rollback(Xid xid) throws XAException
+    {
+        if (xid == null)
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
         AbstractTransactionContext context = resourceManager.getActiveTransactionalResource(xid);
-        if (context == null) {
+        if (context == null)
+        {
             throw new XAException(XAException.XAER_NOTA);
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Rolling back transaction branch " + xid);
         }
-        try {
+        try
+        {
             resourceManager.rollbackTransaction(context);
-        } catch (ResourceManagerException e) {
-            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
+        }
+        catch (ResourceManagerException e)
+        {
+            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
         }
         resourceManager.removeActiveTransactionalResource(xid);
         resourceManager.removeSuspendedTransactionalResource(xid);
     }
 
-    public int prepare(Xid xid) throws XAException {
-        if (xid == null) {
+    public int prepare(Xid xid) throws XAException
+    {
+        if (xid == null)
+        {
             throw new XAException(XAException.XAER_PROTO);
         }
         AbstractTransactionContext context = resourceManager.getTransactionalResource(xid);
-        if (context == null) {
+        if (context == null)
+        {
             throw new XAException(XAException.XAER_NOTA);
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Preparing transaction branch " + xid);
         }
-        if (context.status == Status.STATUS_MARKED_ROLLBACK) {
+        if (context.status == Status.STATUS_MARKED_ROLLBACK)
+        {
             throw new XAException(XAException.XA_RBROLLBACK);
         }
-        try {
+        try
+        {
             int result = resourceManager.prepareTransaction(context);
             return result;
-        } catch (ResourceManagerException e) {
-            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
+        }
+        catch (ResourceManagerException e)
+        {
+            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
         }
     }
 
-    public void forget(Xid xid) throws XAException {
-        if (logger.isDebugEnabled()) {
+    public void forget(Xid xid) throws XAException
+    {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Forgetting transaction branch " + xid);
         }
         AbstractTransactionContext context = resourceManager.getTransactionalResource(xid);
-        if (context == null) {
+        if (context == null)
+        {
             throw new XAException(XAException.XAER_NOTA);
         }
         resourceManager.removeActiveTransactionalResource(xid);
@@ -267,22 +326,23 @@ public class DefaultXASession implements XAResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.transaction.xa.XAResource#getTransactionTimeout()
      */
-    public int getTransactionTimeout() throws XAException {
-        return (int) (resourceManager.getDefaultTransactionTimeout() / 1000);
+    public int getTransactionTimeout() throws XAException
+    {
+        return (int)(resourceManager.getDefaultTransactionTimeout() / 1000);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.transaction.xa.XAResource#setTransactionTimeout(int)
      */
-    public boolean setTransactionTimeout(int timeout) throws XAException {
+    public boolean setTransactionTimeout(int timeout) throws XAException
+    {
         resourceManager.setDefaultTransactionTimeout(timeout * 1000);
         return false;
     }
 
 }
-

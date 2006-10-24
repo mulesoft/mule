@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.simple;
 
 import java.io.UnsupportedEncodingException;
@@ -17,12 +18,13 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>StringToByteArray</code> converts a string into a byte array
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class StringToByteArray extends AbstractTransformer {
+public class StringToByteArray extends AbstractTransformer
+{
 
     private static final long serialVersionUID = 3993746463869846673L;
 
@@ -35,15 +37,20 @@ public class StringToByteArray extends AbstractTransformer {
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof byte[]) {
+        if (src instanceof byte[])
+        {
             return src;
         }
-        else {
-            try {
-                return ((String) src).getBytes(encoding);
+        else
+        {
+            try
+            {
+                return ((String)src).getBytes(encoding);
             }
-            catch (UnsupportedEncodingException e) {
-                throw new TransformerException(Message.createStaticMessage("Unable to convert String to byte[]."), e);
+            catch (UnsupportedEncodingException e)
+            {
+                throw new TransformerException(
+                    Message.createStaticMessage("Unable to convert String to byte[]."), e);
             }
         }
     }

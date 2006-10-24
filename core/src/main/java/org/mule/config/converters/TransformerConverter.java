@@ -15,8 +15,8 @@ import org.apache.commons.beanutils.Converter;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * <code>TransformerConverter</code> will obtain a transformer name and
- * convert it to a transformer instance by looking up the transformer from the
+ * <code>TransformerConverter</code> will obtain a transformer name and convert it
+ * to a transformer instance by looking up the transformer from the
  * <code>MuleManager</code>.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -30,15 +30,16 @@ public class TransformerConverter implements Converter
      * 
      * @param type Data type to which this value should be converted
      * @param value The input value to be converted
-     * @throws ConversionException if conversion cannot be performed
-     *             successfully
+     * @throws ConversionException if conversion cannot be performed successfully
      */
     public Object convert(Class type, Object value)
     {
-        if (value == null) {
+        if (value == null)
+        {
             throw new ConversionException("No value specified");
         }
-        if (value instanceof UMOTransformer) {
+        if (value instanceof UMOTransformer)
+        {
             return value;
         }
         return null;

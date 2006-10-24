@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * <code>UMOConnector</code> is the mechanism used to connect to external
- * systems and protocols in order to send and receive data.
+ * <code>UMOConnector</code> is the mechanism used to connect to external systems
+ * and protocols in order to send and receive data.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -32,25 +32,25 @@ import java.io.OutputStream;
 public interface UMOConnector extends Disposable, Initialisable
 {
     public static final int INT_VALUE_NOT_SET = -1;
-    
+
     /**
-     * This creates a <code>UMOMessageReceiver</code> associated with this
-     * endpoint and registers it with the connector
+     * This creates a <code>UMOMessageReceiver</code> associated with this endpoint
+     * and registers it with the connector
      * 
      * @param component the listening component
-     * @param endpoint the endpoint contains the listener endpointUri on which
-     *            to listen on.
-     * @throws Exception if the UMOMessageReceiver cannot be created or the
-     *             Receiver cannot be registered
+     * @param endpoint the endpoint contains the listener endpointUri on which to
+     *            listen on.
+     * @throws Exception if the UMOMessageReceiver cannot be created or the Receiver
+     *             cannot be registered
      */
     UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception;
 
     /**
      * @param component the listening component
      * @param endpoint the associated endpointDescriptor with the listener
-     * @throws Exception if the listener cannot be unregistered. If a listener
-     *             is not associated with the given endpoint this will not throw
-     *             an exception
+     * @throws Exception if the listener cannot be unregistered. If a listener is not
+     *             associated with the given endpoint this will not throw an
+     *             exception
      */
     void unregisterListener(UMOComponent component, UMOEndpoint endpoint) throws Exception;
 
@@ -60,14 +60,14 @@ public interface UMOConnector extends Disposable, Initialisable
     boolean isStarted();
 
     /**
-     * @return false if the connector is alive and well or true if the connector
-     *         is being destroyed
+     * @return false if the connector is alive and well or true if the connector is
+     *         being destroyed
      */
     boolean isDisposed();
 
     /**
-     * @return false if the connector is alive and well or true if the connector
-     *         has been told to dispose
+     * @return false if the connector is alive and well or true if the connector has
+     *         been told to dispose
      */
     boolean isDisposing();
 
@@ -85,15 +85,17 @@ public interface UMOConnector extends Disposable, Initialisable
 
     /**
      * Gets a <code>UMOStreamMessageAdapter</code> from the connector for the given
-     * message. This Adapter will correctly handle data streaming for this type of connector
-     *
+     * message. This Adapter will correctly handle data streaming for this type of
+     * connector
+     * 
      * @param in the input stream to read the data from
      * @param out the outputStream to write data to. This can be null.
      * @return the <code>UMOStreamMessageAdapter</code> for the endpoint
      * @throws MessagingException if the message parameter is not supported
      * @see UMOStreamMessageAdapter
      */
-    UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out) throws MessagingException;
+    UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
+        throws MessagingException;
 
     /**
      * @return the name associated with the endpoint
@@ -116,14 +118,12 @@ public interface UMOConnector extends Disposable, Initialisable
     boolean supportsProtocol(String protocol);
 
     /**
-     * The connector can pool dispatchers based on their endpointUri or can
-     * ingnore the endpointUri altogether and use a ThreadLocal or always create
-     * new.
+     * The connector can pool dispatchers based on their endpointUri or can ingnore
+     * the endpointUri altogether and use a ThreadLocal or always create new.
      * 
-     * @param endpoint the endpoint that can be used to key cached
-     *            dispatchers
-     * @return the component associated with the endpointUri If there is no
-     *         component for the current thread one will be created
+     * @param endpoint the endpoint that can be used to key cached dispatchers
+     * @return the component associated with the endpointUri If there is no component
+     *         for the current thread one will be created
      * @throws UMOException if creation of a component fails
      */
     UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException;
@@ -146,16 +146,16 @@ public interface UMOConnector extends Disposable, Initialisable
     void handleException(Exception exception);
 
     /**
-     * The dispatcher factory is used to create a message dispatcher of the
-     * current request
+     * The dispatcher factory is used to create a message dispatcher of the current
+     * request
      * 
      * @param factory the factory to use when a dispatcher request is madr
      */
     void setDispatcherFactory(UMOMessageDispatcherFactory factory);
 
     /**
-     * The dispatcher factory is used to create a message dispatcher of the
-     * current request
+     * The dispatcher factory is used to create a message dispatcher of the current
+     * request
      * 
      * @return the factory to use when a dispatcher request is madr
      */

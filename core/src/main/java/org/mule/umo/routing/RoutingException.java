@@ -51,7 +51,10 @@ public class RoutingException extends MessagingException
         this.endpoint = endpoint;
     }
 
-    public RoutingException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
+    public RoutingException(Message message,
+                            UMOMessage umoMessage,
+                            UMOImmutableEndpoint endpoint,
+                            Throwable cause)
     {
         super(generateMessage(message, endpoint), umoMessage, cause);
         this.endpoint = endpoint;
@@ -65,10 +68,13 @@ public class RoutingException extends MessagingException
     private static Message generateMessage(Message message, UMOImmutableEndpoint endpoint)
     {
         Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
-        if (message != null) {
+        if (message != null)
+        {
             message.setNextMessage(m);
             return message;
-        } else {
+        }
+        else
+        {
             return m;
         }
     }

@@ -13,7 +13,8 @@ package org.mule.umo.security.provider;
 /**
  * IBM JDK-specific security provider information.
  */
-public class IBMSecurityProviderInfo implements SecurityProviderInfo {
+public class IBMSecurityProviderInfo implements SecurityProviderInfo
+{
 
     private static final String KEY_MANAGER_ALGORITHM = "IbmX509";
 
@@ -21,15 +22,18 @@ public class IBMSecurityProviderInfo implements SecurityProviderInfo {
 
     private static final String PROVIDER_CLASS = "com.ibm.jsse.IBMJSSEProvider";
 
-    public String getKeyManagerAlgorithm() {
+    public String getKeyManagerAlgorithm()
+    {
         return KEY_MANAGER_ALGORITHM;
     }
 
-    public String getProtocolHandler() {
+    public String getProtocolHandler()
+    {
         return PROTOCOL_HANDLER;
     }
 
-    public String getProviderClass() {
+    public String getProviderClass()
+    {
         return PROVIDER_CLASS;
     }
 

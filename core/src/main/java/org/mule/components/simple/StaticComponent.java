@@ -19,44 +19,53 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 
 /**
- * A component that will return a static data object as a result.  This is useful
- * for testing with expected results.  The data returned can be read from a file or
- * set as a property on this component.
- *
+ * A component that will return a static data object as a result. This is useful for
+ * testing with expected results. The data returned can be read from a file or set as
+ * a property on this component.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StaticComponent implements Callable, Initialisable {
+public class StaticComponent implements Callable, Initialisable
+{
 
     private Object data;
     private String dataFile;
     private String prefix;
     private String postfix;
 
-    public void initialise() throws InitialisationException {
-        if(dataFile!=null)
+    public void initialise() throws InitialisationException
+    {
+        if (dataFile != null)
         {
-            try {
+            try
+            {
                 data = IOUtils.getResourceAsString(dataFile, getClass());
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
     }
 
-    public Object getData() {
+    public Object getData()
+    {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(Object data)
+    {
         this.data = data;
     }
 
-    public String getDataFile() {
+    public String getDataFile()
+    {
         return dataFile;
     }
 
-    public void setDataFile(String dataFile) {
+    public void setDataFile(String dataFile)
+    {
         this.dataFile = dataFile;
     }
 
@@ -80,19 +89,23 @@ public class StaticComponent implements Callable, Initialisable {
         this.postfix = postfix;
     }
 
-    public Object onCall(UMOEventContext eventContext) throws Exception {
+    public Object onCall(UMOEventContext eventContext) throws Exception
+    {
 
-        if(data!=null) {
+        if (data != null)
+        {
             return data;
         }
 
         String eventData = eventContext.getTransformedMessageAsString();
 
-        if(prefix!=null) {
+        if (prefix != null)
+        {
             eventData = prefix + eventData;
         }
 
-        if (postfix!=null) {
+        if (postfix != null)
+        {
             eventData += postfix;
         }
         return eventData;

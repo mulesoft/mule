@@ -7,13 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.simple;
 
 import org.mule.umo.UMOEventContext;
 
 /**
- * <code>EchoComponent</code> will log the message and return the payload back
- * as the result
+ * <code>EchoComponent</code> will log the message and return the payload back as
+ * the result
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

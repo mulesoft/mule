@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.config.i18n.Message;
@@ -14,8 +15,8 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>UnsupportedAuthenticationSchemeException</code> is thrown when a
- * authentication scheme is being used on the message that the Security filter
- * does not understand
+ * authentication scheme is being used on the message that the Security filter does
+ * not understand
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

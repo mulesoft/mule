@@ -22,65 +22,76 @@ import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>EndpointSelector</code> selects the outgoing endpoint by name based on a
- * message property ("endpoint" by default).
- *
- *   <outbound-router>
- *       <router className="org.mule.routing.outbound.EndpointSelector">
- *           <endpoint name="dest1" address="jms://queue1" />
- *           <endpoint name="dest2" address="jms://queue2" />
- *           <endpoint name="dest3" address="jms://queue3" />
- *           <properties>
- *               <property name="selector" value="endpoint" />
- *           </properties>
- *       </router>
- *   </outbound-router>
- *
+ * message property ("endpoint" by default). <outbound-router> <router
+ * className="org.mule.routing.outbound.EndpointSelector"> <endpoint name="dest1"
+ * address="jms://queue1" /> <endpoint name="dest2" address="jms://queue2" />
+ * <endpoint name="dest3" address="jms://queue3" /> <properties> <property
+ * name="selector" value="endpoint" /> </properties> </router> </outbound-router>
+ * 
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class EndpointSelector extends FilteringOutboundRouter {
+public class EndpointSelector extends FilteringOutboundRouter
+{
 
     private String selectorProperty = "endpoint";
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException {
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
+    {
         String endpointName = message.getStringProperty(getSelectorProperty(), null);
-        if (endpointName == null) {
-            throw new IllegalArgumentException("selectorProperty '" + getSelectorProperty() + "' must be set on message in order to route it.");
+        if (endpointName == null)
+        {
+            throw new IllegalArgumentException("selectorProperty '" + getSelectorProperty()
+                                               + "' must be set on message in order to route it.");
         }
 
         UMOEndpoint ep = lookupEndpoint(endpointName);
-        if (ep == null) {
-            throw new CouldNotRouteOutboundMessageException(Message.createStaticMessage("No endpoint found with the name " + endpointName), message, ep);
+        if (ep == null)
+        {
+            throw new CouldNotRouteOutboundMessageException(
+                Message.createStaticMessage("No endpoint found with the name " + endpointName), message, ep);
         }
 
-        try {
-            if (synchronous) {
+        try
+        {
+            if (synchronous)
+            {
                 return send(session, message, ep);
-            } else {
+            }
+            else
+            {
                 dispatch(session, message, ep);
                 return null;
             }
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new CouldNotRouteOutboundMessageException(message, ep, e);
         }
     }
 
-    protected UMOEndpoint lookupEndpoint(String endpointName) {
+    protected UMOEndpoint lookupEndpoint(String endpointName)
+    {
         UMOEndpoint ep;
         Iterator iterator = endpoints.iterator();
-        while (iterator.hasNext()) {
-            ep = (UMOEndpoint) iterator.next();
-            if (endpointName.equals(ep.getName())) {
+        while (iterator.hasNext())
+        {
+            ep = (UMOEndpoint)iterator.next();
+            if (endpointName.equals(ep.getName()))
+            {
                 return ep;
             }
         }
         return null;
     }
 
-    public String getSelectorProperty() {
+    public String getSelectorProperty()
+    {
         return selectorProperty;
     }
 
-    public void setSelectorProperty(String selectorProperty) {
+    public void setSelectorProperty(String selectorProperty)
+    {
         this.selectorProperty = selectorProperty;
     }
 }

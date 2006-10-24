@@ -14,8 +14,8 @@ import org.mule.config.i18n.Message;
 
 /**
  * <p>
- * <code>TransactionInProgressException</code> is thrown if a new transaction
- * is started when there is one already in progress
+ * <code>TransactionInProgressException</code> is thrown if a new transaction is
+ * started when there is one already in progress
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

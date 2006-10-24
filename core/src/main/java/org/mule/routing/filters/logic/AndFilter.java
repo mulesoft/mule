@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.filters.logic;
 
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>AndFilter</code> accepts only if the leftFilter and rightFilter
- * filter accept
+ * <code>AndFilter</code> accepts only if the leftFilter and rightFilter filter
+ * accept
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

@@ -48,14 +48,17 @@ public class ByteArrayToHexString extends AbstractTransformer
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src == null) {
+        if (src == null)
+        {
             return StringUtils.EMPTY;
         }
 
-        try {
+        try
+        {
             return StringUtils.toHexString((byte[])src, upperCase);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new TransformerException(this, ex);
         }
     }

@@ -65,8 +65,8 @@ public class EventTimerTask extends TimerTask
     }
 
     /**
-     * The action to be performed by this timer task. The fireTime event method
-     * is called.
+     * The action to be performed by this timer task. The fireTime event method is
+     * called.
      */
     public void run()
     {
@@ -87,7 +87,8 @@ public class EventTimerTask extends TimerTask
 
     public void removeListener(TimeEventListener listener)
     {
-        if (listeners != null && listeners.contains(listener)) {
+        if (listeners != null && listeners.contains(listener))
+        {
             listeners.remove(listener);
         }
     }
@@ -99,20 +100,25 @@ public class EventTimerTask extends TimerTask
 
     public void addListener(TimeEventListener listener)
     {
-        if (listeners == null) {
+        if (listeners == null)
+        {
             listeners = new ArrayList();
             listeners.add(listener);
-        } else if (!listeners.contains(listener)) {
+        }
+        else if (!listeners.contains(listener))
+        {
             listeners.add(listener);
         }
     }
 
     protected void fireTimerEvent(TimeEvent event)
     {
-        if (listeners != null && started) {
+        if (listeners != null && started)
+        {
             int count = listeners.size();
-            for (int i = 0; i < count; i++) {
-                ((TimeEventListener) listeners.get(i)).timeExpired(event);
+            for (int i = 0; i < count; i++)
+            {
+                ((TimeEventListener)listeners.get(i)).timeExpired(event);
             }
         }
     }

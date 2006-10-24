@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.inbound;
 
 import org.mule.umo.UMOEvent;
@@ -25,8 +26,9 @@ public class InboundPassThroughRouter extends SelectiveConsumer
 {
     public UMOEvent[] process(UMOEvent event) throws RoutingException
     {
-        synchronized (event) {
-            return new UMOEvent[] { event };
+        synchronized (event)
+        {
+            return new UMOEvent[]{event};
         }
     }
 

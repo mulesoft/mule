@@ -34,9 +34,12 @@ public class Max extends AggregateCounter
     public void doCompute()
     {
         double next = getBase().nextValue();
-        if (max == Double.NaN) {
+        if (max == Double.NaN)
+        {
             max = next;
-        } else if (next > max) {
+        }
+        else if (next > max)
+        {
             max = next;
         }
     }

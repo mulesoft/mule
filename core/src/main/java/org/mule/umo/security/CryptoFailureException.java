@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.security;
 
 import org.mule.MuleException;
@@ -17,10 +18,10 @@ import org.mule.umo.UMOEncryptionStrategy;
 /**
  * <code>CryptoFailureException</code> is a generic exception thrown by an
  * CryptoStrategy if encryption or decryption fails. The constuctors of this
- * exception accept a UMOEncryptionStrategy that will be included in the
- * exception message. Implementors of UMOEncryptionStrategy should provide a
- * toString method that exposes *only* information that maybe useful for
- * debugging not passwords, secret keys, etc.
+ * exception accept a UMOEncryptionStrategy that will be included in the exception
+ * message. Implementors of UMOEncryptionStrategy should provide a toString method
+ * that exposes *only* information that maybe useful for debugging not passwords,
+ * secret keys, etc.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

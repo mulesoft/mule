@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.properties;
 
 import org.mule.umo.UMOMessage;
@@ -19,9 +20,9 @@ public class BeanPropertyExtractor implements PropertyExtractor
 
     public Object getProperty(String name, Object message)
     {
-        if(name.equalsIgnoreCase("payload"))
+        if (name.equalsIgnoreCase("payload"))
         {
-            if(message instanceof UMOMessage)
+            if (message instanceof UMOMessage)
             {
                 return ((UMOMessage)message).getPayload();
             }

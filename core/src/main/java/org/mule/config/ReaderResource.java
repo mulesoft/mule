@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import java.io.IOException;
@@ -19,10 +20,10 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 /**
- * <code>ReaderResource</code> is a reader with a description associated with
- * it. This is useful for error resolution as the reader description can be
- * included when reporting errors during reading the resource.
- *
+ * <code>ReaderResource</code> is a reader with a description associated with it.
+ * This is useful for error resolution as the reader description can be included when
+ * reporting errors during reading the resource.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -48,13 +49,16 @@ public class ReaderResource
         return reader;
     }
 
-    public static ReaderResource[] parseResources(String configResources, String encoding) throws IOException {
+    public static ReaderResource[] parseResources(String configResources, String encoding) throws IOException
+    {
         String[] resources = StringUtils.splitAndTrim(configResources, ",");
         MuleManager.getConfiguration().setConfigResources(resources);
         ReaderResource[] readers = new ReaderResource[resources.length];
-        for (int i = 0; i < resources.length; i++) {
+        for (int i = 0; i < resources.length; i++)
+        {
             InputStream is = IOUtils.getResourceAsStream(resources[i].trim(), ReaderResource.class);
-            if(is==null) {
+            if (is == null)
+            {
                 throw new IOException("could not load resource: " + resources[i].trim());
             }
             readers[i] = new ReaderResource(resources[i].trim(), new InputStreamReader(is, encoding));
@@ -62,7 +66,8 @@ public class ReaderResource
         return readers;
     }
 
-    public static ReaderResource[] parseResources(String configResources) throws IOException {
+    public static ReaderResource[] parseResources(String configResources) throws IOException
+    {
         return parseResources(configResources, MuleManager.getConfiguration().getEncoding());
     }
 }

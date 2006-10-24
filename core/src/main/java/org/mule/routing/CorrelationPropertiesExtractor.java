@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import org.mule.config.MuleProperties;
@@ -14,13 +15,12 @@ import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>CorrelationPropertiesExtractor</code> is a default implementation used
- * for getting the Correlation information from a message. This object is only
- * used when getting a specific property to be set on the message. When reading
- * the property the getProperty(...) or the direct property accessor will be
- * used i.e. message.getCorrelationId() or
+ * <code>CorrelationPropertiesExtractor</code> is a default implementation used for
+ * getting the Correlation information from a message. This object is only used when
+ * getting a specific property to be set on the message. When reading the property
+ * the getProperty(...) or the direct property accessor will be used i.e.
+ * message.getCorrelationId() or
  * message.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY)
- *
  */
 public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
 {
@@ -30,7 +30,7 @@ public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
         UMOMessage msg = null;
         if (message instanceof UMOMessage)
         {
-            msg = (UMOMessage) message;
+            msg = (UMOMessage)message;
         }
         if (msg != null)
         {
@@ -45,12 +45,12 @@ public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
             else
             {
                 throw new IllegalArgumentException("Property name: " + name
-                        + " not recognised by the Correlation Property Extractor");
+                                                   + " not recognised by the Correlation Property Extractor");
             }
             if (result == null)
             {
-                throw new NullPointerException("Property Extractor cannot return a null value. Extractor is: "
-                        + getClass().getName());
+                throw new NullPointerException(
+                    "Property Extractor cannot return a null value. Extractor is: " + getClass().getName());
             }
         }
         else

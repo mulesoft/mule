@@ -13,13 +13,13 @@ package org.mule.umo.transformer;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>UMOTransformer</code> extends a UMOSimpleTransformer with the
- * provision of a Transformer component, which simply keeps a copy of the 'live'
- * transfromed data, so that any further transformations will use this cached
- * data. When a component is rolled back a cached copy of the source data will
- * be returned. When the component is committed the caches are cleared. Starting
- * a component will simply put the transfromer in component mode.
- *
+ * <code>UMOTransformer</code> extends a UMOSimpleTransformer with the provision of
+ * a Transformer component, which simply keeps a copy of the 'live' transfromed data,
+ * so that any further transformations will use this cached data. When a component is
+ * rolled back a cached copy of the source data will be returned. When the component
+ * is committed the caches are cleared. Starting a component will simply put the
+ * transfromer in component mode.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

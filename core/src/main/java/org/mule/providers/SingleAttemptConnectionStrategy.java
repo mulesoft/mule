@@ -24,12 +24,14 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
 {
     public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
-        try {
+        try
+        {
             connectable.connect();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                                        getClass().getName(),
-                                                        getDescription(connectable)), e, connectable);
+                getClass().getName(), getDescription(connectable)), e, connectable);
 
         }
     }
@@ -37,7 +39,8 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
     /**
      * Resets any state stored in the retry strategy
      */
-    public void resetState() {
-        //no op
+    public void resetState()
+    {
+        // no op
     }
 }

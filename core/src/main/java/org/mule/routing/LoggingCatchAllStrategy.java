@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import org.apache.commons.logging.Log;
@@ -18,10 +19,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>LoggingCatchAllStrategy</code> is a simple strategy that only logs
- * any events not caught by the router associated with this strategy. This
- * should <b>not</b> be used in production unless it is acceptible for events
- * to be disposing.
+ * <code>LoggingCatchAllStrategy</code> is a simple strategy that only logs any
+ * events not caught by the router associated with this strategy. This should <b>not</b>
+ * be used in production unless it is acceptible for events to be disposing.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -46,10 +46,11 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
         return null;
     }
 
-    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
     {
         logger.warn("Message: " + message + " was not dispatched on session: " + session
-                + ". No routing path was defined for it.");
+                    + ". No routing path was defined for it.");
         return null;
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOManager;
@@ -39,8 +40,9 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public static final int MANAGER_DISPOSING_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 9;
     public static final int MANAGER_DISPOSED_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 10;
 
-    private static final transient String[] ACTIONS = new String[] { "initialising", "initialised", "starting",
-            "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors", "disposed connectors" };
+    private static final transient String[] ACTIONS = new String[]{"initialising", "initialised", "starting",
+        "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
+        "disposed connectors"};
 
     public ManagerNotification(UMOManager message, int action)
     {
@@ -50,20 +52,22 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
 
     protected String getPayloadToString()
     {
-        return ((UMOManager) source).getId();
+        return ((UMOManager)source).getId();
     }
 
     protected String getActionName(int action)
     {
         int i = action - MANAGER_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
         return ACTIONS[i - 1];
     }
 
-    public String toString() {
-        return EVENT_NAME + "{" + "action=" + getActionName(action)
-                + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + "}";
+    public String toString()
+    {
+        return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
+               + ", timestamp=" + timestamp + "}";
     }
 }

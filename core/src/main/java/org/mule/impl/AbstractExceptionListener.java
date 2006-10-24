@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -38,11 +39,11 @@ import java.util.List;
 
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
- * Exception Listeners can override. It provides template methods for handling
- * the for base types of exceptions plus allows multimple endpoints to be
- * associated with this exception listener and provides an implementaiton for
- * dispatching exception events from this Listener.
- *
+ * Exception Listeners can override. It provides template methods for handling the
+ * for base types of exceptions plus allows multimple endpoints to be associated with
+ * this exception listener and provides an implementaiton for dispatching exception
+ * events from this Listener.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -66,7 +67,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            addEndpoint((UMOEndpoint) iterator.next());
+            addEndpoint((UMOEndpoint)iterator.next());
         }
     }
 
@@ -89,7 +90,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         Throwable t = getExceptionType(e, RoutingException.class);
         if (t != null)
         {
-            RoutingException re = (RoutingException) t;
+            RoutingException re = (RoutingException)t;
             handleRoutingException(re.getUmoMessage(), re.getEndpoint(), e);
             return;
         }
@@ -97,7 +98,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         t = getExceptionType(e, MessagingException.class);
         if (t != null)
         {
-            MessagingException me = (MessagingException) t;
+            MessagingException me = (MessagingException)t;
             handleMessagingException(me.getUmoMessage(), e);
             return;
         }
@@ -105,7 +106,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         t = getExceptionType(e, LifecycleException.class);
         if (t != null)
         {
-            LifecycleException le = (LifecycleException) t;
+            LifecycleException le = (LifecycleException)t;
             handleLifecycleException(le.getComponent(), e);
             if (RequestContext.getEventContext() != null)
             {
@@ -137,10 +138,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     }
 
     /**
-     * The initialise method is call every time the Exception stategy is assigned to a component or connector.
-     * This implementation ensures that initialise is called only once.
-     * The actual initialisation code is contained in the <code>doInitialise()</code> method.
-     *
+     * The initialise method is call every time the Exception stategy is assigned to
+     * a component or connector. This implementation ensures that initialise is
+     * called only once. The actual initialisation code is contained in the
+     * <code>doInitialise()</code> method.
+     * 
      * @throws InitialisationException
      */
     public synchronized final void initialise() throws InitialisationException
@@ -157,17 +159,15 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         logger.info("Initialising exception listener: " + toString());
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+            UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
             umoEndpoint.initialise();
         }
     }
 
-
     /**
-     * If there is a current transaction this method will mark it for rollback
-     * This method should not be called if an event is routed from this
-     * exception handler to an endpoint that should take part in the current
-     * transaction
+     * If there is a current transaction this method will mark it for rollback This
+     * method should not be called if an event is routed from this exception handler
+     * to an endpoint that should take part in the current transaction
      */
     protected void markTransactionForRollback()
     {
@@ -186,19 +186,18 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     }
 
     /**
-     * Routes the current exception to an error endpoint such as a Dead Letter
-     * Queue (jms) This method is only invoked if there is a UMOMessage
-     * available to dispatch. The message dispatched from this method will be an
+     * Routes the current exception to an error endpoint such as a Dead Letter Queue
+     * (jms) This method is only invoked if there is a UMOMessage available to
+     * dispatch. The message dispatched from this method will be an
      * <code>ExceptionMessage</code> which contains the exception thrown the
      * UMOMessage and any context information.
-     *
-     * @param message        the UMOMessage being processed when the exception occurred
-     * @param failedEndpoint optional; the endpoint being dispatched or received
-     *                       on when the error occurred. This is NOT the endpoint that the
-     *                       message will be disptched on and is only supplied to this
-     *                       method for logging purposes
-     * @param t              the exception thrown. This will be sent with the
-     *                       ExceptionMessage
+     * 
+     * @param message the UMOMessage being processed when the exception occurred
+     * @param failedEndpoint optional; the endpoint being dispatched or received on
+     *            when the error occurred. This is NOT the endpoint that the message
+     *            will be disptched on and is only supplied to this method for
+     *            logging purposes
+     * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
     protected void routeException(UMOMessage message, UMOImmutableEndpoint failedEndpoint, Throwable t)
@@ -236,8 +235,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 {
                     exceptionMessage = new MuleMessage(msg, ctx.getMessage());
                 }
-                UMOEvent exceptionEvent = new MuleEvent(exceptionMessage, endpoint,
-                        new MuleSession(exceptionMessage, new MuleSessionHandler()), true);
+                UMOEvent exceptionEvent = new MuleEvent(exceptionMessage, endpoint, new MuleSession(
+                    exceptionMessage, new MuleSessionHandler()), true);
                 RequestContext.setEvent(exceptionEvent);
                 endpoint.getConnector().getDispatcher(endpoint).send(exceptionEvent);
 
@@ -276,18 +275,17 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * Returns an endpoint for the given exception. ExceptionListeners can have
      * multiple endpoints registered on them. This methods allows custom
      * implementations to control which endpoint is used based on the exception
-     * thrown. This implementation simply returns the first endpoint in the
-     * list.
-     *
+     * thrown. This implementation simply returns the first endpoint in the list.
+     * 
      * @param t the exception thrown
-     * @return The endpoint used to dispatch an exception message on or null if
-     *         there are no endpoints registered
+     * @return The endpoint used to dispatch an exception message on or null if there
+     *         are no endpoints registered
      */
     protected UMOEndpoint getEndpoint(Throwable t)
     {
         if (endpoints.size() > 0)
         {
-            return (UMOEndpoint) endpoints.get(0);
+            return (UMOEndpoint)endpoints.get(0);
         }
         else
         {
@@ -297,7 +295,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * Used to log the error passed into this Exception Listener
-     *
+     * 
      * @param t the exception thrown
      */
     protected void logException(Throwable t)
@@ -314,18 +312,18 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     }
 
     /**
-     * Logs a fatal error message to the logging system. This should be used
-     * mostly if an error occurs in the exception listener itself. This
-     * implementation logs the the message itself to the logs if it is not null
-     *
+     * Logs a fatal error message to the logging system. This should be used mostly
+     * if an error occurs in the exception listener itself. This implementation logs
+     * the the message itself to the logs if it is not null
+     * 
      * @param message The UMOMessage currently being processed
-     * @param t       the fatal exception to log
+     * @param t the fatal exception to log
      */
     protected void logFatal(UMOMessage message, Throwable t)
     {
-        logger.fatal("Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
-                + (message == null ? "" : "Logging Message here: \n" + message.toString()),
-                t);
+        logger.fatal(
+            "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
+                            + (message == null ? "" : "Logging Message here: \n" + message.toString()), t);
     }
 
     public boolean isInitialised()
@@ -334,49 +332,49 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     }
 
     /**
-     * A messaging exception is thrown when an excpetion occurs during normal
-     * message processing. A <code>MessagingException</code> holds a reference
-     * to the current message that is passed into this method
-     *
+     * A messaging exception is thrown when an excpetion occurs during normal message
+     * processing. A <code>MessagingException</code> holds a reference to the
+     * current message that is passed into this method
+     * 
      * @param message the current message being processed
-     * @param e       the top level exception thrown. This may be a Messaging
-     *                exception or some wrapper exception
+     * @param e the top level exception thrown. This may be a Messaging exception or
+     *            some wrapper exception
      * @see MessagingException
      */
     public abstract void handleMessagingException(UMOMessage message, Throwable e);
 
     /**
-     * A routing exception is thrown when an excpetion occurs during normal
-     * message processing A <code>RoutingException</code> holds a reference to
-     * the current message and te endpoint being routing to or from when the
-     * error occurred. Both are passed into this method
-     *
-     * @param message  the current message being processed
-     * @param endpoint the endpoint being dispatched to or received from when
-     *                 the error occurred
-     * @param e        the top level exception thrown. This may be a Messaging
-     *                 exception or some wrapper exception
+     * A routing exception is thrown when an excpetion occurs during normal message
+     * processing A <code>RoutingException</code> holds a reference to the current
+     * message and te endpoint being routing to or from when the error occurred. Both
+     * are passed into this method
+     * 
+     * @param message the current message being processed
+     * @param endpoint the endpoint being dispatched to or received from when the
+     *            error occurred
+     * @param e the top level exception thrown. This may be a Messaging exception or
+     *            some wrapper exception
      * @see RoutingException
      */
     public abstract void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable e);
 
     /**
      * Lifecycle exceptions are thrown when an error occurs during an object's
-     * lifecycle call such as start, stop or initialise. The exception contains
-     * a reference to the object that failed which can be used for more
-     * informative logging.
-     *
+     * lifecycle call such as start, stop or initialise. The exception contains a
+     * reference to the object that failed which can be used for more informative
+     * logging.
+     * 
      * @param component the object that failed during a lifecycle call
-     * @param e         the top level exception thrown. This may or may not be the
-     *                  <code>LifecycleException</code> but a lifecycle exception
-     *                  will be present in the exception stack.
+     * @param e the top level exception thrown. This may or may not be the
+     *            <code>LifecycleException</code> but a lifecycle exception will be
+     *            present in the exception stack.
      * @see LifecycleException
      */
     public abstract void handleLifecycleException(Object component, Throwable e);
 
     /**
      * A handler for all other exceptions
-     *
+     * 
      * @param e the top level exception thrown
      */
     public abstract void handleStandardException(Throwable e);

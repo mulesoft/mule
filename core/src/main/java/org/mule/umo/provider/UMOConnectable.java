@@ -12,17 +12,17 @@ package org.mule.umo.provider;
 
 /**
  * Interface for objects that should connect to a resource.
- *
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface UMOConnectable {
+public interface UMOConnectable
+{
 
     /**
-     * Make the connection to the underlying transport. 
-     * The fact that this object is connected or not should
-     * have no influence on the lifecycle, especially
-     * the start / stop state if applicable.
+     * Make the connection to the underlying transport. The fact that this object is
+     * connected or not should have no influence on the lifecycle, especially the
+     * start / stop state if applicable.
      * 
      * @throws Exception
      */
@@ -41,9 +41,10 @@ public interface UMOConnectable {
      * @return
      */
     boolean isConnected();
-    
+
     /**
      * Returns a string identifying the underlying resource
+     * 
      * @return
      */
     String getConnectionDescription();

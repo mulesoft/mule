@@ -22,8 +22,7 @@ import javax.transaction.TransactionManager;
 public interface UMOTransactionManagerFactory
 {
     /**
-     * Creates of obtains the jta transaction manager to use for mule
-     * transactions
+     * Creates of obtains the jta transaction manager to use for mule transactions
      * 
      * @return the transaction manager to use
      * @throws Exception if the transaction manager cannot be located or created

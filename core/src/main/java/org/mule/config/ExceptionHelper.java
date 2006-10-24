@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import org.apache.commons.collections.MapUtils;
@@ -29,23 +30,23 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>ExceptionHelper</code> provides a number of helper functions that can
- * be useful for detailing with Mule exceptions. This class has 3 core functions -
- * <p/> 1. ErrorCode lookup. A corresponding Mule error code can be found using
- * for a given Mule exception 2. Addtional Error information such as Java doc
- * url for a given exception can be resolved using this class 3. Error code
- * mappings can be looked up by providing the the protocol to map to and the
- * Mule exception
- *
+ * <code>ExceptionHelper</code> provides a number of helper functions that can be
+ * useful for detailing with Mule exceptions. This class has 3 core functions - <p/>
+ * 1. ErrorCode lookup. A corresponding Mule error code can be found using for a
+ * given Mule exception 2. Addtional Error information such as Java doc url for a
+ * given exception can be resolved using this class 3. Error code mappings can be
+ * looked up by providing the the protocol to map to and the Mule exception
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class ExceptionHelper {
+public class ExceptionHelper
+{
     /**
      * This is the property to set the error code to no the message it is the
-     * property name the Transport provider uses set the set the error code on
-     * the underlying message
+     * property name the Transport provider uses set the set the error code on the
+     * underlying message
      */
     public static final String ERROR_CODE_PROPERTY = "error.code.property";
 
@@ -85,13 +86,17 @@ public class ExceptionHelper {
      */
     private static ExceptionReader defaultExceptionReader = new DefaultExceptionReader();
 
-    static {
+    static
+    {
         initialise();
     }
 
-    public static void initialise() {
-        try {
-            if (initialised) {
+    public static void initialise()
+    {
+        try
+        {
+            if (initialised)
+            {
                 return;
             }
 
@@ -100,91 +105,124 @@ public class ExceptionHelper {
             J2SE_VERSION = System.getProperty("java.specification.version");
 
             InputStream is = SpiUtils.findServiceDescriptor("org/mule/config",
-                    "mule-exception-codes.properties",
-                    ExceptionHelper.class);
-            if (is == null) {
-                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
+                "mule-exception-codes.properties", ExceptionHelper.class);
+            if (is == null)
+            {
+                throw new NullPointerException(
+                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
             }
             errorCodes.load(is);
             reverseErrorCodes = MapUtils.invertMap(errorCodes);
-            is = SpiUtils.findServiceDescriptor("org/mule/config",
-                    "mule-exception-config.properties",
-                    ExceptionHelper.class);
-            if (is == null) {
-                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
+            is = SpiUtils.findServiceDescriptor("org/mule/config", "mule-exception-config.properties",
+                ExceptionHelper.class);
+            if (is == null)
+            {
+                throw new NullPointerException(
+                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
             }
             errorDocs.load(is);
 
             initialised = true;
-        } catch (IOException e) {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"), e);
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"),
+                e);
         }
     }
 
-    public static int getErrorCode(Class exception) {
+    public static int getErrorCode(Class exception)
+    {
         String code = errorCodes.getProperty(exception.getName(), "-1");
         return Integer.parseInt(code);
     }
 
-    public static Class getErrorClass(int code) {
+    public static Class getErrorClass(int code)
+    {
         String key = String.valueOf(code);
         Object clazz = reverseErrorCodes.get(key);
-        if (clazz == null) {
+        if (clazz == null)
+        {
             return null;
-        } else if (clazz instanceof Class) {
-            return (Class) clazz;
-        } else {
-            try {
+        }
+        else if (clazz instanceof Class)
+        {
+            return (Class)clazz;
+        }
+        else
+        {
+            try
+            {
                 clazz = ClassUtils.loadClass(clazz.toString(), ExceptionHelper.class);
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e)
+            {
                 logger.error(e.getMessage(), e);
                 return null;
             }
             reverseErrorCodes.put(key, clazz);
-            return (Class) clazz;
+            return (Class)clazz;
         }
     }
 
-    public static String getErrorMapping(String protocol, int code) {
+    public static String getErrorMapping(String protocol, int code)
+    {
         Class c = getErrorClass(code);
-        if (c != null) {
+        if (c != null)
+        {
             return getErrorMapping(protocol, c);
-        } else {
+        }
+        else
+        {
             logger.error("Class not known for code: " + code);
             return "-1";
         }
     }
 
-    private static Properties getErrorMappings(String protocol) {
+    private static Properties getErrorMappings(String protocol)
+    {
         Object m = errorMappings.get(protocol);
-        if (m != null) {
-            if (m instanceof Properties) {
-                return (Properties) m;
-            } else {
+        if (m != null)
+        {
+            if (m instanceof Properties)
+            {
+                return (Properties)m;
+            }
+            else
+            {
                 return null;
             }
-        } else {
-            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config", protocol
-                    + "-exception-mappings.properties", ExceptionHelper.class);
-            if (is == null) {
+        }
+        else
+        {
+            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config",
+                protocol + "-exception-mappings.properties", ExceptionHelper.class);
+            if (is == null)
+            {
                 errorMappings.put(protocol, "not found");
                 logger.warn("Failed to load error mappings from: META-INF/services/org/mule/config/"
-                        + protocol
-                        + "-exception-mappings.properties. This may be because there are no error code mappings for protocol: "
-                        + protocol);
+                            + protocol
+                            + "-exception-mappings.properties. This may be because there are no error code mappings for protocol: "
+                            + protocol);
                 return null;
             }
             Properties p = new Properties();
-            try {
+            try
+            {
                 p.load(is);
-            } catch (IOException e) {
-                throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"), e);
+            }
+            catch (IOException e)
+            {
+                throw new MuleRuntimeException(
+                    Message.createStaticMessage("Failed to load Exception resources"), e);
             }
             errorMappings.put(protocol, p);
             String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
-            if (applyTo != null) {
+            if (applyTo != null)
+            {
                 String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
-                for (int i = 0; i < protocols.length; i++) {
+                for (int i = 0; i < protocols.length; i++)
+                {
                     errorMappings.put(protocols[i], p);
                 }
             }
@@ -192,30 +230,38 @@ public class ExceptionHelper {
         }
     }
 
-    public static String getErrorCodePropertyName(String protocol) {
+    public static String getErrorCodePropertyName(String protocol)
+    {
         protocol = protocol.toLowerCase();
         Properties mappings = getErrorMappings(protocol);
-        if (mappings == null) {
+        if (mappings == null)
+        {
             return null;
         }
         return mappings.getProperty(ERROR_CODE_PROPERTY);
     }
 
-    public static String getErrorMapping(String protocol, Class exception) {
+    public static String getErrorMapping(String protocol, Class exception)
+    {
         protocol = protocol.toLowerCase();
         Properties mappings = getErrorMappings(protocol);
-        if (mappings == null) {
+        if (mappings == null)
+        {
             logger.info("No mappings found for protocol: " + protocol);
             return String.valueOf(getErrorCode(exception));
         }
 
         Class clazz = exception;
         String code = null;
-        while (!clazz.equals(Object.class)) {
+        while (!clazz.equals(Object.class))
+        {
             code = mappings.getProperty(clazz.getName());
-            if (code == null) {
+            if (code == null)
+            {
                 clazz = clazz.getSuperclass();
-            } else {
+            }
+            else
+            {
                 return code;
             }
         }
@@ -225,27 +271,33 @@ public class ExceptionHelper {
         return mappings.getProperty(code, code);
     }
 
-
-    public static String getJavaDocUrl(Class exception) {
+    public static String getJavaDocUrl(Class exception)
+    {
         return getDocUrl("javadoc.", exception.getName());
     }
 
-    public static String getDocUrl(Class exception) {
+    public static String getDocUrl(Class exception)
+    {
         return getDocUrl("doc.", exception.getName());
     }
 
-    private static String getDocUrl(String prefix, String packageName) {
+    private static String getDocUrl(String prefix, String packageName)
+    {
         String key = prefix;
-        if (packageName.startsWith("java.") || packageName.startsWith("javax.")) {
+        if (packageName.startsWith("java.") || packageName.startsWith("javax."))
+        {
             key += J2SE_VERSION;
         }
         String url = getUrl(key, packageName);
-        if (url == null && (packageName.startsWith("java.") || packageName.startsWith("javax."))) {
+        if (url == null && (packageName.startsWith("java.") || packageName.startsWith("javax.")))
+        {
             key = prefix + J2EE_VERSION;
             url = getUrl(key, packageName);
         }
-        if (url != null) {
-            if (!url.endsWith("/")) {
+        if (url != null)
+        {
+            if (!url.endsWith("/"))
+            {
                 url += "/";
             }
             String s = packageName.replaceAll("[.]", "/");
@@ -253,56 +305,69 @@ public class ExceptionHelper {
             url += s;
         }
 
-        /* If the exception is actually expected to occur by the calling code, the
-         * following output becomes misleading when reading the logs.
-        if (logger.isDebugEnabled()) {
-            if ("javadoc".equalsIgnoreCase(prefix)) {
-                logger.debug("Javadoc Url for package '" + packageName + "' is: " + url);
-            } else if ("doc".equalsIgnoreCase(prefix)) {
-                logger.debug("Online Doc Url for package '" + packageName + "' is: " + url);
-            } else {
-                logger.debug(prefix + " Url for package '" + packageName + "' is: " + url);
-            }
-        } */
+        /*
+         * If the exception is actually expected to occur by the calling code, the
+         * following output becomes misleading when reading the logs. if
+         * (logger.isDebugEnabled()) { if ("javadoc".equalsIgnoreCase(prefix)) {
+         * logger.debug("Javadoc Url for package '" + packageName + "' is: " + url); }
+         * else if ("doc".equalsIgnoreCase(prefix)) { logger.debug("Online Doc Url
+         * for package '" + packageName + "' is: " + url); } else {
+         * logger.debug(prefix + " Url for package '" + packageName + "' is: " +
+         * url); } }
+         */
         return url;
     }
 
-    private static String getUrl(String key, String packageName) {
+    private static String getUrl(String key, String packageName)
+    {
         String url = null;
-        if (!key.endsWith(".")) {
+        if (!key.endsWith("."))
+        {
             key += ".";
         }
-        while (packageName.length() > 0) {
+        while (packageName.length() > 0)
+        {
             url = errorDocs.getProperty(key + packageName, null);
-            if (url == null) {
+            if (url == null)
+            {
                 int i = packageName.lastIndexOf(".");
-                if (i == -1) {
+                if (i == -1)
+                {
                     packageName = "";
-                } else {
+                }
+                else
+                {
                     packageName = packageName.substring(0, i);
                 }
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
         return url;
     }
 
-    public static Throwable getRootException(Throwable t) {
+    public static Throwable getRootException(Throwable t)
+    {
         Throwable cause = t;
         Throwable root = null;
-        while (cause != null) {
+        while (cause != null)
+        {
             root = cause;
             cause = getExceptionReader(cause).getCause(cause);
         }
         return root;
     }
 
-    public static Throwable getRootParentException(Throwable t) {
+    public static Throwable getRootParentException(Throwable t)
+    {
         Throwable cause = t;
         Throwable parent = t;
-        while (cause != null) {
-            if (cause.getCause() == null) {
+        while (cause != null)
+        {
+            if (cause.getCause() == null)
+            {
                 return parent;
             }
             parent = cause;
@@ -311,62 +376,73 @@ public class ExceptionHelper {
         return t;
     }
 
-    public static UMOException getRootMuleException(Throwable t) {
+    public static UMOException getRootMuleException(Throwable t)
+    {
         Throwable cause = t;
         UMOException umoException = null;
-        while (cause != null) {
-            if (cause instanceof UMOException) {
-                umoException = (UMOException) cause;
+        while (cause != null)
+        {
+            if (cause instanceof UMOException)
+            {
+                umoException = (UMOException)cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
         }
         return umoException;
     }
 
-    public static List getExceptionsAsList(Throwable t) {
+    public static List getExceptionsAsList(Throwable t)
+    {
         List exceptions = new ArrayList();
         Throwable cause = t;
-        while (cause != null) {
+        while (cause != null)
+        {
             exceptions.add(0, cause);
             cause = getExceptionReader(cause).getCause(cause);
         }
         return exceptions;
     }
 
-    public static Map getExceptionInfo(Throwable t) {
+    public static Map getExceptionInfo(Throwable t)
+    {
         Map info = new HashMap();
         Throwable cause = t;
-        while (cause != null) {
+        while (cause != null)
+        {
             info.putAll(getExceptionReader(cause).getInfo(cause));
             cause = getExceptionReader(cause).getCause(cause);
         }
         return info;
     }
 
-    public static String getExceptionStack(Throwable t) {
+    public static String getExceptionStack(Throwable t)
+    {
         StringBuffer buf = new StringBuffer();
         // get exception stack
         List exceptions = getExceptionsAsList(t);
 
         int i = 1;
-        for (Iterator iterator = exceptions.iterator(); iterator.hasNext(); i++) {
-            if (i > exceptionThreshold && exceptionThreshold > 0) {
+        for (Iterator iterator = exceptions.iterator(); iterator.hasNext(); i++)
+        {
+            if (i > exceptionThreshold && exceptionThreshold > 0)
+            {
                 buf.append("(").append(exceptions.size() - i + 1).append(" more...)");
                 break;
             }
-            Throwable throwable = (Throwable) iterator.next();
+            Throwable throwable = (Throwable)iterator.next();
             ExceptionReader er = getExceptionReader(throwable);
             buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
-            if (verbose && throwable.getStackTrace().length > 0) {
+            if (verbose && throwable.getStackTrace().length > 0)
+            {
                 StackTraceElement e = throwable.getStackTrace()[0];
                 buf.append("  ")
-                        .append(e.getClassName())
-                        .append(":")
-                        .append(e.getLineNumber())
-                        .append(" (")
-                        .append(getJavaDocUrl(throwable.getClass()))
-                        .append(")\n");
+                    .append(e.getClassName())
+                    .append(":")
+                    .append(e.getLineNumber())
+                    .append(" (")
+                    .append(getJavaDocUrl(throwable.getClass()))
+                    .append(")\n");
             }
         }
         return buf.toString();
@@ -374,30 +450,36 @@ public class ExceptionHelper {
 
     /**
      * Registers an exception reader with Mule
-     *
+     * 
      * @param reader the reader to register.
      */
-    public static void registerExceptionReader(ExceptionReader reader) {
+    public static void registerExceptionReader(ExceptionReader reader)
+    {
         exceptionReaders.add(reader);
     }
 
     /**
      * Gets an exception reader for the exception
-     *
+     * 
      * @param t the exception to get a reader for
-     * @return either a specific reader or an instance of DefaultExceptionReader.  This method never returns null;
+     * @return either a specific reader or an instance of DefaultExceptionReader.
+     *         This method never returns null;
      */
-    public static ExceptionReader getExceptionReader(Throwable t) {
-        for (Iterator iterator = exceptionReaders.iterator(); iterator.hasNext();) {
-            ExceptionReader exceptionReader = (ExceptionReader) iterator.next();
-            if (exceptionReader.getExceptionType().isInstance(t)) {
+    public static ExceptionReader getExceptionReader(Throwable t)
+    {
+        for (Iterator iterator = exceptionReaders.iterator(); iterator.hasNext();)
+        {
+            ExceptionReader exceptionReader = (ExceptionReader)iterator.next();
+            if (exceptionReader.getExceptionType().isInstance(t))
+            {
                 return exceptionReader;
             }
         }
         return defaultExceptionReader;
     }
 
-    public static String writeException(Throwable t) {
+    public static String writeException(Throwable t)
+    {
         ExceptionReader er = getExceptionReader(t);
         StringBuffer msg = new StringBuffer();
         msg.append(er.getMessage(t)).append(". Type: ").append(t.getClass());

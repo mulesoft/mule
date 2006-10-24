@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.routing;
 
 import org.mule.umo.MessagingException;
@@ -34,8 +35,8 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
     UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
     /**
-     * A helper method for finding out which endpoints a message would be routed
-     * to without actually routing the the message
+     * A helper method for finding out which endpoints a message would be routed to
+     * without actually routing the the message
      * 
      * @param message the message to retrieve endpoints for
      * @return an array of UMOEndpoint objects or an empty array
@@ -45,6 +46,7 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
 
     /**
      * Determines if any endpoints have been set on this router
+     * 
      * @return
      */
     public boolean hasEndpoints();

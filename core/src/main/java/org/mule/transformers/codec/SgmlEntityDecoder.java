@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Decodes a string containing SGML entities
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,17 +38,26 @@ public class SgmlEntityDecoder extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if(src instanceof byte[]) {
-           if (encoding != null) {
-              try {
-                return SgmlCodec.decodeString(new String((byte[])src, encoding));
-              } catch (UnsupportedEncodingException ex){
-                return SgmlCodec.decodeString(new String((byte[])src));
-              }
-            } else {
-              return SgmlCodec.decodeString(new String((byte[])src));
+        if (src instanceof byte[])
+        {
+            if (encoding != null)
+            {
+                try
+                {
+                    return SgmlCodec.decodeString(new String((byte[])src, encoding));
+                }
+                catch (UnsupportedEncodingException ex)
+                {
+                    return SgmlCodec.decodeString(new String((byte[])src));
+                }
             }
-        } else {
+            else
+            {
+                return SgmlCodec.decodeString(new String((byte[])src));
+            }
+        }
+        else
+        {
             return SgmlCodec.decodeString(src.toString());
         }
     }

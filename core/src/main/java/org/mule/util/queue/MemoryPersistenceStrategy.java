@@ -42,7 +42,8 @@ public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
      */
     public Object store(String queue, Object obj) throws IOException
     {
-        if (obj == null) {
+        if (obj == null)
+        {
             throw new IllegalArgumentException("Cannot store null object.");
         }
         Object id = getId(obj);
@@ -100,7 +101,8 @@ public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
         // nothing to do
     }
 
-    public boolean isTransient() {
+    public boolean isTransient()
+    {
         return true;
     }
 }
