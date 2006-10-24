@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ejb;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -44,7 +45,8 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
 
     public void testQueryParams2() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=");
+        UMOEndpointURI url = new MuleEndpointURI(
+            "ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=");
         assertEquals("ejb", url.getScheme());
         assertEquals("ejb://localhost:1099", url.getAddress());
         assertEquals("/BeeShirtsejbServer", url.getPath());
@@ -52,8 +54,9 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
         assertEquals("ejbProvider", url.getEndpointName());
         assertEquals(1099, url.getPort());
         assertEquals("localhost", url.getHost());
-        assertEquals("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=",
-                     url.toString());
+        assertEquals(
+            "ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=",
+            url.toString());
         assertEquals("method=testMethod&endpointName=ejbProvider&blankParam=", url.getQuery());
         assertEquals(3, url.getParams().size());
         assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));

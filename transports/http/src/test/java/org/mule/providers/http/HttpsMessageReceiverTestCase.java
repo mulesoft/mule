@@ -42,7 +42,7 @@ public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
         return new HttpsMessageReceiver((AbstractConnector)endpoint.getConnector(),
-                (UMOComponent)mockComponent.proxy(), endpoint);
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

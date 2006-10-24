@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis;
 
 import org.mule.umo.UMOException;
@@ -15,8 +16,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>AxisMessageDispatcherFactory</code> creates an AxisMessageDispatcher,
- * used for making soap calls using the Axis stack.
+ * <code>AxisMessageDispatcherFactory</code> creates an AxisMessageDispatcher, used
+ * for making soap calls using the Axis stack.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

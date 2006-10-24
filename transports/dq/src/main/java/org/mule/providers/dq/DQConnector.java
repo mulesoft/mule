@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import com.ibm.as400.access.AS400;
@@ -25,9 +26,9 @@ import java.util.Map;
 
 /**
  * @author m999svm <p/> <code>DQConnector</code> A delegate provider that
- *         encapsulates a As400 DataQueue provider. The properties hostname,
- *         userId and password must be set for connection. The Message Queue
- *         location is the provider EndPoint.
+ *         encapsulates a As400 DataQueue provider. The properties hostname, userId
+ *         and password must be set for connection. The Message Queue location is the
+ *         provider EndPoint.
  */
 
 public class DQConnector extends AbstractServiceEnabledConnector
@@ -55,31 +56,35 @@ public class DQConnector extends AbstractServiceEnabledConnector
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         Map props = endpoint.getProperties();
-        if (props != null) {
+        if (props != null)
+        {
             // Override properties on the provider for the specific endpoint
-            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
-            if (tempPolling != null) {
+            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
+            if (tempPolling != null)
+            {
                 pollingFrequency = new Long(tempPolling);
             }
         }
-        if (pollingFrequency.longValue() <= 0) {
+        if (pollingFrequency.longValue() <= 0)
+        {
             pollingFrequency = new Long(DEFAULT_POLLING);
         }
         logger.debug("set polling frequency to: " + pollingFrequency);
 
         // TODO Can we include the Lib as part of the URI
-        String lib = (String) endpoint.getEndpointURI().getParams().get(LIB_PROPERTY);
+        String lib = (String)endpoint.getEndpointURI().getParams().get(LIB_PROPERTY);
         logger.debug("provider endpoint: " + endpoint.getName() + " - lib: " + lib);
         String name = "";
-        if (lib != null) {
+        if (lib != null)
+        {
             name = lib + "/";
         }
 
         name += endpoint.getEndpointURI().getAddress();
 
         DataQueue dq = new DataQueue(as400System, name);
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { pollingFrequency, dq,
-                as400System });
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{
+            pollingFrequency, dq, as400System});
 
     }
 
@@ -170,13 +175,17 @@ public class DQConnector extends AbstractServiceEnabledConnector
     {
         super.doInitialise();
         as400System = new AS400(hostname, username, password);
-        if (recordFormat != null) {
-            try {
+        if (recordFormat != null)
+        {
+            try
+            {
                 format = DQMessageUtils.getRecordFormat(recordFormat, as400System);
-            } catch (Exception e) {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: " + recordFormat),
-                                                  e,
-                                                  this);
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: "
+                                                                                      + recordFormat), e,
+                    this);
             }
 
         }

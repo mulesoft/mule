@@ -38,7 +38,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector connector = new FtpConnector();
         connector.setName("testFTP");
-        ((FtpConnector) connector).setPollingFrequency(POLLING_FREQUENCY);
+        ((FtpConnector)connector).setPollingFrequency(POLLING_FREQUENCY);
         connector.initialise();
 
         return connector;
@@ -59,14 +59,13 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testConnectorPollingFrequency() throws Exception
     {
-        FtpConnector connector = (FtpConnector) getConnector();
+        FtpConnector connector = (FtpConnector)getConnector();
 
         UMOEndpoint endpoint = getTestEndpoint("mock", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
         UMOComponent component = getTestComponent(descriptor);
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
-        assertEquals("Connector's polling frequency must not be ignored.",
-                     POLLING_FREQUENCY,
-                     ((FtpMessageReceiver) receiver).getFrequency());
+        assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
+            ((FtpMessageReceiver)receiver).getFrequency());
     }
 
     /**
@@ -74,7 +73,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testPollingFrequencyEndpointOverride() throws Exception
     {
-        FtpConnector connector = (FtpConnector) getConnector();
+        FtpConnector connector = (FtpConnector)getConnector();
 
         UMOEndpoint endpoint = getTestEndpoint("mock", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
 
@@ -85,8 +84,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
 
         UMOComponent component = getTestComponent(descriptor);
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
-        assertEquals("Polling frequency endpoint override must not be ignored.",
-                     POLLING_FREQUENCY_OVERRIDE,
-                     ((FtpMessageReceiver) receiver).getFrequency());
+        assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
+            ((FtpMessageReceiver)receiver).getFrequency());
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jdbc.xa;
 
 import javax.sql.XAConnection;
@@ -254,9 +255,8 @@ public class ConnectionWrapper implements Connection
     public Statement createStatement() throws SQLException
     {
         Statement st = con.createStatement();
-        return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-                                                  new Class[] { Statement.class },
-                                                  new StatementInvocationHandler(st));
+        return (Statement)Proxy.newProxyInstance(Statement.class.getClassLoader(),
+            new Class[]{Statement.class}, new StatementInvocationHandler(st));
     }
 
     /*
@@ -267,9 +267,8 @@ public class ConnectionWrapper implements Connection
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException
     {
         Statement st = con.createStatement(resultSetType, resultSetConcurrency);
-        return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-                                                  new Class[] { Statement.class },
-                                                  new StatementInvocationHandler(st));
+        return (Statement)Proxy.newProxyInstance(Statement.class.getClassLoader(),
+            new Class[]{Statement.class}, new StatementInvocationHandler(st));
     }
 
     /*
@@ -278,12 +277,11 @@ public class ConnectionWrapper implements Connection
      * @see java.sql.Connection#createStatement(int, int, int)
      */
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-            throws SQLException
+        throws SQLException
     {
         Statement st = con.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
-        return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-                                                  new Class[] { Statement.class },
-                                                  new StatementInvocationHandler(st));
+        return (Statement)Proxy.newProxyInstance(Statement.class.getClassLoader(),
+            new Class[]{Statement.class}, new StatementInvocationHandler(st));
     }
 
     /*
@@ -324,9 +322,8 @@ public class ConnectionWrapper implements Connection
     public CallableStatement prepareCall(String sql) throws SQLException
     {
         CallableStatement cs = con.prepareCall(sql);
-        return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-                                                          new Class[] { CallableStatement.class },
-                                                          new StatementInvocationHandler(cs));
+        return (CallableStatement)Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
+            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
     }
 
     /*
@@ -334,12 +331,12 @@ public class ConnectionWrapper implements Connection
      * 
      * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
      */
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
+        throws SQLException
     {
         CallableStatement cs = con.prepareCall(sql, resultSetType, resultSetConcurrency);
-        return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-                                                          new Class[] { CallableStatement.class },
-                                                          new StatementInvocationHandler(cs));
+        return (CallableStatement)Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
+            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
     }
 
     /*
@@ -353,9 +350,8 @@ public class ConnectionWrapper implements Connection
                                          int resultSetHoldability) throws SQLException
     {
         CallableStatement cs = con.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-        return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-                                                          new Class[] { CallableStatement.class },
-                                                          new StatementInvocationHandler(cs));
+        return (CallableStatement)Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
+            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
     }
 
     /*
@@ -366,9 +362,8 @@ public class ConnectionWrapper implements Connection
     public PreparedStatement prepareStatement(String sql) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement(sql);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     /*
@@ -379,9 +374,8 @@ public class ConnectionWrapper implements Connection
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement(sql, autoGeneratedKeys);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     /*
@@ -390,29 +384,27 @@ public class ConnectionWrapper implements Connection
      * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
      */
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-            throws SQLException
+        throws SQLException
     {
         PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int,
-     *      int)
+     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
      */
     public PreparedStatement prepareStatement(String sql,
                                               int resultSetType,
                                               int resultSetConcurrency,
                                               int resultSetHoldability) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency,
+            resultSetHoldability);
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     /*
@@ -423,9 +415,8 @@ public class ConnectionWrapper implements Connection
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement(sql, columnIndexes);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     /*
@@ -447,16 +438,17 @@ public class ConnectionWrapper implements Connection
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement(sql, columnNames);
-        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-                                                          new Class[] { PreparedStatement.class },
-                                                          new StatementInvocationHandler(ps));
+        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
     }
 
     protected void enlist() throws Exception
     {
-        if (tm != null && tx == null) {
+        if (tm != null && tx == null)
+        {
             tx = tm.getTransaction();
-            if (tx != null) {
+            if (tx != null)
+            {
                 tx.enlistResource(xaCon.getXAResource());
             }
         }
@@ -480,12 +472,16 @@ public class ConnectionWrapper implements Connection
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            if (method.getName().startsWith("execute")) {
+            if (method.getName().startsWith("execute"))
+            {
                 enlist();
             }
-            try {
+            try
+            {
                 return method.invoke(statement, args);
-            } catch (InvocationTargetException ex) {
+            }
+            catch (InvocationTargetException ex)
+            {
                 throw ex.getTargetException();
             }
         }

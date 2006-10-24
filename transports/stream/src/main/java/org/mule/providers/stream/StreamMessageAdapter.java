@@ -35,13 +35,14 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
         return message.toString();
     }
 
@@ -70,9 +71,12 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
      */
     private void setMessage(Object message) throws MessageTypeNotSupportedException
     {
-        if (message instanceof String) {
-            this.message = (String) message;
-        } else {
+        if (message instanceof String)
+        {
+            this.message = (String)message;
+        }
+        else
+        {
             throw new MessageTypeNotSupportedException(message, StreamMessageAdapter.class);
         }
     }

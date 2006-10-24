@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.providers.file;
 
 import org.mule.MuleManager;
@@ -27,7 +28,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  */
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "test-connector-config.xml";
     }
 
@@ -35,11 +37,11 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     {
         // TODO initialised wait?
         Thread.sleep(1000);
-        FileConnector c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
-        assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides()
-                                                                              .get("inbound.transformer"));
+        assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
+            "inbound.transformer"));
         assertNotNull(c.getDefaultInboundTransformer());
         assertNotNull(c.getDefaultOutboundTransformer());
         assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerializable);
@@ -48,15 +50,15 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides2() throws InterruptedException
     {
-        FileConnector c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector1");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector1");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
 
-        c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector2");
+        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
 
-        c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector3");
+        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector3");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
     }
@@ -68,25 +70,25 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
-        assertNull(((AbstractServiceEnabledConnector) endpoint.getConnector()).getServiceOverrides());
+        assertNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp", true);
 
-        FileConnector c = (FileConnector) MuleManager.getInstance().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         endpoint.setConnector(c);
 
         endpoint.initialise();
-        assertNotNull(((AbstractServiceEnabledConnector) endpoint.getConnector()).getServiceOverrides());
+        assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector3", true);
         endpoint.initialise();
-        assertNull(((AbstractServiceEnabledConnector) endpoint.getConnector()).getServiceOverrides());
+        assertNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector2", true);
         endpoint.initialise();
-        assertNotNull(((AbstractServiceEnabledConnector) endpoint.getConnector()).getServiceOverrides());
+        assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
     }
 }

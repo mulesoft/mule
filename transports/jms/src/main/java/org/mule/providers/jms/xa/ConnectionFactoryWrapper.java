@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jms.xa;
 
 import org.apache.commons.logging.Log;
@@ -46,7 +47,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
+public class ConnectionFactoryWrapper
+    implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
 {
 
     protected Object factory;
@@ -61,88 +63,84 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.ConnectionFactory#createConnection()
      */
     public Connection createConnection() throws JMSException
     {
-        XAConnection xac = ((XAConnectionFactory) factory).createXAConnection();
-        Connection proxy = (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                               new Class[] { Connection.class },
-                                                               new ConnectionInvocationHandler(xac));
+        XAConnection xac = ((XAConnectionFactory)factory).createXAConnection();
+        Connection proxy = (Connection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{Connection.class}, new ConnectionInvocationHandler(xac));
         return proxy;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.ConnectionFactory#createConnection(java.lang.String,
      *      java.lang.String)
      */
     public Connection createConnection(String username, String password) throws JMSException
     {
-        XAConnection xac = ((XAConnectionFactory) factory).createXAConnection(username, password);
-        Connection proxy = (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                               new Class[] { Connection.class },
-                                                               new ConnectionInvocationHandler(xac));
+        XAConnection xac = ((XAConnectionFactory)factory).createXAConnection(username, password);
+        Connection proxy = (Connection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{Connection.class}, new ConnectionInvocationHandler(xac));
         return proxy;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.QueueConnectionFactory#createQueueConnection()
      */
     public QueueConnection createQueueConnection() throws JMSException
     {
-        XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection();
-        QueueConnection proxy = (QueueConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[] { QueueConnection.class },
-                                                                         new ConnectionInvocationHandler(xaqc));
+        XAQueueConnection xaqc = ((XAQueueConnectionFactory)factory).createXAQueueConnection();
+        QueueConnection proxy = (QueueConnection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{QueueConnection.class}, new ConnectionInvocationHandler(xaqc));
         return proxy;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.QueueConnectionFactory#createQueueConnection(java.lang.String,
      *      java.lang.String)
      */
     public QueueConnection createQueueConnection(String username, String password) throws JMSException
     {
-        XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection(username, password);
-        QueueConnection proxy = (QueueConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[] { QueueConnection.class },
-                                                                         new ConnectionInvocationHandler(xaqc));
+        XAQueueConnection xaqc = ((XAQueueConnectionFactory)factory).createXAQueueConnection(username,
+            password);
+        QueueConnection proxy = (QueueConnection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{QueueConnection.class}, new ConnectionInvocationHandler(xaqc));
         return proxy;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.TopicConnectionFactory#createTopicConnection()
      */
     public TopicConnection createTopicConnection() throws JMSException
     {
-        XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection();
-        TopicConnection proxy = (TopicConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[] { TopicConnection.class },
-                                                                         new ConnectionInvocationHandler(xatc));
+        XATopicConnection xatc = ((XATopicConnectionFactory)factory).createXATopicConnection();
+        TopicConnection proxy = (TopicConnection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{TopicConnection.class}, new ConnectionInvocationHandler(xatc));
         return proxy;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.jms.TopicConnectionFactory#createTopicConnection(java.lang.String,
      *      java.lang.String)
      */
     public TopicConnection createTopicConnection(String username, String password) throws JMSException
     {
-        XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection(username, password);
-        TopicConnection proxy = (TopicConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[] { TopicConnection.class },
-                                                                         new ConnectionInvocationHandler(xatc));
+        XATopicConnection xatc = ((XATopicConnectionFactory)factory).createXATopicConnection(username,
+            password);
+        TopicConnection proxy = (TopicConnection)Proxy.newProxyInstance(Connection.class.getClassLoader(),
+            new Class[]{TopicConnection.class}, new ConnectionInvocationHandler(xatc));
         return proxy;
     }
 
@@ -158,34 +156,38 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
          *      java.lang.reflect.Method, java.lang.Object[])
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Invoking " + method);
             }
-            if (method.getName().equals("createSession")) {
-                XASession xas = ((XAConnection) xac).createXASession();
+            if (method.getName().equals("createSession"))
+            {
+                XASession xas = ((XAConnection)xac).createXASession();
+                return Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class},
+                    new SessionInvocationHandler(xas.getSession(), xas.getXAResource()));
+            }
+            else if (method.getName().equals("createQueueSession"))
+            {
+                XAQueueSession xaqs = ((XAQueueConnection)xac).createXAQueueSession();
                 return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                        new Class[] { Session.class },
-                                                        new SessionInvocationHandler(xas.getSession(),
-                                                                                     xas.getXAResource()));
-            } else if (method.getName().equals("createQueueSession")) {
-                XAQueueSession xaqs = ((XAQueueConnection) xac).createXAQueueSession();
+                    new Class[]{QueueSession.class}, new SessionInvocationHandler(xaqs.getQueueSession(),
+                        xaqs.getXAResource()));
+            }
+            else if (method.getName().equals("createTopicSession"))
+            {
+                XATopicSession xats = ((XATopicConnection)xac).createXATopicSession();
                 return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                        new Class[] { QueueSession.class },
-                                                        new SessionInvocationHandler(xaqs.getQueueSession(),
-                                                                                     xaqs.getXAResource()));
-            } else if (method.getName().equals("createTopicSession")) {
-                XATopicSession xats = ((XATopicConnection) xac).createXATopicSession();
-                return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                        new Class[] { TopicSession.class },
-                                                        new SessionInvocationHandler(xats.getTopicSession(),
-                                                                                     xats.getXAResource()));
-            } else {
+                    new Class[]{TopicSession.class}, new SessionInvocationHandler(xats.getTopicSession(),
+                        xats.getXAResource()));
+            }
+            else
+            {
                 return method.invoke(xac, args);
             }
         }
@@ -205,62 +207,72 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
              *      java.lang.reflect.Method, java.lang.Object[])
              */
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
             {
-                if (logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("Invoking " + method);
                 }
                 Object result = method.invoke(session, args);
-                
-                if (result instanceof TopicSubscriber) {
+
+                if (result instanceof TopicSubscriber)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { TopicSubscriber.class },
-                                                    new ConsumerProducerInvocationHandler(result));
-                } else if (result instanceof QueueReceiver) {
+                        new Class[]{TopicSubscriber.class}, new ConsumerProducerInvocationHandler(result));
+                }
+                else if (result instanceof QueueReceiver)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { QueueReceiver.class },
-                                                    new ConsumerProducerInvocationHandler(result));
-                } else if (result instanceof MessageConsumer) {
+                        new Class[]{QueueReceiver.class}, new ConsumerProducerInvocationHandler(result));
+                }
+                else if (result instanceof MessageConsumer)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { MessageConsumer.class },
-                                                    new ConsumerProducerInvocationHandler(result));
-                } else if (result instanceof TopicPublisher) {
+                        new Class[]{MessageConsumer.class}, new ConsumerProducerInvocationHandler(result));
+                }
+                else if (result instanceof TopicPublisher)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { TopicPublisher.class },
-                                                    new ConsumerProducerInvocationHandler(result));
-                } else if (result instanceof QueueSender) {
+                        new Class[]{TopicPublisher.class}, new ConsumerProducerInvocationHandler(result));
+                }
+                else if (result instanceof QueueSender)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { QueueSender.class },
-                                                    new ConsumerProducerInvocationHandler(result));
-                } else if (result instanceof MessageProducer) {
+                        new Class[]{QueueSender.class}, new ConsumerProducerInvocationHandler(result));
+                }
+                else if (result instanceof MessageProducer)
+                {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                    new Class[] { MessageProducer.class },
-                                                    new ConsumerProducerInvocationHandler(result));
+                        new Class[]{MessageProducer.class}, new ConsumerProducerInvocationHandler(result));
                 }
                 return result;
             }
 
             protected void enlist() throws Exception
             {
-                if (logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("Enlistment request: " + this);
                 }
-                if (tx == null && tm != null) {
+                if (tx == null && tm != null)
+                {
                     tx = tm.getTransaction();
-                    if (tx != null) {
-                        if (logger.isDebugEnabled()) {
+                    if (tx != null)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
                             logger.debug("Enlisting resource in xa transaction: " + xares);
                         }
-                        XAResource xares = (XAResource) Proxy.newProxyInstance(XAResource.class.getClassLoader(),
-                                                                               new Class[] { XAResource.class },
-                                                                               new XAResourceInvocationHandler());
+                        XAResource xares = (XAResource)Proxy.newProxyInstance(
+                            XAResource.class.getClassLoader(), new Class[]{XAResource.class},
+                            new XAResourceInvocationHandler());
                         tx.enlistResource(xares);
                     }
-                }                
+                }
             }
 
             protected class XAResourceInvocationHandler implements InvocationHandler
@@ -268,46 +280,54 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
                 /*
                  * (non-Javadoc)
-                 *
+                 * 
                  * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
                  *      java.lang.reflect.Method, java.lang.Object[])
                  */
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
                 {
-                    try {
-                        if (logger.isDebugEnabled()) {
+                    try
+                    {
+                        if (logger.isDebugEnabled())
+                        {
                             logger.debug("Invoking " + method);
                         }
-                        if (method.getName().equals("end")) {
+                        if (method.getName().equals("end"))
+                        {
                             tx = null;
                         }
-                        
+
                         /*
-                         * This has been added, since JOTM checks if the resource has actually
-                         * been enlisted & tries to compare two proxy classes with eachother.
-                         * Since the equals method is proxied, it will effectivly compare a proxy
-                         * with the ConnectionFactory & this will fail. To solve this, if the object
-                         * passed as a parameter is actually another proxy, call equals on the proxy
-                         * passing this class as a parameter, effictively we would be comparing the two
+                         * This has been added, since JOTM checks if the resource has
+                         * actually been enlisted & tries to compare two proxy
+                         * classes with eachother. Since the equals method is
+                         * proxied, it will effectivly compare a proxy with the
+                         * ConnectionFactory & this will fail. To solve this, if the
+                         * object passed as a parameter is actually another proxy,
+                         * call equals on the proxy passing this class as a
+                         * parameter, effictively we would be comparing the two
                          * proxied classes.
                          */
-                        if(method.getName().equals("equals"))
+                        if (method.getName().equals("equals"))
                         {
-                            if(Proxy.isProxyClass(args[0].getClass()))
+                            if (Proxy.isProxyClass(args[0].getClass()))
                             {
                                 return new Boolean(args[0].equals(this));
-                            }else
+                            }
+                            else
                             {
                                 return new Boolean(this.equals(args[0]));
                             }
                         }
-                        
+
                         return method.invoke(xares, args);
-                    } catch (InvocationTargetException e) {
+                    }
+                    catch (InvocationTargetException e)
+                    {
                         throw e.getCause();
                     }
                 }
-                
+
             }
 
             protected class ConsumerProducerInvocationHandler implements InvocationHandler
@@ -322,16 +342,18 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
                 /*
                  * (non-Javadoc)
-                 *
+                 * 
                  * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
                  *      java.lang.reflect.Method, java.lang.Object[])
                  */
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
                 {
-                    if (logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled())
+                    {
                         logger.debug("Invoking " + method);
                     }
-                    if (!method.getName().equals("close")) {
+                    if (!method.getName().equals("close"))
+                    {
                         enlist();
                     }
                     return method.invoke(target, args);

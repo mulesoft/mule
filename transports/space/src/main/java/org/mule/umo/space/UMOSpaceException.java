@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.space;
 
 import org.mule.config.i18n.Message;
@@ -14,7 +15,7 @@ import org.mule.umo.UMOException;
 
 /**
  * A base exception for all space related exceptions
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

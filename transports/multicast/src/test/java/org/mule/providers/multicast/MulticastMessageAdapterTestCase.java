@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
@@ -37,7 +38,7 @@ public class MulticastMessageAdapterTestCase extends AbstractMessageAdapterTestC
         Object message = getValidMessage();
         UMOMessageAdapter adapter = createAdapter(message);
 
-        assertEquals(new String(((DatagramPacket) message).getData()), adapter.getPayloadAsString());
+        assertEquals(new String(((DatagramPacket)message).getData()), adapter.getPayloadAsString());
         byte[] bytes = adapter.getPayloadAsBytes();
         assertNotNull(bytes);
 
@@ -46,10 +47,13 @@ public class MulticastMessageAdapterTestCase extends AbstractMessageAdapterTestC
 
         assertNotNull(adapter.getPayload());
 
-        try {
+        try
+        {
             adapter = createAdapter(getInvalidMessage());
             fail("Message adapter should throw exception if an invalid messgae is set");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
     }

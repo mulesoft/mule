@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.xmpp;
 
 import org.jivesoftware.smack.PacketListener;
@@ -33,7 +34,8 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
 /**
- * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over xmpp
+ * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over
+ * xmpp
  * 
  * @author Peter Braswell
  * @author John Evans
@@ -45,32 +47,38 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     private XMPPConnection xmppConnection = null;
 
     public XmppMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
     }
 
     public void doConnect() throws Exception
     {
-        try {
-            XmppConnector cnn = (XmppConnector) connector;
+        try
+        {
+            XmppConnector cnn = (XmppConnector)connector;
             xmppConnection = cnn.createXmppConnection(endpoint.getEndpointURI());
-            if (endpoint.getFilter() instanceof PacketFilter) {
-                xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
-            } else {
+            if (endpoint.getFilter() instanceof PacketFilter)
+            {
+                xmppConnection.addPacketListener(this, (PacketFilter)endpoint.getFilter());
+            }
+            else
+            {
                 PacketFilter filter = new PacketTypeFilter(Message.class);
                 xmppConnection.addPacketListener(this, filter);
             }
-        } catch (XMPPException e) {
-            throw new ConnectException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "XMPP Connection"),
-                                       e,
-                                       this);
+        }
+        catch (XMPPException e)
+        {
+            throw new ConnectException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
+                "XMPP Connection"), e, this);
         }
     }
 
     public void doDisconnect() throws Exception
     {
-        if (xmppConnection != null) {
+        if (xmppConnection != null)
+        {
             xmppConnection.removePacketListener(this);
             xmppConnection.close();
         }
@@ -93,9 +101,12 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     {
         logger.debug("processing packet: " + packet.toXML());
         Work work = createWork(packet);
-        try {
+        try
+        {
             getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
-        } catch (WorkException e) {
+        }
+        catch (WorkException e)
+        {
             logger.error("Xmpp Server receiver work failed: " + e.getMessage(), e);
         }
     }
@@ -114,18 +125,23 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
          */
         public void run()
         {
-            try {
+            try
+            {
                 logger.info("processing xmpp packet from: " + packet.getFrom());
                 UMOMessageAdapter adapter = connector.getMessageAdapter(packet);
                 logger.info("UMOMessageAdapter is a: " + adapter.getClass().getName());
                 UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
 
-                if (returnMessage != null && packet instanceof Message) {
+                if (returnMessage != null && packet instanceof Message)
+                {
                     RequestContext.rewriteEvent(returnMessage);
-                    Packet result = (Packet)connector.getDefaultResponseTransformer().transform(returnMessage.getPayload());
+                    Packet result = (Packet)connector.getDefaultResponseTransformer().transform(
+                        returnMessage.getPayload());
                     xmppConnection.sendPacket(result);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 handleException(e);
             }
         }

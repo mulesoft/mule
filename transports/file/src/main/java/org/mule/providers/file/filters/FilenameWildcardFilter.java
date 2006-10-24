@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.file.filters;
 
 import org.apache.commons.logging.Log;
@@ -19,8 +20,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * <code>FilenameWildcardFilter</code> Filters the incoming files from the
- * read From directory, based on file patterns
+ * <code>FilenameWildcardFilter</code> Filters the incoming files from the read
+ * From directory, based on file patterns
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -53,14 +54,17 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
      */
     public boolean accept(File dir, String name)
     {
-        if (name == null) {
+        if (name == null)
+        {
             logger.warn("The filename and or directory was null");
             return false;
-        } else {
+        }
+        else
+        {
             return accept(name);
         }
     }
-    
+
     public boolean accept(UMOMessage message)
     {
         return accept(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));

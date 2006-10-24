@@ -33,13 +33,13 @@ public class ResponseWriter extends FilterWriter
     }
 
     public ResponseWriter(final OutputStream outStream, final String encoding)
-            throws UnsupportedEncodingException
+        throws UnsupportedEncodingException
     {
         this(outStream, CRLF, encoding);
     }
 
     public ResponseWriter(final OutputStream outStream, final String lineSeparator, final String encoding)
-            throws UnsupportedEncodingException
+        throws UnsupportedEncodingException
     {
         super(new BufferedWriter(new OutputStreamWriter(outStream, encoding)));
         this.outStream = outStream;
@@ -53,7 +53,8 @@ public class ResponseWriter extends FilterWriter
 
     public void close() throws IOException
     {
-        if (outStream != null) {
+        if (outStream != null)
+        {
             super.close();
             outStream = null;
         }
@@ -66,7 +67,8 @@ public class ResponseWriter extends FilterWriter
      */
     public void flush() throws IOException
     {
-        if (outStream != null) {
+        if (outStream != null)
+        {
             super.flush();
             outStream.flush();
         }
@@ -92,7 +94,8 @@ public class ResponseWriter extends FilterWriter
 
     public void print(String s) throws IOException
     {
-        if (s == null) {
+        if (s == null)
+        {
             s = "null";
         }
         write(s);

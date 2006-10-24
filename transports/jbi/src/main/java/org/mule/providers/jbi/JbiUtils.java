@@ -29,23 +29,28 @@ import java.util.Map;
 
 /**
  * Useful for converting message types
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JbiUtils {
+public class JbiUtils
+{
 
-    public static UMOMessage createMessage(NormalizedMessage message) throws MessagingException {
+    public static UMOMessage createMessage(NormalizedMessage message) throws MessagingException
+    {
 
         Map properties = new HashMap();
-        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
+        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+        {
+            String s = (String)iterator.next();
             properties.put(s, message.getProperty(s));
         }
-        if (message.getSecuritySubject() != null) {
+        if (message.getSecuritySubject() != null)
+        {
             properties.put(MuleProperties.MULE_USER_PROPERTY, message.getSecuritySubject());
         }
-        try {
+        try
+        {
             // TODO source transformer
             Source source = message.getContent();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -54,25 +59,34 @@ public class JbiUtils {
             UMOMessage msg = new MuleMessage(baos.toByteArray(), properties);
             baos.close();
             return msg;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new MessagingException(e.getMessage(), e);
         }
     }
 
-    public static void populateNormalizedMessage(UMOMessage muleMessage, NormalizedMessage message) throws MessagingException {
-        try {
+    public static void populateNormalizedMessage(UMOMessage muleMessage, NormalizedMessage message)
+        throws MessagingException
+    {
+        try
+        {
             message.setContent(new StreamSource(new ByteArrayInputStream(muleMessage.getPayloadAsBytes())));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new MessagingException(e.getMessage(), e);
         }
 
-        for (Iterator iterator = muleMessage.getPropertyNames().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = muleMessage.getPropertyNames().iterator(); iterator.hasNext();)
+        {
             String s = (String)iterator.next();
             message.setProperty(s, muleMessage.getProperty(s));
         }
 
-        for (Iterator iterator = muleMessage.getAttachmentNames().iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
+        for (Iterator iterator = muleMessage.getAttachmentNames().iterator(); iterator.hasNext();)
+        {
+            String s = (String)iterator.next();
             message.addAttachment(s, muleMessage.getAttachment(s));
         }
     }

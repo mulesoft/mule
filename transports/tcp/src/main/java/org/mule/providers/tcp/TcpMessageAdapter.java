@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp;
 
 import org.mule.providers.AbstractMessageAdapter;
@@ -31,22 +32,26 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
 
     public TcpMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof byte[]) {
-            this.message = (byte[]) message;
-        } else {
+        if (message instanceof byte[])
+        {
+            this.message = (byte[])message;
+        }
+        else
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
         return new String(message, encoding);
     }
 

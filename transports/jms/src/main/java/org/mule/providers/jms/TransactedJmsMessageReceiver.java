@@ -58,7 +58,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     {
         public JmsThreadContext getContext()
         {
-            return (JmsThreadContext) get();
+            return (JmsThreadContext)get();
         }
 
         protected Object initialValue()
@@ -68,22 +68,25 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     }
 
     public TransactedJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint, new Long(0));
-        this.connector = (JmsConnector) connector;
+        this.connector = (JmsConnector)connector;
 
         this.frequency = endpoint.getTransactionConfig().getTimeout();
         // If reconnection is set, default reuse strategy to false
         // as some jms brokers will not detect lost connections if the
         // same consumer / session is used
-        if (this.connectionStrategy instanceof SingleAttemptConnectionStrategy) {
+        if (this.connectionStrategy instanceof SingleAttemptConnectionStrategy)
+        {
             this.reuseConsumer = true;
             this.reuseSession = true;
         }
         // User may override reuse strategy if necessary
-        this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer", this.reuseConsumer);
-        this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession", this.reuseSession);
+        this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer",
+            this.reuseConsumer);
+        this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession",
+            this.reuseSession);
 
         // Check if the destination is a queue and
         // if we are in transactional mode.
@@ -92,14 +95,18 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
         boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
 
-        //If we're using topics We dont want to use multiple receivers as we'll get the same message
-        //multiple times
+        // If we're using topics We dont want to use multiple receivers as we'll get
+        // the same message
+        // multiple times
         useMultipleReceivers = !topic;
 
-        try {
+        try
+        {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(e, this);
         }
 
@@ -107,20 +114,24 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     public void doConnect() throws Exception
     {
-        if (connector.isConnected()) {
-            //TODO Fix Bug
-            
-            //creating this consumer now would prevent from the actual worker consumer
-            //to receive the message!
-            //createConsumer();
-            //if we comment this line, if one tries to restart the service through JMX,
-            //this will fail...
+        if (connector.isConnected())
+        {
+            // TODO Fix Bug
+
+            // creating this consumer now would prevent from the actual worker
+            // consumer
+            // to receive the message!
+            // createConsumer();
+            // if we comment this line, if one tries to restart the service through
+            // JMX,
+            // this will fail...
         }
     }
 
     public void doDisconnect() throws Exception
     {
-        if (connector.isConnected()) {
+        if (connector.isConnected())
+        {
             closeConsumer(true);
         }
     }
@@ -130,28 +141,33 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
      */
     public void poll() throws Exception
     {
-        try {
+        try
+        {
             JmsThreadContext ctx = context.getContext();
             // Create consumer if necessary
-            if (ctx.consumer == null) {
+            if (ctx.consumer == null)
+            {
                 createConsumer();
             }
             // Do polling
             super.poll();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // Force consumer to close
             closeConsumer(true);
             throw e;
-        } finally {
+        }
+        finally
+        {
             // Close consumer if necessary
             closeConsumer(false);
         }
     }
 
-
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#getMessages()
      */
     protected List getMessages() throws Exception
@@ -161,24 +177,33 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         JmsThreadContext ctx = context.getContext();
 
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null) {
+        if (tx != null)
+        {
             tx.bindResource(connector.getConnection(), ctx.session);
         }
 
         // Retrieve message
         Message message = null;
-        try {
+        try
+        {
             message = ctx.consumer.receive(frequency);
-        } catch (JMSException e) {
-            //If we're being disconnected, ignore the exception
-            if(!this.isConnected()) {
-                //ignore
-            } else {
+        }
+        catch (JMSException e)
+        {
+            // If we're being disconnected, ignore the exception
+            if (!this.isConnected())
+            {
+                // ignore
+            }
+            else
+            {
                 throw e;
             }
         }
-        if (message == null) {
-            if (tx != null) {
+        if (message == null)
+        {
+            if (tx != null)
+            {
                 tx.setRollbackOnly();
             }
             return null;
@@ -186,27 +211,34 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         message = connector.preProcessMessage(message, ctx.session);
 
         // Process message
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Message received it is of type: " + message.getClass().getName());
-            if (message.getJMSDestination() != null) {
+            if (message.getJMSDestination() != null)
+            {
                 logger.debug("Message received on " + message.getJMSDestination() + " ("
-                        + message.getJMSDestination().getClass().getName() + ")");
-            } else {
+                             + message.getJMSDestination().getClass().getName() + ")");
+            }
+            else
+            {
                 logger.debug("Message received on unknown destination");
             }
             logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
             logger.debug("Jms Message Id is: " + message.getJMSMessageID());
         }
 
-        if (message.getJMSRedelivered()) {
-            if (logger.isDebugEnabled()) {
+        if (message.getJMSRedelivered())
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                        + " is redelivered. handing off to Exception Handler");
+                             + " is redelivered. handing off to Exception Handler");
             }
             redeliveryHandler.handleRedelivery(message);
         }
 
-        if (tx instanceof JmsClientAcknowledgeTransaction) {
+        if (tx instanceof JmsClientAcknowledgeTransaction)
+        {
             tx.bindResource(message, null);
         }
 
@@ -217,7 +249,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
      */
     protected void processMessage(Object msg) throws Exception
@@ -229,17 +261,20 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     protected void closeConsumer(boolean force)
     {
         JmsThreadContext ctx = context.getContext();
-        if (ctx == null) {
+        if (ctx == null)
+        {
             return;
         }
         // Close consumer
-        if (force || !reuseSession || !reuseConsumer) {
+        if (force || !reuseSession || !reuseConsumer)
+        {
             connector.closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
         // Do not close session if a transaction is in progress
         // the session will be close by the transaction
-        if (force || !reuseSession) {
+        if (force || !reuseSession)
+        {
             connector.closeQuietly(ctx.session);
             ctx.session = null;
         }
@@ -247,50 +282,61 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /**
      * Create a consumer for the jms destination
-     *
+     * 
      * @throws Exception
      */
     protected void createConsumer() throws Exception
     {
-        try {
+        try
+        {
             JmsSupport jmsSupport = this.connector.getJmsSupport();
             JmsThreadContext ctx = context.getContext();
             // Create session if none exists
-            if (ctx.session == null) {
+            if (ctx.session == null)
+            {
                 ctx.session = this.connector.getSession(endpoint);
             }
 
             // Create destination
             String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
             boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
-            Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI().getAddress(), topic);
+            Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI()
+                .getAddress(), topic);
 
             // Extract jms selector
             String selector = null;
-            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-            } else if (endpoint.getProperties() != null) {
+            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+            {
+                selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
+            }
+            else if (endpoint.getProperties() != null)
+            {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
-                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
-            String tempDurable = (String) endpoint.getProperties().get("durable");
+            String tempDurable = (String)endpoint.getProperties().get("durable");
             boolean durable = connector.isDurable();
-            if (tempDurable != null) {
+            if (tempDurable != null)
+            {
                 durable = Boolean.valueOf(tempDurable).booleanValue();
             }
 
             // Get the durable subscriber name if there is one
-            String durableName = (String) endpoint.getProperties().get("durableName");
-            if (durableName == null && durable && dest instanceof Topic) {
+            String durableName = (String)endpoint.getProperties().get("durableName");
+            if (durableName == null && durable && dest instanceof Topic)
+            {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                        + durableName);
+                             + durableName);
             }
 
             // Create consumer
-            ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(), durableName, topic);
-        } catch (JMSException e) {
+            ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(),
+                durableName, topic);
+        }
+        catch (JMSException e)
+        {
             throw new ConnectException(e, this);
         }
     }

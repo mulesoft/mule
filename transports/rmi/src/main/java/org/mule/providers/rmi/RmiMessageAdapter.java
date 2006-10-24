@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractMessageAdapter;
@@ -27,29 +28,28 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
 
     public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
-        if (message == null) {
+        if (message == null)
+        {
             throw new MessageTypeNotSupportedException(null, getClass());
         }
         this.message = message;
     }
 
-    
-
-    public byte[] getPayloadAsBytes() throws Exception {
+    public byte[] getPayloadAsBytes() throws Exception
+    {
         return convertToBytes(getPayload());
     }
 
-
-
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
         return message.toString();
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ejb;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -35,7 +36,7 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        EjbConnector c = (EjbConnector) connector;
+        EjbConnector c = (EjbConnector)connector;
 
         String securityPolicy = "rmi.policy";
         String serverCodebase = "file:///E:/projects/MyTesting/JAVA/rmi/classes/";

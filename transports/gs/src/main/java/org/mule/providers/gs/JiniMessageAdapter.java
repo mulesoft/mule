@@ -23,7 +23,6 @@ import org.mule.util.UUID;
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.
  * 
  * @see Entry
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -81,7 +80,7 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
             // accept or default
             this.setEncoding(StringUtils.defaultIfEmpty(jm.getEncoding(), MuleManager.getConfiguration()
-                    .getEncoding()));
+                .getEncoding()));
 
             // accept null
             this.setExceptionPayload(jm.getExceptionPayload());
@@ -98,12 +97,10 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
     /**
      * Converts the message implementation into a String representation
      * 
-     * @param encoding
-     *            The encoding to use when transforming the message (if necessary).
-     *            The parameter is used when converting from a byte array
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception
     {

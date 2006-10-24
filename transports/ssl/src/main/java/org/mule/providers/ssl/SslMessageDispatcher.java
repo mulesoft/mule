@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import java.io.IOException;
@@ -22,8 +23,7 @@ import org.mule.providers.tcp.TcpMessageDispatcher;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>TcpMessageDispatcher</code> will send transformed mule events over
- * tcp.
+ * <code>TcpMessageDispatcher</code> will send transformed mule events over tcp.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -36,21 +36,29 @@ public class SslMessageDispatcher extends TcpMessageDispatcher
         super(endpoint);
     }
 
-    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException {
-        SslConnector conn = (SslConnector) getConnector();
+    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
+    {
+        SslConnector conn = (SslConnector)getConnector();
         SSLContext context;
-        try {
+        try
+        {
             context = SSLContext.getInstance(conn.getProtocol());
-            context.init(conn.getKeyManagerFactory().getKeyManagers(), conn.getTrustManagerFactory().getTrustManagers(), null);
-        } catch (NoSuchAlgorithmException e) {
+            context.init(conn.getKeyManagerFactory().getKeyManagers(), conn.getTrustManagerFactory()
+                .getTrustManagers(), null);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
             throw new IOException(e.getMessage());
-        } catch (KeyManagementException e) {
+        }
+        catch (KeyManagementException e)
+        {
             throw new IOException(e.getMessage());
         }
 
         SocketFactory factory = context.getSocketFactory();
-        SSLSocket socket = (SSLSocket) factory.createSocket(inetAddress, port);
-        // startHandshake() will reset the current trust and initiate a new negotiation
+        SSLSocket socket = (SSLSocket)factory.createSocket(inetAddress, port);
+        // startHandshake() will reset the current trust and initiate a new
+        // negotiation
         // socket.startHandshake();
         return socket;
     }

@@ -51,39 +51,50 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     public HttpRequestMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof HttpServletRequest) {
+        if (message instanceof HttpServletRequest)
+        {
             setPayload((HttpServletRequest)message);
             final Map parameterMap = request.getParameterMap();
-            if (parameterMap != null && parameterMap.size() > 0) {
-                for (Iterator iterator = parameterMap.entrySet().iterator(); iterator.hasNext();) {
-                    Map.Entry entry = (Map.Entry) iterator.next();
+            if (parameterMap != null && parameterMap.size() > 0)
+            {
+                for (Iterator iterator = parameterMap.entrySet().iterator(); iterator.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry)iterator.next();
                     String key = (String)entry.getKey();
                     Object value = entry.getValue();
-                    if(value != null) {
-                        if(value.getClass().isArray() && ((Object[])value).length==1) {
+                    if (value != null)
+                    {
+                        if (value.getClass().isArray() && ((Object[])value).length == 1)
+                        {
                             setProperty(key, ((Object[])value)[0]);
-                        } else {
+                        }
+                        else
+                        {
                             setProperty(key, value);
                         }
                     }
                 }
             }
             String key;
-            for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+            for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();)
+            {
                 key = (String)e.nextElement();
                 properties.put(key, request.getAttribute(key));
             }
             String realKey;
-            for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
+            for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();)
+            {
                 key = (String)e.nextElement();
                 realKey = key;
-                if(key.startsWith(HttpConstants.X_PROPERTY_PREFIX)) {
+                if (key.startsWith(HttpConstants.X_PROPERTY_PREFIX))
+                {
                     realKey = key.substring(2);
                 }
                 setProperty(realKey, request.getHeader(key));
             }
         }
-        else {
+        else
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
@@ -110,10 +121,12 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if (isBinary()) {
+        if (isBinary())
+        {
             return (byte[])message;
         }
-        else {
+        else
+        {
             return ((String)message).getBytes();
         }
     }
@@ -121,20 +134,19 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     /**
      * Converts the message implementation into a String representation
      * 
-     * @param encoding
-     *            The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte
-     *            array
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        if (isBinary()) {
+        if (isBinary())
+        {
             return new String((byte[])message, encoding);
         }
-        else {
+        else
+        {
             return (String)message;
         }
     }
@@ -146,52 +158,59 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      */
     private void setPayload(HttpServletRequest message) throws MessagingException
     {
-        try {
+        try
+        {
 
             request = message;
-//            String httpRequest = null;
-//            httpRequest = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getServletPath();
-//            httpRequest += request.getPathInfo();
-//            if(StringUtils.isNotBlank(request.getQueryString())) {
-//                httpRequest += "?" + request.getQueryString();
-//            }
-//            setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, httpRequest);
-//            this.message = httpRequest;
-            
+            // String httpRequest = null;
+            // httpRequest = request.getScheme() + "://" + request.getServerName() +
+            // ":" + request.getServerPort() + request.getServletPath();
+            // httpRequest += request.getPathInfo();
+            // if(StringUtils.isNotBlank(request.getQueryString())) {
+            // httpRequest += "?" + request.getQueryString();
+            // }
+            // setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, httpRequest);
+            // this.message = httpRequest;
+
             // Check if a payload parameter has been set, if so use it
             // otherwise we'll use the request payload
-            String payloadParam = (String)request
-                    .getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
+            String payloadParam = (String)request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
 
-            if (payloadParam == null) {
+            if (payloadParam == null)
+            {
                 payloadParam = AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME;
             }
             String payload = request.getParameter(payloadParam);
-            if (payload == null) {
-                if (isText(request.getContentType())) {
+            if (payload == null)
+            {
+                if (isText(request.getContentType()))
+                {
                     BufferedReader reader = request.getReader();
                     StringBuffer buffer = new StringBuffer(8192);
                     String line = reader.readLine();
-                    while (line != null) {
+                    while (line != null)
+                    {
                         buffer.append(line);
                         line = reader.readLine();
-                        if(line!=null) buffer.append(SystemUtils.LINE_SEPARATOR);
+                        if (line != null) buffer.append(SystemUtils.LINE_SEPARATOR);
                     }
                     this.message = buffer.toString();
                 }
-                else {
+                else
+                {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                     IOUtils.copy(request.getInputStream(), baos);
                     this.message = baos.toByteArray();
                 }
             }
-            else {
+            else
+            {
                 this.message = payload;
             }
         }
-        catch (IOException e) {
-            throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()),
-                    e);
+        catch (IOException e)
+        {
+            throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()), e);
         }
     }
 
@@ -200,45 +219,49 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         return request;
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
 
         HttpSession session = null;
 
-        try {
-            // We wrap this call as on some App Servers (Websfear) it can cause an NPE
+        try
+        {
+            // We wrap this call as on some App Servers (Websfear) it can cause an
+            // NPE
             session = getRequest().getSession();
         }
-        catch (Exception e) {
-            throw new UniqueIdNotSupportedException(this,
-                    new Message(Messages.X_IS_NULL, "Http session"));
+        catch (Exception e)
+        {
+            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
         }
-        if (session == null) {
-            throw new UniqueIdNotSupportedException(this,
-                    new Message(Messages.X_IS_NULL, "Http session"));
+        if (session == null)
+        {
+            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
         }
         return session.getId();
     }
 
     protected boolean isText(String contentType)
     {
-        if (contentType == null) {
+        if (contentType == null)
+        {
             return true;
         }
         return (contentType.startsWith("text/"));
     }
 
     /**
-     * Sets a replyTo address for this message. This is useful in an
-     * asynchronous environment where the caller doesn't wait for a response and
-     * the response needs to be routed somewhere for further processing. The
-     * value of this field can be any valid endpointUri url.
+     * Sets a replyTo address for this message. This is useful in an asynchronous
+     * environment where the caller doesn't wait for a response and the response
+     * needs to be routed somewhere for further processing. The value of this field
+     * can be any valid endpointUri url.
      * 
-     * @param replyTo
-     *            the endpointUri url to reply to
+     * @param replyTo the endpointUri url to reply to
      */
     public void setReplyTo(Object replyTo)
     {
-        if (replyTo != null && replyTo.toString().startsWith("http")) {
+        if (replyTo != null && replyTo.toString().startsWith("http"))
+        {
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
         setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, replyTo);
@@ -246,17 +269,18 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * Sets a replyTo address for this message. This is useful in an
-     * asynchronous environment where the caller doesn't wait for a response and
-     * the response needs to be routed somewhere for further processing. The
-     * value of this field can be any valid endpointUri url.
+     * Sets a replyTo address for this message. This is useful in an asynchronous
+     * environment where the caller doesn't wait for a response and the response
+     * needs to be routed somewhere for further processing. The value of this field
+     * can be any valid endpointUri url.
      * 
      * @return the endpointUri url to reply to or null if one has not been set
      */
     public Object getReplyTo()
     {
         String replyto = (String)getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (replyto == null) {
+        if (replyto == null)
+        {
             replyto = (String)getProperty(HttpConstants.HEADER_LOCATION);
         }
         return replyto;

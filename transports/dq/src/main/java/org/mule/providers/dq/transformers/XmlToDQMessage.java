@@ -33,7 +33,6 @@ public class XmlToDQMessage extends AbstractTransformer
 
     /**
      * The contructor
-     * 
      */
     public XmlToDQMessage()
     {
@@ -46,10 +45,11 @@ public class XmlToDQMessage extends AbstractTransformer
      */
     public final Object doTransform(final Object src, String encoding) throws TransformerException
     {
-        String xml = (String) src;
+        String xml = (String)src;
         DQMessage msg;
 
-        try {
+        try
+        {
 
             Document document = DocumentHelper.parseText(xml);
             msg = new DQMessage();
@@ -59,8 +59,9 @@ public class XmlToDQMessage extends AbstractTransformer
             String value;
             Element element;
 
-            for (Iterator i = root.elementIterator(); i.hasNext();) {
-                element = (Element) i.next();
+            for (Iterator i = root.elementIterator(); i.hasNext();)
+            {
+                element = (Element)i.next();
                 name = element.attributeValue(DQMessage.XML_NAME);
                 value = element.getTextTrim();
                 msg.addEntry(name, value);
@@ -68,7 +69,9 @@ public class XmlToDQMessage extends AbstractTransformer
 
             return msg;
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
     }

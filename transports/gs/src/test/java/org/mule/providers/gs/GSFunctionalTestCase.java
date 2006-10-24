@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import org.mule.MuleManager;
@@ -20,33 +21,41 @@ import org.mule.umo.manager.UMOServerNotification;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class GSFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener {
+public class GSFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
+{
 
     private static int unprocessedCount = 0;
     private static int processedCount = 0;
 
-    protected String checkPreReqs() {
-        if(System.getProperty("com.gs.home", null) != null) {
+    protected String checkPreReqs()
+    {
+        if (System.getProperty("com.gs.home", null) != null)
+        {
             System.setProperty("com.gs.security.enabled", "false");
-            System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/policy/policy.all");
+            System.setProperty("java.security.policy", System.getProperty("com.gs.home")
+                                                       + "/policy/policy.all");
             return null;
         }
         return "com.gs.home VM parameter not set.";
     }
 
-    protected void doPostFunctionalSetUp() throws Exception {
+    protected void doPostFunctionalSetUp() throws Exception
+    {
         unprocessedCount = 0;
         processedCount = 0;
         MuleManager.getInstance().registerListener(this);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "mule-space-example.xml";
 
     }
 
-    public void testReceivesWithTemplates() throws Exception {
-        if(!isPrereqsMet("org.mule.providers.gs.GSFunctionalTestCase.testReceivesWithTemplates()")) {
+    public void testReceivesWithTemplates() throws Exception
+    {
+        if (!isPrereqsMet("org.mule.providers.gs.GSFunctionalTestCase.testReceivesWithTemplates()"))
+        {
             return;
         }
 
@@ -75,12 +84,16 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
 
     }
 
-
-    public void onNotification(UMOServerNotification notification) {
-        if (notification.getAction() == FunctionalTestNotification.EVENT_RECEIVED) {
-            if (notification.getResourceIdentifier().equals("unprocessedOrders")) {
+    public void onNotification(UMOServerNotification notification)
+    {
+        if (notification.getAction() == FunctionalTestNotification.EVENT_RECEIVED)
+        {
+            if (notification.getResourceIdentifier().equals("unprocessedOrders"))
+            {
                 unprocessedCount++;
-            } else if (notification.getResourceIdentifier().equals("processedOrders")) {
+            }
+            else if (notification.getResourceIdentifier().equals("processedOrders"))
+            {
                 processedCount++;
             }
         }

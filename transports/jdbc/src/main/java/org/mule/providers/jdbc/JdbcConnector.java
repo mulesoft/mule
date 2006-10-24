@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jdbc;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -62,7 +63,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     private static final String DEFAULT_QUERY_RUNNER = "org.apache.commons.dbutils.QueryRunner";
     private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
 
-    /* Register the SQL Exception reader if this class gets loaded*/
+    /* Register the SQL Exception reader if this class gets loaded */
     static
     {
         ExceptionHelper.registerExceptionReader(new SQLExceptionReader());
@@ -96,7 +97,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         Map props = endpoint.getProperties();
         if (props != null)
         {
-            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
+            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
                 pollingFrequency = Long.parseLong(tempPolling);
@@ -139,12 +140,12 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         Object temp = this.jndiContext.lookup(this.dataSourceJndiName);
         if (temp instanceof DataSource)
         {
-            dataSource = (DataSource) temp;
+            dataSource = (DataSource)temp;
         }
         else
         {
-            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, this.dataSourceJndiName),
-                    this);
+            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND,
+                this.dataSourceJndiName), this);
         }
     }
 
@@ -165,10 +166,10 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
                 initJndiContext();
                 createDataSource();
             }
-            //setup property Extractors for queries
+            // setup property Extractors for queries
             if (queryValueExtractors == null)
             {
-                //Add defaults
+                // Add defaults
                 queryValueExtractors = new HashSet();
                 queryValueExtractors.add(MessagePropertyExtractor.class.getName());
                 queryValueExtractors.add(NowPropertyExtractor.class.getName());
@@ -187,13 +188,14 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             propertyExtractors = new HashSet();
             for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
             {
-                String s = (String) iterator.next();
+                String s = (String)iterator.next();
                 propertyExtractors.add(ClassUtils.instanciateClass(s, ClassUtils.NO_ARGS));
             }
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e, this);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e,
+                this);
         }
     }
 
@@ -202,7 +204,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         String str;
         // Find read statement
         String readStmt;
-        if ((str = (String) endpoint.getProperty("sql")) != null)
+        if ((str = (String)endpoint.getProperty("sql")) != null)
         {
             readStmt = str;
         }
@@ -212,7 +214,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         }
         // Find ack statement
         String ackStmt;
-        if ((str = (String) endpoint.getProperty("ack")) != null)
+        if ((str = (String)endpoint.getProperty("ack")) != null)
         {
             ackStmt = str;
             if ((str = getQuery(endpoint, ackStmt)) != null)
@@ -248,10 +250,11 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         if (ackStmt != null)
         {
             if (!"insert".equalsIgnoreCase(ackStmt.substring(0, 6))
-                    && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
-                    && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
+                && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
+                && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
             {
-                throw new IllegalArgumentException("Ack statement should be an insert / update / delete sql statement");
+                throw new IllegalArgumentException(
+                    "Ack statement should be an insert / update / delete sql statement");
             }
         }
         return new String[]{readStmt, ackStmt};
@@ -265,7 +268,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             Object queries = endpoint.getProperties().get("queries");
             if (queries instanceof Map)
             {
-                query = ((Map) queries).get(stmt);
+                query = ((Map)queries).get(stmt);
             }
         }
         if (query == null)
@@ -424,7 +427,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
             if (tx.hasResource(dataSource))
             {
                 logger.debug("Retrieving connection from current transaction");
-                return (Connection) tx.getResource(dataSource);
+                return (Connection)tx.getResource(dataSource);
             }
         }
         logger.debug("Retrieving new connection from data source");
@@ -462,22 +465,22 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * @return a new instance of the ResultSetHandler class as defined in the JdbcConnector
+     * @return a new instance of the ResultSetHandler class as defined in the
+     *         JdbcConnector
      */
     protected ResultSetHandler createResultSetHandler()
     {
         try
         {
-            return (ResultSetHandler) Class.forName(getResultSetHandler()).newInstance();
+            return (ResultSetHandler)Class.forName(getResultSetHandler()).newInstance();
         }
         catch (Exception e)
         {
-            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :" +
-                    getResultSetHandler() + System.getProperty("line.separator") +
-                    ExceptionUtils.getFullStackTrace(e));
+            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :"
+                                               + getResultSetHandler() + System.getProperty("line.separator")
+                                               + ExceptionUtils.getFullStackTrace(e));
         }
     }
-
 
     public Set getQueryValueExtractors()
     {
@@ -506,27 +509,27 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * @return a new instance of the QueryRunner class as defined in the JdbcConnector
+     * @return a new instance of the QueryRunner class as defined in the
+     *         JdbcConnector
      */
     protected QueryRunner createQueryRunner()
     {
         try
         {
-            return (QueryRunner) Class.forName(getQueryRunner()).newInstance();
+            return (QueryRunner)Class.forName(getQueryRunner()).newInstance();
         }
         catch (Exception e)
         {
-            throw new IllegalArgumentException("Error creating instance of the queryRunner class :" +
-                    getQueryRunner() + System.getProperty("line.separator") +
-                    ExceptionUtils.getFullStackTrace(e));
+            throw new IllegalArgumentException("Error creating instance of the queryRunner class :"
+                                               + getQueryRunner() + System.getProperty("line.separator")
+                                               + ExceptionUtils.getFullStackTrace(e));
         }
     }
-
 
     /**
      * Parse the given statement filling the parameter list and return the ready to
      * use statement.
-     *
+     * 
      * @param stmt
      * @param params
      * @return
@@ -551,21 +554,21 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     }
 
     public Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object message)
-            throws Exception
+        throws Exception
     {
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++)
         {
-            String param = (String) paramNames.get(i);
+            String param = (String)paramNames.get(i);
             String name = param.substring(2, param.length() - 1);
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
-            if(message!=null)
+            if (message != null)
             {
                 for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
                 {
-                    PropertyExtractor pe = (PropertyExtractor) iterator.next();
+                    PropertyExtractor pe = (PropertyExtractor)iterator.next();
                     value = pe.getProperty(name, message);
                     if (value != null)
                     {
@@ -578,17 +581,19 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
                     }
                 }
             }
-            if(!foundValue)
+            if (!foundValue)
             {
                 value = endpoint.getProperty(name);
             }
 
             // Allow null values which may be acceptable to the user
-            //Why shouldn't nulls be allowed? Otherwise every null parameter has to be defined
-//            if (value == null && !foundValue)
-//            {
-//                throw new IllegalArgumentException("Can not retrieve argument " + name);
-//            }
+            // Why shouldn't nulls be allowed? Otherwise every null parameter has to
+            // be defined
+            // if (value == null && !foundValue)
+            // {
+            // throw new IllegalArgumentException("Can not retrieve argument " +
+            // name);
+            // }
             params[i] = value;
         }
         return params;

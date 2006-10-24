@@ -20,7 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,15 +35,15 @@ public class JettyReceiverServlet extends MuleReceiverServlet
 
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-        receiver = (AbstractMessageReceiver)servletConfig.getServletContext().getAttribute(
-                "messageReceiver");
-        if (receiver == null) {
+        receiver = (AbstractMessageReceiver)servletConfig.getServletContext().getAttribute("messageReceiver");
+        if (receiver == null)
+        {
             throw new ServletException(new Message("http", 7).toString());
         }
     }
 
     protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
-            throws EndpointException
+        throws EndpointException
     {
         return receiver;
     }

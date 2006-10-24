@@ -34,8 +34,8 @@ import org.mule.umo.space.UMOSpaceException;
 import org.mule.util.ArrayUtils;
 
 /**
- * Represents a JavaSpace object. This is a wrapper to the underlying space. The Space is
- * created using the GigaSpaces API.
+ * Represents a JavaSpace object. This is a wrapper to the underlying space. The
+ * Space is created using the GigaSpaces API.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -72,21 +72,25 @@ public class GSSpace extends AbstractSpace
 
     public void doPut(Object value, long lease) throws UMOSpaceException
     {
-        try {
+        try
+        {
             Class valueClass = value.getClass();
-            if (Entry.class.isAssignableFrom(valueClass)) {
+            if (Entry.class.isAssignableFrom(valueClass))
+            {
                 space.write((Entry)value, getTransaction(), Lease.FOREVER);
             }
-            else if (valueClass.isArray()) {
-                Entry[] entryArr = (Entry[])ArrayUtils.toArrayOfComponentType((Object[])value,
-                                Entry.class);
+            else if (valueClass.isArray())
+            {
+                Entry[] entryArr = (Entry[])ArrayUtils.toArrayOfComponentType((Object[])value, Entry.class);
                 space.writeMultiple(entryArr, getTransaction(), Lease.FOREVER);
             }
-            else {
+            else
+            {
                 space.write(new ExternalEntry(name, new Object[]{value}), getTransaction(), lease);
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new GSSpaceException(e);
         }
     }
@@ -98,23 +102,29 @@ public class GSSpace extends AbstractSpace
 
     public Object doTake(long timeout) throws UMOSpaceException
     {
-        try {
-            if (snapshot == null) {
+        try
+        {
+            if (snapshot == null)
+            {
                 snapshot = space.snapshot(entryTemplate);
             }
 
             // try taking from Q
             Object retValue = null;
-            while (retValue == null) {
+            while (retValue == null)
+            {
                 retValue = queue.poll();
-                if (retValue != null) {
+                if (retValue != null)
+                {
                     continue;
                 }
 
                 // try multiple
                 Entry[] entrys = space.takeMultiple(snapshot, getTransaction(), Integer.MAX_VALUE);
-                if (entrys != null && entrys.length > 0) {
-                    for (int i = 0; i < entrys.length; i++) {
+                if (entrys != null && entrys.length > 0)
+                {
+                    for (int i = 0; i < entrys.length; i++)
+                    {
                         Entry entry = entrys[i];
                         queue.put(entry);
                     }
@@ -123,18 +133,22 @@ public class GSSpace extends AbstractSpace
 
                 // try for 5 secs
                 Object entry = space.take(snapshot, getTransaction(), 5000);
-                if (entry != null) {
+                if (entry != null)
+                {
                     queue.put(entry);
                 }
             }
             return retValue;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             // TODO: hack, sleep 1 sec to allow GS cluster to come up
-            try {
+            try
+            {
                 Thread.sleep(1000);
             }
-            catch (InterruptedException e1) {
+            catch (InterruptedException e1)
+            {
                 e1.printStackTrace();
             }
             throw new GSSpaceException(e);
@@ -143,10 +157,12 @@ public class GSSpace extends AbstractSpace
 
     public Object doTakeNoWait() throws UMOSpaceException
     {
-        try {
+        try
+        {
             return space.takeIfExists(entryTemplate, getTransaction(), 1);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new GSSpaceException(e);
         }
     }
@@ -164,11 +180,13 @@ public class GSSpace extends AbstractSpace
     public void beginTransaction() throws UMOSpaceException
     {
 
-        try {
+        try
+        {
             UMOTransaction tx = transactionFactory.beginTransaction();
             tx.bindResource(name, space);
         }
-        catch (org.mule.umo.TransactionException e) {
+        catch (org.mule.umo.TransactionException e)
+        {
             throw new SpaceTransactionException(e);
         }
 
@@ -177,14 +195,17 @@ public class GSSpace extends AbstractSpace
     public void commitTransaction() throws UMOSpaceException
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx == null) {
+        if (tx == null)
+        {
             throw new SpaceTransactionException(new TransactionNotInProgressException(new Message(
-                            Messages.TX_COMMIT_FAILED)));
+                Messages.TX_COMMIT_FAILED)));
         }
-        try {
+        try
+        {
             tx.commit();
         }
-        catch (org.mule.umo.TransactionException e) {
+        catch (org.mule.umo.TransactionException e)
+        {
             throw new SpaceTransactionException(e);
         }
     }
@@ -192,14 +213,17 @@ public class GSSpace extends AbstractSpace
     public void rollbackTransaction() throws UMOSpaceException
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx == null) {
+        if (tx == null)
+        {
             throw new SpaceTransactionException(new TransactionNotInProgressException(new Message(
-                            Messages.TX_COMMIT_FAILED)));
+                Messages.TX_COMMIT_FAILED)));
         }
-        try {
+        try
+        {
             tx.rollback();
         }
-        catch (org.mule.umo.TransactionException e) {
+        catch (org.mule.umo.TransactionException e)
+        {
             throw new SpaceTransactionException(e);
         }
     }
@@ -212,10 +236,12 @@ public class GSSpace extends AbstractSpace
     protected Transaction getTransaction()
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null) {
+        if (tx != null)
+        {
             return (Transaction)tx.getResource(space);
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -229,9 +255,9 @@ public class GSSpace extends AbstractSpace
     {
         this.entryTemplate = entryTemplate;
         this.snapshot = null;
-        if (logger.isInfoEnabled()) {
-            logger.info("Space: " + name + " is using receiver template: "
-                            + entryTemplate.toString());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Space: " + name + " is using receiver template: " + entryTemplate.toString());
         }
     }
 

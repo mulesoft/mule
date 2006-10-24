@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jbi.components;
 
 import org.apache.commons.logging.Log;
@@ -41,12 +42,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A base Jbi component implementation.  This is agnostic to any particular Jbi container
- *
+ * A base Jbi component implementation. This is agnostic to any particular Jbi
+ * container
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractJbiComponent implements Component, Work, ComponentLifeCycle {
+public abstract class AbstractJbiComponent implements Component, Work, ComponentLifeCycle
+{
 
     public static final String IN = "in";
     public static final String OUT = "out";
@@ -75,40 +78,50 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
 
     protected WaitableBoolean started = new WaitableBoolean(false);
 
-
-    public ComponentLifeCycle getLifeCycle() {
+    public ComponentLifeCycle getLifeCycle()
+    {
         return this;
     }
 
-    public ServiceUnitManager getServiceUnitManager() {
+    public ServiceUnitManager getServiceUnitManager()
+    {
         return serviceUnitManager;
     }
 
-    public Document getServiceDescription(ServiceEndpoint endpoint) {
-        if (logger.isDebugEnabled()) {
+    public Document getServiceDescription(ServiceEndpoint endpoint)
+    {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Querying service description for " + endpoint);
         }
         String key = getKey(endpoint);
-        Document doc = (Document) this.serviceDescriptions.get(key);
-        if (logger.isDebugEnabled()) {
-            if (doc != null) {
+        Document doc = (Document)this.serviceDescriptions.get(key);
+        if (logger.isDebugEnabled())
+        {
+            if (doc != null)
+            {
                 logger.debug("Description found");
-            } else {
+            }
+            else
+            {
                 logger.debug("Description not found");
             }
         }
         return doc;
     }
 
-    public void setServiceDescription(ServiceEndpoint endpoint, Document doc) {
-        if (logger.isDebugEnabled()) {
+    public void setServiceDescription(ServiceEndpoint endpoint, Document doc)
+    {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Setting service description for " + endpoint);
         }
         String key = getKey(endpoint);
         this.serviceDescriptions.put(key, doc);
     }
 
-    private String getKey(ServiceEndpoint endpoint) {
+    private String getKey(ServiceEndpoint endpoint)
+    {
         StringBuffer sb = new StringBuffer();
         sb.append("{");
         sb.append(endpoint.getServiceName().getNamespaceURI());
@@ -119,155 +132,209 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
         return sb.toString();
     }
 
-    /* (non-Javadoc)
-    * @see javax.jbi.component.Component#isExchangeWithConsumerOkay(javax.jbi.servicedesc.ServiceEndpoint, javax.jbi.messaging.MessageExchange)
-    */
-    public boolean isExchangeWithConsumerOkay(ServiceEndpoint endpoint, MessageExchange exchange) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.jbi.component.Component#isExchangeWithConsumerOkay(javax.jbi.servicedesc.ServiceEndpoint,
+     *      javax.jbi.messaging.MessageExchange)
+     */
+    public boolean isExchangeWithConsumerOkay(ServiceEndpoint endpoint, MessageExchange exchange)
+    {
         return true;
     }
 
-    /* (non-Javadoc)
-      * @see javax.jbi.component.Component#isExchangeWithProviderOkay(javax.jbi.servicedesc.ServiceEndpoint, javax.jbi.messaging.MessageExchange)
-      */
-    public boolean isExchangeWithProviderOkay(ServiceEndpoint endpoint, MessageExchange exchange) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.jbi.component.Component#isExchangeWithProviderOkay(javax.jbi.servicedesc.ServiceEndpoint,
+     *      javax.jbi.messaging.MessageExchange)
+     */
+    public boolean isExchangeWithProviderOkay(ServiceEndpoint endpoint, MessageExchange exchange)
+    {
         return true;
     }
 
-    /* (non-Javadoc)
-      * @see javax.jbi.component.Component#resolveEndpointReference(org.w3c.dom.DocumentFragment)
-      */
-    public ServiceEndpoint resolveEndpointReference(DocumentFragment epr) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.jbi.component.Component#resolveEndpointReference(org.w3c.dom.DocumentFragment)
+     */
+    public ServiceEndpoint resolveEndpointReference(DocumentFragment epr)
+    {
         return null;
     }
 
-    protected ObjectName createExtensionMBeanName() throws Exception {
+    protected ObjectName createExtensionMBeanName() throws Exception
+    {
         return this.context.getMBeanNames().createCustomComponentMBeanName("extension");
     }
 
-    public Object getExtensionMBean() {
-        return null; //todo
+    public Object getExtensionMBean()
+    {
+        return null; // todo
     }
 
-    public QName getService() {
+    public QName getService()
+    {
         return service;
     }
 
-    public void setService(QName service) {
+    public void setService(QName service)
+    {
         this.service = service;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public WorkManager getWorkManager() {
+    public WorkManager getWorkManager()
+    {
         return workManager;
     }
 
-    public void setWorkManager(WorkManager workManager) {
+    public void setWorkManager(WorkManager workManager)
+    {
         this.workManager = workManager;
     }
 
-    //----------Component Lifecycle methods ----------------//
+    // ----------Component Lifecycle methods ----------------//
 
-    /* (non-Javadoc)
-    * @see javax.jbi.component.ComponentLifeCycle#init(javax.jbi.component.ComponentContext)
-    */
-    public synchronized final void init(ComponentContext context) throws JBIException {
-        try {
-            if(context.getComponentName()!=null) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.jbi.component.ComponentLifeCycle#init(javax.jbi.component.ComponentContext)
+     */
+    public synchronized final void init(ComponentContext context) throws JBIException
+    {
+        try
+        {
+            if (context.getComponentName() != null)
+            {
                 name = context.getComponentName();
             }
-            if(name==null) {
+            if (name == null)
+            {
                 throw new NullPointerException("No name has been set for this component");
             }
 
-            if(service==null) {
+            if (service == null)
+            {
                 service = (QName)new QNameConverter().convert(QName.class, name);
             }
 
             context.activateEndpoint(service, service.getLocalPart());
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Initializing component: " + name);
             }
             this.context = context;
             deliveryChannel = context.getDeliveryChannel();
             exchangeFactory = deliveryChannel.createExchangeFactory();
             Object mbean = getExtensionMBean();
-            if (serviceUnitManager == null) {
+            if (serviceUnitManager == null)
+            {
                 serviceUnitManager = new DefaultServiceUnitManager();
             }
 
-            if (workManager == null) {
+            if (workManager == null)
+            {
                 workManager = MuleManager.getInstance().getWorkManager();
             }
 
-            if (mbean != null) {
-                if (mbeanName == null) {
+            if (mbean != null)
+            {
+                if (mbeanName == null)
+                {
                     this.mbeanName = createExtensionMBeanName();
                 }
                 MBeanServer server = AbstractJbiComponent.this.context.getMBeanServer();
-                if (server == null) {
+                if (server == null)
+                {
                     throw new JBIException("null mBeanServer");
                 }
 
-                if (server.isRegistered(this.mbeanName)) {
+                if (server.isRegistered(this.mbeanName))
+                {
                     server.unregisterMBean(this.mbeanName);
                 }
                 server.registerMBean(mbean, this.mbeanName);
             }
 
             doInit();
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Jbi Receiver Component initialized: " + name);
             }
-        } catch (JBIException e) {
+        }
+        catch (JBIException e)
+        {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new JBIException("Error calling init on " + name, e);
         }
     }
 
-    public final void shutDown() throws JBIException {
-        try {
-            if (logger.isDebugEnabled()) {
+    public final void shutDown() throws JBIException
+    {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Shutting down component: " + getName());
             }
             started.set(false);
             doShutdown();
-            if (this.mbeanName != null) {
+            if (this.mbeanName != null)
+            {
                 MBeanServer server = context.getMBeanServer();
-                if (server == null) {
+                if (server == null)
+                {
                     throw new JBIException("null mBeanServer");
                 }
-                if (server.isRegistered(this.mbeanName)) {
+                if (server.isRegistered(this.mbeanName))
+                {
                     server.unregisterMBean(this.mbeanName);
                 }
             }
             this.context = null;
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Component shut down: " + getName());
             }
-        } catch (JBIException e) {
+        }
+        catch (JBIException e)
+        {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new JBIException("Error calling shutdown on " + getName(), e);
         }
     }
 
-    public final void start() throws JBIException {
+    public final void start() throws JBIException
+    {
         logger.debug("Starting Mule Jbi component: " + name);
         started.set(true);
-        if (this instanceof MessageExchangeListener) {
-            try {
+        if (this instanceof MessageExchangeListener)
+        {
+            try
+            {
                 logger.debug("Starting ME thread for: " + name);
                 getWorkManager().scheduleWork(this);
-            } catch (WorkException e) {
+            }
+            catch (WorkException e)
+            {
                 throw new JBIException(e);
             }
         }
@@ -275,125 +342,161 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
 
     }
 
-
-    public final void stop() throws JBIException {
+    public final void stop() throws JBIException
+    {
         started.set(false);
         doStop();
     }
 
-    protected void doInit() throws JBIException {
+    protected void doInit() throws JBIException
+    {
         // template method
     }
 
-    protected void doStart() throws JBIException {
+    protected void doStart() throws JBIException
+    {
         // template method
     }
 
-    protected void doStop() throws JBIException {
+    protected void doStop() throws JBIException
+    {
         // template method
     }
 
-    protected void doShutdown() throws JBIException {
+    protected void doShutdown() throws JBIException
+    {
         // template method
     }
 
-    public ObjectName getExtensionMBeanName() {
+    public ObjectName getExtensionMBeanName()
+    {
         return mbeanName;
     }
 
-    public void setExtensionMBeanName(ObjectName mbeanName) {
+    public void setExtensionMBeanName(ObjectName mbeanName)
+    {
         this.mbeanName = mbeanName;
     }
 
-    public void release() {
+    public void release()
+    {
         // nothing to do
     }
 
-    // TODO This receive code should be separated out to pluggable invocation strategies
+    // TODO This receive code should be separated out to pluggable invocation
+    // strategies
 
-    public void run() {
-        while (started.get()) {
-            try {
+    public void run()
+    {
+        while (started.get())
+        {
+            try
+            {
                 final MessageExchange me = deliveryChannel.accept();
-                if (me != null) {
-                    getWorkManager().scheduleWork(new MessageExchangeWorker(me, (MessageExchangeListener) this));
+                if (me != null)
+                {
+                    getWorkManager().scheduleWork(
+                        new MessageExchangeWorker(me, (MessageExchangeListener)this));
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    protected class MessageExchangeWorker implements Work {
+    protected class MessageExchangeWorker implements Work
+    {
         private MessageExchange me;
         private MessageExchangeListener listener;
 
-        public MessageExchangeWorker(MessageExchange me, MessageExchangeListener listener) {
+        public MessageExchangeWorker(MessageExchange me, MessageExchangeListener listener)
+        {
             this.me = me;
             this.listener = listener;
         }
 
-        public void release() {
+        public void release()
+        {
             // nothing to do
         }
 
-        public void run() {
-            try {
-                try {
+        public void run()
+        {
+            try
+            {
+                try
+                {
                     listener.onExchange(me);
                     done(me);
-                } catch (MessagingException e) {
+                }
+                catch (MessagingException e)
+                {
                     error(me, e);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 handleException(e);
             }
         }
     }
 
-    protected void handleException(Throwable t) {
+    protected void handleException(Throwable t)
+    {
         logger.error(t.getMessage(), t);
     }
 
-    protected void error(MessageExchange me, Fault fault) throws MessagingException {
+    protected void error(MessageExchange me, Fault fault) throws MessagingException
+    {
         me.setFault(fault);
         me.setStatus(ExchangeStatus.ERROR);
         context.getDeliveryChannel().send(me);
     }
 
-    protected void done(MessageExchange me) throws MessagingException {
+    protected void done(MessageExchange me) throws MessagingException
+    {
         me.setStatus(ExchangeStatus.DONE);
         context.getDeliveryChannel().send(me);
     }
 
-    protected void error(MessageExchange me, Exception e) throws MessagingException {
+    protected void error(MessageExchange me, Exception e) throws MessagingException
+    {
         me.setError(e);
         me.setStatus(ExchangeStatus.ERROR);
         context.getDeliveryChannel().send(me);
     }
 
-    private class DefaultServiceUnitManager implements ServiceUnitManager {
-        public String deploy(String string, String string1) throws DeploymentException {
+    private class DefaultServiceUnitManager implements ServiceUnitManager
+    {
+        public String deploy(String string, String string1) throws DeploymentException
+        {
             return null;
         }
 
-        public void init(String string, String string1) throws DeploymentException {
+        public void init(String string, String string1) throws DeploymentException
+        {
             // nothing to do (yet?)
         }
 
-        public void start(String string) throws DeploymentException {
+        public void start(String string) throws DeploymentException
+        {
             // nothing to do (yet?)
         }
 
-        public void stop(String string) throws DeploymentException {
+        public void stop(String string) throws DeploymentException
+        {
             // nothing to do (yet?)
         }
 
-        public void shutDown(String string) throws DeploymentException {
+        public void shutDown(String string) throws DeploymentException
+        {
             // nothing to do (yet?)
         }
 
-        public String undeploy(String string, String string1) throws DeploymentException {
+        public String undeploy(String string, String string1) throws DeploymentException
+        {
             return null;
         }
     }

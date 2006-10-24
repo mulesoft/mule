@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp;
 
 import com.mockobjects.dynamic.Mock;
@@ -33,9 +34,8 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         Mock mockDescriptor = new Mock(UMODescriptor.class);
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
-        return new TcpMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                      (UMOComponent) mockComponent.proxy(),
-                                      endpoint);
+        return new TcpMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

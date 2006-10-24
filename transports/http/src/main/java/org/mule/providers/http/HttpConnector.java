@@ -23,17 +23,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * <code>HttpConnector</code> provides a way of receiving and sending http
- * requests and responses. The UMOConnector itself handles dispatching http
- * requests. The <code>HttpMessageReceiver</code> handles the receiving
- * requests and processing of headers This endpoint recognises the following
- * properties - <p/>
+ * <code>HttpConnector</code> provides a way of receiving and sending http requests
+ * and responses. The UMOConnector itself handles dispatching http requests. The
+ * <code>HttpMessageReceiver</code> handles the receiving requests and processing
+ * of headers This endpoint recognises the following properties - <p/>
  * <ul>
  * <li>hostname - The hostname to send and receive http requests</li>
- * <li>port - The port to listen on. The industry standard is 80 and if this
- * propert is not set it will default to 80</li>
- * <li>proxyHostname - If you access the web through a proxy, this holds the
- * server address</li>
+ * <li>port - The port to listen on. The industry standard is 80 and if this propert
+ * is not set it will default to 80</li>
+ * <li>proxyHostname - If you access the web through a proxy, this holds the server
+ * address</li>
  * <li>proxyPort - The port the proxy is configured on</li>
  * <li>proxyUsername - If the proxy requires authentication supply a username</li>
  * <li>proxyPassword - If the proxy requires authentication supply a password</li>
@@ -81,19 +80,22 @@ public class HttpConnector extends TcpConnector
     /**
      * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
      */
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint)
-            throws Exception
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        if (endpoint != null) {
+        if (endpoint != null)
+        {
             Map endpointProperties = endpoint.getProperties();
-            if (endpointProperties != null) {
+            if (endpointProperties != null)
+            {
                 // normalize properties for HTTP
                 Map newProperties = new HashMap(endpointProperties.size());
-                for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();) {
+                for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();)
+                {
                     Map.Entry entry = (Map.Entry)entries.next();
                     Object key = entry.getKey();
                     Object normalizedKey = HttpConstants.ALL_HEADER_NAMES.get(key);
-                    if (normalizedKey != null) {
+                    if (normalizedKey != null)
+                    {
                         // normalized property exists
                         key = normalizedKey;
                     }
@@ -109,15 +111,17 @@ public class HttpConnector extends TcpConnector
 
     /**
      * The method determines the key used to store the receiver against.
-     *
+     * 
      * @param component the component for which the endpoint is being registered
-     * @param endpoint  the endpoint being registered for the component
+     * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
         String key = endpoint.getEndpointURI().toString();
         int i = key.indexOf('?');
-        if(i > -1) {
+        if (i > -1)
+        {
             key = key.substring(0, i);
         }
         return key;
@@ -207,10 +211,10 @@ public class HttpConnector extends TcpConnector
 
     public void setCookieSpec(String cookieSpec)
     {
-        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec
-                .equalsIgnoreCase(COOKIE_SPEC_RFC2109))) {
+        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109)))
+        {
             throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X,
-                    "cookieSpec", cookieSpec).toString());
+                "cookieSpec", cookieSpec).toString());
         }
         this.cookieSpec = cookieSpec;
     }

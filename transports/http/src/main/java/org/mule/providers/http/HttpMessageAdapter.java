@@ -44,53 +44,68 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     public HttpMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof Object[]) {
+        if (message instanceof Object[])
+        {
             this.message = ((Object[])message)[0];
-            if (((Object[])message).length > 1) {
+            if (((Object[])message).length > 1)
+            {
                 Map props = (Map)((Object[])message)[1];
-                for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+                for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+                {
                     Map.Entry e = (Map.Entry)iterator.next();
                     String key = (String)e.getKey();
                     Object value = e.getValue();
                     // skip incoming null values
-                    if (value != null) {
+                    if (value != null)
+                    {
                         setProperty(key, value);
                     }
                 }
             }
         }
-        else if (message instanceof byte[]) {
+        else if (message instanceof byte[])
+        {
             this.message = message;
-            //If the adapter is being created as part of a response flow, just wrap the HttpResponse
-        } else if (message instanceof HttpResponse) {
+            // If the adapter is being created as part of a response flow, just wrap
+            // the HttpResponse
+        }
+        else if (message instanceof HttpResponse)
+        {
             this.message = message;
             return;
         }
-        else {
+        else
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
         String temp = getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, null);
-        if (HttpConstants.HTTP10.equalsIgnoreCase(temp)) {
+        if (HttpConstants.HTTP10.equalsIgnoreCase(temp))
+        {
             http11 = false;
         }
 
-        //set the encoding
+        // set the encoding
         String charset = null;
         Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null) {
+        if (contenttype != null)
+        {
             HeaderElement values[] = contenttype.getElements();
-            if (values.length == 1) {
+            if (values.length == 1)
+            {
                 NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null) {
+                if (param != null)
+                {
                     charset = param.getValue();
                 }
             }
         }
-        if (charset != null) {
+        if (charset != null)
+        {
             encoding = charset;
         }
-        else {
-            encoding =  MuleManager.getConfiguration().getEncoding();
+        else
+        {
+            encoding = MuleManager.getConfiguration().getEncoding();
         }
     }
 
@@ -111,13 +126,16 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if (message instanceof byte[]) {
+        if (message instanceof byte[])
+        {
             return (byte[])message;
         }
-        else if (message instanceof String) {
+        else if (message instanceof String)
+        {
             return message.toString().getBytes();
         }
-        else {
+        else
+        {
             return (byte[])trans.transform(message);
         }
     }
@@ -130,15 +148,19 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        if (message instanceof byte[]) {
-            if (encoding != null) {
+        if (message instanceof byte[])
+        {
+            if (encoding != null)
+            {
                 return new String((byte[])message, encoding);
             }
-            else {
+            else
+            {
                 return new String((byte[])message);
             }
         }
-        else {
+        else
+        {
             return message.toString();
         }
     }
@@ -150,30 +172,36 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public Object getProperty(String key)
     {
-        if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key)) {
-            if (!http11) {
+        if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key))
+        {
+            if (!http11)
+            {
                 String connection = super.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
-                if (connection != null && connection.equalsIgnoreCase("close")) {
+                if (connection != null && connection.equalsIgnoreCase("close"))
+                {
                     return "false";
                 }
-                else {
+                else
+                {
                     return "true";
                 }
             }
-            else {
+            else
+            {
                 return (super.getProperty(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
             }
         }
-        else {
+        else
+        {
             return super.getProperty(key);
         }
     }
 
-
     public Header getHeader(String name)
     {
         String value = getStringProperty(name, null);
-        if (value == null) {
+        if (value == null)
+        {
             return null;
         }
         return new Header(name, value);

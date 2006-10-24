@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -42,14 +43,20 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
 
     protected void doTearDown() throws Exception
     {
-        try {
+        try
+        {
             s1.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // ignore
         }
-        try {
+        try
+        {
             s2.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // ignore
         }
 
@@ -65,7 +72,8 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         s2 = new MulticastSocket(uri.getPort());
         s2.joinGroup(inet);
 
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++)
+        {
             String msg = "Hello" + i;
 
             DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, uri.getPort());
@@ -78,7 +86,8 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     protected void receiveAndTestResults() throws Exception
     {
         s2.setSoTimeout(2000);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
 
             DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, uri.getPort());
 
@@ -92,9 +101,12 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("multicast://228.8.9.10:6677");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }

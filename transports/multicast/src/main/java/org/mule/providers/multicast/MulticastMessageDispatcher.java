@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import org.mule.providers.udp.UdpMessageDispatcher;
@@ -34,7 +35,7 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
     protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
     {
         MulticastSocket socket = new MulticastSocket(port);
-        socket.setLoopbackMode(((MulticastConnector) connector).isLoopback());
+        socket.setLoopbackMode(((MulticastConnector)connector).isLoopback());
         // socket.setBroadcast(connector.getBroadcast());
         socket.setReceiveBufferSize(connector.getBufferSize());
         socket.setSendBufferSize(connector.getBufferSize());
@@ -42,12 +43,17 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
         return socket;
     }
 
-    protected void doDisconnect() throws Exception {
-        try {
-            if(socket!=null) {
-                ((MulticastSocket) socket).leaveGroup(inetAddress);
+    protected void doDisconnect() throws Exception
+    {
+        try
+        {
+            if (socket != null)
+            {
+                ((MulticastSocket)socket).leaveGroup(inetAddress);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             logger.error("Failed to leave group: " + inetAddress);
         }
         super.doDisconnect();

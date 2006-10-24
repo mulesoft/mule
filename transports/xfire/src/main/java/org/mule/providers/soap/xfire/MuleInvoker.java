@@ -27,7 +27,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * Invokes a Mule Service via an Xfire binding
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,41 +42,48 @@ public class MuleInvoker implements Invoker
         this.synchronous = synchronous;
     }
 
-    public Object invoke(Method method, Object[] objects, MessageContext messageContext)
-            throws XFireFault
+    public Object invoke(Method method, Object[] objects, MessageContext messageContext) throws XFireFault
     {
         UMOMessage message = null;
-        try {
+        try
+        {
             XFireMessageAdapter messageAdapter = (XFireMessageAdapter)receiver.getConnector()
-                    .getMessageAdapter(objects);
+                .getMessageAdapter(objects);
             messageAdapter.setMessageContext(messageContext);
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
         }
-        catch (UMOException e) {
+        catch (UMOException e)
+        {
             throw new XFireFault(e);
         }
 
-        if (message != null) {
-            if (message.getExceptionPayload() != null) {
+        if (message != null)
+        {
+            if (message.getExceptionPayload() != null)
+            {
                 QName code = new QName(String.valueOf(message.getExceptionPayload().getCode()));
-                throw new XFireFault(message.getExceptionPayload().getMessage(), message
-                        .getExceptionPayload().getException(), code);
+                throw new XFireFault(message.getExceptionPayload().getMessage(),
+                    message.getExceptionPayload().getException(), code);
             }
-            else if (message.getPayload() instanceof NullPayload) {
+            else if (message.getPayload() instanceof NullPayload)
+            {
                 return null;
             }
-            else {
+            else
+            {
                 return message.getPayload();
             }
         }
-        else {
+        else
+        {
             return null;
         }
     }
 
-    public UMOImmutableEndpoint getEndpoint() {
+    public UMOImmutableEndpoint getEndpoint()
+    {
         return receiver.getEndpoint();
     }
 }

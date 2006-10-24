@@ -23,53 +23,63 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * Creates an Xmpp message packet from a UMOMessage
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ObjectToXmppPacket extends AbstractEventAwareTransformer {
+public class ObjectToXmppPacket extends AbstractEventAwareTransformer
+{
 
     /**
      * Serial version
      */
     private static final long serialVersionUID = -815224066829254844L;
 
-    public ObjectToXmppPacket() {
+    public ObjectToXmppPacket()
+    {
         registerSourceType(String.class);
         setReturnClass(Message.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context)
-            throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         Message result = null;
-        try {
+        try
+        {
             result = new Message(context.getMessageAsString(encoding));
         }
-        catch (UMOException e) {
+        catch (UMOException e)
+        {
             throw new TransformerException(this, e);
         }
 
         UMOMessage msg = context.getMessage();
-        if (msg.getExceptionPayload() != null) {
+        if (msg.getExceptionPayload() != null)
+        {
             result.setError(new XMPPError(503, context.getMessage().getExceptionPayload().getMessage()));
         }
 
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        {
             String name = (String)iterator.next();
-            if (name.equals(XmppConnector.XMPP_THREAD)) {
+            if (name.equals(XmppConnector.XMPP_THREAD))
+            {
                 result.setThread((String)msg.getProperty(name));
             }
-            else if (name.equals(XmppConnector.XMPP_SUBJECT)) {
+            else if (name.equals(XmppConnector.XMPP_SUBJECT))
+            {
                 result.setSubject((String)msg.getProperty(name));
             }
-            else if (name.equals(XmppConnector.XMPP_FROM)) {
+            else if (name.equals(XmppConnector.XMPP_FROM))
+            {
                 result.setFrom((String)msg.getProperty(name));
             }
-            else if (name.equals(XmppConnector.XMPP_TO)) {
+            else if (name.equals(XmppConnector.XMPP_TO))
+            {
                 result.setTo((String)msg.getProperty(name));
             }
-            else {
+            else
+            {
                 result.setProperty(name, msg.getProperty(name));
             }
         }

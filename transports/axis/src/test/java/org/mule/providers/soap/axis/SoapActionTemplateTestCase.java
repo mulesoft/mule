@@ -23,8 +23,10 @@ import javax.xml.namespace.QName;
  */
 public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
-    public void testHostInfoReplace() throws Exception {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://mycompany.com:8080/services/myService?method=foo", false);
+    public void testHostInfoReplace() throws Exception
+    {
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "axis:http://mycompany.com:8080/services/myService?method=foo", false);
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);
         String result = dispatcher.parseSoapAction("${hostInfo}/${method}", new QName("foo"), event);
@@ -32,13 +34,16 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
         assertEquals("http://mycompany.com:8080/foo", result);
     }
 
-    public void testHostReplace() throws Exception {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://mycompany.com:8080/services/myService?method=foo", false);
+    public void testHostReplace() throws Exception
+    {
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "axis:http://mycompany.com:8080/services/myService?method=foo", false);
 
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);
         event.getComponent().getDescriptor().setName("myService");
-        String result = dispatcher.parseSoapAction("${scheme}://${host}:${port}/${serviceName}/${method}", new QName("foo"), event);
+        String result = dispatcher.parseSoapAction("${scheme}://${host}:${port}/${serviceName}/${method}",
+            new QName("foo"), event);
 
         assertEquals("http://mycompany.com:8080/myService/foo", result);
     }

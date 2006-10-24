@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import org.mule.umo.UMOException;
@@ -15,8 +16,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>SslMessageDispatcherFactory</code> creates SslMessageDispatcher
- * instances
+ * <code>SslMessageDispatcherFactory</code> creates SslMessageDispatcher instances
  * 
  * @see SslMessageDispatcher
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

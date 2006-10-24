@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import com.ibm.as400.access.AS400;
@@ -47,13 +48,14 @@ public final class DQMessageUtils
 
     /**
      * Returns a DQMessage corresponding to the byte array and the record format
-     *
+     * 
      * @param data The data
      * @param format The record format
      * @return The DQMessage
      * @throws Exception Error during the data processing
      */
-    public static synchronized DQMessage getDQMessage(final byte[] data, final RecordFormat format) throws Exception
+    public static synchronized DQMessage getDQMessage(final byte[] data, final RecordFormat format)
+        throws Exception
     {
         Record record = format.getNewRecord(data);
 
@@ -61,7 +63,8 @@ public final class DQMessageUtils
 
         String[] names = format.getFieldNames();
         String name;
-        for (int i = 0; i < names.length; i++) {
+        for (int i = 0; i < names.length; i++)
+        {
             name = names[i];
             message.addEntry(name, record.getField(name));
         }
@@ -71,7 +74,7 @@ public final class DQMessageUtils
 
     /**
      * Returns a Record corresponding to the DQMessage and the record format
-     *
+     * 
      * @param msg The DQMessage
      * @param format The record format
      * @return The Record
@@ -85,10 +88,12 @@ public final class DQMessageUtils
         Object field;
         String[] tab = format.getFieldNames();
 
-        for (int i = 0; i < tab.length; i++) {
+        for (int i = 0; i < tab.length; i++)
+        {
             name = tab[i];
             field = msg.getEntry(name);
-            if (field == null) {
+            if (field == null)
+            {
                 field = "";
             }
             rec.setField(name, field);
@@ -99,31 +104,40 @@ public final class DQMessageUtils
 
     /**
      * Returns the record format described in the record descriptor file.
-     *
+     * 
      * @param recordDescriptor The record descriptor filename
      * @param as400 The as400
      * @return The RecordFormat
      * @throws Exception Error during the record format parsing
      */
     public static synchronized RecordFormat getRecordFormat(final String recordDescriptor, final AS400 as400)
-            throws Exception
+        throws Exception
     {
         log.debug("Record descriptor :" + recordDescriptor);
 
-        if (recordDescriptor == null) {
+        if (recordDescriptor == null)
+        {
             throw new Exception("Failed to read record descriptor : recordDescriptor property is not set ");
         }
 
         InputStream input = null;
         RecordFormat recordFormat = null;
-        try {
+        try
+        {
             input = IOUtils.getResourceAsStream(recordDescriptor, DQMessageUtils.class);
-            if (input == null) {
-                throw new Exception("Failed to read record descriptor  (" + recordDescriptor + ") cannot be found ");
+            if (input == null)
+            {
+                throw new Exception("Failed to read record descriptor  (" + recordDescriptor
+                                    + ") cannot be found ");
             }
             recordFormat = parse(input, as400);
-        } finally {
-            if (input != null) { input.close(); }
+        }
+        finally
+        {
+            if (input != null)
+            {
+                input.close();
+            }
         }
 
         return recordFormat;
@@ -131,7 +145,7 @@ public final class DQMessageUtils
 
     /**
      * Returns the record format.
-     *
+     * 
      * @param stream The record descriptor inputstream
      * @param as400 The as400
      * @return The RecordFormat
@@ -149,8 +163,9 @@ public final class DQMessageUtils
         int length;
         Element element;
 
-        for (Iterator i = root.elementIterator(); i.hasNext();) {
-            element = (Element) i.next();
+        for (Iterator i = root.elementIterator(); i.hasNext();)
+        {
+            element = (Element)i.next();
             name = element.attributeValue("name");
             length = Integer.decode(element.attributeValue("length")).intValue();
             addCharacterField(rec, length, name, as400);
@@ -161,7 +176,7 @@ public final class DQMessageUtils
 
     /**
      * Add a charachter field in the record format.
-     *
+     * 
      * @param format The record format
      * @param length The field length
      * @param as400 The as400

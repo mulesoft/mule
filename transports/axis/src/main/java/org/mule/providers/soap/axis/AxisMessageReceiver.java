@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.AxisProperties;
@@ -42,9 +43,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>AxisMessageReceiver</code> is used to register a component as a
- * service with a Axis server.
- *
+ * <code>AxisMessageReceiver</code> is used to register a component as a service
+ * with a Axis server.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,13 +56,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected SOAPService service;
 
     public AxisMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
-        this.connector = (AxisConnector) connector;
-        try {
+        this.connector = (AxisConnector)connector;
+        try
+        {
             init();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(e, this);
         }
     }
@@ -69,28 +73,34 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void init() throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
-        MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
-        String style = (String) descriptor.getProperties().get("style");
-        String use = (String) descriptor.getProperties().get("use");
-        String doc = (String) descriptor.getProperties().get("documentation");
+        MuleDescriptor descriptor = (MuleDescriptor)component.getDescriptor();
+        String style = (String)descriptor.getProperties().get("style");
+        String use = (String)descriptor.getProperties().get("use");
+        String doc = (String)descriptor.getProperties().get("documentation");
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
         String serviceName = component.getDescriptor().getName();
 
         SOAPService existing = this.connector.getAxisServer().getService(serviceName);
-        if( existing != null) {
+        if (existing != null)
+        {
             service = existing;
             logger.debug("Using existing service for " + serviceName);
-        } else {
-            //Check if the style is message. If so, we need to create
-            //a message oriented provider
-            if (style != null && style.equalsIgnoreCase("message")) {
+        }
+        else
+        {
+            // Check if the style is message. If so, we need to create
+            // a message oriented provider
+            if (style != null && style.equalsIgnoreCase("message"))
+            {
                 logger.debug("Creating Message Provider");
                 service = new SOAPService(new MuleMsgProvider(connector));
-//            } else if (style != null && style.equalsIgnoreCase("document")) {
-//                logger.debug("Creating Doc Provider");
-//                service = new SOAPService(new MuleDocLitProvider(connector));
-            } else {
+                // } else if (style != null && style.equalsIgnoreCase("document")) {
+                // logger.debug("Creating Doc Provider");
+                // service = new SOAPService(new MuleDocLitProvider(connector));
+            }
+            else
+            {
                 logger.debug("Creating RPC Provider");
                 service = new SOAPService(new MuleRPCProvider(connector));
             }
@@ -106,74 +116,91 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setName(serviceName);
 
         // Add any custom options from the Descriptor config
-        Map options = (Map) descriptor.getProperties().get("axisOptions");
-        
-        //IF wsdl service name is not set, default to service name
-        if (options == null) {
-        	options=new HashMap(2);
+        Map options = (Map)descriptor.getProperties().get("axisOptions");
+
+        // IF wsdl service name is not set, default to service name
+        if (options == null)
+        {
+            options = new HashMap(2);
         }
-        if(options.get("wsdlServiceElement")==null) {
-        	options.put("wsdlServiceElement", serviceName);
+        if (options.get("wsdlServiceElement") == null)
+        {
+            options.put("wsdlServiceElement", serviceName);
         }
-           
+
         Map.Entry entry;
-        for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+        for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();)
+        {
+            entry = (Map.Entry)iterator.next();
             service.setOption(entry.getKey().toString(), entry.getValue());
             logger.debug("Adding Axis option: " + entry);
         }
-        
-        
+
         // set method names
         Class[] interfaces = ServiceProxy.getInterfacesForComponent(component);
-        if (interfaces.length == 0) {
-            throw new InitialisationException(new Message(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, serviceName),
-                                              component);
+        if (interfaces.length == 0)
+        {
+            throw new InitialisationException(
+                new Message(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, serviceName), component);
         }
         // You must supply a class name if you want to restrict methods
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        Map methods = (Map) endpoint.getProperties().get("soapMethods");
-        if(methods == null) {
-            methods = (Map) descriptor.getProperties().get("soapMethods");
+        Map methods = (Map)endpoint.getProperties().get("soapMethods");
+        if (methods == null)
+        {
+            methods = (Map)descriptor.getProperties().get("soapMethods");
         }
-        if (methods != null) {
+        if (methods != null)
+        {
             Iterator i = methods.keySet().iterator();
             StringBuffer buf = new StringBuffer(64);
-            while (i.hasNext()) {
-                String name = (String) i.next();
+            while (i.hasNext())
+            {
+                String name = (String)i.next();
                 Object m = methods.get(name);
                 SoapMethod method = null;
-                if(m instanceof List) {
+                if (m instanceof List)
+                {
                     method = new SoapMethod(name, (List)m);
-                } else {
+                }
+                else
+                {
                     method = new SoapMethod(name, (String)m);
                 }
 
                 List namedParameters = method.getNamedParameters();
                 ParameterDesc[] parameters = new ParameterDesc[namedParameters.size()];
-                for (int j = 0; j < namedParameters.size(); j++) {
-                    NamedParameter parameter = (NamedParameter) namedParameters.get(j);
+                for (int j = 0; j < namedParameters.size(); j++)
+                {
+                    NamedParameter parameter = (NamedParameter)namedParameters.get(j);
                     byte mode = ParameterDesc.INOUT;
-                    if (parameter.getMode().equals(ParameterMode.IN)) {
+                    if (parameter.getMode().equals(ParameterMode.IN))
+                    {
                         mode = ParameterDesc.IN;
-                    } else if (parameter.getMode().equals(ParameterMode.OUT)) {
+                    }
+                    else if (parameter.getMode().equals(ParameterMode.OUT))
+                    {
                         mode = ParameterDesc.OUT;
                     }
 
                     parameters[j] = new ParameterDesc(parameter.getName(), mode, parameter.getType());
                 }
 
-                service.getServiceDescription().addOperationDesc(new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
+                service.getServiceDescription().addOperationDesc(
+                    new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
                 buf.append(method.getName().getLocalPart() + ",");
             }
             methodNames = buf.toString();
             methodNames = methodNames.substring(0, methodNames.length() - 1);
-        } else {
+        }
+        else
+        {
             String[] methodNamesArray = ServiceProxy.getMethodNames(interfaces);
             StringBuffer buf = new StringBuffer(64);
-            for (int i = 0; i < methodNamesArray.length; i++) {
+            for (int i = 0; i < methodNamesArray.length; i++)
+            {
                 buf.append(methodNamesArray[i]).append(",");
             }
             methodNames = buf.toString();
@@ -182,51 +209,47 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
         String className = interfaces[0].getName();
         // The namespace of the service.
-        //Todo use the service qname in Mule 2.0
-        String namespace = (String) descriptor.getProperties().get("serviceNamespace");
-        if(namespace==null) {
+        // Todo use the service qname in Mule 2.0
+        String namespace = (String)descriptor.getProperties().get("serviceNamespace");
+        if (namespace == null)
+        {
             namespace = Namespaces.makeNamespace(className);
         }
 
-        //WSDL override
-        String wsdlFile = (String) descriptor.getProperties().get("wsdlFile");
-        if(wsdlFile!=null) {
+        // WSDL override
+        String wsdlFile = (String)descriptor.getProperties().get("wsdlFile");
+        if (wsdlFile != null)
+        {
             service.getServiceDescription().setWSDLFile(wsdlFile);
         }
         /*
          * Now we set up the various options for the SOAPService. We set:
-         *
-         * RPCProvider.OPTION_WSDL_SERVICEPORT In essense, this is our service
-         * name
-         *
-         * RPCProvider.OPTION_CLASSNAME This tells the serverProvider (whether
-         * it be an AvalonProvider or just JavaProvider) what class to load via
-         * "makeNewServiceObject".
-         *
-         * RPCProvider.OPTION_SCOPE How long the object loaded via
-         * "makeNewServiceObject" will persist - either request, session, or
-         * application. We use the default for now.
-         *
+         * RPCProvider.OPTION_WSDL_SERVICEPORT In essense, this is our service name
+         * RPCProvider.OPTION_CLASSNAME This tells the serverProvider (whether it be
+         * an AvalonProvider or just JavaProvider) what class to load via
+         * "makeNewServiceObject". RPCProvider.OPTION_SCOPE How long the object
+         * loaded via "makeNewServiceObject" will persist - either request, session,
+         * or application. We use the default for now.
          * RPCProvider.OPTION_WSDL_TARGETNAMESPACE A namespace created from the
-         * package name of the service.
-         *
-         * RPCProvider.OPTION_ALLOWEDMETHODS What methods the service can
-         * execute on our class.
-         *
-         * We don't set: RPCProvider.OPTION_WSDL_PORTTYPE
-         * RPCProvider.OPTION_WSDL_SERVICEELEMENT
+         * package name of the service. RPCProvider.OPTION_ALLOWEDMETHODS What
+         * methods the service can execute on our class. We don't set:
+         * RPCProvider.OPTION_WSDL_PORTTYPE RPCProvider.OPTION_WSDL_SERVICEELEMENT
          */
         setOptionIfNotset(service, JavaProvider.OPTION_WSDL_SERVICEPORT, serviceName);
         setOptionIfNotset(service, JavaProvider.OPTION_CLASSNAME, className);
         setOptionIfNotset(service, JavaProvider.OPTION_SCOPE, "Request");
-        if(StringUtils.isNotBlank(namespace)) {
+        if (StringUtils.isNotBlank(namespace))
+        {
             setOptionIfNotset(service, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
         }
 
         // Set the allowed methods, allow all if there are none specified.
-        if (methodNames == null) {
+        if (methodNames == null)
+        {
             setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, "*");
-        } else {
+        }
+        else
+        {
             setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, methodNames);
         }
 
@@ -234,20 +257,30 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
 
-        if (style != null) {
+        if (style != null)
+        {
             Style s = Style.getStyle(style);
-            if(s==null) {
-                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, style, "style"), this);
-            } else {
+            if (s == null)
+            {
+                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, style,
+                    "style"), this);
+            }
+            else
+            {
                 service.setStyle(s);
             }
         }
         // Set use: Endcoded/Literal
-        if (use != null) {
+        if (use != null)
+        {
             Use u = Use.getUse(use);
-            if(u==null) {
-                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use"), this);
-            } else {
+            if (u == null)
+            {
+                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use"),
+                    this);
+            }
+            else
+            {
                 service.setUse(u);
             }
         }
@@ -255,14 +288,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
-        // TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
+        // TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl)
+        // service.getTypeMappingRegistry();
         // TypeMappingImpl tm = (TypeMappingImpl) registry.();
 
         // Handle complex bean type automatically
         // registry.setDoAutoTypes( true );
 
         // Axis 1.2 fix to handle autotypes properly
-        // AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
+        // AxisProperties.setProperty("axis.doAutoTypes",
+        // String.valueOf(connector.isDoAutoTypes()));
 
         // TODO Load any explicitly defined bean types
         // List types = (List) descriptor.getProperties().get("beanTypes");
@@ -273,15 +308,19 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // Add initialisation callback for the Axis service
         descriptor.addInitialisationCallback(new AxisInitialisationCallback(service));
 
-        if(uri.getScheme().equalsIgnoreCase("servlet")) {
+        if (uri.getScheme().equalsIgnoreCase("servlet"))
+        {
             connector.addServletService(service);
             String endpointUrl = uri.getAddress() + "/" + serviceName;
             endpointUrl.replaceFirst("servlet:", "http:");
             service.getServiceDescription().setEndpointURL(endpointUrl);
-        } else {
+        }
+        else
+        {
             service.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
         }
-        if(StringUtils.isNotBlank(namespace)) {
+        if (StringUtils.isNotBlank(namespace))
+        {
             service.getServiceDescription().setDefaultNamespace(namespace);
         }
         service.init();
@@ -297,9 +336,12 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     public void doDisconnect() throws Exception
     {
-        try {
+        try
+        {
             doStop();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             logger.error(e.getMessage(), e);
         }
         // TODO: how do you undeploy an Axis service?
@@ -310,14 +352,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     public void doStart() throws UMOException
     {
-        if (service != null) {
+        if (service != null)
+        {
             service.start();
         }
     }
 
     public void doStop() throws UMOException
     {
-        if (service != null) {
+        if (service != null)
+        {
             service.stop();
         }
     }
@@ -325,12 +369,14 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void setOptionIfNotset(SOAPService service, String option, Object value)
     {
         Object val = service.getOption(option);
-        if (val == null) {
+        if (val == null)
+        {
             service.setOption(option, value);
         }
     }
 
-    public SOAPService getService() {
+    public SOAPService getService()
+    {
         return service;
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis.extensions;
 
 import org.apache.axis.EngineConfiguration;
@@ -20,7 +21,6 @@ import org.mule.providers.soap.axis.AxisConnector;
  * MuleProvider
  * 
  * @see MuleRPCProvider
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,11 +41,13 @@ public class WSDDJavaMuleProvider extends WSDDProvider
      * @return a <code>Handler</code> value
      * @exception Exception if an error occurs
      */
-    public org.apache.axis.Handler newProviderInstance(WSDDService wsddService, EngineConfiguration engineConfiguration)
-            throws Exception
+    public org.apache.axis.Handler newProviderInstance(WSDDService wsddService,
+                                                       EngineConfiguration engineConfiguration)
+        throws Exception
     {
         String serviceStyle = wsddService.getStyle().toString();
-        if (serviceStyle.equals("message")) {
+        if (serviceStyle.equals("message"))
+        {
             return new MuleMsgProvider(connector);
         }
         return new MuleRPCProvider(connector);

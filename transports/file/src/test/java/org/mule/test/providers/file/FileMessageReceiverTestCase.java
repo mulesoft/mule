@@ -23,7 +23,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import java.io.File;
 
 /**
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -53,16 +52,9 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         read.deleteOnExit();
         move.deleteOnExit();
 
-        return new FileMessageReceiver(endpoint.getConnector(),
-                                       (UMOComponent) mockComponent.proxy(),
-                                       endpoint,
-                                       read.getAbsolutePath(),
-                                       move.getAbsolutePath(),
-                                       null,
-                                       new Long(1000));
+        return new FileMessageReceiver(endpoint.getConnector(), (UMOComponent)mockComponent.proxy(),
+            endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, new Long(1000));
     }
-
-
 
     public UMOEndpoint getEndpoint() throws Exception
     {

@@ -35,8 +35,8 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         return createConnector(true);
     }
 
-    public static HttpsConnector createConnector(boolean initialised) throws IOException,
-            InitialisationException
+    public static HttpsConnector createConnector(boolean initialised)
+        throws IOException, InitialisationException
     {
         HttpsConnector cnn = new HttpsConnector();
         cnn.setName("HttpsConnector");
@@ -49,7 +49,8 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         cnn.setTrustStorePassword("mulepassword");
         cnn.setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        if (initialised) {
+        if (initialised)
+        {
             cnn.initialise();
         }
         return cnn;
@@ -75,27 +76,33 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("https://localhost:0"));
         connector.registerListener(component, endpoint);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register on the same endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
         connector.dispose();
     }

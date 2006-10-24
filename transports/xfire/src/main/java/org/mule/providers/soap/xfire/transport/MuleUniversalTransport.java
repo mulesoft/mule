@@ -83,12 +83,12 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
 
     public String[] getKnownUriSchemes()
     {
-        return new String[]{"http://","https://","jms://","vm://","xmpp://","smtp://","tcp://"};
+        return new String[]{"http://", "https://", "jms://", "vm://", "xmpp://", "smtp://", "tcp://"};
     }
 
     public String[] getSupportedBindings()
     {
-        return new String[]{SOAP11_HTTP_BINDING,SOAP12_HTTP_BINDING};
+        return new String[]{SOAP11_HTTP_BINDING, SOAP12_HTTP_BINDING};
     }
 
     public String getName()
@@ -100,10 +100,12 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
     {
         SoapVersion version = context.getCurrentMessage().getSoapVersion();
 
-        if (version instanceof Soap11) {
+        if (version instanceof Soap11)
+        {
             return service.getBinding(SOAP11_HTTP_BINDING);
         }
-        else if (version instanceof Soap12) {
+        else if (version instanceof Soap12)
+        {
             return service.getBinding(SOAP12_HTTP_BINDING);
         }
 

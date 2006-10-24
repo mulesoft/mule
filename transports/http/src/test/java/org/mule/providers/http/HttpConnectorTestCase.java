@@ -54,27 +54,33 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("http://localhost:0"));
         connector.registerListener(component, endpoint);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register on the same endpointUri");
         }
-        catch (Exception e) { /* expected */
+        catch (Exception e)
+        { /* expected */
         }
         connector.dispose();
     }

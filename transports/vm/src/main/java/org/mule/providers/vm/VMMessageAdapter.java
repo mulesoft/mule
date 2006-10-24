@@ -16,9 +16,9 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
  * <code>VMMessageAdapter</code> provides a common abstraction of Mule Event
- * message. The message adapter allows a Mule event to be read and manipulated
- * like any other object data type from any external system that has a Mule
- * endpoint implementation.
+ * message. The message adapter allows a Mule event to be read and manipulated like
+ * any other object data type from any external system that has a Mule endpoint
+ * implementation.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -42,13 +42,14 @@ public class VMMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
         return message.getPayloadAsString(encoding);
     }
 
@@ -76,13 +77,15 @@ public class VMMessageAdapter extends AbstractMessageAdapter
      */
     private void setMessage(UMOMessage message) throws MessageTypeNotSupportedException
     {
-        if (message == null) {
+        if (message == null)
+        {
             throw new MessageTypeNotSupportedException(null, getClass());
         }
         this.message = message;
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
         return message.getUniqueId();
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis;
 
 import java.lang.reflect.InvocationHandler;
@@ -24,11 +25,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
- * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
- * like a Web service.
- * 
- * Also provides helper methods for building and describing web service
- * interfaces in Mule.
+ * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
+ * a Web service. Also provides helper methods for building and describing web
+ * service interfaces in Mule.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -40,9 +39,7 @@ public class AxisServiceProxy extends ServiceProxy
     public static Object createProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return Proxy.newProxyInstance(cl,
-                                      classes,
-                                      createServiceHandler(receiver, synchronous));
+        return Proxy.newProxyInstance(cl, classes, createServiceHandler(receiver, synchronous));
     }
 
     public static InvocationHandler createServiceHandler(AbstractMessageReceiver receiver, boolean synchronous)
@@ -67,26 +64,27 @@ public class AxisServiceProxy extends ServiceProxy
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
-            
+
             if (message != null)
             {
-                UMOExceptionPayload wsException = message.getExceptionPayload(); 
-                
+                UMOExceptionPayload wsException = message.getExceptionPayload();
+
                 if (wsException != null)
-                {                 
+                {
                     UMOException umoException = ExceptionHelper.getRootMuleException(wsException.getException());
-                    //if the exception has a cause, then throw only the cause 
-                    if(umoException.getCause()!=null) 
+                    // if the exception has a cause, then throw only the cause
+                    if (umoException.getCause() != null)
                     {
                         throw umoException.getCause();
-                    } else 
+                    }
+                    else
                     {
                         throw umoException;
                     }
                 }
-  
+
                 return message.getPayload();
-            } 
+            }
             else
             {
                 return null;

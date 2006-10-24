@@ -51,29 +51,34 @@ public class HttpResponse
     }
 
     public HttpResponse(final StatusLine statusline, final Header[] headers, final InputStream content)
-            throws IOException
+        throws IOException
     {
         super();
-        if (statusline == null) {
+        if (statusline == null)
+        {
             throw new IllegalArgumentException("Status line may not be null");
         }
         setStatusLine(HttpVersion.parse(statusline.getHttpVersion()), statusline.getStatusCode(),
-                statusline.getReasonPhrase());
+            statusline.getReasonPhrase());
         setHeaders(headers);
-        if (content != null) {
+        if (content != null)
+        {
             InputStream in = content;
             Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
-            Header transferEncoding = this.headers
-                    .getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
+            Header transferEncoding = this.headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
 
-            if (transferEncoding != null) {
-                if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+            if (transferEncoding != null)
+            {
+                if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                {
                     in = new ChunkedInputStream(in);
                 }
             }
-            else if (contentLength != null) {
+            else if (contentLength != null)
+            {
                 long len = getContentLength();
-                if (len >= 0) {
+                if (len >= 0)
+                {
                     in = new ContentLengthInputStream(in, len);
                 }
             }
@@ -83,18 +88,22 @@ public class HttpResponse
 
     public void setStatusLine(final HttpVersion ver, int statuscode, final String phrase)
     {
-        if (ver == null) {
+        if (ver == null)
+        {
             throw new IllegalArgumentException("HTTP version may not be null");
         }
-        if (statuscode <= 0) {
+        if (statuscode <= 0)
+        {
             throw new IllegalArgumentException("Status code may not be negative or zero");
         }
         this.ver = ver;
         this.statusCode = statuscode;
-        if (phrase != null) {
+        if (phrase != null)
+        {
             this.phrase = phrase;
         }
-        else {
+        else
+        {
             this.phrase = HttpStatus.getStatusText(statuscode);
         }
     }
@@ -118,7 +127,8 @@ public class HttpResponse
         return this.getStatusCode();
     }
 
-    public int getStatusCode() {
+    public int getStatusCode()
+    {
         return this.statusCode;
     }
 
@@ -133,7 +143,8 @@ public class HttpResponse
         buffer.append(this.ver);
         buffer.append(' ');
         buffer.append(this.statusCode);
-        if (this.phrase != null) {
+        if (this.phrase != null)
+        {
             buffer.append(' ');
             buffer.append(this.phrase);
         }
@@ -157,18 +168,21 @@ public class HttpResponse
 
     public void removeHeaders(final String s)
     {
-        if (s == null) {
+        if (s == null)
+        {
             return;
         }
         Header[] headers = this.headers.getHeaders(s);
-        for (int i = 0; i < headers.length; i++) {
+        for (int i = 0; i < headers.length; i++)
+        {
             this.headers.removeHeader(headers[i]);
         }
     }
 
     public void addHeader(final Header header)
     {
-        if (header == null) {
+        if (header == null)
+        {
             return;
         }
         this.headers.addHeader(header);
@@ -176,7 +190,8 @@ public class HttpResponse
 
     public void setHeader(final Header header)
     {
-        if (header == null) {
+        if (header == null)
+        {
             return;
         }
         removeHeaders(header.getName());
@@ -185,7 +200,8 @@ public class HttpResponse
 
     public void setHeaders(final Header[] headers)
     {
-        if (headers == null) {
+        if (headers == null)
+        {
             return;
         }
         this.headers.setHeaders(headers);
@@ -200,11 +216,14 @@ public class HttpResponse
     {
         String charset = getFallbackCharset();
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null) {
+        if (contenttype != null)
+        {
             HeaderElement values[] = contenttype.getElements();
-            if (values.length == 1) {
+            if (values.length == 1)
+            {
                 NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null) {
+                if (param != null)
+                {
                     charset = param.getValue();
                 }
             }
@@ -215,37 +234,45 @@ public class HttpResponse
     public long getContentLength()
     {
         Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
-        if (contentLength != null) {
-            try {
+        if (contentLength != null)
+        {
+            try
+            {
                 return Long.parseLong(contentLength.getValue());
             }
-            catch (NumberFormatException e) {
+            catch (NumberFormatException e)
+            {
                 return -1;
             }
         }
-        else {
+        else
+        {
             return -1;
         }
     }
 
     public void setBodyString(final String string)
     {
-        if (string != null) {
+        if (string != null)
+        {
             byte[] raw = null;
-            try {
+            try
+            {
                 raw = string.getBytes(getCharset());
             }
-            catch (UnsupportedEncodingException e) {
+            catch (UnsupportedEncodingException e)
+            {
                 raw = string.getBytes();
             }
             this.entity = new ByteArrayInputStream(raw);
-            if (!containsHeader(HttpConstants.HEADER_CONTENT_TYPE)) {
-                setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE,
-                        HttpConstants.DEFAULT_CONTENT_TYPE));
+            if (!containsHeader(HttpConstants.HEADER_CONTENT_TYPE))
+            {
+                setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
             }
             setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(raw.length)));
         }
-        else {
+        else
+        {
             this.entity = null;
         }
     }
@@ -263,12 +290,14 @@ public class HttpResponse
     public byte[] getBodyBytes() throws IOException
     {
         InputStream in = getBody();
-        if (in != null) {
+        if (in != null)
+        {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream(8192);
             IOUtils.copy(in, buffer);
             return buffer.toByteArray();
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -276,10 +305,12 @@ public class HttpResponse
     public String getBodyString() throws IOException
     {
         byte[] raw = getBodyBytes();
-        if (raw != null) {
+        if (raw != null)
+        {
             return new String(raw, getCharset());
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -299,11 +330,13 @@ public class HttpResponse
         disableKeepAlive = keepalive;
     }
 
-    public String getFallbackCharset() {
+    public String getFallbackCharset()
+    {
         return fallbackCharset;
     }
 
-    public void setFallbackCharset(String overrideCharset) {
+    public void setFallbackCharset(String overrideCharset)
+    {
         this.fallbackCharset = overrideCharset;
     }
 

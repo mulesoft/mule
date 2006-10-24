@@ -267,8 +267,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     UMOMessageAdapter adapter = connector.getMessageAdapter(result);
-                    return new MuleMessage(JmsMessageUtils.toObject(result,
-                        connector.getSpecification()), adapter);
+                    return new MuleMessage(JmsMessageUtils.toObject(result, connector.getSpecification()),
+                        adapter);
                 }
             }
             else
@@ -287,8 +287,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     else
                     {
                         UMOMessageAdapter adapter = connector.getMessageAdapter(result);
-                        return new MuleMessage(JmsMessageUtils.toObject(result,
-                            connector.getSpecification()), adapter);
+                        return new MuleMessage(
+                            JmsMessageUtils.toObject(result, connector.getSpecification()), adapter);
                     }
                 }
             }

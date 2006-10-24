@@ -7,15 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap;
 
 /**
  * Common Sopa constants
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface SoapConstants {
+public interface SoapConstants
+{
 
     public static final String WSDL_PROPERTY = "wsdl";
     public static final String LIST_PROPERTY = "list";

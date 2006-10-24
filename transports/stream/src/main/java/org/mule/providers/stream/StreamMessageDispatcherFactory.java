@@ -16,8 +16,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>StreamMessageDispatcherFactory</code> creates a Stream dispatcher suitable for writing to fixed streams such
- * as System.in or System.out
+ * <code>StreamMessageDispatcherFactory</code> creates a Stream dispatcher suitable
+ * for writing to fixed streams such as System.in or System.out
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

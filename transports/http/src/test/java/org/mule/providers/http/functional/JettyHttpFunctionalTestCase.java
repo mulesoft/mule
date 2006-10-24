@@ -34,10 +34,12 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("jetty:http://localhost:60198");
         }
-        catch (MalformedEndpointException e) {
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -73,13 +75,14 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         byte[] buf = new byte[1024 * 4];
 
         int len = cnn.getResponseInputStream().read(buf);
-        if (len < 1) {
+        if (len < 1)
+        {
             fail("Nothing was sent back in the response");
         }
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        //Todo regression assertTrue(msg.endsWith(TEST_MESSAGE  + " Received"));
-        assertTrue(msg.indexOf(TEST_MESSAGE  + " Received") > -1);
+        // Todo regression assertTrue(msg.endsWith(TEST_MESSAGE + " Received"));
+        assertTrue(msg.indexOf(TEST_MESSAGE + " Received") > -1);
     }
 }

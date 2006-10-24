@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import org.mule.extras.client.MuleClient;
@@ -27,58 +28,75 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase {
+public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
+{
 
     private String IN_URL = "space:java://localhost/mule-space_container/mule-space?schema=cache";
     private String OUT_URL = "space:java://localhost/mule-space2_container/mule-space2?schema=cache";
-    //private String URL = "jini:java://localhost/?address=/./mule-space?schema=cache";
-    //private String URL = "jini:java://localhost:10098/ross-laptop/JavaSpaces";
 
-    protected String checkPreReqs() {
-        if(System.getProperty("com.gs.home", null) != null) {
+    // private String URL =
+    // "jini:java://localhost/?address=/./mule-space?schema=cache";
+    // private String URL = "jini:java://localhost:10098/ross-laptop/JavaSpaces";
+
+    protected String checkPreReqs()
+    {
+        if (System.getProperty("com.gs.home", null) != null)
+        {
             System.setProperty("com.gs.security.enabled", "false");
-            System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/policy/policy.all");
+            System.setProperty("java.security.policy", System.getProperty("com.gs.home")
+                                                       + "/policy/policy.all");
             return null;
         }
         return "com.gs.home VM parameter not set.";
     }
 
-    protected void sendTestData(int iterations) throws Exception {
+    protected void sendTestData(int iterations) throws Exception
+    {
         MuleClient client = new MuleClient();
         client.send(IN_URL, "hello", null);
     }
 
-    protected void receiveAndTestResults() throws Exception {
+    protected void receiveAndTestResults() throws Exception
+    {
         MuleClient client = new MuleClient();
         UMOMessage message = client.receive(OUT_URL, 10000L);
         assertNotNull(message);
         assertEquals("hello Received", message.getPayloadAsString());
     }
 
-    protected UMOEndpointURI getInDest() {
-        try {
+    protected UMOEndpointURI getInDest()
+    {
+        try
+        {
             return new MuleEndpointURI(IN_URL);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
     }
 
-    protected UMOEndpointURI getOutDest() {
-        try {
+    protected UMOEndpointURI getOutDest()
+    {
+        try
+        {
             return new MuleEndpointURI(OUT_URL);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
     }
 
-    protected UMOConnector createConnector() throws Exception {
+    protected UMOConnector createConnector() throws Exception
+    {
         SpaceConnector con = new SpaceConnector();
         con.setName("spaceConnector");
-        //Here we need to configure Gigaspace support manually
+        // Here we need to configure Gigaspace support manually
         con.setSpaceFactory(new GSSpaceFactory());
         con.registerSupportedProtocol("java");
         con.registerSupportedProtocol("rmi");

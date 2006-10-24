@@ -53,7 +53,7 @@ import java.util.Map;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -71,44 +71,59 @@ public class UniversalSender extends BasicHandler
 
     protected Map endpointsCache = new ConcurrentHashMap();
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public void invoke(MessageContext msgContext) throws AxisFault
+    {
         boolean sync = true;
-        Call call = (Call) msgContext.getProperty("call_object");
-        if(call==null) {
-            throw new IllegalStateException("The call_object property must be set on the message context to the client Call object");
+        Call call = (Call)msgContext.getProperty("call_object");
+        if (call == null)
+        {
+            throw new IllegalStateException(
+                "The call_object property must be set on the message context to the client Call object");
         }
-        if (Boolean.TRUE.equals(call.getProperty("axis.one.way"))) {
+        if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
+        {
             sync = false;
         }
-        //Get the event stored in call
-        //If a receive call is made there will be no event
-        //UMOEvent event = (UMOEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
-        //Get the dispatch endpoint
+        // Get the event stored in call
+        // If a receive call is made there will be no event
+        // UMOEvent event =
+        // (UMOEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        // Get the dispatch endpoint
         String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
         UMOImmutableEndpoint requestEndpoint = (UMOImmutableEndpoint)call.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         UMOImmutableEndpoint endpoint = null;
-        try {
+        try
+        {
             endpoint = lookupEndpoint(uri);
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             requestEndpoint.getConnector().handleException(e);
             return;
         }
 
-        try {
-            if(requestEndpoint.getConnector() instanceof AxisConnector) {
-                msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector()).getAxisServer().getTypeMappingRegistry());
+        try
+        {
+            if (requestEndpoint.getConnector() instanceof AxisConnector)
+            {
+                msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector()).getAxisServer()
+                    .getTypeMappingRegistry());
             }
             Object payload = null;
             int contentLength = 0;
-            if (msgContext.getRequestMessage().countAttachments() > 0) {
+            if (msgContext.getRequestMessage().countAttachments() > 0)
+            {
                 File temp = File.createTempFile("soap", ".tmp");
-                temp.deleteOnExit(); // TODO cleanup files earlier (IOUtils has a file tracker)
+                temp.deleteOnExit(); // TODO cleanup files earlier (IOUtils has a
+                                        // file tracker)
                 FileOutputStream fos = new FileOutputStream(temp);
                 msgContext.getRequestMessage().writeTo(fos);
                 fos.close();
-                contentLength = (int) temp.length();
+                contentLength = (int)temp.length();
                 payload = new FileInputStream(temp);
-            } else {
+            }
+            else
+            {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 msgContext.getRequestMessage().writeTo(baos);
                 baos.close();
@@ -116,18 +131,22 @@ public class UniversalSender extends BasicHandler
             }
 
             Map props = new HashMap();
-           // props.putAll(event.getProperties());
-            for (Iterator iterator = msgContext.getPropertyNames(); iterator.hasNext();) {
+            // props.putAll(event.getProperties());
+            for (Iterator iterator = msgContext.getPropertyNames(); iterator.hasNext();)
+            {
                 String name = (String)iterator.next();
-                if(!name.equals("call_object") && !name.equals("wsdl.service")) {
+                if (!name.equals("call_object") && !name.equals("wsdl.service"))
+                {
                     props.put(name, msgContext.getProperty(name));
                 }
             }
-            
-            // add all custom headers, filter out all mule headers (such as MULE_SESSION) except
-            // for MULE_USER header. Filter out other headers like "soapMethods" and MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
+
+            // add all custom headers, filter out all mule headers (such as
+            // MULE_SESSION) except
+            // for MULE_USER header. Filter out other headers like "soapMethods" and
+            // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
             // and also filter out any http related header
-            if((RequestContext.getEvent() != null) && (RequestContext.getEvent().getMessage() != null))
+            if ((RequestContext.getEvent() != null) && (RequestContext.getEvent().getMessage() != null))
             {
                 UMOMessage currentMessage = RequestContext.getEvent().getMessage();
                 final String SOAP_METHODS = "soapMethods";
@@ -135,101 +154,133 @@ public class UniversalSender extends BasicHandler
                 for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
                 {
                     String name = (String)iterator.next();
-                    if (!StringUtils.equals(name, SOAP_METHODS) && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
-                            && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
-                            && (!name.startsWith(MuleProperties.PROPERTY_PREFIX)
-                            		|| StringUtils.equals(name, MuleProperties.MULE_USER_PROPERTY))
-                            && !HttpConstants.ALL_HEADER_NAMES.containsValue(name)
-                            && !StringUtils.equals(name, HttpConnector.HTTP_STATUS_PROPERTY))
+                    if (!StringUtils.equals(name, SOAP_METHODS)
+                        && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
+                        && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
+                        && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name,
+                            MuleProperties.MULE_USER_PROPERTY))
+                        && !HttpConstants.ALL_HEADER_NAMES.containsValue(name)
+                        && !StringUtils.equals(name, HttpConnector.HTTP_STATUS_PROPERTY))
                     {
                         props.put(name, currentMessage.getProperty(name));
                     }
                 }
             }
-            
-            if(call.useSOAPAction()) {
+
+            if (call.useSOAPAction())
+            {
                 uri = call.getSOAPActionURI();
             }
             props.put("SOAPAction", uri);
-            if (contentLength > 0) {
-                props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
+            if (contentLength > 0)
+            {
+                props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary
+                                                                                                    // for
+                                                                                                    // supporting
+                                                                                                    // httpclient
             }
 
-            if(props.get(HttpConstants.HEADER_CONTENT_TYPE)==null) {
+            if (props.get(HttpConstants.HEADER_CONTENT_TYPE) == null)
+            {
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
             }
             UMOMessage message = new MuleMessage(payload, props);
-            UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+            UMOSession session = new MuleSession(message,
+                ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
             UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
             logger.info("Making Axis soap request on: " + uri);
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Soap request is:\n" + payload.toString());
             }
-            if(sync) {
-                //We need to rewrite the endpoint on the event to set the reomoteSync property
+            if (sync)
+            {
+                // We need to rewrite the endpoint on the event to set the
+                // reomoteSync property
                 MuleEndpoint syncEndpoint = new MuleEndpoint(dispatchEvent.getEndpoint());
                 syncEndpoint.setRemoteSync(true);
-                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint, dispatchEvent.getSession(),
-                        dispatchEvent.isSynchronous());
+                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint,
+                    dispatchEvent.getSession(), dispatchEvent.isSynchronous());
                 UMOMessage result = session.sendEvent(dispatchEvent);
-                if(result!=null) 
-                {                  
+                if (result != null)
+                {
                     byte[] response = result.getPayloadAsBytes();
                     Message responseMessage = new Message(response);
                     msgContext.setResponseMessage(responseMessage);
-                
-                } else {
+
+                }
+                else
+                {
                     logger.warn("No response message was returned from synchronous call to: " + uri);
                 }
                 // remove temp file created for streaming
-                if (payload instanceof File) {
-                    ((File) payload).delete();
+                if (payload instanceof File)
+                {
+                    ((File)payload).delete();
                 }
-            } else {
+            }
+            else
+            {
                 session.dispatchEvent(dispatchEvent);
             }
-        } 
+        }
         catch (AxisFault axisFault)
         {
             throw axisFault;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new AxisFault(e.getMessage(), new Throwable(e));
         }
 
     }
 
-    protected UMOEndpoint lookupEndpoint(String uri) throws UMOException {
-        UMODescriptor axis = MuleManager.getInstance().getModel().getDescriptor(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
+    protected UMOEndpoint lookupEndpoint(String uri) throws UMOException
+    {
+        UMODescriptor axis = MuleManager.getInstance().getModel().getDescriptor(
+            AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
         UMOEndpoint ep;
-        if(axis!=null) {
+        if (axis != null)
+        {
             ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
-            if(ep==null) {
+            if (ep == null)
+            {
                 updateEndpointCache(axis.getOutboundRouter());
                 ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
-                if(ep==null) {
-                    logger.debug("Dispatch Endpoint uri: " + uri + " not found on the cache. Creating the endpoint instead.");
+                if (ep == null)
+                {
+                    logger.debug("Dispatch Endpoint uri: " + uri
+                                 + " not found on the cache. Creating the endpoint instead.");
                     ep = new MuleEndpoint(uri, false);
-                } else {
+                }
+                else
+                {
                     logger.info("Found endpoint: " + uri + " on the Axis service component");
                 }
-            } else {
+            }
+            else
+            {
                 logger.info("Found endpoint: " + uri + " on the Axis service component");
             }
-        } else {
+        }
+        else
+        {
             ep = new MuleEndpoint(uri, false);
         }
         return ep;
     }
 
-    private void updateEndpointCache(UMOOutboundMessageRouter router) {
+    private void updateEndpointCache(UMOOutboundMessageRouter router)
+    {
         endpointsCache.clear();
-        for (Iterator iterator = router.getRouters().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = router.getRouters().iterator(); iterator.hasNext();)
+        {
             UMOOutboundRouter r = (UMOOutboundRouter)iterator.next();
-            for (Iterator iterator1 = r.getEndpoints().iterator(); iterator1.hasNext();) {
-                UMOEndpoint endpoint = (UMOEndpoint) iterator1.next();
+            for (Iterator iterator1 = r.getEndpoints().iterator(); iterator1.hasNext();)
+            {
+                UMOEndpoint endpoint = (UMOEndpoint)iterator1.next();
                 endpointsCache.put(endpoint.getEndpointURI().getAddress(), endpoint);
             }
         }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -47,7 +48,8 @@ public class SslEndpointTestCase extends AbstractMuleTestCase
 
     public void testQueryParams2() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("ssl://localhost:7856?param=1&endpointName=sslProvider&blankParam=");
+        UMOEndpointURI url = new MuleEndpointURI(
+            "ssl://localhost:7856?param=1&endpointName=sslProvider&blankParam=");
         assertEquals("ssl", url.getScheme());
         assertEquals("ssl://localhost:7856", url.getAddress());
         assertNotNull(url.getEndpointName());

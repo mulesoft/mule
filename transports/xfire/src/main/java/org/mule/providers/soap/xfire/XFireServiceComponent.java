@@ -48,9 +48,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The Xfire service component receives requests for Xfire services it manages
- * and marshalls requests and responses
- *
+ * The Xfire service component receives requests for Xfire services it manages and
+ * marshalls requests and responses
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -69,12 +69,18 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     // manager to the component
     protected Transport transport;
 
-    public void setDescriptor(UMODescriptor descriptor) {
-        UMOWorkManager wm = ((MuleDescriptor)descriptor).getThreadingProfile().createWorkManager("xfire-local-transport");
-        try {
+    public void setDescriptor(UMODescriptor descriptor)
+    {
+        UMOWorkManager wm = ((MuleDescriptor)descriptor).getThreadingProfile().createWorkManager(
+            "xfire-local-transport");
+        try
+        {
             wm.start();
-        } catch (UMOException e) {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "local channel work manager", e));
+        }
+        catch (UMOException e)
+        {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X,
+                "local channel work manager", e));
         }
         transport = new MuleLocalTransport(wm);
         getTransportManager().register(transport);
@@ -83,17 +89,23 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         logger.debug(eventContext);
-        String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
-        if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY)) {
+        String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
+            StringUtils.EMPTY);
+        if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY))
+        {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             getXfire().generateWSDL(getServiceName(eventContext), out);
             return out.toString();
-        } else {
-            MuleLocalChannel channel = (MuleLocalChannel) transport.createChannel(eventContext.getEndpointURI().getFullScheme());
+        }
+        else
+        {
+            MuleLocalChannel channel = (MuleLocalChannel)transport.createChannel(eventContext.getEndpointURI()
+                .getFullScheme());
             return channel.onCall(eventContext);
         }
 
     }
+
     public void start() throws UMOException
     {
         // template method
@@ -106,7 +118,8 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public void initialise() throws InitialisationException
     {
-        if (xfire == null) {
+        if (xfire == null)
+        {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xfire"), this);
         }
     }
@@ -122,7 +135,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     }
 
     protected void generateService(OutStreamMessageAdapter response, String serviceName)
-            throws IOException, XMLStreamException
+        throws IOException, XMLStreamException
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         Service endpoint = getServiceRegistry().getService(serviceName);
@@ -133,8 +146,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     /**
      * @param response
      */
-    protected void generateServices(OutStreamMessageAdapter response) throws IOException,
-            XMLStreamException
+    protected void generateServices(OutStreamMessageAdapter response) throws IOException, XMLStreamException
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
 
@@ -143,13 +155,14 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     }
 
     /**
-     * Gets the stream representation of the current message. If the message is set for streaming
-     * the input stream on the UMOStreamMEssageAdapter will be used, otherwise a byteArrayInputStream will be used to
-     * hold the byte[] representation of the current message.
+     * Gets the stream representation of the current message. If the message is set
+     * for streaming the input stream on the UMOStreamMEssageAdapter will be used,
+     * otherwise a byteArrayInputStream will be used to hold the byte[]
+     * representation of the current message.
+     * 
      * @param context the event context
      * @return The inputstream for the current message
      * @throws UMOException
-     *
      */
 
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
@@ -158,15 +171,18 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         UMOMessage eventMsg = context.getMessage();
         Object eventMsgPayload = eventMsg.getPayload();
 
-        if (eventMsgPayload instanceof InputStream) {
+        if (eventMsgPayload instanceof InputStream)
+        {
             is = (InputStream)eventMsgPayload;
         }
-        else if (eventMsg.getAdapter() instanceof UMOStreamMessageAdapter) {
+        else if (eventMsg.getAdapter() instanceof UMOStreamMessageAdapter)
+        {
             StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
             is = sma.getInputStream();
 
         }
-        else {
+        else
+        {
             is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
         }
         return is;
@@ -174,6 +190,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     /**
      * Get the service that is mapped to the specified request.
+     * 
      * @param context the context from which to find the service name
      * @return the service that is mapped to the specified request.
      */
@@ -181,7 +198,8 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     {
         String pathInfo = context.getEndpointURI().getPath();
 
-        if (StringUtils.isEmpty(pathInfo)) {
+        if (StringUtils.isEmpty(pathInfo))
+        {
             return context.getEndpointURI().getHost();
         }
 
@@ -189,10 +207,12 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         int i = pathInfo.lastIndexOf("/");
 
-        if (i > -1) {
+        if (i > -1)
+        {
             serviceName = pathInfo.substring(i + 1);
         }
-        else {
+        else
+        {
             serviceName = pathInfo;
         }
 

@@ -20,9 +20,9 @@ import java.io.OutputStream;
 
 /**
  * The LengthProtocol is an application level tcp protocol that can be used to
- * transfer large amounts of data without risking some data to be loss. The
- * protocol is defined by sending / reading an integer (the packet length) and
- * then the data to be transfered.
+ * transfer large amounts of data without risking some data to be loss. The protocol
+ * is defined by sending / reading an integer (the packet length) and then the data
+ * to be transfered.
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -42,10 +42,12 @@ public class LengthProtocol implements TcpProtocol
         byte[] buffer = new byte[32];
         int length;
         dis.mark(32);
-        while ((length = dis.read(buffer)) == 0) {
+        while ((length = dis.read(buffer)) == 0)
+        {
             // wait
         }
-        if (length == -1) {
+        if (length == -1)
+        {
             return null;
         }
         dis.reset();

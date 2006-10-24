@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import com.mockobjects.dynamic.Mock;
@@ -28,10 +29,9 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     /**
      * Store created using
-     * C:\dev\projects\mule\src\providers\ssl\src\test\conf>keytool -genkey
-     * -keystore serverKeystore -keyalg rsa -alias muleserver -storepass
-     * mulepassword -keypass mulepassword
-     * 
+     * C:\dev\projects\mule\src\providers\ssl\src\test\conf>keytool -genkey -keystore
+     * serverKeystore -keyalg rsa -alias muleserver -storepass mulepassword -keypass
+     * mulepassword
      */
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
@@ -40,9 +40,8 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
-        return new SslMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                      (UMOComponent) mockComponent.proxy(),
-                                      endpoint);
+        return new SslMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

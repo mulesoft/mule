@@ -194,8 +194,10 @@ public class MailMessageAdapter extends AbstractMessageAdapter
             setProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
                 MailUtils.mailAddressesToString(msg.getReplyTo()));
             setProperty(MailProperties.FROM_ADDRESS_PROPERTY, MailUtils.mailAddressesToString(msg.getFrom()));
-            setProperty(MailProperties.SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(msg.getSubject(), "(no subject)"));
-            setProperty(MailProperties.CONTENT_TYPE_PROPERTY, StringUtils.defaultIfEmpty(msg.getContentType(), "text/plain"));
+            setProperty(MailProperties.SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(msg.getSubject(),
+                "(no subject)"));
+            setProperty(MailProperties.CONTENT_TYPE_PROPERTY, StringUtils.defaultIfEmpty(
+                msg.getContentType(), "text/plain"));
 
             Date sentDate = msg.getSentDate();
             if (sentDate == null)

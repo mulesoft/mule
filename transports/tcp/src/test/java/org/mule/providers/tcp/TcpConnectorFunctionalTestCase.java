@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp;
 
 import org.apache.commons.logging.Log;
@@ -47,7 +48,8 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void doTearDown() throws Exception
     {
-        if (s != null) {
+        if (s != null)
+        {
             s.close();
         }
     }
@@ -56,7 +58,8 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     {
         MuleManager.getConfiguration().setSynchronous(false);
         URI uri = getInDest().getUri();
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++)
+        {
             s = createSocket(uri);
             DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             dos.write("Hello".getBytes());
@@ -79,9 +82,12 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("tcp://localhost:" + port);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -106,22 +112,23 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         MuleManager.getConfiguration().setSynchronous(false);
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor,
-                            new EventCallback() {
-                                public void eventReceived(UMOEventContext context, Object Component) throws Exception
-                                {
-                                    callbackCount++;
-                                    String result = "Received Async event: " + context.getMessageAsString();
-                                    assertNotNull(context.getOutputStream());
+        initialiseComponent(descriptor, new EventCallback()
+        {
+            public void eventReceived(UMOEventContext context, Object Component) throws Exception
+            {
+                callbackCount++;
+                String result = "Received Async event: " + context.getMessageAsString();
+                assertNotNull(context.getOutputStream());
 
-                                    if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed()) {
-                                        context.getOutputStream().write(result.getBytes());
-                                        context.getOutputStream().flush();
-                                    }
+                if (!((ResponseOutputStream)context.getOutputStream()).getSocket().isClosed())
+                {
+                    context.getOutputStream().write(result.getBytes());
+                    context.getOutputStream().flush();
+                }
 
-                                    callbackCalled = true;
-                                }
-                            });
+                callbackCalled = true;
+            }
+        });
         // Start the server
         MuleManager.getInstance().start();
 

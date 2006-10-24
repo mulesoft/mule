@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp;
 
 import org.mule.config.i18n.Message;
@@ -16,12 +17,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 
 /**
- * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
- * host.
- *
+ * <code>TcpConnector</code> can bind or sent to a given tcp port on a given host.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- *
  * @version $Revision$
  */
 public class TcpConnector extends AbstractServiceEnabledConnector
@@ -56,10 +55,14 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if (tcpProtocol == null) {
-            try {
-                tcpProtocol = (TcpProtocol) ClassUtils.instanciateClass(tcpProtocolClassName, null);
-            } catch (Exception e) {
+        if (tcpProtocol == null)
+        {
+            try
+            {
+                tcpProtocol = (TcpProtocol)ClassUtils.instanciateClass(tcpProtocolClassName, null);
+            }
+            catch (Exception e)
+            {
                 throw new InitialisationException(new Message("tcp", 3), e);
             }
         }
@@ -71,10 +74,10 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * A shorthand property setting timeout for
-     * both SEND and RECEIVE sockets.
+     * A shorthand property setting timeout for both SEND and RECEIVE sockets.
      */
-    public void setTimeout(int timeout) {
+    public void setTimeout(int timeout)
+    {
         setSendTimeout(timeout);
         setReceiveTimeout(timeout);
     }
@@ -86,15 +89,16 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setSendTimeout(int timeout)
     {
-        if (timeout < 0) {
+        if (timeout < 0)
+        {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
         this.sendTimeout = timeout;
     }
 
-    //////////////////////////////////////////////
-    //  New independednt Socket timeout for receiveSocket
-    //////////////////////////////////////////////
+    // ////////////////////////////////////////////
+    // New independednt Socket timeout for receiveSocket
+    // ////////////////////////////////////////////
     public int getReceiveTimeout()
     {
         return receiveTimeout;
@@ -102,7 +106,8 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setReceiveTimeout(int timeout)
     {
-        if (timeout < 0) {
+        if (timeout < 0)
+        {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
         this.receiveTimeout = timeout;
@@ -115,7 +120,8 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1) {
+        if (bufferSize < 1)
+        {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
         this.bufferSize = bufferSize;

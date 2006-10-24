@@ -30,9 +30,8 @@ import javax.resource.spi.work.WorkManager;
 import java.util.Properties;
 
 /**
- * <code>SpaceMessageReceiver</code> registers a listener on a Space, which
- * can be a JavaSpace, Rio space, JCache implementation of an internal Mule
- * space.
+ * <code>SpaceMessageReceiver</code> registers a listener on a Space, which can be
+ * a JavaSpace, Rio space, JCache implementation of an internal Mule space.
  * 
  * @version $Revision$
  */
@@ -43,7 +42,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
     private SpaceConnector connector;
 
     public SpaceMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
         this.connector = (SpaceConnector)connector;
@@ -55,17 +54,21 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
 
         Properties props = new Properties();
         props.putAll(endpoint.getProperties());
-        try {
+        try
+        {
             logger.info("Connecting to space: " + destination);
             space = connector.getSpace(endpoint);
         }
-        catch (UMOSpaceException e) {
+        catch (UMOSpaceException e)
+        {
             throw new ConnectException(new Message("space", 1, destination), e, this);
         }
-        try {
+        try
+        {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
         }
-        catch (WorkException e) {
+        catch (WorkException e)
+        {
             throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
     }
@@ -78,23 +81,30 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
 
     public void run()
     {
-        while (!disposing.get()) {
-            if (connector.isStarted() && !disposing.get()) {
-                if (logger.isTraceEnabled()) {
+        while (!disposing.get())
+        {
+            if (connector.isStarted() && !disposing.get())
+            {
+                if (logger.isTraceEnabled())
+                {
                     logger.trace("Receiver starting on space: " + space);
                 }
 
-                try {
+                try
+                {
                     Object message = space.take(Long.MAX_VALUE);
                     Work work = createWork(space, message);
-                    try {
+                    try
+                    {
                         getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
                     }
-                    catch (WorkException e) {
+                    catch (WorkException e)
+                    {
                         logger.error("GS Server receiver Work was not processed: " + e.getMessage(), e);
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     handleException(e);
                 }
 
@@ -138,8 +148,10 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
          */
         public void run()
         {
-            try {
-                if (logger.isTraceEnabled()) {
+            try
+            {
+                if (logger.isTraceEnabled())
+                {
                     logger.trace("worker listening on space " + space);
                 }
 
@@ -151,10 +163,12 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
                 // }
 
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 handleException(e);
             }
-            finally {
+            finally
+            {
                 release();
             }
         }

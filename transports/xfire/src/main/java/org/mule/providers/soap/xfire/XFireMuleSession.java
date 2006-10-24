@@ -26,7 +26,8 @@ public class XFireMuleSession implements Session
 
     public XFireMuleSession(UMOSession session)
     {
-        if (session == null) {
+        if (session == null)
+        {
             throw new NullPointerException("UMOSession");
         }
         this.session = session;

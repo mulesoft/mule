@@ -38,14 +38,16 @@ public class EjbConnector extends RmiConnector
     {
         EJBObject remoteObj;
 
-        try {
+        try
+        {
             Object ref = getRemoteRef(endpoint);
 
             Method method = ClassUtils.getMethod("create", null, ref.getClass());
 
-            remoteObj = (EJBObject) method.invoke(ref, ClassUtils.NO_ARGS);
+            remoteObj = (EJBObject)method.invoke(ref, ClassUtils.NO_ARGS);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new RemoteException("Remote EJBObject lookup failed for '" + endpoint.getEndpointURI(), e);
         }
 

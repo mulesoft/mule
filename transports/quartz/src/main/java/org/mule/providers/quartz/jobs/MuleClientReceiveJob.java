@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.quartz.jobs;
 
 import org.apache.commons.logging.Log;
@@ -24,7 +25,7 @@ import org.quartz.JobExecutionException;
 
 /**
  * Will receive on an endpoint and dispatch the result on another
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,37 +36,45 @@ public class MuleClientReceiveJob implements Job
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
 
         String dispatchEndpoint = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT);
-        if(dispatchEndpoint==null) {
-            throw new JobExecutionException(new Message("quartz", 4, QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
+        if (dispatchEndpoint == null)
+        {
+            throw new JobExecutionException(new Message("quartz", 4,
+                QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
         }
 
         String receiveEndpoint = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT);
-        if(receiveEndpoint==null) {
-            throw new JobExecutionException(new Message("quartz", 4, QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT).getMessage());
+        if (receiveEndpoint == null)
+        {
+            throw new JobExecutionException(new Message("quartz", 4,
+                QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT).getMessage());
         }
         long timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         String timeoutString = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_RECEIVE_TIMEOUT);
-        if(timeoutString!=null) {
+        if (timeoutString != null)
+        {
             timeout = Long.parseLong(timeoutString);
         }
-        try {
+        try
+        {
             MuleClient client = new MuleClient();
             logger.debug("Attempting to receive event on: " + receiveEndpoint);
             UMOMessage result = client.receive(receiveEndpoint, timeout);
-            if(result!=null) {
+            if (result != null)
+            {
                 logger.debug("Received event on: " + receiveEndpoint);
                 logger.debug("Dispatching result on: " + dispatchEndpoint);
                 result.addProperties(jobDataMap);
                 client.dispatch(dispatchEndpoint, result);
             }
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new JobExecutionException(e);
         }
     }
 }
-

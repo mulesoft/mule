@@ -33,9 +33,12 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
     {
-        if (payload instanceof UMOMessage) {
-            return new VMMessageAdapter((UMOMessage) payload);
-        } else {
+        if (payload instanceof UMOMessage)
+        {
+            return new VMMessageAdapter((UMOMessage)payload);
+        }
+        else
+        {
             throw new MessageTypeNotSupportedException(payload, VMMessageAdapter.class);
         }
     }

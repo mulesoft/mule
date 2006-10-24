@@ -57,7 +57,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
         UMOManager manager = getManager(true);
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
-                PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
         manager.setModel(new SedaModel());
 
         MuleDescriptor descriptor = createInDescriptor("httpIn", EchoComponent.class.getName());
@@ -75,8 +75,8 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
         return descriptor;
     }
 
-    private MuleEndpoint buildEndpoint(String urlStr) throws EndpointException,
-            MalformedEndpointException, UMOException
+    private MuleEndpoint buildEndpoint(String urlStr)
+        throws EndpointException, MalformedEndpointException, UMOException
     {
         MuleEndpoint endpoint = new MuleEndpoint();
         endpoint.setEndpointURI(new MuleEndpointURI(urlStr));
@@ -89,8 +89,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
 
     private UMOConnector buildConnector(String urlStr) throws UMOException
     {
-        HttpConnector connector = (HttpConnector)ConnectorFactory.createConnector(new MuleEndpointURI(
-                urlStr));
+        HttpConnector connector = (HttpConnector)ConnectorFactory.createConnector(new MuleEndpointURI(urlStr));
         connector.getDispatcherThreadingProfile().setDoThreading(false);
         MuleManager.getInstance().registerConnector(connector);
         return connector;
@@ -115,11 +114,13 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
 
     public void testHttpGetFilter() throws HttpException, URISyntaxException, IOException
     {
-        try {
+        try
+        {
             doHttpGet("xyz");
             fail("The response should be invalid as the filter has discarded the request");
         }
-        catch (NoHttpResponseException e) {
+        catch (NoHttpResponseException e)
+        {
             // This is ok
         }
     }

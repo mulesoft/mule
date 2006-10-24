@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Will poll an http URL and use the response as the input for a service
- * request.
+ * Will poll an http URL and use the response as the input for a service request.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -52,7 +51,8 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         this(connector, component, endpoint, new Long(1000));
 
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", -1);
-        if (pollingFrequency > 0) {
+        if (pollingFrequency > 0)
+        {
             setFrequency(pollingFrequency);
         }
     }
@@ -63,12 +63,14 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
                                       Long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
-        try {
+        try
+        {
             pollUrl = new URL(endpoint.getEndpointURI().getAddress());
         }
-        catch (MalformedURLException e) {
-            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, endpoint
-                    .getEndpointURI().getAddress(), "uri"), e, this);
+        catch (MalformedURLException e)
+        {
+            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X,
+                endpoint.getEndpointURI().getAddress(), "uri"), e, this);
         }
     }
 
@@ -80,7 +82,8 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         int bytesWritten = 0;
         int contentLength = connection.getContentLength();
         boolean contentLengthNotSet = false;
-        if (contentLength < 0) {
+        if (contentLength < 0)
+        {
             contentLength = defaultBufferSize;
             contentLengthNotSet = true;
         }
@@ -91,14 +94,18 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         // Ensure we read all bytes, http connections may be slow
         // to send all bytes in consistent stream. I've only seen
         // this when using Axis...
-        while (bytesWritten != contentLength) {
+        while (bytesWritten != contentLength)
+        {
             len = is.read(buffer);
-            if (len != -1) {
+            if (len != -1)
+            {
                 baos.write(buffer, 0, len);
                 bytesWritten += len;
             }
-            else {
-                if (contentLengthNotSet) {
+            else
+            {
+                if (contentLengthNotSet)
+                {
                     contentLength = bytesWritten;
                 }
             }
@@ -109,14 +116,16 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         // Truncate repetitive headers
         Map respHeaders = new HashMap();
         Iterator it = connection.getHeaderFields().entrySet().iterator();
-        while (it.hasNext()) {
+        while (it.hasNext())
+        {
             Map.Entry msgHeader = (Map.Entry)it.next();
-            if (msgHeader.getValue() != null) {
+            if (msgHeader.getValue() != null)
+            {
                 respHeaders.put(msgHeader.getKey(), ((List)msgHeader.getValue()).get(0));
             }
         }
 
-        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{buffer,respHeaders});
+        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{buffer, respHeaders});
 
         connection.disconnect();
         UMOMessage message = new MuleMessage(adapter);
@@ -127,10 +136,12 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
     {
         URL url = null;
         String connectUrl = (String)endpoint.getProperties().get("connectUrl");
-        if (connectUrl == null) {
+        if (connectUrl == null)
+        {
             url = pollUrl;
         }
-        else {
+        else
+        {
             url = new URL(connectUrl);
         }
         logger.debug("Using url to connect: " + pollUrl.toString());

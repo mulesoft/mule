@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import com.ibm.as400.access.AS400;
@@ -31,15 +32,13 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         getManager(true);
         Mock mockComponent = new Mock(UMOComponent.class);
         AS400 system = ((DQConnector)endpoint.getConnector()).getSystem();
-        return new DQMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                     (UMOComponent) mockComponent.proxy(),
-                                     endpoint,
-                                     new Long(1000),
-                                     new DataQueue(system, "/QSYS.LIB/L701QUEUE.DTAQ"),
-                                     system);
+        return new DQMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint, new Long(1000), new DataQueue(system,
+                "/QSYS.LIB/L701QUEUE.DTAQ"), system);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception {
+    public UMOEndpoint getEndpoint() throws Exception
+    {
         DQConnector c = new DQConnector();
         c.setName("dqConnector");
         c.setRecordFormat("DQ_recordFormat.xml");

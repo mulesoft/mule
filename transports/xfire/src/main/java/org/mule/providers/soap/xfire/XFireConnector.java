@@ -39,7 +39,7 @@ import org.mule.util.SystemUtils;
 
 /**
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -82,37 +82,51 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        try {
+        try
+        {
             MuleManager.getInstance().registerListener(this);
         }
-        catch (NotificationException e) {
+        catch (NotificationException e)
+        {
             throw new InitialisationException(e, this);
         }
 
-        if (xfire == null) {
+        if (xfire == null)
+        {
             xfire = new DefaultXFire();
         }
 
-        if (serviceFactory == null) {
-            if(enableJSR181Annotations) {
+        if (serviceFactory == null)
+        {
+            if (enableJSR181Annotations)
+            {
                 // are we running under Java 5 (at least)?
-                if (!SystemUtils.isJavaVersionAtLeast(150)) {
+                if (!SystemUtils.isJavaVersionAtLeast(150))
+                {
                     throw new InitialisationException(new Message("xfire", 9), this);
                 }
-                try {
-                    WebAnnotations wa = (WebAnnotations)
-                            ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS, null, this.getClass());
+                try
+                {
+                    WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS,
+                        null, this.getClass());
                     serviceFactory = new AnnotationServiceFactory(wa, xfire.getTransportManager());
-                } catch (Exception ex) {
-                    throw new InitialisationException(new Message("xfire", 10, CLASSNAME_ANNOTATIONS), ex, this);
                 }
-            } else {
+                catch (Exception ex)
+                {
+                    throw new InitialisationException(new Message("xfire", 10, CLASSNAME_ANNOTATIONS), ex,
+                        this);
+                }
+            }
+            else
+            {
                 serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
             }
         }
-        if (serviceFactory instanceof ObjectServiceFactory) {
+        if (serviceFactory instanceof ObjectServiceFactory)
+        {
             ObjectServiceFactory osf = (ObjectServiceFactory)serviceFactory;
-            if(osf.getTransportManager() == null) {
+            if (osf.getTransportManager() == null)
+            {
                 osf.setTransportManager(xfire.getTransportManager());
             }
         }
@@ -129,21 +143,24 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     }
 
     protected void registerReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep)
-            throws UMOException
+        throws UMOException
     {
         // If this is the first receiver we need to create the Axis service
         // component
         // this will be registered with Mule when the Connector starts
-        if (xfireDescriptor == null) {
+        if (xfireDescriptor == null)
+        {
             // See if the axis descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
             xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
-                    XFIRE_SERVICE_COMPONENT_NAME);
-            if (xfireDescriptor == null) {
+                XFIRE_SERVICE_COMPONENT_NAME);
+            if (xfireDescriptor == null)
+            {
                 xfireDescriptor = createxfireDescriptor();
             }
-            else {
+            else
+            {
                 // Lets unregister the 'template' instance, configure it and
                 // then register
                 // again later
@@ -151,7 +168,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set externally
-            if (xfireDescriptor.getProperties().get(XFIRE_PROPERTY) == null) {
+            if (xfireDescriptor.getProperties().get(XFIRE_PROPERTY) == null)
+            {
                 xfireDescriptor.getProperties().put(XFIRE_PROPERTY, xfire);
             }
             xfireDescriptor.setContainerManaged(false);
@@ -164,20 +182,28 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         String endpoint = receiver.getEndpointURI().getAddress();
         String scheme = ep.getScheme().toLowerCase();
 
-        //Default to using synchronous for socket based protocols unless the
-        //synchronous property has been set explicitly
+        // Default to using synchronous for socket based protocols unless the
+        // synchronous property has been set explicitly
         boolean sync = false;
-        if(!receiver.getEndpoint().isSynchronousSet()) {
-            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
+        if (!receiver.getEndpoint().isSynchronousSet())
+        {
+            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl")
+                || scheme.equals("tcp"))
+            {
                 sync = true;
             }
-        } else {
+        }
+        else
+        {
             sync = receiver.getEndpoint().isSynchronous();
         }
 
-        //If we are using sockets then we need to set the endpoint name appropiately and if using http/https
-        //we need to default to POST and set the Content-Type
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp") || scheme.equals("servlet")) {
+        // If we are using sockets then we need to set the endpoint name appropiately
+        // and if using http/https
+        // we need to default to POST and set the Content-Type
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
+            || scheme.equals("servlet"))
+        {
             endpoint += "/" + serviceName;
             receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
@@ -188,11 +214,11 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
 
         // Set the transformers on the endpoint too
-         serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-         receiver.getEndpoint().setTransformer(null);
+        serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+        receiver.getEndpoint().setTransformer(null);
 
-         serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
-         receiver.getEndpoint().setResponseTransformer(null);
+        serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
+        receiver.getEndpoint().setResponseTransformer(null);
 
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
@@ -209,9 +235,10 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     protected MuleDescriptor createxfireDescriptor()
     {
-        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel()
-                .getDescriptor(XFIRE_SERVICE_COMPONENT_NAME);
-        if (xfireDescriptor == null) {
+        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+            XFIRE_SERVICE_COMPONENT_NAME);
+        if (xfireDescriptor == null)
+        {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME);
             xfireDescriptor.setImplementation(XFireServiceComponent.class.getName());
         }
@@ -230,32 +257,38 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     /**
      * The method determines the key used to store the receiver against.
-     *
+     * 
      * @param component the component for which the endpoint is being registered
-     * @param endpoint  the endpoint being registered for the component
-     * @return the key to store the newly created receiver against. In this case
-     *         it is the component name, which is equivilent to the Axis service
-     *         name.
+     * @param endpoint the endpoint being registered for the component
+     * @return the key to store the newly created receiver against. In this case it
+     *         is the component name, which is equivilent to the Axis service name.
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
-        if(endpoint.getEndpointURI().getPort()==-1) {
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
+        if (endpoint.getEndpointURI().getPort() == -1)
+        {
             return component.getDescriptor().getName();
-        } else {
+        }
+        else
+        {
             return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
         }
     }
 
-    public boolean isEnableJSR181Annotations() {
+    public boolean isEnableJSR181Annotations()
+    {
         return enableJSR181Annotations;
     }
 
-    public void setEnableJSR181Annotations(boolean enableJSR181Annotations) {
+    public void setEnableJSR181Annotations(boolean enableJSR181Annotations)
+    {
         this.enableJSR181Annotations = enableJSR181Annotations;
     }
 
     public void onNotification(UMOServerNotification event)
     {
-        if (event.getAction() == ModelNotification.MODEL_STARTED) {
+        if (event.getAction() == ModelNotification.MODEL_STARTED)
+        {
             // We need to register the xfire service component once the model
             // starts because
             // when the model starts listeners on components are started, thus
@@ -265,22 +298,26 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             // new service and a
             // different http port the model needs to be restarted before the
             // listener is available
-            if (!MuleManager.getInstance().getModel()
-                    .isComponentRegistered(XFIRE_SERVICE_COMPONENT_NAME)) {
-                try {
+            if (!MuleManager.getInstance().getModel().isComponentRegistered(XFIRE_SERVICE_COMPONENT_NAME))
+            {
+                try
+                {
                     // Descriptor might be null if no inbound endpoints have
                     // been register for the xfire connector
-                    if (xfireDescriptor == null) {
+                    if (xfireDescriptor == null)
+                    {
                         xfireDescriptor = createxfireDescriptor();
                     }
                     xfireDescriptor.addInterceptor(new MethodFixInterceptor());
 
-                    if (xfireDescriptor.getProperties().get("xfire") == null) {
+                    if (xfireDescriptor.getProperties().get("xfire") == null)
+                    {
                         xfireDescriptor.getProperties().put("xfire", xfire);
                     }
                     MuleManager.getInstance().getModel().registerComponent(xfireDescriptor);
                 }
-                catch (UMOException e) {
+                catch (UMOException e)
+                {
                     handleException(e);
                 }
             }

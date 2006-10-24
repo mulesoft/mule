@@ -42,7 +42,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     public void testClient() throws Exception
     {
         UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
-        FtpConnector c = (FtpConnector) createConnector();
+        FtpConnector c = (FtpConnector)createConnector();
         c.initialise();
         UMOMessageDispatcher d = c.getDispatcher(endpoint);
         UMOEvent e = getTestEvent(new NullPayload(), endpoint);
@@ -51,7 +51,8 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void sendTestData(int iterations) throws Exception
     {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             FileOutputStream fos = new FileOutputStream("c:\\temp\\ftp\\test\\test" + i + ".txt");
             fos.write(("Hello" + i).getBytes());
             fos.close();
@@ -65,9 +66,12 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("ftp://" + USERNAME + ":" + PASSWORD + "@" + HOSTNAME + "/" + ADDRESS);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }

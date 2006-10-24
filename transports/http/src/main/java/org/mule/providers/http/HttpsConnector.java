@@ -31,7 +31,7 @@ import org.mule.util.IOUtils;
 
 /**
  * <code>HttpsConnector</code> provides Https connectivity
- *
+ * 
  * @version $Revision$
  */
 public class HttpsConnector extends HttpConnector
@@ -66,109 +66,136 @@ public class HttpsConnector extends HttpConnector
 
     public void doInitialise() throws InitialisationException
     {
-        if (getProvider() == null) {
+        if (getProvider() == null)
+        {
             throw new NullPointerException("The security provider cannot be null");
         }
-        if (getKeyStore() == null) {
+        if (getKeyStore() == null)
+        {
             throw new NullPointerException("The KeyStore location cannot be null");
         }
-        if (getKeyPassword() == null) {
+        if (getKeyPassword() == null)
+        {
             throw new NullPointerException("The Key password cannot be null");
         }
-        if (getStorePassword() == null) {
+        if (getStorePassword() == null)
+        {
             throw new NullPointerException("The KeyStore password cannot be null");
         }
-        if (getKeyManagerAlgorithm() == null) {
+        if (getKeyManagerAlgorithm() == null)
+        {
             throw new NullPointerException("The Key Manager Algorithm cannot be null");
         }
 
         KeyStore keystore;
-        try {
+        try
+        {
             Security.addProvider(getProvider());
             // Create keyStore
             keystore = KeyStore.getInstance(keystoreType);
             InputStream is = IOUtils.getResourceAsStream(getKeyStore(), getClass());
-            if (is == null) {
+            if (is == null)
+            {
                 throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                        "Keystore: " + getKeyStore()).getMessage());
+                    "Keystore: " + getKeyStore()).getMessage());
             }
             keystore.load(is, getStorePassword().toCharArray());
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: "
-                    + getKeyStore()), e, this);
+                                                                                  + getKeyStore()), e, this);
         }
-        try {
+        try
+        {
             // Get key manager
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
             // Initialize the KeyManagerFactory to work with our keyStore
             keyManagerFactory.init(keystore, getKeyPassword().toCharArray());
         }
-        catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e,
-                    this);
+        catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e, this);
         }
 
-        if (getTrustStore() != null) {
+        if (getTrustStore() != null)
+        {
             KeyStore truststore;
-            try {
+            try
+            {
                 truststore = KeyStore.getInstance(trustStoreType);
                 InputStream is = IOUtils.getResourceAsStream(getTrustStore(), getClass());
-                if (is == null) {
-                    throw new FileNotFoundException("Failed to load truststore from classpath or local file: "
-                            + getTrustStore());
+                if (is == null)
+                {
+                    throw new FileNotFoundException(
+                        "Failed to load truststore from classpath or local file: " + getTrustStore());
                 }
                 truststore.load(is, getTrustStorePassword().toCharArray());
-            } catch (Exception e) {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "TrustStore: " + getTrustStore()),
-                        e,
-                        this);
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "TrustStore: "
+                                                                                      + getTrustStore()), e,
+                    this);
             }
 
-            try {
+            try
+            {
                 trustManagerFactory = TrustManagerFactory.getInstance(getTrustManagerAlgorithm());
                 trustManagerFactory.init(truststore);
-            } catch (Exception e) {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Trust Manager ("
-                        + getTrustManagerAlgorithm() + ")"), e, this);
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X,
+                    "Trust Manager (" + getTrustManagerAlgorithm() + ")"), e, this);
             }
         }
 
         super.doInitialise();
 
-        if (protocolHandler != null) {
+        if (protocolHandler != null)
+        {
             System.setProperty("java.protocol.handler.pkgs", protocolHandler);
         }
-        if (clientKeyStore != null) {
-            try {
+        if (clientKeyStore != null)
+        {
+            try
+            {
                 String clientPath = FileUtils.getResourcePath(clientKeyStore, getClass());
-                if (clientPath == null) {
-                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X,
-                            "ClientKeyStore: " + clientKeyStore), this);
+                if (clientPath == null)
+                {
+                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: "
+                                                                                          + clientKeyStore),
+                        this);
                 }
                 System.setProperty("javax.net.ssl.keyStore", clientPath);
                 System.setProperty("javax.net.ssl.keyStorePassword", clientKeyStorePassword);
 
                 logger.info("Set Client Key store: javax.net.ssl.keyStore=" + clientPath);
             }
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: "
-                        + clientKeyStore), this);
+                                                                                      + clientKeyStore), this);
             }
         }
 
-        if (trustStore != null) {
+        if (trustStore != null)
+        {
             System.setProperty("javax.net.ssl.trustStore", getTrustStore());
-            if (getTrustStorePassword() != null) {
+            if (getTrustStorePassword() != null)
+            {
                 System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
             }
             logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
         }
-        else if (!isExplicitTrustStoreOnly()) {
+        else if (!isExplicitTrustStoreOnly())
+        {
             logger.info("Defaulting trust store to client Key Store");
             trustStore = getClientKeyStore();
             trustStorePassword = getClientKeyStorePassword();
-            if(trustStore!=null) {
+            if (trustStore != null)
+            {
                 System.setProperty("javax.net.ssl.trustStore", getTrustStore());
                 System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
                 logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
@@ -212,28 +239,33 @@ public class HttpsConnector extends HttpConnector
         this.storePassword = storePassword;
     }
 
-    public String getTrustStoreType() {
+    public String getTrustStoreType()
+    {
         return trustStoreType;
     }
 
-    public void setTrustStoreType(String trustStoreType) {
+    public void setTrustStoreType(String trustStoreType)
+    {
         this.trustStoreType = trustStoreType;
     }
 
-
-    public TrustManagerFactory getTrustManagerFactory() {
+    public TrustManagerFactory getTrustManagerFactory()
+    {
         return trustManagerFactory;
     }
 
-    public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory) {
+    public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory)
+    {
         this.trustManagerFactory = trustManagerFactory;
     }
 
-    public String getTrustManagerAlgorithm() {
+    public String getTrustManagerAlgorithm()
+    {
         return trustManagerAlgorithm;
     }
 
-    public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
+    public void setTrustManagerAlgorithm(String trustManagerAlgorithm)
+    {
         this.trustManagerAlgorithm = trustManagerAlgorithm;
     }
 
@@ -310,7 +342,8 @@ public class HttpsConnector extends HttpConnector
     public void setClientKeyStore(String clientKeyStore) throws IOException
     {
         this.clientKeyStore = clientKeyStore;
-        if (this.clientKeyStore != null) {
+        if (this.clientKeyStore != null)
+        {
             this.clientKeyStore = FileUtils.getResourcePath(clientKeyStore, getClass());
             logger.debug("Normalised clientKeyStore path to: " + getClientKeyStore());
         }
@@ -334,7 +367,8 @@ public class HttpsConnector extends HttpConnector
     public void setTrustStore(String trustStore) throws IOException
     {
         this.trustStore = trustStore;
-        if (this.trustStore != null) {
+        if (this.trustStore != null)
+        {
             this.trustStore = FileUtils.getResourcePath(trustStore, getClass());
             logger.debug("Normalised trustStore path to: " + getTrustStore());
         }
@@ -360,12 +394,13 @@ public class HttpsConnector extends HttpConnector
         this.explicitTrustStoreOnly = explicitTrustStoreOnly;
     }
 
-
-    public SecurityProviderFactory getSecurityProviderFactory() {
+    public SecurityProviderFactory getSecurityProviderFactory()
+    {
         return spFactory;
     }
 
-    public void setSecurityProviderFactory(SecurityProviderFactory spFactory) {
+    public void setSecurityProviderFactory(SecurityProviderFactory spFactory)
+    {
         this.spFactory = spFactory;
     }
 }

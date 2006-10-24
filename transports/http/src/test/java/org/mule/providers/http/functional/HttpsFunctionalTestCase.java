@@ -37,10 +37,12 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("https://localhost:60198");
         }
-        catch (MalformedEndpointException e) {
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }

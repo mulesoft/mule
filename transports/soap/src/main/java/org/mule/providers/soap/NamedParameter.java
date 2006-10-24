@@ -18,11 +18,12 @@ import javax.xml.rpc.ParameterMode;
 
 /**
  * Representation of a Named parameter in a soap or XML-RPC call
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class NamedParameter {
+public class NamedParameter
+{
 
     public final int MODE_IN = 0;
     public final int MODE_OUT = 1;
@@ -88,26 +89,27 @@ public class NamedParameter {
     public static final QName XSD_LANGUAGE = new QName(URI_DEFAULT_SCHEMA_XSD, "language");
     public static final QName XSD_ID = new QName(URI_DEFAULT_SCHEMA_XSD, "ID");
     public static final QName XSD_SCHEMA = new QName(URI_DEFAULT_SCHEMA_XSD, "schema");
-    
 
     private QName name;
     private QName type;
     private ParameterMode mode;
 
-    public NamedParameter(QName name, QName type, String mode) {
+    public NamedParameter(QName name, QName type, String mode)
+    {
         this.name = name;
         this.type = type;
         setMode(mode);
     }
 
-
-    public NamedParameter(QName name, QName type, ParameterMode mode) {
+    public NamedParameter(QName name, QName type, ParameterMode mode)
+    {
         this.name = name;
         this.type = type;
         this.mode = mode;
     }
 
-    public NamedParameter(String name, String type, ParameterMode mode) {
+    public NamedParameter(String name, String type, ParameterMode mode)
+    {
         this.name = new QName(name);
         this.type = createQName(name);
         this.mode = mode;
@@ -116,29 +118,42 @@ public class NamedParameter {
     protected void setMode(String mode)
     {
         mode = mode.toLowerCase().trim();
-        if(mode.equals("in")) {
+        if (mode.equals("in"))
+        {
             this.mode = ParameterMode.IN;
-        } else if(mode.equals("out")) {
+        }
+        else if (mode.equals("out"))
+        {
             this.mode = ParameterMode.OUT;
-        } else if(mode.equals("inout")) {
+        }
+        else if (mode.equals("inout"))
+        {
             this.mode = ParameterMode.INOUT;
-        } else {
-            throw new IllegalArgumentException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, mode, "mode").toString());
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                new Message(Messages.VALUE_X_IS_INVALID_FOR_X, mode, "mode").toString());
         }
     }
-    public QName getName() {
+
+    public QName getName()
+    {
         return name;
     }
 
-    public QName getType() {
+    public QName getType()
+    {
         return type;
     }
 
-    public ParameterMode getMode() {
+    public ParameterMode getMode()
+    {
         return mode;
     }
 
-    public static QName createQName(String value) {
+    public static QName createQName(String value)
+    {
         return new QName(URI_DEFAULT_SCHEMA_XSD, value);
     }
 }

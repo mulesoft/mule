@@ -37,8 +37,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Constructor
      * 
-     * @param endpoint
-     *            The endpoint for this adapter
+     * @param endpoint The endpoint for this adapter
      */
     public DQMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -48,7 +47,8 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        try {
+        try
+        {
             DQMessage msg = (DQMessage)event.getMessage().getPayload();
             AS400 system = connector.getSystem();
 
@@ -59,31 +59,37 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
             dq.write(rec.getContents());
 
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             getConnector().handleException(e);
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("doDispatch(UMOEvent) - end");
         }
     }
 
     protected RecordFormat getRecordFormat(UMOEndpointURI endpointUri) throws Exception
     {
-        String recordDescriptor = (String)endpointUri.getParams().get(
-                DQConnector.RECORD_DESCRIPTOR_PROPERTY);
-        if (recordDescriptor == null) {
-            if (connector.getFormat() == null) {
+        String recordDescriptor = (String)endpointUri.getParams().get(DQConnector.RECORD_DESCRIPTOR_PROPERTY);
+        if (recordDescriptor == null)
+        {
+            if (connector.getFormat() == null)
+            {
                 throw new IllegalArgumentException("Property " + DQConnector.RECORD_DESCRIPTOR_PROPERTY
-                        + " must be set on the endpoint");
+                                                   + " must be set on the endpoint");
             }
-            else {
-                if (logger.isDebugEnabled()) {
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("Defaulting to connector format: " + connector.getRecordFormat());
                 }
                 return connector.getFormat();
             }
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Using endpoint-specific format: " + connector.getRecordFormat());
         }
         return DQMessageUtils.getRecordFormat(recordDescriptor, connector.getSystem());
@@ -103,24 +109,22 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint
-     *            the endpoint to use when connecting to the resource
-     * @param timeout
-     *            the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available.
-     *            If no data becomes available before the timeout elapses, null
-     *            will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null
-     *         will be returned if no data was avaialable
-     * @throws Exception
-     *             if the call to the underlying protocal cuases an exception
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
 
         DataQueue dq = new DataQueue(connector.getSystem(), endpoint.getEndpointURI().getAddress());
         DataQueueEntry entry = dq.read((int)timeout);
-        if (entry != null) {
+        if (entry != null)
+        {
             RecordFormat format = getRecordFormat(endpoint.getEndpointURI());
             DQMessage message = DQMessageUtils.getDQMessage(entry.getData(), format);
             message.setSenderInformation(entry.getSenderInformation());

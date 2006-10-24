@@ -28,7 +28,8 @@ public class StreamMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
-    public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException {
+    public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
+    {
         return new StreamMessageAdapter(payload);
     }
 

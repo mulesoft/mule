@@ -16,15 +16,16 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * A Dummy Url handler for handling jms.  This is needed becuase Axis uses urlStreamHandlers
- * to parse non-http urls.
- *
+ * A Dummy Url handler for handling jms. This is needed becuase Axis uses
+ * urlStreamHandlers to parse non-http urls.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class Handler extends java.net.URLStreamHandler
 {
-    protected URLConnection openConnection(URL url) {
+    protected URLConnection openConnection(URL url)
+    {
         return new VoidURLConnection(url);
     }
 }

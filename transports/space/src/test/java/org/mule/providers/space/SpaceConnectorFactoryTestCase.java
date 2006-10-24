@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.space;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -29,8 +30,9 @@ public class SpaceConnectorFactoryTestCase extends AbstractMuleTestCase
         assertTrue(endpoint.getConnector() instanceof SpaceConnector);
         assertTrue(getEndpointURI().endsWith(endpoint.getEndpointURI().toString()));
     }
-    
-    public String getEndpointURI() {
+
+    public String getEndpointURI()
+    {
         return "space:/test.space";
     }
 }

@@ -21,17 +21,18 @@ public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTes
 {
     UMOMessage reply;
 
-    protected void sendTestData(int iterations) throws Exception {
+    protected void sendTestData(int iterations) throws Exception
+    {
         reply = send(getInDest().getAddress(), TEST_MESSAGE, "text/plain;charset=UTFF-912");
     }
+
     protected void receiveAndTestResults() throws Exception
     {
         assertNotNull(reply);
         assertEquals("500", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertNotNull(reply.getExceptionPayload());
-        
-        callbackCalled=true;
+
+        callbackCalled = true;
     }
 
-    
 }

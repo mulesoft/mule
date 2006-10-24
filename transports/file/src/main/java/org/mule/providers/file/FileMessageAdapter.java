@@ -22,10 +22,10 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import java.io.File;
 
 /**
- * <code>FileMessageAdapter</code> provides a wrapper for a file reference.
- * Users can obtain the contents of the message through the payload property and
- * can get the filename and directory in the properties using PROPERTY_FILENAME
- * and PROPERTY_DIRECTORY.
+ * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
+ * can obtain the contents of the message through the payload property and can get
+ * the filename and directory in the properties using PROPERTY_FILENAME and
+ * PROPERTY_DIRECTORY.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -49,7 +49,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
 
         if (message instanceof File)
         {
-            this.setMessage((File) message);
+            this.setMessage((File)message);
         }
         else
         {
@@ -83,12 +83,11 @@ public class FileMessageAdapter extends AbstractMessageAdapter
                     // TODO unfortunately reading the file here is required,
                     // since otherwise the FileMessageReceiver might delete the
                     // file
-                    this.contents = (byte[]) transformer.transform(file);
-                } catch (Exception noPayloadException)
+                    this.contents = (byte[])transformer.transform(file);
+                }
+                catch (Exception noPayloadException)
                 {
-                    throw new MuleException(new Message(
-                            Messages.FAILED_TO_READ_PAYLOAD),
-                            noPayloadException);
+                    throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD), noPayloadException);
                 }
             }
             return contents;
@@ -98,13 +97,10 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     /**
      * Converts the message implementation into a String representation
      * 
-     * @param encoding
-     *            The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte
-     *            array
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
@@ -128,7 +124,8 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         {
             fileIsValid = (message != null && message.isFile());
             fileInvalidException = null;
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             // save any file access exceptions
             fileInvalidException = ex;
@@ -148,18 +145,15 @@ public class FileMessageAdapter extends AbstractMessageAdapter
                 exceptionArg = ObjectUtils.toString(message, "null");
             }
 
-            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST,
-                    ObjectUtils.toString(message, "null"));
+            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST, ObjectUtils.toString(message, "null"));
 
             throw new MessagingException(msg, exceptionArg);
         }
 
         this.file = message;
         this.contents = null;
-        this.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file
-                .getName());
-        this.setProperty(FileConnector.PROPERTY_DIRECTORY, this.file
-                .getParent());
+        this.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
+        this.setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
 
     public String getUniqueId()

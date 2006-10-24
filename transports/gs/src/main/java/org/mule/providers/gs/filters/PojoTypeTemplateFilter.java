@@ -27,8 +27,9 @@ public class PojoTypeTemplateFilter implements JavaSpaceFilter
 {
     private String expectedType;
 
-    public Entry getEntry() throws IllegalAccessException, NoSuchMethodException,
-            InvocationTargetException, InstantiationException, ClassNotFoundException
+    public Entry getEntry()
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException,
+        InstantiationException, ClassNotFoundException
     {
         if (expectedType == null)
         {
@@ -43,8 +44,7 @@ public class PojoTypeTemplateFilter implements JavaSpaceFilter
     /**
      * Check a given message against this filter.
      * 
-     * @param message
-     *            a non null message to filter.
+     * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
     public boolean accept(UMOMessage message)

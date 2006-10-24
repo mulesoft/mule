@@ -7,20 +7,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ejb;
 
 import org.mule.providers.rmi.RmiMessageDispatcher;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-
 /**
- * Invokes a method on an EJB object stored in Jndi.  A dispatcher is created for each type of object invoked
- *
+ * Invokes a method on an EJB object stored in Jndi. A dispatcher is created for each
+ * type of object invoked
  */
 public class EjbMessageDispatcher extends RmiMessageDispatcher
 {
 
-    public EjbMessageDispatcher(UMOImmutableEndpoint endpoint) {
+    public EjbMessageDispatcher(UMOImmutableEndpoint endpoint)
+    {
         super(endpoint);
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis.extensions;
 
 import org.apache.axis.AxisEngine;
@@ -19,8 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>MuleConfigProvider</code> is needed because the Simple Provider does
- * not list services in the defaultConfiguration
+ * <code>MuleConfigProvider</code> is needed because the Simple Provider does not
+ * list services in the defaultConfiguration
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -36,17 +37,17 @@ public class MuleConfigProvider extends SimpleProvider
     }
 
     /**
-     * Configure an AxisEngine. Right now just calls the default configuration
-     * if there is one, since we don't do anything special.
+     * Configure an AxisEngine. Right now just calls the default configuration if
+     * there is one, since we don't do anything special.
      */
     public void configureEngine(AxisEngine engine) throws ConfigurationException
     {
-        synchronized (this) {
-          engineConfiguration.configureEngine(engine);
-          super.configureEngine(engine);
+        synchronized (this)
+        {
+            engineConfiguration.configureEngine(engine);
+            super.configureEngine(engine);
         }
     }
-
 
     public Iterator getAxisDeployedServices() throws ConfigurationException
     {
@@ -57,11 +58,13 @@ public class MuleConfigProvider extends SimpleProvider
     {
         List services = new ArrayList();
         Iterator iter = engineConfiguration.getDeployedServices();
-        while (iter.hasNext()) {
+        while (iter.hasNext())
+        {
             services.add(iter.next());
         }
         iter = super.getDeployedServices();
-        while (iter.hasNext()) {
+        while (iter.hasNext())
+        {
             services.add(iter.next());
         }
         return services.iterator();

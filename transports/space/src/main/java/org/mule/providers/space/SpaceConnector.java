@@ -28,9 +28,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Provides generic connectivity to 'Spaces' that implment the Mule Space Api,
- * i.e. Gigaspaces, JCache implementations, Rio can be accessed as well as a
- * mule file, Journal or VM space.
+ * Provides generic connectivity to 'Spaces' that implment the Mule Space Api, i.e.
+ * Gigaspaces, JCache implementations, Rio can be accessed as well as a mule file,
+ * Journal or VM space.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -56,10 +56,12 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if (spaceFactory == null) {
+        if (spaceFactory == null)
+        {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "spaceFactory"), this);
         }
-        if (spaceProperties != null) {
+        if (spaceProperties != null)
+        {
             BeanUtils.populateWithoutFail(spaceFactory, spaceProperties, true);
         }
 
@@ -69,7 +71,8 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
     {
         logger.info("looking for space: " + spaceUrl);
         UMOSpace space = (UMOSpace)spaces.get(spaceUrl);
-        if (space == null) {
+        if (space == null)
+        {
             logger.info("Space not found, creating space: " + spaceUrl);
             space = spaceFactory.create(spaceUrl);
             spaces.put(spaceUrl, space);
@@ -78,9 +81,9 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * Will look up a space based on the URI. If the Space is created this
-     * method will honour the transaction information on the endpoint and set
-     * the space up accordingly
+     * Will look up a space based on the URI. If the Space is created this method
+     * will honour the transaction information on the endpoint and set the space up
+     * accordingly
      * 
      * @param endpoint
      * @return
@@ -91,18 +94,21 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
         String spaceKey = getSpaceKey(endpoint);
         logger.info("looking for space: " + spaceKey);
         UMOSpace space = (UMOSpace)spaces.get(spaceKey);
-        if (space == null) {
+        if (space == null)
+        {
             logger.info("Space not found, creating space: " + spaceKey);
             space = spaceFactory.create(endpoint);
             spaces.put(spaceKey, space);
-            if (endpoint.getTransactionConfig().getFactory() != null) {
+            if (endpoint.getTransactionConfig().getFactory() != null)
+            {
                 space.setTransactionFactory(endpoint.getTransactionConfig().getFactory());
             }
         }
         return space;
     }
 
-    protected String getSpaceKey(UMOImmutableEndpoint endpoint) {
+    protected String getSpaceKey(UMOImmutableEndpoint endpoint)
+    {
         return endpoint.getEndpointURI().toString();
     }
 
@@ -131,7 +137,8 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
      */
     protected void doDispose()
     {
-        for (Iterator iterator = spaces.values().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = spaces.values().iterator(); iterator.hasNext();)
+        {
             UMOSpace space = (UMOSpace)iterator.next();
             space.dispose();
         }
@@ -140,13 +147,14 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
 
     /**
      * The method determines the key used to store the receiver against.
-     *
+     * 
      * @param component the component for which the endpoint is being registered
-     * @param endpoint  the endpoint being registered for the component
+     * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
-        return super.getReceiverKey(component, endpoint) +
-                (endpoint.getFilter()!=null ? '#' + endpoint.getFilter().toString() : StringUtils.EMPTY);
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
+        return super.getReceiverKey(component, endpoint)
+               + (endpoint.getFilter() != null ? '#' + endpoint.getFilter().toString() : StringUtils.EMPTY);
     }
 }

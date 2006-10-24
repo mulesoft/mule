@@ -10,6 +10,8 @@
 
 package org.mule.providers.oracle.jms;
 
+import java.util.Map;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -22,81 +24,116 @@ import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
 
-import java.util.Map;
-
 import oracle.jms.AQjmsSession;
 
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
 
 /**
- * Extends the standard Mule JMS Provider with functionality specific to Oracle's
- * JMS implementation based on Advanced Queueing (Oracle AQ).
- *
- * Oracle 9i supports the JMS 1.0.2b specification while Oracle 10g supports JMS 1.1
- *
+ * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS
+ * implementation based on Advanced Queueing (Oracle AQ). Oracle 9i supports the JMS
+ * 1.0.2b specification while Oracle 10g supports JMS 1.1
+ * 
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @author henks
  * @see OracleJmsConnector
  * @see org.mule.providers.jms.Jms102bSupport
  * @see <a href="http://otn.oracle.com/pls/db102/">Streams Advanced Queuing</a>
- * @see <a href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96587/jcreate.htm#103729">Oracle9i J2EE Compliance</a>
+ * @see <a
+ *      href="http://www.lc.leidenuniv.nl/awcourse/oracle/appdev.920/a96587/jcreate.htm#103729">Oracle9i
+ *      J2EE Compliance</a>
  */
-public class OracleJmsSupport extends Jms102bSupport {
+public class OracleJmsSupport extends Jms102bSupport
+{
 
-    /** Since we can't access the endpoint's properties directly from the scope of this
-     * class, we save a copy of the properties in this local variable for easy
-     * reference. */
+    /**
+     * Since we can't access the endpoint's properties directly from the scope of
+     * this class, we save a copy of the properties in this local variable for easy
+     * reference.
+     */
     private Map endpointProperties;
 
-    public OracleJmsSupport(JmsConnector connector, Context context,
-                            boolean jndiDestinations, boolean forceJndiDestinations) {
+    public OracleJmsSupport(JmsConnector connector,
+                            Context context,
+                            boolean jndiDestinations,
+                            boolean forceJndiDestinations)
+    {
         super(connector, context, jndiDestinations, forceJndiDestinations);
     }
 
-    /** Returns an OracleJmsConnection to masquerade the fact that there might be several
-     *  javax.jms.Connections open (one per session).
+    /**
+     * Returns an OracleJmsConnection to masquerade the fact that there might be
+     * several javax.jms.Connections open (one per session).
+     * 
      * @see OracleJmsConnection
      */
-    public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
-        return createConnection(connectionFactory, /*username*/null, /*password*/null);
+    public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
+    {
+        return createConnection(connectionFactory, /* username */null, /* password */null);
     }
 
-    /** Returns an OracleJmsConnection to masquerade the fact that there might be several
-     *  javax.jms.Connections open (one per session).
+    /**
+     * Returns an OracleJmsConnection to masquerade the fact that there might be
+     * several javax.jms.Connections open (one per session).
+     * 
      * @see OracleJmsConnection
      */
     public javax.jms.Connection createConnection(ConnectionFactory connectionFactory,
-                                                    String username, String password) throws JMSException {
-        return new OracleJmsConnection((OracleJmsConnector) connector);
+                                                 String username,
+                                                 String password) throws JMSException
+    {
+        return new OracleJmsConnection((OracleJmsConnector)connector);
     }
 
-    /** In order to receive messages from a queue whose payload is an ADT (Oracle
+    /**
+     * In order to receive messages from a queue whose payload is an ADT (Oracle
      * Advanced Data Type), we must pass the payload factory as a parameter when
      * creating the receiver/subscriber.
-     * @see OracleJmsConnector#PAYLOADFACTORY_PROPERTY */
-    public MessageConsumer createConsumer(Session session, Destination destination,
-                                          String messageSelector, boolean noLocal,
-                                          String durableName, boolean topic) throws JMSException {
+     * 
+     * @see OracleJmsConnector#PAYLOADFACTORY_PROPERTY
+     */
+    public MessageConsumer createConsumer(Session session,
+                                          Destination destination,
+                                          String messageSelector,
+                                          boolean noLocal,
+                                          String durableName,
+                                          boolean topic) throws JMSException
+    {
 
         Object payloadFactory = getPayloadFactory();
-        if (payloadFactory == null) {
+        if (payloadFactory == null)
+        {
             return super.createConsumer(session, destination, messageSelector, noLocal, durableName, topic);
         }
-        else {
-            if (topic && session instanceof TopicSession) {
-                if (durableName == null) {
-                    return ((AQjmsSession) session).createSubscriber((Topic) destination, messageSelector, noLocal);
-                } else {
-                    return ((AQjmsSession) session).createDurableSubscriber((Topic) destination, messageSelector, durableName, noLocal, payloadFactory);
+        else
+        {
+            if (topic && session instanceof TopicSession)
+            {
+                if (durableName == null)
+                {
+                    return ((AQjmsSession)session).createSubscriber((Topic)destination, messageSelector,
+                        noLocal);
                 }
-            } else if (session instanceof QueueSession) {
-                if (messageSelector != null) {
-                    return ((AQjmsSession) session).createReceiver((Queue) destination, messageSelector, payloadFactory);
-                } else {
-                    return ((AQjmsSession) session).createReceiver((Queue) destination, payloadFactory);
+                else
+                {
+                    return ((AQjmsSession)session).createDurableSubscriber((Topic)destination,
+                        messageSelector, durableName, noLocal, payloadFactory);
                 }
-            } else {
+            }
+            else if (session instanceof QueueSession)
+            {
+                if (messageSelector != null)
+                {
+                    return ((AQjmsSession)session).createReceiver((Queue)destination, messageSelector,
+                        payloadFactory);
+                }
+                else
+                {
+                    return ((AQjmsSession)session).createReceiver((Queue)destination, payloadFactory);
+                }
+            }
+            else
+            {
                 throw new IllegalArgumentException("Session and domain type do not match");
             }
         }
@@ -104,71 +141,101 @@ public class OracleJmsSupport extends Jms102bSupport {
 
     /**
      * The standard Oracle JMS classes ({@code oracle.jms}) do not support dynamic
-     * (i.e., run-time) creation of queues.  This is only possible through the
-     * (non-standard) administrative classes ({@code oracle.AQ}).  Therefore this method,
-     * which calls {@code AQjmsSession.createQueue(name)} or
-     * {@code AQjmsSession.createTopic(name)} will inevitably fail.
-     *
-     *  The failure <i>should</i> produce a {@code JMSException} but for some reason it
-     *  doesn't (maybe an Oracle bug) and just returns null.  In this case, we generate
-     *  the appropriate exception.
+     * (i.e., run-time) creation of queues. This is only possible through the
+     * (non-standard) administrative classes ({@code oracle.AQ}). Therefore this
+     * method, which calls {@code AQjmsSession.createQueue(name)} or
+     * {@code AQjmsSession.createTopic(name)} will inevitably fail. The failure
+     * <i>should</i> produce a {@code JMSException} but for some reason it doesn't
+     * (maybe an Oracle bug) and just returns null. In this case, we generate the
+     * appropriate exception.
      */
-    public Destination createDestination(Session session, String name, boolean topic) throws JMSException {
+    public Destination createDestination(Session session, String name, boolean topic) throws JMSException
+    {
         Destination dest = super.createDestination(session, name, topic);
-        if (dest != null) return dest;
-        else throw new JMSException("Oracle JMS was unable to bind to the " + (topic ? "topic" : "queue") + ": " + name
-            + " but gives no exception nor error message to explain why (that's what you get for using proprietary software...)");
+        if (dest != null)
+            return dest;
+        else
+            throw new JMSException(
+                "Oracle JMS was unable to bind to the "
+                                + (topic ? "topic" : "queue")
+                                + ": "
+                                + name
+                                + " but gives no exception nor error message to explain why (that's what you get for using proprietary software...)");
     }
 
     /**
      * The standard Oracle JMS classes ({@code oracle.jms}) do not support dynamic
-     * (i.e., run-time) creation of queues.  This is only possible through the
-     * (non-standard) administrative classes ({@code oracle.AQ}).  Therefore this method,
-     * which calls {@code AQjmsSession.createQueue(name)} or
-     * {@code AQjmsSession.createTopic(name)} will inevitably fail.
-     *
-     *  The failure <i>should</i> produce a {@code JMSException} but for some reason it
-     *  doesn't (maybe an Oracle bug) and just returns null.  In this case, we generate
-     *  the appropriate exception.
+     * (i.e., run-time) creation of queues. This is only possible through the
+     * (non-standard) administrative classes ({@code oracle.AQ}). Therefore this
+     * method, which calls {@code AQjmsSession.createQueue(name)} or
+     * {@code AQjmsSession.createTopic(name)} will inevitably fail. The failure
+     * <i>should</i> produce a {@code JMSException} but for some reason it doesn't
+     * (maybe an Oracle bug) and just returns null. In this case, we generate the
+     * appropriate exception.
      */
-    public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException {
+    public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException
+    {
         Destination dest = super.createTemporaryDestination(session, topic);
-        if (dest != null) return dest;
-        else throw new JMSException("Unable to create temporary " + (topic ? "topic" : "queue"));
+        if (dest != null)
+            return dest;
+        else
+            throw new JMSException("Unable to create temporary " + (topic ? "topic" : "queue"));
     }
 
-    /** Get the payload factory class, if defined, from the connector or endpoint's
+    /**
+     * Get the payload factory class, if defined, from the connector or endpoint's
      * properties.
-     * @see OracleJmsConnector#PAYLOADFACTORY_PROPERTY */
-    public Object getPayloadFactory() throws JMSException {
+     * 
+     * @see OracleJmsConnector#PAYLOADFACTORY_PROPERTY
+     */
+    public Object getPayloadFactory() throws JMSException
+    {
 
         // Get the global property set on the connector, if any.
-        String payloadFactoryClass = ((OracleJmsConnector) connector).getPayloadFactory();
+        String payloadFactoryClass = ((OracleJmsConnector)connector).getPayloadFactory();
 
         // If the property has been set for this endpoint, it overrides the global
         // setting.
         if ((endpointProperties != null)
-            && (endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY) != null)) {
-            payloadFactoryClass = (String) endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY);
+            && (endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY) != null))
+        {
+            payloadFactoryClass = (String)endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY);
         }
 
         Object payloadFactory = null;
-        if (payloadFactoryClass != null) {
+        if (payloadFactoryClass != null)
+        {
             Throwable ex = null;
-            try {
+            try
+            {
                 payloadFactory = Class.forName(payloadFactoryClass).newInstance();
-            } catch (ClassNotFoundException e) { ex = e;
-            } catch (IllegalAccessException e) { ex = e;
-            } catch (InstantiationException e) { ex = e;
-            } if (ex != null) throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass + ": " + ex.getMessage());
+            }
+            catch (ClassNotFoundException e)
+            {
+                ex = e;
+            }
+            catch (IllegalAccessException e)
+            {
+                ex = e;
+            }
+            catch (InstantiationException e)
+            {
+                ex = e;
+            }
+            if (ex != null)
+                throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass
+                                       + ": " + ex.getMessage());
         }
         return payloadFactory;
     }
 
-    public Map getEndpointProperties() {
+    public Map getEndpointProperties()
+    {
         return endpointProperties;
     }
-    public void setEndpointProperties(Map endpointProperties) {
+
+    public void setEndpointProperties(Map endpointProperties)
+    {
         this.endpointProperties = endpointProperties;
     }
 

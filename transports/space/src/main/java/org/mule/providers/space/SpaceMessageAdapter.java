@@ -33,9 +33,8 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter
     /**
      * Creates a default message adapter with properties and attachments
      * 
-     * @param message
-     *            the message to wrap. If this is null and NullPayload object will be
-     *            used
+     * @param message the message to wrap. If this is null and NullPayload object
+     *            will be used
      * @see org.mule.providers.NullPayload
      */
     public SpaceMessageAdapter(Object message) throws MessageTypeNotSupportedException
@@ -59,12 +58,10 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter
     /**
      * Converts the message implementation into a String representation
      * 
-     * @param encoding
-     *            The encoding to use when transforming the message (if necessary).
-     *            The parameter is used when converting from a byte array
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception
     {

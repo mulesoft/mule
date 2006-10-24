@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp;
 
 import org.mule.umo.UMOException;
@@ -25,6 +26,6 @@ public class TcpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new TcpMessageDispatcher( endpoint);
+        return new TcpMessageDispatcher(endpoint);
     }
 }

@@ -59,7 +59,7 @@ import java.util.Properties;
 /**
  * <p>
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -78,49 +78,55 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        if(client==null) {
+        if (client == null)
+        {
             client = new HttpClient();
 
             HttpState state = new HttpState();
-            if (connector.getProxyUsername() != null) {
+            if (connector.getProxyUsername() != null)
+            {
                 state.setProxyCredentials(new AuthScope(null, -1, null, null),
-                        new UsernamePasswordCredentials(connector.getProxyUsername(), connector
-                                .getProxyPassword()));
+                    new UsernamePasswordCredentials(connector.getProxyUsername(),
+                        connector.getProxyPassword()));
             }
             client.setState(state);
             client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
 
-            //test the connection
-//            HeadMethod method = new HeadMethod(endpoint.getEndpointURI().getAddress());
-//            client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()), method);
+            // test the connection
+            // HeadMethod method = new
+            // HeadMethod(endpoint.getEndpointURI().getAddress());
+            // client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()),
+            // method);
         }
 
     }
 
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() throws Exception
+    {
         client = null;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
     protected void doDispatch(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
         execute(event, httpMethod, true);
-        if (httpMethod.getStatusCode() >= 400) {
+        if (httpMethod.getStatusCode() >= 400)
+        {
             logger.error(httpMethod.getResponseBodyAsString());
             throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
-                    "Http call returned a status of: " + httpMethod.getStatusCode() + " "
-                            + httpMethod.getStatusText()));
+                "Http call returned a status of: " + httpMethod.getStatusCode() + " "
+                                + httpMethod.getStatusText()));
         }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
@@ -130,7 +136,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -140,54 +146,66 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     *
+     * 
      * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout  the maximum time the operation should block before returning. The call should
-     *                 return immediately if there is data available. If no data becomes available before the timeout
-     *                 elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     *         avaialable
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
 
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
         httpMethod.setDoAuthentication(true);
-        if (endpoint.getEndpointURI().getUserInfo() != null && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION)==null) {
+        if (endpoint.getEndpointURI().getUserInfo() != null
+            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
+        {
             // Add User Creds
             StringBuffer header = new StringBuffer(128);
             header.append("Basic ");
-            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(endpoint.getEncoding()))));
+            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
+                endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
-        try {
+        try
+        {
             HttpClient client = new HttpClient();
             client.executeMethod(httpMethod);
 
-            if (httpMethod.getStatusCode() == HttpStatus.SC_OK) {
+            if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
+            {
                 return (UMOMessage)receiveTransformer.transform(httpMethod);
             }
-            else {
-                throw new ReceiveException(
-                        new Message("http", 3, httpMethod.getStatusLine().toString()), endpoint, timeout);
+            else
+            {
+                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()),
+                    endpoint, timeout);
             }
         }
-        catch (ReceiveException e) {
+        catch (ReceiveException e)
+        {
             throw e;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new ReceiveException(endpoint, timeout, e);
         }
-        finally {
+        finally
+        {
             httpMethod.releaseConnection();
         }
     }
 
     protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod, boolean closeConnection)
-            throws Exception
+        throws Exception
     {
         // TODO set connection timeout buffer etc
-        try {
+        try
+        {
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
             processCookies(event);
@@ -196,15 +214,19 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
             return httpMethod;
         }
-        catch (ConnectException cex) {
+        catch (ConnectException cex)
+        {
             // TODO employ dispatcher reconnection strategy at this point
             throw new DispatchException(event.getMessage(), event.getEndpoint(), cex);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
-        finally {
-            if (httpMethod != null && closeConnection) {
+        finally
+        {
+            if (httpMethod != null && closeConnection)
+            {
                 httpMethod.releaseConnection();
             }
         }
@@ -214,7 +236,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOMessage msg = event.getMessage();
         Cookie[] cookies = (Cookie[])msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-        if (cookies != null && cookies.length > 0) {
+        if (cookies != null && cookies.length > 0)
+        {
             String policy = (String)msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
             client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
             client.getState().addCookies(cookies);
@@ -224,41 +247,47 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected HttpMethod getMethod(UMOEvent event) throws TransformerException
     {
         UMOMessage msg = event.getMessage();
-        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
-                HttpConstants.METHOD_POST);
+        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod;
         Object body = event.getTransformedMessage();
 
-        if (body instanceof HttpMethod) {
+        if (body instanceof HttpMethod)
+        {
             httpMethod = (HttpMethod)body;
         }
-        else if (HttpConstants.METHOD_GET.equalsIgnoreCase(method)) {
+        else if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
+        {
             httpMethod = new GetMethod(uri.toString());
         }
-        else {
+        else
+        {
             PostMethod postMethod = new PostMethod(uri.toString());
 
-            if (body instanceof String) {
+            if (body instanceof String)
+            {
                 ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
                 httpMethod = (HttpMethod)trans.transform(body.toString());
             }
-            else if (body instanceof HttpMethod) {
+            else if (body instanceof HttpMethod)
+            {
                 httpMethod = (HttpMethod)body;
             }
-            else if (body instanceof UMOStreamMessageAdapter) {
-                 UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
+            else if (body instanceof UMOStreamMessageAdapter)
+            {
+                UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
                 Map headers = sma.getOutputHandler().getHeaders(event);
-                for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
-                    Map.Entry entry = (Map.Entry) iterator.next();
+                for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry)iterator.next();
                     postMethod.addRequestHeader((String)entry.getKey(), (String)entry.getValue());
                 }
-                postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body,
-                        event));
+                postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body, event));
                 postMethod.setContentChunked(true);
                 httpMethod = postMethod;
             }
-            else {
+            else
+            {
                 byte[] buffer = event.getTransformedMessageAsBytes();
                 postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
                 httpMethod = postMethod;
@@ -266,28 +295,29 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         }
         httpMethod.setDoAuthentication(true);
-        if (event.getCredentials() != null) {
+        if (event.getCredentials() != null)
+        {
             String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
             int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
             String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
             String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
             client.getState().setCredentials(
-                    new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                    new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
-                            event.getCredentials().getPassword())));
+                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
+                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
+                    event.getCredentials().getPassword())));
             client.getParams().setAuthenticationPreemptive(true);
-        } else {
-            //don't use preemptive if there are no credentials to send
+        }
+        else
+        {
+            // don't use preemptive if there are no credentials to send
             client.getParams().setAuthenticationPreemptive(false);
         }
         return httpMethod;
     }
 
-
-
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception
@@ -296,37 +326,44 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         httpMethod = execute(event, httpMethod, false);
 
-        try {
+        try
+        {
             Properties h = new Properties();
             Header[] headers = httpMethod.getResponseHeaders();
-            for (int i = 0; i < headers.length; i++) {
+            for (int i = 0; i < headers.length; i++)
+            {
                 h.setProperty(headers[i].getName(), headers[i].getValue());
             }
 
             String status = String.valueOf(httpMethod.getStatusCode());
 
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Http response is: " + status);
             }
             ExceptionPayload ep = null;
-            if (httpMethod.getStatusCode() >= 400) {
+            if (httpMethod.getStatusCode() >= 400)
+            {
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
-                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
-                                + " " + httpMethod.getStatusText())));
+                    new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " "
+                                  + httpMethod.getStatusText())));
             }
             UMOMessage m;
             // text or binary content?
             Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
-            if ((header != null) && event.isStreaming()) {
+            if ((header != null) && event.isStreaming())
+            {
                 HttpStreamMessageAdapter sp = (HttpStreamMessageAdapter)connector.getStreamMessageAdapter(
-                        httpMethod.getResponseBodyAsStream(), null);
+                    httpMethod.getResponseBodyAsStream(), null);
                 sp.setHttpMethod(httpMethod);
                 m = new MuleMessage(sp, h);
             }
-            else {
+            else
+            {
                 Object body = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
-                if(body == null) {
+                if (body == null)
+                {
                     body = StringUtils.EMPTY;
                 }
                 UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{body, h});
@@ -335,17 +372,18 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             m.setExceptionPayload(ep);
             return m;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
-        finally {
-            if (httpMethod != null && !event.isStreaming()) {
+        finally
+        {
+            if (httpMethod != null && !event.isStreaming())
+            {
                 httpMethod.releaseConnection();
             }
         }
     }
-
-
 
     protected HostConfiguration getHostConfig(URI uri) throws URISyntaxException
     {
@@ -355,7 +393,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         int port = uri.getPort();
         HostConfiguration config = new HostConfiguration();
         config.setHost(host, port, protocol);
-        if (StringUtils.isNotBlank(connector.getProxyHostname())) {
+        if (StringUtils.isNotBlank(connector.getProxyHostname()))
+        {
             // add proxy support
             config.setProxy(connector.getProxyHostname(), connector.getProxyPort());
         }

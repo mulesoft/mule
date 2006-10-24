@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import org.mule.config.i18n.Message;
@@ -44,20 +45,27 @@ public class DQMessageReceiver extends PollingMessageReceiver
 
         this.dataQueue = pDq;
 
-        String recordDescriptor = (String) endpoint.getEndpointURI()
-                                                   .getParams()
-                                                   .get(DQConnector.RECORD_DESCRIPTOR_PROPERTY);
-        if (recordDescriptor == null) {
-            format = ((DQConnector) connector).getFormat();
-            if (format == null) {
+        String recordDescriptor = (String)endpoint.getEndpointURI().getParams().get(
+            DQConnector.RECORD_DESCRIPTOR_PROPERTY);
+        if (recordDescriptor == null)
+        {
+            format = ((DQConnector)connector).getFormat();
+            if (format == null)
+            {
                 throw new InitialisationException(new Message("dq", 1), this);
             }
-        } else {
-            try {
+        }
+        else
+        {
+            try
+            {
                 format = DQMessageUtils.getRecordFormat(recordDescriptor, pAs400);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "recordDescriptor: "
-                        + recordDescriptor), e, this);
+                                                                                      + recordDescriptor), e,
+                    this);
             }
         }
     }
@@ -67,16 +75,20 @@ public class DQMessageReceiver extends PollingMessageReceiver
      */
     public final void poll()
     {
-        try {
+        try
+        {
             DataQueueEntry entry = dataQueue.read();
 
-            if (entry == null) {
+            if (entry == null)
+            {
                 return;
             }
 
             processEntry(entry);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             handleException(e);
         }
 

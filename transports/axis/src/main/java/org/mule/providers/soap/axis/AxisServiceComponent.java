@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.AxisEngine;
@@ -64,16 +65,15 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>AxisServiceComponent</code> is a Mule component implementation of the
- * Axis servlet. This component supports all the features of the Axis servlet
- * except -
+ * <code>AxisServiceComponent</code> is a Mule component implementation of the Axis
+ * servlet. This component supports all the features of the Axis servlet except -
  * <ol>
- * <li>Jws class services are not supported as they don't add any value to the
- * Mule model</li>
- * <li>Currently there is no HttpSession support. This will be fixed when
- * Session support is added to the Http Connector</li>
+ * <li>Jws class services are not supported as they don't add any value to the Mule
+ * model</li>
+ * <li>Currently there is no HttpSession support. This will be fixed when Session
+ * support is added to the Http Connector</li>
  * </ol>
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -106,32 +106,34 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     /**
      * Passes the context to the listener
-     *
+     * 
      * @param context the context to process
      * @return Object this object can be anything. When the
-     *         <code>UMOLifecycleAdapter</code> for the component receives
-     *         this object it will first see if the Object is an
-     *         <code>UMOEvent</code> if not and the Object is not null a new
-     *         context will be created using the returned object as the payload.
-     *         This new context will then get published to the configured
-     *         outbound endpoint if-
+     *         <code>UMOLifecycleAdapter</code> for the component receives this
+     *         object it will first see if the Object is an <code>UMOEvent</code>
+     *         if not and the Object is not null a new context will be created using
+     *         the returned object as the payload. This new context will then get
+     *         published to the configured outbound endpoint if-
      *         <ol>
      *         <li>One has been configured for the UMO.</li>
-     *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't
-     *         called on the previous context.</li>
+     *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called
+     *         on the previous context.</li>
      *         </ol>
      * @throws Exception if the context fails to process properly. If exceptions
-     *             aren't handled by the implementation they will be handled by
-     *             the exceptionListener associated with the component
+     *             aren't handled by the implementation they will be handled by the
+     *             exceptionListener associated with the component
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
         WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter(4096));
         String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
-                HttpConstants.METHOD_POST);
-        if (HttpConstants.METHOD_GET.equalsIgnoreCase(method)) {
+            HttpConstants.METHOD_POST);
+        if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
+        {
             doGet(context, response);
-        } else {
+        }
+        else
+        {
             doPost(context, response);
         }
         response.getWriter().close();
@@ -143,75 +145,105 @@ public class AxisServiceComponent implements Initialisable, Callable
         // template method
     }
 
-    public void doGet(UMOEventContext context, WriterMessageAdapter response) throws UMOException, IOException
+    public void doGet(UMOEventContext context, WriterMessageAdapter response)
+        throws UMOException, IOException
     {
-        try {
-            //We parse a new uri based on the listening host and port with the request parameters appended
-            //Using the soap prefix ensures that we use a soap endpoint builder
+        try
+        {
+            // We parse a new uri based on the listening host and port with the
+            // request parameters appended
+            // Using the soap prefix ensures that we use a soap endpoint builder
             UMOEndpointURI endpointUri = context.getEndpointURI();
-            if(!"servlet".equalsIgnoreCase(context.getEndpointURI().getSchemeMetaInfo())) {
-                String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme() + "://" + context.getEndpointURI().getHost() + ":" + context.getEndpointURI().getPort();
+            if (!"servlet".equalsIgnoreCase(context.getEndpointURI().getSchemeMetaInfo()))
+            {
+                String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
+                             + "://" + context.getEndpointURI().getHost() + ":"
+                             + context.getEndpointURI().getPort();
                 uri += context.getMessageAsString();
                 endpointUri = new MuleEndpointURI(uri);
             }
 
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
-            // String realpath = servletContext.getRealPath(request.getServletPath());
+            // String realpath =
+            // servletContext.getRealPath(request.getServletPath());
             boolean wsdlRequested = false;
             boolean listRequested = false;
 
-            if (endpointUri.getAddress().endsWith(".jws")) {
+            if (endpointUri.getAddress().endsWith(".jws"))
+            {
                 throw new AxisFault("Jws not supported by the Mule Axis service");
             }
 
             String queryString = endpointUri.getQuery();
-            if (queryString != null) {
-                if (queryString.equalsIgnoreCase(SoapConstants.WSDL_PROPERTY)) {
+            if (queryString != null)
+            {
+                if (queryString.equalsIgnoreCase(SoapConstants.WSDL_PROPERTY))
+                {
                     wsdlRequested = true;
-                } else {
-                    if (queryString.equalsIgnoreCase(SoapConstants.LIST_PROPERTY)) {
+                }
+                else
+                {
+                    if (queryString.equalsIgnoreCase(SoapConstants.LIST_PROPERTY))
+                    {
                         listRequested = true;
                     }
                 }
             }
 
             boolean hasNoPath = (StringUtils.isEmpty(pathInfo) || pathInfo.equals("/"));
-            if (!wsdlRequested && !listRequested && hasNoPath) {
+            if (!wsdlRequested && !listRequested && hasNoPath)
+            {
                 reportAvailableServices(context, response);
-            } else {
+            }
+            else
+            {
                 // if(realpath != null)
                 MessageContext msgContext = new MessageContext(engine);
                 populateMessageContext(msgContext, context, endpointUri);
 
                 msgContext.setProperty("transport.url", endpointUri.toString());
-                if (wsdlRequested) {
+                if (wsdlRequested)
+                {
                     processWsdlRequest(msgContext, response);
                 }
-                else if (listRequested) {
+                else if (listRequested)
+                {
                     processListRequest(response);
                 }
-                else if (true /* hasParameters */) {
+                else if (true /* hasParameters */)
+                {
                     processMethodRequest(msgContext, context, response, endpointUri);
-                } else {
-                    String serviceName = (String) msgContext.getProperty("serviceName");
-                    if (pathInfo.startsWith("/")) {
+                }
+                else
+                {
+                    String serviceName = (String)msgContext.getProperty("serviceName");
+                    if (pathInfo.startsWith("/"))
+                    {
                         serviceName = pathInfo.substring(1);
                     }
-                    else {
+                    else
+                    {
                         serviceName = pathInfo;
                     }
                     SOAPService s = engine.getService(serviceName);
-                    if (s == null) {
+                    if (s == null)
+                    {
                         reportCantGetAxisService(context, response);
-                    } else {
+                    }
+                    else
+                    {
                         reportServiceInfo(response, s, serviceName);
                     }
                 }
             }
-        } catch (AxisFault fault) {
+        }
+        catch (AxisFault fault)
+        {
             reportTroubleInGet(fault, response);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             reportTroubleInGet(e, response);
         }
     }
@@ -222,11 +254,14 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
         response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
         response.write("<p>" + Messages.getMessage("somethingWrong00") + "</p>");
-        if (exception instanceof AxisFault) {
-            AxisFault fault = (AxisFault) exception;
+        if (exception instanceof AxisFault)
+        {
+            AxisFault fault = (AxisFault)exception;
             processAxisFault(fault);
             writeFault(response, fault);
-        } else {
+        }
+        else
+        {
             logException(exception);
             response.write("<pre>Exception - " + exception + "<br>");
             response.write("</pre>");
@@ -236,10 +271,13 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected void processAxisFault(AxisFault fault)
     {
         org.w3c.dom.Element runtimeException = fault.lookupFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
-        if (runtimeException != null) {
+        if (runtimeException != null)
+        {
             exceptionLog.info(Messages.getMessage("axisFault00"), fault);
             fault.removeFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
-        } else if (exceptionLog.isDebugEnabled()) {
+        }
+        else if (exceptionLog.isDebugEnabled())
+        {
             exceptionLog.debug(Messages.getMessage("axisFault00"), fault);
         }
 
@@ -265,52 +303,68 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         Properties params = endpointUri.getUserParams();
 
-        String method = (String) params.remove(MuleProperties.MULE_METHOD_PROPERTY);
-        if (method == null) {
+        String method = (String)params.remove(MuleProperties.MULE_METHOD_PROPERTY);
+        if (method == null)
+        {
             method = endpointUri.getPath().substring(endpointUri.getPath().lastIndexOf("/") + 1);
         }
         StringBuffer args = new StringBuffer(64);
 
         Map.Entry entry;
-        for (Iterator iterator = params.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+        for (Iterator iterator = params.entrySet().iterator(); iterator.hasNext();)
+        {
+            entry = (Map.Entry)iterator.next();
             args.append("<").append(entry.getKey()).append(">");
             args.append(entry.getValue());
             args.append("</").append(entry.getKey()).append(">");
         }
 
-        if (method == null) {
+        if (method == null)
+        {
             response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "400");
-            response.write("<h2>" + Messages.getMessage("error00") + ":  " + Messages.getMessage("invokeGet00")
-                    + "</h2>");
+            response.write("<h2>" + Messages.getMessage("error00") + ":  "
+                           + Messages.getMessage("invokeGet00") + "</h2>");
             response.write("<p>" + Messages.getMessage("noMethod01") + "</p>");
-        } else {
+        }
+        else
+        {
             invokeEndpointFromGet(msgContext, response, method, args.toString());
         }
     }
 
-    protected void processWsdlRequest(MessageContext msgContext, WriterMessageAdapter response) throws AxisFault
+    protected void processWsdlRequest(MessageContext msgContext, WriterMessageAdapter response)
+        throws AxisFault
     {
         AxisEngine engine = getAxisServer();
-        try {
+        try
+        {
             engine.generateWSDL(msgContext);
-            Document doc = (Document) msgContext.getProperty("WSDL");
-            if (doc != null) {
+            Document doc = (Document)msgContext.getProperty("WSDL");
+            if (doc != null)
+            {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 XMLUtils.DocumentToWriter(doc, response.getWriter());
-            } else {
-                if (logger.isDebugEnabled()) {
+            }
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("processWsdlRequest: failed to create WSDL");
                 }
                 reportNoWSDL(response, "noWSDL02", null);
             }
-        } catch (AxisFault axisFault) {
-            if (axisFault.getFaultCode().equals(Constants.QNAME_NO_SERVICE_FAULT_CODE)) {
+        }
+        catch (AxisFault axisFault)
+        {
+            if (axisFault.getFaultCode().equals(Constants.QNAME_NO_SERVICE_FAULT_CODE))
+            {
                 processAxisFault(axisFault);
                 response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
                 reportNoWSDL(response, "noWSDL01", axisFault);
-            } else {
+            }
+            else
+            {
                 throw axisFault;
             }
         }
@@ -323,9 +377,10 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         String body = "<" + method + ">" + args + "</" + method + ">";
         String msgtxt = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"><SOAP-ENV:Body>"
-                + body + "</SOAP-ENV:Body>" + "</SOAP-ENV:Envelope>";
+                        + body + "</SOAP-ENV:Body>" + "</SOAP-ENV:Envelope>";
         Message responseMsg = null;
-        try {
+        try
+        {
             ByteArrayInputStream istream = new ByteArrayInputStream(msgtxt.getBytes("ISO-8859-1"));
             AxisEngine engine = getAxisServer();
             Message msg = new Message(istream, false);
@@ -334,14 +389,19 @@ public class AxisServiceComponent implements Initialisable, Callable
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HTTPConstants.HEADER_CACHE_CONTROL, "no-cache");
             response.setProperty(HTTPConstants.HEADER_PRAGMA, "no-cache");
-            if (responseMsg == null) {
+            if (responseMsg == null)
+            {
                 throw new Exception(Messages.getMessage("noResponse01"));
             }
-        } catch (AxisFault fault) {
+        }
+        catch (AxisFault fault)
+        {
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = new Message(fault);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
             responseMsg = convertExceptionToAxisFault(e, responseMsg);
         }
@@ -360,18 +420,24 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected void processListRequest(WriterMessageAdapter response) throws AxisFault
     {
         AxisEngine engine = getAxisServer();
-        if (enableList) {
+        if (enableList)
+        {
             Document doc = Admin.listConfig(engine);
-            if (doc != null) {
+            if (doc != null)
+            {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 XMLUtils.DocumentToWriter(doc, response.getWriter());
-            } else {
+            }
+            else
+            {
                 response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
                 response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
                 response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
                 response.write("<p>" + Messages.getMessage("noDeploy00") + "</p>");
             }
-        } else {
+        }
+        else
+        {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "403");
             response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
             response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
@@ -385,38 +451,45 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
         response.write("<p>" + Messages.getMessage("noWSDL00") + "</p>");
-        if (moreDetailCode != null) {
+        if (moreDetailCode != null)
+        {
             response.write("<p>" + Messages.getMessage(moreDetailCode) + "</p>");
         }
 
     }
 
     protected void reportAvailableServices(UMOEventContext context, WriterMessageAdapter response)
-            throws ConfigurationException, AxisFault
+        throws ConfigurationException, AxisFault
     {
         AxisEngine engine = getAxisServer();
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>And now... Some Services</h2>");
         String version = MuleManager.getConfiguration().getProductVersion();
-        if (version == null) {
+        if (version == null)
+        {
             version = "Version Not Set";
         }
         response.write("<h5>(Mule - " + version + ")</h5>");
         Iterator i;
 
-        try {
+        try
+        {
             response.write("<table width=\"400\"><tr><th>Mule Component Services</th><th>Axis Services</th></tr><tr><td width=\"200\" valign=\"top\">");
             i = engine.getConfig().getDeployedServices();
             listServices(i, response);
             response.write("</td><td width=\"200\" valign=\"top\">");
-            i = ((MuleConfigProvider) engine.getConfig()).getAxisDeployedServices();
+            i = ((MuleConfigProvider)engine.getConfig()).getAxisDeployedServices();
             listServices(i, response);
             response.write("</td></tr></table>");
-        } catch (ConfigurationException configException) {
-            if (configException.getContainedException() instanceof AxisFault) {
-                throw (AxisFault) configException.getContainedException();
+        }
+        catch (ConfigurationException configException)
+        {
+            if (configException.getContainedException() instanceof AxisFault)
+            {
+                throw (AxisFault)configException.getContainedException();
             }
-            else {
+            else
+            {
                 throw configException;
             }
         }
@@ -426,31 +499,37 @@ public class AxisServiceComponent implements Initialisable, Callable
     private void listServices(Iterator i, WriterMessageAdapter response)
     {
         response.write("<ul>");
-        while (i.hasNext()) {
-            ServiceDesc sd = (ServiceDesc) i.next();
+        while (i.hasNext())
+        {
+            ServiceDesc sd = (ServiceDesc)i.next();
             StringBuffer sb = new StringBuffer(512);
             sb.append("<li>");
             String name = sd.getName();
             sb.append(name);
             sb.append(" <a href=\"");
-            if (sd.getEndpointURL() != null) {
+            if (sd.getEndpointURL() != null)
+            {
                 sb.append(sd.getEndpointURL());
-                if (!sd.getEndpointURL().endsWith("/")) {
+                if (!sd.getEndpointURL().endsWith("/"))
+                {
                     sb.append("/");
                 }
             }
             sb.append(name);
             sb.append("?wsdl\"><i>(wsdl)</i></a></li>");
             response.write(sb.toString());
-            if (sd.getDocumentation() != null) {
+            if (sd.getDocumentation() != null)
+            {
                 response.write("<ul><h6>" + sd.getDocumentation() + "</h6></ul>");
             }
             ArrayList operations = sd.getOperations();
-            if (!operations.isEmpty()) {
+            if (!operations.isEmpty())
+            {
                 response.write("<ul>");
                 OperationDesc desc;
-                for (Iterator it = operations.iterator(); it.hasNext();) {
-                    desc = (OperationDesc) it.next();
+                for (Iterator it = operations.iterator(); it.hasNext();)
+                {
+                    desc = (OperationDesc)it.next();
                     response.write("<li>" + desc.getName());
                 }
                 response.write("</ul>");
@@ -467,84 +546,105 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<p>" + Messages.getMessage("noService06") + "</p>");
     }
 
-    public void doPost(UMOEventContext context, WriterMessageAdapter response) throws ServletException, IOException
+    public void doPost(UMOEventContext context, WriterMessageAdapter response)
+        throws ServletException, IOException
     {
         String soapAction = null;
         AxisEngine engine = getAxisServer();
-        if (engine == null) {
+        if (engine == null)
+        {
             ServletException se = new ServletException(Messages.getMessage("noEngine00"));
             logger.debug("No Engine!", se);
             throw se;
         }
         MessageContext msgContext = new MessageContext(engine);
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Enter: doPost()");
         }
         Message responseMsg = null;
         String contentType = null;
-        try {
+        try
+        {
             UMOEndpointURI endpointUri = getEndpoint(context);
             populateMessageContext(msgContext, context, endpointUri);
-            if (securityProvider != null) {
-                if (logger.isDebugEnabled()) {
+            if (securityProvider != null)
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("securityProvider:" + securityProvider);
                 }
                 msgContext.setProperty("securityProvider", securityProvider);
             }
 
             Object request = context.getTransformedMessage();
-            if(request instanceof File) {
-                request = new FileInputStream((File) request);
-            } else if(request instanceof byte[]) {
+            if (request instanceof File)
+            {
+                request = new FileInputStream((File)request);
+            }
+            else if (request instanceof byte[])
+            {
                 request = new ByteArrayInputStream((byte[])request);
             }
 
-            Message requestMsg = new Message(request,
-                                             false,
-                                             context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_TYPE, null),
-                                             context.getMessage().getStringProperty(HTTPConstants.HEADER_CONTENT_LOCATION, null));
+            Message requestMsg = new Message(request, false, context.getMessage().getStringProperty(
+                HTTPConstants.HEADER_CONTENT_TYPE, null), context.getMessage().getStringProperty(
+                HTTPConstants.HEADER_CONTENT_LOCATION, null));
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Request Message:" + requestMsg);
             }
             msgContext.setRequestMessage(requestMsg);
             msgContext.setProperty("transport.url", endpointUri.toString());
 
             soapAction = getSoapAction(context);
-            if (soapAction != null) {
+            if (soapAction != null)
+            {
                 msgContext.setUseSOAPAction(true);
                 msgContext.setSOAPActionURI(soapAction);
             }
             // TODO session support
             // msgContext.setSession(new AxisHttpSession(req));
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Invoking Axis Engine.");
             }
             engine.invoke(msgContext);
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Return from Axis Engine.");
             }
-            if (RequestContext.getExceptionPayload() instanceof Exception) {
-                throw (Exception) RequestContext.getExceptionPayload().getException();
+            if (RequestContext.getExceptionPayload() instanceof Exception)
+            {
+                throw (Exception)RequestContext.getExceptionPayload().getException();
             }
             // remove temporary file used for soap message with attachment
-            if (request instanceof File) {
-                ((File) request).delete();
+            if (request instanceof File)
+            {
+                ((File)request).delete();
             }
             responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null) {
+            if (responseMsg == null)
+            {
                 throw new Exception(Messages.getMessage("noResponse01"));
             }
-        } catch (AxisFault fault) {
-            logger.error(fault.toString() + " target service is: " + msgContext.getTargetService() + ". Event is: " + context.toString(), fault);
+        }
+        catch (AxisFault fault)
+        {
+            logger.error(fault.toString() + " target service is: " + msgContext.getTargetService()
+                         + ". Event is: " + context.toString(), fault);
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null) {
+            if (responseMsg == null)
+            {
                 responseMsg = new Message(fault);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
             responseMsg = convertExceptionToAxisFault(e, responseMsg);
@@ -553,9 +653,10 @@ public class AxisServiceComponent implements Initialisable, Callable
         contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
 
         sendResponse(context.getMessage().getStringProperty(HttpConnector.HTTP_STATUS_PROPERTY, null),
-                contentType, response, responseMsg);
+            contentType, response, responseMsg);
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Response sent.");
             logger.debug("Exit: doPost()");
         }
@@ -565,9 +666,11 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         String endpoint = context.getEndpointURI().getAddress();
         String request = context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
-        if (request != null) {
+        if (request != null)
+        {
             int i = endpoint.indexOf("/", endpoint.indexOf("://") + 3);
-            if (i > -1) {
+            if (i > -1)
+            {
                 endpoint = endpoint.substring(0, i);
             }
             endpoint += request;
@@ -579,7 +682,8 @@ public class AxisServiceComponent implements Initialisable, Callable
     private void configureResponseFromAxisFault(WriterMessageAdapter response, AxisFault fault)
     {
         int status = getHttpResponseStatus(fault);
-        if (status == 401) {
+        if (status == 401)
+        {
             response.setProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, "Basic realm=\"AXIS\"");
         }
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(status));
@@ -588,7 +692,8 @@ public class AxisServiceComponent implements Initialisable, Callable
     private Message convertExceptionToAxisFault(Exception exception, Message responseMsg)
     {
         logException(exception);
-        if (responseMsg == null) {
+        if (responseMsg == null)
+        {
             AxisFault fault = AxisFault.makeFault(exception);
             processAxisFault(fault);
             responseMsg = new Message(fault);
@@ -606,21 +711,29 @@ public class AxisServiceComponent implements Initialisable, Callable
                               WriterMessageAdapter response,
                               Message responseMsg) throws AxisFault, IOException
     {
-        if (responseMsg == null) {
+        if (responseMsg == null)
+        {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "204");
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("NO AXIS MESSAGE TO RETURN!");
             }
-        } else {
-            if (logger.isDebugEnabled()) {
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Returned Content-Type:" + contentType);
             }
-            try {
+            try
+            {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 responseMsg.writeTo(baos);
                 response.write(baos.toString());
-            } catch (SOAPException e) {
+            }
+            catch (SOAPException e)
+            {
                 logException(e);
             }
         }
@@ -628,15 +741,19 @@ public class AxisServiceComponent implements Initialisable, Callable
         // res.flushBuffer();
     }
 
-    private void populateMessageContext(MessageContext msgContext, UMOEventContext context, UMOEndpointURI endpointUri)
-            throws AxisFault, ConfigurationException
+    private void populateMessageContext(MessageContext msgContext,
+                                        UMOEventContext context,
+                                        UMOEndpointURI endpointUri) throws AxisFault, ConfigurationException
     {
         UMOMessage msg = context.getMessage();
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("MessageContext:" + msgContext);
-            logger.debug("HEADER_CONTENT_TYPE:" + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
-            logger.debug("HEADER_CONTENT_LOCATION:" + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
+            logger.debug("HEADER_CONTENT_TYPE:"
+                         + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
+            logger.debug("HEADER_CONTENT_LOCATION:"
+                         + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETLOCATION:" +
@@ -656,16 +773,22 @@ public class AxisServiceComponent implements Initialisable, Callable
         // determine service name
         String serviceName = getServiceName(context, endpointUri);
         // Validate Service path against request path
-        SOAPService service = msgContext.getAxisEngine().getConfig().getService(new QName(serviceName.substring(1)));
+        SOAPService service = msgContext.getAxisEngine().getConfig().getService(
+            new QName(serviceName.substring(1)));
 
         // Component Name is set by Mule so if its null we can skip this check
-        if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null) {
-            String servicePath = (String) service.getOption("servicePath");
-            if(StringUtils.isEmpty(endpointUri.getPath())) {
-                if(!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName)) {
+        if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null)
+        {
+            String servicePath = (String)service.getOption("servicePath");
+            if (StringUtils.isEmpty(endpointUri.getPath()))
+            {
+                if (!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName))
+                {
                     throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());
                 }
-            } else if (!endpointUri.getPath().startsWith(servicePath + serviceName)) {
+            }
+            else if (!endpointUri.getPath().startsWith(servicePath + serviceName))
+            {
                 throw new AxisFault("Failed to find service: " + endpointUri.getPath());
             }
         }
@@ -687,18 +810,20 @@ public class AxisServiceComponent implements Initialisable, Callable
     private String getSoapAction(UMOEventContext context) throws AxisFault
     {
         String soapAction = context.getMessage().getStringProperty("SOAPAction", null);
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Header Soap Action:" + soapAction);
         }
-//        if (soapAction == null) {
-//            AxisFault af = new AxisFault("Client.NoSOAPAction",
-//                                         Messages.getMessage("noHeader00", "SOAPAction"),
-//                                         null,
-//                                         null);
-//            exceptionLog.error(Messages.getMessage("genFault00"), af);
-//            throw af;
-//        }
-        if (StringUtils.isEmpty(soapAction)) {
+        // if (soapAction == null) {
+        // AxisFault af = new AxisFault("Client.NoSOAPAction",
+        // Messages.getMessage("noHeader00", "SOAPAction"),
+        // null,
+        // null);
+        // exceptionLog.error(Messages.getMessage("genFault00"), af);
+        // throw af;
+        // }
+        if (StringUtils.isEmpty(soapAction))
+        {
             soapAction = context.getEndpointURI().getAddress();
         }
         return soapAction;
@@ -707,11 +832,13 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected String getServiceName(UMOEventContext context, UMOEndpointURI endpointUri) throws AxisFault
     {
         String serviceName = endpointUri.getPath();
-        if (StringUtils.isEmpty(serviceName)) {
+        if (StringUtils.isEmpty(serviceName))
+        {
             serviceName = getSoapAction(context);
             serviceName = serviceName.replaceAll("\"", "");
             int i = serviceName.indexOf("/", serviceName.indexOf("//"));
-            if(i<-1) {
+            if (i < -1)
+            {
                 serviceName = serviceName.substring(i + 2);
             }
 
@@ -720,11 +847,13 @@ public class AxisServiceComponent implements Initialisable, Callable
         // if (i > -1) serviceName = serviceName.substring(0, i);
 
         int i = serviceName.lastIndexOf('/');
-        if (i > -1) {
+        if (i > -1)
+        {
             serviceName = serviceName.substring(i);
         }
         i = serviceName.lastIndexOf('?');
-        if (i > -1) {
+        if (i > -1)
+        {
             serviceName = serviceName.substring(0, i);
         }
         return serviceName;
@@ -734,11 +863,14 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         String ret = HTTPConstants.HEADER_PROTOCOL_V10;
         String prot = req.getProtocol();
-        if (prot != null) {
+        if (prot != null)
+        {
             int sindex = prot.indexOf('/');
-            if (-1 != sindex) {
+            if (-1 != sindex)
+            {
                 String ver = prot.substring(sindex + 1);
-                if (HTTPConstants.HEADER_PROTOCOL_V11.equals(ver.trim())) {
+                if (HTTPConstants.HEADER_PROTOCOL_V11.equals(ver.trim()))
+                {
                     ret = HTTPConstants.HEADER_PROTOCOL_V11;
                 }
             }
@@ -768,7 +900,8 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     public String getHomeDir()
     {
-        if (homeDir == null) {
+        if (homeDir == null)
+        {
             homeDir = MuleManager.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
         }
         return homeDir;

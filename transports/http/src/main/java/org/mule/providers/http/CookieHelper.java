@@ -41,20 +41,24 @@ public class CookieHelper
 
     public static CookieSpec getCookieSpec(String spec)
     {
-        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
+        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE))
+        {
             return new NetscapeDraftSpec();
         }
-        else {
+        else
+        {
             return new RFC2109Spec();
         }
     }
 
     public static String getCookiePolicy(String spec)
     {
-        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE)) {
+        if (spec != null && spec.equalsIgnoreCase(HttpConnector.COOKIE_SPEC_NETSCAPE))
+        {
             return CookiePolicy.NETSCAPE;
         }
-        else {
+        else
+        {
             return CookiePolicy.RFC_2109;
         }
     }
@@ -65,22 +69,27 @@ public class CookieHelper
         CookieSpec cookieSpec = getCookieSpec(spec);
         HeaderElement[] headerElements = header.getElements();
 
-        for (int j = 0; j < headerElements.length; j++) {
+        for (int j = 0; j < headerElements.length; j++)
+        {
             HeaderElement headerElement = headerElements[j];
             NameValuePair[] headerElementParameters = headerElement.getParameters();
             Cookie cookie = new Cookie();
 
-            for (int k = 0; k < headerElementParameters.length; k++) {
+            for (int k = 0; k < headerElementParameters.length; k++)
+            {
                 NameValuePair nameValuePair = headerElementParameters[k];
                 cookieSpec.parseAttribute(nameValuePair, cookie);
             }
 
-            if (cookie.isExpired()) {
-                if (logger.isDebugEnabled()) {
+            if (cookie.isExpired())
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("Cookie: " + cookie.toString() + " has expired, not adding it.");
                 }
             }
-            else {
+            else
+            {
                 cookies.add(cookie);
             }
         }

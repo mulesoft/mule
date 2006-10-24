@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.glue;
 
 import electric.glue.context.ServiceContext;
@@ -23,7 +24,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 /**
  * <code>GlueInitialisationCallback</code> is invoked when an Glue service
  * component is created from its descriptor.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,7 +45,8 @@ public class GlueInitialisationCallback implements InitialisationCallback
         this.service = service;
         this.servicePath = path;
         this.context = context;
-        if (context == null) {
+        if (context == null)
+        {
             this.context = new ServiceContext();
         }
     }
@@ -52,18 +54,23 @@ public class GlueInitialisationCallback implements InitialisationCallback
     public void initialise(Object component) throws InitialisationException
     {
         // only call this once
-        if (invoked) {
+        if (invoked)
+        {
             return;
         }
-        if (component instanceof GlueInitialisable) {
+        if (component instanceof GlueInitialisable)
+        {
             logger.debug("Calling Glue initialisation for component: " + component.getClass().getName());
-            ((GlueInitialisable) component).initialise(service, context);
+            ((GlueInitialisable)component).initialise(service, context);
         }
         invoked = true;
-        try {
+        try
+        {
             logger.debug("Publishing service " + servicePath + " to Glue registry.");
             Registry.publish(servicePath, service, context);
-        } catch (RegistryException e) {
+        }
+        catch (RegistryException e)
+        {
             throw new InitialisationException(new Message("soap", 3, component.getClass().getName()), e, this);
         }
     }

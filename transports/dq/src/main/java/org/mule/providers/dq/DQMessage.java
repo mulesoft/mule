@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import java.io.Serializable;
@@ -18,10 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author m999svm
- * 
- * <code>DQMessage</code> An encapsulation of a dataqueue message.
- * 
+ * @author m999svm <code>DQMessage</code> An encapsulation of a dataqueue message.
  */
 public class DQMessage implements Serializable
 {
@@ -55,7 +53,6 @@ public class DQMessage implements Serializable
 
     /**
      * Constructor
-     * 
      */
     public DQMessage()
     {
@@ -63,7 +60,6 @@ public class DQMessage implements Serializable
     }
 
     /**
-     * 
      * The constructor
      * 
      * @param pMessage The message
@@ -71,7 +67,8 @@ public class DQMessage implements Serializable
     public DQMessage(final DQMessage pMessage)
     {
         this();
-        if (pMessage == null) {
+        if (pMessage == null)
+        {
             return;
         }
         this.entries = new LinkedHashMap(pMessage.entries);
@@ -101,7 +98,6 @@ public class DQMessage implements Serializable
     }
 
     /**
-     * 
      * @return The entries
      */
     public final Iterator getEntries()
@@ -110,7 +106,6 @@ public class DQMessage implements Serializable
     }
 
     /**
-     * 
      * @return The entry names
      */
     public final List getEntryNames()
@@ -119,7 +114,8 @@ public class DQMessage implements Serializable
 
         Iterator it = entries.keySet().iterator();
 
-        while (it.hasNext()) {
+        while (it.hasNext())
+        {
             list.add(it.next());
         }
 
@@ -128,18 +124,23 @@ public class DQMessage implements Serializable
 
     public boolean equals(Object o)
     {
-        if (this == o) {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof DQMessage)) {
+        if (!(o instanceof DQMessage))
+        {
             return false;
         }
-        final DQMessage dqMessage = (DQMessage) o;
-        if (entries != null ? !entries.equals(dqMessage.entries) : dqMessage.entries != null) {
+        final DQMessage dqMessage = (DQMessage)o;
+        if (entries != null ? !entries.equals(dqMessage.entries) : dqMessage.entries != null)
+        {
             return false;
         }
-        if (senderInformation != null ? !senderInformation.equals(dqMessage.senderInformation)
-                : dqMessage.senderInformation != null) {
+        if (senderInformation != null
+                        ? !senderInformation.equals(dqMessage.senderInformation)
+                        : dqMessage.senderInformation != null)
+        {
             return false;
         }
         return true;

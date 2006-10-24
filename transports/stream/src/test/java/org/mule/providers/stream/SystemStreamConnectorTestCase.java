@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.stream;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -35,7 +36,6 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
     {
         return "stream://System.out";
     }
-
 
     public UMOConnector getConnector() throws Exception
     {

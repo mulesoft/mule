@@ -47,49 +47,59 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
     public static HttpServletRequest getMockRequest(final String message)
     {
         Object proxy = Proxy.newProxyInstance(ServletConnectorTestCase.class.getClassLoader(),
-                new Class[]{HttpServletRequest.class}, new InvocationHandler() {
-                    private String payload = message;
-                    private Map props = new HashMap();
+            new Class[]{HttpServletRequest.class}, new InvocationHandler()
+            {
+                private String payload = message;
+                private Map props = new HashMap();
 
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                {
+                    if ("getInputStream".equals(method.getName()))
                     {
-                        if ("getInputStream".equals(method.getName())) {
 
-                            ServletInputStream s = new ServletInputStream() {
-                                ByteArrayInputStream is = new ByteArrayInputStream(payload.getBytes());
+                        ServletInputStream s = new ServletInputStream()
+                        {
+                            ByteArrayInputStream is = new ByteArrayInputStream(payload.getBytes());
 
-                                public int read() throws IOException
-                                {
-                                    return is.read();
-                                }
-                            };
-                            return s;
+                            public int read() throws IOException
+                            {
+                                return is.read();
+                            }
+                        };
+                        return s;
 
-                        }
-                        else if ("getAttribute".equals(method.getName())) {
-                            return props.get(args[0]);
-                        }
-                        else if ("setAttribute".equals(method.getName())) {
-                            props.put(args[0], args[1]);
-                        }
-                        else if ("equals".equals(method.getName())) {
-                            return Boolean.valueOf(payload.equals(args[0]));
-                        }
-                        else if ("toString".equals(method.getName())) {
-                            return payload;
-                        }
-                        else if ("getReader".equals(method.getName())) {
-                            return new BufferedReader(new StringReader(payload.toString()));
-                        }
-                        else if ("getAttributeNames".equals(method.getName())) {
-                            return new Hashtable().elements();
-                        }
-                        else if ("getHeaderNames".equals(method.getName())) {
-                            return new Hashtable().elements();
-                        }
-                        return null;
                     }
-                });
+                    else if ("getAttribute".equals(method.getName()))
+                    {
+                        return props.get(args[0]);
+                    }
+                    else if ("setAttribute".equals(method.getName()))
+                    {
+                        props.put(args[0], args[1]);
+                    }
+                    else if ("equals".equals(method.getName()))
+                    {
+                        return Boolean.valueOf(payload.equals(args[0]));
+                    }
+                    else if ("toString".equals(method.getName()))
+                    {
+                        return payload;
+                    }
+                    else if ("getReader".equals(method.getName()))
+                    {
+                        return new BufferedReader(new StringReader(payload.toString()));
+                    }
+                    else if ("getAttributeNames".equals(method.getName()))
+                    {
+                        return new Hashtable().elements();
+                    }
+                    else if ("getHeaderNames".equals(method.getName()))
+                    {
+                        return new Hashtable().elements();
+                    }
+                    return null;
+                }
+            });
         return (HttpServletRequest)proxy;
     }
 }

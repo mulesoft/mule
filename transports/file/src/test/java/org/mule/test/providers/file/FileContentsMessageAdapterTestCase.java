@@ -41,7 +41,8 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 
         // The working directory is deleted on tearDown
         File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
-        if (!dir.exists()) {
+        if (!dir.exists())
+        {
             dir.mkdirs();
         }
 
@@ -66,10 +67,12 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
      */
     public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
-        if (payload.equals(validMessage)) {
+        if (payload.equals(validMessage))
+        {
             return new FileContentsMessageAdapter(messageFile);
         }
-        else {
+        else
+        {
             // properly throw
             return new FileContentsMessageAdapter(payload);
         }
@@ -78,10 +81,12 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
     // overridden to properly check the byte[] by content and not just by reference
     public void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
     {
-        if (message instanceof byte[] && payload instanceof byte[]) {
+        if (message instanceof byte[] && payload instanceof byte[])
+        {
             assertTrue(Arrays.equals((byte[])message, (byte[])payload));
         }
-        else {
+        else
+        {
             fail("message and payload must both be byte[]");
         }
     }

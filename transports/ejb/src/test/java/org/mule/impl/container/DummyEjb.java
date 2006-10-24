@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import javax.ejb.EJBObject;
@@ -14,7 +15,6 @@ import java.rmi.RemoteException;
 
 /**
  * A test EJB object
- *
  */
 public interface DummyEjb extends EJBObject
 {

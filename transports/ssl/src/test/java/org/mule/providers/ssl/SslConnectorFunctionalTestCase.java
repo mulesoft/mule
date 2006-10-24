@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import java.io.BufferedInputStream;
@@ -49,9 +50,12 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("ssl://localhost:" + port);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -70,23 +74,24 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected Socket createSocket(URI uri) throws Exception
     {
-        SslConnector conn = (SslConnector) connector;
+        SslConnector conn = (SslConnector)connector;
         SSLContext context;
         context = SSLContext.getInstance(conn.getProtocol());
-        context.init(conn.getKeyManagerFactory().getKeyManagers(),
-                     conn.getTrustManagerFactory().getTrustManagers(), null);
+        context.init(conn.getKeyManagerFactory().getKeyManagers(), conn.getTrustManagerFactory()
+            .getTrustManagers(), null);
         SSLSocketFactory factory = context.getSocketFactory();
         Socket socket = factory.createSocket(uri.getHost(), uri.getPort());
 
         // this will force open the socket and start SSL/TLS negotiation
-        //sslSocket.startHandshake();
+        // sslSocket.startHandshake();
 
         return socket;
     }
 
     protected void doTearDown() throws Exception
     {
-        if (s != null) {
+        if (s != null)
+        {
             s.close();
             s = null;
         }
@@ -96,7 +101,8 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     {
         MuleManager.getConfiguration().setSynchronous(false);
         URI uri = getInDest().getUri();
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++)
+        {
             s = createSocket(uri);
             DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             dos.write("Hello".getBytes());
@@ -118,22 +124,23 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         MuleManager.getConfiguration().setSynchronous(false);
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor,
-                            new EventCallback() {
-                                public void eventReceived(UMOEventContext context, Object Component) throws Exception
-                                {
-                                    callbackCount++;
-                                    String result = "Received Async event: " + context.getMessageAsString();
-                                    assertNotNull(context.getOutputStream());
+        initialiseComponent(descriptor, new EventCallback()
+        {
+            public void eventReceived(UMOEventContext context, Object Component) throws Exception
+            {
+                callbackCount++;
+                String result = "Received Async event: " + context.getMessageAsString();
+                assertNotNull(context.getOutputStream());
 
-                                    if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed()) {
-                                        context.getOutputStream().write(result.getBytes());
-                                        context.getOutputStream().flush();
-                                    }
-                                    
-                                    callbackCalled = true;
-                                }
-                            });
+                if (!((ResponseOutputStream)context.getOutputStream()).getSocket().isClosed())
+                {
+                    context.getOutputStream().write(result.getBytes());
+                    context.getOutputStream().flush();
+                }
+
+                callbackCalled = true;
+            }
+        });
         // Start the server
         MuleManager.getInstance().start();
 

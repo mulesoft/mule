@@ -58,7 +58,8 @@ public class GigaSpacesEntryConverter
 
         System.arraycopy(result.m_FieldsValues, 0, fieldValues, 0, fieldCount);
 
-        if (msg != null) {
+        if (msg != null)
+        {
             fieldValues[fieldCount] = msg.getCorrelationId();
             fieldValues[fieldCount + 1] = new Integer(msg.getCorrelationSequence());
             fieldValues[fieldCount + 2] = new Integer(msg.getCorrelationGroupSize());
@@ -66,7 +67,8 @@ public class GigaSpacesEntryConverter
             fieldValues[fieldCount + 4] = msg.getUniqueId();
 
             Map props = new HashMap();
-            for (Iterator propNames = msg.getPropertyNames().iterator(); propNames.hasNext();) {
+            for (Iterator propNames = msg.getPropertyNames().iterator(); propNames.hasNext();)
+            {
                 String propName = (String)propNames.next();
                 props.put(propName, msg.getProperty(propName));
             }
@@ -76,7 +78,8 @@ public class GigaSpacesEntryConverter
             fieldValues[fieldCount + 7] = msg.getExceptionPayload();
         }
 
-        if (result.m_IndexIndicators != null) {
+        if (result.m_IndexIndicators != null)
+        {
             System.arraycopy(result.m_IndexIndicators, 0, indexIndicators, 0, fieldCount);
         }
 

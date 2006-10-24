@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -30,8 +31,9 @@ public class GSConnectorFactoryTestCase extends AbstractMuleTestCase
         assertTrue(endpoint.getConnector() instanceof GSConnector);
         assertTrue(getEndpointURI().endsWith(endpoint.getEndpointURI().toString()));
     }
-    
-    public String getEndpointURI() {
+
+    public String getEndpointURI()
+    {
         return "gs:rmi://localhoast:1000/MyContainer/JavaSpaces";
     }
 }

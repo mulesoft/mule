@@ -50,10 +50,8 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 
     public void testTwoMessages() throws Exception
     {
-        String[] msgData = {
-            "<?xml version=\"1.0\"?><data>hello</data>",
-            "<?xml version=\"1.0\"?><data>goodbye</data>"
-        };
+        String[] msgData = {"<?xml version=\"1.0\"?><data>hello</data>",
+            "<?xml version=\"1.0\"?><data>goodbye</data>"};
 
         ByteArrayInputStream bais = new ByteArrayInputStream((msgData[0] + msgData[1]).getBytes());
 
@@ -71,35 +69,31 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 
     public void testMultipleMessages() throws Exception
     {
-        String[] msgData = {
-            "<?xml version=\"1.0\"?><data>1</data>",
-            "<?xml version=\"1.0\"?><data>22</data>",
-            "<?xml version=\"1.0\"?><data>333</data>",
-            "<?xml version=\"1.0\"?><data>4444</data>",
-            "<?xml version=\"1.0\"?><data>55555</data>",
-            "<?xml version=\"1.0\"?><data>666666</data>",
-            "<?xml version=\"1.0\"?><data>7777777</data>",
-            "<?xml version=\"1.0\"?><data>88888888</data>",
-            "<?xml version=\"1.0\"?><data>999999999</data>",
+        String[] msgData = {"<?xml version=\"1.0\"?><data>1</data>",
+            "<?xml version=\"1.0\"?><data>22</data>", "<?xml version=\"1.0\"?><data>333</data>",
+            "<?xml version=\"1.0\"?><data>4444</data>", "<?xml version=\"1.0\"?><data>55555</data>",
+            "<?xml version=\"1.0\"?><data>666666</data>", "<?xml version=\"1.0\"?><data>7777777</data>",
+            "<?xml version=\"1.0\"?><data>88888888</data>", "<?xml version=\"1.0\"?><data>999999999</data>",
             "<?xml version=\"1.0\"?><data>aaaaaaaaaa</data>",
             "<?xml version=\"1.0\"?><data>bbbbbbbbbbb</data>",
             "<?xml version=\"1.0\"?><data>cccccccccccc</data>",
             "<?xml version=\"1.0\"?><data>ddddddddddddd</data>",
             "<?xml version=\"1.0\"?><data>eeeeeeeeeeeeee</data>",
-            "<?xml version=\"1.0\"?><data>fffffffffffffff</data>"
-        };
+            "<?xml version=\"1.0\"?><data>fffffffffffffff</data>"};
 
         StringBuffer allMsgData = new StringBuffer();
 
-        for (int i = 0; i < msgData.length; i++) {
+        for (int i = 0; i < msgData.length; i++)
+        {
             allMsgData.append(msgData[i]);
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(allMsgData.toString().getBytes());
 
         byte[] result;
-        
-        for (int i = 0; i < msgData.length; i++) {
+
+        for (int i = 0; i < msgData.length; i++)
+        {
             result = xmp.read(bais);
             assertNotNull(result);
             assertEquals(msgData[i], new String(result));

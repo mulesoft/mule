@@ -29,7 +29,7 @@ import org.mule.umo.transformer.UMOTransformer;
 /**
  * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
  * attahcments and Mule headers
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -52,14 +52,11 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding
-     *            The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte
-     *            array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
-     * @throws Exception
-     *             Implementation may throw an endpoint specific exception
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
@@ -68,10 +65,9 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the payload implementation into a String representation
-     *
+     * 
      * @return String representation of the payload
-     * @throws Exception
-     *             Implemetation may throw an endpoint specific exception
+     * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
@@ -113,28 +109,34 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     protected void initHeaders()
     {
-        if (messageContext.getInMessage() != null) {
+        if (messageContext.getInMessage() != null)
+        {
             Element header = messageContext.getInMessage().getHeader();
             if (header == null) return;
 
             Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
-                    MuleSoapHeaders.MULE_10_ACTOR);
+                MuleSoapHeaders.MULE_10_ACTOR);
             Element muleHeaders = header.getChild(MuleSoapHeaders.MULE_HEADER, ns);
-            if (muleHeaders != null) {
+            if (muleHeaders != null)
+            {
                 Element child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_ID_PROPERTY, ns);
-                if (child != null) {
+                if (child != null)
+                {
                     setCorrelationId(child.getText());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, ns);
-                if (child != null) {
+                if (child != null)
+                {
                     setCorrelationGroupSize(Integer.valueOf(child.getText()).intValue());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, ns);
-                if (child != null) {
+                if (child != null)
+                {
                     setCorrelationSequence(Integer.valueOf(child.getText()).intValue());
                 }
                 child = muleHeaders.getChild(MuleProperties.MULE_REPLY_TO_PROPERTY, ns);
-                if (child != null) {
+                if (child != null)
+                {
                     setReplyTo(child.getText());
                 }
             }
@@ -144,16 +146,20 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     protected void initAttachments()
     {
-        try {
+        try
+        {
             Attachments atts = this.messageContext.getInMessage().getAttachments();
-            if (atts != null) {
-                for (Iterator i = atts.getParts(); i.hasNext();) {
+            if (atts != null)
+            {
+                for (Iterator i = atts.getParts(); i.hasNext();)
+                {
                     Attachment att = ((Attachment)i.next());
                     super.addAttachment(att.getId(), att.getDataHandler());
                 }
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             // this will not happen
             logger.fatal("Failed to read attachments", e);
         }

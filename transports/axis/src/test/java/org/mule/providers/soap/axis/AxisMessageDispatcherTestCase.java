@@ -24,27 +24,29 @@ import java.util.Map;
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase {
+public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
+{
 
-    public void testNullParametersInCallAllowed() throws Exception {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://www.muleumo.org/services/myService?method=myTestMethod", false);
+    public void testNullParametersInCallAllowed() throws Exception
+    {
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "axis:http://www.muleumo.org/services/myService?method=myTestMethod", false);
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         dispatcher.service = new Service();
         UMOEvent event = getTestEvent("testPayload", ep);
         // there should be no NullPointerException
-        Call call = dispatcher.getCall(event, new Object[] { null });
+        Call call = dispatcher.getCall(event, new Object[]{null});
 
         assertNotNull(call);
 
         UMOMessage msg = event.getMessage();
         assertNotNull(msg);
-        final Map soapMethods = (Map) msg.getProperty("soapMethods");
+        final Map soapMethods = (Map)msg.getProperty("soapMethods");
         assertEquals(1, soapMethods.size());
-        final List values = (List) soapMethods.get("myTestMethod");
+        final List values = (List)soapMethods.get("myTestMethod");
         assertNotNull(values);
         assertEquals(1, values.size());
-        assertEquals("value0;qname{:anyType:http://www.w3.org/2001/XMLSchema};in",
-                     values.get(0));
+        assertEquals("value0;qname{:anyType:http://www.w3.org/2001/XMLSchema};in", values.get(0));
     }
 
 }

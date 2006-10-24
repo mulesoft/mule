@@ -25,7 +25,7 @@ import org.mule.umo.provider.UMOConnector;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,12 +34,11 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
     protected XFireConnector connector;
     protected Service service;
-    
+
     protected List serviceInterfaces;
 
-    public XFireMessageReceiver(UMOConnector umoConnector,
-                                UMOComponent component,
-                                UMOEndpoint umoEndpoint) throws InitialisationException
+    public XFireMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint umoEndpoint)
+        throws InitialisationException
     {
         super(umoConnector, component, umoEndpoint);
         connector = (XFireConnector)umoConnector;
@@ -48,12 +47,14 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
     protected void init() throws InitialisationException
     {
-        try {
+        try
+        {
             Map props = new HashMap(component.getDescriptor().getProperties());
             props.putAll(endpoint.getProperties());
 
             // TODO MULE20 get namespace from service name
-            String namespace = MapUtils.getString(props,"namespace", XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
+            String namespace = MapUtils.getString(props, "namespace",
+                XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
 
             // String soapVersionString =
             // PropertiesHelper.getStringProperty(props, "soapVersion", "1.1");
@@ -68,11 +69,13 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             // version), this);
             // }
 
-            if (props.size() == 0) {
+            if (props.size() == 0)
+            {
                 // Xfire checks that properties are null rather than empty
                 props = null;
             }
-            else {
+            else
+            {
                 rewriteProperty(props, "portType");
                 rewriteProperty(props, "style");
                 rewriteProperty(props, "use");
@@ -82,43 +85,46 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "scope");
                 rewriteProperty(props, "schemas");
             }
-            
+
             serviceInterfaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
             Class exposedInterface;
-            
+
             if (serviceInterfaces == null)
                 exposedInterface = component.getDescriptor().getImplementationClass();
-            
+
             else
             {
                 String className = (String)serviceInterfaces.get(0);
                 exposedInterface = Class.forName(className);
                 logger.info(className + " class was used to expose your service");
-                
+
                 if (serviceInterfaces.size() > 1)
                 {
                     logger.info("Only the first class was used to expose your method");
                 }
             }
-            
+
             service = connector.getServiceFactory().create(exposedInterface,
-                    component.getDescriptor().getName(), namespace, props);
+                component.getDescriptor().getName(), namespace, props);
 
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
-            if (endpoint.getEndpointURI().getScheme().startsWith("http") ||
-                endpoint.getEndpointURI().getScheme().startsWith("servlet")) {
+            if (endpoint.getEndpointURI().getScheme().startsWith("http")
+                || endpoint.getEndpointURI().getScheme().startsWith("servlet"))
+            {
                 sync = true;
             }
             service.setInvoker(new MuleInvoker(this, sync));
 
         }
-        catch (UMOException e) {
+        catch (UMOException e)
+        {
             throw new InitialisationException(e, this);
         }
         catch (ClassNotFoundException e)
         {
-            //will be thrown in the case that the forName() does not find the class to load
+            // will be thrown in the case that the forName() does not find the class
+            // to load
             throw new InitialisationException(e, this);
         }
     }
@@ -126,7 +132,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     protected void rewriteProperty(Map props, String name)
     {
         Object temp = null;
-        if (props.containsKey(name)) {
+        if (props.containsKey(name))
+        {
             temp = props.remove(name);
             props.put("objectServiceFactory." + name, temp);
         }

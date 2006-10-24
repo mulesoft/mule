@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.rmi;
 
 import org.apache.commons.logging.Log;
@@ -27,12 +28,11 @@ import java.rmi.Remote;
 import java.util.Collections;
 
 /**
- *
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
  * RMI-JRMP.
- *
  */
-public class RmiMessageDispatcher extends AbstractMessageDispatcher {
+public class RmiMessageDispatcher extends AbstractMessageDispatcher
+{
 
     protected static transient Log logger = LogFactory.getLog(RmiMessageDispatcher.class);
 
@@ -44,19 +44,23 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
 
     protected Method invokedMethod;
 
-    public RmiMessageDispatcher(UMOImmutableEndpoint endpoint) {
+    public RmiMessageDispatcher(UMOImmutableEndpoint endpoint)
+    {
         super(endpoint);
         this.connector = (RmiConnector)endpoint.getConnector();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception {
-        if (remoteObject==null) {
+    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        if (remoteObject == null)
+        {
             String rmiPolicyPath = connector.getSecurityPolicy();
 
             System.setProperty("java.security.policy", rmiPolicyPath);
 
             // Set security manager
-            if (System.getSecurityManager() == null) {
+            if (System.getSecurityManager() == null)
+            {
                 System.setSecurityManager(new RMISecurityManager());
             }
 
@@ -64,19 +68,22 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         }
     }
 
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() throws Exception
+    {
         remoteObject = null;
         invokedMethod = null;
     }
 
-
-
-    private Object[] getArgs(UMOEvent event) throws TransformerException {
+    private Object[] getArgs(UMOEvent event) throws TransformerException
+    {
         Object payload = event.getTransformedMessage();
         Object[] args;
-        if (payload instanceof Object[]) {
-            args = (Object[]) payload;
-        } else {
+        if (payload instanceof Object[])
+        {
+            args = (Object[])payload;
+        }
+        else
+        {
             args = new Object[]{payload};
         }
         return args;
@@ -87,10 +94,12 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
-    protected void doDispatch(UMOEvent event) throws Exception {
+    protected void doDispatch(UMOEvent event) throws Exception
+    {
 
         Object[] arguments = getArgs(event);
-        if(invokedMethod==null) {
+        if (invokedMethod == null)
+        {
             invokedMethod = connector.getMethodObject(remoteObject, event);
         }
         invokedMethod.invoke(remoteObject, arguments);
@@ -101,19 +110,25 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception {
+    public UMOMessage doSend(UMOEvent event) throws Exception
+    {
 
         UMOMessage resultMessage;
-        if(invokedMethod==null) {
+        if (invokedMethod == null)
+        {
             invokedMethod = connector.getMethodObject(remoteObject, event);
         }
         Object[] arguments = getArgs(event);
         Object result = invokedMethod.invoke(remoteObject, arguments);
 
-        if (result == null) {
+        if (result == null)
+        {
             return null;
-        } else {
-            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP);
+        }
+        else
+        {
+            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(),
+                Collections.EMPTY_MAP);
         }
 
         return resultMessage;
@@ -121,26 +136,29 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
 
     /**
      * Make a specific request to the underlying transport
-     *
+     * 
      * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout  the maximum time the operation should block before returning. The call should
-     *                 return immediately if there is data available. If no data becomes available before the timeout
-     *                 elapses, null will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be returned if no data was
-     *         avaialable
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception {
+    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
         throw new UnsupportedOperationException("doReceive");
     }
 
     /**
      * There is no associated session for a RMI connector
-     *
+     * 
      * @return
      * @throws UMOException
      */
-    public Object getDelegateSession() throws UMOException {
+    public Object getDelegateSession() throws UMOException
+    {
         return null;
     }
 
@@ -149,11 +167,13 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
-    public UMOConnector getConnector() {
+    public UMOConnector getConnector()
+    {
         return connector;
     }
 
-    protected void doDispose() {
+    protected void doDispose()
+    {
         // template method
     }
 }

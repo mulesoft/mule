@@ -38,9 +38,11 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     UMOMessage reply;
 
-    protected void sendTestData(int iterations) throws Exception {
+    protected void sendTestData(int iterations) throws Exception
+    {
         reply = send(getInDest().getAddress(), TEST_MESSAGE, "text/plain;charset=UTF-8");
     }
+
     protected void receiveAndTestResults() throws Exception
     {
         assertNotNull(reply);
@@ -49,11 +51,13 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertTrue(reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString().startsWith("text/baz"));
     }
 
-    protected String getExpectedContentType() {
+    protected String getExpectedContentType()
+    {
         return "text/baz;charset=UTF-16BE";
     }
-    
-    public UMOMessage send(String url, Object payload, String contentType) throws Exception {
+
+    public UMOMessage send(String url, Object payload, String contentType) throws Exception
+    {
         Map messageProperties = new HashMap();
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
@@ -64,20 +68,28 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         return event.getSession().sendEvent(event);
     }
 
-    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous, boolean streaming) throws UMOException
+    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous, boolean streaming)
+        throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
-        if (!endpoint.getConnector().isStarted() && manager.isStarted()) {
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri,
+            UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        if (!endpoint.getConnector().isStarted() && manager.isStarted())
+        {
             endpoint.getConnector().startConnector();
         }
         endpoint.setStreaming(streaming);
-        try {
-            MuleSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+        try
+        {
+            MuleSession session = new MuleSession(message,
+                ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
             MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
             return event;
-        } catch (Exception e) {
-            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message, endpoint, e);
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message,
+                endpoint, e);
         }
     }
-    
+
 }

@@ -21,23 +21,27 @@ import java.util.Map;
 
 /**
  * A container for all Mule supported transports for Axis.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleTransport extends Transport {
+public class MuleTransport extends Transport
+{
 
     private static Map transports = null;
 
-    public MuleTransport() {
-            transportName = "MuleTransport";
-        }
+    public MuleTransport()
+    {
+        transportName = "MuleTransport";
+    }
 
-    public MuleTransport(String protocol) {
+    public MuleTransport(String protocol)
+    {
         transportName = protocol;
     }
 
-    private static void initTransports() {
+    private static void initTransports()
+    {
         transports = new HashMap();
         transports.put("http", HTTP.class);
         transports.put("https", HTTPS.class);
@@ -56,111 +60,142 @@ public class MuleTransport extends Transport {
     }
 
     /**
-     *
      * @param protocol the Axis soap transport to use
      * @return The corresponding transport class
      * @throws MuleException if the transport is not supported by Axis
      * @throws NullPointerException if the transport protocol is null
      */
-    public static Class getTransportClass(String protocol) throws MuleException {
-        if(protocol==null) {
+    public static Class getTransportClass(String protocol) throws MuleException
+    {
+        if (protocol == null)
+        {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "protocol").toString());
         }
-        if(!isTransportSupported(protocol)) {
-            throw new MuleException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X,
-                                                          protocol, AxisConnector.class.getName()));
+        if (!isTransportSupported(protocol))
+        {
+            throw new MuleException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X, protocol,
+                AxisConnector.class.getName()));
         }
         return (Class)transports.get(protocol);
     }
 
-    public static boolean isTransportSupported(String protocol)  {
-        if(transports==null) {
+    public static boolean isTransportSupported(String protocol)
+    {
+        if (transports == null)
+        {
             initTransports();
         }
         return transports.get(protocol) != null;
     }
 
-    public static class HTTP extends MuleTransport {
-        public HTTP() {
+    public static class HTTP extends MuleTransport
+    {
+        public HTTP()
+        {
             super("http");
         }
     }
 
-    public static class HTTPS extends MuleTransport {
-        public HTTPS() {
+    public static class HTTPS extends MuleTransport
+    {
+        public HTTPS()
+        {
             super("https");
         }
     }
 
-    public static class TCP extends MuleTransport {
-        public TCP() {
+    public static class TCP extends MuleTransport
+    {
+        public TCP()
+        {
             super("tcp");
         }
     }
 
-    public static class SSL extends MuleTransport {
-        public SSL() {
+    public static class SSL extends MuleTransport
+    {
+        public SSL()
+        {
             super("ssl");
         }
     }
 
-    public static class JMS extends MuleTransport {
-        public JMS() {
+    public static class JMS extends MuleTransport
+    {
+        public JMS()
+        {
             super("jms");
         }
     }
 
-    public static class POP3 extends MuleTransport {
-        public POP3() {
+    public static class POP3 extends MuleTransport
+    {
+        public POP3()
+        {
             super("pop3");
         }
     }
 
-    public static class SMTP extends MuleTransport {
-        public SMTP() {
+    public static class SMTP extends MuleTransport
+    {
+        public SMTP()
+        {
             super("smtp");
         }
     }
 
-    public static class POP3S extends MuleTransport {
-        public POP3S() {
+    public static class POP3S extends MuleTransport
+    {
+        public POP3S()
+        {
             super("pop3s");
         }
     }
 
-    public static class SMTPS extends MuleTransport {
-        public SMTPS() {
+    public static class SMTPS extends MuleTransport
+    {
+        public SMTPS()
+        {
             super("smtps");
         }
     }
 
-    public static class IMAP extends MuleTransport {
-        public IMAP() {
+    public static class IMAP extends MuleTransport
+    {
+        public IMAP()
+        {
             super("imap");
         }
     }
 
-    public static class IMAPS extends MuleTransport {
-        public IMAPS() {
+    public static class IMAPS extends MuleTransport
+    {
+        public IMAPS()
+        {
             super("imaps");
         }
     }
 
-
-    public static class XMPP extends MuleTransport {
-        public XMPP() {
+    public static class XMPP extends MuleTransport
+    {
+        public XMPP()
+        {
             super("xmpp");
         }
     }
 
-    public static class VM extends MuleTransport {
-        public VM() {
+    public static class VM extends MuleTransport
+    {
+        public VM()
+        {
             super("vm");
         }
     }
 
-    public static class SERVLET extends MuleTransport {
-        public SERVLET() {
+    public static class SERVLET extends MuleTransport
+    {
+        public SERVLET()
+        {
             super("servlet");
         }
     }

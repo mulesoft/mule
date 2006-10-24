@@ -36,14 +36,13 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
         return new HttpMessageReceiver((AbstractConnector)endpoint.getConnector(),
-                (UMOComponent)mockComponent.proxy(), endpoint);
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception
     {
         endpoint = new MuleEndpoint("http://localhost:6789", true);
-        ((HttpConnector)endpoint.getConnector())
-                .setDefaultResponseTransformer(new UMOMessageToHttpResponse());
+        ((HttpConnector)endpoint.getConnector()).setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         return endpoint;
     }
 }

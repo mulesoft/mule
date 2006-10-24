@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.xmpp;
 
 import org.jivesoftware.smack.packet.Message;
@@ -34,42 +35,54 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
 
     public XmppMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof Packet) {
-            this.message = (Packet) message;
-            for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();) {
-                String name = (String) iter.next();
+        if (message instanceof Packet)
+        {
+            this.message = (Packet)message;
+            for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();)
+            {
+                String name = (String)iter.next();
                 setProperty(name, this.message.getProperty(name));
             }
-            if(this.message instanceof Message) {
+            if (this.message instanceof Message)
+            {
                 setProperty("subject", ((Message)this.message).getSubject());
                 setProperty("thread", ((Message)this.message).getThread());
             }
-        } else {
+        }
+        else
+        {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
-     *                 used when converting from a byte array
+     * 
+     * @param encoding The encoding to use when transforming the message (if
+     *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString(String encoding) throws Exception {
-        if(message instanceof Message) {
+    public String getPayloadAsString(String encoding) throws Exception
+    {
+        if (message instanceof Message)
+        {
             return ((Message)message).getBody();
-        } else {
+        }
+        else
+        {
             return message.toString();
         }
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if(message instanceof Message) {
+        if (message instanceof Message)
+        {
             return ((Message)message).getBody().getBytes();
-        } else {
+        }
+        else
+        {
             return message.toString().getBytes();
         }
     }
@@ -79,7 +92,8 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    public String getUniqueId() {
+    public String getUniqueId()
+    {
         return message.getPacketID();
     }
 }

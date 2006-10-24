@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import java.net.URI;
@@ -16,8 +17,7 @@ import org.mule.impl.endpoint.ResourceNameEndpointBuilder;
 import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
- * <code>DQEndpointBuilder</code> constructs an endpoint used by AS400 data
- * queues
+ * <code>DQEndpointBuilder</code> constructs an endpoint used by AS400 data queues
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -26,18 +26,25 @@ public class DQEndpointBuilder extends ResourceNameEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
-        String lib = (String) props.get("lib");
-        if (uri.getPath().length() > 0) {
+        String lib = (String)props.get("lib");
+        if (uri.getPath().length() > 0)
+        {
             lib = uri.getHost();
             props.setProperty("lib", lib);
             address = "/" + lib + uri.getPath();
-        } else if (lib == null) {
+        }
+        else if (lib == null)
+        {
             throw new MalformedEndpointException("Could not extract Lib name: " + uri);
-        } else {
-            if (!lib.startsWith("/")) {
+        }
+        else
+        {
+            if (!lib.startsWith("/"))
+            {
                 lib = "/" + lib;
             }
-            if (!lib.endsWith("/")) {
+            if (!lib.endsWith("/"))
+            {
                 lib += "/";
             }
             address = lib + uri.getHost();

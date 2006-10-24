@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ejb;
 
 import org.mule.config.ConfigurationBuilder;
@@ -42,27 +43,26 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         return null;
     }
 
-
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.disableAdminAgent();
 
-        //create RMI connector
+        // create RMI connector
         ejbConnector = new EjbConnector();
         ejbConnector.setName("ejb");
         ejbConnector.setJndiInitialFactory(MuleInitialContextFactory.class.getName());
         ejbConnector.setSecurityPolicy("rmi.policy");
 
-        //Required if connectoring to a Remote Jndi context
-        //builder.getManager().registerAgent(new RmiRegistryAgent());
+        // Required if connectoring to a Remote Jndi context
+        // builder.getManager().registerAgent(new RmiRegistryAgent());
 
-        //Create a local Jndi Context
+        // Create a local Jndi Context
         Hashtable env = new Hashtable();
-        //env.put(Context.PROVIDER_URL, "rmi://localhost:1099");
+        // env.put(Context.PROVIDER_URL, "rmi://localhost:1099");
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         InitialContext ic = new InitialContext(env);
-        //Bind our servcie object
+        // Bind our servcie object
         ic.bind("TestService", new DummyEjbHomeProxy());
 
         ejbConnector.setJndiContext(ic);
@@ -70,11 +70,10 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         return builder;
     }
 
-
-
     public void testReverseString() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("ejb://localhost/TestService?method=reverseString", false);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "ejb://localhost/TestService?method=reverseString", false);
         UMOMessageDispatcher dispatcher = ejbConnector.getDispatcher(ep);
         UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
@@ -83,7 +82,8 @@ public class EjbInvocationTestCase extends FunctionalTestCase
 
     public void testUpperCaseString() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("ejb://localhost/TestService?method=upperCaseString", false);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "ejb://localhost/TestService?method=upperCaseString", false);
         UMOMessageDispatcher dispatcher = ejbConnector.getDispatcher(ep);
         UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
@@ -98,10 +98,12 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         {
             dispatcher.send(getTestEvent("hello", ep));
 
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e instanceof DispatchException);
-            assertTrue(e.getMessage().startsWith(Messages.get("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET)));
+            assertTrue(e.getMessage().startsWith(
+                Messages.get("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET)));
         }
     }
 
@@ -112,7 +114,8 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
@@ -126,7 +129,8 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
@@ -140,7 +144,8 @@ public class EjbInvocationTestCase extends FunctionalTestCase
         try
         {
             dispatcher.send(getTestEvent("hello", ep));
-        } catch (UMOException e)
+        }
+        catch (UMOException e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }

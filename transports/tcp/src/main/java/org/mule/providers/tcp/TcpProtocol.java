@@ -15,8 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * The TcpProtocol interface enables to plug different application level
- * protocols on a TcpConnector.
+ * The TcpProtocol interface enables to plug different application level protocols on
+ * a TcpConnector.
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$

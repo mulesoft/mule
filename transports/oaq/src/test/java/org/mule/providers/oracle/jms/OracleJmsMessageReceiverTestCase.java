@@ -23,12 +23,15 @@ import org.mule.umo.provider.UMOMessageReceiver;
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
-    
+public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
+{
+
     private OracleJmsConnector connector = null;
 
-    public UMOConnector getConnector() throws Exception {
-        if (connector == null) {
+    public UMOConnector getConnector() throws Exception
+    {
+        if (connector == null)
+        {
             connector = new OracleJmsConnector();
             connector.setName("TestConnector");
             connector.setUrl("jdbc:oracle:oci:@TEST_DB");
@@ -39,17 +42,18 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
         return connector;
     }
 
-    public UMOMessageReceiver getMessageReceiver() throws Exception {
+    public UMOMessageReceiver getMessageReceiver() throws Exception
+    {
         getConnector();
         endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
         endpoint.setConnector(getConnector());
         Mock mockComponent = new Mock(UMOComponent.class);
-        return new OracleJmsMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                             (UMOComponent) mockComponent.proxy(),
-                                             endpoint);
+        return new OracleJmsMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception {
+    public UMOEndpoint getEndpoint() throws Exception
+    {
         endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
         endpoint.setConnector(getConnector());
         return endpoint;

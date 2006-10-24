@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap;
 
 import org.mule.impl.endpoint.AbstractEndpointBuilder;
@@ -16,33 +17,42 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * The same as the UrlEndpointbuilder except that all parameters except the first are set as properties on the endpoint and stripped
- * from the endpoint Uri
- *
+ * The same as the UrlEndpointbuilder except that all parameters except the first are
+ * set as properties on the endpoint and stripped from the endpoint Uri
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class WsdlUrlEndpointBuilder extends AbstractEndpointBuilder {
+public class WsdlUrlEndpointBuilder extends AbstractEndpointBuilder
+{
 
-    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException {
+    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
+    {
         address = "";
-        if (uri.getHost() != null) {
+        if (uri.getHost() != null)
+        {
             // set the endpointUri to be a proper url if host and port are set
             this.address = uri.getScheme() + "://" + uri.getHost();
-            if (uri.getPort() != -1) {
+            if (uri.getPort() != -1)
+            {
                 address += ":" + uri.getPort();
             }
         }
-        if (uri.getPath() != null) {
+        if (uri.getPath() != null)
+        {
             address += uri.getPath();
         }
         String query = uri.getQuery();
-        if (query != null) {
+        if (query != null)
+        {
             int i = query.indexOf("&");
-            if(i > -1) {
+            if (i > -1)
+            {
                 address += "?" + query.substring(0, i);
 
-            } else {
+            }
+            else
+            {
                 address += "?" + query;
             }
         }

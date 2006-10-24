@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.stream;
 
 import org.apache.commons.lang.SystemUtils;
@@ -39,37 +40,46 @@ public class StreamMessageReceiver extends PollingMessageReceiver
     public StreamMessageReceiver(UMOConnector connector,
                                  UMOComponent component,
                                  UMOEndpoint endpoint,
-                                 Long checkFrequency) throws InitialisationException {
+                                 Long checkFrequency) throws InitialisationException
+    {
         super(connector, component, endpoint, checkFrequency);
 
         this.connector = (StreamConnector)connector;
         String streamName = endpoint.getEndpointURI().getAddress();
-        if(StreamConnector.STREAM_SYSTEM_IN.equalsIgnoreCase(streamName)) {
+        if (StreamConnector.STREAM_SYSTEM_IN.equalsIgnoreCase(streamName))
+        {
             inputStream = System.in;
-        } else {
+        }
+        else
+        {
             inputStream = this.connector.getInputStream();
         }
 
         // apply connector-specific properties
-        if (connector instanceof SystemStreamConnector) {
+        if (connector instanceof SystemStreamConnector)
+        {
             SystemStreamConnector ssc = (SystemStreamConnector)connector;
 
             String promptMessage = (String)endpoint.getProperties().get("promptMessage");
-            if (promptMessage != null) {
+            if (promptMessage != null)
+            {
                 ssc.setPromptMessage(promptMessage);
             }
         }
     }
 
-    public void doConnect() throws Exception {
-        if (connector instanceof SystemStreamConnector) {
+    public void doConnect() throws Exception
+    {
+        if (connector instanceof SystemStreamConnector)
+        {
             SystemStreamConnector ssc = (SystemStreamConnector)connector;
             DelayedMessageWriter writer = new DelayedMessageWriter(ssc);
             writer.start();
         }
     }
 
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
         // noop
     }
 
@@ -78,31 +88,38 @@ public class StreamMessageReceiver extends PollingMessageReceiver
      * 
      * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
      */
-    public void poll() {
-        try {
+    public void poll()
+    {
+        try
+        {
             byte[] inputBuffer = new byte[bufferSize];
             int len = inputStream.read(inputBuffer);
 
-            if (len == -1) {
+            if (len == -1)
+            {
                 return;
             }
 
             StringBuffer fullBuffer = new StringBuffer(bufferSize);
-            while (len > 0) {
+            while (len > 0)
+            {
                 fullBuffer.append(new String(inputBuffer, 0, len));
                 len = 0; // mark as read
-                if (inputStream.available() > 0) {
+                if (inputStream.available() > 0)
+                {
                     len = inputStream.read(inputBuffer);
                 }
             }
 
-            //remove any trailing CR/LF
+            // remove any trailing CR/LF
             String finalMessageString;
             int noCRLFLength = fullBuffer.length() - SystemUtils.LINE_SEPARATOR.length();
-            if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1) {
+            if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1)
+            {
                 finalMessageString = fullBuffer.substring(0, noCRLFLength);
             }
-            else {
+            else
+            {
                 finalMessageString = fullBuffer.toString();
             }
 
@@ -111,24 +128,29 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
             doConnect();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             handleException(e);
         }
     }
 
-    public InputStream getInputStream() {
+    public InputStream getInputStream()
+    {
         return inputStream;
     }
 
-    public void setInputStream(InputStream inputStream) {
+    public void setInputStream(InputStream inputStream)
+    {
         this.inputStream = inputStream;
     }
 
-    public int getBufferSize() {
+    public int getBufferSize()
+    {
         return bufferSize;
     }
 
-    public void setBufferSize(int bufferSize) {
+    public void setBufferSize(int bufferSize)
+    {
         this.bufferSize = bufferSize;
     }
 
@@ -145,11 +167,15 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
         public void run()
         {
-            if (delay > 0) {
-                try {
+            if (delay > 0)
+            {
+                try
+                {
                     // Allow all other console message to be printed out first
                     sleep(delay);
-                } catch (InterruptedException e1) {
+                }
+                catch (InterruptedException e1)
+                {
                     // ignore
                 }
             }

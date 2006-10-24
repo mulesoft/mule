@@ -34,6 +34,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
      */
     public UMOContainerContext getContainerContext()
@@ -43,6 +44,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
 
     /*
      * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
     protected void doSetUp() throws Exception
@@ -51,7 +53,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         Map env = new HashMap();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
-        //context.setSecurityPolicy("open-security.policy");
+        // context.setSecurityPolicy("open-security.policy");
         context.initialise();
         Context ic = context.getContext();
         ic.bind(EJB_NAME, new DummyEjbHomeProxy());
@@ -65,32 +67,41 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
 
         Object result = null;
 
-        try {
+        try
+        {
             result = container.getComponent(null);
             fail("Should throw ObjectNotFoundException for null key");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             result = container.getComponent("abcdefg123456!£$%^n");
             fail("Should throw ObjectNotFoundException for a key that doesn't exist");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             result = container.getComponent(EJB_NAME);
             assertNotNull("Component should exist in container", result);
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             fail("Component should exist in the container");
         }
     }
 
     /**
-     * Usage 2: the implementation reference on the descriptor is to a component
-     * in the container
-     *
+     * Usage 2: the implementation reference on the descriptor is to a component in
+     * the container
+     * 
      * @throws Exception
      */
     public void testExternalUMOReference() throws Exception
@@ -99,7 +110,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         assertNotNull(container);
         container.initialise();
         UMODescriptor descriptor = getTestDescriptor("some Ejb service", EJB_NAME);
-        DummyEjbBean dummyEjbBean = (DummyEjbBean) container.getComponent(descriptor.getImplementation());
+        DummyEjbBean dummyEjbBean = (DummyEjbBean)container.getComponent(descriptor.getImplementation());
 
         assertNotNull(dummyEjbBean);
     }
@@ -110,10 +121,13 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         container.initialise();
         assertNotNull(container);
 
-        try {
+        try
+        {
             container.getComponent(Apple.class.getName());
             fail("Should throw ObjectNotFoundException for non-ejb object");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
     }

@@ -26,9 +26,10 @@ import java.util.Iterator;
  */
 public class SoapMethodTestCase extends AbstractMuleTestCase
 {
-     public void testNamedParameterParsing() throws Exception {
+    public void testNamedParameterParsing() throws Exception
+    {
         SoapMethod method = new SoapMethod("getFruit",
-           "firstName;string;in, age;integer;in, returnClass;org.mule.tck.testmodels.fruit.Apple");
+            "firstName;string;in, age;integer;in, returnClass;org.mule.tck.testmodels.fruit.Apple");
         assertEquals(new QName("getFruit"), method.getName());
         assertEquals(2, method.getNamedParameters().size());
         assertEquals(Apple.class, method.getReturnClass());
@@ -46,10 +47,10 @@ public class SoapMethodTestCase extends AbstractMuleTestCase
         assertEquals(ParameterMode.IN, np.getMode());
     }
 
-    public void testNamedParameterParsing2() throws Exception {
-        SoapMethod method = new SoapMethod("getAge",
-           "firstName;string;inout,return;int");
-        assertEquals(new QName("getAge") , method.getName());
+    public void testNamedParameterParsing2() throws Exception
+    {
+        SoapMethod method = new SoapMethod("getAge", "firstName;string;inout,return;int");
+        assertEquals(new QName("getAge"), method.getName());
         assertEquals(1, method.getNamedParameters().size());
         assertEquals(Object.class, method.getReturnClass());
         assertEquals(NamedParameter.XSD_INT, method.getReturnType());

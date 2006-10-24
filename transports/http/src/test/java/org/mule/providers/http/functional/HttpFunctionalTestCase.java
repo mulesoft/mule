@@ -39,13 +39,15 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected HttpConnection cnn;
     protected PostMethod postMethod;
-    
+
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("http://localhost:60198");
         }
-        catch (MalformedEndpointException e) {
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -83,23 +85,28 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected void doTearDown() throws Exception
     {
-        if (cnn != null) {
+        if (cnn != null)
+        {
             cnn.close();
         }
-    }    
-    
-    public EventCallback createEventCallback() {
+    }
+
+    public EventCallback createEventCallback()
+    {
         final EventCallback superCallback = super.createEventCallback();
 
-        return new EventCallback() {
-            public void eventReceived(UMOEventContext context, Object Component) throws Exception {
+        return new EventCallback()
+        {
+            public void eventReceived(UMOEventContext context, Object Component) throws Exception
+            {
                 superCallback.eventReceived(context, Component);
                 context.getMessage().setProperty(HttpConstants.HEADER_CONTENT_TYPE, getExpectedContentType());
             }
         };
     }
 
-    protected String getExpectedContentType() {
+    protected String getExpectedContentType()
+    {
         return "text/plain;charset=UTF-8";
     }
 }

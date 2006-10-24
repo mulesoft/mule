@@ -7,20 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.space;
 
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.lifecycle.Disposable;
 
-
 /**
- * A space provides a "store" for shared objects.  Spaces are tread-safe and can be transactional and can also be distributed
- * allowing a shared memory space between multiple clients on a network.
- *
+ * A space provides a "store" for shared objects. Spaces are tread-safe and can be
+ * transactional and can also be distributed allowing a shared memory space between
+ * multiple clients on a network.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOSpace extends Disposable {
+public interface UMOSpace extends Disposable
+{
 
     public void addListener(UMOSpaceEventListener listener);
 
@@ -34,7 +36,7 @@ public interface UMOSpace extends Disposable {
 
     public Object take() throws UMOSpaceException;
 
-    public Object take(long timeout)  throws UMOSpaceException;
+    public Object take(long timeout) throws UMOSpaceException;
 
     public Object takeNoWait() throws UMOSpaceException;
 

@@ -24,8 +24,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import java.util.Properties;
 
 /**
- * Creates a connection to a Quartz sheduler.  This allows events to be sheduled
- * at specific times, with repeat occurences
+ * Creates a connection to a Quartz sheduler. This allows events to be sheduled at
+ * specific times, with repeat occurences
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -71,38 +71,52 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        try {
-            if (scheduler == null) {
-                if (factory == null) {
+        try
+        {
+            if (scheduler == null)
+            {
+                if (factory == null)
+                {
                     Object[] args = null;
-                    if (factoryProperties != null) {
-                        args = new Object[] { factoryProperties };
+                    if (factoryProperties != null)
+                    {
+                        args = new Object[]{factoryProperties};
                     }
-                    factory = (SchedulerFactory) ClassUtils.instanciateClass(factoryClassName, args);
+                    factory = (SchedulerFactory)ClassUtils.instanciateClass(factoryClassName, args);
                 }
                 scheduler = factory.getScheduler();
             }
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "Quartz provider"), e);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X,
+                "Quartz provider"), e);
         }
     }
 
     protected void doStart() throws UMOException
     {
-        try {
+        try
+        {
             scheduler.start();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new ConnectorException(new Message(Messages.FAILED_TO_START_X, "Quartz provider"), this, e);
         }
     }
 
     protected void doStop() throws UMOException
     {
-        try {
-            if (scheduler != null) {
+        try
+        {
+            if (scheduler != null)
+            {
                 scheduler.shutdown();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "Quartz provider"), this, e);
         }
     }

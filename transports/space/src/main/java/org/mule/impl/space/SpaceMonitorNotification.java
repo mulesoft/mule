@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.space;
 
 import org.mule.umo.manager.UMOServerNotification;
@@ -14,7 +15,7 @@ import org.mule.umo.space.UMOSpace;
 
 /**
  * Events that occur in UMOSpaces
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,8 +34,8 @@ public class SpaceMonitorNotification extends UMOServerNotification
     public static final int SPACE_LISTENER_ADDED = SPACE_EVENT_ACTION_START_RANGE + 7;
     public static final int SPACE_LISTENER_REMOVED = SPACE_EVENT_ACTION_START_RANGE + 8;
 
-    private static final transient String[] ACTIONS = new String[] { "created", "item added", "item removed", "item expired",
-            "item miss", "disposed", "listener added", "listener removed"};
+    private static final transient String[] ACTIONS = new String[]{"created", "item added", "item removed",
+        "item expired", "item miss", "disposed", "listener added", "listener removed"};
 
     private Object item;
 
@@ -45,19 +46,21 @@ public class SpaceMonitorNotification extends UMOServerNotification
         this.item = item;
     }
 
-    public Object getItem() {
+    public Object getItem()
+    {
         return item;
     }
 
     protected String getPayloadToString()
     {
-        return ((UMOSpace) source).getName();
+        return ((UMOSpace)source).getName();
     }
 
     protected String getActionName(int action)
     {
         int i = action - SPACE_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length) {
+        if (i - 1 > ACTIONS.length)
+        {
             return String.valueOf(action);
         }
         return ACTIONS[i - 1];

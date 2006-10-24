@@ -62,7 +62,8 @@ public class PlainTextDataSource implements DataSource
 
     public InputStream getInputStream() throws IOException
     {
-        if (os.size() != 0) {
+        if (os.size() != 0)
+        {
             data = os.toByteArray();
         }
         return new ByteArrayInputStream(data == null ? new byte[0] : data);
@@ -70,7 +71,8 @@ public class PlainTextDataSource implements DataSource
 
     public OutputStream getOutputStream() throws IOException
     {
-        if (os.size() != 0) {
+        if (os.size() != 0)
+        {
             data = os.toByteArray();
         }
         return new ByteArrayOutputStream();

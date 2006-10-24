@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.axis.functional;
 
 import org.dom4j.Document;
@@ -23,20 +24,23 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class WsdlGenerationTestCase extends FunctionalTestCase {
+public class WsdlGenerationTestCase extends FunctionalTestCase
+{
 
     /**
-     * The generated proxy names have increasing counter if run
-     * from the top-level m2 build, can be e.g. $Proxy12.
-     * Check optionally for 3 digits to be on the safe side.
+     * The generated proxy names have increasing counter if run from the top-level m2
+     * build, can be e.g. $Proxy12. Check optionally for 3 digits to be on the safe
+     * side.
      */
     private static final String PROXY_REGEX = "^\\$Proxy(\\d+\\d*\\d*)$";
 
-    public WsdlGenerationTestCase() {
+    public WsdlGenerationTestCase()
+    {
         super.setDisposeManagerPerSuite(true);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "axis-wsdl-test.xml";
     }
 
@@ -55,13 +59,18 @@ public class WsdlGenerationTestCase extends FunctionalTestCase {
         // standalone m2 test run can produce $Proxy0, $Proxy1, $Proxy3, etc.
         assertTrue(doc.valueOf("/wsdl:definitions/wsdl:portType/@name").matches(PROXY_REGEX));
 
-        assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
-        assertEquals("http://foo", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
 
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
 
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-        assertEquals("http://localhost:8081/services/EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+        assertEquals("http://localhost:8081/services/EchoService1",
+            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
 
     }
 
@@ -77,11 +86,16 @@ public class WsdlGenerationTestCase extends FunctionalTestCase {
         Document doc = DocumentHelper.parseText(wsdl);
         assertEquals("http://simple.components.mule.org", doc.valueOf("/wsdl:definitions/@targetNamespace"));
         assertEquals("mulePortType", doc.valueOf("/wsdl:definitions/wsdl:portType/@name"));
-        assertEquals("http://simple.components.mule.org", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
-        assertEquals("http://simple.components.mule.org", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://simple.components.mule.org",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://simple.components.mule.org",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
         assertEquals("muleService", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
         assertEquals("muleServicePort", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-        assertEquals("http://localhost:8082/services/EchoService2", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+        assertEquals("http://localhost:8082/services/EchoService2",
+            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
 
     }
 
@@ -97,11 +111,16 @@ public class WsdlGenerationTestCase extends FunctionalTestCase {
         Document doc = DocumentHelper.parseText(wsdl);
         assertEquals("http://foo.com", doc.valueOf("/wsdl:definitions/@targetNamespace"));
         assertEquals("mulePortType1", doc.valueOf("/wsdl:definitions/wsdl:portType/@name"));
-        assertEquals("http://foo.com", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
-        assertEquals("http://foo.com", doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo.com",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo.com",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
         assertEquals("muleService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
         assertEquals("muleServicePort1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-        assertEquals("http://localhost:8083/services/EchoService3", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+        assertEquals("http://localhost:8083/services/EchoService3",
+            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
 
     }
 }

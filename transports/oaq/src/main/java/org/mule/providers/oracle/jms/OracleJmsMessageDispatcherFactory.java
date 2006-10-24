@@ -20,7 +20,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  */
 public class OracleJmsMessageDispatcherFactory extends JmsMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+    {
         return new OracleJmsMessageDispatcher(endpoint);
     }
 }

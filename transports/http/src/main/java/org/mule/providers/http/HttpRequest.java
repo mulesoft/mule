@@ -40,33 +40,40 @@ public class HttpRequest
     }
 
     public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content)
-            throws IOException
+        throws IOException
     {
         super();
-        if (requestLine == null) {
+        if (requestLine == null)
+        {
             throw new IllegalArgumentException("Request line may not be null");
         }
         this.requestLine = requestLine;
-        if (headers != null) {
+        if (headers != null)
+        {
             this.headers.setHeaders(headers);
         }
-        if (content != null) {
+        if (content != null)
+        {
             // only PUT and POST have content
             String methodname = requestLine.getMethod();
             if (HttpConstants.METHOD_POST.equalsIgnoreCase(methodname)
-                    || HttpConstants.METHOD_PUT.equalsIgnoreCase(methodname)) {
+                || HttpConstants.METHOD_PUT.equalsIgnoreCase(methodname))
+            {
                 Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
-                Header transferEncoding = this.headers
-                        .getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
+                Header transferEncoding = this.headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
                 InputStream in = content;
-                if (transferEncoding != null) {
-                    if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                if (transferEncoding != null)
+                {
+                    if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                    {
                         in = new ChunkedInputStream(in);
                     }
                 }
-                else if (contentLength != null) {
+                else if (contentLength != null)
+                {
                     long len = getContentLength();
-                    if (len >= 0) {
+                    if (len >= 0)
+                    {
                         in = new ContentLengthInputStream(in, len);
                     }
                 }
@@ -87,7 +94,8 @@ public class HttpRequest
 
     public void setRequestLine(final RequestLine requestline)
     {
-        if (requestline == null) {
+        if (requestline == null)
+        {
             throw new IllegalArgumentException("Request line may not be null");
         }
         this.requestLine = requestline;
@@ -110,18 +118,21 @@ public class HttpRequest
 
     public void removeHeaders(final String s)
     {
-        if (s == null) {
+        if (s == null)
+        {
             return;
         }
         Header[] headers = this.headers.getHeaders(s);
-        for (int i = 0; i < headers.length; i++) {
+        for (int i = 0; i < headers.length; i++)
+        {
             this.headers.removeHeader(headers[i]);
         }
     }
 
     public void addHeader(final Header header)
     {
-        if (header == null) {
+        if (header == null)
+        {
             return;
         }
         this.headers.addHeader(header);
@@ -129,7 +140,8 @@ public class HttpRequest
 
     public void setHeader(final Header header)
     {
-        if (header == null) {
+        if (header == null)
+        {
             return;
         }
         removeHeaders(header.getName());
@@ -144,10 +156,12 @@ public class HttpRequest
     public String getContentType()
     {
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null) {
+        if (contenttype != null)
+        {
             return contenttype.getValue();
         }
-        else {
+        else
+        {
             return HttpConstants.DEFAULT_CONTENT_TYPE;
         }
     }
@@ -156,19 +170,24 @@ public class HttpRequest
     {
         String charset = null;
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null) {
+        if (contenttype != null)
+        {
             HeaderElement values[] = contenttype.getElements();
-            if (values.length == 1) {
+            if (values.length == 1)
+            {
                 NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null) {
+                if (param != null)
+                {
                     charset = param.getValue();
                 }
             }
         }
-        if (charset != null) {
+        if (charset != null)
+        {
             return charset;
         }
-        else {
+        else
+        {
             return MuleManager.getConfiguration().getEncoding();
         }
     }
@@ -176,15 +195,19 @@ public class HttpRequest
     public long getContentLength()
     {
         Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
-        if (contentLength != null) {
-            try {
+        if (contentLength != null)
+        {
+            try
+            {
                 return Long.parseLong(contentLength.getValue());
             }
-            catch (NumberFormatException e) {
+            catch (NumberFormatException e)
+            {
                 return -1;
             }
         }
-        else {
+        else
+        {
             return -1;
         }
     }
@@ -197,12 +220,14 @@ public class HttpRequest
     public byte[] getBodyBytes() throws IOException
     {
         InputStream in = getBody();
-        if (in != null) {
+        if (in != null)
+        {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             IOUtils.copy(in, buffer);
             return buffer.toByteArray();
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -210,10 +235,12 @@ public class HttpRequest
     public String getBodyString() throws IOException
     {
         byte[] raw = getBodyBytes();
-        if (raw != null) {
+        if (raw != null)
+        {
             return new String(raw, getCharset());
         }
-        else {
+        else
+        {
             return null;
         }
     }

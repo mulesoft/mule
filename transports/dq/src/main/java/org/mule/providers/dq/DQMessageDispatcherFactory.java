@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import org.mule.umo.UMOException;
@@ -15,9 +16,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author m999svm
- * 
- * DQMessageDispatcherFactory
+ * @author m999svm DQMessageDispatcherFactory
  */
 public class DQMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

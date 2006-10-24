@@ -17,7 +17,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates a HttpClientMessageDispatcher to make client requests
- * 
  */
 public class HttpClientMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

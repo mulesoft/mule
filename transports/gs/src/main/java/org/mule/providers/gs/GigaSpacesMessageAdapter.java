@@ -32,17 +32,19 @@ public class GigaSpacesMessageAdapter extends AbstractMessageAdapter
     /**
      * Creates a default message adapter with properties and attachments
      * 
-     * @param message
-     *            the message to wrap. If this is null and NullPayload object will be used
+     * @param message the message to wrap. If this is null and NullPayload object
+     *            will be used
      * @see org.mule.providers.NullPayload
      */
     public GigaSpacesMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
-        if (message == null) {
+        if (message == null)
+        {
             // TODO this is not what the javadocs say?!
             throw new MessageTypeNotSupportedException(null, getClass());
         }
-        else {
+        else
+        {
             this.message = message;
         }
     }
@@ -68,7 +70,8 @@ public class GigaSpacesMessageAdapter extends AbstractMessageAdapter
      */
     public Object getPayload()
     {
-        if (message instanceof ExternalEntry) {
+        if (message instanceof ExternalEntry)
+        {
             return converter.toPojo((Entry)message);
         }
         return message;

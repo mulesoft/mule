@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>GlueMessageDispatcher</code> will make web services calls using the
- * Glue invoking mechanism.
+ * <code>GlueMessageDispatcher</code> will make web services calls using the Glue
+ * invoking mechanism.
  */
 
 public class GlueMessageDispatcher extends AbstractMessageDispatcher
@@ -44,25 +44,30 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        if (proxy == null) {
+        if (proxy == null)
+        {
             String bindAddress = endpoint.getEndpointURI().getAddress();
             String method = (String)endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
-            if (bindAddress.indexOf(".wsdl") == -1 && method != null) {
+            if (bindAddress.indexOf(".wsdl") == -1 && method != null)
+            {
                 bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
             }
             int i = bindAddress.indexOf("?");
-            if (i > -1) {
+            if (i > -1)
+            {
                 bindAddress = bindAddress.substring(0, i);
             }
 
             // add credentials to the request
-            if (endpoint.getEndpointURI().getUsername() != null) {
+            if (endpoint.getEndpointURI().getUsername() != null)
+            {
                 ProxyContext context = new ProxyContext();
                 context.setAuthUser(endpoint.getEndpointURI().getUsername());
                 context.setAuthPassword(new String(endpoint.getEndpointURI().getPassword()));
                 proxy = Registry.bind(bindAddress, context);
             }
-            else {
+            else
+            {
                 proxy = Registry.bind(bindAddress);
             }
         }
@@ -86,30 +91,37 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
 
         Object payload = event.getTransformedMessage();
         Object[] args;
-        if (payload instanceof Object[]) {
+        if (payload instanceof Object[])
+        {
             args = (Object[])payload;
         }
-        else {
+        else
+        {
             args = new Object[]{payload};
         }
-        if (event.getMessage().getReplyTo() != null) {
-            ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, event.getMessage()
-                    .getReplyTo());
+        if (event.getMessage().getReplyTo() != null)
+        {
+            ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, event.getMessage().getReplyTo());
         }
-        if (event.getMessage().getCorrelationId() != null) {
+        if (event.getMessage().getCorrelationId() != null)
+        {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage()
-                    .getCorrelationId());
+                .getCorrelationId());
         }
-        try {
+        try
+        {
             Object result = proxy.invoke(method, args);
-            if (result == null) {
+            if (result == null)
+            {
                 return null;
             }
-            else {
+            else
+            {
                 return new MuleMessage(result);
             }
         }
-        catch (Throwable t) {
+        catch (Throwable t)
+        {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), t);
         }
     }
@@ -117,28 +129,27 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint
-     *            the endpoint to use when connecting to the resource
-     * @param timeout
-     *            the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available.
-     *            If no data becomes available before the timeout elapses, null
-     *            will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null
-     *         will be returned if no data was avaialable
-     * @throws Exception
-     *             if the call to the underlying protocal cuases an exception
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
         Map props = new HashMap();
         props.putAll(endpoint.getProperties());
         String method = (String)props.remove(MuleProperties.MULE_METHOD_PROPERTY);
-        try {
+        try
+        {
             Object result = proxy.invoke(method, props.values().toArray());
             return new MuleMessage(result);
         }
-        catch (Throwable t) {
+        catch (Throwable t)
+        {
             throw new ReceiveException(endpoint, timeout, t);
         }
     }
@@ -157,11 +168,13 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     {
         int i = endpoint.lastIndexOf("/");
         String method = endpoint.substring(i + 1);
-        if (method.indexOf(".wsdl") != -1) {
+        if (method.indexOf(".wsdl") != -1)
+        {
             throw new MalformedEndpointException(
-                    "Soap url must contain method to invoke as a param [method=X] or as the last path element");
+                "Soap url must contain method to invoke as a param [method=X] or as the last path element");
         }
-        else {
+        else
+        {
             return method;
             // endpointUri = endpointUri.substring(0, endpointUri.length() -
             // (method.length() + 1));
@@ -171,25 +184,29 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     protected void setContext(UMOEvent event)
     {
         Object replyTo = event.getMessage().getReplyTo();
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
         }
 
         String correlationId = event.getMessage().getCorrelationId();
-        if (replyTo != null) {
+        if (replyTo != null)
+        {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
         }
 
         int value = event.getMessage().getCorrelationSequence();
-        if (value > 0) {
-            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String
-                    .valueOf(value));
+        if (value > 0)
+        {
+            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+                String.valueOf(value));
         }
 
         value = event.getMessage().getCorrelationGroupSize();
-        if (value > 0) {
-            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String
-                    .valueOf(value));
+        if (value > 0)
+        {
+            ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                String.valueOf(value));
         }
     }
 }

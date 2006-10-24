@@ -32,21 +32,23 @@ public class UMOMessageToGigaSpacesEntry extends AbstractEventAwareTransformer
         setReturnClass(Entry.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context)
-                    throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         Object result = null;
         UMOMessage msg = context.getMessage();
-        if (Object[].class.isAssignableFrom(src.getClass())) {
+        if (Object[].class.isAssignableFrom(src.getClass()))
+        {
             Object[] srcArr = (Object[])src;
             Object[] resultArr = new Object[srcArr.length];
 
-            for (int i = 0; i < srcArr.length; ++i) {
+            for (int i = 0; i < srcArr.length; ++i)
+            {
                 resultArr[i] = converter.toEntry(srcArr[i], msg);
             }
             result = resultArr;
         }
-        else {
+        else
+        {
             result = converter.toEntry(src, msg);
         }
         return result;

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.dq;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -18,7 +19,7 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class DQConnectorTestCase extends AbstractConnectorTestCase
 {
-    
+
     public UMOConnector getConnector() throws Exception
     {
         DQConnector c = new DQConnector();

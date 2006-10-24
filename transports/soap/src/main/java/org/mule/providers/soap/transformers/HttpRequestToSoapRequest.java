@@ -27,8 +27,8 @@ import java.util.Properties;
 
 /**
  * A simple transformer for converting an Http GET request into a SOAP request.
- * Usually, you would POST a soap document, but this Transformer can be useful
- * for making simple soap requests
+ * Usually, you would POST a soap document, but this Transformer can be useful for
+ * making simple soap requests
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -50,19 +50,22 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         registerSourceType(byte[].class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context)
-            throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         String data = src.toString();
-        if (src instanceof byte[]) {
-            try {
+        if (src instanceof byte[])
+        {
+            try
+            {
                 data = new String((byte[])src, encoding);
             }
-            catch (UnsupportedEncodingException e) {
+            catch (UnsupportedEncodingException e)
+            {
                 throw new TransformerException(this, e);
             }
             // Data is already Xml
-            if (data.startsWith("<") || data.startsWith("&lt;")) {
+            if (data.startsWith("<") || data.startsWith("&lt;"))
+            {
                 return data;
             }
         }
@@ -74,17 +77,21 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         Properties p = PropertiesUtils.getPropertiesFromQueryString(query);
 
         String method = (String)p.remove(MuleProperties.MULE_METHOD_PROPERTY);
-        if (method == null) {
+        if (method == null)
+        {
             throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    MuleProperties.MULE_METHOD_PROPERTY), this);
+                MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
-        if (httpMethod.equals("POST")) {
+        if (httpMethod.equals("POST"))
+        {
 
-            try {
+            try
+            {
                 p.setProperty(method, context.getMessageAsString());
             }
-            catch (UMOException e) {
+            catch (UMOException e)
+            {
                 throw new TransformerException(this, e);
             }
         }
@@ -92,11 +99,13 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         StringBuffer result = new StringBuffer(8192);
         String header = StringMessageUtils.getFormattedMessage(SOAP_HEADER, new Object[]{encoding});
 
-        if (p.size() > 0) {
+        if (p.size() > 0)
+        {
             result.append(header);
             result.append('<').append(method).append(" xmlns=\"");
             result.append(DEFAULT_NAMESPACE).append("\">");
-            for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();)
+            {
                 Map.Entry entry = (Map.Entry)iterator.next();
                 result.append('<').append(entry.getKey()).append('>');
                 result.append(entry.getValue());
@@ -105,9 +114,10 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
             result.append("</").append(method).append('>');
             result.append(SOAP_FOOTER);
         }
-        else {
+        else
+        {
             throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    MuleProperties.MULE_METHOD_PROPERTY), this);
+                MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
         return result.toString();

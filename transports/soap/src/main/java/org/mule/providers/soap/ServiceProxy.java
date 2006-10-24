@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap;
 
 import org.mule.umo.UMOComponent;
@@ -22,11 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
- * like a Web service.
- * 
- * Also provides helper methods for building and describing web service
- * interfaces in Mule.
+ * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
+ * a Web service. Also provides helper methods for building and describing web
+ * service interfaces in Mule.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -34,20 +33,25 @@ import java.util.List;
 
 public class ServiceProxy
 {
-    public static Class[] getInterfacesForComponent(UMOComponent component) throws UMOException, ClassNotFoundException
+    public static Class[] getInterfacesForComponent(UMOComponent component)
+        throws UMOException, ClassNotFoundException
     {
         Class[] interfaces;
-        List ifaces = (List) component.getDescriptor().getProperties().get("serviceInterfaces");
-        if (ifaces == null || ifaces.size() == 0) {
+        List ifaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
+        if (ifaces == null || ifaces.size() == 0)
+        {
             final Class implementationClass = component.getDescriptor().getImplementationClass();
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
-            interfaces = (Class[]) intfList.toArray(new Class[intfList.size()]);
+            interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);
 
-        } else {
+        }
+        else
+        {
             interfaces = new Class[ifaces.size()];
-            for (int i = 0; i < ifaces.size(); i++) {
-                String iface = (String) ifaces.get(i);
+            for (int i = 0; i < ifaces.size(); i++)
+            {
+                String iface = (String)ifaces.get(i);
                 interfaces[i] = ClassUtils.loadClass(iface, ServiceProxy.class);
             }
         }
@@ -60,20 +64,26 @@ public class ServiceProxy
 
     public static Class[] removeInterface(Class[] interfaces, Class iface)
     {
-        if (interfaces == null) {
+        if (interfaces == null)
+        {
             return null;
         }
         List results = new ArrayList();
-        for (int i = 0; i < interfaces.length; i++) {
+        for (int i = 0; i < interfaces.length; i++)
+        {
             Class anInterface = interfaces[i];
-            if (!anInterface.equals(iface)) {
+            if (!anInterface.equals(iface))
+            {
                 results.add(anInterface);
             }
         }
         Class[] arResults = new Class[results.size()];
-        if (arResults.length == 0) {
+        if (arResults.length == 0)
+        {
             return arResults;
-        } else {
+        }
+        else
+        {
             results.toArray(arResults);
             return arResults;
         }
@@ -82,11 +92,12 @@ public class ServiceProxy
     public static Method[] getMethods(Class[] interfaces)
     {
         List methodNames = new ArrayList();
-        for (int i = 0; i < interfaces.length; i++) {
+        for (int i = 0; i < interfaces.length; i++)
+        {
             methodNames.addAll(Arrays.asList(interfaces[i].getMethods()));
         }
         Method[] results = new Method[methodNames.size()];
-        return (Method[]) methodNames.toArray(results);
+        return (Method[])methodNames.toArray(results);
 
     }
 
@@ -95,7 +106,8 @@ public class ServiceProxy
         Method[] methods = getMethods(interfaces);
 
         String[] results = new String[methods.length];
-        for (int i = 0; i < results.length; i++) {
+        for (int i = 0; i < results.length; i++)
+        {
             results[i] = methods[i].getName();
         }
         return results;

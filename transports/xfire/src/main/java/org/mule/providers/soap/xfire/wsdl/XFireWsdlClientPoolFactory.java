@@ -21,19 +21,15 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 public class XFireWsdlClientPoolFactory extends XFireClientPoolFactory
 {
 
-    public XFireWsdlClientPoolFactory(UMOImmutableEndpoint endpoint,
-                                      Service service,
-                                      XFire xfire)
+    public XFireWsdlClientPoolFactory(UMOImmutableEndpoint endpoint, Service service, XFire xfire)
     {
         super(endpoint, service, xfire);
     }
 
-    
-    
     public Object makeObject() throws Exception
     {
-        //We are assuming here that we are not going to use any
-        //other transport other than http.
+        // We are assuming here that we are not going to use any
+        // other transport other than http.
         Client client = new Client(new URL(uri.getAddress()));
         client.setXFire(xfire);
         client.setEndpointUri(uri.toString());

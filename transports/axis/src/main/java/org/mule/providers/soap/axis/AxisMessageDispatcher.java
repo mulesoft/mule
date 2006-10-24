@@ -54,8 +54,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>AxisMessageDispatcher</code> is used to make soap requests via the
- * Axis soap client. 
+ * <code>AxisMessageDispatcher</code> is used to make soap requests via the Axis
+ * soap client.
  */
 public class AxisMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -77,14 +77,16 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        if (service == null) {
+        if (service == null)
+        {
             service = createService(endpoint);
         }
     }
 
     protected void doDisconnect() throws Exception
     {
-        if (service != null) {
+        if (service != null)
+        {
             service = null;
         }
     }
@@ -96,15 +98,18 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected EngineConfiguration getClientConfig(UMOImmutableEndpoint endpoint)
     {
-        if (clientConfig == null) {
+        if (clientConfig == null)
+        {
             // Allow the client config to be set on the endpoint
             String config;
             config = (String)endpoint.getProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY);
 
-            if (config != null) {
+            if (config != null)
+            {
                 clientConfig = new FileProvider(config);
             }
-            else {
+            else
+            {
                 clientConfig = connector.getClientProvider();
             }
         }
@@ -140,10 +145,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         Object[] args = getArgs(event);
         call = getCall(event, args);
         result = call.invoke(args);
-        if (result == null) {
+        if (result == null)
+        {
             return null;
         }
-        else {
+        else
+        {
             UMOMessage resultMessage = new MuleMessage(result, event.getMessage());
             setMessageContextProperties(resultMessage, call.getMessageContext());
             return resultMessage;
@@ -154,14 +161,20 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         Object method = event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
-        if (method == null) {
-            method = event.getEndpoint().getEndpointURI().getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        if (method == null)
+        {
+            method = event.getEndpoint().getEndpointURI().getParams().getProperty(
+                MuleProperties.MULE_METHOD_PROPERTY);
         }
-        if (method == null) {
+        if (method == null)
+        {
             throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
-                    event.getEndpoint());
-        } else if(method instanceof SoapMethod) {
-            if(callParameters==null) {
+                event.getEndpoint());
+        }
+        else if (method instanceof SoapMethod)
+        {
+            if (callParameters == null)
+            {
                 callParameters = new HashMap();
             }
             callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
@@ -175,24 +188,30 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
-        if (style != null) {
+        if (style != null)
+        {
             Style s = Style.getStyle(style);
-            if (s == null) {
+            if (s == null)
+            {
                 throw new IllegalArgumentException(new org.mule.config.i18n.Message(
-                        Messages.VALUE_X_IS_INVALID_FOR_X, style, "style").toString());
+                    Messages.VALUE_X_IS_INVALID_FOR_X, style, "style").toString());
             }
-            else {
+            else
+            {
                 call.setOperationStyle(s);
             }
         }
         // Set use: Endcoded/Literal
-        if (use != null) {
+        if (use != null)
+        {
             Use u = Use.getUse(use);
-            if (u == null) {
+            if (u == null)
+            {
                 throw new IllegalArgumentException(new org.mule.config.i18n.Message(
-                        Messages.VALUE_X_IS_INVALID_FOR_X, use, "use").toString());
+                    Messages.VALUE_X_IS_INVALID_FOR_X, use, "use").toString());
             }
-            else {
+            else
+            {
                 call.setOperationUse(u);
             }
         }
@@ -202,18 +221,27 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTargetEndpointAddress(endpointUri.getAddress());
 
         String methodNamespace = null;
-        if(method instanceof String) {
-            //Set a custome method namespace if one is set.  This will be used forthe parameters too
-            methodNamespace = (String) event.getMessage().getProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY);
-            if (methodNamespace != null) {
+        if (method instanceof String)
+        {
+            // Set a custome method namespace if one is set. This will be used forthe
+            // parameters too
+            methodNamespace = (String)event.getMessage().getProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY);
+            if (methodNamespace != null)
+            {
                 call.setOperationName(new QName(methodNamespace, method.toString()));
-            } else {
+            }
+            else
+            {
                 call.setOperationName(new QName(method.toString()));
             }
-        } else if(method instanceof QName){
+        }
+        else if (method instanceof QName)
+        {
             call.setOperationName((QName)method);
             method = ((QName)method).getLocalPart();
-        } else {
+        }
+        else
+        {
             call.setOperationName(((SoapMethod)method).getName());
         }
 
@@ -226,56 +254,66 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTimeout(new Integer(event.getTimeout()));
 
         // Add User Creds
-        if (endpointUri.getUserInfo() != null) {
+        if (endpointUri.getUserInfo() != null)
+        {
             call.setUsername(endpointUri.getUsername());
             call.setPassword(endpointUri.getPassword());
         }
 
-        Map methodCalls = (Map) event.getMessage().getProperty("soapMethods");
-        if (methodCalls == null && !(method instanceof SoapMethod)) {
+        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
+        if (methodCalls == null && !(method instanceof SoapMethod))
+        {
             List params = new ArrayList();
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] == null) {
+            for (int i = 0; i < args.length; i++)
+            {
+                if (args[i] == null)
+                {
                     QName qname = call.getTypeMapping().getTypeQName(Object.class);
-                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart()
-                            + ":" + qname.getNamespaceURI() + "};in");
+                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
+                               + qname.getNamespaceURI() + "};in");
                 }
-                else if (args[i] instanceof DataHandler[]) {
+                else if (args[i] instanceof DataHandler[])
+                {
                     params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
                     // Convert key/value pairs into the parameters
                 }
-                else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams()) {
-                    for (Iterator iterator = ((Map)args[i]).entrySet().iterator(); iterator.hasNext();) {
+                else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams())
+                {
+                    for (Iterator iterator = ((Map)args[i]).entrySet().iterator(); iterator.hasNext();)
+                    {
                         Map.Entry entry = (Map.Entry)iterator.next();
-                        if (call.getTypeMapping().getTypeQName(entry.getValue().getClass()) != null) {
+                        if (call.getTypeMapping().getTypeQName(entry.getValue().getClass()) != null)
+                        {
                             QName type = call.getTypeMapping().getTypeQName(entry.getValue().getClass());
                             params.add("qname{" + entry.getKey().toString()
-                                    + (methodNamespace == null ? "" : ":" + methodNamespace)
-                                    + "};qname{" + type.getPrefix() + ":" + type.getLocalPart() + ":"
-                                    + type.getNamespaceURI() + "};in");
+                                       + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
+                                       + type.getPrefix() + ":" + type.getLocalPart() + ":"
+                                       + type.getNamespaceURI() + "};in");
                         }
-                        else {
+                        else
+                        {
                             params.add("value" + i + ";qname{"
-                                    + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                                    + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+                                       + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                                       + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
                             params.add("qname{" + entry.getKey().toString()
-                                    + (methodNamespace == null ? "" : ":" + methodNamespace)
-                                    + "};qname{"
-                                    + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                                    + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+                                       + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
+                                       + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                                       + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
                         }
 
                     }
                 }
-                else if (call.getTypeMapping().getTypeQName(args[i].getClass()) != null) {
+                else if (call.getTypeMapping().getTypeQName(args[i].getClass()) != null)
+                {
                     QName qname = call.getTypeMapping().getTypeQName(args[i].getClass());
-                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart()
-                            + ":" + qname.getNamespaceURI() + "};in");
+                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
+                               + qname.getNamespaceURI() + "};in");
                 }
-                else {
+                else
+                {
                     params.add("value" + i + ";qname{"
-                            + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                            + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+                               + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                               + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
                 }
             }
 
@@ -288,17 +326,20 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         // Set custom soap action if set on the event or endpoint
         String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-        if (soapAction != null) {
+        if (soapAction != null)
+        {
             soapAction = parseSoapAction(soapAction, call.getOperationName(), event);
             call.setSOAPActionURI(soapAction);
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
         }
-        else {
+        else
+        {
             call.setSOAPActionURI(endpointUri.getAddress());
         }
 
-        //Add any attachments to the call
-        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();) {
+        // Add any attachments to the call
+        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();)
+        {
             String name = (String)iterator.next();
             DataHandler dh = event.getMessage().getAttachment(name);
             AttachmentPart part = new AttachmentPart(dh);
@@ -311,17 +352,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getTransformedMessage();
         Object[] args;
-        if (payload instanceof Object[]) {
+        if (payload instanceof Object[])
+        {
             args = (Object[])payload;
         }
-        else {
+        else
+        {
             args = new Object[]{payload};
         }
         if (event.getMessage().getAttachmentNames() != null
-                && event.getMessage().getAttachmentNames().size() > 0) {
+            && event.getMessage().getAttachmentNames().size() > 0)
+        {
             ArrayList attachments = new ArrayList();
             Iterator i = event.getMessage().getAttachmentNames().iterator();
-            while (i.hasNext()) {
+            while (i.hasNext())
+            {
                 attachments.add(event.getMessage().getAttachment((String)i.next()));
             }
             ArrayList temp = new ArrayList(Arrays.asList(args));
@@ -334,44 +379,48 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected void setMessageContextProperties(UMOMessage message, MessageContext ctx)
     {
         String temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (StringUtils.isNotBlank(temp)) {
+        if (StringUtils.isNotBlank(temp))
+        {
             message.setCorrelationId(temp);
         }
         temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (StringUtils.isNotBlank(temp)) {
+        if (StringUtils.isNotBlank(temp))
+        {
             message.setCorrelationGroupSize(Integer.parseInt(temp));
         }
         temp = ctx.getStrProp(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (StringUtils.isNotBlank(temp)) {
+        if (StringUtils.isNotBlank(temp))
+        {
             message.setCorrelationSequence(Integer.parseInt(temp));
         }
         temp = ctx.getStrProp(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (StringUtils.isNotBlank(temp)) {
+        if (StringUtils.isNotBlank(temp))
+        {
             message.setReplyTo(temp);
         }
     }
 
-    protected void setMessageContextAttachments(UMOMessage message, MessageContext ctx) throws Exception {
-        int x=0;
-        for (Iterator iterator = ctx.getMessage().getAttachments(); iterator.hasNext();x++) {
-            message.addAttachment(String.valueOf(x), ((AttachmentPart)iterator.next()).getActivationDataHandler());
+    protected void setMessageContextAttachments(UMOMessage message, MessageContext ctx) throws Exception
+    {
+        int x = 0;
+        for (Iterator iterator = ctx.getMessage().getAttachments(); iterator.hasNext(); x++)
+        {
+            message.addAttachment(String.valueOf(x),
+                ((AttachmentPart)iterator.next()).getActivationDataHandler());
         }
     }
 
     /**
      * Make a specific request to the underlying transport
-     *
-     * @param endpoint
-     *            the endpoint to use when connecting to the resource
-     * @param timeout
-     *            the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available.
-     *            If no data becomes available before the timeout elapses, null
-     *            will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null
-     *         will be returned if no data was avaialable
-     * @throws Exception
-     *             if the call to the underlying protocal cuases an exception
+     * 
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
@@ -386,7 +435,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         String args[] = new String[params.size()];
         int i = 0;
-        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++) {
+        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++)
+        {
             args[i] = iterator.next().toString();
         }
 
@@ -403,7 +453,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
 
-        if (!endpoint.startsWith("axis:")) {
+        if (!endpoint.startsWith("axis:"))
+        {
             endpoint = "axis:" + endpoint;
         }
         UMOEndpointURI ep = new MuleEndpointURI(endpoint);
@@ -427,13 +478,15 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected UMOMessage createMessage(Object result, Call call)
     {
-        if (result == null) {
+        if (result == null)
+        {
             result = new NullPayload();
         }
         Map props = new HashMap();
         Iterator iter = call.getMessageContext().getPropertyNames();
         Object key;
-        while (iter.hasNext()) {
+        while (iter.hasNext())
+        {
             key = iter.next();
             props.put(key, call.getMessageContext().getProperty(key.toString()));
         }
@@ -454,7 +507,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap();
         UMOMessage msg = event.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        {
             String propertyKey = (String)iterator.next();
             properties.put(propertyKey, msg.getProperty(propertyKey));
         }
@@ -465,16 +519,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         properties.put("host", endpointURI.getHost());
         properties.put("port", String.valueOf(endpointURI.getPort()));
         properties.put("path", endpointURI.getPath());
-        properties.put("hostInfo", endpointURI.getScheme() + "://" + endpointURI.getHost()
-                + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-        if (event.getComponent() != null) {
+        properties.put("hostInfo", endpointURI.getScheme()
+                                   + "://"
+                                   + endpointURI.getHost()
+                                   + (endpointURI.getPort() > -1
+                                                   ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+        if (event.getComponent() != null)
+        {
             properties.put("serviceName", event.getComponent().getDescriptor().getName());
         }
 
         TemplateParser tp = TemplateParser.createAntStyleParser();
         soapAction = tp.parse(properties, soapAction);
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("SoapAction for this call is: " + soapAction);
         }
         return soapAction;
@@ -482,25 +541,31 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private void setCallParams(Call call, UMOEvent event, QName method) throws ClassNotFoundException
     {
-        if (callParameters == null) {
+        if (callParameters == null)
+        {
             loadCallParams(event, method.getNamespaceURI());
         }
 
         SoapMethod soapMethod;
         soapMethod = (SoapMethod)event.getMessage().removeProperty(MuleProperties.MULE_SOAP_METHOD);
-        if (soapMethod == null) {
+        if (soapMethod == null)
+        {
             soapMethod = (SoapMethod)callParameters.get(method.getLocalPart());
         }
-        if (soapMethod != null) {
-            for (Iterator iterator = soapMethod.getNamedParameters().iterator(); iterator.hasNext();) {
+        if (soapMethod != null)
+        {
+            for (Iterator iterator = soapMethod.getNamedParameters().iterator(); iterator.hasNext();)
+            {
                 NamedParameter parameter = (NamedParameter)iterator.next();
                 call.addParameter(parameter.getName(), parameter.getType(), parameter.getMode());
             }
 
-            if (soapMethod.getReturnType() != null) {
+            if (soapMethod.getReturnType() != null)
+            {
                 call.setReturnType(soapMethod.getReturnType());
             }
-            else if (soapMethod.getReturnClass() != null) {
+            else if (soapMethod.getReturnClass() != null)
+            {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
             call.setOperationName(soapMethod.getName());
@@ -510,7 +575,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException
     {
         Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
-        if (methodCalls == null) {
+        if (methodCalls == null)
+        {
             return;
         }
 
@@ -518,24 +584,31 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         SoapMethod soapMethod;
         callParameters = new HashMap();
 
-        for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();)
+        {
             entry = (Map.Entry)iterator.next();
-            if (StringUtils.isEmpty(namespace)) {
-                if (entry.getValue() instanceof List) {
+            if (StringUtils.isEmpty(namespace))
+            {
+                if (entry.getValue() instanceof List)
+                {
                     soapMethod = new SoapMethod(entry.getKey().toString(), (List)entry.getValue());
                 }
-                else {
+                else
+                {
                     soapMethod = new SoapMethod(entry.getKey().toString(), entry.getValue().toString());
                 }
             }
-            else {
-                if (entry.getValue() instanceof List) {
+            else
+            {
+                if (entry.getValue() instanceof List)
+                {
                     soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()),
-                            (List)entry.getValue());
+                        (List)entry.getValue());
                 }
-                else {
-                    soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()), entry
-                            .getValue().toString());
+                else
+                {
+                    soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()),
+                        entry.getValue().toString());
                 }
             }
             callParameters.put(soapMethod.getName().getLocalPart(), soapMethod);

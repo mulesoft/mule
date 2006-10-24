@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.tcp.protocols;
 
 import org.apache.commons.logging.Log;
@@ -21,9 +22,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 /**
- * The EOFProtocol class is an application level tcp protocol that does
- * nothing. Reading is terminated by the stream being closed by the client
- *
+ * The EOFProtocol class is an application level tcp protocol that does nothing.
+ * Reading is terminated by the stream being closed by the client
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,24 +41,35 @@ public class EOFProtocol implements TcpProtocol
 
         byte[] buffer = new byte[EOFProtocol.BUFFER_SIZE];
         int len = 0;
-        try {
-            while ((len = is.read(buffer)) == 0) {
+        try
+        {
+            while ((len = is.read(buffer)) == 0)
+            {
                 // wait
             }
-        } catch (SocketException e) {
+        }
+        catch (SocketException e)
+        {
             // do not pollute the log with a stacktrace, log only the message
             EOFProtocol.logger.debug("Socket exception occured: " + e.getMessage());
             return null;
-        } catch (SocketTimeoutException e) {
+        }
+        catch (SocketTimeoutException e)
+        {
             EOFProtocol.logger.debug("Socket timeout, returning null.");
             return null;
         }
-        if (len == -1) {
+        if (len == -1)
+        {
             return null;
-        } else {
-            do {
+        }
+        else
+        {
+            do
+            {
                 baos.write(buffer, 0, len);
-            } while ((len = is.read(buffer)) >= 0);
+            }
+            while ((len = is.read(buffer)) >= 0);
 
             baos.flush();
             baos.close();

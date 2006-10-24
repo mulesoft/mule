@@ -67,8 +67,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
 
     public void testHostPortAndPathUrlAndUserInfo() throws Exception
     {
-        UMOEndpointURI endpointUri = new MuleEndpointURI(
-                "jetty:http://admin:pwd@localhost:8080/app/path");
+        UMOEndpointURI endpointUri = new MuleEndpointURI("jetty:http://admin:pwd@localhost:8080/app/path");
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -85,8 +84,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
 
     public void testRestHostPortAndPathUrlAndUserInfo() throws Exception
     {
-        UMOEndpointURI endpointUri = new MuleEndpointURI(
-                "jetty:rest://admin:pwd@localhost:8080/app/path");
+        UMOEndpointURI endpointUri = new MuleEndpointURI("jetty:rest://admin:pwd@localhost:8080/app/path");
         assertEquals("rest", endpointUri.getScheme());
         assertEquals("rest://localhost:8080/app/path", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());

@@ -32,13 +32,15 @@ public class RequestLine
         String method = null;
         String uri = null;
         String protocol = null;
-        try {
+        try
+        {
             StringTokenizer st = new StringTokenizer(l, " ");
             method = st.nextToken();
             uri = st.nextToken();
             protocol = st.nextToken();
         }
-        catch (NoSuchElementException e) {
+        catch (NoSuchElementException e)
+        {
             throw new ProtocolException("Invalid request line: " + l);
         }
         return new RequestLine(method, uri, protocol);
@@ -47,13 +49,16 @@ public class RequestLine
     public RequestLine(final String method, final String uri, final HttpVersion httpversion)
     {
         super();
-        if (method == null) {
+        if (method == null)
+        {
             throw new IllegalArgumentException("Method may not be null");
         }
-        if (uri == null) {
+        if (uri == null)
+        {
             throw new IllegalArgumentException("URI may not be null");
         }
-        if (httpversion == null) {
+        if (httpversion == null)
+        {
             throw new IllegalArgumentException("HTTP version may not be null");
         }
         this.method = method;
@@ -62,7 +67,7 @@ public class RequestLine
     }
 
     public RequestLine(final String method, final String uri, final String httpversion)
-            throws ProtocolException
+        throws ProtocolException
     {
         this(method, uri, HttpVersion.parse(httpversion));
     }

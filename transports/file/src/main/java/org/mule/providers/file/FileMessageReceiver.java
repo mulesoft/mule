@@ -34,9 +34,9 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.util.FileUtils;
 
 /**
- * <code>FileMessageReceiver</code> is a polling listener that reads files
- * from a directory.
- *
+ * <code>FileMessageReceiver</code> is a polling listener that reads files from a
+ * directory.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -67,27 +67,33 @@ public class FileMessageReceiver extends PollingMessageReceiver
         this.readDir = readDir;
         this.moveDir = moveDir;
         this.moveToPattern = moveToPattern;
-        if (endpoint.getFilter() instanceof FilenameFilter) {
-            filenameFilter = (FilenameFilter) endpoint.getFilter();
+        if (endpoint.getFilter() instanceof FilenameFilter)
+        {
+            filenameFilter = (FilenameFilter)endpoint.getFilter();
         }
     }
 
     public void doConnect() throws Exception
     {
-        if (readDir != null) {
+        if (readDir != null)
+        {
             readDirectory = FileUtils.openDirectory(readDir);
-            if (!(readDirectory.canRead())) {
+            if (!(readDirectory.canRead()))
+            {
                 throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST,
-                        readDirectory.getAbsolutePath()), this);
+                    readDirectory.getAbsolutePath()), this);
             }
-            else {
+            else
+            {
                 logger.debug("Listening on endpointUri: " + readDirectory.getAbsolutePath());
             }
         }
 
-        if (moveDir != null) {
+        if (moveDir != null)
+        {
             moveDirectory = FileUtils.openDirectory((moveDir));
-            if (!(moveDirectory.canRead()) || !moveDirectory.canWrite()) {
+            if (!(moveDirectory.canRead()) || !moveDirectory.canWrite())
+            {
                 throw new ConnectException(new Message("file", 5), this);
             }
         }
@@ -100,25 +106,30 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     public void poll()
     {
-        try {
+        try
+        {
             File[] files = this.listFiles();
-            for (int i = 0; i < files.length; i++) {
+            for (int i = 0; i < files.length; i++)
+            {
                 this.processFile(files[i]);
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             this.handleException(e);
         }
     }
 
     public synchronized void processFile(final File sourceFile) throws UMOException
     {
-        boolean checkFileAge = ((FileConnector) connector).getCheckFileAge();
-        if (checkFileAge) {
-            long fileAge = ((FileConnector) connector).getFileAge();
+        boolean checkFileAge = ((FileConnector)connector).getCheckFileAge();
+        if (checkFileAge)
+        {
+            long fileAge = ((FileConnector)connector).getFileAge();
             long lastMod = sourceFile.lastModified();
             long now = (new java.util.Date()).getTime();
-            if ((now - lastMod) < fileAge) {
+            if ((now - lastMod) < fileAge)
+            {
                 return;
             }
         }
@@ -129,12 +140,14 @@ public class FileMessageReceiver extends PollingMessageReceiver
         msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         // set up destination file
-        if (moveDir != null) {
+        if (moveDir != null)
+        {
             String destinationFileName = sourceFileOriginalName;
 
-            if (moveToPattern != null) {
-                destinationFileName = ((FileConnector)connector).getFilenameParser()
-                    .getFilename(msgAdapter, moveToPattern);
+            if (moveToPattern != null)
+            {
+                destinationFileName = ((FileConnector)connector).getFilenameParser().getFilename(msgAdapter,
+                    moveToPattern);
             }
 
             destinationFile = new File(moveDir, destinationFileName);
@@ -142,20 +155,24 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
         boolean fileWasMoved = false;
 
-        try {
+        try
+        {
             // Perform some quick checks to make sure file can be processed
-            if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile())) {
+            if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
+            {
                 throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, sourceFileOriginalName));
             }
 
-            if (destinationFile != null) {
+            if (destinationFile != null)
+            {
                 // move sourceFile to new destination
                 fileWasMoved = this.moveFile(sourceFile, destinationFile);
 
                 // move didn't work - bail out (will attempty rollback)
-                if (!fileWasMoved) {
+                if (!fileWasMoved)
+                {
                     throw new MuleException(new Message("file", 4, sourceFile.getAbsolutePath(),
-                            destinationFile.getAbsolutePath()));
+                        destinationFile.getAbsolutePath()));
                 }
 
                 // create new MessageAdapter for destinationFile
@@ -166,16 +183,20 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.
-            if (((FileConnector)connector).isAutoDelete()) {
+            if (((FileConnector)connector).isAutoDelete())
+            {
                 // no moveTo directory
-                if (destinationFile == null) {
+                if (destinationFile == null)
+                {
                     // delete source
-                    if (!sourceFile.delete()) {
+                    if (!sourceFile.delete())
+                    {
                         // TODO better message
                         throw new MuleException(new Message("file", 3, sourceFile.getAbsolutePath()));
                     }
                 }
-                else {
+                else
+                {
                     // nothing to do here since moveFile() should have deleted
                     // the source file for us
                 }
@@ -183,38 +204,40 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
             // finally deliver the file message
             this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             boolean fileWasRolledBack = false;
 
             // only attempt rollback if file move was successful
-            if (fileWasMoved) {
+            if (fileWasMoved)
+            {
                 fileWasRolledBack = this.rollbackFileMove(destinationFile, sourceFile.getAbsolutePath());
             }
 
             // wrap exception & handle it
             Exception ex = new RoutingException(new Message("file", 2, sourceFile.getName(),
-                                     (fileWasRolledBack ? "successful" : "unsuccessful")),
-                                     new MuleMessage(msgAdapter),
-                                     endpoint,
-                                     e);
+                (fileWasRolledBack ? "successful" : "unsuccessful")), new MuleMessage(msgAdapter), endpoint,
+                e);
             this.handleException(ex);
         }
     }
 
     /**
-     * Try to move a file by renaming with backup attempt by copying/deleting
-     * via NIO
+     * Try to move a file by renaming with backup attempt by copying/deleting via NIO
      */
     protected boolean moveFile(File sourceFile, File destinationFile)
     {
         // try fast file-system-level move/rename first
         boolean success = sourceFile.renameTo(destinationFile);
 
-        if (!success) {
+        if (!success)
+        {
             // try again using NIO copy
             FileInputStream fis = null;
             FileOutputStream fos = null;
-            try {
+            try
+            {
                 fis = new FileInputStream(sourceFile);
                 fos = new FileOutputStream(destinationFile);
                 FileChannel srcChannel = fis.getChannel();
@@ -224,11 +247,13 @@ public class FileMessageReceiver extends PollingMessageReceiver
                 dstChannel.close();
                 success = sourceFile.delete();
             }
-            catch (IOException ioex) {
+            catch (IOException ioex)
+            {
                 // grr!
                 success = false;
             }
-            finally {
+            finally
+            {
                 IOUtils.closeQuietly(fis);
                 IOUtils.closeQuietly(fos);
             }
@@ -243,10 +268,12 @@ public class FileMessageReceiver extends PollingMessageReceiver
     protected boolean rollbackFileMove(File sourceFile, String destinationFilePath)
     {
         boolean result = false;
-        try {
+        try
+        {
             result = this.moveFile(sourceFile, new File(destinationFilePath));
         }
-        catch (Throwable t) {
+        catch (Throwable t)
+        {
             logger.debug("rollback of file move failed: " + t.getMessage());
         }
         return result;
@@ -254,19 +281,21 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     /**
      * Get a list of files to be processed.
-     *
+     * 
      * @return an array of files to be processed.
-     * @throws org.mule.MuleException which will wrap any other exceptions or
-     *             errors.
+     * @throws org.mule.MuleException which will wrap any other exceptions or errors.
      */
     File[] listFiles() throws MuleException
     {
-        try {
+        try
+        {
             File[] todoFiles = readDirectory.listFiles(filenameFilter);
-            //logger.trace("Reading directory " + readDirectory.getAbsolutePath() + " -> " + todoFiles.length + " file(s)");
+            // logger.trace("Reading directory " + readDirectory.getAbsolutePath() +
+            // " -> " + todoFiles.length + " file(s)");
             return (todoFiles == null ? new File[0] : todoFiles);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new MuleException(new Message("file", 1), e);
         }
     }

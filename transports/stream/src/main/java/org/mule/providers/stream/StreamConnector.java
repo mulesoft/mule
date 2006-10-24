@@ -20,8 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * <code>StreamConnector</code> can send and receive mule events over IO
- * streams.
+ * <code>StreamConnector</code> can send and receive mule events over IO streams.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -34,19 +33,19 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
     public static final String STREAM_SYSTEM_OUT = "system.out";
     public static final String STREAM_SYSTEM_ERR = "system.err";
 
-
     protected OutputStream outputStream;
     protected InputStream inputStream;
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession,
      *      org.mule.umo.endpoint.UMOEndpoint)
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { new Long(1000) });
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint,
+            new Object[]{new Long(1000)});
     }
 
     /*
@@ -86,20 +85,23 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
         return "stream";
     }
 
-
-    public InputStream getInputStream() {
+    public InputStream getInputStream()
+    {
         return inputStream;
     }
 
-    public void setInputStream(InputStream inputStream) {
+    public void setInputStream(InputStream inputStream)
+    {
         this.inputStream = inputStream;
     }
 
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         return outputStream;
     }
 
-    public void setOutputStream(OutputStream outputStream) {
+    public void setOutputStream(OutputStream outputStream)
+    {
         this.outputStream = outputStream;
     }
 

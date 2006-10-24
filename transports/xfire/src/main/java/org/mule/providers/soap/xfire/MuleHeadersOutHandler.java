@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.xfire;
 
 import org.codehaus.xfire.MessageContext;
@@ -19,48 +20,56 @@ import org.mule.umo.UMOEvent;
 
 /**
  * Writes the Mule Soap Header to the outgoing request
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleHeadersOutHandler extends AbstractHandler
- {
+{
     /**
      * Invoke a handler. If a fault occurs it will be handled via the
      * <code>handleFault</code> method.
-     *
+     * 
      * @param context The message context.
      */
     public void invoke(MessageContext context) throws Exception
     {
         UMOEvent event = (UMOEvent)context.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
 
-        if(event==null && context.getClient()!=null) {
+        if (event == null && context.getClient() != null)
+        {
             event = (UMOEvent)context.getClient().getProperty(MuleProperties.MULE_EVENT_PROPERTY);
         }
 
-        if(event!=null) {
+        if (event != null)
+        {
             MuleSoapHeaders muleHeaders = new MuleSoapHeaders(event);
             Element header = context.getOutMessage().getHeader();
 
             if (header == null)
             {
-                header = new Element("Header", context.getOutMessage().getSoapVersion().getPrefix(), context.getOutMessage().getSoapVersion().getNamespace());
+                header = new Element("Header", context.getOutMessage().getSoapVersion().getPrefix(),
+                    context.getOutMessage().getSoapVersion().getNamespace());
             }
 
-            //we can also add some extra properties like
-            //Enconding Property, Session Property
-            
+            // we can also add some extra properties like
+            // Enconding Property, Session Property
+
             Element muleHeader = null;
-            Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE, MuleSoapHeaders.MULE_10_ACTOR);
-            if (muleHeaders.getCorrelationId() != null || muleHeaders.getReplyTo() != null) {
+            Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
+                MuleSoapHeaders.MULE_10_ACTOR);
+            if (muleHeaders.getCorrelationId() != null || muleHeaders.getReplyTo() != null)
+            {
                 muleHeader = new Element(MuleSoapHeaders.MULE_HEADER, ns);
-            } else {
+            }
+            else
+            {
                 return;
             }
 
             Element e = null;
-            if (muleHeaders.getCorrelationId() != null) {
+            if (muleHeaders.getCorrelationId() != null)
+            {
 
                 e = new Element(MuleProperties.MULE_CORRELATION_ID_PROPERTY, ns);
                 e.setText(muleHeaders.getCorrelationId());
@@ -75,7 +84,8 @@ public class MuleHeadersOutHandler extends AbstractHandler
                 muleHeader.addContent(e);
 
             }
-            if (muleHeaders.getReplyTo() != null) {
+            if (muleHeaders.getReplyTo() != null)
+            {
 
                 e = new Element(MuleProperties.MULE_REPLY_TO_PROPERTY, ns);
                 e.setText(muleHeaders.getReplyTo());

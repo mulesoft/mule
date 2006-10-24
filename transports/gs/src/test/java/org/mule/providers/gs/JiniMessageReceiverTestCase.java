@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import com.mockobjects.dynamic.Mock;
@@ -33,8 +34,9 @@ public class JiniMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         Mock mockDescriptor = new Mock(UMODescriptor.class);
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
-        
-        return new SpaceMessageReceiver((AbstractConnector) endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint);
+
+        return new SpaceMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.container;
 
 import org.mule.config.i18n.Message;
@@ -20,9 +21,9 @@ import javax.naming.NamingException;
 import java.lang.reflect.Method;
 
 /**
- * <code>EjbContainerContext</code> is a container implementaiton that
- * allows EJB Session beans to be referenced as Mule managed UMOs
- *
+ * <code>EjbContainerContext</code> is a container implementaiton that allows EJB
+ * Session beans to be referenced as Mule managed UMOs
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,34 +39,48 @@ public class EjbContainerContext extends RmiContainerContext
         super(name);
     }
 
-    public Object getComponent(Object key) throws ObjectNotFoundException {
+    public Object getComponent(Object key) throws ObjectNotFoundException
+    {
         Object homeObject = null;
-        if(key==null) {
+        if (key == null)
+        {
             throw new ObjectNotFoundException("null");
         }
-        try {
+        try
+        {
             homeObject = context.lookup(key.toString());
-        } catch (NamingException e) {
+        }
+        catch (NamingException e)
+        {
             throw new ObjectNotFoundException(key.toString(), e);
         }
 
-        if(homeObject==null) {
+        if (homeObject == null)
+        {
             throw new ObjectNotFoundException(key.toString());
-        } else if(homeObject instanceof EJBHome) {
+        }
+        else if (homeObject instanceof EJBHome)
+        {
 
             Method method = ClassUtils.getMethod("create", null, homeObject.getClass());
-            if(method==null) {
-                throw new ObjectNotFoundException(key.toString(),
-                        new IllegalArgumentException(new Message(Messages.EJB_OBJECT_X_MISSING_CREATE, key).toString()));
+            if (method == null)
+            {
+                throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(new Message(
+                    Messages.EJB_OBJECT_X_MISSING_CREATE, key).toString()));
             }
-            try {
+            try
+            {
                 return method.invoke(homeObject, ClassUtils.NO_ARGS);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new ObjectNotFoundException(key.toString(), e);
             }
-        } else {
-            throw new ObjectNotFoundException(key.toString(),
-                    new IllegalArgumentException(new Message(Messages.EJB_KEY_REF_X_NOT_VALID, key).toString()));
+        }
+        else
+        {
+            throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(new Message(
+                Messages.EJB_KEY_REF_X_NOT_VALID, key).toString()));
         }
     }
 }

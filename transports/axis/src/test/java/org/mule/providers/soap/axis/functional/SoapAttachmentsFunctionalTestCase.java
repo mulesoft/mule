@@ -42,9 +42,8 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration()
-                   .getPoolingProfile()
-                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         manager.setModel(new SedaModel());
         callbackCalled = false;
@@ -54,9 +53,12 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("axis:http://localhost:60198/mule/services");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -77,7 +79,8 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
     public void testSend() throws Exception
     {
-        descriptor = getTestDescriptor("testComponent", SoapAttachmentsFunctionalTestComponent.class.getName());
+        descriptor = getTestDescriptor("testComponent",
+            SoapAttachmentsFunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor, null);
         // Start the server
@@ -92,10 +95,13 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected void sendTestData(int iterations) throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments", false);
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
+            "axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments",
+            false);
 
         AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
-        for(int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++)
+        {
             UMOMessage msg = new MuleMessage("testPayload");
             File tempFile = File.createTempFile("test", ".att");
             tempFile.deleteOnExit();

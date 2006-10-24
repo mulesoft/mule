@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractMessageReceiver;
@@ -32,8 +33,8 @@ import java.lang.reflect.Method;
 public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 {
     /**
-     * The property name for the service object implementing the callback interface RmiAble
-     * This should be set on the inbound endpoint
+     * The property name for the service object implementing the callback interface
+     * RmiAble This should be set on the inbound endpoint
      */
     public static final String PROPERTY_SERVICE_CLASS_NAME = "serviceClassName";
 
@@ -45,16 +46,18 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
     private String bindName = null;
 
-    public RmiCallbackMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException
+    public RmiCallbackMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+        throws InitialisationException
     {
         super(connector, component, endpoint);
 
-        this.connector = (RmiConnector) connector;
+        this.connector = (RmiConnector)connector;
     }
 
     /**
-     * Actual initialization. Attempts to rebind service object to Jndi Tree for discovery
-     *
+     * Actual initialization. Attempts to rebind service object to Jndi Tree for
+     * discovery
+     * 
      * @param endpoint
      * @throws org.mule.umo.lifecycle.InitialisationException
      */
@@ -70,25 +73,29 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
         int port = endpointUri.getPort();
 
-        if (port < 1) {
+        if (port < 1)
+        {
             port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
         }
 
-        try {
+        try
+        {
             InetAddress inetAddress = InetAddress.getByName(endpointUri.getHost());
 
             bindName = endpointUri.getPath();
 
             remoteObject = getRmiObject();
 
-            Method theMethod = remoteObject.getClass().getMethod("setReceiver", new Class[]{RmiCallbackMessageReceiver.class});
+            Method theMethod = remoteObject.getClass().getMethod("setReceiver",
+                new Class[]{RmiCallbackMessageReceiver.class});
             theMethod.invoke(remoteObject, new Object[]{this});
 
             jndi = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port);
 
             jndi.rebind(bindName, remoteObject);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new InitialisationException(e, this);
         }
 
@@ -97,23 +104,26 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
     /**
      * Initializes endpoint
-     *
+     * 
      * @throws org.mule.providers.ConnectException
      */
     public void doConnect() throws ConnectException
     {
-        try {
+        try
+        {
             // Do not reinit if RMI is already bound to JNDI!!!
             // TODO Test how things work under heavy load!!!
             // Do we need threadlocals or so!?!?
 
             // TODO [aperepel] consider AtomicBooleans here
             // for 'initialised/initialising' status, etc.
-            if (null == remoteObject) {
+            if (null == remoteObject)
+            {
                 initialize(getEndpoint());
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new ConnectException(e, this);
         }
     }
@@ -125,10 +135,12 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     {
         logger.debug("Disconnecting...");
 
-        try {
+        try
+        {
             jndi.unbind(bindName);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             logger.error(e);
         }
 
@@ -137,7 +149,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
     /**
      * Gets RmiAble objetc for registry to add in.
-     *
+     * 
      * @return java.rmi.Remote and RmiAble implementing class
      * @throws org.mule.umo.lifecycle.InitialisationException
      */
@@ -145,17 +157,22 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     {
         String className = (String)endpoint.getProperty(PROPERTY_SERVICE_CLASS_NAME);
 
-        if (null == className) {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi", RmiConnector.NO_RMI_SERVICECLASS_SET), this);
+        if (null == className)
+        {
+            throw new InitialisationException(new org.mule.config.i18n.Message("rmi",
+                RmiConnector.NO_RMI_SERVICECLASS_SET), this);
         }
 
         RmiAble remote = null;
 
-        try {
-            remote = (RmiAble) Class.forName(className).newInstance();
+        try
+        {
+            remote = (RmiAble)Class.forName(className).newInstance();
         }
-        catch (Exception e) {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi", RmiConnector.RMI_SERVICECLASS_INVOCATION_FAILED), e);
+        catch (Exception e)
+        {
+            throw new InitialisationException(new org.mule.config.i18n.Message("rmi",
+                RmiConnector.RMI_SERVICECLASS_INVOCATION_FAILED), e);
         }
 
         return (remote);
@@ -163,7 +180,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
     /**
      * Routes message forward
-     *
+     * 
      * @param message
      * @return
      * @throws org.mule.umo.MessagingException

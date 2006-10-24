@@ -21,12 +21,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 
 /**
- * <code>SpaceMessageDispatcher</code> Provides generic connectivity to
- * 'Spaces' that implement the Mule Space Api, i.e. Gigaspaces, JCache imples,
- * Rio can be accessed as well as a mule file, Journal or VM space.
- * 
- * The dispatcher allows Mule to dispatch events synchronously and asynchronusly
- * to a space as well as make receive calls to the space.
+ * <code>SpaceMessageDispatcher</code> Provides generic connectivity to 'Spaces'
+ * that implement the Mule Space Api, i.e. Gigaspaces, JCache imples, Rio can be
+ * accessed as well as a mule file, Journal or VM space. The dispatcher allows Mule
+ * to dispatch events synchronously and asynchronusly to a space as well as make
+ * receive calls to the space.
  * 
  * @version $Revision$
  */
@@ -50,17 +49,20 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
     {
-        if (space == null) {
+        if (space == null)
+        {
             space = connector.getSpace(endpoint);
         }
     }
 
     protected void doDisconnect() throws Exception
     {
-        try {
+        try
+        {
             space.dispose();
         }
-        finally {
+        finally
+        {
             space = null;
         }
     }
@@ -79,28 +81,27 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint
-     *            the endpoint to use when connecting to the resource
-     * @param timeout
-     *            the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available.
-     *            If no data becomes available before the timeout elapses, null
-     *            will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null
-     *         will be returned if no data was avaialable
-     * @throws Exception
-     *             if the call to the underlying protocal cuases an exception
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
         String destination = endpoint.getEndpointURI().toString();
 
-        if (logger.isInfoEnabled()) {
+        if (logger.isInfoEnabled())
+        {
             logger.info("Connecting to space '" + destination + "'");
         }
 
         Object result = space.take(timeout);
-        if (result == null) {
+        if (result == null)
+        {
             return null;
         }
         return new MuleMessage(connector.getMessageAdapter(result));

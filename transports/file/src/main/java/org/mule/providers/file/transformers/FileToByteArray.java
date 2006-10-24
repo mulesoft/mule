@@ -39,21 +39,18 @@ public class FileToByteArray extends AbstractTransformer
         setReturnClass(byte[].class);
     }
 
-    public Object doTransform(Object src, String encoding)
-            throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        File file = (File) src;
+        File file = (File)src;
 
         if (file == null)
         {
-            throw new TransformerException(this, new IllegalArgumentException(
-                    "null file"));
+            throw new TransformerException(this, new IllegalArgumentException("null file"));
         }
 
         if (!file.exists())
         {
-            throw new TransformerException(this, new FileNotFoundException(file
-                    .getPath()));
+            throw new TransformerException(this, new FileNotFoundException(file.getPath()));
         }
 
         if (file.length() == 0)
@@ -79,10 +76,12 @@ public class FileToByteArray extends AbstractTransformer
         catch (OutOfMemoryError oom)
         {
             throw new TransformerException(this, oom);
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new TransformerException(this, e);
-        } finally
+        }
+        finally
         {
             IOUtils.closeQuietly(fis);
         }

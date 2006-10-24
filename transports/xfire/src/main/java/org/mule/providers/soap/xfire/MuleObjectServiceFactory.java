@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.xfire;
 
 import java.lang.reflect.Method;
@@ -23,24 +24,26 @@ import org.mule.util.ClassUtils;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleObjectServiceFactory extends ObjectServiceFactory {
+public class MuleObjectServiceFactory extends ObjectServiceFactory
+{
 
     protected Set excludedMethods;
 
     /**
      * Initializes a new instance of the <code>ObjectServiceFactory</code>.
      */
-    public MuleObjectServiceFactory(TransportManager transportManager) {
+    public MuleObjectServiceFactory(TransportManager transportManager)
+    {
         super(transportManager);
         initExcludedMethods();
     }
 
-
-    protected void initExcludedMethods() {
+    protected void initExcludedMethods()
+    {
         excludedMethods = new HashSet();
 
         addIgnoredMethods("java.lang.Object");
@@ -50,16 +53,16 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory {
         addIgnoredMethods("javax.ejb.EJBObject");
         addIgnoredMethods("javax.rmi.CORBA.Stub");
 
-        //Mule ignorred methods
+        // Mule ignorred methods
         addIgnoredMethods(Callable.class.getName());
         addIgnoredMethods(Initialisable.class.getName());
         addIgnoredMethods(Disposable.class.getName());
     }
 
     /**
-     * Ignore the specified class' declared methods.
-     * This can be used to not expose certain interfaces as a service.
-     * By default, the methods specified by the following interfaces/classes are ignored:
+     * Ignore the specified class' declared methods. This can be used to not expose
+     * certain interfaces as a service. By default, the methods specified by the
+     * following interfaces/classes are ignored:
      * <li><code>java.lang.Object</code>
      * <li><code>org.omg.CORBA_2_3.portable.ObjectImpl</code>
      * <li><code>org.omg.CORBA.portable.ObjectImpl</code>
@@ -69,30 +72,36 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory {
      * <li><code>org.mule.umo.lifecycle.Callable</code>
      * <li><code>org.mule.umo.lifecycle.Initialisable</code>
      * <li><code>org.mule.umo.lifecycle.Disposable</code>
-     *
+     * 
      * @param className the fully qualified class name
      */
-    public void addIgnoredMethods(String className) {
-        try {
+    public void addIgnoredMethods(String className)
+    {
+        try
+        {
             Class c = ClassUtils.loadClass(className, getClass());
-            for (int i = 0; i < c.getMethods().length; i++) {
+            for (int i = 0; i < c.getMethods().length; i++)
+            {
                 excludedMethods.add(getMethodName(c.getMethods()[i]));
             }
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e)
+        {
             // can be ignored.
         }
     }
 
-    protected boolean isValidMethod(final Method method) {
-        if(excludedMethods.contains(getMethodName(method))) return false;
+    protected boolean isValidMethod(final Method method)
+    {
+        if (excludedMethods.contains(getMethodName(method))) return false;
 
         final int modifiers = method.getModifiers();
 
         return Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers);
     }
 
-
-    protected String getMethodName(Method method) {
+    protected String getMethodName(Method method)
+    {
         return method.getName();
     }
 }

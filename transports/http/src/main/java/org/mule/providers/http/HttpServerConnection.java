@@ -45,7 +45,8 @@ public class HttpServerConnection
     public HttpServerConnection(final Socket socket, String encoding) throws IOException
     {
         super();
-        if (socket == null) {
+        if (socket == null)
+        {
             throw new IllegalArgumentException("Socket may not be null");
         }
         this.socket = socket;
@@ -57,15 +58,19 @@ public class HttpServerConnection
 
     public synchronized void close()
     {
-        try {
-            if (socket != null) {
+        try
+        {
+            if (socket != null)
+            {
                 socket.close();
             }
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             // ignore
         }
-        finally {
+        finally
+        {
             socket = null;
         }
     }
@@ -108,21 +113,25 @@ public class HttpServerConnection
     public HttpRequest readRequest() throws IOException
     {
         String line = null;
-        try {
-            do {
+        try
+        {
+            do
+            {
                 line = HttpParser.readLine(in, encoding);
             }
             while (line != null && line.length() == 0);
 
-            if (line == null) {
+            if (line == null)
+            {
                 setKeepAlive(false);
                 return null;
             }
-            HttpRequest request = new HttpRequest(RequestLine.parseLine(line), HttpParser
-                    .parseHeaders(this.in, encoding), this.in);
+            HttpRequest request = new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(
+                this.in, encoding), this.in);
             return request;
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             close();
             throw e;
         }
@@ -130,22 +139,26 @@ public class HttpServerConnection
 
     public HttpResponse readResponse() throws IOException
     {
-        try {
+        try
+        {
             String line = null;
-            do {
+            do
+            {
                 line = HttpParser.readLine(in, encoding);
             }
             while (line != null && line.length() == 0);
 
-            if (line == null) {
+            if (line == null)
+            {
                 setKeepAlive(false);
                 return null;
             }
-            HttpResponse response = new HttpResponse(new StatusLine(line), HttpParser.parseHeaders(
-                    this.in, encoding), this.in);
+            HttpResponse response = new HttpResponse(new StatusLine(line), HttpParser.parseHeaders(this.in,
+                encoding), this.in);
             return response;
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             close();
             throw e;
         }
@@ -153,13 +166,15 @@ public class HttpServerConnection
 
     public void writeRequest(final HttpRequest request) throws IOException
     {
-        if (request == null) {
+        if (request == null)
+        {
             return;
         }
         ResponseWriter writer = new ResponseWriter(this.out, encoding);
         writer.println(request.getRequestLine().toString());
         Iterator item = request.getHeaderIterator();
-        while (item.hasNext()) {
+        while (item.hasNext())
+        {
             Header header = (Header)item.next();
             writer.print(header.toExternalForm());
         }
@@ -168,18 +183,22 @@ public class HttpServerConnection
 
         OutputStream outstream = this.out;
         InputStream content = request.getBody();
-        if (content != null) {
+        if (content != null)
+        {
             Header transferenc = request.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
-            if (transferenc != null) {
+            if (transferenc != null)
+            {
                 request.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
-                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                {
                     outstream = new ChunkedOutputStream(outstream);
                 }
             }
 
             IOUtils.copy(content, outstream);
 
-            if (outstream instanceof ChunkedOutputStream) {
+            if (outstream instanceof ChunkedOutputStream)
+            {
                 ((ChunkedOutputStream)outstream).finish();
             }
         }
@@ -189,7 +208,8 @@ public class HttpServerConnection
 
     public void writeResponse(final HttpResponse response) throws IOException
     {
-        if (response == null) {
+        if (response == null)
+        {
             return;
         }
         setKeepAlive(response.isKeepAlive());
@@ -198,7 +218,8 @@ public class HttpServerConnection
 
         writer.println(response.getStatusLine());
         Iterator item = response.getHeaderIterator();
-        while (item.hasNext()) {
+        while (item.hasNext())
+        {
             Header header = (Header)item.next();
             writer.print(header.toExternalForm());
 
@@ -207,18 +228,22 @@ public class HttpServerConnection
         writer.flush();
 
         InputStream content = response.getBody();
-        if (content != null) {
+        if (content != null)
+        {
             Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
-            if (transferenc != null) {
+            if (transferenc != null)
+            {
                 response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
-                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                {
                     outstream = new ChunkedOutputStream(outstream);
                 }
             }
 
             IOUtils.copy(content, outstream);
 
-            if (outstream instanceof ChunkedOutputStream) {
+            if (outstream instanceof ChunkedOutputStream)
+            {
                 ((ChunkedOutputStream)outstream).finish();
             }
         }

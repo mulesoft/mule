@@ -7,13 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs;
 
 import net.jini.core.entry.Entry;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,23 +28,28 @@ public class Order implements Entry
     public String orderId;
     public Boolean processed = Boolean.FALSE;
 
-    public String getOrderId() {
+    public String getOrderId()
+    {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(String orderId)
+    {
         this.orderId = orderId;
     }
 
-    public Boolean getProcessed() {
+    public Boolean getProcessed()
+    {
         return processed;
     }
 
-    public void setProcessed(Boolean processed) {
+    public void setProcessed(Boolean processed)
+    {
         this.processed = processed;
     }
 
-    public String toString(){
+    public String toString()
+    {
         return "Order{id=" + orderId + ", processed=" + processed.booleanValue() + "}";
     }
 }

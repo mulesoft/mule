@@ -37,7 +37,8 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
         // The working directory is deleted on tearDown
         File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
-        if (!dir.exists()) {
+        if (!dir.exists())
+        {
             dir.mkdirs();
         }
 

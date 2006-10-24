@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.glue;
 
 import electric.service.IService;
@@ -23,11 +24,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
- * like a Web service.
- * 
- * Also provides helper methods for building and describing web service
- * interfaces in Mule.
+ * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
+ * a Web service. Also provides helper methods for building and describing web
+ * service interfaces in Mule.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -38,9 +37,7 @@ public class GlueServiceProxy extends ServiceProxy
     public static Object createProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return Proxy.newProxyInstance(cl,
-                                      classes,
-                                      createServiceHandler(receiver, synchronous));
+        return Proxy.newProxyInstance(cl, classes, createServiceHandler(receiver, synchronous));
     }
 
     public static InvocationHandler createServiceHandler(AbstractMessageReceiver receiver, boolean synchronous)
@@ -62,22 +59,29 @@ public class GlueServiceProxy extends ServiceProxy
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
             GlueMessageAdapter.GlueMessageHolder holder;
-            if (args.length == 1) {
-                holder = new GlueMessageAdapter.GlueMessageHolder(args[0], (IService) proxy);
-            } else {
-                holder = new GlueMessageAdapter.GlueMessageHolder(args, (IService) proxy);
+            if (args.length == 1)
+            {
+                holder = new GlueMessageAdapter.GlueMessageHolder(args[0], (IService)proxy);
+            }
+            else
+            {
+                holder = new GlueMessageAdapter.GlueMessageHolder(args, (IService)proxy);
             }
             UMOMessageAdapter messageAdapter = receiver.getConnector().getMessageAdapter(holder);
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
 
-            if (message != null) {
-                if(message.getExceptionPayload()!=null) {
+            if (message != null)
+            {
+                if (message.getExceptionPayload() != null)
+                {
                     throw message.getExceptionPayload().getException();
                 }
                 return message.getPayload();
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }

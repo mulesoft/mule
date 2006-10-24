@@ -7,22 +7,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.space;
 
-
-
 /**
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class VMSpaceTestCase extends AbstractLocalSpaceTestCase {
-    
-    protected DefaultSpaceFactory getSpaceFactory() throws Exception {
+public class VMSpaceTestCase extends AbstractLocalSpaceTestCase
+{
+
+    protected DefaultSpaceFactory getSpaceFactory() throws Exception
+    {
         return new VMSpaceFactory(false);
     }
 
-    protected boolean isPersistent() {
+    protected boolean isPersistent()
+    {
         return false;
     }
 }

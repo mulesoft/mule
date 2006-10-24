@@ -42,36 +42,47 @@ public class VMTransaction extends AbstractSingleResourceTransaction
      */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
-        if (!(key instanceof QueueManager) || !(resource instanceof QueueSession)) {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES,
-                                                                   "QueueManager/QueueSession"));
+        if (!(key instanceof QueueManager) || !(resource instanceof QueueSession))
+        {
+            throw new IllegalTransactionStateException(new Message(
+                Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "QueueManager/QueueSession"));
         }
         super.bindResource(key, resource);
     }
 
     protected void doBegin() throws TransactionException
     {
-        try {
-            ((QueueSession) resource).begin();
-        } catch (ResourceManagerException e) {
-            throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "VMTransaction"), e);
+        try
+        {
+            ((QueueSession)resource).begin();
+        }
+        catch (ResourceManagerException e)
+        {
+            throw new TransactionException(
+                new Message(Messages.TX_CANT_START_X_TRANSACTION, "VMTransaction"), e);
         }
     }
 
     protected void doCommit() throws TransactionException
     {
-        try {
-            ((QueueSession) resource).commit();
-        } catch (ResourceManagerException e) {
+        try
+        {
+            ((QueueSession)resource).commit();
+        }
+        catch (ResourceManagerException e)
+        {
             throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
         }
     }
 
     protected void doRollback() throws TransactionException
     {
-        try {
-            ((QueueSession) resource).rollback();
-        } catch (ResourceManagerException e) {
+        try
+        {
+            ((QueueSession)resource).rollback();
+        }
+        catch (ResourceManagerException e)
+        {
             throw new TransactionException(new Message(Messages.TX_ROLLBACK_FAILED), e);
         }
     }

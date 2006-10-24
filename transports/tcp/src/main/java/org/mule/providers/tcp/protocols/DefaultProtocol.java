@@ -22,10 +22,10 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 /**
- * The DefaultProtocol class is an application level tcp protocol that does
- * nothing. Reading is performed in reading the socket until no more bytes are
- * available. Writing simply writes the data to the socket.
- *
+ * The DefaultProtocol class is an application level tcp protocol that does nothing.
+ * Reading is performed in reading the socket until no more bytes are available.
+ * Writing simply writes the data to the socket.
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
@@ -42,31 +42,44 @@ public class DefaultProtocol implements TcpProtocol
 
         byte[] buffer = new byte[BUFFER_SIZE];
         int len = 0;
-        try {
-            while ((len = is.read(buffer)) == 0) {
+        try
+        {
+            while ((len = is.read(buffer)) == 0)
+            {
                 // wait
             }
-        } catch (SocketException e) {
+        }
+        catch (SocketException e)
+        {
             // do not pollute the log with a stacktrace, log only the message
             logger.debug("Socket exception occured: " + e.getMessage());
             return null;
-        } catch (SocketTimeoutException e) {
+        }
+        catch (SocketTimeoutException e)
+        {
             logger.debug("Socket timeout, returning null.");
             return null;
         }
-        if (len == -1) {
+        if (len == -1)
+        {
             return null;
-        } else {
-            do {
+        }
+        else
+        {
+            do
+            {
                 baos.write(buffer, 0, len);
-                if (len < buffer.length) {
+                if (len < buffer.length)
+                {
                     break;
                 }
                 int av = is.available();
-                if (av == 0) {
+                if (av == 0)
+                {
                     break;
                 }
-            } while ((len = is.read(buffer)) > 0);
+            }
+            while ((len = is.read(buffer)) > 0);
 
             baos.flush();
             baos.close();

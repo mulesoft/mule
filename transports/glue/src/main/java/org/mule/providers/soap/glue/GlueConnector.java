@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.soap.glue;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -22,10 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>GlueConnector</code> instanciates a Glue soap server and allows beans
- * to be dynamically exposed via web services simply by registering with the
- * connector.
- *
+ * <code>GlueConnector</code> instanciates a Glue soap server and allows beans to
+ * be dynamically exposed via web services simply by registering with the connector.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,7 +35,8 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     private List serverEndpoints = new ArrayList();
     private Map context;
 
-    public GlueConnector() {
+    public GlueConnector()
+    {
         super();
         registerSupportedProtocol("http");
     }
@@ -49,12 +50,11 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         boolean createServer = shouldCreateServer(endpoint.getEndpointURI().getAddress());
 
-        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this,
-                                                                              component,
-                                                                              endpoint,
-                                                                              new Object[] { Boolean.valueOf(createServer) });
+        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this, component, endpoint,
+            new Object[]{Boolean.valueOf(createServer)});
 
-        if (createServer) {
+        if (createServer)
+        {
             serverEndpoints.add(endpoint.getEndpointURI().getAddress());
         }
         return receiver;
@@ -69,13 +69,16 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         URI uri = new URI(endpoint);
         String ep = uri.getScheme() + "://" + uri.getHost();
-        if (uri.getPort() != -1) {
+        if (uri.getPort() != -1)
+        {
             ep += ":" + uri.getPort();
         }
 
-        for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
-            if (s.startsWith(ep)) {
+        for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();)
+        {
+            String s = (String)iterator.next();
+            if (s.startsWith(ep))
+            {
                 return false;
             }
         }
@@ -92,7 +95,8 @@ public class GlueConnector extends AbstractServiceEnabledConnector
         this.context = context;
     }
 
-    public boolean supportsProtocol(String protocol) {
+    public boolean supportsProtocol(String protocol)
+    {
         return super.supportsProtocol(protocol) || protocol.toLowerCase().equals("glue:http");
     }
 }

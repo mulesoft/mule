@@ -30,9 +30,9 @@ import org.quartz.Trigger;
 import java.util.Date;
 
 /**
- * Listens for Quartz sheduled events using the Receiver Job and fires events
- * to the component associated with this receiver
- *
+ * Listens for Quartz sheduled events using the Receiver Job and fires events to the
+ * component associated with this receiver
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -45,7 +45,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     private QuartzConnector connector = null;
 
     public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
         this.connector = (QuartzConnector)connector;
@@ -58,7 +58,8 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
     public void doStart() throws UMOException
     {
-        try {
+        try
+        {
             Scheduler scheduler = connector.getScheduler();
 
             JobDetail jobDetail = new JobDetail();
@@ -77,33 +78,44 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
             String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
 
-            if(groupName==null) {
+            if (groupName == null)
+            {
                 groupName = QuartzConnector.DEFAULT_GROUP_NAME;
             }
-            if(jobGroupName==null) {
+            if (jobGroupName == null)
+            {
                 jobGroupName = groupName;
             }
 
             jobDetail.setGroup(groupName);
 
-            if (cronExpression != null) {
+            if (cronExpression != null)
+            {
                 CronTrigger ctrigger = new CronTrigger();
                 ctrigger.setCronExpression(cronExpression);
                 trigger = ctrigger;
-            } else if (repeatInterval != null) {
+            }
+            else if (repeatInterval != null)
+            {
                 SimpleTrigger strigger = new SimpleTrigger();
                 strigger.setRepeatInterval(Long.parseLong(repeatInterval));
-                if (repeatCount != null) {
+                if (repeatCount != null)
+                {
                     strigger.setRepeatCount(Integer.parseInt(repeatCount));
-                } else {
+                }
+                else
+                {
                     strigger.setRepeatCount(-1);
                 }
                 trigger = strigger;
-            } else {
+            }
+            else
+            {
                 throw new IllegalArgumentException(new Message("quartz", 1).getMessage());
             }
             long start = System.currentTimeMillis();
-            if (startDelay != null) {
+            if (startDelay != null)
+            {
                 start += Long.parseLong(startDelay);
             }
             trigger.setStartTime(new Date(start));
@@ -114,7 +126,9 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
             scheduler.scheduleJob(jobDetail, trigger);
             scheduler.start();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new EndpointException(new Message(Messages.FAILED_TO_START_X, "Quartz receiver"), e);
         }
     }

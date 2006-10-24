@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.file;
 
 import org.apache.commons.logging.Log;
@@ -32,15 +33,16 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <code>FileConnector</code> is used for setting up listeners on a directory
- * and for writing files to a directory. The connecotry provides support for
- * defining file output patterns and filters for receiving files.
- *
+ * <code>FileConnector</code> is used for setting up listeners on a directory and
+ * for writing files to a directory. The connecotry provides support for defining
+ * file output patterns and filters for receiving files.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class FileConnector extends AbstractServiceEnabledConnector {
+public class FileConnector extends AbstractServiceEnabledConnector
+{
     /**
      * logger used by this class
      */
@@ -93,20 +95,24 @@ public class FileConnector extends AbstractServiceEnabledConnector {
      * 
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
-    public FileConnector() {
+    public FileConnector()
+    {
         filenameParser = new SimpleFilenameParser();
     }
 
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
-        if (endpoint.getFilter() != null) {
-            return endpoint.getEndpointURI().getAddress() + "/" + ((FilenameWildcardFilter) endpoint.getFilter()).getPattern();
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
+        if (endpoint.getFilter() != null)
+        {
+            return endpoint.getEndpointURI().getAddress() + "/"
+                   + ((FilenameWildcardFilter)endpoint.getFilter()).getPattern();
         }
         return endpoint.getEndpointURI().getAddress();
     }
 
     /**
-     * Registers a listener for a particular directory The following properties
-     * can be overriden in the endpoint declaration
+     * Registers a listener for a particular directory The following properties can
+     * be overriden in the endpoint declaration
      * <ul>
      * <li>moveToDirectory</li>
      * <li>filterPatterns</li>
@@ -114,7 +120,8 @@ public class FileConnector extends AbstractServiceEnabledConnector {
      * <li>pollingFrequency</li>
      * </ul>
      */
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception {
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    {
         String readDir = endpoint.getEndpointURI().getAddress();
         long polling = this.pollingFrequency;
 
@@ -122,50 +129,63 @@ public class FileConnector extends AbstractServiceEnabledConnector {
         String moveToPattern = getMoveToPattern();
 
         Map props = endpoint.getProperties();
-        if (props != null) {
+        if (props != null)
+        {
             // Override properties on the endpoint for the specific endpoint
-            String move = (String) props.get(PROPERTY_MOVE_TO_DIRECTORY);
-            if (move != null) {
+            String move = (String)props.get(PROPERTY_MOVE_TO_DIRECTORY);
+            if (move != null)
+            {
                 moveTo = move;
             }
-            String tempMoveToPattern = (String) props.get(PROPERTY_MOVE_TO_PATTERN);
-            if (tempMoveToPattern != null) {
-                if (logger.isDebugEnabled()) {
+            String tempMoveToPattern = (String)props.get(PROPERTY_MOVE_TO_PATTERN);
+            if (tempMoveToPattern != null)
+            {
+                if (logger.isDebugEnabled())
+                {
                     logger.debug("set moveTo Pattern to: " + tempMoveToPattern);
                 }
                 moveToPattern = tempMoveToPattern;
             }
 
-            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
-            if (tempPolling != null) {
+            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
+            if (tempPolling != null)
+            {
                 polling = Long.parseLong(tempPolling);
             }
 
-            if (polling <= 0) {
+            if (polling <= 0)
+            {
                 polling = DEFAULT_POLLING_FREQUENCY;
             }
 
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("set polling frequency to: " + polling);
             }
-            String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
-            if (tempFileAge != null) {
-                try {
+            String tempFileAge = (String)props.get(PROPERTY_FILE_AGE);
+            if (tempFileAge != null)
+            {
+                try
+                {
                     setFileAge(Long.parseLong(tempFileAge));
-                } catch (Exception ex1) {
+                }
+                catch (Exception ex1)
+                {
                     logger.error("Failed to set fileAge", ex1);
                 }
             }
         }
 
-        try {
-            return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{readDir, moveTo,
-                                                                                                   moveToPattern, new Long(polling)});
+        try
+        {
+            return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{readDir,
+                moveTo, moveToPattern, new Long(polling)});
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                    "Message Receiver",
-                    serviceDescriptor.getMessageReceiver()), e, this);
+                "Message Receiver", serviceDescriptor.getMessageReceiver()), e, this);
         }
     }
 
@@ -174,11 +194,16 @@ public class FileConnector extends AbstractServiceEnabledConnector {
      * 
      * @see org.mule.providers.UMOConnector#stop()
      */
-    protected synchronized void doStop() throws UMOException {
-        if (outputStream != null) {
-            try {
+    protected synchronized void doStop() throws UMOException
+    {
+        if (outputStream != null)
+        {
+            try
+            {
                 outputStream.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 logger.warn("Failed to close file output stream on stop: " + e);
             }
         }
@@ -189,15 +214,18 @@ public class FileConnector extends AbstractServiceEnabledConnector {
      * 
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
-    public String getProtocol() {
+    public String getProtocol()
+    {
         return "FILE";
     }
 
-    public FilenameParser getFilenameParser() {
+    public FilenameParser getFilenameParser()
+    {
         return filenameParser;
     }
 
-    public void setFilenameParser(FilenameParser filenameParser) {
+    public void setFilenameParser(FilenameParser filenameParser)
+    {
         this.filenameParser = filenameParser;
     }
 
@@ -206,10 +234,14 @@ public class FileConnector extends AbstractServiceEnabledConnector {
      * 
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
-    protected void doDispose() {
-        try {
+    protected void doDispose()
+    {
+        try
+        {
             doStop();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             logger.error(e.getMessage(), e);
         }
     }
@@ -217,88 +249,101 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     /**
      * @return Returns the moveToDirectoryName.
      */
-    public String getMoveToDirectory() {
+    public String getMoveToDirectory()
+    {
         return moveToDirectoryName;
     }
 
     /**
      * @param dir The moveToDirectoryName to set.
      */
-    public void setMoveToDirectory(String dir) {
+    public void setMoveToDirectory(String dir)
+    {
         this.moveToDirectoryName = dir;
     }
 
     /**
      * @return Returns the outputAppend.
      */
-    public boolean isOutputAppend() {
+    public boolean isOutputAppend()
+    {
         return outputAppend;
     }
 
     /**
      * @param outputAppend The outputAppend to set.
      */
-    public void setOutputAppend(boolean outputAppend) {
+    public void setOutputAppend(boolean outputAppend)
+    {
         this.outputAppend = outputAppend;
     }
 
     /**
      * @return Returns the outputPattern.
      */
-    public String getOutputPattern() {
+    public String getOutputPattern()
+    {
         return outputPattern;
     }
 
     /**
      * @param outputPattern The outputPattern to set.
      */
-    public void setOutputPattern(String outputPattern) {
+    public void setOutputPattern(String outputPattern)
+    {
         this.outputPattern = outputPattern;
     }
 
     /**
      * @return Returns the outputStream.
      */
-    public FileOutputStream getOutputStream() {
+    public FileOutputStream getOutputStream()
+    {
         return outputStream;
     }
 
     /**
      * @param outputStream The outputStream to set.
      */
-    public void setOutputStream(FileOutputStream outputStream) {
+    public void setOutputStream(FileOutputStream outputStream)
+    {
         this.outputStream = outputStream;
     }
 
     /**
      * @return Returns the pollingFrequency.
      */
-    public long getPollingFrequency() {
+    public long getPollingFrequency()
+    {
         return pollingFrequency;
     }
 
     /**
      * @param pollingFrequency The pollingFrequency to set.
      */
-    public void setPollingFrequency(long pollingFrequency) {
+    public void setPollingFrequency(long pollingFrequency)
+    {
         this.pollingFrequency = pollingFrequency;
     }
 
     /**
      * @return Returns the fileAge.
      */
-    public long getFileAge() {
+    public long getFileAge()
+    {
         return fileAge;
     }
 
-    public boolean getCheckFileAge() {
+    public boolean getCheckFileAge()
+    {
         return checkFileAge;
     }
 
     /**
      * @param fileAge The fileAge in seconds to set.
      */
-    public void setFileAge(long fileAge) {
+    public void setFileAge(long fileAge)
+    {
         this.fileAge = fileAge;
         this.checkFileAge = true;
     }
@@ -306,63 +351,80 @@ public class FileConnector extends AbstractServiceEnabledConnector {
     /**
      * @return Returns the writeToDirectory.
      */
-    public String getWriteToDirectory() {
+    public String getWriteToDirectory()
+    {
         return writeToDirectoryName;
     }
 
     /**
      * @param dir The writeToDirectory to set.
      */
-    public void setWriteToDirectory(String dir) throws IOException {
+    public void setWriteToDirectory(String dir) throws IOException
+    {
         this.writeToDirectoryName = dir;
-        if (writeToDirectoryName != null) {
+        if (writeToDirectoryName != null)
+        {
             File writeToDirectory = FileUtils.openDirectory((writeToDirectoryName));
-            if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite()) {
-                throw new IOException("Error on initialization, Write To directory does not exist or is not read/write");
+            if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite())
+            {
+                throw new IOException(
+                    "Error on initialization, Write To directory does not exist or is not read/write");
             }
         }
     }
 
-    public boolean isSerialiseObjects() {
+    public boolean isSerialiseObjects()
+    {
         return serialiseObjects;
     }
 
-    public void setSerialiseObjects(boolean serialiseObjects) {
+    public void setSerialiseObjects(boolean serialiseObjects)
+    {
         // set serialisable transformers on the connector if this is set
-        if (serialiseObjects) {
-            if (serviceOverrides == null) {
+        if (serialiseObjects)
+        {
+            if (serviceOverrides == null)
+            {
                 serviceOverrides = new Properties();
             }
             serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
-                    ByteArrayToSerializable.class.getName());
+                ByteArrayToSerializable.class.getName());
             serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
-                    SerializableToByteArray.class.getName());
+                SerializableToByteArray.class.getName());
         }
 
         this.serialiseObjects = serialiseObjects;
     }
 
-    public boolean isAutoDelete() {
+    public boolean isAutoDelete()
+    {
         return autoDelete;
     }
 
-    public void setAutoDelete(boolean autoDelete) {
+    public void setAutoDelete(boolean autoDelete)
+    {
         this.autoDelete = autoDelete;
-        if (!autoDelete) {
-            if (serviceOverrides == null) {
+        if (!autoDelete)
+        {
+            if (serviceOverrides == null)
+            {
                 serviceOverrides = new Properties();
             }
-            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null) {
-                serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, FileMessageAdapter.class.getName());
+            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null)
+            {
+                serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER,
+                    FileMessageAdapter.class.getName());
             }
         }
     }
 
-    public String getMoveToPattern() {
+    public String getMoveToPattern()
+    {
         return moveToPattern;
     }
 
-    public void setMoveToPattern(String moveToPattern) {
+    public void setMoveToPattern(String moveToPattern)
+    {
         this.moveToPattern = moveToPattern;
     }
 }

@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>HttpClientMethodResponseToObject</code> transforms a http client
- * response to a MuleMessage.
+ * <code>HttpClientMethodResponseToObject</code> transforms a http client response
+ * to a MuleMessage.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -49,25 +49,31 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         Object msg;
         HttpMethod httpMethod = (HttpMethod)src;
         Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        try {
-            if (contentType != null && !contentType.getValue().startsWith("text/")) {
+        try
+        {
+            if (contentType != null && !contentType.getValue().startsWith("text/"))
+            {
                 // TODO properly do streaming
                 msg = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
             }
-            else {
+            else
+            {
                 msg = httpMethod.getResponseBodyAsString();
             }
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             throw new TransformerException(this, e);
         }
         // Standard headers
         Map headerProps = new HashMap();
         Header[] headers = httpMethod.getRequestHeaders();
         String name;
-        for (int i = 0; i < headers.length; i++) {
+        for (int i = 0; i < headers.length; i++)
+        {
             name = headers[i].getName();
-            if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX)) {
+            if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX))
+            {
                 name = name.substring(2);
             }
             headerProps.put(name, headers[i].getValue());

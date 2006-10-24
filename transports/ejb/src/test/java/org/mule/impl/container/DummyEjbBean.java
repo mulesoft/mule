@@ -24,7 +24,6 @@ import java.rmi.RemoteException;
 
 /**
  * A fake (and invalid) EJB used for testing MUle ejb lookup
- *
  */
 public class DummyEjbBean implements SessionBean, DummyEjb
 {
@@ -63,11 +62,13 @@ public class DummyEjbBean implements SessionBean, DummyEjb
         // nothing to do
     }
 
-    public String reverseString(String string) {
+    public String reverseString(String string)
+    {
         return StringUtils.reverse(string);
     }
 
-    public String upperCaseString(String string) {
+    public String upperCaseString(String string)
+    {
         return string.toUpperCase();
     }
 

@@ -31,9 +31,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * 
- * Receives Http requests via a Servlet and routes the to listeners with
- * servlet:// endpoints
+ * Receives Http requests via a Servlet and routes the to listeners with servlet://
+ * endpoints
  */
 
 public class MuleReceiverServlet extends AbstractReceiverServlet
@@ -48,15 +47,17 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
         connector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
-        if (connector == null) {
+        if (connector == null)
+        {
             throw new ServletException("No servlet connector found using protocol: servlet");
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+        throws ServletException, IOException
     {
-        try {
+        try
+        {
             AbstractMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage = null;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
@@ -64,46 +65,54 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             responseMessage = receiver.routeMessage(requestMessage, true);
             writeResponse(response, responseMessage);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             handleException(e, e.getMessage(), response);
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+        throws ServletException, IOException
     {
-        try {
+        try
+        {
             AbstractMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage = null;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             responseMessage = receiver.routeMessage(requestMessage, true);
-            if (responseMessage != null) {
+            if (responseMessage != null)
+            {
                 writeResponse(response, responseMessage);
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             handleException(e, e.getMessage(), response);
         }
     }
 
     protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
-            throws EndpointException
+        throws EndpointException
     {
         String uri = getReceiverName(httpServletRequest);
-        if (uri == null) {
+        if (uri == null)
+        {
             throw new EndpointException(new Message("http", 4, httpServletRequest.getRequestURI()));
         }
         AbstractMessageReceiver receiver = (AbstractMessageReceiver)getReceivers().get(uri);
-        if (receiver == null) {
+        if (receiver == null)
+        {
             // Nothing found lets try stripping the path and only use the last
             // path element
             int i = uri.lastIndexOf("/");
-            if (i > -1) {
+            if (i > -1)
+            {
                 uri = uri.substring(i + 1);
                 receiver = (AbstractMessageReceiver)getReceivers().get(uri);
             }
-            if (receiver == null) {
+            if (receiver == null)
+            {
                 throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
             }
         }
@@ -123,7 +132,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         url.append(httpServletRequest.getServerPort());
         url.append("/");
         url.append(getReceiverName(httpServletRequest));
-        if (httpServletRequest.getQueryString() != null) {
+        if (httpServletRequest.getQueryString() != null)
+        {
             url.append("?");
             url.append(httpServletRequest.getQueryString());
         }
@@ -133,18 +143,21 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected String getReceiverName(HttpServletRequest httpServletRequest)
     {
         String name = httpServletRequest.getPathInfo();
-        if (name == null) {
+        if (name == null)
+        {
             name = httpServletRequest.getParameter("endpoint");
-            if (name == null) {
-                Properties params = PropertiesUtils.getPropertiesFromQueryString(httpServletRequest
-                        .getQueryString());
+            if (name == null)
+            {
+                Properties params = PropertiesUtils.getPropertiesFromQueryString(httpServletRequest.getQueryString());
                 name = params.getProperty("endpoint");
-                if (name == null) {
+                if (name == null)
+                {
                     return null;
                 }
             }
         }
-        if (name.startsWith("/")) {
+        if (name.startsWith("/"))
+        {
             name = name.substring(1);
         }
         return name;

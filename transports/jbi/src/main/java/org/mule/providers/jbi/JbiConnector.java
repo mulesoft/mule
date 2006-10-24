@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jbi;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -20,69 +21,86 @@ import javax.jbi.messaging.MessageExchangeFactory;
 import javax.management.ObjectName;
 
 /**
- * <code>JbiConnector</code> can bind to a Jbi container allowing components to send events via
- * Mule
- *
+ * <code>JbiConnector</code> can bind to a Jbi container allowing components to
+ * send events via Mule
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JbiConnector extends AbstractServiceEnabledConnector implements ComponentLifeCycle {
+public class JbiConnector extends AbstractServiceEnabledConnector implements ComponentLifeCycle
+{
 
     private ObjectName extensionMBeanName;
     private ComponentContext context;
     private DeliveryChannel deliveryChannel;
     private MessageExchangeFactory exchangeFactory;
 
-    public String getProtocol() {
+    public String getProtocol()
+    {
         return "jbi";
     }
 
-    public ObjectName getExtensionMBeanName() {
+    public ObjectName getExtensionMBeanName()
+    {
         return extensionMBeanName;
     }
 
-    public void setExtensionMBeanName(ObjectName extensionMBeanName) {
+    public void setExtensionMBeanName(ObjectName extensionMBeanName)
+    {
         this.extensionMBeanName = extensionMBeanName;
     }
 
-    public ComponentContext getComponentContext() {
+    public ComponentContext getComponentContext()
+    {
         return context;
     }
 
-    public DeliveryChannel getDeliveryChannel() {
+    public DeliveryChannel getDeliveryChannel()
+    {
         return deliveryChannel;
     }
 
-    public MessageExchangeFactory getExchangeFactory() {
+    public MessageExchangeFactory getExchangeFactory()
+    {
         return exchangeFactory;
     }
 
     // TODO the start/stop/shutdown JBI lifecycle methods are rather picky,
     // we should probably review the spec here again
 
-    public void init(ComponentContext componentContext) throws JBIException {
+    public void init(ComponentContext componentContext) throws JBIException
+    {
         this.context = componentContext;
         this.deliveryChannel = context.getDeliveryChannel();
         this.exchangeFactory = deliveryChannel.createExchangeFactory();
     }
 
-    public void start() {
-        try {
+    public void start()
+    {
+        try
+        {
             startConnector();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             handleException(e);
         }
     }
 
-    public void stop() {
-        try {
+    public void stop()
+    {
+        try
+        {
             stopConnector();
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             handleException(e);
         }
     }
 
-    public void shutDown() throws JBIException {
+    public void shutDown() throws JBIException
+    {
         // nothing to do (for now?)
     }
 }

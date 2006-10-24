@@ -40,14 +40,13 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * This class implements a typed DataSource from:<br>
- *  - an InputStream<br> - a byte array<br> - a String<br>
+ * This class implements a typed DataSource from:<br> - an InputStream<br> - a byte
+ * array<br> - a String<br>
  * 
  * @author <a href="mailto:colin.chalmers@maxware.nl">Colin Chalmers</a>
  * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
  * @author <a href="mailto:bmclaugh@algx.net">Brett McLaughlin</a>
- * @version $Id: ByteArrayDataSource.java,v 1.1 2005/08/24 09:54:12 rossmason
- *          Exp $
+ * @version $Id$
  */
 public class ByteArrayDataSource implements DataSource
 {
@@ -60,30 +59,34 @@ public class ByteArrayDataSource implements DataSource
     /**
      * Create a datasource from a byte array.
      * 
-     * @param data
-     *            A byte[].
-     * @param type
-     *            A String.
+     * @param data A byte[].
+     * @param type A String.
      * @exception IOException
      */
     public ByteArrayDataSource(byte[] data, String type) throws IOException
     {
         ByteArrayInputStream Bis = null;
 
-        try {
+        try
+        {
             Bis = new ByteArrayInputStream(data);
             this.byteArrayDataSource(Bis, type);
         }
-        catch (IOException ioex) {
+        catch (IOException ioex)
+        {
             throw ioex;
         }
-        finally {
-            try {
-                if (Bis != null) {
+        finally
+        {
+            try
+            {
+                if (Bis != null)
+                {
                     Bis.close();
                 }
             }
-            catch (IOException ignored) {
+            catch (IOException ignored)
+            {
                 // ignore
             }
         }
@@ -92,10 +95,8 @@ public class ByteArrayDataSource implements DataSource
     /**
      * Create a datasource from an input stream.
      * 
-     * @param aIs
-     *            An InputStream.
-     * @param type
-     *            A String.
+     * @param aIs An InputStream.
+     * @param type A String.
      * @exception IOException
      */
     public ByteArrayDataSource(InputStream aIs, String type) throws IOException
@@ -106,10 +107,8 @@ public class ByteArrayDataSource implements DataSource
     /**
      * Create a datasource from an input stream.
      * 
-     * @param aIs
-     *            An InputStream.
-     * @param type
-     *            A String.
+     * @param aIs An InputStream.
+     * @param type A String.
      * @exception IOException
      */
     private void byteArrayDataSource(InputStream aIs, String type) throws IOException
@@ -119,7 +118,8 @@ public class ByteArrayDataSource implements DataSource
         BufferedInputStream Bis = null;
         BufferedOutputStream osWriter = null;
 
-        try {
+        try
+        {
             Bis = new BufferedInputStream(aIs);
             baos = new ByteArrayOutputStream();
             osWriter = new BufferedOutputStream(baos);
@@ -129,22 +129,29 @@ public class ByteArrayDataSource implements DataSource
             osWriter.flush();
             osWriter.close();
         }
-        catch (IOException ioex) {
+        catch (IOException ioex)
+        {
             throw ioex;
         }
-        finally {
-            try {
-                if (Bis != null) {
+        finally
+        {
+            try
+            {
+                if (Bis != null)
+                {
                     Bis.close();
                 }
-                if (baos != null) {
+                if (baos != null)
+                {
                     baos.close();
                 }
-                if (osWriter != null) {
+                if (osWriter != null)
+                {
                     osWriter.close();
                 }
             }
-            catch (IOException ignored) {
+            catch (IOException ignored)
+            {
                 // ignore
             }
         }
@@ -153,17 +160,16 @@ public class ByteArrayDataSource implements DataSource
     /**
      * Create a datasource from a String.
      * 
-     * @param data
-     *            A String.
-     * @param type
-     *            A String.
+     * @param data A String.
+     * @param type A String.
      * @exception IOException
      */
     public ByteArrayDataSource(String data, String type) throws IOException
     {
         this.type = type;
 
-        try {
+        try
+        {
             baos = new ByteArrayOutputStream();
 
             // Assumption that the string contains only ASCII
@@ -173,19 +179,25 @@ public class ByteArrayDataSource implements DataSource
             baos.flush();
             baos.close();
         }
-        catch (UnsupportedEncodingException uex) {
+        catch (UnsupportedEncodingException uex)
+        {
             // Do something!
         }
-        catch (IOException ignored) {
+        catch (IOException ignored)
+        {
             // Ignore
         }
-        finally {
-            try {
-                if (baos != null) {
+        finally
+        {
+            try
+            {
+                if (baos != null)
+                {
                     baos.close();
                 }
             }
-            catch (IOException ignored) {
+            catch (IOException ignored)
+            {
                 // ignore
             }
         }
@@ -209,7 +221,8 @@ public class ByteArrayDataSource implements DataSource
      */
     public InputStream getInputStream() throws IOException
     {
-        if (baos == null) {
+        if (baos == null)
+        {
             throw new IOException("no data");
         }
         return new ByteArrayInputStream(baos.toByteArray());

@@ -32,9 +32,9 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * Can schedule a Job with the Quartz scheduler. The event must contain the Job
- * to invoke or have it set as a property. Time triggger properties can be set
- * on the event to control how and when the event is fired.
+ * Can schedule a Job with the Quartz scheduler. The event must contain the Job to
+ * invoke or have it set as a property. Time triggger properties can be set on the
+ * event to control how and when the event is fired.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -60,7 +60,8 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         JobDataMap jobDataMap = new JobDataMap();
         UMOMessage msg = event.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        {
             String propertyKey = (String)iterator.next();
             jobDataMap.put(propertyKey, msg.getProperty(propertyKey));
         }
@@ -71,33 +72,40 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         Object payload = event.getTransformedMessage();
 
         String jobClass = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_CLASS);
-        if (payload instanceof Job) {
+        if (payload instanceof Job)
+        {
             job = (Job)payload;
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
             jobDetail.setJobClass(DelegatingJob.class);
         }
-        else if (jobClass != null) {
+        else if (jobClass != null)
+        {
             jobDetail.setJobClass(ClassUtils.loadClass(jobClass, getClass()));
         }
-        else {
+        else
+        {
             Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
-            if (tempJob == null) {
+            if (tempJob == null)
+            {
                 tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_REF);
-                if (tempJob == null) {
-                    throw new DispatchException(new Message("quartz", 2), event.getMessage(), event
-                            .getEndpoint());
+                if (tempJob == null)
+                {
+                    throw new DispatchException(new Message("quartz", 2), event.getMessage(),
+                        event.getEndpoint());
                 }
-                else {
+                else
+                {
                     tempJob = MuleManager.getInstance().getContainerContext().getComponent(tempJob);
-                    if (!(tempJob instanceof Job)) {
-                        throw new DispatchException(new Message("quartz", 3), event.getMessage(), event
-                                .getEndpoint());
+                    if (!(tempJob instanceof Job))
+                    {
+                        throw new DispatchException(new Message("quartz", 3), event.getMessage(),
+                            event.getEndpoint());
                     }
                 }
             }
-            else if (!(tempJob instanceof Job)) {
-                throw new DispatchException(new Message("quartz", 3), event.getMessage(), event
-                        .getEndpoint());
+            else if (!(tempJob instanceof Job))
+            {
+                throw new DispatchException(new Message("quartz", 3), event.getMessage(), event.getEndpoint());
             }
             jobDetail.setJobClass(DelegatingJob.class);
         }
@@ -112,36 +120,44 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
         String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
 
-        if (groupName == null) {
+        if (groupName == null)
+        {
             groupName = QuartzConnector.DEFAULT_GROUP_NAME;
         }
-        if (jobGroupName == null) {
+        if (jobGroupName == null)
+        {
             jobGroupName = groupName;
         }
 
         jobDetail.setGroup(groupName);
 
-        if (cronExpression != null) {
+        if (cronExpression != null)
+        {
             CronTrigger ctrigger = new CronTrigger();
             ctrigger.setCronExpression(cronExpression);
             trigger = ctrigger;
         }
-        else if (repeatInterval != null) {
+        else if (repeatInterval != null)
+        {
             SimpleTrigger strigger = new SimpleTrigger();
             strigger.setRepeatInterval(Long.parseLong(repeatInterval));
-            if (repeatCount != null) {
+            if (repeatCount != null)
+            {
                 strigger.setRepeatCount(Integer.parseInt(repeatCount));
             }
-            else {
+            else
+            {
                 strigger.setRepeatCount(-1);
             }
             trigger = strigger;
         }
-        else {
+        else
+        {
             throw new IllegalArgumentException(new Message("quartz", 1).getMessage());
         }
         long start = System.currentTimeMillis();
-        if (startDelay != null) {
+        if (startDelay != null)
+        {
             start += Long.parseLong(startDelay);
         }
         trigger.setStartTime(new Date(start));
@@ -173,17 +189,14 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint
-     *            the endpoint to use when connecting to the resource
-     * @param timeout
-     *            the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available.
-     *            If no data becomes available before the timeout elapses, null
-     *            will be returned
-     * @return the result of the request wrapped in a UMOMessage object. Null
-     *         will be returned if no data was avaialable
-     * @throws Exception
-     *             if the call to the underlying protocal cuases an exception
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {

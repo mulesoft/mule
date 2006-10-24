@@ -50,8 +50,7 @@ public class JavaSpaceTemplateFilter implements JavaSpaceFilter
     /**
      * Check a given message against this filter.
      * 
-     * @param message
-     *            a non null message to filter.
+     * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
     public boolean accept(UMOMessage message)
@@ -67,10 +66,12 @@ public class JavaSpaceTemplateFilter implements JavaSpaceFilter
 
     public void setExpectedType(String expectedType)
     {
-        if (NULL_VALUE.equalsIgnoreCase(expectedType) || StringUtils.isEmpty(expectedType)) {
+        if (NULL_VALUE.equalsIgnoreCase(expectedType) || StringUtils.isEmpty(expectedType))
+        {
             expectedType = null;
         }
-        else {
+        else
+        {
             this.expectedType = expectedType;
         }
     }
@@ -82,32 +83,41 @@ public class JavaSpaceTemplateFilter implements JavaSpaceFilter
 
     public void setFields(Map fields)
     {
-        for (Iterator iterator = fields.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = fields.entrySet().iterator(); iterator.hasNext();)
+        {
             Map.Entry entry = (Map.Entry)iterator.next();
             setProperty(entry.getKey(), entry.getValue());
         }
     }
 
-    public Entry getEntry() throws IllegalAccessException, NoSuchMethodException,
-            InvocationTargetException, InstantiationException, ClassNotFoundException
+    public Entry getEntry()
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException,
+        InstantiationException, ClassNotFoundException
     {
 
-        if (entry == null) {
-            if (expectedType == null) {
+        if (entry == null)
+        {
+            if (expectedType == null)
+            {
                 return null; // Match all template
             }
             Object entryType = ClassUtils.instanciateClass(expectedType, ClassUtils.NO_ARGS);
-            if (!(entryType instanceof Entry)) {
+            if (!(entryType instanceof Entry))
+            {
                 entry = new JiniMessage(null, entryType);
-                if (fields.size() > 0) {
-                    //Populate any properties on the message
+                if (fields.size() > 0)
+                {
+                    // Populate any properties on the message
                     BeanUtils.populate(entry, fields);
-                    //populate properties on the payload
+                    // populate properties on the payload
                     BeanUtils.populate(((JiniMessage)entry).getPayload(), fields);
                 }
-            } else {
+            }
+            else
+            {
                 entry = (Entry)entryType;
-                if (fields.size() > 0) {
+                if (fields.size() > 0)
+                {
                     BeanUtils.populate(entry, fields);
                 }
             }
@@ -130,10 +140,12 @@ public class JavaSpaceTemplateFilter implements JavaSpaceFilter
     // Useful when configuring the filter programmatically
     public void setProperty(Object key, Object value)
     {
-        if (NULL_VALUE.equalsIgnoreCase(value.toString())) {
+        if (NULL_VALUE.equalsIgnoreCase(value.toString()))
+        {
             fields.put(key, null);
         }
-        else {
+        else
+        {
             fields.put(key, value);
         }
     }

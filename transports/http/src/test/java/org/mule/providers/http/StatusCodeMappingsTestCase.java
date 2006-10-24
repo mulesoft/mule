@@ -36,8 +36,8 @@ public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
         assertEquals("401", code);
 
         code = ExceptionHelper.getErrorMapping("blah", MuleException.class);
-        assertEquals(String.valueOf(new MuleException(Message.createStaticMessage("test"))
-                .getExceptionCode()), code);
+        assertEquals(
+            String.valueOf(new MuleException(Message.createStaticMessage("test")).getExceptionCode()), code);
 
     }
 

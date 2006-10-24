@@ -23,14 +23,14 @@ import java.util.Iterator;
  * extracting the message payload. The xml exemple:
  * 
  * <pre>
- * 
  *  
- *   &amp;ltDQMessage&amp;gt
- *           &amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
- *          ....
- *    &amp;lt/DQMessage&amp;gt
  *   
- *  
+ *    &amp;ltDQMessage&amp;gt
+ *            &amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
+ *           ....
+ *     &amp;lt/DQMessage&amp;gt
+ *    
+ *   
  * </pre>
  * 
  * @author m999svm
@@ -44,7 +44,6 @@ public class DQMessageToXml extends AbstractTransformer
 
     /**
      * Constructor
-     * 
      */
     public DQMessageToXml()
     {
@@ -57,9 +56,10 @@ public class DQMessageToXml extends AbstractTransformer
      */
     public final Object doTransform(final Object src, String encoding) throws TransformerException
     {
-        DQMessage msg = (DQMessage) src;
+        DQMessage msg = (DQMessage)src;
 
-        try {
+        try
+        {
             org.dom4j.Document document = DocumentHelper.createDocument();
             Element root = document.addElement(DQMessage.XML_ROOT);
 
@@ -67,25 +67,29 @@ public class DQMessageToXml extends AbstractTransformer
             String name;
             Object field;
 
-            while (it.hasNext()) {
-                name = (String) it.next();
+            while (it.hasNext())
+            {
+                name = (String)it.next();
                 field = msg.getEntry(name);
 
-                if (field instanceof String) {
-                    String f = ((String) field).trim();
+                if (field instanceof String)
+                {
+                    String f = ((String)field).trim();
                     field = (f.length() == 0) ? null : f;
                 }
 
-                if (field != null) {
-                    root.addElement(DQMessage.XML_ENTRY)
-                        .addAttribute(DQMessage.XML_NAME, name)
-                        .addText(field.toString());
+                if (field != null)
+                {
+                    root.addElement(DQMessage.XML_ENTRY).addAttribute(DQMessage.XML_NAME, name).addText(
+                        field.toString());
                 }
             }
 
             return document.asXML();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
     }

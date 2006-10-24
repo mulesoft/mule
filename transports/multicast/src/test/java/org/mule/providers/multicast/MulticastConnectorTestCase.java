@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import org.mule.impl.MuleDescriptor;
@@ -54,24 +55,33 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("multicast://228.2.3.4:10100"));
         connector.registerListener(component, endpoint);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register on the same endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
         connector.dispose();
     }

@@ -32,7 +32,8 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     private static final String endpointUri = "tcp://localhost:4544";
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "tcp-sync.xml";
     }
 
@@ -40,7 +41,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     {
         UMOMessage message = new MuleMessage(payload);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
-                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOEndpoint.ENDPOINT_TYPE_SENDER);
         MuleSession session = new MuleSession(message, new NullSessionHandler());
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);
@@ -57,7 +58,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testSyncResponseOfBufferSize() throws Exception
     {
-        TcpConnector tcp = (TcpConnector) MuleManager.getInstance().lookupConnector("tcpConnector");
+        TcpConnector tcp = (TcpConnector)MuleManager.getInstance().lookupConnector("tcpConnector");
         tcp.setBufferSize(1024 * 16);
         byte[] data = new byte[tcp.getBufferSize()];
         UMOMessage message = send(data);

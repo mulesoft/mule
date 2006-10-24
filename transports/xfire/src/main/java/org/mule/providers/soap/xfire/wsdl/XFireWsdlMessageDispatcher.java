@@ -37,13 +37,15 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 
     protected void doConnect(final UMOImmutableEndpoint endpoint) throws Exception
     {
-        try {
+        try
+        {
             XFire xfire = connector.getXfire();
             String wsdlUrl = endpoint.getEndpointURI().getAddress();
             String serviceName = wsdlUrl.substring(0, wsdlUrl.lastIndexOf('?'));
             Service service = xfire.getServiceRegistry().getService(new QName(serviceName));
 
-            if (service == null) {
+            if (service == null)
+            {
                 service = new Client(new URL(wsdlUrl)).getService();
                 service.setName(new QName(serviceName));
                 xfire.getServiceRegistry().register(service);
@@ -52,7 +54,8 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
             clientPool = new StackObjectPool(new XFireWsdlClientPoolFactory(endpoint, service, xfire));
             clientPool.addObject();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             disconnect();
             throw ex;
         }

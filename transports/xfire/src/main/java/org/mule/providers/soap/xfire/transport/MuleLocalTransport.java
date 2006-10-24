@@ -50,8 +50,9 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
         this.workManager = workManager;
     }
 
-    public String getServiceURL(Service service) {
-        String ep =  ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
+    public String getServiceURL(Service service)
+    {
+        String ep = ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
         return ep + "/" + service.getSimpleName();
     }
 
@@ -74,10 +75,12 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
 
     public void resetSession()
     {
-        if (maintainSession) {
+        if (maintainSession)
+        {
             session = new MapSession();
         }
-        else {
+        else
+        {
             session = null;
         }
     }

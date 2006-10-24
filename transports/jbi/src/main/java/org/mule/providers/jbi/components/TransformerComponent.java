@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jbi.components;
 
 import org.mule.umo.transformer.TransformerException;
@@ -21,46 +22,59 @@ import javax.xml.transform.Source;
 
 /**
  * Mule transformers can be reused in side a Jbi container
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TransformerComponent extends AbstractJbiComponent {
+public class TransformerComponent extends AbstractJbiComponent
+{
 
     protected UMOTransformer transformer = null;
 
-    public void onMessage(MessageExchange messageExchange, NormalizedMessage message) throws MessagingException {
-        if (messageExchange.getRole() == MessageExchange.Role.PROVIDER) {
+    public void onMessage(MessageExchange messageExchange, NormalizedMessage message)
+        throws MessagingException
+    {
+        if (messageExchange.getRole() == MessageExchange.Role.PROVIDER)
+        {
             return;
         }
         NormalizedMessage in = messageExchange.getMessage("in");
 
-
-        try {
+        try
+        {
             NormalizedMessage out = messageExchange.createMessage();
             transform(messageExchange, in, out);
 
-            if(messageExchange instanceof InOut) {
+            if (messageExchange instanceof InOut)
+            {
                 messageExchange.setMessage(out, OUT);
             }
-            else {
+            else
+            {
                 InOnly outExchange = exchangeFactory.createInOnlyExchange();
                 outExchange.setInMessage(out);
                 deliveryChannel.sendSync(outExchange);
             }
             done(messageExchange);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             error(messageExchange, e);
         }
     }
 
-    protected void transform(MessageExchange exchange, NormalizedMessage in, NormalizedMessage out) throws TransformerException, MessagingException {
+    protected void transform(MessageExchange exchange, NormalizedMessage in, NormalizedMessage out)
+        throws TransformerException, MessagingException
+    {
         Object result = transformer.transform(in.getContent());
-        if(result instanceof Source) {
+        if (result instanceof Source)
+        {
             out.setContent((Source)result);
-        } else {
-            throw new UnsupportedOperationException("Support for Source transformation is not yet implemented");
+        }
+        else
+        {
+            throw new UnsupportedOperationException(
+                "Support for Source transformation is not yet implemented");
         }
     }
 }

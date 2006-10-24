@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.stream;
 
 import com.mockobjects.dynamic.Mock;
@@ -38,7 +39,7 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
 
     public void testOtherProperties() throws Exception
     {
-        StreamMessageReceiver receiver = (StreamMessageReceiver) getMessageReceiver();
+        StreamMessageReceiver receiver = (StreamMessageReceiver)getMessageReceiver();
 
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
         assertNotNull(descriptor);

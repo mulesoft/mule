@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.xmpp;
 
 import org.jivesoftware.smack.AccountManager;
@@ -47,40 +48,53 @@ public class XmppConnector extends AbstractServiceEnabledConnector
         String password = endpointURI.getPassword();
         String resource = (String)endpointURI.getParams().get("resource");
 
-        if(endpointURI.getPort() != -1) {
-                xmppConnection = new XMPPConnection(endpointURI.getHost(), endpointURI.getPort());
-            } else {
-                xmppConnection = new XMPPConnection(endpointURI.getHost());
-            }
+        if (endpointURI.getPort() != -1)
+        {
+            xmppConnection = new XMPPConnection(endpointURI.getHost(), endpointURI.getPort());
+        }
+        else
+        {
+            xmppConnection = new XMPPConnection(endpointURI.getHost());
+        }
 
-        if (!xmppConnection.isAuthenticated()) {
+        if (!xmppConnection.isAuthenticated())
+        {
             // Make sure we have an account. If we don't, make one.
-            try {
+            try
+            {
                 AccountManager accManager = new AccountManager(xmppConnection);
                 accManager.createAccount(username, password);
-            } catch (XMPPException ex) {
+            }
+            catch (XMPPException ex)
+            {
                 // User probably already exists, throw away...
                 logger.info("*** account (" + username + ") already exists ***");
             }
 
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Logging in as: " + username);
                 logger.debug("pw is        : " + password);
                 logger.debug("server       : " + hostname);
                 logger.debug("resource     : " + resource);
             }
 
-            if(resource == null) {
+            if (resource == null)
+            {
                 xmppConnection.login(username, password);
-            } else {
+            }
+            else
+            {
                 xmppConnection.login(username, password, resource);
             }
-        } else {
-            if(logger.isDebugEnabled()) logger.debug("Already authenticated on this connection, no need to log in again.");
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Already authenticated on this connection, no need to log in again.");
         }
         return xmppConnection;
     }
-
 
     /**
      * Template method to perform any work when destroying the connectoe
@@ -90,7 +104,8 @@ public class XmppConnector extends AbstractServiceEnabledConnector
         // template method
     }
 
-    public boolean isRemoteSyncEnabled() {
+    public boolean isRemoteSyncEnabled()
+    {
         return true;
     }
 }

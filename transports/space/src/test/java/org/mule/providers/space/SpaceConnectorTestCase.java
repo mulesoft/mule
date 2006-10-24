@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.space;
 
 import org.mule.impl.space.VMSpaceFactory;
@@ -20,8 +21,8 @@ import org.mule.umo.provider.UMOConnector;
 public class SpaceConnectorTestCase extends AbstractConnectorTestCase
 {
     /**
-     * Create and initialise an instance of your connector here. Do not actually call the
-     * connect method.
+     * Create and initialise an instance of your connector here. Do not actually call
+     * the connect method.
      */
     public UMOConnector getConnector() throws Exception
     {

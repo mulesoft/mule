@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import com.mockobjects.dynamic.Mock;
@@ -33,9 +34,8 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
         mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
         mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
-        return new MulticastMessageReceiver((AbstractConnector) endpoint.getConnector(),
-                                            (UMOComponent) mockComponent.proxy(),
-                                            endpoint);
+        return new MulticastMessageReceiver((AbstractConnector)endpoint.getConnector(),
+            (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

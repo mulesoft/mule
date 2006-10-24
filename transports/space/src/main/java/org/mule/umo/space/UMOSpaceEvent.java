@@ -7,13 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.umo.space;
 
 import java.util.EventObject;
 
 /**
- * A space event occurs when an item is added to the sapce and there is a one or more listeners waiting for it.
- *
+ * A space event occurs when an item is added to the sapce and there is a one or more
+ * listeners waiting for it.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

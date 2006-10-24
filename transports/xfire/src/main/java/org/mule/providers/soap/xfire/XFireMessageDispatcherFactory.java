@@ -16,8 +16,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * Creates an XFire Messgae dispatcher used for making XFire soap requests using
- * the Xfire client
+ * Creates an XFire Messgae dispatcher used for making XFire soap requests using the
+ * Xfire client
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

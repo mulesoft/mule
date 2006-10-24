@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.gs.transformers;
 
 import net.jini.core.entry.Entry;
@@ -21,9 +22,8 @@ import java.util.Map;
 
 /**
  * Convers an outbound event ot a JavaSpace entry that can be written to the space.
- *
+ * 
  * @see net.jini.core.entry.Entry
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,14 +34,19 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer
      */
     private static final long serialVersionUID = -6852740125237850362L;
 
-    public UMOMessageToJavaSpaceEntry() {
+    public UMOMessageToJavaSpaceEntry()
+    {
         setReturnClass(Entry.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
-        if(src instanceof Entry) {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    {
+        if (src instanceof Entry)
+        {
             return src;
-        } else {
+        }
+        else
+        {
             String destination = context.getEndpointURI().toString();
             JiniMessage msg = new JiniMessage(destination, src);
             msg.setMessageId(context.getMessage().getUniqueId());
@@ -52,7 +57,8 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer
             msg.setEncoding(context.getMessage().getEncoding());
             msg.setExceptionPayload(context.getMessage().getExceptionPayload());
             Map props = new HashMap();
-            for (Iterator iterator = context.getMessage().getPropertyNames().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = context.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
+            {
                 String key = (String)iterator.next();
                 props.put(key, context.getMessage().getProperty(key));
             }

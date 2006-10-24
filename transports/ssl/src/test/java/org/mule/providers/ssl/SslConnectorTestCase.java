@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.ssl;
 
 import org.mule.impl.MuleDescriptor;
@@ -32,7 +33,8 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         return createConnector(true);
     }
 
-    public static SslConnector createConnector(boolean initialised) throws InitialisationException, IOException
+    public static SslConnector createConnector(boolean initialised)
+        throws InitialisationException, IOException
     {
         SslConnector cnn = new SslConnector();
         cnn.setName("SslConnector");
@@ -44,7 +46,8 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.setTrustStore("trustStore");
         cnn.setTrustStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        if (initialised) {
+        if (initialised)
+        {
             cnn.initialise();
         }
         return cnn;
@@ -58,7 +61,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
         cnn.initialise();
     }
-    
+
     public String getTestEndpointURI()
     {
         return "ssl://localhost:56801";
@@ -77,30 +80,39 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try {
+        try
+        {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("ssl://localhost:30303"));
         connector.registerListener(component, endpoint);
-        try {
+        try
+        {
             // connector.registerListener(component, endpoint);
             // fail("cannot register on the same endpointUri");
-        } catch (Exception e) { /* expected */
+        }
+        catch (Exception e)
+        { /* expected */
         }
     }
 
     public void testProperties() throws Exception
     {
-        SslConnector c = (SslConnector) connector;
+        SslConnector c = (SslConnector)connector;
 
         c.setBufferSize(1024);
         assertEquals(1024, c.getBufferSize());

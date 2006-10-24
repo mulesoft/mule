@@ -17,7 +17,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>VMMessageDispatcherFactory</code> creates an in-memory event dispatcher
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

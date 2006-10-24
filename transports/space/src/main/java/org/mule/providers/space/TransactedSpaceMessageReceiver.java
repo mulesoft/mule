@@ -49,12 +49,14 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
     protected List getMessages() throws Exception
     {
         Object message = space.take(frequency);
-        if (message == null) {
+        if (message == null)
+        {
             return null;
         }
 
         // Process message
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Message received it is of type: " + message.getClass().getName());
         }
 
@@ -74,11 +76,13 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
 
         Properties props = new Properties();
         props.putAll(endpoint.getProperties());
-        try {
+        try
+        {
             logger.info("Connecting to space: " + destination);
             space = connector.getSpace(endpoint);
         }
-        catch (UMOSpaceException e) {
+        catch (UMOSpaceException e)
+        {
             throw new ConnectException(new Message("space", 1, destination), e, this);
         }
     }

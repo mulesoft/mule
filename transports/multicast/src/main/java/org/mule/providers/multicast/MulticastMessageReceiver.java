@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.multicast;
 
 import org.mule.providers.AbstractConnector;
@@ -33,7 +34,7 @@ import java.net.URI;
 public class MulticastMessageReceiver extends UdpMessageReceiver
 {
     public MulticastMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
+        throws InitialisationException
     {
         super(connector, component, endpoint);
     }
@@ -68,10 +69,14 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
 
     protected void doDispose()
     {
-        if (socket != null && !socket.isClosed()) {
-            try {
-                ((MulticastSocket) socket).leaveGroup(inetAddress);
-            } catch (IOException e) {
+        if (socket != null && !socket.isClosed())
+        {
+            try
+            {
+                ((MulticastSocket)socket).leaveGroup(inetAddress);
+            }
+            catch (IOException e)
+            {
                 logger.error("failed to leave group: " + e.getMessage(), e);
             }
         }
