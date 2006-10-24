@@ -10,30 +10,14 @@
 
 package org.mule.providers.jdbc;
 
-import org.mule.util.properties.PropertyExtractor;
-
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Utility methods for working with various parts of JDBC.
  */
 public abstract class JdbcUtils
 {
-
-    protected static Set extractors = new HashSet();
-
-    public static void addPropertyExtractor(PropertyExtractor extractor)
-    {
-        extractors.add(extractor);
-    }
-
-    public static void removePropertyExtractor(PropertyExtractor extractor)
-    {
-        extractors.remove(extractor);
-    }
 
     public static void close(Connection con) throws SQLException
     {
