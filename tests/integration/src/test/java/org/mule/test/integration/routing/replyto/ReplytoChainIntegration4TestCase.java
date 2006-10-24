@@ -21,11 +21,13 @@ import org.mule.umo.UMOMessage;
 
 public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration4TestCase() {
+    public ReplytoChainIntegration4TestCase()
+    {
         setDisposeManagerPerSuite(true);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/routing/replyto/routing-chain-4-test.xml";
     }
 

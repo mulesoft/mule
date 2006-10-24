@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.transaction;
 
 import org.mule.transaction.TransactionCoordination;
@@ -26,17 +27,20 @@ public class XABridgeComponent
     public static boolean mayRollback = false;
 
     /**
-     * If <code>mayRollback</code> has been set to true, the component will
-     * mark the current transaction as rollback only on a 30 percent basis.
+     * If <code>mayRollback</code> has been set to true, the component will mark
+     * the current transaction as rollback only on a 30 percent basis.
      * 
      * @throws Exception
      */
     protected void mayRollback() throws Exception
     {
-        if (mayRollback) {
+        if (mayRollback)
+        {
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-            if (tx != null) {
-                if (Math.random() < 0.3) {
+            if (tx != null)
+            {
+                if (Math.random() < 0.3)
+                {
                     System.err.println("Marking transaction for rollback");
                     tx.setRollbackOnly();
                 }
@@ -45,8 +49,8 @@ public class XABridgeComponent
     }
 
     /**
-     * Receive the jdbc message and forward the <code>data</code> part. May
-     * mark the current transaction as rollback only.
+     * Receive the jdbc message and forward the <code>data</code> part. May mark
+     * the current transaction as rollback only.
      * 
      * @param msg
      * @return
@@ -59,8 +63,8 @@ public class XABridgeComponent
     }
 
     /**
-     * Receive the content of the jms message and forward it. May mark the
-     * current transaction as rollback only.
+     * Receive the content of the jms message and forward it. May mark the current
+     * transaction as rollback only.
      * 
      * @param msg
      * @return

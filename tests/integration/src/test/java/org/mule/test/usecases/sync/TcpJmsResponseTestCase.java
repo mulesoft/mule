@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.usecases.sync;
 
 import org.mule.extras.client.MuleClient;
@@ -17,9 +18,11 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TcpJmsResponseTestCase extends FunctionalTestCase {
+public class TcpJmsResponseTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/sync/tcp-jms-response.xml";
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.spring.transaction;
 
 import net.sf.hibernate.SessionFactory;
@@ -25,7 +26,8 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
     protected void dotearDown() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null) {
+        if (tx != null)
+        {
             TransactionCoordination.getInstance().unbindTransaction(tx);
         }
     }
@@ -44,7 +46,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         // Init hibernate transaction manager
         HibernateTransactionManager tm = new HibernateTransactionManager();
         tm.setDataSource(ds);
-        SessionFactory sessionFactory = (SessionFactory) sfactory.getObject();
+        SessionFactory sessionFactory = (SessionFactory)sfactory.getObject();
         tm.setSessionFactory(sessionFactory);
         // Init spring transaction factory
         SpringTransactionFactory factory = new SpringTransactionFactory();

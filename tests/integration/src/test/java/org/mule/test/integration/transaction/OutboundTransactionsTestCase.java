@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.transaction;
 
 import org.mule.extras.client.MuleClient;
@@ -20,7 +21,8 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
 {
     private static final int TIMEOUT = 2000;
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/transaction/outbound-transactions.xml";
     }
 
@@ -28,11 +30,13 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        while (client.receive("jms://my.queue1", TIMEOUT) != null) {
+        while (client.receive("jms://my.queue1", TIMEOUT) != null)
+        {
             // consume messages
         }
 
-        while (client.receive("jms://my.queue2", TIMEOUT) != null) {
+        while (client.receive("jms://my.queue2", TIMEOUT) != null)
+        {
             // consume messages
         }
 
@@ -48,11 +52,13 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        while (client.receive("jms://my.queue3", TIMEOUT) != null) {
+        while (client.receive("jms://my.queue3", TIMEOUT) != null)
+        {
             // consume messages
         }
 
-        while (client.receive("jms://my.queue4", TIMEOUT) != null) {
+        while (client.receive("jms://my.queue4", TIMEOUT) != null)
+        {
             // consume messages
         }
 

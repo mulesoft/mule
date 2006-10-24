@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.vm;
 
 import org.mule.tck.FunctionalTestCase;
@@ -25,11 +26,11 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         return null;
     }
 
-
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        builder.registerComponent(MatchingMethodsComponent.class.getName(), "service", "vm://service", null, null);
+        builder.registerComponent(MatchingMethodsComponent.class.getName(), "service", "vm://service", null,
+            null);
         return builder;
     }
 

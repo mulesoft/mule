@@ -25,11 +25,13 @@ import java.util.Map;
 
 public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration2TestCase() {
+    public ReplytoChainIntegration2TestCase()
+    {
         setDisposeManagerPerSuite(true);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/routing/replyto/injection2-test.xml";
     }
 

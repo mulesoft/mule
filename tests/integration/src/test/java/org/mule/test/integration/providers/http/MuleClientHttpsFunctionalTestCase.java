@@ -35,9 +35,12 @@ public class MuleClientHttpsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected UMOEndpointURI getInDest()
     {
-        try {
+        try
+        {
             return new MuleEndpointURI("https://localhost:50198");
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -64,7 +67,8 @@ public class MuleClientHttpsFunctionalTestCase extends AbstractProviderFunctiona
     protected void sendTestData(int iterations) throws Exception
     {
         MuleClient client = new MuleClient();
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++)
+        {
             UMOMessage m = client.send(getInDest().toString(), TEST_MESSAGE + i, null);
             assertNotNull(m);
             results.add(m.getPayload());
@@ -73,9 +77,10 @@ public class MuleClientHttpsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected void receiveAndTestResults() throws Exception
     {
-        int i=0;
-        for (Iterator iterator = results.iterator(); iterator.hasNext();i++) {
-            byte[] result = (byte[]) iterator.next();
+        int i = 0;
+        for (Iterator iterator = results.iterator(); iterator.hasNext(); i++)
+        {
+            byte[] result = (byte[])iterator.next();
             assertNotNull(result);
             assertEquals(TEST_MESSAGE + i + " Received", new String(result));
         }

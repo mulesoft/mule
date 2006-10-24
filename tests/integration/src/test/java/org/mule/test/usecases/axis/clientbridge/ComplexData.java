@@ -16,7 +16,7 @@ public class ComplexData implements Serializable
 {
     private String someString = "Default String";
     private Integer someInteger = new Integer(13);
-    
+
     public ComplexData()
     {
         super();
@@ -41,6 +41,7 @@ public class ComplexData implements Serializable
             throw new RuntimeException(e);
         }
     }
+
     public Integer getSomeInteger()
     {
         return someInteger;

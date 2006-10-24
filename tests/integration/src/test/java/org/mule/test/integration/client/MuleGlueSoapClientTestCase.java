@@ -7,8 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.client;
 
+package org.mule.test.integration.client;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -16,7 +16,8 @@ package org.mule.test.integration.client;
  */
 public class MuleGlueSoapClientTestCase extends MuleAxisSoapClientTestCase
 {
-    public String getSoapProvider() {
+    public String getSoapProvider()
+    {
         return "glue";
     }
 }

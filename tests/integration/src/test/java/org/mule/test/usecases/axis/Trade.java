@@ -12,11 +12,12 @@ package org.mule.test.usecases.axis;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Trade implements java.io.Serializable {
+public class Trade implements java.io.Serializable
+{
     private static final long serialVersionUID = -1225935545079750532L;
 
     private int accountID;
@@ -30,54 +31,62 @@ public class Trade implements java.io.Serializable {
         super();
     }
 
-    public int getAccountID() {
+    public int getAccountID()
+    {
         return accountID;
     }
 
-    public void setAccountID(int accountID) {
+    public void setAccountID(int accountID)
+    {
         this.accountID = accountID;
     }
 
-    public java.lang.String getCusip() {
+    public java.lang.String getCusip()
+    {
         return cusip;
     }
 
-    public void setCusip(java.lang.String cusip) {
+    public void setCusip(java.lang.String cusip)
+    {
         this.cusip = cusip;
     }
 
-    public int getCurrency() {
+    public int getCurrency()
+    {
         return currency;
     }
 
-    public void setCurrency(int currency) {
+    public void setCurrency(int currency)
+    {
         this.currency = currency;
     }
 
-  //  public float getPrice() {
-    //    return price;
-   // }
+    // public float getPrice() {
+    // return price;
+    // }
 
-   // public void setPrice(float price) {
-      //  this.price = price;
-   // }
+    // public void setPrice(float price) {
+    // this.price = price;
+    // }
 
-    public int getTradeID() {
+    public int getTradeID()
+    {
         return tradeID;
     }
 
-    public void setTradeID(int tradeID) {
+    public void setTradeID(int tradeID)
+    {
         this.tradeID = tradeID;
     }
 
-    public int getTransaction() {
+    public int getTransaction()
+    {
         return transaction;
     }
 
-    public void setTransaction(int transaction) {
+    public void setTransaction(int transaction)
+    {
         this.transaction = transaction;
     }
-
-
 
 }

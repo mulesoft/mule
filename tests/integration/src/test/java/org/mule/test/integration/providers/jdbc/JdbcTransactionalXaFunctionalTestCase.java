@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jdbc;
 
 import org.enhydra.jdbc.standard.StandardXADataSource;
@@ -33,7 +34,8 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
         // check for already active JOTM instance
         txManager = Current.getCurrent();
         // if none found, create new local JOTM instance
-        if (txManager == null) {
+        if (txManager == null)
+        {
             new Jotm(true, false);
             txManager = Current.getCurrent();
         }

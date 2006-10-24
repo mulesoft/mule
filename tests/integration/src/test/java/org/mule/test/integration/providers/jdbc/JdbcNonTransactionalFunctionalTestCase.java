@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jdbc;
 
 import org.enhydra.jdbc.standard.StandardDataSource;
@@ -46,7 +47,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         assertNull(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                + "', NULL, NULL)");
+                      + "', NULL, NULL)");
         message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNotNull(message);
     }
@@ -57,7 +58,8 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         MuleManager.getInstance().start();
 
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
         UMOSession session = MuleTestUtils.getTestSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
@@ -81,7 +83,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         assertNull(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                + "', NULL, NULL)");
+                      + "', NULL, NULL)");
         message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
         assertNotNull(message);
 
@@ -94,14 +96,16 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         MuleManager.getInstance().start();
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                + "', NULL, NULL)");
+                      + "', NULL, NULL)");
 
         long t0 = System.currentTimeMillis();
-        while (System.currentTimeMillis() - t0 < 20000) {
+        while (System.currentTimeMillis() - t0 < 20000)
+        {
             Object[] rs = execSqlQuery("SELECT COUNT(*) FROM TEST WHERE TYPE = 2");
             assertNotNull(rs);
             assertEquals(1, rs.length);
-            if (((Number) rs[0]).intValue() > 0) {
+            if (((Number)rs[0]).intValue() > 0)
+            {
                 break;
             }
             Thread.sleep(100);
@@ -118,11 +122,8 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
-        builder.registerComponent(JdbcFunctionalTestComponent.class.getName(),
-                                  "testComponent",
-                                  getInDest(),
-                                  getOutDest(),
-                                  props);
+        builder.registerComponent(JdbcFunctionalTestComponent.class.getName(), "testComponent", getInDest(),
+            getOutDest(), props);
     }
 
     protected DataSource createDataSource() throws Exception

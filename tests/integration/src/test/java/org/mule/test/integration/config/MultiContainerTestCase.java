@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.config;
 
 import org.mule.MuleManager;
@@ -20,11 +21,13 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
- * Tests Deploying and referencing components from two different spring container contexts
+ * Tests Deploying and referencing components from two different spring container
+ * contexts
  */
 public class MultiContainerTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/config/multi-container-test.xml";
     }
 
@@ -37,10 +40,13 @@ public class MultiContainerTestCase extends FunctionalTestCase
         assertNotNull(context.getComponent("spring2-Banana"));
         assertNotNull(context.getComponent("spring-Banana"));
 
-        try {
+        try
+        {
             context.getComponent("WaterMelon");
             fail("Object should  not found");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // ignore
         }
     }
@@ -49,16 +55,16 @@ public class MultiContainerTestCase extends FunctionalTestCase
     {
         UMOContainerContext context = MuleManager.getInstance().getContainerContext();
         assertNotNull(context);
-        Orange o = (Orange) context.getComponent(new ContainerKeyPair("spring1", "Orange"));
+        Orange o = (Orange)context.getComponent(new ContainerKeyPair("spring1", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
 
-        o = (Orange) context.getComponent(new ContainerKeyPair("spring2", "Orange"));
+        o = (Orange)context.getComponent(new ContainerKeyPair("spring2", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
 
         // gets the component from the first container
-        o = (Orange) context.getComponent("Orange");
+        o = (Orange)context.getComponent("Orange");
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
     }

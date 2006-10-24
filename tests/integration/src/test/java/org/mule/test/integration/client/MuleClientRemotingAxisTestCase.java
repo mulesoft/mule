@@ -74,7 +74,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
         dispatcher.setWireFormat(new XStreamWireFormat());
-        
+
         try
         {
             String[] args = new String[]{"Betty", "Rubble"};

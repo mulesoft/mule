@@ -131,7 +131,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         // lets get our newly added person
         UMOMessage result = client.receive(getDispatchAsyncComplexEndpoint2(), 0);
         assertNotNull(result);
-        assertTrue("Did not receive a Person but: " + result.getPayload().getClass(), result.getPayload() instanceof Person);
+        assertTrue("Did not receive a Person but: " + result.getPayload().getClass(),
+            result.getPayload() instanceof Person);
         assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
         assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
     }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.spring.events.async;
 
 import org.mule.MuleManager;
@@ -21,8 +22,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
- * example config in the docco. this test is not run when building this module
- * as it relies on Jms, it's used to verify the example config works.
+ * example config in the docco. this test is not run when building this module as it
+ * relies on Jms, it's used to verify the example config works.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -34,9 +35,13 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        if (context == null) {
-            context = new ClassPathXmlApplicationContext("org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml");
-        } else {
+        if (context == null)
+        {
+            context = new ClassPathXmlApplicationContext(
+                "org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml");
+        }
+        else
+        {
             context.refresh();
         }
         eventCount = 0;
@@ -44,11 +49,12 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
 
     public void testReceivingASubscriptionEvent() throws Exception
     {
-        OrderManagerBean subscriptionBean = (OrderManagerBean) context.getBean("orderManager");
+        OrderManagerBean subscriptionBean = (OrderManagerBean)context.getBean("orderManager");
         assertNotNull(subscriptionBean);
         // when an event is received by 'testEventBean1' this callback will be
         // invoked
-        EventCallback callback = new EventCallback() {
+        EventCallback callback = new EventCallback()
+        {
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount++;
@@ -72,9 +78,10 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
     public void testReceiveAsWebService() throws Exception
     {
         MuleClient client = new MuleClient();
-        OrderManagerBean orderManager = (OrderManagerBean) context.getBean("orderManager");
+        OrderManagerBean orderManager = (OrderManagerBean)context.getBean("orderManager");
         assertNotNull(orderManager);
-        EventCallback callback = new EventCallback() {
+        EventCallback callback = new EventCallback()
+        {
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount++;
@@ -83,11 +90,8 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         orderManager.setEventCallback(callback);
 
         Order order = new Order("Sausage and Mash");
-        //Make an async call
-        client.dispatch("axis:http://localhost:44444/mule/orderManager?method=processOrderAsync",
-                                        order,
-                                        null);
-
+        // Make an async call
+        client.dispatch("axis:http://localhost:44444/mule/orderManager?method=processOrderAsync", order, null);
 
         UMOMessage result = client.receive("jms://processed.queue", 10000);
         assertNotNull(result);

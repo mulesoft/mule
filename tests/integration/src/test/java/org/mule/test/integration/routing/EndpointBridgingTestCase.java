@@ -18,9 +18,11 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EndpointBridgingTestCase extends FunctionalTestCase {
+public class EndpointBridgingTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/routing/bridge-mule.xml";
     }
 

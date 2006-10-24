@@ -23,22 +23,26 @@ import java.util.List;
  * @version $Revision$
  */
 public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
- {
-    public TwoEndpointsSinglePortTestCase() {
+{
+    public TwoEndpointsSinglePortTestCase()
+    {
         setDisposeManagerPerSuite(true);
     }
 
-     protected String getConfigResources() {
-         return "org/mule/test/integration/providers/http/two-endpoints-single-port.xml";
-     }
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/providers/http/two-endpoints-single-port.xml";
+    }
 
-     public void testSendToEach() throws Exception {
+    public void testSendToEach() throws Exception
+    {
 
         sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 10);
         sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 10);
     }
 
-    public void testSendToEachWithBadEndpoint() throws Exception {
+    public void testSendToEachWithBadEndpoint() throws Exception
+    {
 
         MuleClient client = new MuleClient();
 
@@ -50,21 +54,25 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         assertNotNull(result.getExceptionPayload());
         assertEquals(404, result.getIntProperty("http.status", 0));
 
-        //Test that after the exception the endpoints still receive events
+        // Test that after the exception the endpoints still receive events
         sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 5);
         sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 5);
     }
 
-    protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages) throws UMOException {
+    protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
+        throws UMOException
+    {
         MuleClient client = new MuleClient();
 
         List results = new ArrayList();
-        for (int i = 0; i < noOfMessages; i++) {
+        for (int i = 0; i < noOfMessages; i++)
+        {
             results.add(client.send(endpoint, message, null).getPayload());
         }
 
         assertEquals(noOfMessages, results.size());
-        for (int i = 0; i < noOfMessages; i++) {
+        for (int i = 0; i < noOfMessages; i++)
+        {
             assertEquals(response, new String((byte[])results.get(i)));
         }
     }

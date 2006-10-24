@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.file;
 
 import org.mule.tck.FunctionalTestCase;
@@ -19,7 +20,8 @@ import java.io.File;
  */
 public class FileFunctionalTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/providers/file/file-config.xml";
     }
 

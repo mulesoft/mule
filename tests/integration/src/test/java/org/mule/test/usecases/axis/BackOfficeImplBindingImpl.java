@@ -11,9 +11,10 @@
 package org.mule.test.usecases.axis;
 
 public class BackOfficeImplBindingImpl implements org.mule.test.usecases.axis.BackOfficeImpl
- {
-    //Doc Lit test
-    public SubmitTradeResponse submitTrade(SubmitTrade parameters) {
+{
+    // Doc Lit test
+    public SubmitTradeResponse submitTrade(SubmitTrade parameters)
+    {
         TradeStatus ts = new TradeStatus();
         Trade trade = parameters.getArg0();
         ts.setTradeID(trade.getTradeID());
@@ -22,17 +23,18 @@ public class BackOfficeImplBindingImpl implements org.mule.test.usecases.axis.Ba
         return str;
     }
 
-    //RPC Enc test
-    public TradeStatus submitTrade(Trade trade) {
+    // RPC Enc test
+    public TradeStatus submitTrade(Trade trade)
+    {
         TradeStatus ts = new TradeStatus();
         ts.setTradeID(trade.getTradeID());
         ts.setStatus("RECEIVED");
         return ts;
     }
 
-    //Wrapped Lit test
-    public TradeStatus submitTrade(int accountID, String cusip, int currency,
-                                   int tradeID, int transaction) {
+    // Wrapped Lit test
+    public TradeStatus submitTrade(int accountID, String cusip, int currency, int tradeID, int transaction)
+    {
         Trade trade = new Trade();
         trade.setAccountID(accountID);
         trade.setCusip(cusip);

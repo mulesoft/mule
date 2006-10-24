@@ -26,42 +26,47 @@ import org.mule.umo.routing.RoutingException;
 public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 {
 
-    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+        throws RoutingException
     {
-        if (getEndpoint() == null) {
-            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET),
-                                                message,
-                                                getEndpoint(),
-                                                session.getComponent());
+        if (getEndpoint() == null)
+        {
+            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message,
+                getEndpoint(), session.getComponent());
         }
-        try {
-            
-            
+        try
+        {
+
             UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
-            
+
             message = new MuleMessage(RequestContext.getEventContext().getTransformedMessage(), message);
-            
+
             UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
 
-            if (synchronous) {
+            if (synchronous)
+            {
                 UMOMessage result = dispatcher.send(newEvent);
-                if (statistics != null) {
+                if (statistics != null)
+                {
                     statistics.incrementRoutedMessage(getEndpoint());
                 }
                 return result;
-            } else {
+            }
+            else
+            {
                 dispatcher.dispatch(newEvent);
-                if (statistics != null) {
+                if (statistics != null)
+                {
                     statistics.incrementRoutedMessage(getEndpoint());
                 }
                 return null;
             }
-            
-        } catch (Exception e) {
+
+        }
+        catch (Exception e)
+        {
             throw new RoutingException(message, getEndpoint(), e);
 
         }
     }
 }
-
-

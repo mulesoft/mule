@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.persistence;
 
 import org.mule.MuleManager;
@@ -18,15 +19,19 @@ import java.io.File;
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
-public class FilePersistenceTestCase extends FunctionalTestCase {
+public class FilePersistenceTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/persistence/file-persistence-config.xml";
     }
 
-    public void testFilesStored() throws Exception {
+    public void testFilesStored() throws Exception
+    {
 
-        //Note that the FunctionalTestCase will remove the working directory after each execution
+        // Note that the FunctionalTestCase will remove the working directory after
+        // each execution
         String path = MuleManager.getConfiguration().getWorkingDirectory() + "/queuestore/test.queue";
         File store = new File(path);
         assertFalse(store.exists());
@@ -38,7 +43,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase {
         assertEquals(1, files.length);
 
         MuleManager.getInstance().getModel().startComponent("TestComponent");
-        //give the component some time to initialise
+        // give the component some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();
         assertNotNull(files);

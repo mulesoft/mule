@@ -20,12 +20,14 @@ import org.mule.util.ObjectFactory;
 
 /**
  * A dummy property factory for creating a Jndi context
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DummyInitialContextFactory implements ObjectFactory {
-    public Object create() throws Exception {
+public class DummyInitialContextFactory implements ObjectFactory
+{
+    public Object create() throws Exception
+    {
         SimpleContext c = new SimpleContext();
         c.bind("vmConnector", new VMConnector());
         c.bind("endpointRef", "vm://my.object");

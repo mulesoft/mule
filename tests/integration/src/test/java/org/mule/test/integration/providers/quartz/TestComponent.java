@@ -18,11 +18,15 @@ public class TestComponent implements Callable
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-       if (eventContext.getMessageAsString().equals("quartz test")) {
-            if (QuartzFunctionalTestCase.countDown != null) {
+        if (eventContext.getMessageAsString().equals("quartz test"))
+        {
+            if (QuartzFunctionalTestCase.countDown != null)
+            {
                 QuartzFunctionalTestCase.countDown.countDown();
             }
-        } else {
+        }
+        else
+        {
             throw new IllegalArgumentException("Unrecognised event payload");
         }
         return null;

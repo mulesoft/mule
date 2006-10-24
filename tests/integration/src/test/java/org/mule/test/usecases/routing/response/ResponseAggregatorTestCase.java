@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.usecases.routing.response;
 
 import org.mule.extras.client.MuleClient;
@@ -22,9 +23,11 @@ import java.util.Map;
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
-public class ResponseAggregatorTestCase extends FunctionalTestCase {
+public class ResponseAggregatorTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/routing/response/response-router.xml";
     }
 

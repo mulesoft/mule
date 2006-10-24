@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.usecases.dlq;
 
 import org.mule.extras.client.MuleClient;
@@ -21,7 +22,8 @@ import org.mule.umo.UMOMessage;
  */
 public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/dlq/exception-dlq.xml";
     }
 
@@ -34,14 +36,17 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
         UMOMessage message = client.receive("jms://out.queue", 3000);
         assertNull(message);
 
-        try {
+        try
+        {
             message = client.receive("jms://DLQ", 6000000);
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             e.printStackTrace(System.err);
         }
         assertNotNull(message);
 
-        ExceptionMessage em = (ExceptionMessage) message.getPayload();
+        ExceptionMessage em = (ExceptionMessage)message.getPayload();
         assertEquals("testing 1 2 3", em.getPayload());
     }
 }

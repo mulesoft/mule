@@ -22,7 +22,8 @@ import org.mule.umo.UMOMessage;
 
 public class AggregatorIntegrationTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/routing/test-correlation-aggregator.xml";
     }
 

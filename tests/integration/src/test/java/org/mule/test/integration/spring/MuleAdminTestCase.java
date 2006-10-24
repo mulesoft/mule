@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.spring;
 
 import org.mule.config.ConfigurationBuilder;
@@ -20,13 +21,16 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleAdminTestCase extends FunctionalTestCase {
+public class MuleAdminTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/spring/mule-admin-spring.xml";
     }
 
-    protected ConfigurationBuilder getBuilder() {
+    protected ConfigurationBuilder getBuilder()
+    {
         return new SpringConfigurationBuilder();
     }
 

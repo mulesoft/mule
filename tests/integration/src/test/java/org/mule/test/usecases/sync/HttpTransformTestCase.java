@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.usecases.sync;
 
 import org.mule.extras.client.MuleClient;
@@ -21,9 +22,11 @@ import java.util.Arrays;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class HttpTransformTestCase extends FunctionalTestCase {
+public class HttpTransformTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/sync/http-transform.xml";
     }
 
@@ -35,14 +38,14 @@ public class HttpTransformTestCase extends FunctionalTestCase {
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setReturnClass(String.class);
         assertNotNull(message.getPayload());
-        String result = (String) gu.transform(message.getPayloadAsBytes());
+        String result = (String)gu.transform(message.getPayloadAsBytes());
         assertEquals("<string>payload</string>", result);
     }
 
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient();
-        Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        Object payload = Arrays.asList(new Integer[]{new Integer(42)});
         UMOMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
@@ -55,7 +58,7 @@ public class HttpTransformTestCase extends FunctionalTestCase {
     public void testBinaryWithBridge() throws Exception
     {
         MuleClient client = new MuleClient();
-        Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        Object payload = Arrays.asList(new Integer[]{new Integer(42)});
         UMOMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();

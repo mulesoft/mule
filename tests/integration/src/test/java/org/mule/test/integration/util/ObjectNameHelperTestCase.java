@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,13 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.util;
 
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
-
 
 public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 {
@@ -26,8 +26,8 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         ep = new MuleEndpoint("jms://cn=foo,name=queue", true);
         assertEquals("endpoint.jms.cn.foo.name.queue.1", ep.getName());
 
-        //Test generating a unique name when there is a matching endpoint
-        ep =new MuleEndpoint("vm://localhost/my.queue", true);
+        // Test generating a unique name when there is a matching endpoint
+        ep = new MuleEndpoint("vm://localhost/my.queue", true);
         assertEquals("endpoint.vm.my.queue", ep.getName());
         ep = new MuleEndpoint("pop3://ross:secret@mail.mycompany.com?subject=foo", true);
         assertEquals("endpoint.pop3.ross.mycompany.com", ep.getName());
@@ -43,10 +43,11 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         assertEquals("this.is.aWierd.Name.x", ep.getName());
         MuleManager.getInstance().registerEndpoint(ep);
 
-        //Test generating a unique name when there is a matching endpoint
+        // Test generating a unique name when there is a matching endpoint
         ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", true);
         assertEquals("this.is.aWierd.Name.x", ep.getName());
-        ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::", true);
+        ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::",
+            true);
         assertEquals("this.is.another.Wierd.Name.x", ep.getName());
     }
 }

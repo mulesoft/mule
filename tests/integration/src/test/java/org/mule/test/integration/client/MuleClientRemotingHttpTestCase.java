@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
 /**
@@ -15,7 +16,8 @@ package org.mule.test.integration.client;
  */
 public class MuleClientRemotingHttpTestCase extends MuleClientRemotingTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/client/test-client-mule-config-remote-http.xml";
     }
 

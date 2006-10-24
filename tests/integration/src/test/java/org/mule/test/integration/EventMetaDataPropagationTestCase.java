@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration;
 
 import org.mule.MuleManager;
@@ -43,36 +44,36 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 {
     private Apple testObjectProperty = new Apple();
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "";
     }
 
-    protected ConfigurationBuilder getBuilder() throws Exception {
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, null);
-        UMODescriptor c1 = builder.registerComponentInstance(this,
-                                                             "component1",
-                                                             new MuleEndpointURI("vm://component1"),
-                                                             new MuleEndpointURI("vm://component2"));
+        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", new MuleEndpointURI(
+            "vm://component1"), new MuleEndpointURI("vm://component2"));
         c1.getOutboundEndpoint().setTransformer(new DummyTransformer());
 
         builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
         return builder;
     }
 
-
     public void testEventMetaDataPropagation() throws UMOException
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("component1");
         UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), session.getComponent()
-                                                                                   .getDescriptor()
-                                                                                   .getInboundEndpoint(), session, true);
+            .getDescriptor()
+            .getInboundEndpoint(), session, true);
         session.sendEvent(event);
     }
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        if ("component1".equals(context.getComponentDescriptor().getName())) {
+        if ("component1".equals(context.getComponentDescriptor().getName()))
+        {
             Map props = new HashMap();
             props.put("stringParam", "param1");
             props.put("objectParam", testObjectProperty);
@@ -81,25 +82,32 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
             props.put("longParam", new Long(123456789));
             props.put("booleanParam", Boolean.TRUE);
             UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
-            msg.addAttachment("test1", new DataHandler(new DataSource() {
-                public InputStream getInputStream() throws IOException {
+            msg.addAttachment("test1", new DataHandler(new DataSource()
+            {
+                public InputStream getInputStream() throws IOException
+                {
                     return null;
                 }
 
-                public OutputStream getOutputStream() throws IOException {
+                public OutputStream getOutputStream() throws IOException
+                {
                     return null;
                 }
 
-                public String getContentType() {
+                public String getContentType()
+                {
                     return "text/plain";
                 }
 
-                public String getName() {
+                public String getName()
+                {
                     return "test1";
                 }
             }));
             return msg;
-        } else {
+        }
+        else
+        {
             UMOMessage msg = context.getMessage();
             assertEquals("param1", msg.getProperty("stringParam"));
             assertEquals(testObjectProperty, msg.getProperty("objectParam"));
@@ -116,7 +124,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
     {
         private static final long serialVersionUID = 2488453445525934222L;
 
-        public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+        public Object transform(Object src, String encoding, UMOEventContext context)
+            throws TransformerException
         {
             UMOMessage msg = context.getMessage();
             assertEquals("param1", msg.getProperty("stringParam"));

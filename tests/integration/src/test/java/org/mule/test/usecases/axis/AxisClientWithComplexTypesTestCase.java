@@ -19,12 +19,12 @@ import java.util.Map;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
- {
+{
     private Trade trade = null;
     private String uri = "axis:http://localhost:8081/services/BackOfficeImplBindingImplUMO?method=submitTrade";
 
@@ -39,11 +39,13 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/routing/axis/axis-client-test.xml";
     }
 
-    public void testSendComplexDOCLIT() throws Exception {
+    public void testSendComplexDOCLIT() throws Exception
+    {
 
         MuleClient client = new MuleClient();
         Map props = new HashMap();
@@ -53,10 +55,12 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         SubmitTrade submittrade = new SubmitTrade();
         submittrade.setArg0(trade);
 
-        //We need to name the parameters weh using Doc/Lit
-//        SoapMethod method = new SoapMethod(new QName("submitTrade"), SubmitTradeResponse.class);
-//        method.addNamedParameter(new NamedParameter(new QName("submitTrade"), NamedParameter.createQName("Object"), ParameterMode.IN));
-//        props.put(MuleProperties.MULE_SOAP_METHOD, method);
+        // We need to name the parameters weh using Doc/Lit
+        // SoapMethod method = new SoapMethod(new QName("submitTrade"),
+        // SubmitTradeResponse.class);
+        // method.addNamedParameter(new NamedParameter(new QName("submitTrade"),
+        // NamedParameter.createQName("Object"), ParameterMode.IN));
+        // props.put(MuleProperties.MULE_SOAP_METHOD, method);
         UMOMessage result = client.send(uri, submittrade, props);
         assertNotNull(result);
         SubmitTradeResponse response = (SubmitTradeResponse)result.getPayload();
@@ -64,7 +68,8 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 
     }
 
-    public void testSendComplexRPCENC() throws Exception {
+    public void testSendComplexRPCENC() throws Exception
+    {
         MuleClient client = new MuleClient();
 
         UMOMessage result = client.send(uri, trade, null);

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.exceptions;
 
 import org.mule.components.simple.NullComponent;
@@ -31,16 +32,16 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         setDisposeManagerPerSuite(true);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return null;
     }
-
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
 
-        //Create VM connector that queues events
+        // Create VM connector that queues events
         VMConnector cnn = new VMConnector();
         cnn.setName("vmCnn");
         cnn.setQueueEvents(true);
@@ -48,8 +49,9 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         DefaultComponentExceptionStrategy es = new DefaultComponentExceptionStrategy();
         es.addEndpoint(new MuleEndpoint("vm://error.queue", false));
         builder.getManager().getModel().setExceptionListener(es);
-        UMOEndpoint ep  = new MuleEndpoint("vm://component1", true);
-        ep.setTransformer(new AbstractTransformer() {
+        UMOEndpoint ep = new MuleEndpoint("vm://component1", true);
+        ep.setTransformer(new AbstractTransformer()
+        {
 
             protected Object doTransform(Object src, String encoding) throws TransformerException
             {
@@ -57,9 +59,11 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
             }
         });
 
-        builder.registerComponent(Object.class.getName(), "component1", ep, new MuleEndpoint("vm://component1.out", false), null);
+        builder.registerComponent(Object.class.getName(), "component1", ep, new MuleEndpoint(
+            "vm://component1.out", false), null);
 
-        builder.registerComponent(NullComponent.class.getName(), "component2", "vm://component2", "vm://component2.out", null);
+        builder.registerComponent(NullComponent.class.getName(), "component2", "vm://component2",
+            "vm://component2.out", null);
         return builder;
     }
 

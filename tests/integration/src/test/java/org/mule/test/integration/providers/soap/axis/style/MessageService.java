@@ -35,17 +35,17 @@ import javax.xml.soap.SOAPEnvelope;
  * Simple message-style service sample.
  */
 
-public interface MessageService {
+public interface MessageService
+{
     /**
      * Service methods, echo back any XML received.
-     *
      */
-    
-   public org.apache.axis.message.SOAPBodyElement [] soapBodyElement(org.apache.axis.message.SOAPBodyElement [] bodyElements);
+
+    public org.apache.axis.message.SOAPBodyElement[] soapBodyElement(org.apache.axis.message.SOAPBodyElement[] bodyElements);
 
     public Document document(Document body);
 
-    public Element[] elementArray(Element [] elems);
+    public Element[] elementArray(Element[] elems);
 
     public void soapRequestResponse(SOAPEnvelope req, SOAPEnvelope resp) throws javax.xml.soap.SOAPException;
 

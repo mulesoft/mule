@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.usecases.routing;
 
 import org.mule.extras.client.MuleClient;
@@ -22,7 +23,8 @@ import java.util.List;
  */
 public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/routing/forwarding-message-splitter.xml";
     }
 

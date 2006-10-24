@@ -7,15 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.models;
 
 /**
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SedaPipelineTestCase extends AbstractPipelineTestCase {
-    protected String getModelType() {
+public class SedaPipelineTestCase extends AbstractPipelineTestCase
+{
+    protected String getModelType()
+    {
         return "seda";
     }
 }

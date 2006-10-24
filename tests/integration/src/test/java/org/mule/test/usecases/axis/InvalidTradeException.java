@@ -12,26 +12,31 @@ package org.mule.test.usecases.axis;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class InvalidTradeException extends Exception {
+public class InvalidTradeException extends Exception
+{
     private static final long serialVersionUID = -997233549872918131L;
 
-    public InvalidTradeException() {
+    public InvalidTradeException()
+    {
         super();
     }
 
-    public InvalidTradeException(String message) {
+    public InvalidTradeException(String message)
+    {
         super(message);
     }
 
-    public InvalidTradeException(Throwable cause) {
+    public InvalidTradeException(Throwable cause)
+    {
         super(cause);
     }
 
-    public InvalidTradeException(String message, Throwable cause) {
+    public InvalidTradeException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 }

@@ -35,7 +35,8 @@ public class Client
         }
         finally
         {
-            if (manager != null) {
+            if (manager != null)
+            {
                 manager.dispose();
             }
         }
@@ -54,7 +55,8 @@ public class Client
         }
         finally
         {
-            if (client != null) {
+            if (client != null)
+            {
                 client.dispose();
             }
         }
@@ -63,11 +65,11 @@ public class Client
     private void executeComplexity() throws UMOException
     {
         System.err.println("\nexecuteComplexity");
-        Object result = client.send(AXIS_ENDPOINT + "?method=executeComplexity",
-                new ComplexData("Foo", new Integer(42)), null);
+        Object result = client.send(AXIS_ENDPOINT + "?method=executeComplexity", new ComplexData("Foo",
+            new Integer(42)), null);
         System.err.println(result);
-        UMOMessage message = (UMOMessage) result;
-        ComplexData data = (ComplexData) message.getPayload();
+        UMOMessage message = (UMOMessage)result;
+        ComplexData data = (ComplexData)message.getPayload();
         System.err.println(data);
     }
 
@@ -76,8 +78,8 @@ public class Client
         System.err.println("\ncomplexRequest");
         Object result = client.send(LOCAL_ENDPOINT, new ComplexData("Foo", new Integer(84)), null);
         System.err.println(result);
-        UMOMessage message = (UMOMessage) result;
-        ComplexData data = (ComplexData) message.getPayload();
+        UMOMessage message = (UMOMessage)result;
+        ComplexData data = (ComplexData)message.getPayload();
         System.err.println(data);
     }
 }

@@ -24,7 +24,6 @@ import org.mule.providers.quartz.jobs.MuleClientReceiveJob;
 import org.mule.tck.AbstractMuleTestCase;
 
 /**
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -105,8 +104,9 @@ public class QuartzFunctionalTestCase extends AbstractMuleTestCase
         Map props = new HashMap();
         props.put(QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT, "vm://event.queue");
         props.put(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT, "vm://quartz.in");
-        //The ref will be loaded from the default classloader container context, but his
-        //could be Jndi or spring
+        // The ref will be loaded from the default classloader container context, but
+        // his
+        // could be Jndi or spring
         props.put(QuartzConnector.PROPERTY_JOB_REF, MuleClientReceiveJob.class.getName());
 
         new MuleClient().send("vm://quartz.scheduler", "test", props);

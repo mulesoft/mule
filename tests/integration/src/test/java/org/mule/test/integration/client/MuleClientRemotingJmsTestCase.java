@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
@@ -21,11 +22,13 @@ import org.mule.umo.UMOMessage;
  */
 public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 {
-    public MuleClientRemotingJmsTestCase() {
+    public MuleClientRemotingJmsTestCase()
+    {
         setDisposeManagerPerSuite(true);
     }
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/client/test-client-mule-config-remote-jms.xml";
     }
 
@@ -36,7 +39,8 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         MuleManager.getConfiguration().setSynchronous(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message", null);
+        UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
+            null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayload());
     }

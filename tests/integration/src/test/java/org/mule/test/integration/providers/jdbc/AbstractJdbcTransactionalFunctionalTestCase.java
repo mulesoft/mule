@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.providers.jdbc;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -46,17 +47,22 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
     {
         final AtomicBoolean called = new AtomicBoolean(false);
 
-        EventCallback callback = new EventCallback() {
+        EventCallback callback = new EventCallback()
+        {
             public void eventReceived(UMOEventContext context, Object Component) throws Exception
             {
-                try {
+                try
+                {
                     called.set(true);
                     currentTx = context.getCurrentTransaction();
                     assertNotNull(currentTx);
                     assertTrue(currentTx.isBegun());
                     currentTx.setRollbackOnly();
-                } finally {
-                    synchronized (called) {
+                }
+                finally
+                {
+                    synchronized (called)
+                    {
                         called.notifyAll();
                     }
                 }
@@ -68,9 +74,10 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         MuleManager.getInstance().start();
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                + "', NULL, NULL)");
+                      + "', NULL, NULL)");
 
-        synchronized (called) {
+        synchronized (called)
+        {
             called.wait(20000);
         }
         assertTrue(called.get());
@@ -98,26 +105,16 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         descriptor.setName("testComponent");
         descriptor.setImplementation(JdbcFunctionalTestComponent.class.getName());
 
-        UMOEndpoint endpoint = new MuleEndpoint("testIn",
-                                                getInDest(),
-                                                connector,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                                                0,
-                                                null, null);
+        UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(), connector, null,
+            UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
 
         UMOTransactionFactory tf = getTransactionFactory();
         UMOTransactionConfig txConfig = new MuleTransactionConfig();
         txConfig.setFactory(tf);
         txConfig.setAction(txBeginAction);
 
-        UMOEndpoint outProvider = new MuleEndpoint("testOut",
-                                                   getOutDest(),
-                                                   connector,
-                                                   null,
-                                                   UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                   0,
-                                                   null, null);
+        UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(), connector, null,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
 
         endpoint.setTransactionConfig(txConfig);
 

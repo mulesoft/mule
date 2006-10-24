@@ -55,11 +55,14 @@ public class ServerTools
 
     public static void killEmbeddedActiveMq()
     {
-        if (embeddedFactory != null) {
-            try {
+        if (embeddedFactory != null)
+        {
+            try
+            {
                 embeddedFactory.stop();
             }
-            catch (JMSException e) {
+            catch (JMSException e)
+            {
                 throw new RuntimeException("Could not stop embedded ActiveMQ!", e);
             }
             embeddedFactory = null;
@@ -69,11 +72,12 @@ public class ServerTools
     public static void launchActiveMq(String brokerUrl)
     {
         String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
-        if (activeMqHome == null) {
+        if (activeMqHome == null)
+        {
             throw new NullPointerException(
-                    "You must set the "
-                            + ACTIVEMQ_HOME
-                            + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");
+                "You must set the "
+                                + ACTIVEMQ_HOME
+                                + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");
         }
         Project project = new Project();
         DefaultLogger consoleLogger = new DefaultLogger();
@@ -84,30 +88,34 @@ public class ServerTools
         Path path = new Path(project);
         File[] jars = new File(activeMqHome + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
         path.add(new Path(project, new File(activeMqHome, "\\conf").getAbsolutePath()));
-        for (int i = 0; i < jars.length; i++) {
+        for (int i = 0; i < jars.length; i++)
+        {
             path.add(new Path(project, jars[i].getAbsolutePath()));
         }
         jars = new File(activeMqHome + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
-        for (int i = 0; i < jars.length; i++) {
+        for (int i = 0; i < jars.length; i++)
+        {
             path.add(new Path(project, jars[i].getAbsolutePath()));
         }
         final JavaTask java = new JavaTask();
         java.setProject(project);
         java.setClasspath(path);
-        if (activeMqHome.indexOf("4.") > -1) {
+        if (activeMqHome.indexOf("4.") > -1)
+        {
             java.setClassname("org.apache.activemq.broker.Main");
         }
-        else {
+        else
+        {
             java.setClassname("org.activemq.broker.impl.Main");
         }
         java.setArgs(brokerUrl);
         java.setFork(true);
         java.setDir(new File(activeMqHome));
         java.addSysproperty(createVar("activemq.home", new File(activeMqHome).getAbsolutePath()));
-        java.addSysproperty(createVar("derby.system.home", new File(activeMqHome, "\\var")
-                .getAbsolutePath()));
+        java.addSysproperty(createVar("derby.system.home", new File(activeMqHome, "\\var").getAbsolutePath()));
         java.createWatchdog();
-        new Thread() {
+        new Thread()
+        {
             public void run()
             {
                 java.execute();
@@ -118,11 +126,15 @@ public class ServerTools
 
     public static void killActiveMq()
     {
-        try {
-            if (activemq != null) {
+        try
+        {
+            if (activemq != null)
+            {
                 activemq.kill();
             }
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }
@@ -140,7 +152,8 @@ public class ServerTools
 
         protected ExecuteWatchdog createWatchdog() throws BuildException
         {
-            if (watchDog == null) {
+            if (watchDog == null)
+            {
                 watchDog = new KillableWatchdog(timeout != null ? timeout.longValue() : 0);
             }
             return watchDog;

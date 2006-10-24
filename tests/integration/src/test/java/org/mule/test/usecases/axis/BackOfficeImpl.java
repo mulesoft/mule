@@ -12,12 +12,13 @@ package org.mule.test.usecases.axis;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface BackOfficeImpl {
+public interface BackOfficeImpl
+{
 
-    public SubmitTradeResponse submitTrade(SubmitTrade parameters);    
+    public SubmitTradeResponse submitTrade(SubmitTrade parameters);
 
 }

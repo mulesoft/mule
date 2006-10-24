@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.models;
 
 import org.mule.components.simple.EchoComponent;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,37 +34,45 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 
     protected abstract String getModelType();
 
-    protected int getNumberOfMessages() {
+    protected int getNumberOfMessages()
+    {
         return 1000;
     }
 
-    public void testPipelineSynchronous() throws Exception {
+    public void testPipelineSynchronous() throws Exception
+    {
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, "", getModelType());
         configureModel(builder.getManager().getModel());
-        builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1", "vm://component2", null);
-        builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2", "vm://component3", null);
+        builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1",
+            "vm://component2", null);
+        builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2",
+            "vm://component3", null);
         Map props = new HashMap();
         props.put("data", "request received by component 3");
-        builder.registerComponent(StaticComponent.class.getName(), "component3", "vm://component3", null, props);
+        builder.registerComponent(StaticComponent.class.getName(), "component3", "vm://component3", null,
+            props);
 
         MuleClient client = new MuleClient();
         List results = new ArrayList();
-        for (int i = 0; i < getNumberOfMessages(); i++) {
+        for (int i = 0; i < getNumberOfMessages(); i++)
+        {
             UMOMessage result = client.send("vm://component1", "test", null);
             assertNotNull(result);
             results.add(result);
         }
 
         assertEquals(results.size(), getNumberOfMessages());
-        for (Iterator iterator = results.iterator(); iterator.hasNext();) {
-            UMOMessage umoMessage = (UMOMessage) iterator.next();
+        for (Iterator iterator = results.iterator(); iterator.hasNext();)
+        {
+            UMOMessage umoMessage = (UMOMessage)iterator.next();
             assertEquals("request received by component 3", umoMessage.getPayloadAsString());
         }
     }
 
-    public void testPipelineAsynchronous() throws Exception {
+    public void testPipelineAsynchronous() throws Exception
+    {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(false, "", getModelType());
 
@@ -77,33 +85,40 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
         c2.setName("vmNoQueue");
         builder.getManager().registerConnector(c2);
 
-        builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1?connector=vmNoQueue", "vm://component2?connector=vmNoQueue", null);
-        builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2?connector=vmNoQueue", "vm://component3?connector=vmNoQueue", null);
+        builder.registerComponent(EchoComponent.class.getName(), "component1",
+            "vm://component1?connector=vmNoQueue", "vm://component2?connector=vmNoQueue", null);
+        builder.registerComponent(EchoComponent.class.getName(), "component2",
+            "vm://component2?connector=vmNoQueue", "vm://component3?connector=vmNoQueue", null);
 
         Map props = new HashMap();
         props.put("data", "request received by component 3");
-        builder.registerComponent(StaticComponent.class.getName(), "component3", "vm://component3?connector=vmNoQueue", "vm://results?connector=queuingConnector", props);
+        builder.registerComponent(StaticComponent.class.getName(), "component3",
+            "vm://component3?connector=vmNoQueue", "vm://results?connector=queuingConnector", props);
 
         MuleClient client = new MuleClient();
 
         List results = new ArrayList();
-        for (int i = 0; i < getNumberOfMessages(); i++) {
+        for (int i = 0; i < getNumberOfMessages(); i++)
+        {
             client.dispatch("vm://component1", "test", null);
         }
 
-        for (int i = 0; i < getNumberOfMessages(); i++) {
+        for (int i = 0; i < getNumberOfMessages(); i++)
+        {
             UMOMessage result = client.receive("vm://results?connector=queuingConnector", 100000);
             assertNotNull(result);
             results.add(result);
         }
         assertEquals(results.size(), getNumberOfMessages());
-        for (Iterator iterator = results.iterator(); iterator.hasNext();) {
-            UMOMessage umoMessage = (UMOMessage) iterator.next();
+        for (Iterator iterator = results.iterator(); iterator.hasNext();)
+        {
+            UMOMessage umoMessage = (UMOMessage)iterator.next();
             assertEquals("request received by component 3", umoMessage.getPayloadAsString());
         }
     }
 
-    protected void configureModel(UMOModel model) {
+    protected void configureModel(UMOModel model)
+    {
         // nothing to do here
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
 import org.mule.MuleException;
@@ -31,21 +32,24 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class RemoteExceptionTestCase extends FunctionalTestCase {
+public class RemoteExceptionTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "";
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-        //Test component 1. Will be used to create a transformer exceotion
+        // Test component 1. Will be used to create a transformer exceotion
         MuleEndpoint ep = new MuleEndpoint("vm://test.queue.1", true);
         ep.setTransformer(new ByteArrayToString());
         builder.registerComponent(FunctionalTestComponent.class.getName(), "testComponent1", ep, null, null);
 
-        //Test component 2. Will be used to create an exception thrown from within the component
+        // Test component 2. Will be used to create an exception thrown from within
+        // the component
         MuleEndpoint ep2 = new MuleEndpoint("vm://test.queue.2", true);
         Map props = new HashMap();
         props.put("throwException", "true");
@@ -55,7 +59,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
         return builder;
     }
 
-    public void testClientTransformerException() throws Exception {
+    public void testClientTransformerException() throws Exception
+    {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
@@ -65,7 +70,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
         assertTrue(exceptionPayload.getRootException() instanceof TransformerException);
     }
 
-    public void testClientMalformedEndpointException() throws Exception {
+    public void testClientMalformedEndpointException() throws Exception
+    {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
@@ -75,7 +81,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase {
         assertTrue(exceptionPayload.getRootException() instanceof MalformedEndpointException);
     }
 
-    public void testClientComponentException() throws Exception {
+    public void testClientComponentException() throws Exception
+    {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
         UMOMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);

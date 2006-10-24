@@ -18,16 +18,18 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ClientBridgeTestCase extends FunctionalTestCase {
+public class ClientBridgeTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/usecases/axis/clientbridge/client-mule-config.xml";
     }
 
-    public void testBridgeVMToAxis () throws Exception {
+    public void testBridgeVMToAxis() throws Exception
+    {
         MuleClient client = new MuleClient();
-        UMOMessage message =
-          client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
+        UMOMessage message = client.send("vm://complexRequest", new ComplexData("Foo", new Integer(84)), null);
 
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof ComplexData);

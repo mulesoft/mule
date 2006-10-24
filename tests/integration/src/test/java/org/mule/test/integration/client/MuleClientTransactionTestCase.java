@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.client;
 
 import org.mule.config.MuleProperties;
@@ -32,41 +33,43 @@ import java.util.Map;
 public class MuleClientTransactionTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
-    
-    public void testTransactionsWithSetRollbackOnly() throws Exception 
+
+    public void testTransactionsWithSetRollbackOnly() throws Exception
     {
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        
+
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        while (client.receive("jms://replyTo.queue", 2000) != null)
+        {
             // slurp
         }
-        
-        
-        
+
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-        
-        //This enpoint needs to be registered prior to use cause we need to set
-        //the transaction config so that the endpoint will "know" it is transacted
-        //and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint=(new MuleEndpoint("jms://test.queue",false));
+
+        // This enpoint needs to be registered prior to use cause we need to set
+        // the transaction config so that the endpoint will "know" it is transacted
+        // and not close the session itself but leave it up to the transaction.
+        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
         inboundEndpoint.setTransactionConfig(tc);
         inboundEndpoint.setName("TransactedTest.Queue");
         client.getManager().registerEndpoint(inboundEndpoint);
-        
+
         TransactionTemplate tt = new TransactionTemplate(tc, null);
-        tt.execute(new TransactionCallback() {
+        tt.execute(new TransactionCallback()
+        {
             public Object doInTransaction() throws Exception
             {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 100; i++)
+                {
                     client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
                 }
                 UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -75,109 +78,122 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 return null;
             }
         });
-        
+
         UMOMessage result = client.receive("jms://replyTo.queue", 2000);
         assertNull(result);
     }
 
-    public void testTransactionsWithExceptionThrown() throws Exception 
+    public void testTransactionsWithExceptionThrown() throws Exception
     {
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        
+
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        while (client.receive("jms://replyTo.queue", 2000) != null)
+        {
             // hmm..mesages
         }
 
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-        
-        //This enpoint needs to be registered prior to use cause we need to set
-        //the transaction config so that the endpoint will "know" it is transacted
-        //and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint=(new MuleEndpoint("jms://test.queue",false));
+
+        // This enpoint needs to be registered prior to use cause we need to set
+        // the transaction config so that the endpoint will "know" it is transacted
+        // and not close the session itself but leave it up to the transaction.
+        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
         inboundEndpoint.setTransactionConfig(tc);
         inboundEndpoint.setName("TransactedTest.Queue");
         client.getManager().registerEndpoint(inboundEndpoint);
-        
+
         TransactionTemplate tt = new TransactionTemplate(tc, null);
-        try {
-            tt.execute(new TransactionCallback() {
+        try
+        {
+            tt.execute(new TransactionCallback()
+            {
                 public Object doInTransaction() throws Exception
                 {
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 100; i++)
+                    {
                         client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
                     }
                     throw new Exception();
                 }
             });
             fail();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // this is ok
         }
-        
+
         UMOMessage result = client.receive("jms://replyTo.queue", 2000);
         assertNull(result);
     }
 
-    public void testTransactionsWithCommit() throws Exception 
+    public void testTransactionsWithCommit() throws Exception
     {
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         props.put("transacted", "true");
-        
+
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        while (client.receive("jms://replyTo.queue", 2000) != null)
+        {
             // yum!
         }
 
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-        
-        //This enpoint needs to be registered prior to use cause we need to set
-        //the transaction config so that the endpoint will "know" it is transacted
-        //and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint=(new MuleEndpoint("jms://test.queue",false));
+
+        // This enpoint needs to be registered prior to use cause we need to set
+        // the transaction config so that the endpoint will "know" it is transacted
+        // and not close the session itself but leave it up to the transaction.
+        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
         inboundEndpoint.setTransactionConfig(tc);
         inboundEndpoint.setName("TransactedTest.Queue");
         client.getManager().registerEndpoint(inboundEndpoint);
-        
+
         TransactionTemplate tt = new TransactionTemplate(tc, null);
-        tt.execute(new TransactionCallback() {
-            public Object doInTransaction() throws Exception 
+        tt.execute(new TransactionCallback()
+        {
+            public Object doInTransaction() throws Exception
             {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 100; i++)
+                {
                     client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
                 }
                 return null;
             }
         });
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             UMOMessage result = client.receive("jms://replyTo.queue", 2000);
             assertNotNull(result);
         }
         UMOMessage result = client.receive("jms://replyTo.queue", 2000);
         assertNull(result);
     }
-    
-    protected void emptyReplyQueue() throws Exception {
+
+    protected void emptyReplyQueue() throws Exception
+    {
         final MuleClient client = new MuleClient();
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate tt = new TransactionTemplate(tc, null);
-        tt.execute(new TransactionCallback() {
-            public Object doInTransaction() throws Exception 
+        tt.execute(new TransactionCallback()
+        {
+            public Object doInTransaction() throws Exception
             {
-                while (client.receive("jms://replyTo.queue", 2000) != null) {
+                while (client.receive("jms://replyTo.queue", 2000) != null)
+                {
                     // munch..
                 }
 

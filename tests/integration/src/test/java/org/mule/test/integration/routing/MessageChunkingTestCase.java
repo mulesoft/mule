@@ -26,10 +26,11 @@ import org.mule.util.concurrent.Latch;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MessageChunkingTestCase  extends FunctionalTestCase {
+public class MessageChunkingTestCase extends FunctionalTestCase
+{
 
-
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "org/mule/test/integration/routing/message-chunking.xml";
     }
 
@@ -45,9 +46,10 @@ public class MessageChunkingTestCase  extends FunctionalTestCase {
 
     public void testMessageChunkingWith100Splits() throws Exception
     {
-        doMessageChunking("0123456789012345678901234567890123456789012345678901234567890123456789" +
-                "01234567890123456789012345678901234567890123456789012345678901234567890123456789" +
-                "01234567890123456789012345678901234567890123456789", 100);
+        doMessageChunking(
+            "0123456789012345678901234567890123456789012345678901234567890123456789"
+                            + "01234567890123456789012345678901234567890123456789012345678901234567890123456789"
+                            + "01234567890123456789012345678901234567890123456789", 100);
     }
 
     public void testMessageChunkingOneChunk() throws Exception
@@ -55,15 +57,18 @@ public class MessageChunkingTestCase  extends FunctionalTestCase {
         doMessageChunking("x", 1);
     }
 
-    protected void doMessageChunking(final String data,  int partsCount) throws Exception
+    protected void doMessageChunking(final String data, int partsCount) throws Exception
     {
         final AtomicInteger messagePartsCount = new AtomicInteger(0);
         final Latch chunkingReceiverLatch = new Latch();
 
         // Listen to events fired by the ChunkingReceiver component
-        MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                // Not strictly necessary to test for this as when we register the listener we
+        MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                // Not strictly necessary to test for this as when we register the
+                // listener we
                 // supply the ComponentName as the subscription filter
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
                 // Test that we have received all chunks in the correct order
@@ -73,11 +78,15 @@ public class MessageChunkingTestCase  extends FunctionalTestCase {
             }
         }, "ChunkingReceiver");
 
-        // Listen to Message Notifications on the Chunking receiver so we can determine how
+        // Listen to Message Notifications on the Chunking receiver so we can
+        // determine how
         // many message parts have been received
-        MuleManager.getInstance().registerListener(new MessageNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                if(notification.getAction() == MessageNotification.MESSAGE_RECEIVED) {
+        MuleManager.getInstance().registerListener(new MessageNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == MessageNotification.MESSAGE_RECEIVED)
+                {
                     messagePartsCount.getAndIncrement();
                 }
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
