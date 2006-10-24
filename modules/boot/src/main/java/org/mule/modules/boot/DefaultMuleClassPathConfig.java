@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.modules.boot;
 
 import java.io.File;
@@ -19,8 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Constructs a default set of JAR Urls located under
- * Mule home folder.
+ * Constructs a default set of JAR Urls located under Mule home folder.
  */
 public class DefaultMuleClassPathConfig
 {
@@ -40,12 +40,14 @@ public class DefaultMuleClassPathConfig
         muleHome = System.getProperty("mule.home");
         if (muleHome == null || muleHome.trim().length() == 0)
         {
-            throw new IllegalArgumentException("Either MULE_HOME is not set or mule.home system property is missing.");
+            throw new IllegalArgumentException(
+                "Either MULE_HOME is not set or mule.home system property is missing.");
         }
 
         try
         {
-            // if trailing slash is specified, the folder will be added (e.g. for properties files)
+            // if trailing slash is specified, the folder will be added (e.g. for
+            // properties files)
             addURL(new URL("file:///" + muleHome + FOLDER_USER + "/"));
             addURL(new URL("file:///" + muleHome + FOLDER_MULE + "/"));
             addURL(new URL("file:///" + muleHome + FOLDER_OPT + "/"));
@@ -79,10 +81,9 @@ public class DefaultMuleClassPathConfig
 
     }
 
-
     /**
      * Getter for property 'urls'.
-     *
+     * 
      * @return A copy of 'urls'. Items are java.net.URL
      */
     public List getURLs()
@@ -92,7 +93,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Setter for property 'urls'.
-     *
+     * 
      * @param urls Value to set for property 'urls'.
      */
     public void addURLs(List urls)
@@ -105,6 +106,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Add a URL to Mule's classpath.
+     * 
      * @param url folder (should end with a slash) or jar path
      */
     public void addURL(URL url)
@@ -114,6 +116,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Find and if necessary filter the jars for classpath.
+     * 
      * @param muleSubfolder folder under Mule home to list
      * @return a list
      */
@@ -140,4 +143,3 @@ public class DefaultMuleClassPathConfig
         return jars == null ? new File[0] : jars;
     }
 }
-

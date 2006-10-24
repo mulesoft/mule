@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.interceptors;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -21,14 +22,12 @@ import java.util.List;
 
 /**
  * <code>JXPathNormalizerInterceptor</code> can be used as a simple pre/post
- * message transformer for a given component. <p/> Users can set JXPath
- * expressions to execute before and after the component reeives the event. The
- * <i>beforeExpressions</i> can be a single expression or a comma separated
- * list of expressions, each of which result in an object that will be used as
- * an argument to the method called on the component.
- * 
- * The <i>afterExpression</i> is a single expression that will be used to set a
- * value on the orginal payload.
+ * message transformer for a given component. <p/> Users can set JXPath expressions
+ * to execute before and after the component reeives the event. The
+ * <i>beforeExpressions</i> can be a single expression or a comma separated list of
+ * expressions, each of which result in an object that will be used as an argument to
+ * the method called on the component. The <i>afterExpression</i> is a single
+ * expression that will be used to set a value on the orginal payload.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -46,15 +45,20 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
      */
     public UMOMessage before(Invocation invocation) throws UMOException
     {
-        if (beforeExpressions != null && beforeExpressionsList.size() > 0) {
+        if (beforeExpressions != null && beforeExpressionsList.size() > 0)
+        {
             JXPathContext ctx = JXPathContext.newContext(getOriginalPayload());
             Object[] result = new Object[beforeExpressionsList.size()];
-            for (int i = 0; i < result.length; i++) {
-                result[i] = ctx.getValue((String) beforeExpressionsList.get(i));
+            for (int i = 0; i < result.length; i++)
+            {
+                result[i] = ctx.getValue((String)beforeExpressionsList.get(i));
             }
-            if (result.length == 1) {
+            if (result.length == 1)
+            {
                 return new MuleMessage(result[0], invocation.getMessage());
-            } else {
+            }
+            else
+            {
                 return new MuleMessage(result, invocation.getMessage());
             }
         }
@@ -68,7 +72,8 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
      */
     public UMOMessage after(Invocation invocation) throws UMOException
     {
-        if (afterExpression != null) {
+        if (afterExpression != null)
+        {
             JXPathContext ctx = JXPathContext.newContext(getOriginalPayload());
             ctx.setValue(afterExpression, invocation.getMessage().getPayload());
             return new MuleMessage(getOriginalPayload(), invocation.getMessage());
@@ -86,7 +91,8 @@ public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
         this.beforeExpressions = beforeExpressions;
         String[] exp = StringUtils.splitAndTrim(beforeExpressions, ",");
         this.beforeExpressionsList = new ArrayList(exp.length);
-        for (int i = 0; i < exp.length; i++) {
+        for (int i = 0; i < exp.length; i++)
+        {
             this.beforeExpressionsList.add(exp[i]);
 
         }

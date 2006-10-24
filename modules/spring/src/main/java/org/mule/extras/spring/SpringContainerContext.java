@@ -90,7 +90,8 @@ public class SpringContainerContext extends AbstractContainerContext implements 
      */
     public BeanFactory getBeanFactory()
     {
-        if (externalBeanFactory != null) {
+        if (externalBeanFactory != null)
+        {
             return externalBeanFactory;
         }
         return beanFactory;
@@ -103,14 +104,17 @@ public class SpringContainerContext extends AbstractContainerContext implements 
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        if (getBeanFactory() == null) {
+        if (getBeanFactory() == null)
+        {
             throw new IllegalStateException("Spring Application context has not been set");
         }
-        if (key == null) {
+        if (key == null)
+        {
             throw new ObjectNotFoundException("Component not found for null key");
         }
 
-        if (key instanceof Class) {
+        if (key instanceof Class)
+        {
             // We will assume that there should only be one object of
             // this class in the container for now
             // String[] names = getBeanFactory().getBeanDefinitionNames((Class)
@@ -118,16 +122,19 @@ public class SpringContainerContext extends AbstractContainerContext implements 
             // if (names == null || names.length == 0 || names.length > 1)
             // {
             throw new ObjectNotFoundException("The container is unable to build single instance of "
-                    + ((Class) key).getName() + " number of instances found was: 0");
+                                              + ((Class)key).getName() + " number of instances found was: 0");
             // }
             // else
             // {
             // key = names[0];
             // }
         }
-        try {
+        try
+        {
             return getBeanFactory().getBean(key.toString());
-        } catch (BeansException e) {
+        }
+        catch (BeansException e)
+        {
             throw new ObjectNotFoundException("Component not found for key: " + key.toString(), e);
         }
     }
@@ -153,68 +160,86 @@ public class SpringContainerContext extends AbstractContainerContext implements 
 
     /**
      * Configure Spring by passing an in-memory XML Spring config.
+     * 
      * @param configurationXmlAsString XML config contents
      * @throws ContainerException in case of any error
      */
-    public void configure(String configurationXmlAsString) throws ContainerException {
+    public void configure(String configurationXmlAsString) throws ContainerException
+    {
         final String encoding = MuleManager.getConfiguration().getEncoding();
-        try {
+        try
+        {
             BeanFactory bf = new XmlBeanFactory(new CachedResource(configurationXmlAsString, encoding));
             setExternalBeanFactory(bf);
-        } catch (UnsupportedEncodingException e) {
-            final Message message = new Message(
-                                            "core",
-                                            CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING,
-                                            encoding);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            final Message message = new Message("core",
+                CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, encoding);
             throw new ContainerException(message, e);
         }
     }
 
     public void initialise() throws InitialisationException
     {
-        if (configFile == null) {
-            if(configuration!=null) {
-                try {
+        if (configFile == null)
+        {
+            if (configuration != null)
+            {
+                try
+                {
                     configure(configuration);
                     return;
-                } catch (ContainerException e) {
+                }
+                catch (ContainerException e)
+                {
                     throw new InitialisationException(e, this);
                 }
-            } else {
+            }
+            else
+            {
                 return;
             }
         }
 
-        try {
-            if (ClassUtils.getResource(configFile, getClass()) == null) {
+        try
+        {
+            if (ClassUtils.getResource(configFile, getClass()) == null)
+            {
                 logger.warn("Spring config resource: " + configFile
-                        + " not found on class path, attempting to load it from local file");
+                            + " not found on class path, attempting to load it from local file");
                 setExternalBeanFactory(new FileSystemXmlApplicationContext(configFile));
-            } else {
+            }
+            else
+            {
                 logger.info("Loading Spring config from classpath, resource is: " + configFile);
                 setExternalBeanFactory(new ClassPathXmlApplicationContext(configFile));
             }
-        } catch (BeansException e) {
+        }
+        catch (BeansException e)
+        {
             throw new InitialisationException(new ConfigurationException(new Message(Messages.FAILED_LOAD_X,
-                                                                                     "Application Context: "
-                                                                                             + configFile), e), this);
+                "Application Context: " + configFile), e), this);
         }
     }
 
     public void dispose()
     {
-        if (externalBeanFactory instanceof ConfigurableApplicationContext) {
-            ((ConfigurableApplicationContext) externalBeanFactory).close();
+        if (externalBeanFactory instanceof ConfigurableApplicationContext)
+        {
+            ((ConfigurableApplicationContext)externalBeanFactory).close();
         }
         super.dispose();
 
     }
 
-    public String getConfiguration() {
+    public String getConfiguration()
+    {
         return configuration;
     }
 
-    public void setConfiguration(String configuration) {
+    public void setConfiguration(String configuration)
+    {
         this.configuration = configuration;
     }
 

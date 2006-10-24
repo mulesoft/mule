@@ -7,13 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.mbeans;
 
-
-
 /**
- * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for
- * the Mule server configuration
+ * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the
+ * Mule server configuration
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

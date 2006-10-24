@@ -33,8 +33,8 @@ public class MuleCallbackHandler implements CallbackHandler
     public MuleCallbackHandler(UMOAuthentication authentication)
     {
         this.authentication = authentication;
-        this.username = (String) this.authentication.getPrincipal();
-        this.password = (String) this.authentication.getCredentials();
+        this.username = (String)this.authentication.getPrincipal();
+        this.password = (String)this.authentication.getCredentials();
     }
 
     /**
@@ -44,7 +44,7 @@ public class MuleCallbackHandler implements CallbackHandler
      * 
      * @param callbacks
      * @throws IOException
-     * @throws UnsupportedCallbackException 
+     * @throws UnsupportedCallbackException
      */
     public final void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
@@ -52,18 +52,17 @@ public class MuleCallbackHandler implements CallbackHandler
         {
             if (callbacks[i] instanceof NameCallback)
             {
-                NameCallback nameCb = (NameCallback) callbacks[i];
+                NameCallback nameCb = (NameCallback)callbacks[i];
                 nameCb.setName(username);
             }
             else if (callbacks[i] instanceof PasswordCallback)
             {
-                PasswordCallback passCb = (PasswordCallback) callbacks[i];
+                PasswordCallback passCb = (PasswordCallback)callbacks[i];
                 passCb.setPassword(password.toCharArray());
             }
             else
             {
-                throw (new UnsupportedCallbackException(callbacks[i],
-                    "Callback class not supported"));
+                throw (new UnsupportedCallbackException(callbacks[i], "Callback class not supported"));
             }
         }
     }

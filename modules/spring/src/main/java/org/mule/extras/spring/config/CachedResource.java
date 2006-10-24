@@ -17,48 +17,49 @@ import java.io.UnsupportedEncodingException;
 
 import org.springframework.core.io.AbstractResource;
 
-
 /**
- * Spring 2.x is picky about open/closed input streams, as it
- * requires a closed stream (fully read resource) to enable
- * automatic validation detection (DTD or XSD). Otherwise, a caller
- * has to specify the mode explicitly.
- * <p/>
- * Code relying on Spring 1.2.x behavior may now break with
- * {@link org.springframework.beans.factory.BeanDefinitionStoreException}.
- *  This class is called in
- * to remedy this and should be used instead of, e.g.
- * {@link org.springframework.core.io.InputStreamResource}.
- * <p/>
- * The resource is fully stored in memory.
- *
+ * Spring 2.x is picky about open/closed input streams, as it requires a closed
+ * stream (fully read resource) to enable automatic validation detection (DTD or
+ * XSD). Otherwise, a caller has to specify the mode explicitly. <p/> Code relying on
+ * Spring 1.2.x behavior may now break with
+ * {@link org.springframework.beans.factory.BeanDefinitionStoreException}. This
+ * class is called in to remedy this and should be used instead of, e.g.
+ * {@link org.springframework.core.io.InputStreamResource}. <p/> The resource is
+ * fully stored in memory.
+ * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public class CachedResource extends AbstractResource {
+public class CachedResource extends AbstractResource
+{
 
     private static final String DEFAULT_DESCRIPTION = "cached in-memory resource";
 
     private byte[] buffer;
     private String description;
 
-    public CachedResource(byte[] source) {
+    public CachedResource(byte[] source)
+    {
         this(source, null);
     }
 
-    public CachedResource(String source, String encoding) throws UnsupportedEncodingException {
+    public CachedResource(String source, String encoding) throws UnsupportedEncodingException
+    {
         this(source.trim().getBytes(encoding), DEFAULT_DESCRIPTION);
     }
 
-    public CachedResource(byte[] source, String description) {
+    public CachedResource(byte[] source, String description)
+    {
         this.buffer = source;
         this.description = description;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return (description == null) ? "" : description;
     }
 
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws IOException
+    {
         // This HAS to be a new InputStream, otherwise SAX
         // parser breaks with 'Premature end of file at line -1"
         // This behavior is not observed with Spring pre-2.x

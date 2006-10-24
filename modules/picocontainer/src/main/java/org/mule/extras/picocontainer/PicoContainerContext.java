@@ -30,9 +30,9 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.SimpleReference;
 
 /**
- * <code>PicoContainerContext</code> is a Pico Context that can expose
- * pico-managed components for use in the Mule framework.
- *
+ * <code>PicoContainerContext</code> is a Pico Context that can expose pico-managed
+ * components for use in the Mule framework.
+ * 
  * @author <a href="mailto:antonio.lopez@4clerks.com">Antonio Lopez</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -69,35 +69,45 @@ public class PicoContainerContext extends AbstractContainerContext
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        if (container == null) {
+        if (container == null)
+        {
             throw new IllegalStateException("Pico container has not been set");
         }
-        if (key == null) {
+        if (key == null)
+        {
             throw new ObjectNotFoundException("Component not found for null key");
         }
 
-        if(key instanceof ContainerKeyPair) {
+        if (key instanceof ContainerKeyPair)
+        {
             key = ((ContainerKeyPair)key).getKey();
         }
 
         Object component = null;
-        if (key instanceof String) {
-            try {
-                Class keyClass = ClassUtils.loadClass((String) key, getClass());
+        if (key instanceof String)
+        {
+            try
+            {
+                Class keyClass = ClassUtils.loadClass((String)key, getClass());
                 component = container.getComponentInstance(keyClass);
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e)
+            {
                 component = container.getComponentInstance(key);
             }
-        } else {
+        }
+        else
+        {
             component = container.getComponentInstance(key);
         }
 
-        if (component == null) {
+        if (component == null)
+        {
             throw new ObjectNotFoundException("Component not found for key: " + key.toString());
         }
         return component;
@@ -121,7 +131,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
     /**
      * The config file can be a resource on the classpath on a file system.
-     *
+     * 
      * @param configFile The configFile to set.
      */
     public void setConfigFile(String configFile) throws PicoCompositionException
@@ -141,18 +151,19 @@ public class PicoContainerContext extends AbstractContainerContext
         org.picocontainer.defaults.ObjectReference containerRef = new SimpleReference();
         org.picocontainer.defaults.ObjectReference parentContainerRef = new SimpleReference();
         ScriptedContainerBuilderFactory scriptedContainerBuilderFactory = null;
-        try {
+        try
+        {
             scriptedContainerBuilderFactory = new ScriptedContainerBuilderFactory(configReader,
-                                                                                  builderClassName,
-                                                                                  Thread.currentThread()
-                                                                                        .getContextClassLoader());
-        } catch (ClassNotFoundException e) {
+                builderClassName, Thread.currentThread().getContextClassLoader());
+        }
+        catch (ClassNotFoundException e)
+        {
             throw new ContainerException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER), e);
         }
 
         ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();
         builder.buildContainer(containerRef, parentContainerRef, null, false);
-        setContainer((MutablePicoContainer) containerRef.get());
+        setContainer((MutablePicoContainer)containerRef.get());
     }
 
     private String getBuilderClassName(String scriptName)
@@ -163,23 +174,28 @@ public class PicoContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if (configFile == null) {
+        if (configFile == null)
+        {
             return;
         }
-        try {
+        try
+        {
             String builderClassName = getBuilderClassName(configFile);
             String configString = IOUtils.getResourceAsString(configFile, getClass());
             StringReader configReader = new StringReader(configString);
             doConfigure(configReader, builderClassName);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new PicoCompositionException(e);
         }
     }
 
     public void dispose()
     {
-        if (container != null) {
+        if (container != null)
+        {
             container.dispose();
         }
     }

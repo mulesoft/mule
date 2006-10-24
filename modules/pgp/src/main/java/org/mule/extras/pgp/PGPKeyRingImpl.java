@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import java.io.InputStream;
@@ -26,7 +27,6 @@ import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- *
  */
 public class PGPKeyRingImpl implements PGPKeyRing
 {
@@ -83,7 +83,7 @@ public class PGPKeyRingImpl implements PGPKeyRing
     {
         InputStream in = IOUtils.getResourceAsStream(secretKeyRingFileName, getClass());
 
-        ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
+        ExtendedKeyStore ring = (ExtendedKeyStore)ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);
 
         in.close();
@@ -114,12 +114,13 @@ public class PGPKeyRingImpl implements PGPKeyRing
 
     public KeyBundle getKeyBundle(String principalId)
     {
-        return (KeyBundle) principalsKeyBundleMap.get(principalId);
+        return (KeyBundle)principalsKeyBundleMap.get(principalId);
     }
 
     public void initialise() throws InitialisationException
     {
-        try {
+        try
+        {
             java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
             java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
 
@@ -127,10 +128,12 @@ public class PGPKeyRingImpl implements PGPKeyRing
 
             readPublicKeyRing();
             readPrivateKeyBundle();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.error("errore in inizializzazione:" + e.getMessage(), e);
             throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                                                                               "PGPKeyRingImpl"), e);
+                "PGPKeyRingImpl"), e);
         }
     }
 
@@ -139,18 +142,21 @@ public class PGPKeyRingImpl implements PGPKeyRing
         logger.debug(System.getProperties().get("user.dir"));
         InputStream in = IOUtils.getResourceAsStream(publicKeyRingFileName, getClass());
 
-        ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
+        ExtendedKeyStore ring = (ExtendedKeyStore)ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
         ring.load(in, null);
         in.close();
 
-        for (Enumeration e = ring.aliases(); e.hasMoreElements();) {
-            String aliasId = (String) e.nextElement();
+        for (Enumeration e = ring.aliases(); e.hasMoreElements();)
+        {
+            String aliasId = (String)e.nextElement();
 
             KeyBundle bundle = ring.getKeyBundle(aliasId);
 
-            if (bundle != null) {
-                for (Iterator users = bundle.getPrincipals(); users.hasNext();) {
-                    Principal princ = (Principal) users.next();
+            if (bundle != null)
+            {
+                for (Iterator users = bundle.getPrincipals(); users.hasNext();)
+                {
+                    Principal princ = (Principal)users.next();
 
                     principalsKeyBundleMap.put(princ.getName(), bundle);
                 }

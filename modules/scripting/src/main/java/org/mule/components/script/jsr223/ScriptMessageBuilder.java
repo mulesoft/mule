@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.script.jsr223;
 
 import org.mule.components.builder.AbstractMessageBuilder;
@@ -25,39 +26,48 @@ import javax.script.ScriptException;
 
 /**
  * A message builder component that can execute message building as a script
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable {
+public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable
+{
 
     /** Delegating script component that actually does the work */
     protected Scriptable scriptable;
 
-    public ScriptMessageBuilder() {
+    public ScriptMessageBuilder()
+    {
         this.scriptable = new Scriptable();
     }
 
-    public Object buildMessage(UMOMessage request, UMOMessage response) throws MessageBuilderException {
+    public Object buildMessage(UMOMessage request, UMOMessage response) throws MessageBuilderException
+    {
         Namespace namespace = scriptable.getScriptEngine().createNamespace();
         populateNamespace(namespace, request, response);
         Object result = null;
-        try {
+        try
+        {
             result = runScript(namespace);
-        } catch (ScriptException e) {
+        }
+        catch (ScriptException e)
+        {
             throw new MessageBuilderException(response, e);
         }
-        if (result == null) {
+        if (result == null)
+        {
             throw new NullPointerException("A result payload must be returned from the groovy script");
         }
         return result;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
         scriptable.initialise();
     }
 
-    protected void populateNamespace(Namespace namespace, UMOMessage request, UMOMessage response) {
+    protected void populateNamespace(Namespace namespace, UMOMessage request, UMOMessage response)
+    {
         namespace.put("request", request);
         namespace.put("response", response);
         namespace.put("descriptor", descriptor);
@@ -65,43 +75,53 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         namespace.put("log", logger);
     }
 
-    public ScriptEngine getScriptEngine() {
+    public ScriptEngine getScriptEngine()
+    {
         return scriptable.getScriptEngine();
     }
 
-    public void setScriptEngine(ScriptEngine scriptEngine) {
+    public void setScriptEngine(ScriptEngine scriptEngine)
+    {
         scriptable.setScriptEngine(scriptEngine);
     }
 
-    public CompiledScript getCompiledScript() {
+    public CompiledScript getCompiledScript()
+    {
         return scriptable.getCompiledScript();
     }
 
-    public void setCompiledScript(CompiledScript compiledScript) {
+    public void setCompiledScript(CompiledScript compiledScript)
+    {
         scriptable.setCompiledScript(compiledScript);
     }
 
-    public String getScriptText() {
+    public String getScriptText()
+    {
         return scriptable.getScriptText();
     }
 
-    public void setScriptText(String scriptText) {
+    public void setScriptText(String scriptText)
+    {
         scriptable.setScriptText(scriptText);
     }
 
-    public String getScriptFile() {
+    public String getScriptFile()
+    {
         return scriptable.getScriptFile();
     }
 
-    public void setScriptFile(String scriptFile) {
+    public void setScriptFile(String scriptFile)
+    {
         scriptable.setScriptFile(scriptFile);
     }
 
-    public void setScriptEngineName(String scriptEngineName) {
+    public void setScriptEngineName(String scriptEngineName)
+    {
         scriptable.setScriptEngineName(scriptEngineName);
     }
 
-    protected void populateNamespace(Namespace namespace, UMOEventContext context) {
+    protected void populateNamespace(Namespace namespace, UMOEventContext context)
+    {
         namespace.put("context", context);
         namespace.put("message", context.getMessage());
         namespace.put("descriptor", context.getComponentDescriptor());
@@ -110,19 +130,23 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         namespace.put("result", new Object());
     }
 
-    protected void compileScript(Compilable compilable) throws ScriptException {
+    protected void compileScript(Compilable compilable) throws ScriptException
+    {
         scriptable.compileScript(compilable);
     }
 
-    protected Object evaluteScript(Namespace namespace) throws ScriptException {
+    protected Object evaluteScript(Namespace namespace) throws ScriptException
+    {
         return scriptable.evaluteScript(namespace);
     }
 
-    protected Object runScript(Namespace namespace) throws ScriptException {
+    protected Object runScript(Namespace namespace) throws ScriptException
+    {
         return scriptable.runScript(namespace);
     }
 
-    protected ScriptEngine createScriptEngine() {
+    protected ScriptEngine createScriptEngine()
+    {
         return scriptable.createScriptEngine();
     }
 

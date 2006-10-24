@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.mbeans;
 
 import org.mule.umo.UMOException;
@@ -18,9 +19,8 @@ import org.mule.util.ObjectNameHelper;
 import java.beans.ExceptionListener;
 
 /**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * 
- * $Id$
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
+ *         ConnectorService.java 3183 2006-09-23 09:27:47Z rossmason $
  */
 public class ConnectorService implements ConnectorServiceMBean
 {
@@ -68,14 +68,12 @@ public class ConnectorService implements ConnectorServiceMBean
         return connector.getDispatcherFactory();
     }
 
-    public void startConnector()
-            throws UMOException
+    public void startConnector() throws UMOException
     {
         connector.startConnector();
     }
 
-    public void stopConnector()
-            throws UMOException
+    public void stopConnector() throws UMOException
     {
         connector.stopConnector();
     }

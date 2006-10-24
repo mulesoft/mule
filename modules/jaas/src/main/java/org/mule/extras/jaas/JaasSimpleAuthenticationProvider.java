@@ -182,20 +182,20 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
     }
 
     /**
-     * The authenticate method first creates the jaas Login Context using the callback 
-     * handler and the name of the class or directory to prtect. If the Login Context 
-     * is successfully created, it will then attempt to login.
+     * The authenticate method first creates the jaas Login Context using the
+     * callback handler and the name of the class or directory to prtect. If the
+     * Login Context is successfully created, it will then attempt to login.
      * 
      * @param UMOAuthentication
      * @return UMOAuthentication
-     * @throws org.mule.umo.security.SecurityException 
+     * @throws org.mule.umo.security.SecurityException
      */
     public final UMOAuthentication authenticate(UMOAuthentication authentication)
         throws org.mule.umo.security.SecurityException
     {
 
         LoginContext loginContext;
-        MuleAuthentication auth = (MuleAuthentication) authentication;
+        MuleAuthentication auth = (MuleAuthentication)authentication;
 
         // Create the Mule Callback Handler
         MuleCallbackHandler cbh = new MuleCallbackHandler(auth);
@@ -312,8 +312,8 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message(
-                Messages.FAILED_TO_CREATE_X, "JaasProvider"), e);
+            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
+                "JaasProvider"), e);
         }
     }
 
@@ -371,8 +371,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
                 throw new NullPointerException("applicationName passed in was null.");
             }
 
-            AppConfigurationEntry entry = (AppConfigurationEntry) appConfigEntries
-                .get(applicationName);
+            AppConfigurationEntry entry = (AppConfigurationEntry)appConfigEntries.get(applicationName);
             if (entry == null)
             {
                 return new AppConfigurationEntry[]{};

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import cryptix.message.Message;
@@ -26,7 +27,6 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * @author ariva
- * 
  */
 public class PGPSecurityProvider implements UMOSecurityProvider
 {
@@ -63,31 +63,38 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      */
     public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
     {
-        PGPAuthentication auth = (PGPAuthentication) authentication;
+        PGPAuthentication auth = (PGPAuthentication)authentication;
 
-        String userId = (String) auth.getPrincipal();
+        String userId = (String)auth.getPrincipal();
 
-        if (userId == null) {
+        if (userId == null)
+        {
             throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "UserId"));
         }
 
         KeyBundle userKeyBundle = keyManager.getKeyBundle(userId);
 
-        if (userKeyBundle == null) {
+        if (userKeyBundle == null)
+        {
             throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 1, userId));
         }
 
-        Message msg = (Message) auth.getCredentials();
+        Message msg = (Message)auth.getCredentials();
 
-        if (!((msg != null) && msg instanceof SignedMessage)) {
+        if (!((msg != null) && msg instanceof SignedMessage))
+        {
             throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 2));
         }
 
-        try {
-            if (!((SignedMessage) msg).verify(userKeyBundle)) {
+        try
+        {
+            if (!((SignedMessage)msg).verify(userKeyBundle))
+            {
                 throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 3));
             }
-        } catch (MessageException e) {
+        }
+        catch (MessageException e)
+        {
             throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 4), e);
         }
 
@@ -112,7 +119,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#createSecurityContext(org.mule.umo.security.UMOAuthentication)
      */
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException
+    public UMOSecurityContext createSecurityContext(UMOAuthentication auth)
+        throws UnknownAuthenticationTypeException
     {
         return factory.create(auth);
     }
@@ -124,14 +132,17 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      */
     public void initialise() throws InitialisationException
     {
-        try {
+        try
+        {
             java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
             java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
 
             factory = new PGPSecurityContextFactory();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                                                                               "PGPProvider"), e);
+                "PGPProvider"), e);
         }
     }
 

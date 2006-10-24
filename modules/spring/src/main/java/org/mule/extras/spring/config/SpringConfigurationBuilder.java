@@ -26,86 +26,100 @@ import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 /**
- * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from as
- * Spring context. Multiple configuration files can be loaded from this builder
- * (specified as a comma-separated list) the files can be String Beans documents
- * or Mule Xml Documents or a combination of both.
- *
- * Any Mule Xml documents will be transformed at run-time in to Spring Bean
- * documents before the bean definitions are loaded. Make sure that the DTD
- * definitions for each of the document types are declared in the documents.
- *
+ * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from as Spring
+ * context. Multiple configuration files can be loaded from this builder (specified
+ * as a comma-separated list) the files can be String Beans documents or Mule Xml
+ * Documents or a combination of both. Any Mule Xml documents will be transformed at
+ * run-time in to Spring Bean documents before the bean definitions are loaded. Make
+ * sure that the DTD definitions for each of the document types are declared in the
+ * documents.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {
     /**
-     * Will configure a UMOManager based on the configurations made available
-     * through Readers.
-     *
+     * Will configure a UMOManager based on the configurations made available through
+     * Readers.
+     * 
      * @param configResources an array of Readers
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
-     *
      */
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
     {
         // just in case it's ever implemented
         return configure(configResources, null);
     }
+
     /**
-     *
-     * Will configure a UMOManager based on the configurations made available
-     * through Readers.
-     *
+     * Will configure a UMOManager based on the configurations made available through
+     * Readers.
+     * 
      * @param configResources an array of Readers
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
-     *
      */
-    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties) throws ConfigurationException
+    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties)
+        throws ConfigurationException
     {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public UMOManager configure(String configResources) throws ConfigurationException {
+    public UMOManager configure(String configResources) throws ConfigurationException
+    {
         return configure(configResources, null);
     }
 
-    public UMOManager configure(String configResource, String startupPropertiesFile) throws ConfigurationException {
+    public UMOManager configure(String configResource, String startupPropertiesFile)
+        throws ConfigurationException
+    {
         // Load startup properties if any.
-        if (StringUtils.isNotBlank(startupPropertiesFile)) {
-            try {
+        if (StringUtils.isNotBlank(startupPropertiesFile))
+        {
+            try
+            {
                 startupPropertiesFile = StringUtils.trimToEmpty(startupPropertiesFile);
-                Properties startupProperties = PropertiesUtils.loadProperties(startupPropertiesFile, getClass());
-                ((MuleManager) MuleManager.getInstance()).addProperties(startupProperties);
-            } catch (IOException e) {
-                throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X, "Mule server from builder"), e);
+                Properties startupProperties = PropertiesUtils.loadProperties(startupPropertiesFile,
+                    getClass());
+                ((MuleManager)MuleManager.getInstance()).addProperties(startupProperties);
+            }
+            catch (IOException e)
+            {
+                throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X,
+                    "Mule server from builder"), e);
             }
         }
 
-        if (configResource == null) {
+        if (configResource == null)
+        {
             throw new ConfigurationException(new Message(Messages.X_IS_NULL, "Configuration Resource"));
         }
-        String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;", true, true);
+        String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;",
+            true, true);
 
         MuleManager.getConfiguration().setConfigResources(resources);
         new MuleApplicationContext(resources);
-        try {
-            if(System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true").equalsIgnoreCase("true")) {
-                 MuleManager.getInstance().start();
+        try
+        {
+            if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
+                .equalsIgnoreCase("true"))
+            {
+                MuleManager.getInstance().start();
             }
-        } catch (UMOException e) {
-            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X, "Mule server from builder"), e);
+        }
+        catch (UMOException e)
+        {
+            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X,
+                "Mule server from builder"), e);
         }
         return MuleManager.getInstance();
     }
 
     /**
      * Indicate whether this ConfigurationBulder has been configured yet
-     *
-     * @return <code>true</code> if this ConfigurationBulder has been
-     *         configured
+     * 
+     * @return <code>true</code> if this ConfigurationBulder has been configured
      */
     public boolean isConfigured()
     {

@@ -70,8 +70,7 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
         return name;
     }
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication)
-        throws SecurityException
+    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
     {
         Authentication auth = null;
         if (authentication instanceof AcegiAuthenticationAdapter)
@@ -85,11 +84,10 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
 
         }
         auth = delegate.authenticate(auth);
-        return new AcegiAuthenticationAdapter(auth,getSecurityProperties());
+        return new AcegiAuthenticationAdapter(auth, getSecurityProperties());
     }
 
-    public Authentication authenticate(Authentication authentication)
-        throws AuthenticationException
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
         return delegate.authenticate(authentication);
     }

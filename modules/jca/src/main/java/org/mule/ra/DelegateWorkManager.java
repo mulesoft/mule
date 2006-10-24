@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.umo.UMOException;
@@ -39,7 +40,7 @@ public class DelegateWorkManager implements UMOWorkManager
     }
 
     public void doWork(Work work, long l, ExecutionContext executionContext, WorkListener workListener)
-            throws WorkException
+        throws WorkException
     {
         workManager.doWork(work, l, executionContext, workListener);
     }
@@ -50,7 +51,7 @@ public class DelegateWorkManager implements UMOWorkManager
     }
 
     public long startWork(Work work, long l, ExecutionContext executionContext, WorkListener workListener)
-            throws WorkException
+        throws WorkException
     {
         return workManager.startWork(work, l, executionContext, workListener);
     }
@@ -61,7 +62,7 @@ public class DelegateWorkManager implements UMOWorkManager
     }
 
     public void scheduleWork(Work work, long l, ExecutionContext executionContext, WorkListener workListener)
-            throws WorkException
+        throws WorkException
     {
         workManager.scheduleWork(work, l, executionContext, workListener);
     }

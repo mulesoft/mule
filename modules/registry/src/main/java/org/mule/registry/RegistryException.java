@@ -15,7 +15,7 @@ import org.mule.umo.UMOException;
 
 /**
  * Base Registry exception thrown when reading or writing to the registry
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -26,24 +26,29 @@ public class RegistryException extends UMOException
      */
     private static final long serialVersionUID = 7362073316934744362L;
 
-    public RegistryException(Message message) {
+    public RegistryException(Message message)
+    {
         super(message);
     }
 
-    public RegistryException(Message message, Throwable throwable) {
+    public RegistryException(Message message, Throwable throwable)
+    {
         super(message, throwable);
     }
 
-    public RegistryException(Throwable throwable) {
+    public RegistryException(Throwable throwable)
+    {
         super(throwable);
     }
 
-    //TODO remove
-    public RegistryException(String message) {
+    // TODO remove
+    public RegistryException(String message)
+    {
         super(Message.createStaticMessage(message));
     }
 
-    public RegistryException(String message, Throwable throwable) {
+    public RegistryException(String message, Throwable throwable)
+    {
         super(Message.createStaticMessage(message), throwable);
     }
 }

@@ -7,13 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- * 
  */
 public interface PGPKeyRing
 {

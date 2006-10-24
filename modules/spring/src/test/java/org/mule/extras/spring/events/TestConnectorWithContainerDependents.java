@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.events;
 
 import org.mule.tck.testmodels.fruit.Apple;
@@ -29,8 +30,10 @@ public class TestConnectorWithContainerDependents extends TestConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if (containerProp == null) {
-            throw new IllegalStateException("Initialise should not be called before all properties have been set");
+        if (containerProp == null)
+        {
+            throw new IllegalStateException(
+                "Initialise should not be called before all properties have been set");
         }
 
     }

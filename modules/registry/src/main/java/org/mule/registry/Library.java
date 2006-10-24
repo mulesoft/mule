@@ -15,7 +15,8 @@ import java.util.List;
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface Library extends Entry {
+public interface Library extends Entry
+{
 
     RegistryComponent[] getComponents();
 
@@ -33,7 +34,7 @@ public interface Library extends Entry {
 
     /**
      * Return the descriptor for this component.
-     *
+     * 
      * @return
      */
     RegistryDescriptor getDescriptor() throws RegistryException;

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.events;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
@@ -51,9 +52,12 @@ public class AsynchronousEventListener implements MuleEventListener
 
     public void onApplicationEvent(ApplicationEvent event)
     {
-        try {
+        try
+        {
             threadPool.execute(new Worker(event));
-        } catch (RejectedExecutionException e) {
+        }
+        catch (RejectedExecutionException e)
+        {
             logger.error("Failed to process event: " + event.toString(), e);
         }
     }
@@ -73,7 +77,8 @@ public class AsynchronousEventListener implements MuleEventListener
         }
     }
 
-    public ApplicationListener getListener() {
+    public ApplicationListener getListener()
+    {
         return listener;
     }
 }

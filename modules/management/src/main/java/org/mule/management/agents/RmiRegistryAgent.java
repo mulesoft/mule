@@ -25,10 +25,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
 
 /**
- * Binds to an existing RMI registry or creates a new one on a defined URI.
- * The default is <code>rmi://localhost:1099</code>
+ * Binds to an existing RMI registry or creates a new one on a defined URI. The
+ * default is <code>rmi://localhost:1099</code>
  */
-public class RmiRegistryAgent  implements UMOAgent
+public class RmiRegistryAgent implements UMOAgent
 {
     /**
      * logger used by this class
@@ -41,87 +41,116 @@ public class RmiRegistryAgent  implements UMOAgent
     private String serverUri = DEFAULT_SERVER_URI;
     private boolean createRegistry = true;
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return "Rmi Registry: " + serverUri;
     }
 
-    public void registered() {
+    public void registered()
+    {
         // nothing to do
     }
 
-    public void unregistered() {
+    public void unregistered()
+    {
         // nothing to do
     }
 
-    public void start() throws UMOException {
+    public void start() throws UMOException
+    {
         URI uri = null;
 
-        try {
+        try
+        {
             uri = new URI(serverUri);
-        } catch (URISyntaxException e) {
+        }
+        catch (URISyntaxException e)
+        {
             throw new InitialisationException(e, this);
         }
 
-        if (rmiRegistry == null) {
-            try {
-                if(createRegistry) {
-                    try {
+        if (rmiRegistry == null)
+        {
+            try
+            {
+                if (createRegistry)
+                {
+                    try
+                    {
                         rmiRegistry = LocateRegistry.createRegistry(uri.getPort());
-                    } catch (ExportException e) {
-                        logger.info("Registry on " + serverUri + " already bound. Attempting to use that instead");
+                    }
+                    catch (ExportException e)
+                    {
+                        logger.info("Registry on " + serverUri
+                                    + " already bound. Attempting to use that instead");
                         rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
                     }
-                } else {
+                }
+                else
+                {
                     rmiRegistry = LocateRegistry.getRegistry(uri.getHost(), uri.getPort());
                 }
-            } catch (RemoteException e) {
+            }
+            catch (RemoteException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
     }
 
-    public void stop() throws UMOException {
-        //todo how do you unbind a registry??
+    public void stop() throws UMOException
+    {
+        // todo how do you unbind a registry??
         rmiRegistry = null;
     }
 
-    public void dispose() {
+    public void dispose()
+    {
         // nothing to do
     }
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
         // nothing to do
     }
 
-    public Registry getRmiRegistry() {
+    public Registry getRmiRegistry()
+    {
         return rmiRegistry;
     }
 
-    public void setRmiRegistry(Registry rmiRegistry) {
+    public void setRmiRegistry(Registry rmiRegistry)
+    {
         this.rmiRegistry = rmiRegistry;
     }
 
-    public String getServerUri() {
+    public String getServerUri()
+    {
         return serverUri;
     }
 
-    public void setServerUri(String serverUri) {
+    public void setServerUri(String serverUri)
+    {
         this.serverUri = serverUri;
     }
 
-    public boolean isCreateRegistry() {
+    public boolean isCreateRegistry()
+    {
         return createRegistry;
     }
 
-    public void setCreateRegistry(boolean createRegistry) {
+    public void setCreateRegistry(boolean createRegistry)
+    {
         this.createRegistry = createRegistry;
     }
 }

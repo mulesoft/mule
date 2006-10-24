@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -33,9 +34,9 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 
 /**
- * <code>JcaComponent</code> Is the type of component used in mul when embedded inside
- * an app server using JCA.
- * If future we might want to use one of the existing models
+ * <code>JcaComponent</code> Is the type of component used in mul when embedded
+ * inside an app server using JCA. If future we might want to use one of the existing
+ * models
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -67,7 +68,8 @@ public class JcaComponent implements UMOComponent
 
     public JcaComponent(MuleDescriptor descriptor)
     {
-        if (descriptor == null) {
+        if (descriptor == null)
+        {
             throw new IllegalArgumentException("Descriptor cannot be null");
         }
         this.descriptor = descriptor;
@@ -80,19 +82,23 @@ public class JcaComponent implements UMOComponent
 
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
-        try {
+        try
+        {
             // Invoke method
-            // TODO is there anything we can/should do with the return result from invoke()?
+            // TODO is there anything we can/should do with the return result from
+            // invoke()?
             entryPoint.invoke(component, RequestContext.getEventContext());
-        } catch (Exception e) {
-            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()),
-                                    e);
+        }
+        catch (Exception e)
+        {
+            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
+                                                                             + descriptor.getName()), e);
         }
     }
 
     /**
-     * This is the synchronous call method and not supported by components
-     * managed in a JCA container
+     * This is the synchronous call method and not supported by components managed in
+     * a JCA container
      * 
      * @param event
      * @return
@@ -113,7 +119,6 @@ public class JcaComponent implements UMOComponent
         // nothing to do
     }
 
-
     public boolean isPaused()
     {
         return false;
@@ -131,34 +136,40 @@ public class JcaComponent implements UMOComponent
 
     public void dispose()
     {
-        ((MuleManager) MuleManager.getInstance()).getStatistics().remove(stats);
+        ((MuleManager)MuleManager.getInstance()).getStatistics().remove(stats);
     }
 
     public synchronized void initialise() throws InitialisationException, RecoverableException
     {
-        if (initialised.get()) {
-            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, "Component '"
-                    + descriptor.getName() + "'"), this);
+        if (initialised.get())
+        {
+            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
+                "Component '" + descriptor.getName() + "'"), this);
         }
         descriptor.initialise();
-        try {
-            entryPoint = MuleManager.getInstance().getModel().getEntryPointResolver().resolveEntryPoint(descriptor);
-        } catch (ModelException e) {
+        try
+        {
+            entryPoint = MuleManager.getInstance().getModel().getEntryPointResolver().resolveEntryPoint(
+                descriptor);
+        }
+        catch (ModelException e)
+        {
             throw new InitialisationException(e, this);
         }
 
         // initialise statistics
         stats = new ComponentStatistics(descriptor.getName(), -1, -1);
 
-        stats.setEnabled(((MuleManager) MuleManager.getInstance()).getStatistics().isEnabled());
-        ((MuleManager) MuleManager.getInstance()).getStatistics().add(stats);
+        stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
+        ((MuleManager)MuleManager.getInstance()).getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
 
         component = descriptor.getImplementation();
 
         initialised.set(true);
-        MuleManager.getInstance().fireNotification(new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
+        MuleManager.getInstance().fireNotification(
+            new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
     }
 
     protected Object getDelegateComponent() throws InitialisationException
@@ -166,17 +177,24 @@ public class JcaComponent implements UMOComponent
         Object impl = descriptor.getImplementation();
         Object component = null;
 
-        try {
-            if (impl instanceof ContainerKeyPair) {
+        try
+        {
+            if (impl instanceof ContainerKeyPair)
+            {
                 component = MuleManager.getInstance().getContainerContext().getComponent(impl);
 
-                if(descriptor.isSingleton()) {
+                if (descriptor.isSingleton())
+                {
                     descriptor.setImplementation(component);
                 }
-            } else {
+            }
+            else
+            {
                 component = impl;
             }
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             throw new InitialisationException(e, this);
         }
 
@@ -185,21 +203,22 @@ public class JcaComponent implements UMOComponent
         return component;
     }
 
-    public boolean isStarted() {
-        return started; 
+    public boolean isStarted()
+    {
+        return started;
     }
 
     /**
-     * Gets the underlying instance form this component
-     * Where the Component implmentation provides pooling this is no 1-2-1 mapping
-     * between UMOComponent and instance, so this method will return the object in initial state.
-     * <p/>
-     * If the underlying component is Container managed in Spring or another IoC container then the
-     * object instance in the IoC container will be returned
-     *
+     * Gets the underlying instance form this component Where the Component
+     * implmentation provides pooling this is no 1-2-1 mapping between UMOComponent
+     * and instance, so this method will return the object in initial state. <p/> If
+     * the underlying component is Container managed in Spring or another IoC
+     * container then the object instance in the IoC container will be returned
+     * 
      * @return the underlying instance form this component
      */
-    public Object getInstance() throws UMOException {
+    public Object getInstance() throws UMOException
+    {
         return component;
     }
 }

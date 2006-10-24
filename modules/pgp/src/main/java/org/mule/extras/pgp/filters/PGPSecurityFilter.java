@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp.filters;
 
 import cryptix.message.LiteralMessage;
@@ -39,7 +40,6 @@ import java.util.Collection;
 
 /**
  * @author ariva
- * 
  */
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -58,59 +58,71 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
      * 
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#authenticateInbound(org.mule.umo.UMOEvent)
      */
-    protected void authenticateInbound(UMOEvent event) throws SecurityException, UnauthorisedException,
-            UnknownAuthenticationTypeException
+    protected void authenticateInbound(UMOEvent event)
+        throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException
     {
         UMOMessage message = event.getMessage();
 
-        String userId = (String) getCredentialsAccessor().getCredentials(event);
+        String userId = (String)getCredentialsAccessor().getCredentials(event);
 
         byte[] creds = null;
 
-        try {
+        try
+        {
             creds = message.getPayloadAsBytes();
             creds = strategy.decrypt(creds, null);
-        } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
-                                            event.getMessage(),
-                                            e1);
+        }
+        catch (Exception e1)
+        {
+            throw new UnauthorisedException(
+                new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event.getMessage(), e1);
         }
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication;
 
-        try {
+        try
+        {
             umoAuthentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
-        } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
-                                            event.getMessage(),
-                                            e1);
+        }
+        catch (Exception e1)
+        {
+            throw new UnauthorisedException(
+                new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event.getMessage(), e1);
         }
 
-        try {
+        try
+        {
             authResult = getSecurityManager().authenticate(umoAuthentication);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // Authentication failed
-            if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
             }
 
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.AUTH_FAILED_FOR_USER_X, userId),
-                                            event.getMessage(),
-                                            e);
+            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.AUTH_FAILED_FOR_USER_X,
+                userId), event.getMessage(), e);
         }
 
         // Authentication success
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled())
+        {
             logger.debug("Authentication success: " + authResult.toString());
         }
 
         UMOSecurityContext context = getSecurityManager().createSecurityContext(authResult);
         event.getSession().setSecurityContext(context);
 
-        try {
-            RequestContext.rewriteEvent(new MuleMessage(getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult)));
-        } catch (Exception e2) {
+        try
+        {
+            RequestContext.rewriteEvent(new MuleMessage(
+                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
+        }
+        catch (Exception e2)
+        {
             throw new UnauthorisedException(event.getMessage(), context, event.getEndpoint(), this);
         }
     }
@@ -123,20 +135,24 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         Collection msgs = mf.generateMessages(in);
 
-        return (Message) msgs.iterator().next();
+        return (Message)msgs.iterator().next();
     }
 
     private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception
     {
-        Message msg = (Message) auth.getCredentials();
+        Message msg = (Message)auth.getCredentials();
 
-        if (msg instanceof SignedMessage) {
-            msg = ((SignedMessage) msg).getContents();
+        if (msg instanceof SignedMessage)
+        {
+            msg = ((SignedMessage)msg).getContents();
         }
 
-        if (msg instanceof LiteralMessage) {
-            return ((LiteralMessage) msg).getTextData();
-        } else {
+        if (msg instanceof LiteralMessage)
+        {
+            return ((LiteralMessage)msg).getTextData();
+        }
+        else
+        {
             throw new Exception("Wrong data");
         }
     }
@@ -150,36 +166,41 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
     {
         logger.debug("authenticateOutbound:" + event.getId());
 
-        if (!isAuthenticate()) {
+        if (!isAuthenticate())
+        {
             return;
         }
 
         UMOMessage message = event.getMessage();
 
-        KeyBundle userKeyBundle = keyManager.getKeyBundle((String) getCredentialsAccessor().getCredentials(event));
+        KeyBundle userKeyBundle = keyManager.getKeyBundle((String)getCredentialsAccessor().getCredentials(
+            event));
 
         PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
 
         byte[] msg = null;
 
-        try {
+        try
+        {
             msg = message.getPayloadAsBytes();
             msg = strategy.encrypt(msg, cryptInfo);
-        } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
-                                            event.getMessage(),
-                                            e1);
+        }
+        catch (Exception e1)
+        {
+            throw new UnauthorisedException(
+                new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event.getMessage(), e1);
         }
 
-        try {
+        try
+        {
             String mesg = new String(msg);
             RequestContext.rewriteEvent(new MuleMessage(mesg));
             logger.debug("Message:" + mesg);
-        } catch (Exception e2) {
-            throw new UnauthorisedException(event.getMessage(),
-                                            event.getSession().getSecurityContext(),
-                                            event.getEndpoint(),
-                                            this);
+        }
+        catch (Exception e2)
+        {
+            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                event.getEndpoint(), this);
         }
     }
 
@@ -190,12 +211,15 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
      */
     protected void doInitialise() throws InitialisationException
     {
-        if (strategyName != null) {
+        if (strategyName != null)
+        {
             strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
-        if (strategy == null) {
-            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
+        if (strategy == null)
+        {
+            throw new InitialisationException(new org.mule.config.i18n.Message(
+                Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }
 

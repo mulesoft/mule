@@ -7,9 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.agents;
 
-//import com.sun.jdmk.comm.HtmlAdaptorServer;
+// import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -44,9 +45,9 @@ public class JdmkAgent implements UMOAgent
 
     protected Object createAdaptor() throws Exception
     {
-        Object adaptor=null;
+        Object adaptor = null;
         URI uri = new URI(jmxAdaptorUrl);
-        //adaptor = new HtmlAdaptorServer(uri.getPort());
+        // adaptor = new HtmlAdaptorServer(uri.getPort());
         return adaptor;
     }
 
@@ -87,13 +88,22 @@ public class JdmkAgent implements UMOAgent
      */
     public void start() throws UMOException
     {
-        try {
+        try
+        {
             mBeanServer.invoke(adaptorName, "start", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
-        } catch (ReflectionException e) {
+        }
+        catch (InstanceNotFoundException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"),
+                adaptorName, e);
+        }
+        catch (MBeanException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"),
+                adaptorName, e);
+        }
+        catch (ReflectionException e)
+        {
             // ignore
         }
     }
@@ -105,13 +115,22 @@ public class JdmkAgent implements UMOAgent
      */
     public void stop() throws UMOException
     {
-        try {
+        try
+        {
             mBeanServer.invoke(adaptorName, "stop", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"), adaptorName, e);
-        } catch (ReflectionException e) {
+        }
+        catch (InstanceNotFoundException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"),
+                adaptorName, e);
+        }
+        catch (MBeanException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"),
+                adaptorName, e);
+        }
+        catch (ReflectionException e)
+        {
             // ignore
         }
     }
@@ -123,9 +142,12 @@ public class JdmkAgent implements UMOAgent
      */
     public void dispose()
     {
-        try {
+        try
+        {
             stop();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // TODO: log an exception
         }
     }
@@ -157,12 +179,15 @@ public class JdmkAgent implements UMOAgent
      */
     public void initialise() throws InitialisationException
     {
-        try {
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+        try
+        {
+            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
             adaptor = createAdaptor();
             adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
             mBeanServer.registerMBean(adaptor, adaptorName);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "Jdmk Agent"), e);
         }
     }

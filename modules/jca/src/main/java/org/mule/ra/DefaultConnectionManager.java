@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.apache.commons.logging.Log;
@@ -41,7 +42,7 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
      *      javax.resource.spi.ConnectionRequestInfo)
      */
     public Object allocateConnection(ManagedConnectionFactory connectionFactory, ConnectionRequestInfo info)
-            throws ResourceException
+        throws ResourceException
     {
         Subject subject = null;
         ManagedConnection connection = connectionFactory.createManagedConnection(subject, info);
@@ -54,14 +55,20 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
      */
     public void connectionClosed(ConnectionEvent event)
     {
-        try {
-            ((ManagedConnection) event.getSource()).cleanup();
-        } catch (ResourceException e) {
+        try
+        {
+            ((ManagedConnection)event.getSource()).cleanup();
+        }
+        catch (ResourceException e)
+        {
             log.warn("Error occured during the cleanup of a managed connection: ", e);
         }
-        try {
-            ((ManagedConnection) event.getSource()).destroy();
-        } catch (ResourceException e) {
+        try
+        {
+            ((ManagedConnection)event.getSource()).destroy();
+        }
+        catch (ResourceException e)
+        {
             log.warn("Error occured during the destruction of a managed connection: ", e);
         }
     }
@@ -96,14 +103,20 @@ public class DefaultConnectionManager implements ConnectionManager, ConnectionEv
     public void connectionErrorOccurred(ConnectionEvent event)
     {
         log.warn("Managed connection experiened an error: ", event.getException());
-        try {
-            ((ManagedConnection) event.getSource()).cleanup();
-        } catch (ResourceException e) {
+        try
+        {
+            ((ManagedConnection)event.getSource()).cleanup();
+        }
+        catch (ResourceException e)
+        {
             log.warn("Error occured during the cleanup of a managed connection: ", e);
         }
-        try {
-            ((ManagedConnection) event.getSource()).destroy();
-        } catch (ResourceException e) {
+        try
+        {
+            ((ManagedConnection)event.getSource()).destroy();
+        }
+        catch (ResourceException e)
+        {
             log.warn("Error occured during the destruction of a managed connection: ", e);
         }
     }

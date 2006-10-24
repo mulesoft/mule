@@ -14,20 +14,22 @@ import org.apache.commons.digester.CallMethodRule;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CallMethodOnIndexRule extends CallMethodRule 
+public class CallMethodOnIndexRule extends CallMethodRule
 {
     int index = 0;
 
-    public CallMethodOnIndexRule(String s, int i, int index) {
+    public CallMethodOnIndexRule(String s, int i, int index)
+    {
         super(s, i);
         this.index = index;
     }
 
-    public CallMethodOnIndexRule(String s, int index) {
+    public CallMethodOnIndexRule(String s, int index)
+    {
         super(s);
         this.index = index;
     }

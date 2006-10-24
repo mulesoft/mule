@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
@@ -26,7 +27,8 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
-        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()), "UTF-8");
+        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()),
+            "UTF-8");
     }
 
     public UMOTransformer getTransformer() throws Exception
@@ -59,8 +61,9 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src != null) {
-            src = ((String) src).replaceAll("\r", "");
+        if (src != null)
+        {
+            src = ((String)src).replaceAll("\r", "");
         }
         return super.compareResults(src, result);
     }

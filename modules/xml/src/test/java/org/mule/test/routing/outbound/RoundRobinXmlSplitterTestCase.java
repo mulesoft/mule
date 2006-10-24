@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import java.util.HashMap;
@@ -86,7 +87,6 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
-
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -99,7 +99,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint3)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        xmlSplitter.route(message, (UMOSession) session.proxy(), false);
+        xmlSplitter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(payload);
@@ -108,12 +108,11 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint2)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint3)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
-        UMOMessage result = xmlSplitter.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = xmlSplitter.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
     }
-
 
     public void testXsdNotFoundThrowsException() throws Exception
     {
@@ -132,16 +131,18 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage(payload);
 
         assertTrue(splitter.isMatch(message));
-        try {
-            splitter.route(message, (UMOSession) session.proxy(), false);
+        try
+        {
+            splitter.route(message, (UMOSession)session.proxy(), false);
             fail("Should have thrown an exception, because XSD is not found.");
-        } catch (IllegalArgumentException iaex) {
-            assertTrue("Wrong exception?",
-                    iaex.getMessage().indexOf("Couldn't find schema at " + invalidSchemaLocation) != -1);
+        }
+        catch (IllegalArgumentException iaex)
+        {
+            assertTrue("Wrong exception?", iaex.getMessage().indexOf(
+                "Couldn't find schema at " + invalidSchemaLocation) != -1);
         }
         session.verify();
     }
-
 
     public void testUnsupportedTypePayloadIsIgnored() throws Exception
     {
@@ -152,30 +153,33 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage(unsupportedPayload);
 
         assertTrue(xmlSplitter.isMatch(message));
-        xmlSplitter.route(message, (UMOSession) session.proxy(), false);
+        xmlSplitter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(unsupportedPayload);
 
-        UMOMessage result = xmlSplitter.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = xmlSplitter.route(message, (UMOSession)session.proxy(), true);
         assertNull(result);
         session.verify();
     }
 
-
-    public void testInvalidXmlPayloadThrowsException() throws Exception {
+    public void testInvalidXmlPayloadThrowsException() throws Exception
+    {
         Mock session = MuleTestUtils.getMockSession();
 
         RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
 
         UMOMessage message = new MuleMessage("This is not XML.");
 
-        try {
-            splitter.route(message, (UMOSession) session.proxy(), false);
+        try
+        {
+            splitter.route(message, (UMOSession)session.proxy(), false);
             fail("No exception thrown.");
-        } catch (IllegalArgumentException iaex) {
-            assertTrue("Wrong exception message.",
-                       iaex.getMessage().startsWith("Failed to initialise the payload: "));
+        }
+        catch (IllegalArgumentException iaex)
+        {
+            assertTrue("Wrong exception message.", iaex.getMessage().startsWith(
+                "Failed to initialise the payload: "));
         }
 
     }
@@ -184,16 +188,16 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     {
         public boolean eval(Object o)
         {
-            final UMOMessage message = (UMOMessage) o;
+            final UMOMessage message = (UMOMessage)o;
             final Object payload = message.getPayload();
-            assertTrue("Wrong class type for node.",  payload instanceof Document);
+            assertTrue("Wrong class type for node.", payload instanceof Document);
 
-            Document node = (Document) payload;
+            Document node = (Document)payload;
 
             final String partNumber = node.getRootElement().attributeValue("partNum");
 
-
-            return "872-AA".equals(partNumber) || "926-AA".equals(partNumber) || "126-AA".equals(partNumber) || "226-AA".equals(partNumber);
+            return "872-AA".equals(partNumber) || "926-AA".equals(partNumber) || "126-AA".equals(partNumber)
+                   || "226-AA".equals(partNumber);
         }
     }
 }

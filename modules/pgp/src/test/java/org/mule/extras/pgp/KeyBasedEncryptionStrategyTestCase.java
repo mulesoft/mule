@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import org.mule.tck.AbstractMuleTestCase;
@@ -17,7 +18,6 @@ import java.net.URL;
 
 /**
  * @author ariva
- * 
  */
 public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
@@ -62,7 +62,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
 
-        int length = (int) new File(url.getFile()).length();
+        int length = (int)new File(url.getFile()).length();
         byte[] msg = new byte[length];
 
         FileInputStream in = new FileInputStream(url.getFile());
@@ -79,8 +79,8 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
     public void testEncrypt() throws Exception
     {
         String msg = "Test Message";
-        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager()
-                                                            .getKeyBundle("Mule client <mule_client@mule.com>"), true);
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getKeyBundle(
+            "Mule client <mule_client@mule.com>"), true);
 
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
 

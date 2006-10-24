@@ -15,18 +15,19 @@ import org.mule.config.builders.ScriptConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 
 /**
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
-    public String getConfigResources() {
+    public String getConfigResources()
+    {
         return "mule-config.groovy";
     }
 
-    public ConfigurationBuilder getBuilder() {
-       ScriptConfigurationBuilder builder = new ScriptConfigurationBuilder("groovy");
+    public ConfigurationBuilder getBuilder()
+    {
+        ScriptConfigurationBuilder builder = new ScriptConfigurationBuilder("groovy");
         return builder;
     }
 }

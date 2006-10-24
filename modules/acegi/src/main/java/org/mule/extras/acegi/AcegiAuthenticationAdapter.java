@@ -92,6 +92,6 @@ public class AcegiAuthenticationAdapter implements UMOAuthentication
 
     public void setProperties(Map properties)
     {
-        this.properties = properties;       
+        this.properties = properties;
     }
 }

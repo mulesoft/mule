@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
@@ -21,7 +22,8 @@ import org.mule.umo.manager.UMOContainerContext;
 public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "test-embedded-spring-config.xml";
     }
 
@@ -42,10 +44,13 @@ public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
         assertNotNull(context.getComponent("Apple"));
         assertNotNull(context.getComponent("Banana"));
 
-        try {
+        try
+        {
             context.getComponent("Orange");
             fail("Object should  not found");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // ignore
         }
     }

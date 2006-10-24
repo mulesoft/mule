@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import java.util.Collection;
@@ -34,7 +35,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
-        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()), "UTF-8");
+        resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.html", getClass()),
+            "UTF-8");
     }
 
     public UMOTransformer getTransformer() throws Exception
@@ -47,25 +49,35 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     int running = 0;
 
-    public synchronized void signalStarted() {
+    public synchronized void signalStarted()
+    {
         ++running;
     }
 
-    public synchronized void signalDone() {
+    public synchronized void signalDone()
+    {
         if (--running == 0) this.notify();
     }
 
-    public void testParallelTransformation() throws Exception {
+    public void testParallelTransformation() throws Exception
+    {
         final UMOTransformer transformer = getTransformer();
 
-        for (int i=0; i < getParallelThreadCount(); ++i) {
-            new Thread(new Runnable() {
-                public void run() {
+        for (int i = 0; i < getParallelThreadCount(); ++i)
+        {
+            new Thread(new Runnable()
+            {
+                public void run()
+                {
                     signalStarted();
-                    for (int j=0; j < getCallsPerThread(); ++j) {
-                        try {
+                    for (int j = 0; j < getCallsPerThread(); ++j)
+                    {
+                        try
+                        {
                             actualResults.add(transformer.transform(srcData));
-                        } catch (TransformerException e) {
+                        }
+                        catch (TransformerException e)
+                        {
                             actualResults.add(e);
                         }
                     }
@@ -76,28 +88,38 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
         checkResult();
     }
 
-    private synchronized void checkResult() throws Exception {
+    private synchronized void checkResult() throws Exception
+    {
         wait();
         Object expectedResult = resultData;
-        for (Iterator it = actualResults.iterator(); it.hasNext();) {
+        for (Iterator it = actualResults.iterator(); it.hasNext();)
+        {
             Object result = it.next();
             if (result instanceof Exception) throw (Exception)result;
 
-            if (expectedResult instanceof String && result instanceof String ) {
+            if (expectedResult instanceof String && result instanceof String)
+            {
                 XMLAssert.assertXMLEqual((String)expectedResult, (String)result);
-            } else {
+            }
+            else
+            {
                 XMLAssert.assertEquals(expectedResult, result);
             }
         }
     }
-    private int getParallelThreadCount() {
+
+    private int getParallelThreadCount()
+    {
         return 20;
     }
-    private int getCallsPerThread() {
+
+    private int getCallsPerThread()
+    {
         return 100;
     }
 
-    protected  static String normalizeString(String rawString) {
+    protected static String normalizeString(String rawString)
+    {
         return rawString.replaceAll("\r\n", "\n");
     }
 }

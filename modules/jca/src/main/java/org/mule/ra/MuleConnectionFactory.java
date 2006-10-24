@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import javax.resource.Referenceable;
@@ -16,9 +17,9 @@ import javax.resource.spi.ConnectionManager;
 import java.io.Serializable;
 
 /**
- * <code>MuleConnectionFactory</code> defines the connection factory interface
- * that the RA clients will obtain a reference to.
- *
+ * <code>MuleConnectionFactory</code> defines the connection factory interface that
+ * the RA clients will obtain a reference to.
+ * 
  * @version $Revision$
  */
 public interface MuleConnectionFactory extends Serializable, Referenceable

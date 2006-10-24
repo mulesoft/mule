@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
 
 /**
  * A digester rule set that loads rules for <properties> tags and its child tags;
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,51 +51,63 @@ public class MulePropertiesRuleSet extends RuleSetBase
     private List objectRefs = null;
     private String parentElement = "properties";
 
-    public MulePropertiesRuleSet(String path, String propertiesSetterName, List objectRefs) {
+    public MulePropertiesRuleSet(String path, String propertiesSetterName, List objectRefs)
+    {
         this(path, objectRefs);
         this.propertiesSetterName = propertiesSetterName;
     }
 
-    public MulePropertiesRuleSet(String path, String propertiesSetterName, List objectRefs, String parentElement) {
+    public MulePropertiesRuleSet(String path,
+                                 String propertiesSetterName,
+                                 List objectRefs,
+                                 String parentElement)
+    {
         this(path, objectRefs);
         this.propertiesSetterName = propertiesSetterName;
         this.parentElement = parentElement;
     }
 
-    public MulePropertiesRuleSet(String path, List objectRefs) {
+    public MulePropertiesRuleSet(String path, List objectRefs)
+    {
         this.path = path;
         processor = new PlaceholderProcessor();
         this.objectRefs = objectRefs;
     }
 
-    public void addRuleInstances(Digester digester) {
+    public void addRuleInstances(Digester digester)
+    {
 
         path += "/" + parentElement;
-       // digester.addObjectCreate(path, HashMap.class);
-        digester.addRule(path, new ObjectCreateRule(path, HashMap.class) {
+        // digester.addObjectCreate(path, HashMap.class);
+        digester.addRule(path, new ObjectCreateRule(path, HashMap.class)
+        {
             // This will set the properties on the top object as bean setters if
             // the flag is set
             public void end(String string, String string1) throws Exception
             {
-                Map props = (Map) digester.peek();
-                if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES)) {
+                Map props = (Map)digester.peek();
+                if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES))
+                {
                     props.putAll(MuleManager.getInstance().getProperties());
                     props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
                 }
                 super.end(string, string1);
 
-                if (propertiesSetterName==null) {
+                if (propertiesSetterName == null)
+                {
                     org.mule.util.BeanUtils.populateWithoutFail(digester.peek(), props, true);
-                } else {
-                    MethodUtils.invokeMethod(digester.peek(), propertiesSetterName, props);
-                    //digester.addSetNext(path + "/properties", "setProperties");
                 }
-                //todo - is this needed?
+                else
+                {
+                    MethodUtils.invokeMethod(digester.peek(), propertiesSetterName, props);
+                    // digester.addSetNext(path + "/properties", "setProperties");
+                }
+                // todo - is this needed?
                 // support for setting transformers as properties
-//                String trans = (String) props.remove("transformer");
-//                if (trans != null) {
-//                    addTransformerReference("transformer", trans, digester.peek());
-//                }
+                // String trans = (String) props.remove("transformer");
+                // if (trans != null) {
+                // addTransformerReference("transformer", trans, digester.peek());
+                // }
             }
         });
         digester.addCallMethod(path + "/property", "put", 2);
@@ -106,7 +118,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
         addPropertyFactoryRule(digester, path + "/factory-property");
         addSystemPropertyRule(digester, path + "/system-property");
         addFilePropertiesRule(digester, path + "/file-properties");
-        addContainerPropertyRule(digester, path + "/container-property", propertiesSetterName==null);
+        addContainerPropertyRule(digester, path + "/container-property", propertiesSetterName == null);
         addTextPropertyRule(digester, path + "/text-property");
 
         addMapPropertyRules(digester, path);
@@ -128,7 +140,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
         addFilePropertiesRule(digester, path + "/map/file-properties");
         addContainerPropertyRule(digester, path + "/map/container-property", false);
 
-        //  call the put method on top -1 object
+        // call the put method on top -1 object
         digester.addRule(path + "/map", new CallMethodOnIndexRule("put", 2, 1));
         digester.addCallParam(path + "/map", 0, "name");
         digester.addCallParam(path + "/map", 1, true);
@@ -139,8 +151,10 @@ public class MulePropertiesRuleSet extends RuleSetBase
         digester.addObjectCreate(path + "/list", ArrayList.class);
 
         // digester.addCallMethod(path + "/list/entry", "add", 1);
-        digester.addRule(path + "/list/entry", new CallMethodRule("add", 1) {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
+        digester.addRule(path + "/list/entry", new CallMethodRule("add", 1)
+        {
+            public void begin(String endpointName, String endpointName1, Attributes attributes)
+                throws Exception
             {
                 // Process template tokens
                 attributes = processor.processAttributes(attributes, endpointName1);
@@ -159,9 +173,11 @@ public class MulePropertiesRuleSet extends RuleSetBase
         digester.addCallParam(path + "/list", 0, "name");
         digester.addCallParam(path + "/list", 1, true);
     }
+
     protected void addPropertyFactoryRule(Digester digester, String path)
     {
-        digester.addRule(path, new Rule() {
+        digester.addRule(path, new Rule()
+        {
 
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
@@ -172,20 +188,28 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String name = attributes.getValue("name");
                 Object props = digester.peek();
                 Object obj = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
-                if (obj instanceof PropertyFactory) {
-                    if (props instanceof Map) {
-                        obj = ((PropertyFactory) obj).create((Map) props);
-                    } else {
+                if (obj instanceof PropertyFactory)
+                {
+                    if (props instanceof Map)
+                    {
+                        obj = ((PropertyFactory)obj).create((Map)props);
+                    }
+                    else
+                    {
                         // this must be a list so we'll get the containing
                         // properties map
-                        obj = ((PropertyFactory) obj).create((Map) digester.peek(1));
+                        obj = ((PropertyFactory)obj).create((Map)digester.peek(1));
                     }
                 }
-                if (obj != null) {
-                    if (props instanceof Map) {
-                        ((Map) props).put(name, obj);
-                    } else {
-                        ((List) props).add(obj);
+                if (obj != null)
+                {
+                    if (props instanceof Map)
+                    {
+                        ((Map)props).put(name, obj);
+                    }
+                    else
+                    {
+                        ((List)props).add(obj);
                     }
                 }
             }
@@ -194,7 +218,8 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
     protected void addSystemPropertyRule(Digester digester, String path)
     {
-        digester.addRule(path, new Rule() {
+        digester.addRule(path, new Rule()
+        {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 // Process template tokens
@@ -204,12 +229,16 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String key = attributes.getValue("key");
                 String defaultValue = attributes.getValue("defaultValue");
                 String value = System.getProperty(key, defaultValue);
-                if (value != null) {
+                if (value != null)
+                {
                     Object props = digester.peek();
-                    if (props instanceof Map) {
-                        ((Map) props).put(name, value);
-                    } else {
-                        ((List) props).add(value);
+                    if (props instanceof Map)
+                    {
+                        ((Map)props).put(name, value);
+                    }
+                    else
+                    {
+                        ((List)props).add(value);
                     }
                 }
             }
@@ -218,7 +247,8 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
     protected synchronized void addFilePropertiesRule(Digester digester, String path)
     {
-        digester.addRule(path, new Rule() {
+        digester.addRule(path, new Rule()
+        {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 // Process template tokens
@@ -228,40 +258,53 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
                 InputStream is = IOUtils.getResourceAsStream(location, getClass());
-                if (is == null) {
-                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, location));
+                if (is == null)
+                {
+                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
+                        location));
                 }
 
                 Properties fileProps = new Properties();
                 fileProps.load(is);
-                Map digesterProps = (Map) digester.peek();
+                Map digesterProps = (Map)digester.peek();
 
-                if (override) {
+                if (override)
+                {
                     // Set all properties.
                     digesterProps.putAll(fileProps);
-                } else {
+                }
+                else
+                {
                     // Set only those properties which have not yet been set.
                     String key;
-                    for (Iterator iterator = fileProps.keySet().iterator(); iterator.hasNext();) {
-                        key = (String) iterator.next();
-                        if (!digesterProps.containsKey(key)) {
+                    for (Iterator iterator = fileProps.keySet().iterator(); iterator.hasNext();)
+                    {
+                        key = (String)iterator.next();
+                        if (!digesterProps.containsKey(key))
+                        {
                             digesterProps.put(key, fileProps.getProperty(key));
                         }
                     }
                 }
 
-                // If startup properties were given on the command line, they should override the file properties.
-                if (StringUtils.isNotBlank(MuleServer.getStartupPropertiesFile())) {
+                // If startup properties were given on the command line, they should
+                // override the file properties.
+                if (StringUtils.isNotBlank(MuleServer.getStartupPropertiesFile()))
+                {
                     is = IOUtils.getResourceAsStream(MuleServer.getStartupPropertiesFile(), getClass(),
-                                                        /*tryAsFile*/true, /*tryAsUrl*/false);
-                    if (is != null) {
+                    /* tryAsFile */true, /* tryAsUrl */false);
+                    if (is != null)
+                    {
                         Properties startupProps = new Properties();
                         startupProps.load(is);
                         String key;
-                        // For each startup property, if the property has been set, override its value.
-                        for (Iterator iterator = startupProps.keySet().iterator(); iterator.hasNext();) {
-                            key = (String) iterator.next();
-                            if (digesterProps.containsKey(key)) {
+                        // For each startup property, if the property has been set,
+                        // override its value.
+                        for (Iterator iterator = startupProps.keySet().iterator(); iterator.hasNext();)
+                        {
+                            key = (String)iterator.next();
+                            if (digesterProps.containsKey(key))
+                            {
                                 digesterProps.put(key, startupProps.getProperty(key));
                             }
                         }
@@ -273,7 +316,8 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
     protected void addContainerPropertyRule(Digester digester, String path, final boolean asBean)
     {
-        digester.addRule(path, new Rule() {
+        digester.addRule(path, new Rule()
+        {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 attributes = processor.processAttributes(attributes, s1);
@@ -282,7 +326,8 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 String value = attributes.getValue("reference");
                 String required = attributes.getValue("required");
                 String container = attributes.getValue("container");
-                if (required == null) {
+                if (required == null)
+                {
                     required = "true";
                 }
                 boolean req = Boolean.valueOf(required).booleanValue();
@@ -290,9 +335,12 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 // top-most object
                 // which will be a list or Map
                 Object obj = null;
-                if (asBean) {
+                if (asBean)
+                {
                     obj = digester.peek(1);
-                } else {
+                }
+                else
+                {
                     obj = digester.peek();
                 }
                 objectRefs.add(new ContainerReference(name, value, obj, req, container));
@@ -303,8 +351,10 @@ public class MulePropertiesRuleSet extends RuleSetBase
     protected void addTextPropertyRule(Digester digester, String path)
     {
 
-        digester.addRule(path, new Rule() {
+        digester.addRule(path, new Rule()
+        {
             private String name = null;
+
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 // Process template tokens
@@ -312,12 +362,16 @@ public class MulePropertiesRuleSet extends RuleSetBase
                 name = attributes.getValue("name");
             }
 
-            public void body(String string, String string1, String string2) throws Exception {
+            public void body(String string, String string1, String string2) throws Exception
+            {
                 Object props = digester.peek();
-                if (props instanceof Map) {
-                    ((Map) props).put(name, string2);
-                } else {
-                    ((List) props).add(string2);
+                if (props instanceof Map)
+                {
+                    ((Map)props).put(name, string2);
+                }
+                else
+                {
+                    ((List)props).add(string2);
                 }
             }
         });
@@ -325,19 +379,23 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
     private class ProcessedCallParamRule extends CallParamRule
     {
-        public ProcessedCallParamRule(int i) {
+        public ProcessedCallParamRule(int i)
+        {
             super(i);
         }
 
-        public ProcessedCallParamRule(int i, String s) {
+        public ProcessedCallParamRule(int i, String s)
+        {
             super(i, s);
         }
 
-        public ProcessedCallParamRule(int i, boolean b) {
+        public ProcessedCallParamRule(int i, boolean b)
+        {
             super(i, b);
         }
 
-        public ProcessedCallParamRule(int i, int i1) {
+        public ProcessedCallParamRule(int i, int i1)
+        {
             super(i, i1);
         }
 
@@ -349,7 +407,8 @@ public class MulePropertiesRuleSet extends RuleSetBase
         }
     }
 
-    public static interface PropertiesCallback {
+    public static interface PropertiesCallback
+    {
         public void setProperties(Map props, Digester digester) throws Exception;
     }
 }

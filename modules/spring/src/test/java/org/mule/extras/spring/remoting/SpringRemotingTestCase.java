@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.remoting;
 
 import org.mule.tck.FunctionalTestCase;
@@ -16,8 +17,8 @@ public class SpringRemotingTestCase extends FunctionalTestCase
 {
     private static final String SPRING_HTTP_ENDPOINT = "http://localhost:8003/springService";
 
-
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "spring-remoting-mule-config.xml";
     }
 
@@ -28,7 +29,7 @@ public class SpringRemotingTestCase extends FunctionalTestCase
         invoker.setServiceInterface(WorkInterface.class);
         invoker.setServiceUrl(SPRING_HTTP_ENDPOINT);
         invoker.afterPropertiesSet();
-        WorkInterface worker = (WorkInterface) invoker.getObject();
+        WorkInterface worker = (WorkInterface)invoker.getObject();
         ComplexData data = worker.executeComplexity(cd);
         assertNotNull(data);
         assertEquals(data.getSomeString(), "Foo Received");

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.agents;
 
 import org.mule.MuleManager;
@@ -20,11 +21,12 @@ import java.util.Map;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultJmxSupportAgent implements UMOAgent {
+public class DefaultJmxSupportAgent implements UMOAgent
+{
 
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
 
@@ -34,113 +36,131 @@ public class DefaultJmxSupportAgent implements UMOAgent {
 
     /**
      * Gets the name of this agent
-     *
+     * 
      * @return the agent name
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     /**
      * Sets the name of this agent
-     *
+     * 
      * @param name the name of the agent
      */
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
     /**
      * Should be a 1 line description of the agent
-     *
+     * 
      * @return
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return "Default Jmx Agent Support";
     }
 
-    public void registered() {
+    public void registered()
+    {
         // nothing to do
     }
 
-    public void unregistered() {
+    public void unregistered()
+    {
         // nothing to do
     }
 
-    public void start() throws UMOException {
+    public void start() throws UMOException
+    {
         // nothing to do
     }
 
-    public void stop() throws UMOException {
+    public void stop() throws UMOException
+    {
         // nothing to do
     }
 
     /**
      * A lifecycle method where implementor should free up any resources. If an
-     * exception is thrown it should just be logged and processing should
-     * continue. This method should not throw Runtime exceptions.
+     * exception is thrown it should just be logged and processing should continue.
+     * This method should not throw Runtime exceptions.
      */
-    public void dispose() {
+    public void dispose()
+    {
         // nothing to do
     }
 
     /**
-     * Method used to perform any initialisation work. If a fatal error occurs
-     * during initialisation an <code>InitialisationException</code> should be
-     * thrown, causing the Mule instance to shutdown. If the error is
-     * recoverable, say by retrying to connect, a
-     * <code>RecoverableException</code> should be thrown. There is no
-     * guarantee that by throwing a Recoverable exception that the Mule instance
-     * will not shut down.
-     *
-     * @throws org.mule.umo.lifecycle.InitialisationException
-     *          if a fatal error occurs causing the Mule
-     *          instance to shutdown
-     * @throws org.mule.umo.lifecycle.RecoverableException
-     *          if an error occurs that can be recovered
-     *          from
+     * Method used to perform any initialisation work. If a fatal error occurs during
+     * initialisation an <code>InitialisationException</code> should be thrown,
+     * causing the Mule instance to shutdown. If the error is recoverable, say by
+     * retrying to connect, a <code>RecoverableException</code> should be thrown.
+     * There is no guarantee that by throwing a Recoverable exception that the Mule
+     * instance will not shut down.
+     * 
+     * @throws org.mule.umo.lifecycle.InitialisationException if a fatal error occurs
+     *             causing the Mule instance to shutdown
+     * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
+     *             can be recovered from
      */
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
 
-        try {
+        try
+        {
             UMOAgent agent = createRmiAgent();
-            if (!isAgentRegistered(agent)) {
+            if (!isAgentRegistered(agent))
+            {
                 MuleManager.getInstance().registerAgent(agent);
             }
             agent = createJmxAgent();
-            if (!isAgentRegistered(agent)) {
+            if (!isAgentRegistered(agent))
+            {
                 MuleManager.getInstance().registerAgent(agent);
             }
             agent = createLog4jAgent();
-            if (!isAgentRegistered(agent)) {
+            if (!isAgentRegistered(agent))
+            {
                 MuleManager.getInstance().registerAgent(agent);
             }
             agent = createJmxNotificationAgent();
-            if (!isAgentRegistered(agent)) {
+            if (!isAgentRegistered(agent))
+            {
                 MuleManager.getInstance().registerAgent(agent);
             }
-            if (loadJdmkAgent) {
+            if (loadJdmkAgent)
+            {
                 agent = createJdmkAgent();
-                if (!isAgentRegistered(agent)) {
+                if (!isAgentRegistered(agent))
+                {
                     MuleManager.getInstance().registerAgent(agent);
                 }
             }
 
-            if (loadMx4jAgent) {
+            if (loadMx4jAgent)
+            {
                 agent = createMx4jAgent();
-                if (!isAgentRegistered(agent)) {
+                if (!isAgentRegistered(agent))
+                {
                     MuleManager.getInstance().registerAgent(agent);
                 }
             }
 
-            //remove this agent once t has registered the other agents
+            // remove this agent once t has registered the other agents
             MuleManager.getInstance().unregisterAgent(name);
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw new InitialisationException(e, this);
         }
     }
 
-    protected JmxAgent createJmxAgent() {
+    protected JmxAgent createJmxAgent()
+    {
         JmxAgent agent = new JmxAgent();
         agent.setConnectorServerUrl(DEFAULT_REMOTING_URI);
         Map props = new HashMap();
@@ -149,43 +169,53 @@ public class DefaultJmxSupportAgent implements UMOAgent {
         return agent;
     }
 
-    protected Log4jAgent createLog4jAgent() {
+    protected Log4jAgent createLog4jAgent()
+    {
         return new Log4jAgent();
     }
 
-    protected RmiRegistryAgent createRmiAgent() {
+    protected RmiRegistryAgent createRmiAgent()
+    {
         return new RmiRegistryAgent();
     }
 
-    protected JmxServerNotificationAgent createJmxNotificationAgent() {
+    protected JmxServerNotificationAgent createJmxNotificationAgent()
+    {
         return new JmxServerNotificationAgent();
     }
 
-    protected Mx4jAgent createMx4jAgent() {
+    protected Mx4jAgent createMx4jAgent()
+    {
         return new Mx4jAgent();
     }
 
-    protected JdmkAgent createJdmkAgent() {
+    protected JdmkAgent createJdmkAgent()
+    {
         return new JdmkAgent();
     }
 
-    protected boolean isAgentRegistered(UMOAgent agent) {
+    protected boolean isAgentRegistered(UMOAgent agent)
+    {
         return MuleManager.getInstance().lookupAgent(agent.getName()) != null;
     }
 
-    public boolean isLoadJdmkAgent() {
+    public boolean isLoadJdmkAgent()
+    {
         return loadJdmkAgent;
     }
 
-    public void setLoadJdmkAgent(boolean loadJdmkAgent) {
+    public void setLoadJdmkAgent(boolean loadJdmkAgent)
+    {
         this.loadJdmkAgent = loadJdmkAgent;
     }
 
-    public boolean isLoadMx4jAgent() {
+    public boolean isLoadMx4jAgent()
+    {
         return loadMx4jAgent;
     }
 
-    public void setLoadMx4jAgent(boolean loadMx4jAgent) {
+    public void setLoadMx4jAgent(boolean loadMx4jAgent)
+    {
         this.loadMx4jAgent = loadMx4jAgent;
     }
 }

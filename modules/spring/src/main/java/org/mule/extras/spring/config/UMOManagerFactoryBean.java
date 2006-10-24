@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>UMOManagerFactoryBean</code> is a Spring FactoryBean used for
- * creating a MuleManager from a Spring context. The context must explicitly
- * wire the beans together. Users might want to try
- * AutowireUMOManagerFactoryBean for a simpler and cleaner spring configuration.
+ * <code>UMOManagerFactoryBean</code> is a Spring FactoryBean used for creating a
+ * MuleManager from a Spring context. The context must explicitly wire the beans
+ * together. Users might want to try AutowireUMOManagerFactoryBean for a simpler and
+ * cleaner spring configuration.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -66,8 +66,9 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
     public void setMessageEndpoints(Map endpoints) throws InitialisationException
     {
         Map.Entry entry;
-        for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+        for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
+        {
+            entry = (Map.Entry)iterator.next();
             manager.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
 
         }
@@ -76,8 +77,9 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
     public void setProperties(Map props)
     {
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
+            entry = (Map.Entry)iterator.next();
             manager.setProperty(entry.getKey(), entry.getValue());
         }
     }
@@ -94,35 +96,40 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
 
     public void setConnectors(List connectors) throws UMOException
     {
-        for (Iterator iterator = connectors.iterator(); iterator.hasNext();) {
-            manager.registerConnector((UMOConnector) iterator.next());
+        for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
+        {
+            manager.registerConnector((UMOConnector)iterator.next());
         }
     }
 
     public void setTransformers(List transformers) throws InitialisationException
     {
-        for (Iterator iterator = transformers.iterator(); iterator.hasNext();) {
-            manager.registerTransformer((UMOTransformer) iterator.next());
+        for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
+        {
+            manager.registerTransformer((UMOTransformer)iterator.next());
         }
     }
 
     public void setProviders(List endpoints) throws InitialisationException
     {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
-            manager.registerEndpoint((UMOEndpoint) iterator.next());
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        {
+            manager.registerEndpoint((UMOEndpoint)iterator.next());
         }
     }
 
     public void setInterceptorStacks(Map interceptors)
     {
         Map.Entry entry;
-        for (Iterator iterator = interceptors.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack) entry.getValue());
+        for (Iterator iterator = interceptors.entrySet().iterator(); iterator.hasNext();)
+        {
+            entry = (Map.Entry)iterator.next();
+            manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack)entry.getValue());
         }
     }
 
-    public void setModel(UMOModel model) throws UMOException {
+    public void setModel(UMOModel model) throws UMOException
+    {
         manager.setModel(model);
     }
 

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.mbeans;
 
 import org.apache.commons.logging.Log;
@@ -43,10 +44,13 @@ public class StatisticsService implements StatisticsServiceMBean
 
     public void setManager(UMOManager manager)
     {
-        this.manager = (MuleManager) manager;
-        if (manager == null) {
+        this.manager = (MuleManager)manager;
+        if (manager == null)
+        {
             stats = new AllStatistics();
-        } else {
+        }
+        else
+        {
             stats = this.manager.getStatistics();
         }
 
@@ -95,7 +99,6 @@ public class StatisticsService implements StatisticsServiceMBean
     }
 
     /**
-     *
      * @return
      * @deprecated Use getHtmlSummary
      */
@@ -107,7 +110,8 @@ public class StatisticsService implements StatisticsServiceMBean
         return w.toString();
     }
 
-    public String getHtmlSummary() {
+    public String getHtmlSummary()
+    {
         return printHtmlSummary();
     }
 }

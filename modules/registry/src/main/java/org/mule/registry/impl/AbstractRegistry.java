@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public abstract class AbstractRegistry implements Registry {
+public abstract class AbstractRegistry implements Registry
+{
 
     public static final String REGISTRY_DIRECTORY = "registry";
 
@@ -52,11 +52,13 @@ public abstract class AbstractRegistry implements Registry {
 
     private transient boolean started = false;
 
-    public AbstractRegistry(RegistryStore store, ManagementContext context) {
+    public AbstractRegistry(RegistryStore store, ManagementContext context)
+    {
         this.store = store;
         this.context = context;
         registry = new HashMap();
-        for (int i = 0; i < ComponentType.COMPONENT_TYPES.length; i++) {
+        for (int i = 0; i < ComponentType.COMPONENT_TYPES.length; i++)
+        {
             ComponentType componentType = ComponentType.COMPONENT_TYPES[i];
             registry.put(componentType.getName() + ".list", new ArrayList());
             registry.put(componentType.getName() + ".map", new HashMap());
@@ -72,73 +74,92 @@ public abstract class AbstractRegistry implements Registry {
         workingDirectory = new File(MuleManager.getConfiguration().getWorkingDirectory(), REGISTRY_DIRECTORY);
     }
 
-    public File getWorkingDirectory() {
+    public File getWorkingDirectory()
+    {
         return workingDirectory;
     }
 
-    public void setWorkingDirectory(File workingDirectory) {
+    public void setWorkingDirectory(File workingDirectory)
+    {
         this.workingDirectory = workingDirectory;
     }
 
-    public String getStoreLocation() {
+    public String getStoreLocation()
+    {
         return this.storeLocation;
     }
 
-
-    public void setStoreLocation(String storeLocation) {
+    public void setStoreLocation(String storeLocation)
+    {
         this.storeLocation = storeLocation;
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getComponents()
      */
-    public synchronized RegistryComponent[] getComponents() {
-        return (RegistryComponent[]) components.toArray(new RegistryComponent[components.size()]);
+    public synchronized RegistryComponent[] getComponents()
+    {
+        return (RegistryComponent[])components.toArray(new RegistryComponent[components.size()]);
     }
 
-    public synchronized RegistryComponent[] getComponents(ComponentType type) {
+    public synchronized RegistryComponent[] getComponents(ComponentType type)
+    {
         RegistryComponent[] components = new RegistryComponent[]{};
         List list = (List)registry.get(type + ".list");
-        if(list!=null) {
-            components = (RegistryComponent[]) list.toArray(new RegistryComponent[list.size()]);
+        if (list != null)
+        {
+            components = (RegistryComponent[])list.toArray(new RegistryComponent[list.size()]);
         }
         return components;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getRegistryComponent(java.lang.String)
      */
-    public synchronized RegistryComponent getComponent(String name, ComponentType type) {
-        return (RegistryComponent) this.componentsMap.get(name);
+    public synchronized RegistryComponent getComponent(String name, ComponentType type)
+    {
+        return (RegistryComponent)this.componentsMap.get(name);
     }
 
-
-    public synchronized void removeComponent(RegistryComponent component) {
+    public synchronized void removeComponent(RegistryComponent component)
+    {
         this.componentsMap.remove(component.getName());
         List list = (List)registry.get(component.getType() + ".list");
-        if(list!=null) {
+        if (list != null)
+        {
             list.remove(component);
         }
         Map map = (Map)registry.get(component.getType() + ".map");
-        if(map!=null) {
+        if (map != null)
+        {
             map.remove(component);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getRegistryComponent(java.lang.String)
      */
-    public synchronized RegistryComponent getComponent(String name) {
-        return (RegistryComponent) this.componentsMap.get(name);
+    public synchronized RegistryComponent getComponent(String name)
+    {
+        return (RegistryComponent)this.componentsMap.get(name);
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#addEngine(java.lang.String)
      */
-    public synchronized RegistryComponent addComponent(String name, ComponentType type) throws RegistryException {
-        if (getComponent(name) != null) {
+    public synchronized RegistryComponent addComponent(String name, ComponentType type)
+        throws RegistryException
+    {
+        if (getComponent(name) != null)
+        {
             throw new RegistryException("Component already registered: " + name);
         }
         RegistryComponent rc = createComponent(name, type);
@@ -146,68 +167,101 @@ public abstract class AbstractRegistry implements Registry {
         return rc;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.jbi.registry.Registry#addTransientEngine(java.lang.String, javax.jbi.component.Component)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.jbi.registry.Registry#addTransientEngine(java.lang.String,
+     *      javax.jbi.component.Component)
      */
-    public synchronized RegistryComponent addTransientComponent(String name, ComponentType type, Object component, Object bootstrap) throws RegistryException {
+    public synchronized RegistryComponent addTransientComponent(String name,
+                                                                ComponentType type,
+                                                                Object component,
+                                                                Object bootstrap) throws RegistryException
+    {
 
         RegistryComponent rc = getComponent(name);
-        if (rc == null) {
+        if (rc == null)
+        {
             rc = createComponent(name, type);
             rc.setTransient(true);
             rc.setComponent(component);
             rc.setStateAtShutdown(RegistryComponent.RUNNING);
-            try {
-                rc.setWorkspaceRoot(context.getComponentWorkspaceDir(getWorkingDirectory(), name).getAbsoluteFile().getCanonicalPath());
-            } catch (IOException e) {
+            try
+            {
+                rc.setWorkspaceRoot(context.getComponentWorkspaceDir(getWorkingDirectory(), name)
+                    .getAbsoluteFile()
+                    .getCanonicalPath());
+            }
+            catch (IOException e)
+            {
                 throw new RegistryException(e);
             }
             this.componentsMap.put(name, rc);
             components.add(rc);
-            if (bootstrap != null) {
-                try {
+            if (bootstrap != null)
+            {
+                try
+                {
                     bootstrapComponent(rc, bootstrap);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     throw new RegistryException(e);
                 }
             }
-        } else {
-            if ( !rc.isTransient()) {
+        }
+        else
+        {
+            if (!rc.isTransient())
+            {
                 throw new RegistryException("A non-transient component is already registered: " + name);
             }
             rc.setComponent(component);
         }
-        try {
+        try
+        {
             rc.initComponent();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RegistryException(e);
         }
         return rc;
     }
 
-    protected abstract void bootstrapComponent(RegistryComponent component, Object bootstrap) throws Exception;
+    protected abstract void bootstrapComponent(RegistryComponent component, Object bootstrap)
+        throws Exception;
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getLibraries()
      */
-    public synchronized Library[] getLibraries() {
+    public synchronized Library[] getLibraries()
+    {
         Collection c = this.libraries;
-        return (Library[]) c.toArray(new Library[c.size()]);
+        return (Library[])c.toArray(new Library[c.size()]);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getLibrary(java.lang.String)
      */
-    public synchronized Library getLibrary(String name) {
-        return (Library) this.librariesMap.get(name);
+    public synchronized Library getLibrary(String name)
+    {
+        return (Library)this.librariesMap.get(name);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#addLibrary(java.lang.String)
      */
-    public synchronized Library addLibrary(String name) throws RegistryException {
-        if (getLibrary(name) != null) {
+    public synchronized Library addLibrary(String name) throws RegistryException
+    {
+        if (getLibrary(name) != null)
+        {
             throw new RegistryException("Library already registered: " + name);
         }
         Library l = createLibrary(name);
@@ -216,31 +270,42 @@ public abstract class AbstractRegistry implements Registry {
         return l;
     }
 
-    public synchronized void removeLibrary(Library library) {
+    public synchronized void removeLibrary(Library library)
+    {
         this.librariesMap.remove(library.getName());
         this.libraries.remove(library);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getAssemblies()
      */
-    public synchronized Assembly[] getAssemblies() {
+    public synchronized Assembly[] getAssemblies()
+    {
         Collection c = this.assemblies;
-        return (Assembly[]) c.toArray(new Assembly[c.size()]);
+        return (Assembly[])c.toArray(new Assembly[c.size()]);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#getAssembly(java.lang.String)
      */
-    public synchronized Assembly getAssembly(String name) {
-        return (Assembly) this.assembliesMap.get(name);
+    public synchronized Assembly getAssembly(String name)
+    {
+        return (Assembly)this.assembliesMap.get(name);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#addAssembly(java.lang.String)
      */
-    public synchronized Assembly addAssembly(String name) {
-        if (getAssembly(name) != null) {
+    public synchronized Assembly addAssembly(String name)
+    {
+        if (getAssembly(name) != null)
+        {
             return null;
         }
         Assembly a = createAssembly(name);
@@ -249,70 +314,97 @@ public abstract class AbstractRegistry implements Registry {
         return a;
     }
 
-    public synchronized void removeAssembly(Assembly assembly) {
+    public synchronized void removeAssembly(Assembly assembly)
+    {
         this.assembliesMap.remove(assembly.getName());
         this.assemblies.remove(assembly);
     }
 
-    public void initialize() {
+    public void initialize()
+    {
         this.componentsMap = new HashMap();
-        for (Iterator it = this.components.iterator(); it.hasNext();) {
-            RegistryComponent e = (RegistryComponent) it.next();
+        for (Iterator it = this.components.iterator(); it.hasNext();)
+        {
+            RegistryComponent e = (RegistryComponent)it.next();
             this.componentsMap.put(e.getName(), e);
         }
         this.librariesMap = new HashMap();
-        for (Iterator it = this.libraries.iterator(); it.hasNext();) {
-            AbstractLibrary l = (AbstractLibrary) it.next();
+        for (Iterator it = this.libraries.iterator(); it.hasNext();)
+        {
+            AbstractLibrary l = (AbstractLibrary)it.next();
             this.librariesMap.put(l.getName(), l);
         }
         this.assembliesMap = new HashMap();
-        for (Iterator it = this.assemblies.iterator(); it.hasNext();) {
-            AbstractAssembly a = (AbstractAssembly) it.next();
+        for (Iterator it = this.assemblies.iterator(); it.hasNext();)
+        {
+            AbstractAssembly a = (AbstractAssembly)it.next();
             this.assembliesMap.put(a.getName(), a);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#start()
      */
-    public synchronized void start() throws RegistryException {
+    public synchronized void start() throws RegistryException
+    {
         started = true;
-        try {
+        try
+        {
             RegistryComponent[] components = getComponents();
-            for (int i = 0; i < components.length; i++) {
-                if (components[i].isTransient() && components[i].getComponent() == null) {
-                    // a transient component was removed from config, so remove it from registry
+            for (int i = 0; i < components.length; i++)
+            {
+                if (components[i].isTransient() && components[i].getComponent() == null)
+                {
+                    // a transient component was removed from config, so remove it
+                    // from registry
                     removeComponent(components[i]);
-                } else {
+                }
+                else
+                {
                     components[i].restoreState();
                 }
             }
             Assembly[] assemblies = getAssemblies();
-            for (int i = 0; i < assemblies.length; i++) {
+            for (int i = 0; i < assemblies.length; i++)
+            {
                 assemblies[i].restoreState();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RegistryException(e);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Registry#shutDown()
      */
-    public synchronized void shutDown() throws RegistryException {
-            RegistryComponent[] components = getComponents();
-            for (int i = 0; i < components.length; i++) {
-                components[i].saveAndShutdown();
-            }
-            store.save(this);
+    public synchronized void shutDown() throws RegistryException
+    {
+        RegistryComponent[] components = getComponents();
+        for (int i = 0; i < components.length; i++)
+        {
+            components[i].saveAndShutdown();
+        }
+        store.save(this);
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.jbi.registry.Registry#addTransientUnit(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.jbi.registry.Registry#addTransientUnit(java.lang.String,
+     *      java.lang.String, java.lang.String)
      */
-    public synchronized void addTransientUnit(String suName, RegistryComponent component, String installDir) throws RegistryException {
+    public synchronized void addTransientUnit(String suName, RegistryComponent component, String installDir)
+        throws RegistryException
+    {
         Assembly a = getAssembly(suName);
-        if (a == null) {
+        if (a == null)
+        {
             Assembly assembly = createAssembly(suName);
             assembly.setTransient(true);
             assembly.setStateAtShutdown(Assembly.RUNNING);
@@ -320,9 +412,12 @@ public abstract class AbstractRegistry implements Registry {
             unit.setName(suName);
             unit.setAssembly(assembly);
             unit.setRegistryComponent(component);
-            try {
+            try
+            {
                 unit.setInstallRoot(new File(installDir).getAbsoluteFile().getCanonicalPath());
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 throw new RegistryException(e);
             }
             this.assemblies.add(assembly);
@@ -330,22 +425,28 @@ public abstract class AbstractRegistry implements Registry {
             unit.deploy();
             unit.start();
             assembly.setCurrentState(Assembly.RUNNING);
-        } else {
-            if (!a.isTransient()) {
+        }
+        else
+        {
+            if (!a.isTransient())
+            {
                 throw new RegistryException("A non-transient or assembly is already deployed: " + suName);
             }
         }
     }
 
-    public void save() throws RegistryException {
+    public void save() throws RegistryException
+    {
         store.save(this);
     }
 
-    public boolean isStarted() {
+    public boolean isStarted()
+    {
         return started;
     }
 
-    public ManagementContext getManagementContext() {
+    public ManagementContext getManagementContext()
+    {
         return context;
     }
 }

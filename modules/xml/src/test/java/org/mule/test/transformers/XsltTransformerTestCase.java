@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
@@ -59,8 +60,9 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src != null) {
-            src = ((String) src).replaceAll("\r", "");
+        if (src != null)
+        {
+            src = ((String)src).replaceAll("\r", "");
         }
         return super.compareResults(src, result);
     }

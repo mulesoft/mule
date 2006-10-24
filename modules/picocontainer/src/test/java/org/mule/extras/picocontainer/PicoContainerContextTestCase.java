@@ -27,11 +27,12 @@ public class PicoContainerContextTestCase extends AbstractContainerContextTestCa
         context = new PicoContainerContext();
         context.setConfigFile("test-pico-config.xml");
     }
+
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
-    */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
+     */
     public UMOContainerContext getContainerContext()
     {
         return context;

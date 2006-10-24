@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.transaction;
 
 import com.mockobjects.dynamic.C;
@@ -29,7 +30,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         mockPTM.expect("commit", C.same(mockTS.proxy()));
 
         SpringTransactionFactory factory = new SpringTransactionFactory();
-        factory.setManager((PlatformTransactionManager) mockPTM.proxy());
+        factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
         UMOTransaction tx = factory.beginTransaction();
         TransactionCoordination.getInstance().bindTransaction(tx);
@@ -45,7 +46,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         mockTS.expect("setRollbackOnly");
 
         SpringTransactionFactory factory = new SpringTransactionFactory();
-        factory.setManager((PlatformTransactionManager) mockPTM.proxy());
+        factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
         UMOTransaction tx = factory.beginTransaction();
         TransactionCoordination.getInstance().bindTransaction(tx);

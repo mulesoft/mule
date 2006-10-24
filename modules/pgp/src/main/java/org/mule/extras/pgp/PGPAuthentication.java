@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import java.util.Map;
@@ -18,7 +19,6 @@ import org.mule.umo.security.UMOAuthentication;
 
 /**
  * @author ariva
- * 
  */
 public class PGPAuthentication implements UMOAuthentication
 {
@@ -91,14 +91,14 @@ public class PGPAuthentication implements UMOAuthentication
 
     public Map getProperties()
     {
-        // TODO 
+        // TODO
         return null;
     }
 
     public void setProperties(Map securityMode)
     {
-        // TODO 
-        
+        // TODO
+
     }
 
 }

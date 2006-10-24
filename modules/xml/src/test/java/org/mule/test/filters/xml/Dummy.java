@@ -30,8 +30,7 @@ public class Dummy
     }
 
     /**
-     * @param content
-     *            The content to set.
+     * @param content The content to set.
      */
     public void setContent(String content)
     {
@@ -47,8 +46,7 @@ public class Dummy
     }
 
     /**
-     * @param id
-     *            The id to set.
+     * @param id The id to set.
      */
     public void setId(int id)
     {

@@ -34,9 +34,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * A base classs for configuration schemes that use digester to parse the
- * documents.
- *
+ * A base classs for configuration schemes that use digester to parse the documents.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,65 +53,79 @@ public abstract class AbstractDigesterConfiguration
     protected List containerReferences = new ArrayList();
     protected String configEncoding;
 
-
-    protected AbstractDigesterConfiguration(boolean validate, String dtd) {
+    protected AbstractDigesterConfiguration(boolean validate, String dtd)
+    {
         // This is a hack to stop Digester spitting out unnecessary warnings
         // when there is a customer error handler registered
-        digester = new Digester() {
-            public void warning(SAXParseException e) throws SAXException {
-                if (errorHandler != null) {
+        digester = new Digester()
+        {
+            public void warning(SAXParseException e) throws SAXException
+            {
+                if (errorHandler != null)
+                {
                     errorHandler.warning(e);
                 }
             }
         };
 
-        configEncoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, MuleManager.getConfiguration().getEncoding());
+        configEncoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY,
+            MuleManager.getConfiguration().getEncoding());
 
         digester.setValidating(validate);
         digester.setEntityResolver(new MuleDtdResolver(dtd));
 
-        digester.setErrorHandler(new ErrorHandler() {
-            public void error(SAXParseException exception) throws SAXException {
+        digester.setErrorHandler(new ErrorHandler()
+        {
+            public void error(SAXParseException exception) throws SAXException
+            {
                 logger.error(exception.getMessage(), exception);
                 throw new SAXException(exception);
             }
 
-            public void fatalError(SAXParseException exception) throws SAXException {
+            public void fatalError(SAXParseException exception) throws SAXException
+            {
                 logger.fatal(exception.getMessage(), exception);
                 throw new SAXException(exception);
             }
 
-            public void warning(SAXParseException exception) {
+            public void warning(SAXParseException exception)
+            {
                 logger.warn(exception.getMessage());
             }
         });
     }
 
-//    protected ReaderResource[] parseResources(String configResources) throws ConfigurationException {
-//        String[] resources = Utility.split(configResources, ",");
-//        MuleManager.getConfiguration().setConfigResources(resources);
-//        ReaderResource[] readers = new ReaderResource[resources.length];
-//        for (int i = 0; i < resources.length; i++) {
-//            try {
-//                readers[i] = new ReaderResource(resources[i].trim(),
-//                        new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
-//            } catch (UnsupportedEncodingException e) {
-//                throw new ConfigurationException(e);
-//            }
-//        }
-//        return readers;
-//    }
+    // protected ReaderResource[] parseResources(String configResources) throws
+    // ConfigurationException {
+    // String[] resources = Utility.split(configResources, ",");
+    // MuleManager.getConfiguration().setConfigResources(resources);
+    // ReaderResource[] readers = new ReaderResource[resources.length];
+    // for (int i = 0; i < resources.length; i++) {
+    // try {
+    // readers[i] = new ReaderResource(resources[i].trim(),
+    // new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
+    // } catch (UnsupportedEncodingException e) {
+    // throw new ConfigurationException(e);
+    // }
+    // }
+    // return readers;
+    // }
 
-    protected Object process(ReaderResource[] configResources) throws ConfigurationException {
+    protected Object process(ReaderResource[] configResources) throws ConfigurationException
+    {
         Object result = null;
         Reader configResource;
-        for (int i = 0; i < configResources.length; i++) {
-            try {
+        for (int i = 0; i < configResources.length; i++)
+        {
+            try
+            {
                 configResource = configResources[i].getReader();
                 result = digester.parse(configResource);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new ConfigurationException(new Message(Messages.FAILED_TO_PARSE_CONFIG_RESOURCE_X,
-                        configResources[i].getDescription()), e);
+                    configResources[i].getDescription()), e);
             }
         }
 
@@ -120,66 +133,86 @@ public abstract class AbstractDigesterConfiguration
     }
 
     /**
-     * Attempt to load a configuration resource from the file system, classpath,
-     * or as a URL, in that order.
-     *
+     * Attempt to load a configuration resource from the file system, classpath, or
+     * as a URL, in that order.
+     * 
      * @param configResource Mule configuration resources
      * @return an InputStream to the resource
-     * @throws ConfigurationException if the resource could not be loaded by any means
+     * @throws ConfigurationException if the resource could not be loaded by any
+     *             means
      */
-    protected InputStream loadConfig(String configResource) throws ConfigurationException {
+    protected InputStream loadConfig(String configResource) throws ConfigurationException
+    {
         InputStream is = null;
-        try {
+        try
+        {
             is = IOUtils.getResourceAsStream(configResource, getClass());
-        } catch (IOException e) {
-            throw new ConfigurationException(new Message(
-                    Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource), e);
+        }
+        catch (IOException e)
+        {
+            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
+                configResource), e);
         }
 
-        if (is != null) {
+        if (is != null)
+        {
             return is;
-        } else {
-            throw new ConfigurationException(new Message(
-                    Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource));
+        }
+        else
+        {
+            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
+                configResource));
         }
     }
 
     public abstract String getRootName();
 
-    protected void addContainerContextRules(String path, String setterMethod, int parentIndex) throws ConfigurationException {
+    protected void addContainerContextRules(String path, String setterMethod, int parentIndex)
+        throws ConfigurationException
+    {
         // Create container Context
         digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
         digester.addSetProperties(path, "name", "name");
         addMulePropertiesRule(path, digester);
 
-        //Set the container on the parent object
+        // Set the container on the parent object
         digester.addSetNext(path, setterMethod);
     }
 
-    protected void addServerPropertiesRules(String path, String setterMethod, int parentIndex) {
+    protected void addServerPropertiesRules(String path, String setterMethod, int parentIndex)
+    {
         // Set environment properties
         int i = path.lastIndexOf("/");
         addMulePropertiesRule(path.substring(0, i), digester, setterMethod, path.substring(i + 1));
     }
 
-    protected void addSetPropertiesRule(String path, Digester digester) {
+    protected void addSetPropertiesRule(String path, Digester digester)
+    {
         digester.addRule(path, new MuleSetPropertiesRule());
     }
 
-    protected void addSetPropertiesRule(String path, Digester digester, String[] s1, String[] s2) {
+    protected void addSetPropertiesRule(String path, Digester digester, String[] s1, String[] s2)
+    {
         digester.addRule(path, new MuleSetPropertiesRule(s1, s2));
     }
 
-    protected void addMulePropertiesRule(String path, Digester digester) {
+    protected void addMulePropertiesRule(String path, Digester digester)
+    {
         digester.addRuleSet(new MulePropertiesRuleSet(path, containerReferences));
     }
 
-    protected void addMulePropertiesRule(String path, Digester digester, String propertiesSetter) {
+    protected void addMulePropertiesRule(String path, Digester digester, String propertiesSetter)
+    {
         digester.addRuleSet(new MulePropertiesRuleSet(path, propertiesSetter, containerReferences));
     }
 
-    protected void addMulePropertiesRule(String path, Digester digester, String propertiesSetter, String parentElement) {
-        digester.addRuleSet(new MulePropertiesRuleSet(path, propertiesSetter, containerReferences, parentElement));
+    protected void addMulePropertiesRule(String path,
+                                         Digester digester,
+                                         String propertiesSetter,
+                                         String parentElement)
+    {
+        digester.addRuleSet(new MulePropertiesRuleSet(path, propertiesSetter, containerReferences,
+            parentElement));
     }
 
     protected void addFilterRules(Digester digester, String path) throws ConfigurationException

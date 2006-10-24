@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.script.jsr223;
 
 import org.apache.commons.logging.Log;
@@ -21,39 +22,42 @@ import org.mule.util.MuleLogger;
 import javax.script.Namespace;
 
 /**
- * A JSR 223 Script component. Allows any JSR 223 compliant script engines
- * such as javaScript, Groovy or Rhino to be embedded as Mule components
- *
+ * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
+ * javaScript, Groovy or Rhino to be embedded as Mule components
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ScriptComponent extends Scriptable implements Callable {
+public class ScriptComponent extends Scriptable implements Callable
+{
 
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-
-
     private Namespace namespace;
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
 
         super.initialise();
         namespace = getScriptEngine().createNamespace();
     }
 
-    public Object onCall(UMOEventContext eventContext) throws Exception {
+    public Object onCall(UMOEventContext eventContext) throws Exception
+    {
         populateNamespace(namespace, eventContext);
         Object result = runScript(namespace);
-        if(result==null) {
+        if (result == null)
+        {
             result = namespace.get("result");
         }
         return result;
     }
 
-    protected void populateNamespace(Namespace namespace, UMOEventContext context) {
+    protected void populateNamespace(Namespace namespace, UMOEventContext context)
+    {
         namespace.put("eventContext", context);
         namespace.put("managementContext", MuleManager.getInstance());
         namespace.put("message", context.getMessage());
@@ -63,8 +67,8 @@ public class ScriptComponent extends Scriptable implements Callable {
         namespace.put("result", new Object());
     }
 
-    public Namespace getNamespace() {
+    public Namespace getNamespace()
+    {
         return namespace;
     }
 }
-

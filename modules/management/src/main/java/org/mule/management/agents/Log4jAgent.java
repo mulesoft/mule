@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.agents;
 
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
@@ -28,9 +29,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <code>Log4jAgent</code> exposes the configuration of the Log4J instance
- * running in Mule for Jmx management
- * 
+ * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running
+ * in Mule for Jmx management
  */
 public class Log4jAgent implements UMOAgent
 {
@@ -76,13 +76,16 @@ public class Log4jAgent implements UMOAgent
      */
     public void initialise() throws InitialisationException
     {
-        try {
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+        try
+        {
+            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
             final ObjectName objectName = ObjectName.getInstance(JMX_OBJECT_NAME);
             // unregister existing Log4j MBean first if required
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(new HierarchyDynamicMBean(), objectName);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Agent"), e, this);
         }
     }
@@ -91,14 +94,15 @@ public class Log4jAgent implements UMOAgent
      * Unregister all log4j MBeans if there are any left over the old deployment
      */
     protected void unregisterMBeansIfNecessary()
-            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+        throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
     {
-        if (mBeanServer.isRegistered(ObjectName.getInstance(JMX_OBJECT_NAME))) {
+        if (mBeanServer.isRegistered(ObjectName.getInstance(JMX_OBJECT_NAME)))
+        {
             // unregister all log4jMBeans and loggers
             Set log4jMBeans = mBeanServer.queryMBeans(ObjectName.getInstance("log4j*:*"), null);
             for (Iterator it = log4jMBeans.iterator(); it.hasNext();)
             {
-                ObjectInstance objectInstance = (ObjectInstance) it.next();
+                ObjectInstance objectInstance = (ObjectInstance)it.next();
                 ObjectName theName = objectInstance.getObjectName();
                 mBeanServer.unregisterMBean(theName);
             }

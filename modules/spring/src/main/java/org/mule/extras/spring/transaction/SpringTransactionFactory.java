@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.transaction;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -66,16 +67,18 @@ public class SpringTransactionFactory implements UMOTransactionFactory
         public Object getResource(Object key)
         {
             Object res = TransactionSynchronizationManager.getResource(key);
-            if (res != null) {
+            if (res != null)
+            {
                 if (!(res instanceof ConnectionHolder))
                 {
                     if (res instanceof JmsResourceHolder)
                     {
-                        return ((JmsResourceHolder) res).getConnection();
+                        return ((JmsResourceHolder)res).getConnection();
                     }
-                } else
+                }
+                else
                 {
-                    return ((ConnectionHolder) res).getConnection();
+                    return ((ConnectionHolder)res).getConnection();
                 }
             }
             return res;

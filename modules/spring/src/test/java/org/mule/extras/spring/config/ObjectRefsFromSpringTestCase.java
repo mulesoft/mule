@@ -18,11 +18,13 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-public class ObjectRefsFromSpringTestCase extends FunctionalTestCase {
+public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
+{
 
-        protected String getConfigResources() {
-            return "test-refs-from-spring.xml";
-        }
+    protected String getConfigResources()
+    {
+        return "test-refs-from-spring.xml";
+    }
 
     public void testObjectCreation() throws Exception
     {
@@ -36,6 +38,6 @@ public class ObjectRefsFromSpringTestCase extends FunctionalTestCase {
         assertEquals("testTransformer", ep.getTransformer().getName());
         assertTrue(ep.getTransformer() instanceof TestCompressionTransformer);
         assertEquals(12, ((TestCompressionTransformer)ep.getTransformer()).getBeanProperty2());
-        
+
     }
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -93,29 +94,39 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
 
     public boolean equals(Object o)
     {
-        if (this == o) {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof MuleConnectionRequestInfo)) {
+        if (!(o instanceof MuleConnectionRequestInfo))
+        {
             return false;
         }
 
-        final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo) o;
+        final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo)o;
 
-        if (configurationBuilder != null ? !configurationBuilder.equals(muleConnectionRequestInfo.configurationBuilder)
-                : muleConnectionRequestInfo.configurationBuilder != null) {
+        if (configurationBuilder != null
+                        ? !configurationBuilder.equals(muleConnectionRequestInfo.configurationBuilder)
+                        : muleConnectionRequestInfo.configurationBuilder != null)
+        {
             return false;
         }
-        if (configurations != null ? !configurations.equals(muleConnectionRequestInfo.configurations)
-                : muleConnectionRequestInfo.configurations != null) {
+        if (configurations != null
+                        ? !configurations.equals(muleConnectionRequestInfo.configurations)
+                        : muleConnectionRequestInfo.configurations != null)
+        {
             return false;
         }
-        if (password != null ? !password.equals(muleConnectionRequestInfo.password)
-                : muleConnectionRequestInfo.password != null) {
+        if (password != null
+                        ? !password.equals(muleConnectionRequestInfo.password)
+                        : muleConnectionRequestInfo.password != null)
+        {
             return false;
         }
-        if (username != null ? !username.equals(muleConnectionRequestInfo.username)
-                : muleConnectionRequestInfo.username != null) {
+        if (username != null
+                        ? !username.equals(muleConnectionRequestInfo.username)
+                        : muleConnectionRequestInfo.username != null)
+        {
             return false;
         }
 

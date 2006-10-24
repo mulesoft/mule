@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.properties;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -19,9 +20,7 @@ import org.mule.util.properties.PropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**
- * Will extract properties based on Xpath expressions.  Will work on
- * Xml/Dom and beans
- *
+ * Will extract properties based on Xpath expressions. Will work on Xml/Dom and beans
  */
 public class JXPathPropertyExtractor implements PropertyExtractor
 {
@@ -31,29 +30,39 @@ public class JXPathPropertyExtractor implements PropertyExtractor
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public Object getProperty(String name, Object message) {
+    public Object getProperty(String name, Object message)
+    {
 
         Object result = null;
         Object payload = message;
-        if(message instanceof UMOMessage)
+        if (message instanceof UMOMessage)
         {
             payload = ((UMOMessage)message).getPayload();
         }
 
-        if (payload instanceof String) {
+        if (payload instanceof String)
+        {
             Document doc;
-            try {
-                doc = DocumentHelper.parseText((String) payload);
-            } catch (DocumentException e) {
+            try
+            {
+                doc = DocumentHelper.parseText((String)payload);
+            }
+            catch (DocumentException e)
+            {
                 logger.error(e);
                 return null;
             }
             result = doc.valueOf(name);
-        } else {
+        }
+        else
+        {
             JXPathContext context = JXPathContext.newContext(payload);
-            try {
+            try
+            {
                 result = context.getValue(name);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // ignore
             }
         }

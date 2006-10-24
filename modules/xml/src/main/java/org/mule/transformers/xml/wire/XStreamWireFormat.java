@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.xml.wire;
 
 import org.mule.transformers.wire.TransformerPairWireFormat;
@@ -18,8 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Serializes objects using XStream. This is equivelent of using the ObjectToXml and XmlToObject except
- * that there is not source or return type checking. WireFormats are only
+ * Serializes objects using XStream. This is equivelent of using the ObjectToXml and
+ * XmlToObject except that there is not source or return type checking. WireFormats
+ * are only
  */
 public class XStreamWireFormat extends TransformerPairWireFormat
 {
@@ -28,7 +30,8 @@ public class XStreamWireFormat extends TransformerPairWireFormat
         this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
     }
 
-    public XStreamWireFormat(String driverClassName, Map aliases, List converters) throws IllegalAccessException, InstantiationException, ClassNotFoundException
+    public XStreamWireFormat(String driverClassName, Map aliases, List converters)
+        throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         XmlToObject in = new XmlToObject();
         in.setDriverClassName(driverClassName);
@@ -42,6 +45,5 @@ public class XStreamWireFormat extends TransformerPairWireFormat
         out.setConverters(converters);
         setOutboundTransformer(out);
     }
-
 
 }

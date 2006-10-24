@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import org.mule.umo.security.UMOAuthentication;
@@ -14,7 +15,6 @@ import org.mule.umo.security.UMOSecurityContext;
 
 /**
  * @author ariva
- * 
  */
 public class PGPSecurityContext implements UMOSecurityContext
 {
@@ -33,7 +33,7 @@ public class PGPSecurityContext implements UMOSecurityContext
      */
     public void setAuthentication(UMOAuthentication authentication)
     {
-        this.authentication = (PGPAuthentication) authentication;
+        this.authentication = (PGPAuthentication)authentication;
     }
 
     /*

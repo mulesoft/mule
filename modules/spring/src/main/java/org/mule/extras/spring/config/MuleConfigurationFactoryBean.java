@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
@@ -17,10 +18,9 @@ import org.mule.config.ThreadingProfile;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * <code>MuleConfigurationFactoryBean</code> is used to configure the
- * MuleManager object. This is not necessary if you use the
- * AutowireUMOManagerFactoryBean as it handles creating the MuleConfiguration
- * correctly for you.
+ * <code>MuleConfigurationFactoryBean</code> is used to configure the MuleManager
+ * object. This is not necessary if you use the AutowireUMOManagerFactoryBean as it
+ * handles creating the MuleConfiguration correctly for you.
  * 
  * @deprecated use AutowireUMOManagerFactoryBean instead
  * @see AutowireUMOManagerFactoryBean

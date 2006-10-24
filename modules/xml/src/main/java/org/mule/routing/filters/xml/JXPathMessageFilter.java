@@ -12,7 +12,8 @@ package org.mule.routing.filters.xml;
 
 /**
  * @inheritDoc
- * @deprecated Please use <code>org.mule.routing.filters.xml.JXPathFilter</code> instead.
+ * @deprecated Please use <code>org.mule.routing.filters.xml.JXPathFilter</code>
+ *             instead.
  */
 public class JXPathMessageFilter extends JXPathFilter
 {

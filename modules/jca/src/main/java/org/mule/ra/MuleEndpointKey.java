@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import javax.resource.spi.endpoint.MessageEndpointFactory;
@@ -61,13 +62,15 @@ public class MuleEndpointKey
      */
     public boolean equals(Object obj)
     {
-        if (this == obj) {
+        if (this == obj)
+        {
             return true;
         }
-        if (obj == null) {
+        if (obj == null)
+        {
             return false;
         }
-        MuleEndpointKey o = (MuleEndpointKey) obj;
+        MuleEndpointKey o = (MuleEndpointKey)obj;
 
         return o.activationSpec == activationSpec && o.messageEndpointFactory == messageEndpointFactory;
     }
@@ -75,6 +78,6 @@ public class MuleEndpointKey
     public String toString()
     {
         return "MuleEndpointKey{" + "messageEndpointFactory=" + messageEndpointFactory + ", activationSpec="
-                + activationSpec + "}";
+               + activationSpec + "}";
     }
 }

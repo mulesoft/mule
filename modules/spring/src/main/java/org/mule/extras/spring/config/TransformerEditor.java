@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.config;
 
 import org.apache.commons.logging.Log;
@@ -32,9 +33,12 @@ public class TransformerEditor extends PropertyEditorSupport
 
     public void setAsText(String text)
     {
-        try {
+        try
+        {
             setValue(MuleObjectHelper.getTransformer(text, (text.indexOf(",") > -1 ? "," : " ")));
-        } catch (MuleException e) {
+        }
+        catch (MuleException e)
+        {
             logger.error(e.getMessage(), e);
         }
     }

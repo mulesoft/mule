@@ -18,9 +18,8 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import java.beans.ExceptionListener;
 
 /**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * 
- * $Id$
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
+ *         ConnectorServiceMBean.java 3167 2006-09-22 15:47:04Z holger $
  */
 public interface ConnectorServiceMBean
 {
@@ -39,14 +38,11 @@ public interface ConnectorServiceMBean
 
     UMOMessageDispatcherFactory getDispatcherFactory();
 
-    void startConnector()
-            throws UMOException;
+    void startConnector() throws UMOException;
 
-    void stopConnector()
-            throws UMOException;
+    void stopConnector() throws UMOException;
 
     void dispose();
 
-    void initialise()
-            throws InitialisationException, RecoverableException;
+    void initialise() throws InitialisationException, RecoverableException;
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
@@ -39,10 +40,11 @@ public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTe
         UMOManager manager = MuleManager.getInstance();
         assertNotNull(manager.getContainerContext());
 
-        Object object = manager.getContainerContext().getComponent(new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
+        Object object = manager.getContainerContext().getComponent(
+            new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
-        FruitBowl bowl = (FruitBowl) object;
+        FruitBowl bowl = (FruitBowl)object;
         assertTrue(bowl.hasBanana());
         assertTrue(bowl.hasApple());
     }

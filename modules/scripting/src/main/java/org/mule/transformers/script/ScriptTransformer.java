@@ -23,7 +23,7 @@ import javax.script.ScriptException;
 
 /**
  * Will run a script to perform transformation on an object
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,23 +36,29 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
 
     protected Scriptable scriptable;
 
-    public ScriptTransformer() {
+    public ScriptTransformer()
+    {
         scriptable = new Scriptable();
 
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    {
 
         Namespace ns = getScriptEngine().createNamespace();
         populateNamespace(ns, context, src);
-        try {
+        try
+        {
             return scriptable.runScript(ns);
-        } catch (ScriptException e) {
+        }
+        catch (ScriptException e)
+        {
             throw new TransformerException(this, e);
         }
     }
 
-     protected void populateNamespace(Namespace namespace, UMOEventContext context, Object src) {
+    protected void populateNamespace(Namespace namespace, UMOEventContext context, Object src)
+    {
         namespace.put("context", context);
         namespace.put("message", context.getMessage());
         namespace.put("src", src);
@@ -63,73 +69,83 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
     /**
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
-     *
+     * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     *
      */
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         super.initialise();
         scriptable.initialise();
     }
 
-    public ScriptEngine getScriptEngine() {
+    public ScriptEngine getScriptEngine()
+    {
         return scriptable.getScriptEngine();
     }
 
-    public void setScriptEngine(ScriptEngine scriptEngine) {
+    public void setScriptEngine(ScriptEngine scriptEngine)
+    {
         scriptable.setScriptEngine(scriptEngine);
     }
 
-    public CompiledScript getCompiledScript() {
+    public CompiledScript getCompiledScript()
+    {
         return scriptable.getCompiledScript();
     }
 
-    public void setCompiledScript(CompiledScript compiledScript) {
+    public void setCompiledScript(CompiledScript compiledScript)
+    {
         scriptable.setCompiledScript(compiledScript);
     }
 
-    public String getScriptText() {
+    public String getScriptText()
+    {
         return scriptable.getScriptText();
     }
 
-
-    public void setScriptText(String scriptText) {
+    public void setScriptText(String scriptText)
+    {
         scriptable.setScriptText(scriptText);
     }
 
-
-    public String getScriptFile() {
+    public String getScriptFile()
+    {
         return scriptable.getScriptFile();
     }
 
-    public void setScriptFile(String scriptFile) {
+    public void setScriptFile(String scriptFile)
+    {
         scriptable.setScriptFile(scriptFile);
     }
 
-    public void setScriptEngineName(String scriptEngineName) {
+    public void setScriptEngineName(String scriptEngineName)
+    {
         scriptable.setScriptEngineName(scriptEngineName);
     }
 
-    public String getScriptEngineName() {
+    public String getScriptEngineName()
+    {
         return scriptable.getScriptEngineName();
     }
 
-    Scriptable getScriptable() {
+    Scriptable getScriptable()
+    {
         return scriptable;
     }
 
-    void setScriptable(Scriptable scriptable) {
+    void setScriptable(Scriptable scriptable)
+    {
         this.scriptable = scriptable;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#clone()
      */
     public Object clone() throws CloneNotSupportedException
     {
-        ScriptTransformer trans = (ScriptTransformer) super.clone();
+        ScriptTransformer trans = (ScriptTransformer)super.clone();
         trans.setScriptable(scriptable);
         return trans;
     }

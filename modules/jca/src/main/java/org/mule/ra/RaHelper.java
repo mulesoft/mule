@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.config.i18n.Message;
@@ -34,16 +35,22 @@ public class RaHelper
 {
     public static PasswordCredential getPasswordCredential(final ManagedConnectionFactory mcf,
                                                            final Subject subject,
-                                                           ConnectionRequestInfo info) throws ResourceException
+                                                           ConnectionRequestInfo info)
+        throws ResourceException
     {
-        if (subject == null) {
-            if (info == null) {
+        if (subject == null)
+        {
+            if (info == null)
+            {
                 return null;
-            } else {
-                MuleConnectionRequestInfo muleInfo = (MuleConnectionRequestInfo) info;
+            }
+            else
+            {
+                MuleConnectionRequestInfo muleInfo = (MuleConnectionRequestInfo)info;
 
                 // Can't create a PC with null values
-                if (muleInfo.getUserName() == null || muleInfo.getPassword() == null) {
+                if (muleInfo.getUserName() == null || muleInfo.getPassword() == null)
+                {
                     // logger.info("\tUtil::GetPasswordCred: User or password is
                     // null");
                     return null;
@@ -54,17 +61,23 @@ public class RaHelper
                 pc.setManagedConnectionFactory(mcf);
                 return pc;
             }
-        } else {
-            PasswordCredential pc = (PasswordCredential) AccessController.doPrivileged(new PrivilegedAction() {
+        }
+        else
+        {
+            PasswordCredential pc = (PasswordCredential)AccessController.doPrivileged(new PrivilegedAction()
+            {
                 public Object run()
                 {
                     Set creds = subject.getPrivateCredentials(PasswordCredential.class);
                     Iterator iter = creds.iterator();
-                    while (iter.hasNext()) {
-                        PasswordCredential candidate = (PasswordCredential) iter.next();
-                        if (candidate != null) {
+                    while (iter.hasNext())
+                    {
+                        PasswordCredential candidate = (PasswordCredential)iter.next();
+                        if (candidate != null)
+                        {
                             ManagedConnectionFactory candidatemcf = candidate.getManagedConnectionFactory();
-                            if (candidatemcf != null && candidatemcf.equals(mcf)) {
+                            if (candidatemcf != null && candidatemcf.equals(mcf))
+                            {
                                 return candidate;
                             }
                         }
@@ -72,9 +85,12 @@ public class RaHelper
                     return null;
                 }
             });
-            if (pc == null) {
+            if (pc == null)
+            {
                 throw new java.lang.SecurityException(new Message(Messages.AUTH_NO_CREDENTIALS).getMessage());
-            } else {
+            }
+            else
+            {
                 return pc;
             }
         }

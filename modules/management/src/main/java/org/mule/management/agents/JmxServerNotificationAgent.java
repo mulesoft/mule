@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.agents;
 
 import org.mule.MuleManager;
@@ -28,11 +29,12 @@ import java.util.List;
 
 /**
  * An agent that propergates Mule Server notifications to Jmx.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent {
+public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
+{
 
     public static final String LISTENER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationListener";
     public static final String BROADCASTER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationBroadcaster";
@@ -44,82 +46,109 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
     private ObjectName listenerObjectName;
     private ObjectName broadcasterObjectName;
 
-
-    protected void doInitialise() throws InitialisationException {
-        if (getName() == null) {
+    protected void doInitialise() throws InitialisationException
+    {
+        if (getName() == null)
+        {
             setName("Jmx Notification Agent");
         }
-        try {
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-            broadcasterObjectName = ObjectName.getInstance(getDomainName() + ":" + BROADCASTER_JMX_OBJECT_NAME);
+        try
+        {
+            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            broadcasterObjectName = ObjectName.getInstance(getDomainName() + ":"
+                                                           + BROADCASTER_JMX_OBJECT_NAME);
             broadcastNotificationMbean = new BroadcastNotificationService();
             mBeanServer.registerMBean(broadcastNotificationMbean, broadcasterObjectName);
-            if(registerListenerMbean) {
+            if (registerListenerMbean)
+            {
                 listenerObjectName = ObjectName.getInstance(getDomainName() + ":" + LISTENER_JMX_OBJECT_NAME);
                 NotificationListener mbean = new NotificationListener();
                 broadcastNotificationMbean.addNotificationListener(mbean, null, null);
                 mBeanServer.registerMBean(mbean, listenerObjectName);
             }
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Server Notification Agent"), e, this);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X,
+                "JMX Server Notification Agent"), e, this);
         }
     }
 
-
-    public void dispose() {
-        try {
-           if(listenerObjectName!=null) {
-            mBeanServer.unregisterMBean(listenerObjectName);
+    public void dispose()
+    {
+        try
+        {
+            if (listenerObjectName != null)
+            {
+                mBeanServer.unregisterMBean(listenerObjectName);
+            }
         }
-        } catch (Exception e) {
+        catch (Exception e)
+        {
             logger.warn(e.getMessage(), e);
         }
-        try {
+        try
+        {
             mBeanServer.unregisterMBean(broadcasterObjectName);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.warn(e.getMessage(), e);
         }
         super.dispose();
     }
 
-    protected void logEvent(UMOServerNotification e) {
-        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e, e.getTimestamp(), e.toString()));
+    protected void logEvent(UMOServerNotification e)
+    {
+        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e,
+            e.getTimestamp(), e.toString()));
     }
 
     /**
      * Should be a 1 line description of the agent
-     *
+     * 
      * @return description
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return "Jmx Notification Agent" + (registerListenerMbean ? "(Listener MBean registered)" : "");
     }
 
-    protected String getDomainName() {
-        if (MuleManager.getInstance().getId() != null && isUseInstanceIdAsDomain()) {
+    protected String getDomainName()
+    {
+        if (MuleManager.getInstance().getId() != null && isUseInstanceIdAsDomain())
+        {
             return MuleManager.getInstance().getId();
-        } else {
+        }
+        else
+        {
             return "org.mule";
         }
     }
 
-    public boolean isUseInstanceIdAsDomain() {
+    public boolean isUseInstanceIdAsDomain()
+    {
         return useInstanceIdAsDomain;
     }
 
-    public void setUseInstanceIdAsDomain(boolean useInstanceIdAsDomain) {
+    public void setUseInstanceIdAsDomain(boolean useInstanceIdAsDomain)
+    {
         this.useInstanceIdAsDomain = useInstanceIdAsDomain;
     }
 
-    public static interface BroadcastNotificationServiceMBean extends NotificationEmitter {
+    public static interface BroadcastNotificationServiceMBean extends NotificationEmitter
+    {
         // no methods
     }
 
-    public static class BroadcastNotificationService extends NotificationBroadcasterSupport implements BroadcastNotificationServiceMBean {
+    public static class BroadcastNotificationService extends NotificationBroadcasterSupport
+        implements BroadcastNotificationServiceMBean
+    {
         // no methods
     }
 
-    public static interface NotificationListenerMBean {
+    public static interface NotificationListenerMBean
+    {
         List getNotificsationList();
 
         int getListSize();
@@ -127,32 +156,41 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent 
         void setListSize(int listSize);
     }
 
-    public static class NotificationListener implements NotificationListenerMBean, javax.management.NotificationListener {
+    public static class NotificationListener
+        implements NotificationListenerMBean, javax.management.NotificationListener
+    {
         private int listSize = 100;
 
         private List notifs;
 
-        public void handleNotification(Notification notification, Object o) {
-            if (getList().size() == listSize) {
+        public void handleNotification(Notification notification, Object o)
+        {
+            if (getList().size() == listSize)
+            {
                 getList().remove(listSize - 1);
             }
             getList().add(0, notification);
         }
 
-        public List getNotificsationList() {
+        public List getNotificsationList()
+        {
             return notifs;
         }
 
-        public int getListSize() {
+        public int getListSize()
+        {
             return listSize;
         }
 
-        public void setListSize(int listSize) {
+        public void setListSize(int listSize)
+        {
             this.listSize = listSize;
         }
 
-        protected List getList() {
-            if (notifs == null) {
+        protected List getList()
+        {
+            if (notifs == null)
+            {
                 notifs = new ArrayList(listSize);
             }
             return notifs;

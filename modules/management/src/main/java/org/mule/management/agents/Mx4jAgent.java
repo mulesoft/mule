@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.agents;
 
 import mx4j.log.CommonsLogger;
@@ -40,7 +41,6 @@ import java.util.Map;
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
  * statistics and configuration viewing of a Mule instance..
- *
  */
 public class Mx4jAgent implements UMOAgent
 {
@@ -54,7 +54,7 @@ public class Mx4jAgent implements UMOAgent
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
 
-    //Adaptor overrides
+    // Adaptor overrides
     private String login = null;
 
     private String password = null;
@@ -70,7 +70,8 @@ public class Mx4jAgent implements UMOAgent
     // SSL/TLS socket factory config
     private Map socketFactoryProperties = new HashMap();
 
-    protected HttpAdaptor createAdaptor() throws Exception {
+    protected HttpAdaptor createAdaptor() throws Exception
+    {
 
         Log.redirectTo(new CommonsLogger());
         URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
@@ -79,11 +80,13 @@ public class Mx4jAgent implements UMOAgent
         // Set the XSLT Processor with any local overrides
         XSLTProcessor processor = new XSLTProcessor();
 
-        if (StringUtils.isNotBlank(xslFilePath)) {
+        if (StringUtils.isNotBlank(xslFilePath))
+        {
             processor.setFile(xslFilePath.trim());
         }
 
-        if (StringUtils.isNotBlank(pathInJar)) {
+        if (StringUtils.isNotBlank(pathInJar))
+        {
             processor.setPathInJar(pathInJar.trim());
         }
 
@@ -91,17 +94,22 @@ public class Mx4jAgent implements UMOAgent
 
         adaptor.setProcessor(processor);
 
-        //Set endpoint authentication if required
-        if (login != null) {
+        // Set endpoint authentication if required
+        if (login != null)
+        {
             adaptor.addAuthorization(login, password);
             adaptor.setAuthenticationMethod(authenticationMethod);
         }
 
-        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty()) {
+        if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty())
+        {
             SSLAdaptorServerSocketFactoryMBean factory;
-            if (SystemUtils.isIbmJDK()) {
+            if (SystemUtils.isIbmJDK())
+            {
                 factory = new IBMSslAdapterServerSocketFactory();
-            } else {
+            }
+            else
+            {
                 // BEA are using Sun's JSSE, so no extra checks necessary
                 factory = new SSLAdaptorServerSocketFactory();
             }
@@ -113,42 +121,66 @@ public class Mx4jAgent implements UMOAgent
     }
 
     /* @see org.mule.umo.lifecycle.Initialisable#initialise() */
-    public void initialise() throws InitialisationException {
-        try {
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-            
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+
             adaptor = createAdaptor();
             adaptorName = new ObjectName(HTTP_ADAPTER_OBJECT_NAME);
-            
+
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(adaptor, adaptorName);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e, this);
         }
     }
 
     /* @see org.mule.umo.lifecycle.Startable#start() */
-    public void start() throws UMOException {
-        try {
+    public void start() throws UMOException
+    {
+        try
+        {
             mBeanServer.invoke(adaptorName, "start", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
-        } catch (ReflectionException e) {
+        }
+        catch (InstanceNotFoundException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"),
+                adaptorName, e);
+        }
+        catch (MBeanException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"),
+                adaptorName, e);
+        }
+        catch (ReflectionException e)
+        {
             // ignore
         }
     }
 
     /* @see org.mule.umo.lifecycle.Stoppable#stop() */
-    public void stop() throws UMOException {
-        try {
+    public void stop() throws UMOException
+    {
+        try
+        {
             mBeanServer.invoke(adaptorName, "stop", null, null);
-        } catch (InstanceNotFoundException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
-        } catch (MBeanException e) {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"), adaptorName, e);
-        } catch (ReflectionException e) {
+        }
+        catch (InstanceNotFoundException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"),
+                adaptorName, e);
+        }
+        catch (MBeanException e)
+        {
+            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"),
+                adaptorName, e);
+        }
+        catch (ReflectionException e)
+        {
             // ignore
         }
     }
@@ -157,122 +189,152 @@ public class Mx4jAgent implements UMOAgent
      * Unregister all log4j MBeans if there are any left over the old deployment
      */
     protected void unregisterMBeansIfNecessary()
-            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+        throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
     {
-        if (mBeanServer.isRegistered(ObjectName.getInstance(HTTP_ADAPTER_OBJECT_NAME))) {
+        if (mBeanServer.isRegistered(ObjectName.getInstance(HTTP_ADAPTER_OBJECT_NAME)))
+        {
             mBeanServer.unregisterMBean(adaptorName);
         }
     }
 
     /* @see org.mule.umo.lifecycle.Disposable#dispose() */
-    public void dispose() {
-        try {
+    public void dispose()
+    {
+        try
+        {
             stop();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.warn("Failed to stop Mx4jAgent: " + e.getMessage());
-        } finally {
+        }
+        finally
+        {
             try
             {
                 unregisterMBeansIfNecessary();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                logger.error("Couldn't unregister MBean: " + (adaptorName!=null ? adaptorName.getCanonicalName() : "null"), e);
+                logger.error("Couldn't unregister MBean: "
+                             + (adaptorName != null ? adaptorName.getCanonicalName() : "null"), e);
             }
         }
     }
 
     /* @see org.mule.umo.manager.UMOAgent#registered() */
-    public void registered() {
+    public void registered()
+    {
         // nothing to do
     }
 
     /* @see org.mule.umo.manager.UMOAgent#unregistered() */
-    public void unregistered() {
+    public void unregistered()
+    {
         // nothing to do
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Getters and setters
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     /* @see org.mule.umo.manager.UMOAgent#getDescription() */
-    public String getDescription() {
+    public String getDescription()
+    {
         return "MX4J Http adaptor: " + jmxAdaptorUrl;
     }
 
     /* @see org.mule.umo.manager.UMOAgent#getName() */
-    public String getName() {
+    public String getName()
+    {
         return this.name;
     }
 
     /* @see org.mule.umo.manager.UMOAgent#setName(java.lang.String) */
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
     /** @return Returns the jmxAdaptorUrl. */
-    public String getJmxAdaptorUrl() {
+    public String getJmxAdaptorUrl()
+    {
         return jmxAdaptorUrl;
     }
 
     /** @param jmxAdaptorUrl The jmxAdaptorUrl to set. */
-    public void setJmxAdaptorUrl(String jmxAdaptorUrl) {
+    public void setJmxAdaptorUrl(String jmxAdaptorUrl)
+    {
         this.jmxAdaptorUrl = jmxAdaptorUrl;
     }
 
-    public Map getSocketFactoryProperties() {
+    public Map getSocketFactoryProperties()
+    {
         return socketFactoryProperties;
     }
 
-    public void setSocketFactoryProperties(Map socketFactoryProperties) {
+    public void setSocketFactoryProperties(Map socketFactoryProperties)
+    {
         this.socketFactoryProperties = socketFactoryProperties;
     }
 
-    public String getLogin() {
+    public String getLogin()
+    {
         return login;
     }
 
-    public void setLogin(String login) {
+    public void setLogin(String login)
+    {
         this.login = login;
     }
 
-    public String getPassword() {
+    public String getPassword()
+    {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(String password)
+    {
         this.password = password;
     }
 
-    public String getAuthenticationMethod() {
+    public String getAuthenticationMethod()
+    {
         return authenticationMethod;
     }
 
-    public void setAuthenticationMethod(String authenticationMethod) {
+    public void setAuthenticationMethod(String authenticationMethod)
+    {
         this.authenticationMethod = authenticationMethod;
     }
 
-    public String getXslFilePath() {
+    public String getXslFilePath()
+    {
         return xslFilePath;
     }
 
-    public void setXslFilePath(String xslFilePath) {
+    public void setXslFilePath(String xslFilePath)
+    {
         this.xslFilePath = xslFilePath;
     }
 
-    public String getPathInJar() {
+    public String getPathInJar()
+    {
         return pathInJar;
     }
 
-    public void setPathInJar(String pathInJar) {
+    public void setPathInJar(String pathInJar)
+    {
         this.pathInJar = pathInJar;
     }
 
-    public boolean isCacheXsl() {
+    public boolean isCacheXsl()
+    {
         return cacheXsl;
     }
 
-    public void setCacheXsl(boolean cacheXsl) {
+    public void setCacheXsl(boolean cacheXsl)
+    {
         this.cacheXsl = cacheXsl;
     }
 }

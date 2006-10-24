@@ -19,7 +19,7 @@ import org.mule.umo.security.UMOSecurityContext;
  */
 public class JaasSecurityContext implements UMOSecurityContext
 {
-    
+
     private MuleAuthentication authentication;
 
     /**
@@ -49,6 +49,6 @@ public class JaasSecurityContext implements UMOSecurityContext
      */
     public final void setAuthentication(UMOAuthentication authentication)
     {
-        this.authentication = (MuleAuthentication) authentication;
+        this.authentication = (MuleAuthentication)authentication;
     }
 }

@@ -36,28 +36,34 @@ public class OGNLFilter implements UMOFilter
 
     public boolean accept(UMOMessage message)
     {
-        if (message == null) {
+        if (message == null)
+        {
             return false;
         }
 
         Object candidate = message.getPayload();
-        if (candidate == null) {
+        if (candidate == null)
+        {
             return false;
         }
 
-        if (expression == null) {
+        if (expression == null)
+        {
             logger.warn("Expression for OGNLFilter is not set");
             return false;
         }
 
-        try {
+        try
+        {
             Object result = Ognl.getValue(expression, candidate);
-            if (result instanceof Boolean) {
+            if (result instanceof Boolean)
+            {
                 return ((Boolean)result).booleanValue();
             }
         }
 
-        catch (OgnlException ex) {
+        catch (OgnlException ex)
+        {
             logger.error("Error evaluating OGNL expression.", ex);
         }
 

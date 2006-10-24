@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.transaction;
 
 import org.mule.umo.manager.UMOTransactionManagerFactory;
@@ -21,11 +22,13 @@ public class SpringTransactionManagerFactory implements UMOTransactionManagerFac
 
     private TransactionManager transactionManager;
 
-    public void setTransactionManager(TransactionManager transactionManager) {
+    public void setTransactionManager(TransactionManager transactionManager)
+    {
         this.transactionManager = transactionManager;
     }
 
-    public TransactionManager create() throws Exception {
+    public TransactionManager create() throws Exception
+    {
         return transactionManager;
     }
 

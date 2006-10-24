@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.remoting;
 
 public interface WorkInterface
@@ -16,6 +17,6 @@ public interface WorkInterface
     String executeString(String input);
 
     ComplexData executeComplexity(ComplexData input);
-    
-//    QueryResult executeQuery(RioQuery query);
+
+    // QueryResult executeQuery(RioQuery query);
 }

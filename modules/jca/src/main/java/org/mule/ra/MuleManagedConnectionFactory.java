@@ -123,12 +123,11 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * initialized with the passed ConnectionManager. In the managed scenario,
      * ConnectionManager is provided by the application server.
      * 
-     * @param cxManager
-     *            ConnectionManager to be associated with created EIS connection
-     *            factory instance
+     * @param cxManager ConnectionManager to be associated with created EIS
+     *            connection factory instance
      * @return EIS-specific Connection Factory instance
-     * @throws javax.resource.ResourceException
-     *             if the attempt to create a connection factory fails
+     * @throws javax.resource.ResourceException if the attempt to create a connection
+     *             factory fails
      */
 
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException
@@ -151,8 +150,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * ConnectionManager is provided by the resource adapter.
      * 
      * @return EIS-specific Connection Factory instance
-     * @throws ResourceException
-     *             if the attempt to create a connection factory fails
+     * @throws ResourceException if the attempt to create a connection factory fails
      */
 
     public Object createConnectionFactory() throws ResourceException
@@ -165,17 +163,15 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * additional ConnectionRequestInfo (which is specific to ResourceAdapter and
      * opaque to application server) to create this new connection.
      * 
-     * @param subject
-     *            caller's security information
-     * @param cxRequestInfo
-     *            additional resource adapter specific connection request information
+     * @param subject caller's security information
+     * @param cxRequestInfo additional resource adapter specific connection request
+     *            information
      * @return ManagedConnection instance
-     * @throws ResourceException
-     *             if the attempt to create a connection fails
+     * @throws ResourceException if the attempt to create a connection fails
      */
 
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo)
-            throws ResourceException
+        throws ResourceException
     {
         MuleManagedConnection mc = new MuleManagedConnection(this, subject, cxRequestInfo);
         return mc;
@@ -188,21 +184,19 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * Adapter specific criteria to do matching. A MC that has the requested store is
      * returned as a match
      * 
-     * @param connectionSet
-     *            candidate connection set
-     * @param subject
-     *            caller's security information
-     * @param cxRequestInfo
-     *            additional resource adapter specific connection request information
+     * @param connectionSet candidate connection set
+     * @param subject caller's security information
+     * @param cxRequestInfo additional resource adapter specific connection request
+     *            information
      * @return ManagedConnection if resource adapter finds an acceptable match,
      *         otherwise null
-     * @throws ResourceException
-     *             if the match fails
+     * @throws ResourceException if the match fails
      */
 
     public ManagedConnection matchManagedConnections(Set connectionSet,
-            Subject subject,
-            ConnectionRequestInfo cxRequestInfo) throws ResourceException
+                                                     Subject subject,
+                                                     ConnectionRequestInfo cxRequestInfo)
+        throws ResourceException
     {
         PasswordCredential pc = RaHelper.getPasswordCredential(this, subject, cxRequestInfo);
 
@@ -228,10 +222,8 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * is a character output stream to which all logging and tracing messages for
      * this ManagedConnectionfactory instance will be printed.
      * 
-     * @param out
-     *            an output stream for error logging and tracing
-     * @throws ResourceException
-     *             if the method fails
+     * @param out an output stream for error logging and tracing
+     * @throws ResourceException if the method fails
      */
 
     public void setLogWriter(PrintWriter out) throws ResourceException
@@ -243,8 +235,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * Gets the log writer for this ManagedConnectionFactory instance.
      * 
      * @return PrintWriter an output stream for error logging and tracing
-     * @throws ResourceException
-     *             if the method fails
+     * @throws ResourceException if the method fails
      */
 
     public PrintWriter getLogWriter() throws ResourceException
@@ -256,8 +247,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * Associate PropertyChangeListener with the ManagedConnectionFactory, in order
      * to notify about properties changes.
      * 
-     * @param lis
-     *            the PropertyChangeListener to be associated with the
+     * @param lis the PropertyChangeListener to be associated with the
      *            ManagedConnectionFactory
      */
 
@@ -270,8 +260,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
      * Delete association of PropertyChangeListener with the
      * ManagedConnectionFactory.
      * 
-     * @param lis
-     *            the PropertyChangeListener to be removed
+     * @param lis the PropertyChangeListener to be removed
      */
 
     public void removePropertyChangeListener(PropertyChangeListener lis)
@@ -300,8 +289,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     /**
      * Sets the value of the userName property.
      * 
-     * @param username
-     *            String containing the value to be assigned to userName
+     * @param username String containing the value to be assigned to userName
      */
 
     public void setUsername(String username)
@@ -323,8 +311,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     /**
      * Sets the value of the password property.
      * 
-     * @param password
-     *            String containing the value to be assigned to password
+     * @param password String containing the value to be assigned to password
      */
 
     public void setPassword(String password)

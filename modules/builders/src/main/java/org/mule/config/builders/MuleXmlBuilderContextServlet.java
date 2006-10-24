@@ -39,7 +39,7 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         try
         {
             String config = getServletContext().getInitParameter(CONFIG_INIT_PARAMETER);
-            if(config == null)
+            if (config == null)
             {
                 config = getDefaultConfigResource();
             }
@@ -60,18 +60,22 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
 
     /**
      * Used to actually construct the UMOManager instance
-     * @param configResource  the location of the config resource, this can be on the
-     * local file system or on the classpath.
-     * @return  A configured UMOManager instance
+     * 
+     * @param configResource the location of the config resource, this can be on the
+     *            local file system or on the classpath.
+     * @return A configured UMOManager instance
      */
-    protected UMOManager createManager(String configResource, ServletContext context) throws ConfigurationException {
+    protected UMOManager createManager(String configResource, ServletContext context)
+        throws ConfigurationException
+    {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context);
         return builder.configure(configResource, null);
     }
 
     /**
-     * If no config location resource is configured on the servlet context, the
-     * value returned from this method will be used to initialise the MuleManager.
+     * If no config location resource is configured on the servlet context, the value
+     * returned from this method will be used to initialise the MuleManager.
+     * 
      * @return the default config resource location
      */
     protected String getDefaultConfigResource()
@@ -79,9 +83,14 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         return "/WEB-INF/mule-config.xml";
     }
 
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
-        getServletContext().log("(" + request.getRequestURI() + ")" + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
+        getServletContext().log(
+            "("
+                            + request.getRequestURI()
+                            + ")"
+                            + "MuleXmlBuilderContextServlet.service(HttpServletRequest request, HttpServletResponse response) call ignored.");
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
 

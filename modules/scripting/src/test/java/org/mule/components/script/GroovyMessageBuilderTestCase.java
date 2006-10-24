@@ -20,7 +20,8 @@ import org.mule.umo.UMOMessage;
  */
 public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "groovy-builder-config.xml";
     }
 
@@ -32,4 +33,3 @@ public class GroovyMessageBuilderTestCase extends FunctionalTestCase
         assertEquals("Test: A Received B Received", m.getPayloadAsString());
     }
 }
-

@@ -81,7 +81,7 @@ import java.util.Map;
  * <p>
  * Note that there must be a configured MuleManager for this client to work. It will
  * use the one available using <code>MuleManager.getInstance()</code>
- *
+ * 
  * @see org.mule.impl.endpoint.MuleEndpointURI
  */
 public class MuleClient implements Disposable
@@ -221,28 +221,28 @@ public class MuleClient implements Disposable
         // if we are creating a server for this client then set client mode
         // this will disable Admin connections by default;
         // If there is no local manager present create a default manager
-        if(MuleManager.isInstanciated())
+        if (MuleManager.isInstanciated())
         {
-            if(logger.isInfoEnabled())
+            if (logger.isInfoEnabled())
             {
                 logger.info("There is already a manager available to this client locally, no need to create a new one");
             }
-        } else
+        }
+        else
         {
             MuleManager.getConfiguration().setClientMode(true);
-            if(logger.isInfoEnabled())
+            if (logger.isInfoEnabled())
             {
                 logger.info("There is no manager instance available locally for this client, Creating a new Manager");
             }
         }
-
 
         manager = MuleManager.getInstance();
         builder = new QuickConfigurationBuilder();
 
         if (!manager.isInitialised() && startManager == true)
         {
-            if(logger.isInfoEnabled()) logger.info("Starting Mule Manager for this client");
+            if (logger.isInfoEnabled()) logger.info("Starting Mule Manager for this client");
             ((MuleManager)manager).start();
         }
     }

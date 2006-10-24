@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.config;
 
 import java.io.IOException;
@@ -17,12 +18,11 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 
 /**
- * <code>MuleApplicationContext</code> is A Simple extension Application
- * context that allows rosurces to be loaded from the Classpath of file system
- * using the MuleBeanDefinitionReader.
- *
+ * <code>MuleApplicationContext</code> is A Simple extension Application context
+ * that allows rosurces to be loaded from the Classpath of file system using the
+ * MuleBeanDefinitionReader.
+ * 
  * @see MuleBeanDefinitionReader
- *
  * @version $Revision$
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
@@ -31,7 +31,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     public MuleApplicationContext(String configLocation)
     {
-        this(new String[] { configLocation });
+        this(new String[]{configLocation});
     }
 
     public MuleApplicationContext(String[] configLocations)
@@ -42,7 +42,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException
     {
         this.configLocations = configLocations;
-        if (refresh) {
+        if (refresh)
+        {
             refresh();
         }
     }
@@ -59,7 +60,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
+        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory,
+            configLocations.length);
         initBeanDefinitionReader(beanDefinitionReader);
         loadBeanDefinitions(beanDefinitionReader);
     }

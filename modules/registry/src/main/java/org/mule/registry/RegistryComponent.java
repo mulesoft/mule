@@ -15,13 +15,12 @@ import javax.management.ObjectName;
 import java.util.List;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface RegistryComponent extends Entry {
+public interface RegistryComponent extends Entry
+{
 
     ComponentType getType();
-
 
     void restoreState() throws RegistryException;
 
@@ -42,21 +41,22 @@ public interface RegistryComponent extends Entry {
     void stop() throws RegistryException;
 
     /**
-     * Shut down the item. The releases resources, preparatory to 
-     * uninstallation.
-     *
+     * Shut down the item. The releases resources, preparatory to uninstallation.
+     * 
      * @exception RegistryException if the item fails to shut down.
      */
     void shutDown() throws RegistryException;
 
     /**
      * Retrieves the libraries that this component uses.
+     * 
      * @return
      */
     Library[] getLibraries();
 
     /**
      * Units deployed to this component
+     * 
      * @return
      */
     Unit[] getUnits();
@@ -76,13 +76,16 @@ public interface RegistryComponent extends Entry {
 
     /**
      * Return the component implementation.
+     * 
      * @return
      */
     Object getComponent();
 
     void setComponent(Object component);
+
     /**
      * Return the descriptor for this component.
+     * 
      * @return
      */
     RegistryDescriptor getDescriptor() throws RegistryException;
@@ -91,12 +94,14 @@ public interface RegistryComponent extends Entry {
 
     /**
      * Return the ObjectName under which the lifecycle mbean is registered.
+     * 
      * @return
      */
     ObjectName getObjectName();
 
     /**
      * Return the private component workspace
+     * 
      * @return
      */
     String getWorkspaceRoot();
@@ -105,14 +110,14 @@ public interface RegistryComponent extends Entry {
 
     /**
      * Install this component.
-     *
+     * 
      * @throws RegistryException
      */
     void install() throws RegistryException;
 
     /**
      * Uninstall this component.
-     *
+     * 
      * @throws RegistryException
      */
     void uninstall() throws RegistryException;

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import org.mule.extras.client.MuleClient;
@@ -19,12 +20,12 @@ import java.net.URL;
 
 /**
  * @author ariva
- * 
  */
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "test-pgp-encrypt-config.xml";
     }
 
@@ -32,7 +33,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
 
-        int length = (int) new File(url.getFile()).length();
+        int length = (int)new File(url.getFile()).length();
         byte[] msg = new byte[length];
 
         FileInputStream in = new FileInputStream(url.getFile());
@@ -45,11 +46,14 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
     public void testAuthenticationNotAuthorised() throws Exception
     {
-        try {
+        try
+        {
             MuleClient client = new MuleClient();
             client.send("vm://localhost/echo", new String("An unsigned message"), null);
             fail("The request is not signed");
-        } catch (UnauthorisedException e) {
+        }
+        catch (UnauthorisedException e)
+        {
             // ignore
         }
     }

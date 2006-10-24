@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import cryptix.message.Message;
@@ -20,7 +21,6 @@ import java.net.URL;
 
 /**
  * @author ariva
- * 
  */
 public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 {
@@ -54,7 +54,7 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 
         FileInputStream in = new FileInputStream(url.getFile());
 
-        message = (Message) mf.generateMessages(in).iterator().next();
+        message = (Message)mf.generateMessages(in).iterator().next();
     }
 
     /*
@@ -70,13 +70,16 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 
     public void testAuthenticate()
     {
-        try {
+        try
+        {
             UMOAuthentication auth = new PGPAuthentication("Mule client <mule_client@mule.com>", message);
 
             auth = securityProvider.authenticate(auth);
 
             assertTrue(auth.isAuthenticated());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             assertTrue(false);
         }

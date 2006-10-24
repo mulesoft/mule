@@ -18,13 +18,16 @@ import org.mule.umo.manager.UMOContainerContext;
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public class MultipleSpringContextsTestCase extends FunctionalTestCase {
+public class MultipleSpringContextsTestCase extends FunctionalTestCase
+{
 
-    protected String getConfigResources () {
+    protected String getConfigResources()
+    {
         return "multiple-spring-contexts-mule.xml";
     }
 
-    public void testMultiptleSpringContexts() throws Exception {
+    public void testMultiptleSpringContexts() throws Exception
+    {
         // initialize the manager
         UMOManager manager = MuleManager.getInstance();
 

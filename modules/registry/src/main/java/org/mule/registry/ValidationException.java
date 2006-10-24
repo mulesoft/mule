@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * Is thrown when an object loaded from a descriptor is invalid
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,20 +29,24 @@ public class ValidationException extends RegistryException
      */
     private static final long serialVersionUID = -8798792301579785598L;
 
-    public ValidationException(String vaildationError) {
+    public ValidationException(String vaildationError)
+    {
         super(Message.createStaticMessage(vaildationError));
     }
 
-    public ValidationException(List vaildationErrors) {
+    public ValidationException(List vaildationErrors)
+    {
         this(createMessage(vaildationErrors));
     }
 
-    private static String createMessage(List vaildationErrors) {
-        //TODO i18n
+    private static String createMessage(List vaildationErrors)
+    {
+        // TODO i18n
         StringBuffer buf = new StringBuffer();
         buf.append("The following validation errors occurred");
-        for (Iterator iterator = vaildationErrors.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
+        for (Iterator iterator = vaildationErrors.iterator(); iterator.hasNext();)
+        {
+            String s = (String)iterator.next();
             buf.append(SystemUtils.LINE_SEPARATOR).append(s);
         }
         return buf.toString();

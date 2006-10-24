@@ -29,47 +29,59 @@ import java.io.Writer;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmlRegistryStore implements RegistryStore {
+public class XmlRegistryStore implements RegistryStore
+{
 
     protected ManagementContext context;
 
-    public XmlRegistryStore(ManagementContext context) {
+    public XmlRegistryStore(ManagementContext context)
+    {
         this.context = context;
     }
 
-    public void save(Registry registry) throws RegistryException {
-        synchronized (registry) {
-            try {
+    public void save(Registry registry) throws RegistryException
+    {
+        synchronized (registry)
+        {
+            try
+            {
                 Writer w = new FileWriter(new File(registry.getStoreLocation()));
                 getXStream().toXML(registry, w);
                 w.close();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new RegistryException("Could not save registry", e);
             }
         }
     }
 
-
-    public Registry load(String storeLocation) throws RegistryException {
-        try {
+    public Registry load(String storeLocation) throws RegistryException
+    {
+        try
+        {
             Reader r = new FileReader(storeLocation);
-            AbstractRegistry reg = (AbstractRegistry) getXStream().fromXML(r);
+            AbstractRegistry reg = (AbstractRegistry)getXStream().fromXML(r);
             reg.initialize();
             reg.setStoreLocation(storeLocation);
             r.close();
             return reg;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new RegistryException("Could not load registry", e);
         }
     }
 
-    public Registry create(String store, RegistryFactory factory) throws RegistryException {
+    public Registry create(String store, RegistryFactory factory) throws RegistryException
+    {
         Registry reg = factory.create(this, context);
-        if(reg instanceof AbstractRegistry) {
+        if (reg instanceof AbstractRegistry)
+        {
             ((AbstractRegistry)reg).initialize();
             ((AbstractRegistry)reg).setStoreLocation(store);
         }
@@ -77,15 +89,17 @@ public class XmlRegistryStore implements RegistryStore {
         return reg;
     }
 
-    private static XStream getXStream() {
-        if (xstream == null) {
+    private static XStream getXStream()
+    {
+        if (xstream == null)
+        {
             xstream = new XStream(new StaxDriver());
-//            xstream.alias("registry", BaseRegistry.class);
-//            xstream.alias("engine", EngineImpl.class);
-//            xstream.alias("binding", BindingImpl.class);
-//            xstream.alias("library", LibraryImpl.class);
-//            xstream.alias("assembly", AssemblyImpl.class);
-//            xstream.alias("unit", UnitImpl.class);
+            // xstream.alias("registry", BaseRegistry.class);
+            // xstream.alias("engine", EngineImpl.class);
+            // xstream.alias("binding", BindingImpl.class);
+            // xstream.alias("library", LibraryImpl.class);
+            // xstream.alias("assembly", AssemblyImpl.class);
+            // xstream.alias("unit", UnitImpl.class);
         }
         return xstream;
     }

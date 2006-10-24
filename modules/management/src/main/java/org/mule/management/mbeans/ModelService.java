@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.mbeans;
 
 import org.mule.MuleManager;
@@ -15,8 +16,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
 
 /**
- * <code>ModelService</code> exposes service information and actions on the
- * Mule Model
+ * <code>ModelService</code> exposes service information and actions on the Mule
+ * Model
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -81,7 +82,8 @@ public class ModelService implements ModelServiceMBean
         return model.getName();
     }
 
-    public String getType() {
+    public String getType()
+    {
         return model.getType();
     }
 }

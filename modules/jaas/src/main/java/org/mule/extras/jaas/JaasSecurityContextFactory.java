@@ -28,7 +28,7 @@ public class JaasSecurityContextFactory implements UMOSecurityContextFactory
      */
     public final UMOSecurityContext create(UMOAuthentication authentication)
     {
-        return new JaasSecurityContext((MuleAuthentication) authentication);
+        return new JaasSecurityContext((MuleAuthentication)authentication);
     }
 
 }

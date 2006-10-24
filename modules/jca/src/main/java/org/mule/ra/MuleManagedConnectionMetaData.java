@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.MuleManager;
@@ -49,7 +50,8 @@ public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
 
     public String getUserName() throws ResourceException
     {
-        if (managedConnection.isDestroyed()) {
+        if (managedConnection.isDestroyed())
+        {
             throw new IllegalStateException(new Message(Messages.X_IS_DISPOSED, managedConnection).toString());
         }
         return managedConnection.getUsername();

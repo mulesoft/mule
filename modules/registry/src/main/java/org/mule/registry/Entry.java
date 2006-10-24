@@ -11,13 +11,14 @@
 package org.mule.registry;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface Entry {
+public interface Entry
+{
 
     /**
      * Name of this entry
+     * 
      * @return
      */
     String getName();
@@ -26,13 +27,14 @@ public interface Entry {
 
     /**
      * Retrieves the installation directory.
+     * 
      * @return the installation directory
      */
     String getInstallRoot();
 
     /**
      * Sets the installation directory.
-     *
+     * 
      * @param installRoot the installation directory
      */
     void setInstallRoot(String installRoot);
@@ -40,19 +42,21 @@ public interface Entry {
     /**
      * Get the current state of this managed compononent.
      * 
-     * @return the current state of this managed component (must be one of the 
-     *         string constants defined by this interface)
+     * @return the current state of this managed component (must be one of the string
+     *         constants defined by this interface)
      */
     String getCurrentState();
 
     /**
      * Status before JBI was shutdown.
+     * 
      * @return
      */
     String getStateAtShutdown();
 
     /**
      * Set the state before the server was shutdown.
+     * 
      * @param state
      */
     void setStateAtShutdown(String state) throws RegistryException;
@@ -63,18 +67,21 @@ public interface Entry {
     final static String SHUTDOWN = "Shutdown";
 
     /** Value returned by {@link #getCurrentState()} for a stopped component. */
-    final static String STOPPED  = "Stopped";
+    final static String STOPPED = "Stopped";
 
     /** Value returned by {@link #getCurrentState()} for a running component. */
-    final static String RUNNING  = "Running";
-    
-    /** Value returned by {@link #getCurrentState()} for a component in an
-     * unknown state. */
-    final static String UNKNOWN  = "Unknown";
+    final static String RUNNING = "Running";
 
-    /** Value returned by {@link #getCurrentState()} for a component in an
-     * initialised state. */
-    final static String INITIALIZED  = "Initialized";
+    /**
+     * Value returned by {@link #getCurrentState()} for a component in an unknown
+     * state.
+     */
+    final static String UNKNOWN = "Unknown";
 
+    /**
+     * Value returned by {@link #getCurrentState()} for a component in an initialised
+     * state.
+     */
+    final static String INITIALIZED = "Initialized";
 
 }

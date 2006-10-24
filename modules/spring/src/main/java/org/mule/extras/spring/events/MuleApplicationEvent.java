@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.events;
 
 import org.mule.umo.UMOEventContext;
@@ -18,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>MuleApplicationEvent</code> is an Spring ApplicationEvent used to
- * wrap a MuleEvent
+ * <code>MuleApplicationEvent</code> is an Spring ApplicationEvent used to wrap a
+ * MuleEvent
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,27 +38,29 @@ public class MuleApplicationEvent extends ApplicationEvent
     private ApplicationContext applicationContext;
     private Map properties = new HashMap();
 
-    public MuleApplicationEvent(Object message, String endpoint) //throws MalformedEndpointException
+    public MuleApplicationEvent(Object message, String endpoint) // throws
+                                                                    // MalformedEndpointException
     {
         super(message);
-//        String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
-//                                                         endpoint,
-//                                                         null);
-//        if(temp==null) {
-//            UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpoint);
-//            if(ep!=null) {
-//                setEndpoint(ep.getEndpointURI());
-//            } else {
-//                setEndpoint(new MuleEndpointURI(endpoint));
-//            }
-//        } else {
-//            setEndpoint(new MuleEndpointURI(temp));
-//        }
+        // String temp =
+        // PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
+        // endpoint,
+        // null);
+        // if(temp==null) {
+        // UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpoint);
+        // if(ep!=null) {
+        // setEndpoint(ep.getEndpointURI());
+        // } else {
+        // setEndpoint(new MuleEndpointURI(endpoint));
+        // }
+        // } else {
+        // setEndpoint(new MuleEndpointURI(temp));
+        // }
         this.endpoint = endpoint;
     }
 
     MuleApplicationEvent(Object message, UMOEventContext context, ApplicationContext appContext)
-            throws MalformedEndpointException
+        throws MalformedEndpointException
     {
         super(message);
         this.context = context;

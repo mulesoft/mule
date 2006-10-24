@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.tck.testmodels.fruit.Apple;
@@ -22,7 +23,8 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
 {
     private Apple testObject = null;
 
-    public XmlObjectTransformersTestCase() {
+    public XmlObjectTransformersTestCase()
+    {
         testObject = new Apple();
         testObject.wash();
     }
@@ -44,9 +46,7 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
 
     public Object getResultData()
     {
-        return "<org.mule.tck.testmodels.fruit.Apple>\n" +
-                "  <bitten>false</bitten>\n" +
-                "  <washed>true</washed>\n" +
-                "</org.mule.tck.testmodels.fruit.Apple>";
+        return "<org.mule.tck.testmodels.fruit.Apple>\n" + "  <bitten>false</bitten>\n"
+               + "  <washed>true</washed>\n" + "</org.mule.tck.testmodels.fruit.Apple>";
     }
 }

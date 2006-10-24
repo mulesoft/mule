@@ -24,79 +24,104 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public abstract class AbstractLibrary extends AbstractEntry implements Library {
+public abstract class AbstractLibrary extends AbstractEntry implements Library
+{
 
     protected List components;
     protected List classPathElements;
     protected boolean isClassLoaderParentFirst;
     protected RegistryDescriptor descriptor;
 
-    protected AbstractLibrary(Registry registry) {
+    protected AbstractLibrary(Registry registry)
+    {
         super(registry);
         this.components = new ArrayList();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Library#getReferringComponents()
      */
-    public RegistryComponent[] getComponents() {
+    public RegistryComponent[] getComponents()
+    {
         Collection c = new ArrayList();
-        for (Iterator it = this.components.iterator(); it.hasNext();) {
-            String ref = (String) it.next();
+        for (Iterator it = this.components.iterator(); it.hasNext();)
+        {
+            String ref = (String)it.next();
             RegistryComponent comp = getRegistry().getComponent(ref);
             c.add(comp);
         }
-        return (RegistryComponent[]) c.toArray(new RegistryComponent[c.size()]);
+        return (RegistryComponent[])c.toArray(new RegistryComponent[c.size()]);
     }
 
-    public void addComponent(RegistryComponent component) {
+    public void addComponent(RegistryComponent component)
+    {
         this.components.add(component.getName());
     }
 
-    public void removeComponent(RegistryComponent component) {
+    public void removeComponent(RegistryComponent component)
+    {
         this.components.remove(component.getName());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
      */
-    protected void checkDescriptor() throws RegistryException {
+    protected void checkDescriptor() throws RegistryException
+    {
         super.checkDescriptor();
         // Check that it is a service assembly
-        if (!getDescriptor().isSharedLibrary()) {
+        if (!getDescriptor().isSharedLibrary())
+        {
             throw new RegistryException("shared library should be set");
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.jbi.management.LifeCycleMBean#start()
      */
-    public synchronized void install() throws RegistryException {
-        if (!getCurrentState().equals(UNKNOWN)) {
+    public synchronized void install() throws RegistryException
+    {
+        if (!getCurrentState().equals(UNKNOWN))
+        {
             throw new RegistryException("Illegal status: " + getCurrentState());
         }
-        try {
+        try
+        {
             doInstall();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RegistryException(e);
         }
         // Set current state
         setCurrentState(SHUTDOWN);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.jbi.management.LifeCycleMBean#start()
      */
-    public synchronized void uninstall() throws RegistryException {
-        if (!getCurrentState().equals(SHUTDOWN)) {
+    public synchronized void uninstall() throws RegistryException
+    {
+        if (!getCurrentState().equals(SHUTDOWN))
+        {
             throw new RegistryException("Illegal status: " + getCurrentState());
         }
-        try {
+        try
+        {
             doUninstall();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RegistryException(e);
         }
         FileUtils.deleteTree(new File(getInstallRoot()));
@@ -104,21 +129,28 @@ public abstract class AbstractLibrary extends AbstractEntry implements Library {
         setCurrentState(UNKNOWN);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Library#getClassPathElements()
      */
-    public List getClassPathElements() {
+    public List getClassPathElements()
+    {
         return this.classPathElements;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.jbi.registry.Library#isClassLoaderParentFirst()
      */
-    public boolean isClassLoaderParentFirst() {
+    public boolean isClassLoaderParentFirst()
+    {
         return this.isClassLoaderParentFirst;
     }
 
-    public void setDescriptor(RegistryDescriptor descriptor) {
+    public void setDescriptor(RegistryDescriptor descriptor)
+    {
         this.descriptor = descriptor;
     }
 

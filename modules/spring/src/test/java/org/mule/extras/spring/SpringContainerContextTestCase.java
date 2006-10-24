@@ -50,24 +50,33 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
         container.initialise();
         assertNotNull(container);
 
-        try {
+        try
+        {
             container.getComponent(null);
             fail("Should throw ObjectNotFoundException for null key");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             container.getComponent("abcdefg123456!£$%^n");
             fail("Should throw ObjectNotFoundException for a key that doesn't exist");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             Object result = container.getComponent(Apple.class.getName());
             assertNotNull("Component should exist in container", result);
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             fail("Component should exist in the container");
         }
     }

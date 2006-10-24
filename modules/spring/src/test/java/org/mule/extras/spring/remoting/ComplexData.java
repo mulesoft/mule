@@ -16,7 +16,7 @@ public class ComplexData implements Serializable
 {
     private String someString = "Default String";
     private Integer someInteger = new Integer(13);
-    
+
     public ComplexData()
     {
         super();
@@ -34,7 +34,8 @@ public class ComplexData implements Serializable
         try
         {
             String foo = new String(someString);
-            if(someString == null) {
+            if (someString == null)
+            {
                 foo = "NULL";
             }
             return "[ComplexData: [someString=" + foo + "][someInteger=" + someInteger + "]]";
@@ -45,6 +46,7 @@ public class ComplexData implements Serializable
             throw new RuntimeException(e);
         }
     }
+
     public Integer getSomeInteger()
     {
         return someInteger;

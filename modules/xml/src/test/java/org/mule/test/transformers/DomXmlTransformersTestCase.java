@@ -59,12 +59,14 @@ public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src instanceof Document) {
+        if (src instanceof Document)
+        {
             String srcXml = new DOMReader().read((Document)src).asXML();
             String resultXml = new DOMReader().read((Document)result).asXML();
             return srcXml.equals(resultXml);
         }
-        else if (src != null) {
+        else if (src != null)
+        {
             src = ((String)src).replaceAll("\r", "");
             src = ((String)src).replaceAll("\t", "");
             src = ((String)src).replaceAll("\n", "");

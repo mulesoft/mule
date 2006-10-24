@@ -11,10 +11,10 @@
 package org.mule.registry;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface Assembly extends Entry {
+public interface Assembly extends Entry
+{
 
     void restoreState() throws RegistryException;
 
@@ -39,15 +39,15 @@ public interface Assembly extends Entry {
     String stop() throws RegistryException;
 
     /**
-     * Shut down the item. The releases resources, preparatory to 
-     * uninstallation.
-     *
+     * Shut down the item. The releases resources, preparatory to uninstallation.
+     * 
      * @exception RegistryException if the item fails to shut down.
      */
     String shutDown() throws RegistryException;
 
     /**
      * Return the Unit of the given name.
+     * 
      * @param name the name of the unit
      * @return the Unit or <code>null</code> if not found
      */
@@ -55,12 +55,14 @@ public interface Assembly extends Entry {
 
     /**
      * Get all units of this Assembly
+     * 
      * @return the units of this Assembly
      */
     Unit[] getUnits();
 
     /**
      * Return the descriptor for this component.
+     * 
      * @return
      */
     RegistryDescriptor getDescriptor() throws RegistryException;

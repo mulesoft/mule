@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.config.MuleProperties;
@@ -55,16 +56,15 @@ public class DefaultMuleConnection implements MuleConnection
     }
 
     /**
-     * Dispatches an event asynchronously to a endpointUri via a mule server.
-     * the Url determines where to dispathc the event to, this can be in the
-     * form of
+     * Dispatches an event asynchronously to a endpointUri via a mule server. the Url
+     * determines where to dispathc the event to, this can be in the form of
      * 
-     * @param url the Mule url used to determine the destination and transport
-     *            of the message
+     * @param url the Mule url used to determine the destination and transport of the
+     *            message
      * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the
-     *            payload. In the case of Jms you could set the JMSReplyTo
-     *            property in these properties.
+     * @param messageProperties any properties to be associated with the payload. In
+     *            the case of Jms you could set the JMSReplyTo property in these
+     *            properties.
      * @throws org.mule.umo.UMOException
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws UMOException
@@ -72,11 +72,16 @@ public class DefaultMuleConnection implements MuleConnection
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOEvent event = getEvent(message, muleEndpoint, false);
-        try {
+        try
+        {
             event.getSession().dispatchEvent(event);
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
     }
@@ -84,18 +89,17 @@ public class DefaultMuleConnection implements MuleConnection
     /**
      * Sends an object (payload) synchronous to the given url and returns a
      * UMOMessage response back.
-     *
-     * @param url               the Mule url used to determine the destination and transport
-     *                          of the message
-     * @param payload           the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the
-     *                          payload. In the case of Jms you could set the JMSReplyTo
-     *                          property in these properties.
+     * 
+     * @param url the Mule url used to determine the destination and transport of the
+     *            message
+     * @param payload the object that is the payload of the event
+     * @param messageProperties any properties to be associated with the payload. In
+     *            the case of Jms you could set the JMSReplyTo property in these
+     *            properties.
      * @return a umomessage response.
      * @throws org.mule.umo.UMOException
      */
-    public UMOMessage send(String url, Object payload, Map messageProperties)
-            throws UMOException
+    public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
     {
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         UMOMessage message = new MuleMessage(payload, messageProperties);
@@ -120,11 +124,11 @@ public class DefaultMuleConnection implements MuleConnection
     /**
      * Will receive an event from an endpointUri determined by the url
      * 
-     * @param url the Mule url used to determine the destination and transport
-     *            of the message
-     * @param timeout how long to block waiting to receive the event, if set to
-     *            0 the receive will not wait at all and if set to -1 the
-     *            receive will wait forever
+     * @param url the Mule url used to determine the destination and transport of the
+     *            message
+     * @param timeout how long to block waiting to receive the event, if set to 0 the
+     *            receive will not wait at all and if set to -1 the receive will wait
+     *            forever
      * @return the message received or null if no message was received
      * @throws org.mule.umo.UMOException
      */
@@ -132,11 +136,15 @@ public class DefaultMuleConnection implements MuleConnection
     {
         MuleEndpointURI muleEndpoint = new MuleEndpointURI(url);
 
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        try {
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        try
+        {
             UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
             return message;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new ReceiveException(endpoint, timeout, e);
         }
     }
@@ -150,34 +158,42 @@ public class DefaultMuleConnection implements MuleConnection
      * @return the UMOEvent
      * @throws UMOException in case of Mule error
      */
-    protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous) throws UMOException
+    protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous)
+        throws UMOException
     {
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-        if (!endpoint.getConnector().isStarted() && manager.isStarted()) {
+        if (!endpoint.getConnector().isStarted() && manager.isStarted())
+        {
             endpoint.getConnector().startConnector();
         }
 
-        try {
+        try
+        {
 
-            UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+            UMOSession session = new MuleSession(message,
+                ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
-            if (credentials != null) {
+            if (credentials != null)
+            {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
             MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
 
             return event;
-        } catch (Exception e) {
-            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message, endpoint, e);
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message,
+                endpoint, e);
         }
     }
 
     /**
      * Retrieves a ManagedConnection.
      * 
-     * @return a ManagedConnection instance representing the physical connection
-     *         to the EIS
+     * @return a ManagedConnection instance representing the physical connection to
+     *         the EIS
      */
 
     public MuleManagedConnection getManagedConnection()
@@ -190,7 +206,8 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public void close() throws ResourceException
     {
-        if (managedConnection == null) {
+        if (managedConnection == null)
+        {
             return; // connection is already closed
         }
         managedConnection.removeConnection(this);
@@ -218,19 +235,22 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Checks the validity of the physical connection to the EIS.
+     * 
      * @throws javax.resource.ResourceException in case of any error
      */
 
     void checkIfValid() throws ResourceException
     {
-        if (managedConnection == null) {
-            throw new ResourceException(new Message(Messages.OBJECT_X_MARKED_INVALID, "muleManagedConnection").toString());
+        if (managedConnection == null)
+        {
+            throw new ResourceException(
+                new Message(Messages.OBJECT_X_MARKED_INVALID, "muleManagedConnection").toString());
         }
     }
 
     /**
-     * Sets the physical connection to the EIS as invalid. The physical
-     * connection to the EIS cannot be used any more.
+     * Sets the physical connection to the EIS as invalid. The physical connection to
+     * the EIS cannot be used any more.
      */
 
     void invalidate()

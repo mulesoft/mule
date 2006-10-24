@@ -19,8 +19,8 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ObjectNameHelper;
 
 /**
- * The EndpointServiceMBean allows you to check the confiugration of an endpoint
- * and conect/disconnect endpoints manually.
+ * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
+ * conect/disconnect endpoints manually.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -45,7 +45,8 @@ public class EndpointService implements EndpointServiceMBean
 
     public EndpointService(UMOMessageReceiver receiver)
     {
-        if (receiver == null) {
+        if (receiver == null)
+        {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "Receiver").getMessage());
         }
         this.endpoint = receiver.getEndpoint();
@@ -56,11 +57,14 @@ public class EndpointService implements EndpointServiceMBean
 
     private void init()
     {
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "Endpoint").getMessage());
         }
-        if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType())) {
-            throw new IllegalArgumentException("Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
+        if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+        {
+            throw new IllegalArgumentException(
+                "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
 
         name = ObjectNameHelper.getEndpointName(endpoint);
@@ -84,18 +88,24 @@ public class EndpointService implements EndpointServiceMBean
 
     public void connect() throws Exception
     {
-        if (receiver != null && !receiver.isConnected()) {
+        if (receiver != null && !receiver.isConnected())
+        {
             receiver.connect();
-        } else if (logger.isDebugEnabled()) {
+        }
+        else if (logger.isDebugEnabled())
+        {
             logger.debug("Endpoint is already connected");
         }
     }
 
     public void disconnect() throws Exception
     {
-        if (receiver != null && receiver.isConnected()) {
+        if (receiver != null && receiver.isConnected())
+        {
             receiver.disconnect();
-        } else if (logger.isDebugEnabled()) {
+        }
+        else if (logger.isDebugEnabled())
+        {
             logger.debug("Endpoint is already disconnected");
         }
     }
@@ -110,11 +120,13 @@ public class EndpointService implements EndpointServiceMBean
         return endpoint.getType();
     }
 
-    public String getComponentName() {
+    public String getComponentName()
+    {
         return componentName;
     }
 
-    public void setComponentName(String componentName) {
+    public void setComponentName(String componentName)
+    {
         this.componentName = componentName;
     }
 

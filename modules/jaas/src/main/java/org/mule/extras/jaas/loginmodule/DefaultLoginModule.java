@@ -62,7 +62,7 @@ public class DefaultLoginModule implements LoginModule
             // login succeeded but overall authentication failed
             succeeded = false;
             username = null;
-            if (password != null) 
+            if (password != null)
             {
                 password = null;
             }
@@ -114,8 +114,8 @@ public class DefaultLoginModule implements LoginModule
     {
         this.callbackHandler = callbackHandler;
 
-        this.credentials = (String) options.get("credentials");
-        this.credentialList = getCredentialList (this.credentials);
+        this.credentials = (String)options.get("credentials");
+        this.credentialList = getCredentialList(this.credentials);
     }
 
     /**
@@ -253,18 +253,15 @@ public class DefaultLoginModule implements LoginModule
             {
                 dividerIsFound = true;
             }
-            else if ((credentialArray[i] != ';') && (!semicolonIsFound)
-                     && (dividerIsFound))
+            else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
             {
                 password = password + credentialArray[i];
             }
-            else if ((credentialArray[i] != ';') && (!semicolonIsFound)
-                     && (dividerIsFound))
+            else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
             {
                 password = password + credentialArray[i];
             }
-            else if ((credentialArray[i] == ';') && (!semicolonIsFound)
-                     && (dividerIsFound))
+            else if ((credentialArray[i] == ';') && (!semicolonIsFound) && (dividerIsFound))
             {
                 outputList.add(username);
                 outputList.add(password);

@@ -34,7 +34,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
@@ -50,7 +51,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
@@ -66,7 +68,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
@@ -81,7 +84,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
@@ -96,7 +100,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);

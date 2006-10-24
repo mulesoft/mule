@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.transformers.xml.XsltTransformer;
@@ -32,15 +33,11 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setXslt("<?xml version='1.0'?>\n" +
-            "<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n"+
-            "<xsl:output method='xml'/>\n"+
-            "<xsl:template match='/'>\n"+
-            "  <some-xml>\n"+
-            "    <xsl:copy-of select='.'/>\n"+
-            "  </some-xml>\n"+
-            "</xsl:template>\n"+
-            "</xsl:stylesheet>");
+        transformer.setXslt("<?xml version='1.0'?>\n"
+                            + "<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n"
+                            + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
+                            + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
+                            + "</xsl:template>\n" + "</xsl:stylesheet>");
         transformer.initialise();
         return transformer;
     }

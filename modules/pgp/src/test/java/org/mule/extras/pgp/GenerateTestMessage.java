@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.pgp;
 
 import cryptix.message.EncryptedMessageBuilder;
@@ -31,7 +32,6 @@ import java.util.Iterator;
 
 /**
  * @author ariva
- * 
  */
 public class GenerateTestMessage
 {
@@ -54,30 +54,40 @@ public class GenerateTestMessage
 
         ExtendedKeyStore ring = null;
 
-        try {
+        try
+        {
 
             FileInputStream in = new FileInputStream(filename);
 
-            ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
+            ring = (ExtendedKeyStore)ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
             ring.load(in, null);
 
             in.close();
 
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe)
+        {
             System.err.println("IOException... You did remember to run the "
-                    + "GenerateAndWriteKey example first, right?");
+                               + "GenerateAndWriteKey example first, right?");
             ioe.printStackTrace();
             System.exit(-1);
-        } catch (NoSuchAlgorithmException nsae) {
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
             System.err.println("Cannot find the OpenPGP KeyRing. "
-                    + "This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
+                               + "This usually means that the Cryptix OpenPGP provider is not "
+                               + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
-        } catch (KeyStoreException kse) {
+        }
+        catch (KeyStoreException kse)
+        {
             System.err.println("Reading keyring failed.");
             kse.printStackTrace();
             System.exit(-1);
-        } catch (CertificateException ce) {
+        }
+        catch (CertificateException ce)
+        {
             System.err.println("Reading keyring failed.");
             ce.printStackTrace();
             System.exit(-1);
@@ -89,14 +99,18 @@ public class GenerateTestMessage
     public static KeyBundle findKeyBundle(ExtendedKeyStore ring, String principal) throws Exception
     {
 
-        for (Enumeration e = ring.aliases(); e.hasMoreElements();) {
-            String aliasId = (String) e.nextElement();
+        for (Enumeration e = ring.aliases(); e.hasMoreElements();)
+        {
+            String aliasId = (String)e.nextElement();
             KeyBundle bundle = ring.getKeyBundle(aliasId);
-            if (bundle != null) {
-                for (Iterator users = bundle.getPrincipals(); users.hasNext();) {
-                    Principal princ = (Principal) users.next();
+            if (bundle != null)
+            {
+                for (Iterator users = bundle.getPrincipals(); users.hasNext();)
+                {
+                    Principal princ = (Principal)users.next();
                     System.out.println("aliasId:" + aliasId + ", user:" + princ.toString());
-                    if (princ.toString().equals(principal)) {
+                    if (princ.toString().equals(principal))
+                    {
                         return bundle;
                     }
                 }
@@ -118,17 +132,23 @@ public class GenerateTestMessage
     {
         Message msg = null;
 
-        try {
+        try
+        {
             String data = "This is a test message.\n" + "This is another line.\n";
             LiteralMessageBuilder lmb = LiteralMessageBuilder.getInstance("OpenPGP");
             lmb.init(data);
             msg = lmb.build();
-        } catch (NoSuchAlgorithmException nsae) {
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
             System.err.println("Cannot find the OpenPGP LiteralMessageBuilder."
-                    + " This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
+                               + " This usually means that the Cryptix OpenPGP provider is not "
+                               + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
-        } catch (MessageException me) {
+        }
+        catch (MessageException me)
+        {
             System.err.println("Creating the literal message failed.");
             me.printStackTrace();
             System.exit(-1);
@@ -140,7 +160,8 @@ public class GenerateTestMessage
         // Note that signing usually comes before encryption, such that
         // unauthorized parties cannot see who signed the message.
         // **********************************************************************
-        try {
+        try
+        {
 
             SignedMessageBuilder smb = SignedMessageBuilder.getInstance("OpenPGP");
 
@@ -154,16 +175,23 @@ public class GenerateTestMessage
 
             msg = smb.build();
 
-        } catch (NoSuchAlgorithmException nsae) {
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
             System.err.println("Cannot find the OpenPGP SignedMessageBuilder. "
-                    + "This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
+                               + "This usually means that the Cryptix OpenPGP provider is not "
+                               + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
-        } catch (UnrecoverableKeyException uke) {
+        }
+        catch (UnrecoverableKeyException uke)
+        {
             System.err.println("Incorrect passphrase.");
             uke.printStackTrace();
             System.exit(-1);
-        } catch (MessageException me) {
+        }
+        catch (MessageException me)
+        {
             System.err.println("Generating the message failed.");
             me.printStackTrace();
             System.exit(-1);
@@ -172,7 +200,8 @@ public class GenerateTestMessage
         // **********************************************************************
         // Armour the message and write it to disk
         // **********************************************************************
-        try {
+        try
+        {
 
             PGPArmouredMessage armoured;
 
@@ -181,11 +210,15 @@ public class GenerateTestMessage
             out.write(armoured.getEncoded());
             out.close();
 
-        } catch (MessageException me) {
+        }
+        catch (MessageException me)
+        {
             System.err.println("Writing the encrypted message failed.");
             me.printStackTrace();
             System.exit(-1);
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe)
+        {
             System.err.println("Writing the encrypted message failed.");
             ioe.printStackTrace();
             System.exit(-1);
@@ -194,19 +227,25 @@ public class GenerateTestMessage
         // **********************************************************************
         // Encrypt the message.
         // **********************************************************************
-        try {
+        try
+        {
 
             EncryptedMessageBuilder emb = EncryptedMessageBuilder.getInstance("OpenPGP");
             emb.init(msg);
             emb.addRecipient(serverPublicKey);
             msg = emb.build();
 
-        } catch (NoSuchAlgorithmException nsae) {
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
             System.err.println("Cannot find the OpenPGP " + "EncryptedMessageBuilder. "
-                    + "This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
+                               + "This usually means that the Cryptix OpenPGP provider is not "
+                               + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
-        } catch (MessageException me) {
+        }
+        catch (MessageException me)
+        {
             System.err.println("Creating the encrypted message failed.");
             me.printStackTrace();
             System.exit(-1);
@@ -215,7 +254,8 @@ public class GenerateTestMessage
         // **********************************************************************
         // Armour the message and write it to disk
         // **********************************************************************
-        try {
+        try
+        {
 
             PGPArmouredMessage armoured;
 
@@ -224,11 +264,15 @@ public class GenerateTestMessage
             out.write(armoured.getEncoded());
             out.close();
 
-        } catch (MessageException me) {
+        }
+        catch (MessageException me)
+        {
             System.err.println("Writing the encrypted message failed.");
             me.printStackTrace();
             System.exit(-1);
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe)
+        {
             System.err.println("Writing the encrypted message failed.");
             ioe.printStackTrace();
             System.exit(-1);

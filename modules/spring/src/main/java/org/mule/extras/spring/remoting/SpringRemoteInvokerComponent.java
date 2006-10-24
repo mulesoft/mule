@@ -44,11 +44,13 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
 
         public Object execute(RemoteInvocation invocation)
         {
-            try {
+            try
+            {
                 Object value = invoke(invocation, proxy);
                 return value;
             }
-            catch (Throwable ex) {
+            catch (Throwable ex)
+            {
                 ex.printStackTrace();
                 return new RemoteInvocationResult(ex);
             }
@@ -62,31 +64,38 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if (serviceClass == null && serviceBean == null) {
+        if (serviceClass == null && serviceBean == null)
+        {
             throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    "serviceClass or serviceBean"), this);
+                "serviceClass or serviceBean"), this);
         }
-        if (serviceInterface == null) {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    "serviceInterface"), this);
+        if (serviceInterface == null)
+        {
+            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "serviceInterface"),
+                this);
         }
 
-        if (serviceClass != null) {
+        if (serviceClass != null)
+        {
             Object service = null;
-            try {
+            try
+            {
                 service = ClassUtils.instanciateClass(serviceClass, null);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 throw new InitialisationException(e, this);
             }
             delegate.setService(service);
         }
-        else if (serviceBean != null) {
+        else if (serviceBean != null)
+        {
             delegate.setService(serviceBean);
         }
         delegate.setServiceInterface(serviceInterface);
         delegate.setRegisterTraceInterceptor(registerTraceInterceptor);
-        if (remoteInvocationExecutor != null) {
+        if (remoteInvocationExecutor != null)
+        {
             delegate.setRemoteInvocationExecutor(remoteInvocationExecutor);
         }
         delegate.afterPropertiesSet();

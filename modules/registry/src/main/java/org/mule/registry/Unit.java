@@ -11,10 +11,10 @@
 package org.mule.registry;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface Unit extends Entry {
+public interface Unit extends Entry
+{
 
     void init() throws RegistryException;
 
@@ -33,13 +33,12 @@ public interface Unit extends Entry {
     void stop() throws RegistryException;
 
     /**
-     * Shut down the item. The releases resources, preparatory to 
-     * uninstallation.
-     *
+     * Shut down the item. The releases resources, preparatory to uninstallation.
+     * 
      * @exception RegistryException
      */
     void shutDown() throws RegistryException;
-    
+
     RegistryComponent getRegistryComponent();
 
     void setRegistryComponent(RegistryComponent component);

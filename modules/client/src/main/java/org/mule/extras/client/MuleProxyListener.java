@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.client;
 
 import org.mule.MuleException;
@@ -20,8 +21,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * <code>MuleProxyListener</code> is a generic listent proxy that can be used
- * to foward calls as Mule events from any Observer/Observerable implementation.
+ * <code>MuleProxyListener</code> is a generic listent proxy that can be used to
+ * foward calls as Mule events from any Observer/Observerable implementation.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -44,8 +45,9 @@ public class MuleProxyListener implements InvocationHandler
         createProxy();
     }
 
-    public MuleProxyListener(Class listenerClass, AbstractEventTransformer eventTransformer, String componentName)
-            throws UMOException
+    public MuleProxyListener(Class listenerClass,
+                             AbstractEventTransformer eventTransformer,
+                             String componentName) throws UMOException
     {
         setListenerClass(listenerClass);
         setEventTransformer(eventTransformer);
@@ -68,7 +70,7 @@ public class MuleProxyListener implements InvocationHandler
 
     protected void createProxy()
     {
-        proxy = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class[] { listenerClass }, this);
+        proxy = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class[]{listenerClass}, this);
     }
 
     public Class getListenerClass()
@@ -113,18 +115,25 @@ public class MuleProxyListener implements InvocationHandler
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if (args.length == 0) {
+        if (args.length == 0)
+        {
             throw new MuleException(new Message("client", 2));
         }
         UMOMessage message = eventTransformer.transform(args[0], method);
-        if (!"void".equals(method.getReturnType().getName())) {
+        if (!"void".equals(method.getReturnType().getName()))
+        {
             UMOMessage result = client.sendDirect(componentName, null, message);
-            if (UMOMessage.class.equals(method.getReturnType())) {
+            if (UMOMessage.class.equals(method.getReturnType()))
+            {
                 return result;
-            } else {
+            }
+            else
+            {
                 return (result == null ? null : result.getPayload());
             }
-        } else {
+        }
+        else
+        {
             client.dispatchDirect(componentName, message);
             return null;
         }

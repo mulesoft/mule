@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.extras.spring.events;
 
 import org.mule.tck.functional.EventCallback;
@@ -28,12 +29,17 @@ public class TestApplicationEventBean implements ApplicationListener
 
     public void onApplicationEvent(ApplicationEvent event)
     {
-        System.out.println(StringMessageUtils.getBoilerPlate("Received Spring event " + event.getClass().getName()));
+        System.out.println(StringMessageUtils.getBoilerPlate("Received Spring event "
+                                                             + event.getClass().getName()));
 
-        if (eventCallback != null) {
-            try {
+        if (eventCallback != null)
+        {
+            try
+            {
                 eventCallback.eventReceived(null, event);
-            } catch (Exception e1) {
+            }
+            catch (Exception e1)
+            {
                 throw new RuntimeException("Callback failed: " + e1.getMessage(), e1);
             }
         }

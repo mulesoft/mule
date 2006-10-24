@@ -272,8 +272,8 @@ public class RemoteDispatcher implements Disposable
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
         setCredentials(message);
-        AdminNotification action = new AdminNotification(message,
-            (synchronous ? AdminNotification.ACTION_SEND : AdminNotification.ACTION_DISPATCH), endpoint);
+        AdminNotification action = new AdminNotification(message, (synchronous
+                        ? AdminNotification.ACTION_SEND : AdminNotification.ACTION_DISPATCH), endpoint);
 
         UMOMessage result = dispatchAction(action, synchronous, timeout);
         return result;
@@ -335,7 +335,8 @@ public class RemoteDispatcher implements Disposable
                 if (result.getPayload() != null)
                 {
                     Object response;
-                    if(result.getPayload() instanceof InputStream) {
+                    if (result.getPayload() instanceof InputStream)
+                    {
                         response = wireFormat.read((InputStream)result.getPayload());
                     }
                     else
@@ -385,7 +386,6 @@ public class RemoteDispatcher implements Disposable
         }
     }
 
-
     public WireFormat getWireFormat()
     {
         return wireFormat;
@@ -396,11 +396,11 @@ public class RemoteDispatcher implements Disposable
         this.wireFormat = wireFormat;
     }
 
-    protected void updateContext(UMOMessage message, UMOEndpoint endpoint, boolean synchronous) throws UMOException
+    protected void updateContext(UMOMessage message, UMOEndpoint endpoint, boolean synchronous)
+        throws UMOException
     {
 
-        RequestContext.setEvent(
-                new MuleEvent(
-                        message, endpoint, new MuleSession(message, new MuleSessionHandler()), synchronous));
+        RequestContext.setEvent(new MuleEvent(message, endpoint, new MuleSession(message,
+            new MuleSessionHandler()), synchronous));
     }
 }

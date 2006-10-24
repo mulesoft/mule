@@ -34,7 +34,8 @@ public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager()
+        UMOEncryptionStrategy strategy = MuleManager.getInstance()
+            .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.apache.commons.logging.Log;
@@ -18,8 +19,8 @@ import javax.resource.spi.ConnectionManager;
 
 /**
  * <code>DefaultMuleConnectionFactory</code> an implementation of the
- * MuleconnectionFactory interface used by clients of this ResourceAdapter to
- * obtain a connection to Mule resources
+ * MuleconnectionFactory interface used by clients of this ResourceAdapter to obtain
+ * a connection to Mule resources
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -58,7 +59,7 @@ public class DefaultMuleConnectionFactory implements MuleConnectionFactory
     public MuleConnection createConnection(MuleConnectionRequestInfo info) throws ResourceException
     {
         // TODO try {
-        return (MuleConnection) manager.allocateConnection(factory, info);
+        return (MuleConnection)manager.allocateConnection(factory, info);
         // }
         // catch (ResourceException e) {
         //            

@@ -13,10 +13,10 @@ package org.mule.registry;
 import org.mule.ManagementContext;
 
 /**
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public interface Registry {
+public interface Registry
+{
 
     String getStoreLocation();
 
@@ -28,23 +28,24 @@ public interface Registry {
 
     RegistryComponent addComponent(String name, ComponentType type) throws RegistryException;
 
-
     /**
-     * Remove a registered component from the list.
-     * Internal use only.
-     *
+     * Remove a registered component from the list. Internal use only.
+     * 
      * @param component the component to remove
      */
     void removeComponent(RegistryComponent component);
 
     /**
      * Return all engines.
-     *
+     * 
      * @return
      */
     RegistryComponent[] getComponents(ComponentType type);
 
-    RegistryComponent addTransientComponent(String name, ComponentType type, Object component, Object bootstrap) throws RegistryException;
+    RegistryComponent addTransientComponent(String name,
+                                            ComponentType type,
+                                            Object component,
+                                            Object bootstrap) throws RegistryException;
 
     Library[] getLibraries();
 
@@ -62,7 +63,8 @@ public interface Registry {
 
     void removeAssembly(Assembly assembly);
 
-    void addTransientUnit(String suName, RegistryComponent component, String installRoot) throws RegistryException;
+    void addTransientUnit(String suName, RegistryComponent component, String installRoot)
+        throws RegistryException;
 
     void start() throws RegistryException;
 

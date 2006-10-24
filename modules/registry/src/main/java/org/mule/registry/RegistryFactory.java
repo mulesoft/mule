@@ -14,11 +14,11 @@ import org.mule.ManagementContext;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface RegistryFactory {
+public interface RegistryFactory
+{
     public Registry create(RegistryStore store, ManagementContext context);
 }
-

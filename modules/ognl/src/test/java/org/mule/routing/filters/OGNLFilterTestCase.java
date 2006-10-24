@@ -85,8 +85,7 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
         }
 
         /**
-         * @param content
-         *            The content to set.
+         * @param content The content to set.
          */
         public void setContent(String content)
         {
@@ -102,8 +101,7 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
         }
 
         /**
-         * @param id
-         *            The id to set.
+         * @param id The id to set.
          */
         public void setId(int id)
         {

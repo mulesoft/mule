@@ -19,25 +19,24 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
 {
 
     protected static final String TEST_XML_MULTI_RESULTS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                    + "<root>"
-                    + "<node>value1</node>"
-                    + "<node>value2</node>"
-                    + "<node>value3</node>" + "</root>";
+                                                           + "<root>" + "<node>value1</node>"
+                                                           + "<node>value2</node>" + "<node>value3</node>"
+                                                           + "</root>";
 
     protected static final String TEST_XML_MULTI_NESTED_RESULTS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                    + "<root>"
-                    + "<node>"
-                    + "<subnode1>val1</subnode1>"
-                    + "<subnode2>val2</subnode2>"
-                    + "</node>"
-                    + "<node>"
-                    + "<subnode1>val3</subnode1>"
-                    + "<subnode2>val4</subnode2>"
-                    + "</node>"
-                    + "</root>";
+                                                                  + "<root>"
+                                                                  + "<node>"
+                                                                  + "<subnode1>val1</subnode1>"
+                                                                  + "<subnode2>val2</subnode2>"
+                                                                  + "</node>"
+                                                                  + "<node>"
+                                                                  + "<subnode1>val3</subnode1>"
+                                                                  + "<subnode2>val4</subnode2>"
+                                                                  + "</node>"
+                                                                  + "</root>";
 
     protected static final String TEST_XML_SINGLE_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                    + "<root>" + "<node>value1</node>" + "</root>";
+                                                           + "<root>" + "<node>value1</node>" + "</root>";
 
     public void testSingeResult() throws Exception
     {
@@ -67,8 +66,8 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * This xpath expression will internally have DefaultText returned, test there are no
-     * ClassCastExceptions.
+     * This xpath expression will internally have DefaultText returned, test there
+     * are no ClassCastExceptions.
      */
     public void testMultipleResultsNested() throws Exception
     {

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.umo.UMOException;
@@ -17,8 +18,8 @@ import javax.resource.ResourceException;
 import java.util.Map;
 
 /**
- * <code>MuleConnection</code> defines the client connection methods for the
- * JCA cci contract
+ * <code>MuleConnection</code> defines the client connection methods for the JCA
+ * cci contract
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

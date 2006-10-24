@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.properties;
 
 import org.dom4j.Node;
@@ -20,13 +21,13 @@ public class Dom4jPropertyExtractor implements PropertyExtractor
     public Object getProperty(String name, Object message)
     {
         Object payload = message;
-        if(message instanceof UMOMessage)
+        if (message instanceof UMOMessage)
         {
             payload = ((UMOMessage)message).getPayload();
         }
         if (payload instanceof org.dom4j.Document)
         {
-            org.dom4j.Document dom4jDoc = (org.dom4j.Document) payload;
+            org.dom4j.Document dom4jDoc = (org.dom4j.Document)payload;
             try
             {
                 Node node = dom4jDoc.selectSingleNode(name);
@@ -41,21 +42,21 @@ public class Dom4jPropertyExtractor implements PropertyExtractor
             }
         }
         else if (payload instanceof org.dom4j.Node)
+        {
+            org.dom4j.Node dom4jNode = (org.dom4j.Node)payload;
+            try
             {
-                org.dom4j.Node dom4jNode = (org.dom4j.Node)payload;
-                try
+                Node node = dom4jNode.selectSingleNode(name);
+                if (node != null)
                 {
-                    Node node = dom4jNode.selectSingleNode(name);
-                    if (node != null)
-                    {
-                        return node.getText();
-                    }
-                }
-                catch (Exception ignored)
-                {
-                    // ignore
+                    return node.getText();
                 }
             }
+            catch (Exception ignored)
+            {
+                // ignore
+            }
+        }
         return null;
     }
 }

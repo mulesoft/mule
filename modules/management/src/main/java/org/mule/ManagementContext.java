@@ -12,7 +12,7 @@ package org.mule;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.mule.registry.Registry;
+// import org.mule.registry.Registry;
 import org.mule.util.FileUtils;
 
 import javax.management.MBeanServer;
@@ -26,11 +26,12 @@ import java.io.IOException;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ManagementContext {
+public class ManagementContext
+{
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -39,77 +40,95 @@ public class ManagementContext {
     protected TransactionManager transactionManager;
     protected MBeanServer mBeanServer;
     protected InitialContext namingContext;
-    //protected Registry registry;
 
-    //public Registry getRegistry() {
-    //    return registry;
-    //}
+    // protected Registry registry;
 
-    //public void setRegistry(Registry registry) {
-    //    this.registry = registry;
-    //}
+    // public Registry getRegistry() {
+    // return registry;
+    // }
 
-    public String getJmxDomainName() {
+    // public void setRegistry(Registry registry) {
+    // this.registry = registry;
+    // }
+
+    public String getJmxDomainName()
+    {
         return jmxDomainName;
     }
 
-    public void setJmxDomainName(String jmxDomainName) {
+    public void setJmxDomainName(String jmxDomainName)
+    {
         this.jmxDomainName = jmxDomainName;
     }
 
-    public File getWorkingDir() {
+    public File getWorkingDir()
+    {
         return workingDir;
     }
 
-    public void setWorkingDir(File workingDir) {
+    public void setWorkingDir(File workingDir)
+    {
         this.workingDir = workingDir;
     }
 
-    public TransactionManager getTransactionManager() {
+    public TransactionManager getTransactionManager()
+    {
         return transactionManager;
     }
 
-    public void setTransactionManager(TransactionManager transactionManager) {
+    public void setTransactionManager(TransactionManager transactionManager)
+    {
         this.transactionManager = transactionManager;
     }
 
-    public MBeanServer getMBeanServer() {
+    public MBeanServer getMBeanServer()
+    {
         return mBeanServer;
     }
 
-    public void setMBeanServer(MBeanServer mBeanServer) {
+    public void setMBeanServer(MBeanServer mBeanServer)
+    {
         this.mBeanServer = mBeanServer;
     }
 
-    public InitialContext getNamingContext() {
+    public InitialContext getNamingContext()
+    {
         return namingContext;
     }
 
-    public void setNamingContext(InitialContext namingContext) {
+    public void setNamingContext(InitialContext namingContext)
+    {
         this.namingContext = namingContext;
     }
 
-    public ObjectName createMBeanName(String componentName, String type, String name) {
-        try {
+    public ObjectName createMBeanName(String componentName, String type, String name)
+    {
+        try
+        {
             StringBuffer sb = new StringBuffer();
             sb.append(getJmxDomainName()).append(':');
-            if (componentName != null) {
+            if (componentName != null)
+            {
                 sb.append("component=").append(validateString(componentName));
                 sb.append(',');
             }
             sb.append("type=").append(validateString(type));
-            if (name != null) {
+            if (name != null)
+            {
                 sb.append(',');
                 sb.append("name=").append(validateString(name));
             }
             return new ObjectName(sb.toString());
-        } catch (MalformedObjectNameException e) {
+        }
+        catch (MalformedObjectNameException e)
+        {
             logger.error("Could not create component mbean name", e);
             return null;
         }
     }
 
-    private String validateString(String str) {
+    private String validateString(String str)
+    {
         str = str.replace(':', '_');
         str = str.replace('/', '_');
         str = str.replace('\\', '_');
@@ -127,59 +146,78 @@ public class ManagementContext {
 
     private int counter;
 
-    public synchronized File getNewTempDir(File rootDir) {
-        while (true) {
+    public synchronized File getNewTempDir(File rootDir)
+    {
+        while (true)
+        {
             String s = Integer.toHexString(++counter);
-            while (s.length() < 8) {
+            while (s.length() < 8)
+            {
                 s = "0" + s;
             }
             File f = new File(rootDir, File.separator + TEMP_DIR + File.separator + s);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 return f;
             }
         }
     }
 
-    public File getComponentInstallDir(File rootDir, String name) {
+    public File getComponentInstallDir(File rootDir, String name)
+    {
         return new File(rootDir, COMPONENTS_DIR + File.separator + validateString(name));
     }
 
-    public File getComponentWorkspaceDir(File rootDir, String name) {
+    public File getComponentWorkspaceDir(File rootDir, String name)
+    {
         return new File(rootDir, WORKSPACE_DIR + File.separator + validateString(name));
     }
 
-    public File getLibraryInstallDir(File rootDir, String name) {
+    public File getLibraryInstallDir(File rootDir, String name)
+    {
         return new File(rootDir, LIBRARIES_DIR + File.separator + validateString(name));
     }
 
-    public File getAssemblyInstallDir(File rootDir, String name) {
+    public File getAssemblyInstallDir(File rootDir, String name)
+    {
         return new File(rootDir, ASSEMBLIES_DIR + File.separator + validateString(name));
     }
 
-    public static File getAutoInstallDir(File rootDir) {
+    public static File getAutoInstallDir(File rootDir)
+    {
         return new File(rootDir, INSTALL_DIR);
     }
 
-    public File getAutoInstallProcessedDir(File rootDir) {
+    public File getAutoInstallProcessedDir(File rootDir)
+    {
         return new File(rootDir, INSTALL_DIR + File.separator + PROCESSED_DIR);
     }
 
-    public File getAutoDeployDir(File rootDir) {
+    public File getAutoDeployDir(File rootDir)
+    {
         return new File(rootDir, DEPLOY_DIR);
     }
 
-    public File getAutoDeployProcessedDir(File rootDir) {
+    public File getAutoDeployProcessedDir(File rootDir)
+    {
         return new File(rootDir, DEPLOY_DIR + File.separator + PROCESSED_DIR);
     }
 
-    public void deleteMarkedDirectories(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            if (new File(dir, ".delete").isFile()) {
+    public void deleteMarkedDirectories(File dir)
+    {
+        if (dir != null && dir.isDirectory())
+        {
+            if (new File(dir, ".delete").isFile())
+            {
                 deleteDir(dir);
-            } else {
+            }
+            else
+            {
                 File[] children = dir.listFiles();
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i].isDirectory()) {
+                for (int i = 0; i < children.length; i++)
+                {
+                    if (children[i].isDirectory())
+                    {
                         deleteMarkedDirectories(children[i]);
                     }
                 }
@@ -187,22 +225,29 @@ public class ManagementContext {
         }
     }
 
-    public void deleteDir(String dir) {
+    public void deleteDir(String dir)
+    {
         deleteDir(new File(dir));
     }
 
-    public void deleteDir(File dir) {
+    public void deleteDir(File dir)
+    {
         FileUtils.deleteTree(dir);
-        if (dir.isDirectory()) {
-            try {
+        if (dir.isDirectory())
+        {
+            try
+            {
                 new File(dir, ".delete").createNewFile();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 logger.warn("Could not mark directory to be deleted", e);
             }
         }
     }
 
-    public void createDirectories(File rootDir) throws IOException {
+    public void createDirectories(File rootDir) throws IOException
+    {
         FileUtils.createFile(rootDir.getAbsolutePath());
         FileUtils.createFile(new File(rootDir, COMPONENTS_DIR).getAbsolutePath());
         FileUtils.createFile(new File(rootDir, WORKSPACE_DIR).getAbsolutePath());

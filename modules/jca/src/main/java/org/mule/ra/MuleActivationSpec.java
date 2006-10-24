@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.ra;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -22,10 +23,9 @@ import java.io.Serializable;
 import java.util.Properties;
 
 /**
- * <code>MuleActivationSpec</code> defines the contract between a Message
- * Driven Bean (MDB) and the Mule Resource Adapter. This spec holds the
- * configuration values used to register inbound communication with the Resource
- * Adapter
+ * <code>MuleActivationSpec</code> defines the contract between a Message Driven
+ * Bean (MDB) and the Mule Resource Adapter. This spec holds the configuration values
+ * used to register inbound communication with the Resource Adapter
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -59,12 +59,16 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
     {
         String[] pairs = StringUtils.splitAndTrim(properties, ",");
         propertiesMap = new Properties();
-        for (int i = 0; i < pairs.length; i++) {
+        for (int i = 0; i < pairs.length; i++)
+        {
             String pair = pairs[i];
             int x = pair.indexOf("=");
-            if (x == -1) {
+            if (x == -1)
+            {
                 propertiesMap.setProperty(pair, null);
-            } else {
+            }
+            else
+            {
                 propertiesMap.setProperty(pair.substring(0, x), pair.substring(x + 1));
             }
         }
@@ -113,22 +117,30 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
 
     public void validate() throws InvalidPropertyException
     {
-        try {
+        try
+        {
             this.endpointURI = new MuleEndpointURI(endpoint);
-        } catch (MalformedEndpointException e) {
+        }
+        catch (MalformedEndpointException e)
+        {
             throw new InvalidPropertyException(e);
         }
 
-        if (propertiesMap != null) {
+        if (propertiesMap != null)
+        {
             propertiesMap.putAll(this.endpointURI.getParams());
-        } else {
+        }
+        else
+        {
             propertiesMap = this.endpointURI.getParams();
         }
-        if (endpoint == null) {
+        if (endpoint == null)
+        {
             throw new InvalidPropertyException("endpoint is null");
         }
 
-        if (endpointURI == null) {
+        if (endpointURI == null)
+        {
             throw new InvalidPropertyException("endpointURI is null");
         }
     }
@@ -141,12 +153,15 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
     public void setResourceAdapter(ResourceAdapter resourceAdapter) throws ResourceException
     {
         // spec section 5.3.3
-        if (this.resourceAdapter != null) {
+        if (this.resourceAdapter != null)
+        {
             throw new ResourceException("ResourceAdapter already set");
         }
-        if (!(resourceAdapter instanceof MuleResourceAdapter)) {
-            throw new ResourceException("ResourceAdapter is not of type: " + MuleResourceAdapter.class.getName());
+        if (!(resourceAdapter instanceof MuleResourceAdapter))
+        {
+            throw new ResourceException("ResourceAdapter is not of type: "
+                                        + MuleResourceAdapter.class.getName());
         }
-        this.resourceAdapter = (MuleResourceAdapter) resourceAdapter;
+        this.resourceAdapter = (MuleResourceAdapter)resourceAdapter;
     }
 }

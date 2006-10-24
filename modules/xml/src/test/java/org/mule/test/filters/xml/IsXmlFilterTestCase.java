@@ -18,46 +18,57 @@ import org.mule.routing.filters.xml.IsXmlFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
-public class IsXmlFilterTestCase extends AbstractMuleTestCase {
+public class IsXmlFilterTestCase extends AbstractMuleTestCase
+{
 
     private IsXmlFilter filter;
 
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         filter = new IsXmlFilter();
     }
 
-    public void testFilterFalse() throws Exception {
+    public void testFilterFalse() throws Exception
+    {
         assertFalse(filter.accept(new MuleMessage("This is definitely not XML.")));
     }
 
-    public void testFilterFalse2() throws Exception {
-        assertFalse(filter.accept(new MuleMessage("<line>This is almost XML</line><line>This is almost XML</line>")));
+    public void testFilterFalse2() throws Exception
+    {
+        assertFalse(filter.accept(new MuleMessage(
+            "<line>This is almost XML</line><line>This is almost XML</line>")));
     }
 
-    public void testFilterTrue() throws Exception {
+    public void testFilterTrue() throws Exception
+    {
         assertTrue(filter.accept(new MuleMessage("<msg attrib=\"att1\">This is some nice XML!</msg>")));
     }
 
-    public void testFilterBytes() throws Exception {
+    public void testFilterBytes() throws Exception
+    {
         byte[] bytes = "<msg attrib=\"att1\">This is some nice XML!</msg>".getBytes();
         assertTrue(filter.accept(new MuleMessage(bytes)));
     }
 
-    public void testFilterNull() throws Exception {
+    public void testFilterNull() throws Exception
+    {
         assertFalse(filter.accept(new MuleMessage(null)));
     }
 
-    public void testFilterLargeXml() throws Exception {
+    public void testFilterLargeXml() throws Exception
+    {
         final String xml = loadFromClasspath("cdcatalog.xml");
         assertTrue(filter.accept(new MuleMessage(xml)));
     }
 
-    public void testFilterLargeXmlFalse() throws Exception {
+    public void testFilterLargeXmlFalse() throws Exception
+    {
         final String html = loadFromClasspath("cdcatalog.html");
         assertTrue(filter.accept(new MuleMessage(html)));
     }
 
-    private String loadFromClasspath(final String name) throws IOException {
+    private String loadFromClasspath(final String name) throws IOException
+    {
         InputStream is = IOUtils.getResourceAsStream(name, getClass());
         assertNotNull("Test resource not found.", is);
 

@@ -23,9 +23,8 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
 /**
- * <code>MuleService</code> exposes certain Mule server functions for
- * management
- *
+ * <code>MuleService</code> exposes certain Mule server functions for management
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -43,25 +42,30 @@ public class MuleService implements MuleServiceMBean
     private String ip;
     private String os;
     private String buildDate;
-    //TODO
+    // TODO
     private String copyright = "Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com";
     private String license;
 
-    public MuleService() {
+    public MuleService()
+    {
         String patch = System.getProperty("sun.os.patch.level", null);
         jdk = System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")";
         os = System.getProperty("os.name");
-        if(patch!=null && !"unknown".equalsIgnoreCase(patch)) {
+        if (patch != null && !"unknown".equalsIgnoreCase(patch))
+        {
             os += " - " + patch;
         }
         os += " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")";
 
         buildDate = MuleManager.getConfiguration().getBuildDate();
-        try {
+        try
+        {
             InetAddress iad = InetAddress.getLocalHost();
             host = iad.getCanonicalHostName();
             ip = iad.getHostAddress();
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e)
+        {
             // ignore
         }
     }
@@ -83,18 +87,23 @@ public class MuleService implements MuleServiceMBean
 
     public Date getStartTime()
     {
-        if (!isStopped()) {
+        if (!isStopped())
+        {
             return new Date(MuleManager.getInstance().getStartDate());
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
 
     public String getVersion()
     {
-        if (version == null) {
+        if (version == null)
+        {
             version = MuleManager.getConfiguration().getProductVersion();
-            if (version == null) {
+            if (version == null)
+            {
                 version = "Mule Version Info Not Set";
             }
         }
@@ -103,9 +112,11 @@ public class MuleService implements MuleServiceMBean
 
     public String getVendor()
     {
-        if (vendor == null) {
+        if (vendor == null)
+        {
             vendor = MuleManager.getConfiguration().getVendorName();
-            if (vendor == null) {
+            if (vendor == null)
+            {
                 vendor = "Mule Vendor Info Not Set";
             }
         }
@@ -127,62 +138,79 @@ public class MuleService implements MuleServiceMBean
         MuleManager.getInstance().dispose();
     }
 
-    public long getFreeMemory() {
+    public long getFreeMemory()
+    {
         return Runtime.getRuntime().freeMemory();
     }
 
-    public long getMaxMemory() {
+    public long getMaxMemory()
+    {
         return Runtime.getRuntime().maxMemory();
     }
 
-    public long getTotalMemory() {
+    public long getTotalMemory()
+    {
         return Runtime.getRuntime().totalMemory();
     }
 
-    public String getServerId() {
+    public String getServerId()
+    {
         return MuleManager.getInstance().getId();
     }
 
-    public String getHostname() {
+    public String getHostname()
+    {
         return host;
     }
 
-    public String getHostIp() {
+    public String getHostIp()
+    {
         return ip;
     }
 
-    public String getOsVersion() {
+    public String getOsVersion()
+    {
         return os;
     }
 
-    public String getJdkVersion() {
+    public String getJdkVersion()
+    {
         return jdk;
     }
 
-    public String getCopyright() {
+    public String getCopyright()
+    {
         return copyright;
     }
 
-    public String getLicense() {
-        if(license==null) {
-            try {
+    public String getLicense()
+    {
+        if (license == null)
+        {
+            try
+            {
                 license = IOUtils.getResourceAsString("MULE_LICENSE.txt", getClass());
                 license = StringMessageUtils.getBoilerPlate(license, ' ', 80);
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 logger.warn("Failed to load LICENSE.txt", e);
             }
-            if(license == null) {
+            if (license == null)
+            {
                 license = "Failed to load license";
             }
         }
         return license;
     }
 
-    public String getBuildDate() {
+    public String getBuildDate()
+    {
         return buildDate;
     }
 
-    public String getInstanceId() {
+    public String getInstanceId()
+    {
         return MuleManager.getInstance().getId();
     }
 }

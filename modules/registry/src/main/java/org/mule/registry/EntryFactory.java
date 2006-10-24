@@ -12,11 +12,12 @@ package org.mule.registry;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface EntryFactory {
+public interface EntryFactory
+{
 
     public RegistryComponent createComponent(String name, ComponentType type, Registry registry);
 

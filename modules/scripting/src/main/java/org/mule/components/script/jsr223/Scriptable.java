@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.components.script.jsr223;
 
 import java.io.IOException;
@@ -32,19 +33,19 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.IOUtils;
 
 /**
- * A JSR 223 Script component. Allows any JSR 223 compliant script engines
- * such as javaScript, Groovy or Rhino to be embedded as Mule components
- *
+ * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
+ * javaScript, Groovy or Rhino to be embedded as Mule components
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Scriptable implements Initialisable {
+public class Scriptable implements Initialisable
+{
 
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
 
     private String scriptText;
     private String scriptFile;
@@ -54,135 +55,180 @@ public class Scriptable implements Initialisable {
     private ScriptEngine scriptEngine;
     private String scriptEngineName;
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException, RecoverableException
+    {
 
-        if (scriptEngine == null) {
-            if (compiledScript == null) {
-                if (scriptEngineName != null) {
+        if (scriptEngine == null)
+        {
+            if (compiledScript == null)
+            {
+                if (scriptEngineName != null)
+                {
                     scriptEngine = createScriptEngine();
-                } else if(scriptFile!=null) {
+                }
+                else if (scriptFile != null)
+                {
                     int i = scriptFile.lastIndexOf(".");
-                    if(i > -1) {
+                    if (i > -1)
+                    {
                         setScriptEngineName(scriptFile.substring(i + 1));
-                        logger.info("Script Engine name not set.  Defaulting to file extension: " + getScriptEngineName());
+                        logger.info("Script Engine name not set.  Defaulting to file extension: "
+                                    + getScriptEngineName());
                         scriptEngine = createScriptEngine();
                     }
                 }
-                if (scriptEngine == null) {
-                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "scriptEngine, scriptEngineName, compiledScript"), this);
+                if (scriptEngine == null)
+                {
+                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                        "scriptEngine, scriptEngineName, compiledScript"), this);
                 }
-            } else {
+            }
+            else
+            {
                 scriptEngine = compiledScript.getEngine();
             }
         }
-        if (compiledScript == null) {
-            if (script == null) {
-                if (scriptText == null && scriptFile == null) {
-                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "scriptText, scriptFile"), this);
-                } else if (scriptText != null) {
+        if (compiledScript == null)
+        {
+            if (script == null)
+            {
+                if (scriptText == null && scriptFile == null)
+                {
+                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                        "scriptText, scriptFile"), this);
+                }
+                else if (scriptText != null)
+                {
                     script = new StringReader(scriptText);
-                } else {
+                }
+                else
+                {
                     InputStream is = null;
-                    try {
+                    try
+                    {
                         is = IOUtils.getResourceAsStream(scriptFile, getClass());
                         script = new InputStreamReader(is);
-                    } catch (IOException e) {
-                        throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, scriptFile), e, this);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new InitialisationException(new Message(
+                            Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, scriptFile), e, this);
                     }
                 }
             }
-            try {
+            try
+            {
                 compiledScript = compileScript(script);
-            } catch (ScriptException e) {
+            }
+            catch (ScriptException e)
+            {
                 throw new InitialisationException(e, this);
             }
         }
     }
 
-
-    public ScriptEngine getScriptEngine() {
+    public ScriptEngine getScriptEngine()
+    {
         return scriptEngine;
     }
 
-    public void setScriptEngine(ScriptEngine scriptEngine) {
+    public void setScriptEngine(ScriptEngine scriptEngine)
+    {
         this.scriptEngine = scriptEngine;
     }
 
-    public CompiledScript getCompiledScript() {
+    public CompiledScript getCompiledScript()
+    {
         return compiledScript;
     }
 
-    public void setCompiledScript(CompiledScript compiledScript) {
+    public void setCompiledScript(CompiledScript compiledScript)
+    {
         this.compiledScript = compiledScript;
     }
 
-    public String getScriptText() {
+    public String getScriptText()
+    {
         return scriptText;
     }
 
-
-    public void setScriptText(String scriptText) {
+    public void setScriptText(String scriptText)
+    {
         this.scriptText = scriptText;
     }
 
-
-    public String getScriptFile() {
+    public String getScriptFile()
+    {
         return scriptFile;
     }
 
-    public void setScriptFile(String scriptFile) {
+    public void setScriptFile(String scriptFile)
+    {
         this.scriptFile = scriptFile;
     }
 
-    public void setScriptEngineName(String scriptEngineName) {
+    public void setScriptEngineName(String scriptEngineName)
+    {
         this.scriptEngineName = scriptEngineName;
     }
 
-    public String getScriptEngineName() {
+    public String getScriptEngineName()
+    {
         return scriptEngineName;
     }
 
-    protected CompiledScript compileScript(Compilable compilable, Reader scriptReader) throws ScriptException {
+    protected CompiledScript compileScript(Compilable compilable, Reader scriptReader) throws ScriptException
+    {
         return compilable.compile(scriptReader);
     }
 
-    protected CompiledScript compileScript(Reader scriptReader) throws ScriptException {
-        if (scriptEngine instanceof Compilable) {
-            Compilable compilable = (Compilable) scriptEngine;
+    protected CompiledScript compileScript(Reader scriptReader) throws ScriptException
+    {
+        if (scriptEngine instanceof Compilable)
+        {
+            Compilable compilable = (Compilable)scriptEngine;
             return compileScript(compilable, scriptReader);
         }
         return null;
     }
 
-    protected CompiledScript compileScript(Compilable compilable) throws ScriptException {
+    protected CompiledScript compileScript(Compilable compilable) throws ScriptException
+    {
         return compileScript(compilable, script);
     }
 
-    protected Object evaluteScript(Namespace namespace) throws ScriptException {
+    protected Object evaluteScript(Namespace namespace) throws ScriptException
+    {
         return scriptEngine.eval(scriptText, namespace);
     }
 
-    public Object runScript(Namespace namespace) throws ScriptException {
+    public Object runScript(Namespace namespace) throws ScriptException
+    {
         Object result = null;
-        if (compiledScript != null) {
+        if (compiledScript != null)
+        {
             result = compiledScript.eval(namespace);
-        } else {
+        }
+        else
+        {
             result = evaluteScript(namespace);
         }
         return result;
     }
 
-    public Object runScript(CompiledScript compiledScript, Namespace namespace) throws ScriptException {
+    public Object runScript(CompiledScript compiledScript, Namespace namespace) throws ScriptException
+    {
         Object result = null;
-        if (compiledScript != null) {
+        if (compiledScript != null)
+        {
             result = compiledScript.eval(namespace);
         }
         return result;
     }
 
-    protected ScriptEngine createScriptEngine() {
+    protected ScriptEngine createScriptEngine()
+    {
         ScriptEngineManager manager = new ScriptEngineManager();
         return manager.getEngineByName(scriptEngineName);
     }
 }
-
