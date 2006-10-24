@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.config.i18n.Message;
@@ -31,10 +32,13 @@ public class MessagesTestCase extends AbstractMuleTestCase
 
     public void testBadBundle()
     {
-        try {
+        try
+        {
             new Message("blah", 1);
             fail("should throw resource bundle not found exception");
-        } catch (MissingResourceException e) {
+        }
+        catch (MissingResourceException e)
+        {
             assertTrue(e.getMessage().startsWith("Can't find bundle"));
         }
     }

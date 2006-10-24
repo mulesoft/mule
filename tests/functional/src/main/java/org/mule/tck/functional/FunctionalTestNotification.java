@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.functional;
 
 import org.mule.impl.internal.notifications.CustomNotification;
@@ -32,8 +33,8 @@ public class FunctionalTestNotification extends CustomNotification
 
     private UMOEventContext eventContext;
 
-    public FunctionalTestNotification(UMOEventContext context,
-            Object replyMessage, int action) throws TransformerException
+    public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action)
+        throws TransformerException
     {
         super(context.getTransformedMessage(), action);
         resourceIdentifier = context.getComponentDescriptor().getName();

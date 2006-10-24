@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.MuleManager;
@@ -26,7 +27,8 @@ import java.util.Map;
 public class PropertyTemplatesTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "test-xml-property-templates.xml";
     }
 
@@ -35,10 +37,10 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
         assertEquals("blah", MuleManager.getConfiguration().getModel());
         assertEquals("blah", MuleManager.getInstance().getModel().getName());
 
-        AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("myTestConnector");
+        AbstractConnector c = (AbstractConnector)MuleManager.getInstance().lookupConnector("myTestConnector");
         assertNotNull(c);
         assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy) c.getConnectionStrategy()).getRetryCount());
+        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
 
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test-from-env-props");
         assertNotNull(d);
@@ -80,11 +82,11 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
 
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test3");
         assertNotNull(d);
-        Map props = (Map) d.getProperties().get("testMap");
+        Map props = (Map)d.getProperties().get("testMap");
         assertNotNull(props);
         assertEquals("foo entry", props.get("foo"));
 
-        List list = (List) d.getProperties().get("testList");
+        List list = (List)d.getProperties().get("testList");
         assertNotNull(list);
         assertEquals("bar entry", list.get(0).toString());
 

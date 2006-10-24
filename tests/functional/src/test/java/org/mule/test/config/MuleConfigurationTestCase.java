@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.config.MuleConfiguration;
@@ -25,13 +26,14 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     {
         MuleConfiguration mc = new MuleConfiguration();
         assertEquals(MuleConfiguration.DEFAULT_MAX_OUTSTANDING_MESSAGES, mc.getQueueProfile()
-                                                                           .getMaxOutstandingMessages());
+            .getMaxOutstandingMessages());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_WAIT, mc.getPoolingProfile().getMaxWait());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_ACTIVE, mc.getPoolingProfile().getMaxActive());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_IDLE, mc.getPoolingProfile().getMaxIdle());
-        assertEquals(PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION, mc.getPoolingProfile().getExhaustedAction());
+        assertEquals(PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION, mc.getPoolingProfile()
+            .getExhaustedAction());
         assertEquals(PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY, mc.getPoolingProfile()
-                                                                          .getInitialisationPolicy());
+            .getInitialisationPolicy());
         assertEquals(MuleConfiguration.DEFAULT_SYNCHRONOUS, mc.isSynchronous());
         assertNull(mc.getModel());
     }
@@ -44,8 +46,8 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         mc.getPoolingProfile().setMaxWait(0);
         mc.getPoolingProfile().setMaxActive(1);
         mc.getPoolingProfile().setMaxIdle(1);
-        mc.getPoolingProfile().setExhaustedAction((byte) 1);
-        mc.getPoolingProfile().setInitialisationPolicy((byte) 0);
+        mc.getPoolingProfile().setExhaustedAction((byte)1);
+        mc.getPoolingProfile().setInitialisationPolicy((byte)0);
         mc.setSynchronous(false);
         mc.setModel("Test");
 

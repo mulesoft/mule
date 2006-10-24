@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.MuleManager;
@@ -18,7 +19,8 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class AlwaysCreateConnectorTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "always-create-connector-config.xml";
     }
 

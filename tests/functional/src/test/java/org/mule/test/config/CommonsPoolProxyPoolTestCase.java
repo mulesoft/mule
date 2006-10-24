@@ -16,14 +16,15 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 
-
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
-public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase {
+public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase
+{
 
-    public void testOnRemoveCallsDispose() throws Exception {
+    public void testOnRemoveCallsDispose() throws Exception
+    {
         MuleDescriptor descriptor = getTestDescriptor("test", "java.lang.Object");
         CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor);
         CommonsPoolProxyPool pool = new CommonsPoolProxyPool(descriptor, factory);
@@ -35,14 +36,18 @@ public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase {
         // if calling dispose throws an IllegalStateException it means
         // the component has already been disposed by the pool.
         boolean exceptionWasThrown = false;
-        try {
-            ((MuleProxy) obj).dispose();
-        } catch (IllegalStateException isex) {
+        try
+        {
+            ((MuleProxy)obj).dispose();
+        }
+        catch (IllegalStateException isex)
+        {
             assertEquals("Component has already been disposed of", isex.getMessage());
             exceptionWasThrown = true;
         }
 
-        if (!exceptionWasThrown) {
+        if (!exceptionWasThrown)
+        {
             fail("Expected exception has never been thrown. Was the component disposed before?");
         }
     }

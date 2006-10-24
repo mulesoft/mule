@@ -7,16 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.functional;
 
 import org.mule.impl.internal.notifications.CustomNotificationListener;
 
 /**
  * TODO document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface FunctionalTestNotificationListener extends CustomNotificationListener {
+public interface FunctionalTestNotificationListener extends CustomNotificationListener
+{
     // no methods
 }

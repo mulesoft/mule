@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.apache.commons.beanutils.Converter;
@@ -38,17 +39,21 @@ public class TransactionFactoryConverterTestCase extends AbstractConverterTestCa
 
     public void testValidConversion()
     {
-        Object obj = getConverter().convert(UMOTransactionFactory.class, TestTransactionFactory.class.getName());
+        Object obj = getConverter().convert(UMOTransactionFactory.class,
+            TestTransactionFactory.class.getName());
         assertNotNull(obj);
         assertTrue(obj instanceof TestTransactionFactory);
     }
 
     public void testInvalidConversion()
     {
-        try {
+        try
+        {
             getConverter().convert(UMOTransactionFactory.class, "foo.bar.bad.TransactionFactory");
             fail("should throw exception on bad transaction factory class");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
 

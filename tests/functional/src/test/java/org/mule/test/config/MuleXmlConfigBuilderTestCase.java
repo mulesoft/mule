@@ -52,44 +52,51 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public ConfigurationBuilder getBuilder()
     {
-        try {
+        try
+        {
             return new MuleXmlConfigurationBuilder();
-        } catch (ConfigurationException e) {
+        }
+        catch (ConfigurationException e)
+        {
             fail(e.getMessage());
             return null;
         }
     }
 
-    public void testPropertyExtractorConfig() throws Exception {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("propertyExtractorTestComponent");
+    public void testPropertyExtractorConfig() throws Exception
+    {
+        UMODescriptor d = MuleManager.getInstance()
+            .getModel()
+            .getDescriptor("propertyExtractorTestComponent");
         assertNotNull(d);
         UMOOutboundMessageRouter router = d.getOutboundRouter();
         assertNotNull(router);
         List routers = router.getRouters();
         assertNotNull(routers);
         assertEquals(1, routers.size());
-        AbstractOutboundRouter theRouter = (AbstractOutboundRouter) routers.get(0);
+        AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
         PropertyExtractor pe = theRouter.getPropertyExtractor();
         assertNotNull(pe);
         // the one we put in the config
         assertTrue(pe instanceof JXPathPropertyExtractor);
     }
 
-    public void testPropertyExtractorResponseRouterConfig() throws Exception {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("propertyExtractorResponseRouterTestComponent");
+    public void testPropertyExtractorResponseRouterConfig() throws Exception
+    {
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor(
+            "propertyExtractorResponseRouterTestComponent");
         assertNotNull(d);
         UMOResponseMessageRouter router = d.getResponseRouter();
         assertNotNull(router);
         List routers = router.getRouters();
         assertNotNull(routers);
         assertEquals(1, routers.size());
-        AbstractResponseRouter theRouter = (AbstractResponseRouter) routers.get(0);
+        AbstractResponseRouter theRouter = (AbstractResponseRouter)routers.get(0);
         PropertyExtractor pe = theRouter.getCorrelationExtractor();
         assertNotNull(pe);
         // the one we put in the config
         assertTrue(pe instanceof JXPathPropertyExtractor);
     }
-
 
     public void testPropertyTypesConfig() throws Exception
     {
@@ -110,7 +117,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
     {
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
-        Map props = (Map) d.getProperties().get("propertiesMap");
+        Map props = (Map)d.getProperties().get("propertiesMap");
         assertNotNull(props);
         assertNotNull(props.get("factoryObject"));
         assertTrue(props.get("factoryObject") instanceof Orange);
@@ -127,7 +134,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
     {
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
-        List props = (List) d.getProperties().get("propertiesList");
+        List props = (List)d.getProperties().get("propertiesList");
         assertNotNull(props);
         assertEquals(6, props.size());
         assertNotNull(props.get(0));
@@ -156,13 +163,13 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         UMOTransformer t = MuleManager.getInstance().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
-        assertTrue(((TestCompressionTransformer) t).isSourceTypeSupported(String.class, true));
+        assertTrue(((TestCompressionTransformer)t).isSourceTypeSupported(String.class, true));
 
         // This will only work with the MuleXml Builder other implementations
         // will have to set this proerty manually or mimic Mules behaviour
         Assert.assertEquals("this was set from the manager properties!",
-                            ((TestCompressionTransformer) t).getBeanProperty1());
-        Assert.assertEquals(12, ((TestCompressionTransformer) t).getBeanProperty2());
+            ((TestCompressionTransformer)t).getBeanProperty1());
+        Assert.assertEquals(12, ((TestCompressionTransformer)t).getBeanProperty2());
 
         assertEquals(t.getReturnClass(), java.lang.String.class);
 
@@ -180,9 +187,9 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     /**
      * The MuleXmlConfiguration builder provides special support for overloading
-     * config elements for threadingProfiles, queueProfiles and poolingProfiles,
-     * so that defaults can be declared in the main configuration but overiding
-     * elements can just replace certain values
+     * config elements for threadingProfiles, queueProfiles and poolingProfiles, so
+     * that defaults can be declared in the main configuration but overiding elements
+     * can just replace certain values
      * 
      * @throws MuleException
      */
@@ -205,7 +212,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals(60001, tp.getThreadTTL());
 
         // test thatvalues not set retain a default value
-        AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("dummyConnector");
+        AbstractConnector c = (AbstractConnector)MuleManager.getInstance().lookupConnector("dummyConnector");
         tp = c.getDispatcherThreadingProfile();
         assertEquals(2, tp.getMaxBufferSize());
         assertEquals(8, tp.getMaxThreadsActive());
@@ -213,9 +220,8 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
-                                                                .getModel()
-                                                                .getDescriptor("appleComponent2");
+        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+            "appleComponent2");
         tp = descriptor.getThreadingProfile();
         assertEquals(6, tp.getMaxBufferSize());
         assertEquals(12, tp.getMaxThreadsActive());
@@ -236,9 +242,8 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test override
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
-                                                                .getModel()
-                                                                .getDescriptor("appleComponent2");
+        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+            "appleComponent2");
         pp = descriptor.getPoolingProfile();
 
         assertEquals(8, pp.getMaxActive());
@@ -256,9 +261,8 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals("value1", ep.getProperties().get("testGlobal"));
         assertNull(ep.getFilter());
 
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
-                                                                .getModel()
-                                                                .getDescriptor("orangeComponent");
+        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+            "orangeComponent");
         assertNotNull(descriptor);
         ep = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(ep);

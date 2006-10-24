@@ -21,9 +21,11 @@ import org.mule.util.properties.JXPathPropertyExtractor;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
+public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase
+{
 
-    public void testWithExpressions() {
+    public void testWithExpressions()
+    {
         Apple apple = new Apple();
         apple.wash();
         FruitBowl payload = new FruitBowl(apple, new Banana());
@@ -39,7 +41,6 @@ public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
         assertNotNull(value);
         assertTrue(value instanceof Boolean);
         assertTrue(((Boolean)value).booleanValue());
-
 
         value = e.getProperty("bar", msg);
         assertNull(value);

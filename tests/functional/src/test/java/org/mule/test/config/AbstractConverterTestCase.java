@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import com.mockobjects.dynamic.C;
@@ -27,10 +28,13 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 
     public void testnullConverter()
     {
-        try {
+        try
+        {
             getConverter().convert(getValidConvertedType().getClass(), null);
             fail("Should thow exception on null");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
     }
@@ -47,32 +51,40 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
     public void testValidConversion()
     {
         Mock mockManager = new Mock(UMOManager.class);
-        try {
-            MuleManager.setInstance((UMOManager) mockManager.proxy());
+        try
+        {
+            MuleManager.setInstance((UMOManager)mockManager.proxy());
             Object obj = getValidConvertedType();
             mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
             Object result = getConverter().convert(obj.getClass(), "test://Test");
 
             assertNotNull(result);
             mockManager.verify();
-        } finally {
+        }
+        finally
+        {
             MuleManager.setInstance(null);
         }
     }
 
     public void testInvalidConversion()
     {
-        Mock mockManager = new Mock(UMOManager.class);        
-        MuleManager.setInstance((UMOManager) mockManager.proxy());
+        Mock mockManager = new Mock(UMOManager.class);
+        MuleManager.setInstance((UMOManager)mockManager.proxy());
         Object obj = getValidConvertedType();
         mockManager.expectAndReturn(getLookupMethod(), C.eq("TestBad"), null);
-        try {
+        try
+        {
             getConverter().convert(obj.getClass(), "TestBad");
             fail("should throw an exception if not found");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // exprected
             mockManager.verify();
-        } finally {
+        }
+        finally
+        {
             MuleManager.setInstance(null);
         }
 

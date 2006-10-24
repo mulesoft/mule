@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.apache.commons.beanutils.Converter;
@@ -29,9 +30,12 @@ public class EndpointConverterTestCase extends AbstractMuleTestCase
 
     public Object getValidConvertedType()
     {
-        try {
+        try
+        {
             return MuleTestUtils.getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             fail(e.getMessage());
             return null;

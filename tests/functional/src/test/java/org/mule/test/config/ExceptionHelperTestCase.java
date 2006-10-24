@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.MuleException;
@@ -21,9 +22,11 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ExceptionHelperTestCase extends AbstractMuleTestCase {
+public class ExceptionHelperTestCase extends AbstractMuleTestCase
+{
 
-    public void testNestedExceptionRetreval() throws Exception {
+    public void testNestedExceptionRetreval() throws Exception
+    {
 
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
@@ -46,9 +49,10 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
     }
 
-    private Exception getException() {
+    private Exception getException()
+    {
 
-        return new MuleException(Message.createStaticMessage("foo"),
-                new MuleException(Message.createStaticMessage("bar"), new Exception("blah")));
+        return new MuleException(Message.createStaticMessage("foo"), new MuleException(
+            Message.createStaticMessage("bar"), new Exception("blah")));
     }
 }

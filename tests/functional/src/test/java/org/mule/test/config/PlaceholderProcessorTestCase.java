@@ -8,7 +8,6 @@
  * LICENSE.txt file.
  */
 
-
 package org.mule.test.config;
 
 import org.mule.MuleManager;

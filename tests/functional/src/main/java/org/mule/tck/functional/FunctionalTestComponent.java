@@ -24,6 +24,7 @@ import org.mule.util.StringMessageUtils;
  * <code>FunctionalTestComponent</code> is a component that can be used by
  * functional tests. This component accepts an EventCallback that can be used to
  * assert the state of the current event.
+ * 
  * @see EventCallback
  */
 

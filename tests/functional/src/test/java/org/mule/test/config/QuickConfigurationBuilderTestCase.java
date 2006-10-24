@@ -55,30 +55,34 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase {
+public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
+{
 
-    public String getConfigResources() {
+    public String getConfigResources()
+    {
         return null;
     }
 
-    public ConfigurationBuilder getBuilder() {
+    public ConfigurationBuilder getBuilder()
+    {
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMOManager m = builder.getManager();
-        //Disable the admin agent
+        // Disable the admin agent
         MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
-        try {
-            //set global properties
+        try
+        {
+            // set global properties
             m.setProperty("doCompression", "true");
 
-            //Set a dummy TX manager
+            // Set a dummy TX manager
             m.setTransactionManager(new TestTransactionManagerFactory().create());
-            //register agents
+            // register agents
             UMOAgent agent = new JmxAgent();
             agent.setName("jmxAgent");
             m.registerAgent(agent);
 
-            //register connector
+            // register connector
             TestConnector c = new TestConnector();
             c.setName("dummyConnector");
             c.setExceptionListener(new TestExceptionStrategy());
@@ -88,12 +92,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             c.setConnectionStrategy(cs);
             m.registerConnector(c);
 
-            //Endpoint identifiers
+            // Endpoint identifiers
             m.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
             m.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
             m.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
-            //Register transformers
+            // Register transformers
             TestCompressionTransformer t = new TestCompressionTransformer();
             t.setReturnClass(String.class);
             t.setBeanProperty2(12);
@@ -105,21 +109,21 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             t2.setReturnClass(byte[].class);
             m.registerTransformer(t2);
 
-            //Register endpoints
+            // Register endpoints
             JXPathFilter filter = new JXPathFilter("name");
             filter.setExpectedValue("bar");
             Map ns = new HashMap();
             ns.put("foo", "http://foo.com");
             filter.setNamespaces(ns);
-            builder.registerEndpoint( "test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
+            builder.registerEndpoint("test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
             builder.registerEndpoint("Test Queue", "waterMelonEndpoint", false);
             builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
             builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
             Map props = new HashMap();
             props.put("testGlobal", "value1");
-            builder.registerEndpoint( "test://orangeQ", "orangeEndpoint",false, props);
+            builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 
-            //Register Interceptors
+            // Register Interceptors
             InterceptorStack stack = new InterceptorStack();
             List interceptors = new ArrayList();
             interceptors.add(new LoggingInterceptor());
@@ -127,7 +131,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             stack.setInterceptors(interceptors);
             m.registerInterceptorStack("default", stack);
 
-            //register model
+            // register model
             UMOModel model = new SedaModel();
             model.setName("test-model");
             TestExceptionStrategy es = new TestExceptionStrategy();
@@ -137,7 +141,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             model.setEntryPointResolver(new TestEntryPointResolver());
             m.setModel(model);
 
-            //register components
+            // register components
             UMOEndpoint ep1 = m.lookupEndpoint("appleInEndpoint");
             ep1.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
             UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
@@ -145,11 +149,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
             dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
             d.setExceptionListener(dces);
-            //Create the inbound router
+            // Create the inbound router
             UMOInboundMessageRouter inRouter = new InboundMessageRouter();
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
             inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
-            UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
+            UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
+                "TestCompressionTransformer");
             ep2.setResponseTransformer(m.lookupTransformer("TestCompressionTransformer"));
             inRouter.addEndpoint(ep2);
             UMOEndpoint ep3 = m.lookupEndpoint("orangeEndpoint");
@@ -161,7 +166,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.addEndpoint(ep3);
             d.setInboundRouter(inRouter);
 
-            //Response Router
+            // Response Router
             UMOResponseMessageRouter responseRouter = new ResponseMessageRouter();
             responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
             responseRouter.addEndpoint(m.lookupEndpoint("appleResponseEndpoint"));
@@ -169,12 +174,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             responseRouter.setTimeout(10001);
             d.setResponseRouter(responseRouter);
 
-            //Interceptors
+            // Interceptors
             UMOInterceptorStack stack2 = m.lookupInterceptorStack("default");
             d.setInterceptors(new ArrayList(stack2.getInterceptors()));
             d.getInterceptors().add(new TimerInterceptor());
 
-            //properties
+            // properties
             Map cprops = new HashMap();
             cprops.put("orange", new Orange());
             cprops.put("brand", "Juicy Baby!");
@@ -196,10 +201,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             cprops.put("arrayProperties", nested3);
             d.setProperties(cprops);
 
-            //register components
+            // register components
             m.getModel().registerComponent(d);
             m.start();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             fail(e.getMessage());
         }

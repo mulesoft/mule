@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.config.converters.QNameConverter;
@@ -32,7 +33,7 @@ public class QNameConverterTestCase extends AbstractMuleTestCase
         assertEquals("http://muleumo.org/echo", name.getNamespaceURI());
     }
 
-     public void testNameAndNamespace()
+    public void testNameAndNamespace()
     {
         QName name = (QName)converter.convert(QName.class, "qname{echo:http://muleumo.org/echo}");
         assertNotNull(name);

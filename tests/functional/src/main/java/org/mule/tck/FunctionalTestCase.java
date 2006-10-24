@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck;
 
 import org.mule.MuleManager;
@@ -17,85 +18,105 @@ import org.mule.umo.manager.DefaultWorkListener;
 import javax.resource.spi.work.WorkEvent;
 
 /**
- * Is a base tast case for tests that initialise Mule using a configuration file.
- * The default configuration builder used is the MuleXmlConfigurationBuilder. This
- * you need to have the mule-modules-builders module/jar on your classpath. If you want
- * to use a different builder, just overload the <code>getBuilder()</code> method of
- * this class to return the type of builder you want to use with your test.
- *
- * Note you can overload the <code>getBuilder()</code> to return an initialised instance of
- * the QuickConfiguratonBuilder, this allows the developer to programmatically build a Mule
- * instance and roves the need for additional config files for the test.
- *
+ * Is a base tast case for tests that initialise Mule using a configuration file. The
+ * default configuration builder used is the MuleXmlConfigurationBuilder. This you
+ * need to have the mule-modules-builders module/jar on your classpath. If you want
+ * to use a different builder, just overload the <code>getBuilder()</code> method
+ * of this class to return the type of builder you want to use with your test. Note
+ * you can overload the <code>getBuilder()</code> to return an initialised instance
+ * of the QuickConfiguratonBuilder, this allows the developer to programmatically
+ * build a Mule instance and roves the need for additional config files for the test.
  */
-public abstract class FunctionalTestCase extends AbstractMuleTestCase {
+public abstract class FunctionalTestCase extends AbstractMuleTestCase
+{
 
     public static final String DEFAULT_BUILDER_CLASS = "org.mule.config.builders.MuleXmlConfigurationBuilder";
 
-    protected final void doSetUp() throws Exception {
+    protected final void doSetUp() throws Exception
+    {
         doPreFunctionalSetUp();
-        //Should we set up te manager for every method?
-        if (!getTestInfo().isDisposeManagerPerSuite()) {
+        // Should we set up te manager for every method?
+        if (!getTestInfo().isDisposeManagerPerSuite())
+        {
             setupManager();
         }
         doPostFunctionalSetUp();
     }
 
-    protected void suitePreSetUp() throws Exception {
-        if(getTestInfo().isDisposeManagerPerSuite()) {
+    protected void suitePreSetUp() throws Exception
+    {
+        if (getTestInfo().isDisposeManagerPerSuite())
+        {
             setupManager();
         }
     }
 
-    protected void setupManager() throws Exception {
+    protected void setupManager() throws Exception
+    {
         MuleManager.getConfiguration().setWorkListener(new TestingWorkListener());
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources(), null);
     }
 
-    protected final void doTearDown() throws Exception {
+    protected final void doTearDown() throws Exception
+    {
         doFunctionalTearDown();
     }
 
-    protected ConfigurationBuilder getBuilder() throws Exception {
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
 
         try
         {
             Class builderClass = ClassUtils.loadClass(DEFAULT_BUILDER_CLASS, getClass());
             return (ConfigurationBuilder)builderClass.newInstance();
-        } catch (ClassNotFoundException e)
+        }
+        catch (ClassNotFoundException e)
         {
-            throw new ClassNotFoundException("The builder " + DEFAULT_BUILDER_CLASS + " is not on your classpath and " +
-                    "the getBuilder() method of this class has not been overloaded to return adifferent builder. Please " +
-                    "check your functional test.", e);
+            throw new ClassNotFoundException(
+                "The builder "
+                                + DEFAULT_BUILDER_CLASS
+                                + " is not on your classpath and "
+                                + "the getBuilder() method of this class has not been overloaded to return adifferent builder. Please "
+                                + "check your functional test.", e);
         }
 
     }
 
-    protected void doPreFunctionalSetUp() throws Exception {
+    protected void doPreFunctionalSetUp() throws Exception
+    {
         // template method
     }
 
-    protected void doPostFunctionalSetUp() throws Exception {
+    protected void doPostFunctionalSetUp() throws Exception
+    {
         // template method
     }
 
-    protected void doFunctionalTearDown() throws Exception {
+    protected void doFunctionalTearDown() throws Exception
+    {
         // template method
     }
 
     protected abstract String getConfigResources();
 
-    public class TestingWorkListener extends DefaultWorkListener {
-        protected void handleWorkException(WorkEvent event, String type) {
+    public class TestingWorkListener extends DefaultWorkListener
+    {
+        protected void handleWorkException(WorkEvent event, String type)
+        {
             super.handleWorkException(event, type);
-            if(event.getException()!=null) {
+            if (event.getException() != null)
+            {
                 Throwable t = event.getException().getCause();
-                if(t!=null) {
+                if (t != null)
+                {
 
-                    if(t instanceof Error) {
+                    if (t instanceof Error)
+                    {
                         throw (Error)t;
-                    } else if(t instanceof RuntimeException) {
+                    }
+                    else if (t instanceof RuntimeException)
+                    {
                         throw (RuntimeException)t;
                     }
                 }

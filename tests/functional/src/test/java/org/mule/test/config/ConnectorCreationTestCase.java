@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.config;
 
 import org.mule.components.simple.EchoComponent;
@@ -27,9 +28,8 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
         builder.registerEndpoint("test://inbound?createConnector=ALWAYS", "in", true);
         builder.registerEndpoint("test://outbound?createConnector=ALWAYS", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
-        assertTrue(!c.getDescriptor().getInboundEndpoint().getConnector().equals(c.getDescriptor()
-                                                                                  .getOutboundEndpoint()
-                                                                                  .getConnector()));
+        assertTrue(!c.getDescriptor().getInboundEndpoint().getConnector().equals(
+            c.getDescriptor().getOutboundEndpoint().getConnector()));
     }
 
     public void testCreateOnce() throws Exception
@@ -39,17 +39,20 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
         builder.registerEndpoint("test://outbound", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
         assertEquals(c.getDescriptor().getInboundEndpoint().getConnector(), c.getDescriptor()
-                                                                             .getOutboundEndpoint()
-                                                                             .getConnector());
+            .getOutboundEndpoint()
+            .getConnector());
     }
 
     public void testCreateNeverUsingParamString() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-        try {
+        try
+        {
             builder.registerEndpoint("test://inbound?createConnector=NEVER", "in", true);
             fail("Should fail as there is no existing test connector");
-        } catch (UMOException e) {
+        }
+        catch (UMOException e)
+        {
             // expected
         }
     }
