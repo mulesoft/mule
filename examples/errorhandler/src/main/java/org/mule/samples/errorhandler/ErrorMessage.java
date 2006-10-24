@@ -7,13 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.errorhandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
  * <code>ErrorMessage</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -24,6 +24,7 @@ public class ErrorMessage
     private ExceptionBean exception;
     private Throwable throwable;
     private Map properties = new HashMap();
+
     /**
      *
      */
@@ -57,8 +58,7 @@ public class ErrorMessage
     }
 
     /**
-     * @param exception
-     *            The exception to set.
+     * @param exception The exception to set.
      */
     public void setException(ExceptionBean exception) throws InstantiationException
     {
@@ -75,8 +75,7 @@ public class ErrorMessage
     }
 
     /**
-     * @param properties
-     *            The properties to set.
+     * @param properties The properties to set.
      */
     public void setProperties(Map properties)
     {
@@ -92,8 +91,7 @@ public class ErrorMessage
     }
 
     /**
-     * @param throwable
-     *            The throwable to set.
+     * @param throwable The throwable to set.
      */
     public void setThrowable(Throwable throwable)
     {

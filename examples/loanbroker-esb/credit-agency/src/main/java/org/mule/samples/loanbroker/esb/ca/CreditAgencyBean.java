@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker.esb.ca;
 
 import javax.ejb.EJBException;
@@ -15,56 +16,63 @@ import javax.ejb.SessionContext;
 import java.text.MessageFormat;
 
 /**
- * <code>CreditAgencyBean</code> obtains a credit historey record for a
- * customer.
- *
+ * <code>CreditAgencyBean</code> obtains a credit historey record for a customer.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CreditAgencyBean implements SessionBean {
+public class CreditAgencyBean implements SessionBean
+{
     private static final long serialVersionUID = 1546168214387311746L;
 
-    private static final String MSG="<credit-profile><customer-name>{0}</customer-name><customer-ssn>{1}</customer-ssn><credit-score>{2}</credit-score><customer-history>{3}</customer-history></credit-profile>";
+    private static final String MSG = "<credit-profile><customer-name>{0}</customer-name><customer-ssn>{1}</customer-ssn><credit-score>{2}</credit-score><customer-history>{3}</customer-history></credit-profile>";
 
-    public void ejbActivate() throws EJBException {
+    public void ejbActivate() throws EJBException
+    {
         // nothing to do
     }
 
-    public void ejbPassivate() throws EJBException {
+    public void ejbPassivate() throws EJBException
+    {
         // nothing to do
     }
 
-    public void ejbRemove() throws EJBException {
+    public void ejbRemove() throws EJBException
+    {
         // nothing to do
     }
 
-    public void ejbCreate() throws EJBException {
+    public void ejbCreate() throws EJBException
+    {
         // nothing to do
     }
 
-    public void setSessionContext(SessionContext sessionContext) throws EJBException {
+    public void setSessionContext(SessionContext sessionContext) throws EJBException
+    {
         // SessionContext can be ignored
     }
 
-    protected int getCreditScore(int ssn) {
+    protected int getCreditScore(int ssn)
+    {
         int credit_score;
 
-        credit_score = (int) (Math.random() * 600 + 300);
+        credit_score = (int)(Math.random() * 600 + 300);
 
         return credit_score;
     }
 
-    protected int getCreditHistoryLength(int ssn) {
+    protected int getCreditHistoryLength(int ssn)
+    {
         int credit_history_length;
 
-        credit_history_length = (int) (Math.random() * 19 + 1);
+        credit_history_length = (int)(Math.random() * 19 + 1);
 
         return credit_history_length;
     }
 
-
     /**
      * Used by Ejb Call
+     * 
      * @param name
      * @param ssn
      * @return
@@ -72,8 +80,7 @@ public class CreditAgencyBean implements SessionBean {
     public String getCreditProfile(String name, Integer ssn)
     {
         String msg = MessageFormat.format(MSG, new Object[]{name, ssn,
-                       new Integer(getCreditScore(ssn.intValue())),
-                       new Integer(getCreditHistoryLength(ssn.intValue()))});
+            new Integer(getCreditScore(ssn.intValue())), new Integer(getCreditHistoryLength(ssn.intValue()))});
         return msg;
     }
 

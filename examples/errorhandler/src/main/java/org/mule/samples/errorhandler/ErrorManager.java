@@ -22,7 +22,6 @@ import org.mule.samples.errorhandler.handlers.FatalHandler;
 import org.mule.umo.UMOException;
 
 /**
- * 
  * <code>ErrorManager</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -48,14 +47,16 @@ public class ErrorManager
 
     public void setHandlers(ExceptionHandler[] eh)
     {
-        for (int i = 0; i < eh.length; i++) {
+        for (int i = 0; i < eh.length; i++)
+        {
             addHandler(eh[i]);
         }
     }
 
     public void addHandler(ExceptionHandler eh)
     {
-        for (Iterator i = eh.getRegisteredClasses(); i.hasNext();) {
+        for (Iterator i = eh.getRegisteredClasses(); i.hasNext();)
+        {
             handlers.put(i.next(), eh);
         }
     }
@@ -63,7 +64,8 @@ public class ErrorManager
     public ExceptionHandler getHandler(Class exceptionClass)
     {
         Object obj = handlers.get(exceptionClass);
-        if (obj == null) {
+        if (obj == null)
+        {
             obj = handlers.get(Throwable.class);
         }
 
@@ -75,33 +77,37 @@ public class ErrorManager
         Class eClass = null;
         ExceptionHandler eh = null;
 
-        try {
+        try
+        {
             eClass = msg.getException().toException().getClass();
             eh = getHandler(eClass);
             eh.onException(msg);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             logger.error("Failed to handle Exception using handler: "
-                            + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
+                         + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
 
-            if (eh instanceof DefaultHandler) {
-                logger
-                                .error("As the failure happened in the Default Exception handler, now using Fatal Behaviour "
-                                                + FatalHandler.class.getName()
-                                                + " which will cause the Exception Manager to shutdown");
+            if (eh instanceof DefaultHandler)
+            {
+                logger.error("As the failure happened in the Default Exception handler, now using Fatal Behaviour "
+                             + FatalHandler.class.getName()
+                             + " which will cause the Exception Manager to shutdown");
 
                 handleFatal(e);
 
             }
-            else if (eh instanceof FatalHandler) {
+            else if (eh instanceof FatalHandler)
+            {
                 logger.fatal("Exception caught handling Fatal exception: " + e);
                 ((MuleManager)MuleManager.getInstance()).shutdown(e, false);
             }
-            else {
+            else
+            {
                 logger.error("Exception Handler resorting to Default Behaviour : "
-                                + DefaultHandler.class.getName()
-                                + ", due to exception in configured behavour : "
-                                + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
+                             + DefaultHandler.class.getName()
+                             + ", due to exception in configured behavour : "
+                             + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
                 handleDefault(msg, e);
             }
         }
@@ -112,22 +118,24 @@ public class ErrorManager
         ErrorMessage nestedMsg = null;
         // Try wrapping the exception and the Exception message that caused the
         // exception in a new message
-        try {
+        try
+        {
             nestedMsg = new ErrorMessage(t);
         }
-        catch (Exception e) {
-            logger.fatal(
-                            "Exception happened while handling and exception using the Default behaviour: "
-                                            + e, e);
+        catch (Exception e)
+        {
+            logger.fatal("Exception happened while handling and exception using the Default behaviour: " + e,
+                e);
             handleFatal(e);
         }
-        try {
+        try
+        {
             defaultHandler.onException(nestedMsg);
         }
-        catch (HandlerException e) {
-            logger.fatal(
-                            "Exception happened while handling and exception using the Default behaviour: "
-                                            + e, e);
+        catch (HandlerException e)
+        {
+            logger.fatal("Exception happened while handling and exception using the Default behaviour: " + e,
+                e);
             handleFatal(e);
         }
 

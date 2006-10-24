@@ -22,15 +22,18 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class LoanBrokerESBTestCase extends FunctionalTestCase {
+public class LoanBrokerESBTestCase extends FunctionalTestCase
+{
 
     public static final int REQUESTS = 100;
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "loan-broker-esb-mule-config-test-case.xml";
     }
 
-    public void testSingleLoanRequest() throws Exception {
+    public void testSingleLoanRequest() throws Exception
+    {
         MuleClient client = new MuleClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
@@ -42,32 +45,32 @@ public class LoanBrokerESBTestCase extends FunctionalTestCase {
         assertTrue(quote.getInterestRate() > 0);
     }
 
-//    public void testLotsOfLoanRequests() throws Exception {
-//        MuleClient client = new MuleClient();
-//        Customer c = new Customer("Ross Mason", 1234);
-//        LoanQuoteRequest[] requests = new LoanQuoteRequest[2];
-//        requests[0] = new LoanQuoteRequest();
-//        requests[1] = new LoanQuoteRequest();
-//        requests[0].setCustomerRequest(new CustomerQuoteRequest(c, 100000, 48));
-//        requests[1].setCustomerRequest(new CustomerQuoteRequest(c, 1000, 12));
-//        UMOMessage result;
-//        int i = 0;
-//        long start = System.currentTimeMillis();
-//        try {
-//            for (; i < REQUESTS; i++) {
-//                result = client.send("vm://loan.broker.requests",  requests[i % 2], null);
-//                assertNotNull(result);
-//                assertFalse(result.getPayload() instanceof NullPayload);
-//                assertTrue(result.getPayload() instanceof LoanQuote);
-//                LoanQuote quote = (LoanQuote)result.getPayload();
-//                assertTrue(quote.getInterestRate() > 0);
-//            }
-//        } finally {
-//            System.out.println("Requests processed was: " + i);
-//            long el = System.currentTimeMillis() - start;
-//            System.out.println("Total running time was: " + el);
-//            float mps = 1000 / (el / REQUESTS);
-//            System.out.println("MPS: " + mps + " (no warm up)");
-//        }
-//    }
+    // public void testLotsOfLoanRequests() throws Exception {
+    // MuleClient client = new MuleClient();
+    // Customer c = new Customer("Ross Mason", 1234);
+    // LoanQuoteRequest[] requests = new LoanQuoteRequest[2];
+    // requests[0] = new LoanQuoteRequest();
+    // requests[1] = new LoanQuoteRequest();
+    // requests[0].setCustomerRequest(new CustomerQuoteRequest(c, 100000, 48));
+    // requests[1].setCustomerRequest(new CustomerQuoteRequest(c, 1000, 12));
+    // UMOMessage result;
+    // int i = 0;
+    // long start = System.currentTimeMillis();
+    // try {
+    // for (; i < REQUESTS; i++) {
+    // result = client.send("vm://loan.broker.requests", requests[i % 2], null);
+    // assertNotNull(result);
+    // assertFalse(result.getPayload() instanceof NullPayload);
+    // assertTrue(result.getPayload() instanceof LoanQuote);
+    // LoanQuote quote = (LoanQuote)result.getPayload();
+    // assertTrue(quote.getInterestRate() > 0);
+    // }
+    // } finally {
+    // System.out.println("Requests processed was: " + i);
+    // long el = System.currentTimeMillis() - start;
+    // System.out.println("Total running time was: " + el);
+    // float mps = 1000 / (el / REQUESTS);
+    // System.out.println("MPS: " + mps + " (no warm up)");
+    // }
+    // }
 }

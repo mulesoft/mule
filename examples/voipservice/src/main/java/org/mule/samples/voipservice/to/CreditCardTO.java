@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.to;
 
 import java.io.Serializable;
@@ -33,7 +34,8 @@ public class CreditCardTO implements Serializable, Cloneable
 
     private static final List CREDIT_CARDS;
 
-    static {
+    static
+    {
         CREDIT_CARDS = new ArrayList();
 
         CREDIT_CARDS.add(new CreditCardTO("1111-2222-3333-4444", "01-JAN-2006", VISA));
@@ -48,68 +50,85 @@ public class CreditCardTO implements Serializable, Cloneable
         CREDIT_CARDS.add(new CreditCardTO("9999-1111-2222-4444", "01-FEB-2008", VISA));
     }
 
-    public CreditCardTO() {
+    public CreditCardTO()
+    {
         super();
     }
 
-    public CreditCardTO(String cardNumber, String validTill, String cardType) {
+    public CreditCardTO(String cardNumber, String validTill, String cardType)
+    {
         this.cardNumber = cardNumber;
         this.validTill = validTill;
         this.cardType = cardType;
     }
 
-    public void setCardNumber(String cardNumber) {
+    public void setCardNumber(String cardNumber)
+    {
         this.cardNumber = cardNumber;
     }
 
-    public String getCardNumber() {
+    public String getCardNumber()
+    {
         return cardNumber;
     }
 
-    public void setValidTill(String validTill) {
+    public void setValidTill(String validTill)
+    {
         this.validTill = validTill;
     }
 
-    public String getValidTill() {
+    public String getValidTill()
+    {
         return validTill;
     }
 
-    public void setCardType(String cardType) {
+    public void setCardType(String cardType)
+    {
         this.cardType = cardType;
     }
 
-    public String getCardType() {
+    public String getCardType()
+    {
         return cardType;
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         Object clone = null;
-        try {
+        try
+        {
             clone = super.clone();
-        } catch (CloneNotSupportedException cloneNotSupportedException) {
+        }
+        catch (CloneNotSupportedException cloneNotSupportedException)
+        {
             // too bad
         }
         return clone;
     }
 
-    public String toString() {
+    public String toString()
+    {
         StringBuffer stringBuffer = new StringBuffer();
-        if (this.cardNumber != null) {
+        if (this.cardNumber != null)
+        {
             stringBuffer.append("[CardNumber : " + cardNumber + "; ");
         }
-        if (this.validTill != null) {
+        if (this.validTill != null)
+        {
             stringBuffer.append("ValidTill : " + validTill + "; ");
         }
-        if (this.cardType != null) {
+        if (this.cardType != null)
+        {
             stringBuffer.append("CardType : " + cardType + "]");
         }
         return stringBuffer.toString();
     }
 
-    public static CreditCardTO getRandomCreditCard() {
+    public static CreditCardTO getRandomCreditCard()
+    {
 
         int index = new Double(Math.random() * 10).intValue();
-        return (CreditCardTO) ((CreditCardTO) CREDIT_CARDS.get(index)).clone();
+        return (CreditCardTO)((CreditCardTO)CREDIT_CARDS.get(index)).clone();
     }
 
 }

@@ -18,8 +18,8 @@ import org.mule.umo.lifecycle.FatalException;
 import org.mule.util.StringMessageUtils;
 
 /**
- *  <code>FatalBehaviour</code> TODO (document class)
- *
+ * <code>FatalBehaviour</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -28,16 +28,17 @@ public class FatalHandler extends DefaultHandler
     /** logger used by this class */
     private static transient Log logger = LogFactory.getLog(FatalHandler.class);
 
-    public FatalHandler( ) {
-       super();
-       registerException(FatalException.class);
+    public FatalHandler()
+    {
+        super();
+        registerException(FatalException.class);
     }
 
     public void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        System.out.println( StringMessageUtils.getBoilerPlate("Exception received in \n" +
-                " FATAL EXCEPTION HANDLER \n." +
-                " Logic could be put in here to enrich the message content"));
+        System.out.println(StringMessageUtils.getBoilerPlate("Exception received in \n"
+                                                             + " FATAL EXCEPTION HANDLER \n."
+                                                             + " Logic could be put in here to enrich the message content"));
         logger.fatal("Exception is: " + t, t);
     }
 

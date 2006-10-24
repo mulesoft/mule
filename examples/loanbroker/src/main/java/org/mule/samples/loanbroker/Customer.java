@@ -7,13 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker;
 
 import java.io.Serializable;
 
 /**
  * <code>Customer</code> the loan broker customer
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

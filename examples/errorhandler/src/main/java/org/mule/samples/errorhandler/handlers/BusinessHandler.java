@@ -17,7 +17,6 @@ import org.mule.samples.errorhandler.exceptions.BusinessException;
 import org.mule.util.StringMessageUtils;
 
 /**
- * 
  * <code>BusinessHandler</code> TODO (document class)
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -35,8 +34,8 @@ public class BusinessHandler extends AbstractExceptionHandler
     protected void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Exception received in /n"
-                        + " BUSINESS EXCEPTION HANDLER /n."
-                        + " Logic could be put in here to enrich the message content"));
+                                                             + " BUSINESS EXCEPTION HANDLER /n."
+                                                             + " Logic could be put in here to enrich the message content"));
     }
 
 }

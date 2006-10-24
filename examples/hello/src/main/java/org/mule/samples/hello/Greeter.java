@@ -7,22 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
- 
+
 package org.mule.samples.hello;
 
 /**
- *  <code>Greeter</code> TODO (document class)
- *
+ * <code>Greeter</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class Greeter
 {
     String greeting = "Hello ";
-   
+
     public void greet(NameString person)
     {
-       person.setGreeting(greeting);
+        person.setGreeting(greeting);
 
     }
 }

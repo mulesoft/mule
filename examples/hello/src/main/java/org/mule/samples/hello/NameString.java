@@ -42,8 +42,7 @@ public class NameString implements Serializable
     }
 
     /**
-     * @param name
-     *            The name to set.
+     * @param name The name to set.
      */
     public void setName(String name)
     {
@@ -59,8 +58,7 @@ public class NameString implements Serializable
     }
 
     /**
-     * @param greeting
-     *            The greeting to set.
+     * @param greeting The greeting to set.
      */
     public void setGreeting(String greeting)
     {

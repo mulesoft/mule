@@ -14,8 +14,8 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>NameStringToChatString</code> cnverts from a NameString object to a ChatString
- * object
+ * <code>NameStringToChatString</code> cnverts from a NameString object to a
+ * ChatString object
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

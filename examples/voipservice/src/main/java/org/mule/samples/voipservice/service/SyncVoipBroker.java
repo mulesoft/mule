@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.service;
 
 import org.apache.commons.logging.Log;
@@ -26,11 +27,13 @@ import java.util.Map;
 /**
  * @author Binildas Christudas
  */
-public class SyncVoipBroker {
+public class SyncVoipBroker
+{
 
     protected static transient Log logger = LogFactory.getLog(SyncVoipBroker.class);
 
-    public UMOMessage validate(ServiceParamTO serviceParamTO) throws Exception {
+    public UMOMessage validate(ServiceParamTO serviceParamTO) throws Exception
+    {
 
         logger.info("Inside Method : " + serviceParamTO);
 
@@ -38,10 +41,11 @@ public class SyncVoipBroker {
         List endPoints = null;
         UMOEventContext umoEventContext = RequestContext.getEventContext();
         UMOMessage umoMessage = umoEventContext.sendEvent(serviceParamTO.getCustomer().getAddress());
-        Integer isValidAddress = (Integer) umoMessage.getPayload();
-        if (isValidAddress.intValue() == AddressValidation.SUCCESS) {
+        Integer isValidAddress = (Integer)umoMessage.getPayload();
+        if (isValidAddress.intValue() == AddressValidation.SUCCESS)
+        {
             umoMessage = umoEventContext.sendEvent(serviceParamTO.getCreditCard().getCardType());
-            endPoints = (List) umoMessage.getPayload();
+            endPoints = (List)umoMessage.getPayload();
             logger.info("Inside Method : isValidAddress = " + isValidAddress + "; endPoints = " + endPoints);
             Map props = new HashMap();
             props.put("recipients", endPoints);

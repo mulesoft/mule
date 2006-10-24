@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.to;
 
 import java.io.Serializable;
@@ -29,7 +30,8 @@ public class AddressTO implements Serializable, Cloneable
 
     private static final List ADDRESSES;
 
-    static {
+    static
+    {
         ADDRESSES = new ArrayList();
 
         ADDRESSES.add(new AddressTO("123", "Koudiar Palace", "Trivandrum"));
@@ -45,70 +47,87 @@ public class AddressTO implements Serializable, Cloneable
 
     }
 
-    public AddressTO() {
+    public AddressTO()
+    {
         super();
     }
 
-    public AddressTO(String houseNumber, String street, String city) {
+    public AddressTO(String houseNumber, String street, String city)
+    {
 
         this.houseNumber = houseNumber;
         this.street = street;
         this.city = city;
     }
 
-    public void setHouseNumber(String houseNumber) {
+    public void setHouseNumber(String houseNumber)
+    {
         this.houseNumber = houseNumber;
     }
 
-    public String getHouseNumber() {
+    public String getHouseNumber()
+    {
         return houseNumber;
     }
 
-    public void setStreet(String street) {
+    public void setStreet(String street)
+    {
         this.street = street;
     }
 
-    public String getStreet() {
+    public String getStreet()
+    {
         return street;
     }
 
-    public void setCity(String city) {
+    public void setCity(String city)
+    {
         this.city = city;
     }
 
-    public String getCity() {
+    public String getCity()
+    {
         return city;
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         Object clone = null;
-        try {
+        try
+        {
             clone = super.clone();
-        } catch (CloneNotSupportedException cloneNotSupportedException) {
+        }
+        catch (CloneNotSupportedException cloneNotSupportedException)
+        {
             // too bad
         }
         return clone;
     }
 
-    public String toString() {
+    public String toString()
+    {
         StringBuffer stringBuffer = new StringBuffer();
-        if (this.houseNumber != null) {
+        if (this.houseNumber != null)
+        {
             stringBuffer.append("[HouseNumber : " + houseNumber + "; ");
         }
-        if (this.street != null) {
+        if (this.street != null)
+        {
             stringBuffer.append("Street : " + street + "; ");
         }
-        if (this.houseNumber != null) {
+        if (this.houseNumber != null)
+        {
             stringBuffer.append("City : " + city + "]");
         }
         return stringBuffer.toString();
     }
 
-    public static AddressTO getRandomAddress() {
+    public static AddressTO getRandomAddress()
+    {
 
         int index = new Double(Math.random() * 10).intValue();
-        //AddressTO addressTO = (AddressTO) ADDRESSES.get(index);
-        return (AddressTO) ((AddressTO) ADDRESSES.get(index)).clone();
+        // AddressTO addressTO = (AddressTO) ADDRESSES.get(index);
+        return (AddressTO)((AddressTO)ADDRESSES.get(index)).clone();
     }
 
 }

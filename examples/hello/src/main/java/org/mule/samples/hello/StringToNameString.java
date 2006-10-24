@@ -41,7 +41,8 @@ public class StringToNameString extends AbstractTransformer
     {
         String name = (String)src;
         int i = name.indexOf("\r");
-        if (i > -1) {
+        if (i > -1)
+        {
             name = name.substring(0, i);
         }
         return new NameString(name);

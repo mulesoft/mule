@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  <code>BusinessErrorManager</code> TODO (document class)
- *
+ * <code>BusinessErrorManager</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,19 +30,21 @@ public class BusinessErrorManager implements Callable
 {
     /** logger used by this class */
     private static transient Log logger = LogFactory.getLog(BusinessErrorManager.class);
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.lifecycle.AsynchronousCallable#onEvent(org.mule.umo.UMOEvent)
      */
     public Object onCall(UMOEventContext context) throws UMOException
     {
         ErrorMessage msg = (ErrorMessage)context.getTransformedMessage();
-        //Do something with the error message
+        // Do something with the error message
         List msgs = new ArrayList();
         msgs.add("Received Error Message in the Sample Business Error Manager.");
         msgs.add("Error is: " + msg.getException().getDetailMessage());
-        msgs.add("Error class: " + msg.getException().getClass().getName()); 
-           
+        msgs.add("Error class: " + msg.getException().getClass().getName());
+
         logger.info("\n" + StringMessageUtils.getBoilerPlate(msgs, '*', 80));
         context.setStopFurtherProcessing(true);
         return null;

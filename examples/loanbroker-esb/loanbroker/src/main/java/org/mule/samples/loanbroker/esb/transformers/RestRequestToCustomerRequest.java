@@ -18,7 +18,7 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * Converts parameters on the message into a CustomerQuoteRequest object
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,22 +29,27 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
      */
     private static final long serialVersionUID = -5017931788994993161L;
 
-    public RestRequestToCustomerRequest() {
+    public RestRequestToCustomerRequest()
+    {
         setReturnClass(CustomerQuoteRequest.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    {
 
         String name;
         int ssn;
         double amount;
         int duration;
-        try {
+        try
+        {
             name = getParam(context, "customerName");
             ssn = Integer.parseInt(getParam(context, "ssn"));
             amount = Double.parseDouble(getParam(context, "loanAmount"));
             duration = Integer.parseInt(getParam(context, "loanDuration"));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new TransformerException(this, e);
         }
 
@@ -56,7 +61,8 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
     protected String getParam(UMOEventContext context, String name) throws NullPointerException
     {
         String value = context.getMessage().getStringProperty(name, null);
-        if(value==null) {
+        if (value == null)
+        {
             throw new NullPointerException("Parameter '" + name + "' must be set on the request");
         }
         return value;

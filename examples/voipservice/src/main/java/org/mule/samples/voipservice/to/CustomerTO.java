@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.to;
 
 import java.io.Serializable;
@@ -29,7 +30,8 @@ public class CustomerTO implements Serializable, Cloneable
 
     private static final List CUSTOMERS;
 
-    static {
+    static
+    {
         CUSTOMERS = new ArrayList();
 
         CUSTOMERS.add(new CustomerTO("Binil", "Das"));
@@ -44,86 +46,109 @@ public class CustomerTO implements Serializable, Cloneable
         CUSTOMERS.add(new CustomerTO("Rama", "Varma"));
     }
 
-    public CustomerTO() {
+    public CustomerTO()
+    {
         super();
     }
 
-    public CustomerTO(String firstName, String lastName) {
+    public CustomerTO(String firstName, String lastName)
+    {
         this(firstName, lastName, null);
     }
 
-    public CustomerTO(String firstName, String lastName, AddressTO addressTO) {
+    public CustomerTO(String firstName, String lastName, AddressTO addressTO)
+    {
         this.firstName = firstName;
         this.lastName = lastName;
         this.addressTO = addressTO;
     }
 
-    public String getName() {
+    public String getName()
+    {
 
         String name = firstName;
         String lastName = null;
-        if (this.lastName == null) {
+        if (this.lastName == null)
+        {
             lastName = "";
-        } else {
+        }
+        else
+        {
             lastName = this.lastName;
         }
         return name + " " + lastName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(String firstName)
+    {
         this.firstName = firstName;
     }
 
-    public String getFirstName() {
+    public String getFirstName()
+    {
         return firstName;
     }
 
-    public void setLastName(String lastName) {
+    public void setLastName(String lastName)
+    {
         this.lastName = lastName;
     }
 
-    public String getLastName() {
+    public String getLastName()
+    {
         return lastName;
     }
 
-    public void setAddress(AddressTO addressTO) {
+    public void setAddress(AddressTO addressTO)
+    {
         this.addressTO = addressTO;
     }
 
-    public AddressTO getAddress() {
+    public AddressTO getAddress()
+    {
         return addressTO;
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         Object clone = null;
-        try {
+        try
+        {
             clone = super.clone();
-            if (null != addressTO) {
-                ((CustomerTO) clone).setAddress((AddressTO) addressTO.clone());
+            if (null != addressTO)
+            {
+                ((CustomerTO)clone).setAddress((AddressTO)addressTO.clone());
             }
-        } catch (CloneNotSupportedException cloneNotSupportedException) {
+        }
+        catch (CloneNotSupportedException cloneNotSupportedException)
+        {
             // too bad
         }
         return clone;
     }
 
-    public String toString() {
+    public String toString()
+    {
         StringBuffer stringBuffer = new StringBuffer();
-        if (this.firstName != null) {
+        if (this.firstName != null)
+        {
             stringBuffer.append("[Name : " + getName() + "] ");
         }
-        if (this.addressTO != null) {
+        if (this.addressTO != null)
+        {
             stringBuffer.append("Address -> " + addressTO);
         }
         return stringBuffer.toString();
     }
 
-    public static CustomerTO getRandomCustomer() {
+    public static CustomerTO getRandomCustomer()
+    {
 
         int index = new Double(Math.random() * 10).intValue();
-        //AddressTO addressTO = (AddressTO) ADDRESSES.get(index);
-        CustomerTO customerTO = (CustomerTO) ((CustomerTO) CUSTOMERS.get(index)).clone();
-        if (null == customerTO.getAddress()) {
+        // AddressTO addressTO = (AddressTO) ADDRESSES.get(index);
+        CustomerTO customerTO = (CustomerTO)((CustomerTO)CUSTOMERS.get(index)).clone();
+        if (null == customerTO.getAddress())
+        {
             customerTO.setAddress(AddressTO.getRandomAddress());
         }
         return customerTO;

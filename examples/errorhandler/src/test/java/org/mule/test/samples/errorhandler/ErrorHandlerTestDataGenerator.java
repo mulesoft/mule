@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.samples.errorhandler;
 
 import org.mule.MuleException;
@@ -24,40 +25,39 @@ import java.io.IOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ErrorHandlerTestDataGenerator {
+public class ErrorHandlerTestDataGenerator
+{
 
-    
     public static void generateTestData(String targetDir) throws IOException, TransformerException
     {
         if (!(targetDir.endsWith("/") || targetDir.endsWith("\\")))
         {
-            targetDir += "/"; 
+            targetDir += "/";
         }
 
         ObjectToXml trans = new ObjectToXml();
-        MuleException exception =
-            new MuleException(Message.createStaticMessage("Some default exception"));
-        FatalException fatal = new FatalException(Message.createStaticMessage("Some fatal exception"), new IOException("Some IO exception"));
+        MuleException exception = new MuleException(Message.createStaticMessage("Some default exception"));
+        FatalException fatal = new FatalException(Message.createStaticMessage("Some fatal exception"),
+            new IOException("Some IO exception"));
         BusinessException business = new BusinessException("Some business exception");
-        
-        ExceptionBean bean = new ExceptionBean(exception);
-        String xml = (String) trans.transform(bean);
-        FileUtils.stringToFile(targetDir + "MuleException.xml", xml);
-        
-        bean = new ExceptionBean(fatal);
-        xml = (String) trans.transform(bean);
-        FileUtils.stringToFile(targetDir + "FatalException.xml", xml);
-        
-        bean = new ExceptionBean(business);
-        xml = (String) trans.transform(bean);
-        FileUtils.stringToFile(targetDir + "BusinesException.xml", xml);
-       }
 
+        ExceptionBean bean = new ExceptionBean(exception);
+        String xml = (String)trans.transform(bean);
+        FileUtils.stringToFile(targetDir + "MuleException.xml", xml);
+
+        bean = new ExceptionBean(fatal);
+        xml = (String)trans.transform(bean);
+        FileUtils.stringToFile(targetDir + "FatalException.xml", xml);
+
+        bean = new ExceptionBean(business);
+        xml = (String)trans.transform(bean);
+        FileUtils.stringToFile(targetDir + "BusinesException.xml", xml);
+    }
 
     public static void main(String[] args)
     {
 
-        if(args.length == 0)
+        if (args.length == 0)
         {
             System.out.println("You must specifiy a target directory for the output files");
             System.exit(1);
@@ -69,7 +69,7 @@ public class ErrorHandlerTestDataGenerator {
         }
         catch (Exception e)
         {
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
 
     }

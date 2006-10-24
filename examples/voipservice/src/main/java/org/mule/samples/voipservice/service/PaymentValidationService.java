@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.service;
 
 import org.apache.commons.logging.Log;
@@ -20,11 +21,13 @@ import java.util.List;
 /**
  * @author Binildas Christudas
  */
-public class PaymentValidationService implements PaymentValidation {
+public class PaymentValidationService implements PaymentValidation
+{
 
     protected static transient Log logger = LogFactory.getLog(PaymentValidationService.class);
 
-    public List getCreditVendors(String cardType) {
+    public List getCreditVendors(String cardType)
+    {
 
         logger.info("Inside PaymentValidationService.getCreditVendors() ***************");
         List endPoints = new ArrayList();

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.routers;
 
 import org.apache.commons.logging.Log;
@@ -27,38 +28,49 @@ import java.util.Map;
 /**
  * @author Binildas Christudas
  */
-public class PaymentValidationResponseAggregator extends ResponseCorrelationAggregator {
+public class PaymentValidationResponseAggregator extends ResponseCorrelationAggregator
+{
 
     protected static transient Log logger = LogFactory.getLog(PaymentValidationResponseAggregator.class);
 
-    protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException {
+    protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
+    {
 
         UMOEvent event = null;
         boolean one = false;
         boolean two = false;
         CreditProfileTO creditProfileTO = null;
 
-        try {
-            for (Iterator iterator = events.iterator(); iterator.hasNext();) {
-                event = (UMOEvent) iterator.next();
-                creditProfileTO = (CreditProfileTO) event.getTransformedMessage();
-                if (creditProfileTO.getCreditScore() >= CreditProfileTO.CREDIT_LIMIT) {
+        try
+        {
+            for (Iterator iterator = events.iterator(); iterator.hasNext();)
+            {
+                event = (UMOEvent)iterator.next();
+                creditProfileTO = (CreditProfileTO)event.getTransformedMessage();
+                if (creditProfileTO.getCreditScore() >= CreditProfileTO.CREDIT_LIMIT)
+                {
                     one = true;
                 }
-                if (creditProfileTO.getCreditAuthorisedStatus() == CreditProfileTO.CREDIT_AUTHORISED) {
+                if (creditProfileTO.getCreditAuthorisedStatus() == CreditProfileTO.CREDIT_AUTHORISED)
+                {
                     two = true;
                 }
             }
-        } catch (TransformerException e) {
-            throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"), new MuleMessage(events, (Map)null), null, e);
         }
-        if (one && two && creditProfileTO != null) {
+        catch (TransformerException e)
+        {
+            throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"),
+                new MuleMessage(events, (Map)null), null, e);
+        }
+        if (one && two && creditProfileTO != null)
+        {
             creditProfileTO.setValid(true);
         }
         return new MuleMessage(creditProfileTO, event.getMessage());
     }
 
-    protected boolean shouldAggregate(EventGroup events) {
+    protected boolean shouldAggregate(EventGroup events)
+    {
 
         boolean shouldAggregate = super.shouldAggregate(events);
         logger.info("--- *** --- shouldAggregate = " + shouldAggregate + " --- *** ---");

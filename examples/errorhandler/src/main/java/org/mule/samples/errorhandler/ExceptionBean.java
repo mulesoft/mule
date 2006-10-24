@@ -7,30 +7,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.errorhandler;
 
 import org.mule.util.ClassUtils;
 
 /**
- * 
  * <code>ExceptionBean</code> TODO -document class
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version 1.0
- *  
  */
 public class ExceptionBean
 {
     /**
-     * Specific details about the Throwable. For example, for <tt>FileNotFoundException</tt>,
-     * this contains the name of the file that could not be found.
+     * Specific details about the Throwable. For example, for
+     * <tt>FileNotFoundException</tt>, this contains the name of the file that
+     * could not be found.
      */
     private String detailMessage;
 
     /**
      * The throwable that caused this throwable to get thrown, or null if this
-     * throwable was not caused by another throwable, or if the causative
-     * throwable is unknown.
+     * throwable was not caused by another throwable, or if the causative throwable
+     * is unknown.
      */
 
     private ExceptionBean cause = null;
@@ -53,8 +53,7 @@ public class ExceptionBean
 
     public ExceptionBean(Throwable exception)
     {
-        if (exception == null)
-            throw new IllegalArgumentException("The exception cannot be null");
+        if (exception == null) throw new IllegalArgumentException("The exception cannot be null");
         originalException = exception;
         exceptionClass = exception.getClass().getName();
         setDetailMessage(exception.getMessage());
@@ -79,21 +78,23 @@ public class ExceptionBean
                 Class aClass = ClassUtils.loadClass(exceptionClass, getClass());
                 if (cause == null)
                 {
-                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[] { getDetailMessage()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[]{getDetailMessage()});
                 }
                 else
                 {
-                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[] { getDetailMessage(), cause.toException()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[]{getDetailMessage(),
+                        cause.toException()});
                 }
                 if (getStackTrace() != null)
                 {
-                    //t.setStackTrace( getStackTrace());
+                    // t.setStackTrace( getStackTrace());
                 }
                 originalException = t;
             }
             catch (Exception e)
             {
-                throw new InstantiationException("Failed to create Exception from ExceptionBean: " + e.getMessage());
+                throw new InstantiationException("Failed to create Exception from ExceptionBean: "
+                                                 + e.getMessage());
             }
         }
         return originalException;
@@ -125,10 +126,10 @@ public class ExceptionBean
         return stackTrace;
     }
 
-    //    public void addStackTrace(String trace)
-    //    {
-    //        stackTrace.add(trace);
-    //    }
+    // public void addStackTrace(String trace)
+    // {
+    // stackTrace.add(trace);
+    // }
 
     public void setStackTrace(StackTraceElement[] stackTrace)
     {

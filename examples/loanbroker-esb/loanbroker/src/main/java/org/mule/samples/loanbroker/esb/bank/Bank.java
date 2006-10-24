@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker.esb.bank;
 
 import org.apache.commons.logging.Log;
@@ -21,7 +22,7 @@ import java.io.Serializable;
 /**
  * <code>Bank</code> is a representation of a bank form which to obtain loan
  * quotes.
- *
+ * 
  * @author Gregor Hohpe, Bobby Wolfe, et al. EI Patterns
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -98,6 +99,5 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
     {
         this.primeRate = primeRate;
     }
-
 
 }

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker;
 
 import org.apache.commons.logging.Log;
@@ -20,7 +21,7 @@ import java.io.Serializable;
 /**
  * <code>Bank</code> is a representation of a bank from which to obtain loan
  * quotes.
- *
+ * 
  * @author Gregor Hohpe, Bobby Wolfe, et al. EI Patterns
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -59,14 +60,15 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
         this.bankName = descriptor.getName();
     }
 
-//    public LoanQuote getLoanQuote(LoanRequest request, CreditProfile creditProfile)
-//    {
-//        LoanQuote quote = new LoanQuote();
-//        quote.setBankName(getBankName());
-//        quote.setInterestRate(primeRate);
-//        logger.info("Returning Rate is:" + quote);
-//        return quote;
-//    }
+    // public LoanQuote getLoanQuote(LoanRequest request, CreditProfile
+    // creditProfile)
+    // {
+    // LoanQuote quote = new LoanQuote();
+    // quote.setBankName(getBankName());
+    // quote.setInterestRate(primeRate);
+    // logger.info("Returning Rate is:" + quote);
+    // return quote;
+    // }
 
     public LoanQuote getLoanQuote(BankQuoteRequest request)
     {
@@ -106,6 +108,5 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
     {
         this.primeRate = primeRate;
     }
-
 
 }

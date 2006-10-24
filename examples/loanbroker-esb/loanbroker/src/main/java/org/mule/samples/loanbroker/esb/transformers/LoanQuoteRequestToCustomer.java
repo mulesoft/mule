@@ -16,7 +16,7 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * Extracts the customer information from the request
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,11 +27,13 @@ public class LoanQuoteRequestToCustomer extends AbstractTransformer
      */
     private static final long serialVersionUID = 3989958201499427076L;
 
-    public LoanQuoteRequestToCustomer() {
+    public LoanQuoteRequestToCustomer()
+    {
         registerSourceType(LoanQuoteRequest.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException
+    {
 
         return ((LoanQuoteRequest)src).getCustomerRequest().getCustomer();
     }

@@ -7,45 +7,46 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker;
 
 import org.mule.samples.loanbroker.service.CreditAgencyService;
 
 /**
- * <code>DefaultCreditAgencyService</code> the service that provides a credit
- * score for a customer
- *
+ * <code>DefaultCreditAgencyService</code> the service that provides a credit score
+ * for a customer
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class DefaultCreditAgencyService implements CreditAgencyService
 {
     public int getCreditScore(int ssn)
-  {
-    int credit_score;
+    {
+        int credit_score;
 
-    credit_score = (int)(Math.random()*600+300);
+        credit_score = (int)(Math.random() * 600 + 300);
 
-    return credit_score;
-  }
+        return credit_score;
+    }
 
-  public int getCreditHistoryLength(int ssn)
-  {
-    int credit_history_length;
+    public int getCreditHistoryLength(int ssn)
+    {
+        int credit_history_length;
 
-    credit_history_length = (int)(Math.random()*19+1);
+        credit_history_length = (int)(Math.random() * 19 + 1);
 
-    return credit_history_length;
-  }
+        return credit_history_length;
+    }
 
-//    public CreditProfile getCreditProfile(Customer customer)
-//    {
-//        CreditProfile cp = new CreditProfile();
-//        cp.setCreditHistoryLength(getCreditHistoryLength(customer.getSsn()));
-//        cp.setCreditScore(getCreditScore(customer.getSsn()));
-//
-//        return cp;
-//    }
+    // public CreditProfile getCreditProfile(Customer customer)
+    // {
+    // CreditProfile cp = new CreditProfile();
+    // cp.setCreditHistoryLength(getCreditHistoryLength(customer.getSsn()));
+    // cp.setCreditScore(getCreditScore(customer.getSsn()));
+    //
+    // return cp;
+    // }
 
     public BankQuoteRequest getCreditProfile(BankQuoteRequest request)
     {

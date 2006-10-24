@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.loanbroker.esb.message;
 
 import org.mule.samples.loanbroker.esb.bank.Bank;
@@ -14,9 +15,9 @@ import org.mule.samples.loanbroker.esb.bank.Bank;
 import java.io.Serializable;
 
 /**
- * <code>LoanQuoteRequest</code> represents a customer request for a loan
- * through a loan broker
- *
+ * <code>LoanQuoteRequest</code> represents a customer request for a loan through a
+ * loan broker
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision:2944 $
  */
@@ -64,19 +65,23 @@ public class LoanQuoteRequest implements Serializable
         this.customerRequest = customerRequest;
     }
 
-    public CreditProfile getCreditProfile() {
+    public CreditProfile getCreditProfile()
+    {
         return creditProfile;
     }
 
-    public void setCreditProfile(CreditProfile creditProfile) {
+    public void setCreditProfile(CreditProfile creditProfile)
+    {
         this.creditProfile = creditProfile;
     }
 
-    public LoanQuote getLoanQuote() {
+    public LoanQuote getLoanQuote()
+    {
         return loanQuote;
     }
 
-    public void setLoanQuote(LoanQuote loanQuote) {
+    public void setLoanQuote(LoanQuote loanQuote)
+    {
         this.loanQuote = loanQuote;
     }
 }

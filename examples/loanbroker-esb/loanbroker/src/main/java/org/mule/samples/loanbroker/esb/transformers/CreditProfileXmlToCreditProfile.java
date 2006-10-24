@@ -34,14 +34,18 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Document doc = null;
-        if (src instanceof Document) {
+        if (src instanceof Document)
+        {
             doc = (Document)src;
         }
-        else {
-            try {
+        else
+        {
+            try
+            {
                 doc = DocumentHelper.parseText(src.toString());
             }
-            catch (DocumentException e) {
+            catch (DocumentException e)
+            {
                 throw new TransformerException(this, e);
             }
         }

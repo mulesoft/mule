@@ -17,7 +17,7 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ErrorMessageToException extends AbstractTransformer 
+public class ErrorMessageToException extends AbstractTransformer
 {
     /**
      * Serial version
@@ -29,7 +29,9 @@ public class ErrorMessageToException extends AbstractTransformer
         registerSourceType(ErrorMessage.class);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
@@ -37,7 +39,8 @@ public class ErrorMessageToException extends AbstractTransformer
         try
         {
             return ((ErrorMessage)src).getException().toException();
-        } catch (InstantiationException e)
+        }
+        catch (InstantiationException e)
         {
             throw new TransformerException(this, e);
         }

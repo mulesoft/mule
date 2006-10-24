@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.samples.voipservice.to;
 
 import java.io.Serializable;
@@ -30,44 +31,54 @@ public class CreditProfileTO implements Serializable
     private int creditAuthorisedStatus;
     private boolean valid;
 
-    public CreditProfileTO() {
+    public CreditProfileTO()
+    {
         super();
     }
 
-    public CreditProfileTO(CustomerTO customerTO) {
+    public CreditProfileTO(CustomerTO customerTO)
+    {
         this.customerTO = customerTO;
 
     }
 
-    public CustomerTO getCustomer() {
+    public CustomerTO getCustomer()
+    {
         return customerTO;
     }
 
-    public void setCustomer(CustomerTO customerTO) {
+    public void setCustomer(CustomerTO customerTO)
+    {
         this.customerTO = customerTO;
     }
 
-    public int getCreditScore() {
+    public int getCreditScore()
+    {
         return creditScore;
     }
 
-    public void setCreditScore(int creditScore) {
+    public void setCreditScore(int creditScore)
+    {
         this.creditScore = creditScore;
     }
 
-    public boolean isValid() {
+    public boolean isValid()
+    {
         return valid;
     }
 
-    public void setValid(boolean valid) {
+    public void setValid(boolean valid)
+    {
         this.valid = valid;
     }
 
-    public int getCreditAuthorisedStatus() {
+    public int getCreditAuthorisedStatus()
+    {
         return creditAuthorisedStatus;
     }
 
-    public void setCreditAuthorisedStatus(int creditAuthorisedStatus) {
+    public void setCreditAuthorisedStatus(int creditAuthorisedStatus)
+    {
         this.creditAuthorisedStatus = creditAuthorisedStatus;
     }
 

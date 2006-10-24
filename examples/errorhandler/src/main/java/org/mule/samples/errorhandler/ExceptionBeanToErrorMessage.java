@@ -36,10 +36,12 @@ public class ExceptionBeanToErrorMessage extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        try {
+        try
+        {
             return new ErrorMessage((ExceptionBean)src);
         }
-        catch (InstantiationException e) {
+        catch (InstantiationException e)
+        {
             throw new TransformerException(this, e);
         }
     }

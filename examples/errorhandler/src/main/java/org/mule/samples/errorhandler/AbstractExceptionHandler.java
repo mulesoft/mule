@@ -49,9 +49,11 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
     public boolean isRegisteredFor(Class exceptionClass)
     {
         Class aClass = null;
-        for (Iterator i = getRegisteredClasses(); i.hasNext();) {
+        for (Iterator i = getRegisteredClasses(); i.hasNext();)
+        {
             aClass = (Class)i.next();
-            if (aClass.isAssignableFrom(exceptionClass)) {
+            if (aClass.isAssignableFrom(exceptionClass))
+            {
                 return true;
             }
         }
@@ -62,26 +64,26 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
     {
         Throwable t = null;
 
-        try {
+        try
+        {
             t = message.getException().toException();
         }
-        catch (Exception e) {
-            throw new HandlerException("Failed to retrieve exception from exception message: " + e,
-                            e);
+        catch (Exception e)
+        {
+            throw new HandlerException("Failed to retrieve exception from exception message: " + e, e);
         }
 
-        if (!isRegisteredFor(t.getClass())) {
-            throw new HandlerException("Exception: "
-                                        + t.getClass().getName()
-                                        + " was received by Exception behaviour: "
-                                        + getClass().getName()
-                                        + ", but the exception is not registered to be handled by this behaviour");
+        if (!isRegisteredFor(t.getClass()))
+        {
+            throw new HandlerException(
+                "Exception: " + t.getClass().getName() + " was received by Exception behaviour: "
+                                + getClass().getName()
+                                + ", but the exception is not registered to be handled by this behaviour");
         }
         processException(message, t);
     }
 
-    protected abstract void processException(ErrorMessage message, Throwable t)
-                    throws HandlerException;
+    protected abstract void processException(ErrorMessage message, Throwable t) throws HandlerException;
 
     /**
      * @return Returns the errorManager.
@@ -92,8 +94,7 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
     }
 
     /**
-     * @param errorManager
-     *            The errorManager to set.
+     * @param errorManager The errorManager to set.
      */
     public void setErrorManager(ErrorManager errorManager)
     {
@@ -109,8 +110,7 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
     }
 
     /**
-     * @param endpointName
-     *            The endpointName to set.
+     * @param endpointName The endpointName to set.
      */
     public void setEndpointName(String endpointName)
     {
