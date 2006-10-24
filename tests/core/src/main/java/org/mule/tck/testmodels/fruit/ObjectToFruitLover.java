@@ -29,10 +29,13 @@ public class ObjectToFruitLover extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof FruitLover) {
+        if (src instanceof FruitLover)
+        {
             return src;
-        } else {
-            return new FruitLover((String) src);
+        }
+        else
+        {
+            return new FruitLover((String)src);
         }
     }
 

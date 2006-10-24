@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
@@ -62,13 +63,13 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -78,18 +79,18 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(!router.isMatch(message));
 
         router.setTransformer(new AbstractTransformer()
-                {
+        {
 
-                    /**
-                     * Serial version
-                     */
-                    private static final long serialVersionUID = 9051843541762963831L;
+            /**
+             * Serial version
+             */
+            private static final long serialVersionUID = 9051843541762963831L;
 
-                    public Object doTransform(Object src, String encoding) throws TransformerException
-                    {
-                        return ((Exception) src).getMessage();
-                        }
-            });
+            public Object doTransform(Object src, String encoding) throws TransformerException
+            {
+                return ((Exception)src).getMessage();
+            }
+        });
 
         assertTrue(router.isMatch(message));
     }

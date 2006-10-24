@@ -61,7 +61,8 @@ public class CompressionTestCase extends TestCase
         assertEquals(temp, new String(uncompressed));
 
         String tempLarge = temp;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             tempLarge += temp;
         }
 

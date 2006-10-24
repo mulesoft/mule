@@ -32,31 +32,40 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
 
         Object result = null;
 
-        try {
+        try
+        {
             result = container.getComponent(null);
             fail("Should throw ObjectNotFoundException for null key");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             result = container.getComponent("abcdefg123456!£$%^n");
             fail("Should throw ObjectNotFoundException for a key that doesn't exist");
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             result = container.getComponent(Apple.class);
             assertNotNull("Component should exist in container", result);
-        } catch (ObjectNotFoundException e) {
+        }
+        catch (ObjectNotFoundException e)
+        {
             fail("Component should exist in the container");
         }
     }
 
     /**
-     * Usage 2: the implementation reference on the descriptor is to a component
-     * in the container
+     * Usage 2: the implementation reference on the descriptor is to a component in
+     * the container
      * 
      * @throws Exception
      */
@@ -68,7 +77,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
         descriptor.setContainer("plexus");
         descriptor.initialise();
-        FruitBowl fruitBowl = (FruitBowl) container.getComponent(descriptor.getImplementation());
+        FruitBowl fruitBowl = (FruitBowl)container.getComponent(descriptor.getImplementation());
 
         assertNotNull(fruitBowl);
         assertTrue(fruitBowl.hasApple());

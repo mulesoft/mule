@@ -34,7 +34,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         assertEquals(0, descriptor.getInterceptors().size());
 
         assertEquals(config.getQueueProfile().getMaxOutstandingMessages(), descriptor.getQueueProfile()
-                                                                                     .getMaxOutstandingMessages());
+            .getMaxOutstandingMessages());
         assertEquals(config.getPoolingProfile().getMaxIdle(), descriptor.getPoolingProfile().getMaxIdle());
         assertEquals(config.getPoolingProfile().getMaxWait(), descriptor.getPoolingProfile().getMaxWait());
         assertEquals(config.getPoolingProfile().getMaxActive(), descriptor.getPoolingProfile().getMaxActive());
@@ -54,24 +54,33 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
     {
         UMODescriptor descriptor = new MuleDescriptor();
 
-        try {
+        try
+        {
             descriptor.setExceptionListener(null);
             fail("setting exeption strategy to null should fail");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             descriptor.setName(null);
             fail("setting name to null should fail");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
 
-        try {
+        try
+        {
             descriptor.setImplementation(null);
             fail("setting implementation to null should fail");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
 
@@ -81,10 +90,13 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
     {
         UMODescriptor descriptor = new MuleDescriptor();
 
-        try {
+        try
+        {
             descriptor.setImplementation(null);
             fail("setting implementation to null should fail");
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             // expected
         }
 

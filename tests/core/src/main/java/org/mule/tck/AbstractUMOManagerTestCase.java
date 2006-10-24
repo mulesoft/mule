@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck;
 
 import org.mule.MuleManager;
@@ -34,7 +35,8 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        if (!initialised) {
+        if (!initialised)
+        {
             getUMOManager();
             initialised = true;
         }
@@ -95,7 +97,7 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
     public void testManagerProperties()
     {
-        String value = (String) MuleManager.getInstance().getProperty("envProperty1");
+        String value = (String)MuleManager.getInstance().getProperty("envProperty1");
         assertEquals("value1", value);
         assertEquals(1, MuleManager.getInstance().getProperties().size());
     }
@@ -114,7 +116,10 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
         MuleManager.getInstance().registerInterceptorStack("testInterceptors2", stack2);
 
-        assertEquals(1, MuleManager.getInstance().lookupInterceptorStack("testInterceptors2").getInterceptors().size());
+        assertEquals(1, MuleManager.getInstance()
+            .lookupInterceptorStack("testInterceptors2")
+            .getInterceptors()
+            .size());
 
         UMOInterceptorStack stack3 = MuleManager.getInstance().lookupInterceptorStack("doesnotexist");
         assertNull(stack3);
@@ -123,15 +128,19 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
     public void testTrasactionSetting() throws Exception
     {
         assertNotNull(MuleManager.getInstance().getTransactionManager());
-        try {
+        try
+        {
             MuleManager.getInstance().setTransactionManager(null);
             fail("cannot set tx manager once it has been set");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
     }
 
-    public void testModelSetting() throws UMOException {
+    public void testModelSetting() throws UMOException
+    {
         assertNotNull(MuleManager.getInstance().getModel());
         MuleManager.getInstance().setModel(new SedaModel());
         assertEquals("mule", MuleManager.getInstance().getModel().getName());

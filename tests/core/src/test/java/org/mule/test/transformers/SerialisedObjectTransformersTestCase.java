@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -42,8 +43,7 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
     public Object getResultData()
     {
         return SerializationUtils.serialize(testObject);
-        
+
     }
 
-    
 }

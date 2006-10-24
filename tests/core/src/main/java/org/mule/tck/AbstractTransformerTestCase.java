@@ -34,7 +34,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(null);
     }
 
-    protected  String normalizeString(String rawString) {
+    protected String normalizeString(String rawString)
+    {
         return rawString.replaceAll("\r\n", "\n");
     }
 
@@ -45,9 +46,12 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
         Object expectedResult = getResultData();
         // Special case for string results
-        if (result instanceof String && expectedResult instanceof String ) {
+        if (result instanceof String && expectedResult instanceof String)
+        {
             assertEquals(normalizeString((String)expectedResult), normalizeString((String)result));
-        } else {
+        }
+        else
+        {
             boolean b = compareResults(expectedResult, result);
             assertTrue(b);
         }
@@ -55,7 +59,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testRoundtripTransform() throws Exception
     {
-        if (getRoundTripTransformer() != null) {
+        if (getRoundTripTransformer() != null)
+        {
             Object result = getRoundTripTransformer().transform(getResultData());
             assertNotNull(result);
             boolean b = compareRoundtripResults(getTestData(), result);
@@ -70,14 +75,16 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testRoundtripBadReturnType() throws Exception
     {
-        if (getRoundTripTransformer() != null) {
+        if (getRoundTripTransformer() != null)
+        {
             doTestBadReturnType(getRoundTripTransformer(), getResultData());
         }
     }
 
     public void testRoundTrip() throws Exception
     {
-        if (getRoundTripTransformer() != null) {
+        if (getRoundTripTransformer() != null)
+        {
             UMOTransformer trans = getTransformer();
             trans.setNextTransformer(getRoundTripTransformer());
             Object result = trans.transform(getTestData());
@@ -88,10 +95,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     public void doTestBadReturnType(UMOTransformer tran, Object src) throws Exception
     {
         tran.setReturnClass(InvalidSatsuma.class);
-        try {
+        try
+        {
             tran.transform(src);
             fail("Should throw exception for bad return type");
-        } catch (TransformerException e) {
+        }
+        catch (TransformerException e)
+        {
             // expected
         }
     }
@@ -106,19 +116,27 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
-        if(src instanceof Object[] && result instanceof Object[] ) {
+        if (src instanceof Object[] && result instanceof Object[])
+        {
             return Arrays.equals((Object[])src, (Object[])result);
-            // TODO check if RetroTranslating Mule to JDK 1.4 makes this method available
-            //return Arrays.deepEquals((Object[])src, (Object[])result);
-        } else if (src instanceof byte[] && result instanceof byte[] ) {
+            // TODO check if RetroTranslating Mule to JDK 1.4 makes this method
+            // available
+            // return Arrays.deepEquals((Object[])src, (Object[])result);
+        }
+        else if (src instanceof byte[] && result instanceof byte[])
+        {
             return Arrays.equals((byte[])src, (byte[])result);
-        } else {
+        }
+        else
+        {
             return src.equals(result);
         }
     }

@@ -34,14 +34,15 @@ public class MuleModelTestCase extends AbstractMuleTestCase
         {
             // register it again with the same name
             model.registerComponent(duplicateDescriptor);
-            fail("Trying to register a component descriptor with the same name " +
-                 "must have thrown an exception.");
-        } catch (ModelException mex)
+            fail("Trying to register a component descriptor with the same name "
+                 + "must have thrown an exception.");
+        }
+        catch (ModelException mex)
         {
             // expected
             final String message = mex.getMessage();
             assertTrue("Exception message should contain our descriptor name.",
-                       (message.indexOf("\"" + descriptorName + "\"") > -1));
+                (message.indexOf("\"" + descriptorName + "\"") > -1));
         }
 
         // count components (no direct method to count 'em)
@@ -52,8 +53,6 @@ public class MuleModelTestCase extends AbstractMuleTestCase
             componentCount++;
         }
 
-        assertEquals("Wrong number of components registered in the model.",
-                     1,
-                     componentCount);
+        assertEquals("Wrong number of components registered in the model.", 1, componentCount);
     }
 }

@@ -41,17 +41,16 @@ import java.io.OutputStream;
 public class TestConnector extends AbstractConnector
 {
     /**
-     * The connector can pool dispatchers based on their endpointUri or can
-     * ingnore the endpointUri altogether and use a ThreadLocal or always create
-     * new.
-     *
-     * @param endpoint the endpoint that can be used to key cached
-     *                 dispatchers
-     * @return the component associated with the endpointUri If there is no
-     *         component for the current thread one will be created
+     * The connector can pool dispatchers based on their endpointUri or can ingnore
+     * the endpointUri altogether and use a ThreadLocal or always create new.
+     * 
+     * @param endpoint the endpoint that can be used to key cached dispatchers
+     * @return the component associated with the endpointUri If there is no component
+     *         for the current thread one will be created
      * @throws org.mule.umo.UMOException if creation of a component fails
      */
-    public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException {
+    public UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
+    {
         return new TestMessageDispatcher(endpoint);
     }
 
@@ -61,9 +60,11 @@ public class TestConnector extends AbstractConnector
     public TestConnector()
     {
         super();
-        setDispatcherFactory(new UMOMessageDispatcherFactory() {
+        setDispatcherFactory(new UMOMessageDispatcherFactory()
+        {
 
-            public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException {
+            public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+            {
                 return new TestMessageDispatcher(endpoint);
             }
         });
@@ -129,15 +130,16 @@ public class TestConnector extends AbstractConnector
         return new DummyMessageAdapter(message);
     }
 
-
-    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out) throws MessagingException
+    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
+        throws MessagingException
     {
         return new DummyMessageAdapter(in);
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint) {
+        UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint)
+        {
             public void doConnect() throws Exception
             {
                 // nothing to do
@@ -200,7 +202,6 @@ public class TestConnector extends AbstractConnector
         {
             return message.toString();
         }
-
 
         public InputStream getInputStream()
         {

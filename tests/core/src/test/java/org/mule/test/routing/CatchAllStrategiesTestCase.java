@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing;
 
 import com.mockobjects.constraint.Constraint;
@@ -43,10 +44,13 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
     {
         UMOEvent event = getTestEvent("UncaughtEvent");
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
-        try {
+        try
+        {
             strategy.setEndpoint(getTestEndpoint("testProvider", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             fail("Illegal operation exception should have been thrown");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
 
@@ -61,7 +65,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(UMOMessageDispatcher.class);
         Mock connector = MuleTestUtils.getMockConnector();
         UMOEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((UMOEndpoint) endpoint.proxy());
+        strategy.setEndpoint((UMOEndpoint)endpoint.proxy());
 
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
@@ -96,7 +100,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             return "Transformed Test Data";
         }
     }
-    
+
     public void testForwardingStrategyWithTransform() throws Exception
     {
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
@@ -105,7 +109,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(UMOMessageDispatcher.class);
         Mock connector = MuleTestUtils.getMockConnector();
         UMOEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((UMOEndpoint) endpoint.proxy());
+        strategy.setEndpoint((UMOEndpoint)endpoint.proxy());
 
         endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
         endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
@@ -116,11 +120,13 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
-        dispatcher.expect("send", new Constraint() {
+        dispatcher.expect("send", new Constraint()
+        {
             public boolean eval(Object arg0)
             {
-                if (arg0 instanceof UMOEvent) {
-                    return "Transformed Test Data".equals(((UMOEvent) arg0).getMessage().getPayload());
+                if (arg0 instanceof UMOEvent)
+                {
+                    return "Transformed Test Data".equals(((UMOEvent)arg0).getMessage().getPayload());
                 }
                 return false;
             }
@@ -136,13 +142,14 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
     public void testFullRouter() throws Exception
     {
-        final int[] count1 = new int[] { 0 };
-        final int[] count2 = new int[] { 0 };
-        final int[] catchAllCount = new int[] { 0 };
+        final int[] count1 = new int[]{0};
+        final int[] count2 = new int[]{0};
+        final int[] catchAllCount = new int[]{0};
 
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
 
-        FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter() {
+        FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
+        {
             public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
             {
                 count1[0]++;
@@ -150,7 +157,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             }
         };
 
-        FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter() {
+        FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
+        {
             public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
             {
                 count2[0]++;
@@ -163,7 +171,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter1);
         messageRouter.addRouter(filterRouter2);
 
-        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy() {
+        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy()
+        {
             public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
             {
                 catchAllCount[0]++;

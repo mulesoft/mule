@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.model;
 
 import com.mockobjects.dynamic.Mock;
@@ -28,10 +29,10 @@ public abstract class AbstractProxyPoolFactoryTestCase extends AbstractMuleTestC
     {
         Mock mockPool = new Mock(ObjectPool.class);
         MuleDescriptor descriptor = getTestDescriptor("apple", Apple.class.getName());
-        ObjectFactory factory = getProxyFactory(descriptor, (ObjectPool) mockPool.proxy());
+        ObjectFactory factory = getProxyFactory(descriptor, (ObjectPool)mockPool.proxy());
         Object result = factory.create();
         assertNotNull(result);
-        MuleProxy proxy = (MuleProxy) result;
+        MuleProxy proxy = (MuleProxy)result;
         assertEquals("apple", proxy.getDescriptor().getName());
         mockPool.verify();
     }

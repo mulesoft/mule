@@ -29,16 +29,14 @@ public class TestTransactionManagerFactory implements UMOTransactionManagerFacto
 {
     public TransactionManager create() throws Exception
     {
-        return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                           new Class[] { TransactionManager.class },
-                                                           new InvocationHandler() {
-                                                               public Object invoke(Object proxy,
-                                                                                    Method method,
-                                                                                    Object[] args) throws Throwable
-                                                               {
-                                                                   return null;
-                                                               }
+        return (TransactionManager)Proxy.newProxyInstance(getClass().getClassLoader(),
+            new Class[]{TransactionManager.class}, new InvocationHandler()
+            {
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                {
+                    return null;
+                }
 
-                                                           });
+            });
     }
 }

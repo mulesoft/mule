@@ -86,8 +86,7 @@ public class MapUtilsTestCase extends TestCase
         assertEquals("{foo=bar, foozle=doozle}", MapUtils.toString(props, false));
 
         assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR
-                     + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}",
-            MapUtils.toString(props, true));
+                     + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}", MapUtils.toString(props, true));
     }
 
 }

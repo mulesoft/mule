@@ -35,39 +35,51 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMODescriptor descriptor = getTestDescriptor("badSatsuma", InvalidSatsuma.class.getName());
 
         UMOEntryPoint ep = null;
-        try {
+        try
+        {
             ep = epd.resolveEntryPoint(descriptor);
-        } catch (NoSatisfiableMethodsException e) {
+        }
+        catch (NoSatisfiableMethodsException e)
+        {
             // expected
             return;
         }
         assertTrue(ep != null);
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new InvalidSatsuma(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint on Satsuma");
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
-        } finally {
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
 
     }
 
     /**
-     * Tests entrypoint discovery on object that has it's own event handler
-     * without implementing any of the Mule event interfaces
+     * Tests entrypoint discovery on object that has it's own event handler without
+     * implementing any of the Mule event interfaces
      */
     public void testEntryPointDiscovery() throws Exception
     {
         ComponentMethodMapping[] mappings = getComponentMappings();
 
-        for (int i = 0; i < mappings.length; i++) {
-            if (mappings[i].isShouldFail()) {
+        for (int i = 0; i < mappings.length; i++)
+        {
+            if (mappings[i].isShouldFail())
+            {
                 doExpectedFail(mappings[i]);
-            } else {
+            }
+            else
+            {
                 doExpectedPass(mappings[i]);
             }
         }
@@ -91,11 +103,15 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMOEntryPointResolver epr = getEntryPointResolver();
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
 
-        try {
+        try
+        {
             UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
-            ep.invoke(ClassUtils.instanciateClass(mapping.getComponentClass(), ClassUtils.NO_ARGS), getTestEventContext("blah"));
+            ep.invoke(ClassUtils.instanciateClass(mapping.getComponentClass(), ClassUtils.NO_ARGS),
+                getTestEventContext("blah"));
             fail("Resolving should have failed for: " + mapping.toString());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // expected
         }
 
@@ -109,15 +125,15 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
     public abstract UMOEntryPointResolver getEntryPointResolver();
 
     /**
-     * @return an array of the the different components that can be resolved by
-     *         the resolver and the method name to be resolved on each component
+     * @return an array of the the different components that can be resolved by the
+     *         resolver and the method name to be resolved on each component
      */
     public abstract ComponentMethodMapping[] getComponentMappings();
 
     /**
      * <p>
-     * <code>ComponentMethodMapping</code> is used to supply a component class
-     * and the correct method to be resovled on the component.
+     * <code>ComponentMethodMapping</code> is used to supply a component class and
+     * the correct method to be resovled on the component.
      * 
      * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
      * @version $Revision$
@@ -180,7 +196,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         public String toString()
         {
             return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName()
-                    + "), Expected to fail= " + shouldFail;
+                   + "), Expected to fail= " + shouldFail;
         }
 
     }

@@ -50,16 +50,17 @@ public class InterceptorStackTestCase extends AbstractMuleTestCase
     public void testStack() throws Exception
     {
         final AtomicInteger c = new AtomicInteger(0);
-        final UMOMessage m1 = (UMOMessage) new Mock(UMOMessage.class).proxy();
-        final UMOMessage m2 = (UMOMessage) new Mock(UMOMessage.class).proxy();
-        final UMOMessage m3 = (UMOMessage) new Mock(UMOMessage.class).proxy();
-        final UMOMessage m4 = (UMOMessage) new Mock(UMOMessage.class).proxy();
-        final UMOMessage m5 = (UMOMessage) new Mock(UMOMessage.class).proxy();
-        final UMODescriptor d = (UMODescriptor) new Mock(UMODescriptor.class).proxy();
+        final UMOMessage m1 = (UMOMessage)new Mock(UMOMessage.class).proxy();
+        final UMOMessage m2 = (UMOMessage)new Mock(UMOMessage.class).proxy();
+        final UMOMessage m3 = (UMOMessage)new Mock(UMOMessage.class).proxy();
+        final UMOMessage m4 = (UMOMessage)new Mock(UMOMessage.class).proxy();
+        final UMOMessage m5 = (UMOMessage)new Mock(UMOMessage.class).proxy();
+        final UMODescriptor d = (UMODescriptor)new Mock(UMODescriptor.class).proxy();
 
         InterceptorStack s = new InterceptorStack();
         List interceptors = new ArrayList();
-        interceptors.add(new UMOInterceptor() {
+        interceptors.add(new UMOInterceptor()
+        {
             public UMOMessage intercept(Invocation invocation) throws UMOException
             {
                 assertEquals(0, c.get());
@@ -74,7 +75,8 @@ public class InterceptorStackTestCase extends AbstractMuleTestCase
                 return m5;
             }
         });
-        interceptors.add(new UMOInterceptor() {
+        interceptors.add(new UMOInterceptor()
+        {
             public UMOMessage intercept(Invocation invocation) throws UMOException
             {
                 assertEquals(1, c.get());

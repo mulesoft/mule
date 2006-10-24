@@ -37,7 +37,6 @@ import java.util.EventObject;
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- *
  * @version $Revision$
  */
 public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDiscoveryTestCase
@@ -49,24 +48,24 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     private static final String INVALID_METHOD_NAME = "nosuchmethod";
 
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
-    */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
+     */
     public ComponentMethodMapping[] getComponentMappings()
     {
         ComponentMethodMapping[] mappings = new ComponentMethodMapping[4];
         mappings[0] = new ComponentMethodMapping(WaterMelon.class, "myEventHandler", UMOEvent.class);
         mappings[1] = new ComponentMethodMapping(FruitBowl.class, "consumeFruit", FruitLover.class);
         mappings[2] = new ComponentMethodMapping(Banana.class, "peelEvent", EventObject.class);
-        //test proxy objects
+        // test proxy objects
         mappings[3] = new ComponentMethodMapping(InvocationHandler.class, "invoke", FruitLover.class);
         return mappings;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getDescriptorToResolve(java.lang.String)
      */
     public UMODescriptor getDescriptorToResolve(String className) throws Exception
@@ -75,10 +74,13 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         descriptor.setInboundRouter(new InboundMessageRouter());
         UMOEndpoint endpoint = new MuleEndpoint("test://foo", true);
 
-        if (className.equals(FruitBowl.class.getName())) {
+        if (className.equals(FruitBowl.class.getName()))
+        {
             endpoint.setTransformer(new ObjectToFruitLover());
             descriptor.getInboundRouter().addEndpoint(endpoint);
-        } else if (className.equals(InvocationHandler.class.getName())) {
+        }
+        else if (className.equals(InvocationHandler.class.getName()))
+        {
             endpoint.setTransformer(new ObjectToFruitLover());
             descriptor.getInboundRouter().addEndpoint(endpoint);
         }
@@ -87,7 +89,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getEntryPointResolver()
      */
     public UMOEntryPointResolver getEntryPointResolver()
@@ -102,29 +104,37 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     public void testFailEntryPointMultipleEventContextMatches() throws Exception
     {
         UMOEntryPointResolver epd = getEntryPointResolver();
-        UMODescriptor descriptor = getTestDescriptor("badContexts", MultipleEventContextsTestObject.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("badContexts",
+            MultipleEventContextsTestObject.class.getName());
 
         UMOEntryPoint ep;
         ep = epd.resolveEntryPoint(descriptor);
         assertTrue(ep != null);
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new MultipleEventContextsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
-        } catch (InvocationTargetException itex) {
+        }
+        catch (InvocationTargetException itex)
+        {
             final Throwable cause = itex.getCause();
-            if (cause instanceof TooManySatisfiableMethodsException) {
+            if (cause instanceof TooManySatisfiableMethodsException)
+            {
                 // expected
-            } else {
+            }
+            else
+            {
                 throw itex;
             }
-        } finally {
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
 
     }
-
 
     /**
      * Tests entrypoint discovery when there is more than one discoverable method
@@ -133,29 +143,35 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     public void testFailEntryPointMultiplePayloadMatches() throws Exception
     {
         UMOEntryPointResolver epd = getEntryPointResolver();
-        UMODescriptor descriptor = getTestDescriptor("badPayloads", MultiplePayloadsTestObject.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("badPayloads",
+            MultiplePayloadsTestObject.class.getName());
 
         UMOEntryPoint ep;
         ep = epd.resolveEntryPoint(descriptor);
         assertTrue(ep != null);
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
 
-        } catch (TooManySatisfiableMethodsException itex) {
+        }
+        catch (TooManySatisfiableMethodsException itex)
+        {
             // expected
-        } finally {
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
 
     }
 
     /**
-     * If there was a method parameter specified to override the discovery
-     * mechanism and no such method exists, an exception should be thrown,
-     * and no fallback to the default discovery should take place.
+     * If there was a method parameter specified to override the discovery mechanism
+     * and no such method exists, an exception should be thrown, and no fallback to
+     * the default discovery should take place.
      */
     public void testMethodOverrideDoesNotFallback() throws Exception
     {
@@ -166,7 +182,8 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         ep = epd.resolveEntryPoint(descriptor);
         assertNotNull(ep);
 
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
@@ -177,17 +194,21 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
 
             ep.invoke(new FruitBowl(), RequestContext.getEventContext());
             fail("Should have failed to find an entrypoint.");
-        } catch (NoSuchMethodException itex) {
-            //expected
-        } finally {
+        }
+        catch (NoSuchMethodException itex)
+        {
+            // expected
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
     }
 
     /**
-     * If there was a method parameter specified to override the discovery
-     * mechanism and a Callable instance is serving the request, call
-     * the Callable, ignore the method override parameter.
+     * If there was a method parameter specified to override the discovery mechanism
+     * and a Callable instance is serving the request, call the Callable, ignore the
+     * method override parameter.
      */
     public void testMethodOverrideIgnoredWithCallable() throws Exception
     {
@@ -197,23 +218,27 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
         assertNotNull(ep);
 
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
             // those are usually set on the endpoint and copied over to the message
-            RequestContext.getEventContext().getMessage().setProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME);
+            RequestContext.getEventContext().getMessage().setProperty(METHOD_PROPERTY_NAME,
+                INVALID_METHOD_NAME);
 
             ep.invoke(new Apple(), RequestContext.getEventContext());
-        } finally {
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
     }
 
     /**
-     * If there was a method parameter specified to override the discovery
-     * mechanism and a target instance has a method accepting UMOEventContext,
-     * proceed to call this method, ignore the method override parameter.
+     * If there was a method parameter specified to override the discovery mechanism
+     * and a target instance has a method accepting UMOEventContext, proceed to call
+     * this method, ignore the method override parameter.
      */
     public void testMethodOverrideIgnoredWithEventContext() throws Exception
     {
@@ -223,7 +248,8 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
         assertNotNull(ep);
 
-        try {
+        try
+        {
 
             RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
@@ -232,13 +258,18 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
             RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
 
-            try {
+            try
+            {
                 ep.invoke(new Kiwi(), RequestContext.getEventContext());
                 fail("no such method on component");
-            } catch (NoSuchMethodException e) {
-               //expected
             }
-        } finally {
+            catch (NoSuchMethodException e)
+            {
+                // expected
+            }
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
     }

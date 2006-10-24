@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.services;
 
 import org.mule.util.StringUtils;
@@ -18,11 +19,13 @@ import java.rmi.Remote;
  */
 public class MatchingMethodsComponent implements Remote
 {
-    public String reverseString(String string) {
+    public String reverseString(String string)
+    {
         return StringUtils.reverse(string);
     }
 
-    public String upperCaseString(String string) {
+    public String upperCaseString(String string)
+    {
         return string.toUpperCase();
     }
 }

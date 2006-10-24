@@ -66,17 +66,21 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final Latch latch = new Latch();
 
-        Thread t = new Thread() {
+        Thread t = new Thread()
+        {
             public void run()
             {
-                try {
+                try
+                {
                     latch.countDown();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
                     assertEquals(0, q.size());
                     q.put("String1");
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     // ignore, let test fail
                 }
             }
@@ -105,10 +109,12 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final Latch latch = new Latch();
 
-        Thread t = new Thread() {
+        Thread t = new Thread()
+        {
             public void run()
             {
-                try {
+                try
+                {
                     latch.countDown();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
@@ -120,7 +126,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     s.begin();
                     q.put("String2");
                     s.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     // ignore, let test fail
                 }
             }
@@ -150,17 +158,21 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final Latch latch = new Latch();
 
-        Thread t = new Thread() {
+        Thread t = new Thread()
+        {
             public void run()
             {
-                try {
+                try
+                {
                     latch.await();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
                     Object o = q.take();
                     assertEquals("String1", o);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     // ignore, let test fail
                 }
             }
@@ -184,10 +196,12 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     public void testPutWithPersistence() throws Exception
     {
-        if (isPersistent()) {
+        if (isPersistent())
+        {
             TransactionalQueueManager mgr = createQueueManager();
 
-            try {
+            try
+            {
                 mgr.start();
 
                 QueueSession s = mgr.getQueueSession();
@@ -197,30 +211,39 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
                 q = s.getQueue("queue1");
                 assertEquals(1, q.size());
-            } finally {
+            }
+            finally
+            {
                 mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
             }
 
             mgr = createQueueManager();
-            try {
+            try
+            {
                 mgr.start();
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue("queue1");
                 assertEquals(1, q.size());
-            } finally {
+            }
+            finally
+            {
                 mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
             }
-        } else {
+        }
+        else
+        {
             logger.info("Ignoring test because queue manager is not persistent");
         }
     }
 
     public void testTransactedPutCommitWithPersistence() throws Exception
     {
-        if (isPersistent()) {
+        if (isPersistent())
+        {
             TransactionalQueueManager mgr = createQueueManager();
 
-            try {
+            try
+            {
                 mgr.start();
 
                 QueueSession s = mgr.getQueueSession();
@@ -242,20 +265,26 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                 s = mgr.getQueueSession();
                 q = s.getQueue("queue1");
                 assertEquals(1, q.size());
-            } finally {
+            }
+            finally
+            {
                 mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
             }
-        } else {
+        }
+        else
+        {
             logger.info("Ignoring test because queue manager is not persistent");
         }
     }
 
     public void testTransactedPutRollbackWithPersistence() throws Exception
     {
-        if (isPersistent()) {
+        if (isPersistent())
+        {
             TransactionalQueueManager mgr = createQueueManager();
 
-            try {
+            try
+            {
                 mgr.start();
 
                 QueueSession s = mgr.getQueueSession();
@@ -278,12 +307,16 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                 q = s.getQueue("queue1");
                 assertEquals(0, q.size());
 
-            } finally {
+            }
+            finally
+            {
 
                 mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
             }
-        } else {
+        }
+        else
+        {
             logger.info("Ignoring test because queue manager is not persistent");
         }
     }
@@ -293,7 +326,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         TransactionalQueueManager mgr = createQueueManager();
 
-        try {
+        try
+        {
             mgr.start();
 
             QueueSession s1 = mgr.getQueueSession();
@@ -350,7 +384,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals(1, q2s1.size());
             assertEquals(1, q2s2.size());
 
-        } finally {
+        }
+        finally
+        {
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
@@ -360,7 +396,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final TransactionalQueueManager mgr = createQueueManager();
 
-        try {
+        try
+        {
             mgr.start();
 
             QueueSession s = mgr.getQueueSession();
@@ -379,15 +416,19 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals(q.size(), 0);
             assertEquals("String1", o);
 
-            new Thread(new Runnable() {
+            new Thread(new Runnable()
+            {
                 public void run()
                 {
-                    try {
+                    try
+                    {
                         Thread.sleep(500);
                         QueueSession s = mgr.getQueueSession();
                         Queue q = s.getQueue("queue1");
                         q.put("String1");
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -396,7 +437,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals(q.size(), 0);
             assertEquals("String1", o);
 
-        } finally {
+        }
+        finally
+        {
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
@@ -406,7 +449,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         TransactionalQueueManager mgr = createQueueManager();
 
-        try {
+        try
+        {
             mgr.start();
 
             QueueSession s = mgr.getQueueSession();
@@ -422,7 +466,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals(q.size(), 1);
             assertEquals("String1", o);
 
-        } finally {
+        }
+        finally
+        {
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
@@ -432,7 +478,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.setDefaultQueueConfiguration(new QueueConfiguration(1));
-        try {
+        try
+        {
             mgr.start();
 
             QueueSession s = mgr.getQueueSession();
@@ -444,22 +491,28 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertFalse(q.offer("String2", 1000));
             assertEquals(q.size(), 1);
 
-            new Thread(new Runnable() {
+            new Thread(new Runnable()
+            {
                 public void run()
                 {
-                    try {
+                    try
+                    {
                         Thread.sleep(500);
                         QueueSession s = mgr.getQueueSession();
                         Queue q = s.getQueue("queue1");
                         assertEquals("String1", q.take());
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         e.printStackTrace();
                     }
                 }
             }).start();
             assertTrue(q.offer("String2", 1000));
             assertEquals(q.size(), 1);
-        } finally {
+        }
+        finally
+        {
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
@@ -469,7 +522,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         TransactionalQueueManager mgr = createQueueManager();
 
-        try {
+        try
+        {
             mgr.start();
 
             QueueSession s = mgr.getQueueSession();
@@ -477,13 +531,16 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
             Random rnd = new Random();
             long t0 = System.currentTimeMillis();
-            for (int i = 0; i < 1; i++) {
-                for (int j = 0; j < 500; j++) {
+            for (int i = 0; i < 1; i++)
+            {
+                for (int j = 0; j < 500; j++)
+                {
                     byte[] o = new byte[2048];
                     rnd.nextBytes(o);
                     q.put(o);
                 }
-                while (q.size() > 0) {
+                while (q.size() > 0)
+                {
                     q.take();
                 }
             }
@@ -491,7 +548,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
             logger.info("Time: " + (t1 - t0) + " ms");
 
-        } finally {
+        }
+        finally
+        {
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }

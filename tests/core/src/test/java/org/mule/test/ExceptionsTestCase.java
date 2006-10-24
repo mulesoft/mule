@@ -41,8 +41,8 @@ public class ExceptionsTestCase extends TestCase
         String rootMsg = "Root Test Exception Message";
         String msg = "Test Exception Message";
 
-        Exception e = new ManagerException(Message.createStaticMessage(msg),
-                new MuleException(Message.createStaticMessage(rootMsg)));
+        Exception e = new ManagerException(Message.createStaticMessage(msg), new MuleException(
+            Message.createStaticMessage(rootMsg)));
 
         assertEquals(rootMsg, e.getCause().getMessage());
         assertEquals(msg, e.getMessage());

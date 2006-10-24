@@ -13,8 +13,8 @@ package org.mule.tck.testmodels.fruit;
 import org.mule.umo.UMOEventContext;
 
 /**
- * A test object not implementing Callable, but having
- * a matching method accepting UMOEventContext.
+ * A test object not implementing Callable, but having a matching method accepting
+ * UMOEventContext.
  */
 public class Kiwi implements Fruit
 {
@@ -25,18 +25,22 @@ public class Kiwi implements Fruit
 
     private boolean bitten;
 
-    public void handle(UMOEventContext eventContext) throws Exception {
+    public void handle(UMOEventContext eventContext) throws Exception
+    {
         final Object payload = eventContext.getTransformedMessage();
-        if (payload instanceof FruitLover) {
+        if (payload instanceof FruitLover)
+        {
             this.bite();
         }
     }
 
-    public void bite () {
+    public void bite()
+    {
         this.bitten = true;
     }
 
-    public boolean isBitten () {
+    public boolean isBitten()
+    {
         return this.bitten;
     }
 }

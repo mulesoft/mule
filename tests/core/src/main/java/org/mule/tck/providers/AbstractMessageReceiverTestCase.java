@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.providers;
 
 import org.mule.tck.AbstractMuleTestCase;
@@ -40,16 +41,22 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         assertNotNull(receiver.getEndpoint());
         assertNotNull(receiver.getConnector());
 
-        try {
+        try
+        {
             receiver.setEndpoint(null);
             fail("Provider cannot be set to null");
-        } catch (IllegalArgumentException e) { /* expected */
+        }
+        catch (IllegalArgumentException e)
+        { /* expected */
         }
 
-        try {
+        try
+        {
             receiver.setComponent(null);
             fail("component cannot be set to null");
-        } catch (IllegalArgumentException e) { /* expected */
+        }
+        catch (IllegalArgumentException e)
+        { /* expected */
         }
 
         receiver.setComponent(component);
@@ -65,6 +72,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
     /**
      * Implementations of this method should ensure that the correct connector is set
      * on the endpoint
+     * 
      * @return
      * @throws Exception
      */

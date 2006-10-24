@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck.testmodels.mule;
 
 import com.mockobjects.dynamic.Mock;
@@ -26,7 +27,7 @@ public class TestTransactionFactory implements UMOTransactionFactory
 {
     public UMOTransaction beginTransaction() throws TransactionException
     {
-        return (UMOTransaction) new Mock(UMOTransaction.class).proxy();
+        return (UMOTransaction)new Mock(UMOTransaction.class).proxy();
     }
 
     public boolean isTransacted()

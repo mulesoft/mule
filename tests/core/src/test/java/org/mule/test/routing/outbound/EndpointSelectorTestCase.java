@@ -28,29 +28,24 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 
 /**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- *
- * Sample config:
- *
- *   <outbound-router>
- *       <router className="org.mule.routing.outbound.EndpointSelector">
- *           <endpoint name="dest1" address="jms://queue1" />
- *           <endpoint name="dest2" address="jms://queue2" />
- *           <endpoint name="dest3" address="jms://queue3" />
- *           <properties>
- *               <property name="selector" value="endpoint" />
- *           </properties>
- *       </router>
- *   </outbound-router>
+ * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a> Sample config:
+ *         <outbound-router> <router
+ *         className="org.mule.routing.outbound.EndpointSelector"> <endpoint
+ *         name="dest1" address="jms://queue1" /> <endpoint name="dest2"
+ *         address="jms://queue2" /> <endpoint name="dest3" address="jms://queue3" />
+ *         <properties> <property name="selector" value="endpoint" /> </properties>
+ *         </router> </outbound-router>
  */
-public class EndpointSelectorTestCase extends AbstractMuleTestCase {
+public class EndpointSelectorTestCase extends AbstractMuleTestCase
+{
     Mock session;
     UMOEndpoint dest1;
     UMOEndpoint dest2;
     UMOEndpoint dest3;
     EndpointSelector router;
 
-    protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception
+    {
         super.doSetUp();
         session = MuleTestUtils.getMockSession();
         dest1 = getTestEndpoint("dest1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
@@ -66,7 +61,8 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase {
         router.setEndpoints(endpoints);
     }
 
-    public void testSelectEndpointDefaultProperty() throws Exception {
+    public void testSelectEndpointDefaultProperty() throws Exception
+    {
         Map props = new HashMap();
         props.put("apple", "red");
         props.put(router.getSelectorProperty(), "dest3");
@@ -75,12 +71,14 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase {
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest3));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
     }
 
-    public void testSelectEndpointCustomProperty() throws Exception {
-        // The "wayOut" property will determine which endpoint the message gets sent to.
+    public void testSelectEndpointCustomProperty() throws Exception
+    {
+        // The "wayOut" property will determine which endpoint the message gets sent
+        // to.
         router.setSelectorProperty("wayOut");
 
         Map props = new HashMap();
@@ -91,30 +89,38 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase {
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest2));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
     }
 
-    public void testSelectEndpointNoMatch() throws Exception {
+    public void testSelectEndpointNoMatch() throws Exception
+    {
         Map props = new HashMap();
         props.put(router.getSelectorProperty(), "dest5");
         UMOMessage message = new MuleMessage("test event", props);
 
-        try {
-            router.route(message, (UMOSession) session.proxy(), false);
+        try
+        {
+            router.route(message, (UMOSession)session.proxy(), false);
             fail("Router should have thrown an exception if endpoint was not found.");
-        } catch (CouldNotRouteOutboundMessageException e) {
+        }
+        catch (CouldNotRouteOutboundMessageException e)
+        {
             // expected
         }
     }
 
-    public void testSelectEndpointNoPropertySet() throws Exception {
+    public void testSelectEndpointNoPropertySet() throws Exception
+    {
         UMOMessage message = new MuleMessage("test event");
 
-        try {
-            router.route(message, (UMOSession) session.proxy(), false);
+        try
+        {
+            router.route(message, (UMOSession)session.proxy(), false);
             fail("Router should have thrown an exception if no selector property was set on the message.");
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             // expected
         }
     }

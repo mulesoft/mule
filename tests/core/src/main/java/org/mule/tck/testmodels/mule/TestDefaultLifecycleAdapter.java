@@ -39,8 +39,9 @@ public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
      * @param epResolver
      * @throws UMOException
      */
-    public TestDefaultLifecycleAdapter(Object component, UMODescriptor descriptor, UMOEntryPointResolver epResolver)
-            throws UMOException
+    public TestDefaultLifecycleAdapter(Object component,
+                                       UMODescriptor descriptor,
+                                       UMOEntryPointResolver epResolver) throws UMOException
     {
         super(component, descriptor, epResolver);
     }

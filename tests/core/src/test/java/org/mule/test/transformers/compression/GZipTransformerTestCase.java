@@ -41,10 +41,12 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
      */
     public Object getResultData()
     {
-        try {
+        try
+        {
             return strat.compressByteArray(SerializationUtils.serialize((Serializable)getTestData()));
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -86,10 +88,12 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setReturnClass(String.class);
-        try {
+        try
+        {
             transformer.initialise();
         }
-        catch (InitialisationException e) {
+        catch (InitialisationException e)
+        {
             fail(e.getMessage());
         }
         return transformer;
@@ -97,36 +101,44 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
 
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
 
-        if (src instanceof byte[] && result instanceof byte[]) {
+        if (src instanceof byte[] && result instanceof byte[])
+        {
             return Arrays.equals((byte[])src, (byte[])result);
         }
-        else {
+        else
+        {
             return super.compareResults(src, result);
         }
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
 
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
 
-        if (src instanceof byte[] && result instanceof byte[]) {
+        if (src instanceof byte[] && result instanceof byte[])
+        {
             return Arrays.equals((byte[])src, (byte[])result);
         }
-        else {
+        else
+        {
             return super.compareResults(src, result);
         }
     }

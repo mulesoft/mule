@@ -45,10 +45,12 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
         return Arrays.equals((byte[])src, (byte[])result);
@@ -56,10 +58,12 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
         return src.equals(result);

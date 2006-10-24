@@ -37,7 +37,8 @@ public class Banana implements Fruit
 
     public void peelEvent(EventObject e)
     {
-        logger.debug("Banana got peel event in peelEvent(EventObject)! Event says: " + e.getSource().toString());
+        logger.debug("Banana got peel event in peelEvent(EventObject)! Event says: "
+                     + e.getSource().toString());
         peel();
     }
 

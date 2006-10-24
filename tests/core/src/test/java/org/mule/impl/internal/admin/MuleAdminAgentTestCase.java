@@ -14,8 +14,8 @@ import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 
 /**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * $Id$
+ * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
+ *         MuleAdminAgentTestCase.java 3167 2006-09-22 15:47:04Z holger $
  */
 public class MuleAdminAgentTestCase extends AbstractMuleTestCase
 {
@@ -27,7 +27,6 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
     {
         getManager(false);
     }
-
 
     public void testEmptyServerUrl() throws Exception
     {

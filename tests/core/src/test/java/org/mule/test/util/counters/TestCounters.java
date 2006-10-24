@@ -19,10 +19,8 @@ import org.mule.util.counters.CounterFactory;
 import org.mule.util.counters.CounterFactory.Type;
 
 /**
- * @author Nodet
- * 
- * To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
+ * @author Nodet To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Generation - Code and Comments
  */
 public class TestCounters extends TestCase
 {
@@ -41,15 +39,19 @@ public class TestCounters extends TestCase
         assertNotNull(CounterFactory.getCounter("create1"));
         assertNull(CounterFactory.getCounter("zzz"));
 
-        for (Iterator it = CounterFactory.getCounters(); it.hasNext();) {
-            Counter ct = (Counter) it.next();
+        for (Iterator it = CounterFactory.getCounters(); it.hasNext();)
+        {
+            Counter ct = (Counter)it.next();
             assertNotNull(ct);
         }
 
-        try {
+        try
+        {
             CounterFactory.createCounter("create1", Type.NUMBER);
             fail("The creation of a duplicate counter should have failed");
-        } catch (IllegalStateException e) {
+        }
+        catch (IllegalStateException e)
+        {
             // expected
         }
     }
@@ -158,15 +160,18 @@ public class TestCounters extends TestCase
         Counter ct = CounterFactory.createCounter("testRatePerUnit", Type.NUMBER);
         assertNotNull(ct);
 
-        Counter rsec = CounterFactory.createCounter("testRatePerUnit.rate.sec", "testRatePerUnit", Type.RATE_PER_SECOND);
+        Counter rsec = CounterFactory.createCounter("testRatePerUnit.rate.sec", "testRatePerUnit",
+            Type.RATE_PER_SECOND);
         assertNotNull(rsec);
 
-        Counter rmin = CounterFactory.createCounter("testRatePerUnit.rate.min", "testRatePerUnit", Type.RATE_PER_MINUTE);
+        Counter rmin = CounterFactory.createCounter("testRatePerUnit.rate.min", "testRatePerUnit",
+            Type.RATE_PER_MINUTE);
         assertNotNull(rmin);
 
         assertEquals("Rate", 0.0, rsec.nextValue(), delta);
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 50; i++)
+        {
             ct.setRawValue(1);
             Thread.sleep(100);
         }

@@ -13,8 +13,8 @@ package org.mule.test.mule.model;
 import org.mule.umo.UMOEventContext;
 
 /**
- * A test object with multiple matching methods accepting UMOEventContext for
- * the discovery to fail..
+ * A test object with multiple matching methods accepting UMOEventContext for the
+ * discovery to fail..
  * 
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */

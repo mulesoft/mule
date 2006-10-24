@@ -34,6 +34,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
      */
     public UMOContainerContext getContainerContext()
@@ -43,6 +44,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
 
     /*
      * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
     protected void doSetUp() throws Exception
@@ -63,15 +65,14 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         assertNotNull(ctx);
 
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-        FruitBowl fruitBowl = (FruitBowl) ctx.getComponent(descriptor.getImplementation());
+        FruitBowl fruitBowl = (FruitBowl)ctx.getComponent(descriptor.getImplementation());
 
         assertNotNull(fruitBowl);
     }
 
-
     /**
-     * If no 'environment' is specified, shall use the default
-     * jndi config via 'new InitialContext()'.
+     * If no 'environment' is specified, shall use the default jndi config via 'new
+     * InitialContext()'.
      */
     public void testDefaultInitialContext() throws Exception
     {

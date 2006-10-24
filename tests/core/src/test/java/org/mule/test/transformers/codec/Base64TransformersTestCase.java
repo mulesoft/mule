@@ -29,10 +29,12 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
      */
     public Object getResultData()
     {
-        try {
+        try
+        {
             return Base64.encodeBytes(getTestData().toString().getBytes());
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return null;
         }
     }

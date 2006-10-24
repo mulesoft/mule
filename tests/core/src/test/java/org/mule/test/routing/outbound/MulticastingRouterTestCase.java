@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
@@ -61,14 +62,14 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoint2), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
@@ -41,7 +42,8 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         // Dummy message splitter
-        AbstractMessageSplitter router = new AbstractMessageSplitter() {
+        AbstractMessageSplitter router = new AbstractMessageSplitter()
+        {
             private List parts;
 
             protected void initialise(UMOMessage message)
@@ -52,13 +54,20 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 
             protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
             {
-                if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1")) {
+                if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1"))
+                {
                     return new MuleMessage(parts.get(0));
-                } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.2")) {
+                }
+                else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.2"))
+                {
                     return new MuleMessage(parts.get(1));
-                } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.3")) {
+                }
+                else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.3"))
+                {
                     return new MuleMessage(parts.get(2));
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
@@ -76,7 +85,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint3)));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test,mule,message");
@@ -84,7 +93,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint2)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint3)), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

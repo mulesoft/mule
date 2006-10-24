@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.impl.MuleEvent;
@@ -35,15 +36,19 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
 {
     private UMOMessage testObject = null;
 
-    protected void doSetUp() throws Exception {
-        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils.getTestSession(), true));
+    protected void doSetUp() throws Exception
+    {
+        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"),
+            MuleTestUtils.getTestSession(), true));
     }
 
-    protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception
+    {
         RequestContext.clear();
     }
 
-    public SerializedUMOMessageTransformersTestCase() {
+    public SerializedUMOMessageTransformersTestCase()
+    {
         Map props = new HashMap();
         props.put("object", new Apple());
         props.put("number", new Integer(1));
@@ -70,7 +75,8 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
 
     public Object getResultData()
     {
-        try {
+        try
+        {
             ByteArrayOutputStream bs = null;
             ObjectOutputStream os = null;
 
@@ -80,36 +86,48 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
             os.flush();
             os.close();
             return bs.toByteArray();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new IllegalStateException(e.getMessage());
         }
     }
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
-        return Arrays.equals((byte[]) src, (byte[]) result);
+        return Arrays.equals((byte[])src, (byte[])result);
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
-        if(src instanceof UMOMessage && result instanceof UMOMessage) {
-            return ((UMOMessage)src).getPayload().equals(((UMOMessage)result).getPayload()) &&
-                 ((UMOMessage)src).getProperty("object").equals(((UMOMessage)result).getProperty("object")) &&
-                 ((UMOMessage)src).getProperty("string").equals(((UMOMessage)result).getProperty("string")) &&
-                 ((UMOMessage)src).getIntProperty("number", -1) == ((UMOMessage)result).getIntProperty("number", -2);
-        } else {
+        if (src instanceof UMOMessage && result instanceof UMOMessage)
+        {
+            return ((UMOMessage)src).getPayload().equals(((UMOMessage)result).getPayload())
+                   && ((UMOMessage)src).getProperty("object").equals(
+                       ((UMOMessage)result).getProperty("object"))
+                   && ((UMOMessage)src).getProperty("string").equals(
+                       ((UMOMessage)result).getProperty("string"))
+                   && ((UMOMessage)src).getIntProperty("number", -1) == ((UMOMessage)result).getIntProperty(
+                       "number", -2);
+        }
+        else
+        {
             return false;
         }
     }

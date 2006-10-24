@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -30,15 +31,16 @@ import org.mule.umo.manager.UMOServerNotification;
  * @version $Revision$
  */
 public class ServerNotificationsTestCase extends AbstractMuleTestCase
-        implements ModelNotificationListener, ManagerNotificationListener {
-
+    implements ModelNotificationListener, ManagerNotificationListener
+{
 
     private boolean managerStopped = false;
     private boolean modelStopped = false;
     private int componentStartedCount = 0;
     private int customNotificationCount = 0;
 
-    public void testStandardNotifications() throws Exception {
+    public void testStandardNotifications() throws Exception
+    {
 
         UMOManager m = getManager(true);
         m.start();
@@ -48,14 +50,18 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(managerStopped);
     }
 
-    public void testStandardNotificationsWithSubscription() throws Exception {
+    public void testStandardNotificationsWithSubscription() throws Exception
+    {
 
         final CountDownLatch latch = new CountDownLatch(1);
         UMOManager m = getManager(true);
         m.start();
-        m.registerListener(new ComponentNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED) {
+        m.registerListener(new ComponentNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
+                {
                     componentStartedCount++;
                     assertEquals("component1", notification.getResourceIdentifier());
                     latch.countDown();
@@ -66,20 +72,24 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         m.getModel().registerComponent(getTestDescriptor("component2", Apple.class.getName()));
         m.getModel().registerComponent(getTestDescriptor("component1", Apple.class.getName()));
 
-        //Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(1, componentStartedCount);
     }
 
-    public void testStandardNotificationsWithWildcardSubscription() throws Exception {
+    public void testStandardNotificationsWithWildcardSubscription() throws Exception
+    {
 
         final CountDownLatch latch = new CountDownLatch(2);
 
         UMOManager m = getManager(true);
         m.start();
-        m.registerListener(new ComponentNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED) {
+        m.registerListener(new ComponentNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
+                {
                     componentStartedCount++;
                     assertFalse("noMatchComponent".equals(notification.getResourceIdentifier()));
                     latch.countDown();
@@ -91,20 +101,24 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         m.getModel().registerComponent(getTestDescriptor("component1", Apple.class.getName()));
         m.getModel().registerComponent(getTestDescriptor("noMatchComponent", Apple.class.getName()));
 
-        //Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(2, componentStartedCount);
     }
 
-    public void testCustomNotifications() throws Exception {
+    public void testCustomNotifications() throws Exception
+    {
 
         final CountDownLatch latch = new CountDownLatch(2);
 
         UMOManager m = getManager(true);
         m.start();
-        m.registerListener(new DummyNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
+        m.registerListener(new DummyNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
+                {
                     customNotificationCount++;
                     assertEquals("hello", notification.getSource());
                     latch.countDown();
@@ -115,20 +129,24 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         m.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
         m.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
 
-        //Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(2, customNotificationCount);
     }
 
-    public void testCustomNotificationsWithWildcardSubscription() throws Exception {
+    public void testCustomNotificationsWithWildcardSubscription() throws Exception
+    {
 
         final CountDownLatch latch = new CountDownLatch(2);
 
         UMOManager m = getManager(true);
         m.start();
-        m.registerListener(new DummyNotificationListener() {
-            public void onNotification(UMOServerNotification notification) {
-                if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
+        m.registerListener(new DummyNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
+                {
                     customNotificationCount++;
                     assertFalse("e quick bro".equals(notification.getResourceIdentifier()));
                     latch.countDown();
@@ -136,24 +154,30 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "* quick brown*");
 
-        m.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog", DummyNotification.EVENT_RECEIVED));
+        m.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
+            DummyNotification.EVENT_RECEIVED));
         m.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
         m.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
 
-        //Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(2, customNotificationCount);
     }
 
-    public void onNotification(UMOServerNotification notification) {
-        if (notification.getAction() == ModelNotification.MODEL_STOPPED) {
+    public void onNotification(UMOServerNotification notification)
+    {
+        if (notification.getAction() == ModelNotification.MODEL_STOPPED)
+        {
             modelStopped = true;
-        } else if (notification.getAction() == ManagerNotification.MANAGER_STOPPED) {
+        }
+        else if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
+        {
             managerStopped = true;
         }
     }
 
-    public static interface DummyNotificationListener extends CustomNotificationListener {
+    public static interface DummyNotificationListener extends CustomNotificationListener
+    {
         // no methods
     }
 
@@ -173,4 +197,3 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         }
     }
 }
-

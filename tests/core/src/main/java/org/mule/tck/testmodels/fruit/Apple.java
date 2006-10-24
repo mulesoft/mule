@@ -53,32 +53,39 @@ public class Apple implements Fruit, Callable
 
     public Object onCall(UMOEventContext context) throws UMOException
     {
-        logger.debug("Apple received an event in UMOCallable.onEvent! Event says: " + context.getMessageAsString());
+        logger.debug("Apple received an event in UMOCallable.onEvent! Event says: "
+                     + context.getMessageAsString());
         wash();
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass())
+        {
             return false;
         }
 
-        final Apple apple = (Apple) o;
+        final Apple apple = (Apple)o;
 
-        if (bitten != apple.bitten) {
+        if (bitten != apple.bitten)
+        {
             return false;
         }
-        if (washed != apple.washed) {
+        if (washed != apple.washed)
+        {
             return false;
         }
 
         return true;
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         int result;
         result = (bitten ? 1 : 0);
         result = 29 * result + (washed ? 1 : 0);

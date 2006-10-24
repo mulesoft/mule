@@ -20,16 +20,15 @@ import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- *
  * @version $Revision$
  */
 public class CallableEntryPointDiscoveryTestCase extends AbstractEntryPointDiscoveryTestCase
 {
     /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
-    */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
+     */
     public ComponentMethodMapping[] getComponentMappings()
     {
         ComponentMethodMapping[] mappings = new ComponentMethodMapping[2];
@@ -38,7 +37,8 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         return mappings;
     }
 
-    public UMOEntryPointResolver getEntryPointResolver() {
+    public UMOEntryPointResolver getEntryPointResolver()
+    {
         return new CallableEntryPointResolver();
     }
 }

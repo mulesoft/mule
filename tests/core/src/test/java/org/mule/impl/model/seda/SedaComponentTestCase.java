@@ -22,37 +22,45 @@ import javax.resource.spi.work.WorkException;
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
-public class SedaComponentTestCase extends AbstractMuleTestCase {
+public class SedaComponentTestCase extends AbstractMuleTestCase
+{
 
-    public void testSpiWorkThrowableHandling() throws Exception {
-        try {
+    public void testSpiWorkThrowableHandling() throws Exception
+    {
+        try
+        {
             // getTestComponent() currently already returns a SedaComponent, but
             // here we are safe-guarding for any future changes
             MuleDescriptor descriptor = MuleTestUtils.getTestDescriptor("test", "java.lang.Object");
             SedaComponent component = new SedaComponent(descriptor, new SedaModel());
 
             component.handleWorkException(getTestWorkEvent(), "workRejected");
-        } catch (MuleRuntimeException mrex) {
+        }
+        catch (MuleRuntimeException mrex)
+        {
             assertNotNull(mrex);
             assertTrue(mrex.getCause().getClass() == Throwable.class);
             assertEquals("testThrowable", mrex.getCause().getMessage());
         }
     }
 
-    private WorkEvent getTestWorkEvent() {
+    private WorkEvent getTestWorkEvent()
+    {
         return new WorkEvent(this, // source
-                                        WorkEvent.WORK_REJECTED,
-                                        getTestWork(),
-                                        new WorkException(new Throwable("testThrowable")));
+            WorkEvent.WORK_REJECTED, getTestWork(), new WorkException(new Throwable("testThrowable")));
     }
 
-    private Work getTestWork() {
-        return new Work() {
-            public void release() {
+    private Work getTestWork()
+    {
+        return new Work()
+        {
+            public void release()
+            {
                 // noop
             }
 
-            public void run() {
+            public void run()
+            {
                 // noop
             }
         };

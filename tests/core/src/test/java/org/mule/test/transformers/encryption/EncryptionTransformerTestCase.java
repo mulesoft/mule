@@ -42,10 +42,12 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
      */
     public Object getResultData()
     {
-        try {
+        try
+        {
             return strat.encrypt(getTestData().toString().getBytes(), null);
         }
-        catch (CryptoFailureException e) {
+        catch (CryptoFailureException e)
+        {
             fail(e.getMessage());
             return null;
         }
@@ -70,10 +72,12 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         EncryptionTransformer transformer = new EncryptionTransformer();
         transformer.setStrategy(strat);
-        try {
+        try
+        {
             transformer.initialise();
         }
-        catch (InitialisationException e) {
+        catch (InitialisationException e)
+        {
             fail(e.getMessage());
         }
         return transformer;
@@ -95,10 +99,12 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         DecryptionTransformer transformer = new DecryptionTransformer();
         transformer.setStrategy(strat);
         transformer.setReturnClass(String.class);
-        try {
+        try
+        {
             transformer.initialise();
         }
-        catch (InitialisationException e) {
+        catch (InitialisationException e)
+        {
             fail(e.getMessage());
         }
         return transformer;
@@ -106,18 +112,22 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
 
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
 
-        if (src instanceof byte[] && result instanceof byte[]) {
+        if (src instanceof byte[] && result instanceof byte[])
+        {
             return Arrays.equals((byte[])src, (byte[])result);
         }
-        else {
+        else
+        {
             return super.compareResults(src, result);
         }
     }

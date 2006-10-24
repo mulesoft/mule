@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.constraint.Constraint;
@@ -66,16 +67,20 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(payload);
 
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)), message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
+            message);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -92,7 +97,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         public boolean eval(Object o)
         {
-            return ((UMOMessage) o).getPayload().getClass().equals(type);
+            return ((UMOMessage)o).getPayload().getClass().equals(type);
         }
     }
 }

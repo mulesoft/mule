@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.mule.commonspool;
 
 import com.mockobjects.dynamic.C;
@@ -40,8 +41,8 @@ public class CommonsPoolProxyFactoryTestCase extends AbstractProxyPoolFactoryTes
         mockPool.expect("onAdd", C.IS_NOT_NULL);
         mockPool.expect("onRemove", C.IS_NOT_NULL);
         MuleDescriptor descriptor = getTestDescriptor("apple", Apple.class.getName());
-        CommonsPoolProxyFactory factory = (CommonsPoolProxyFactory) getProxyFactory(descriptor,
-                                                                                    (ObjectPool) mockPool.proxy());
+        CommonsPoolProxyFactory factory = (CommonsPoolProxyFactory)getProxyFactory(descriptor,
+            (ObjectPool)mockPool.proxy());
 
         assertNotNull(factory);
 

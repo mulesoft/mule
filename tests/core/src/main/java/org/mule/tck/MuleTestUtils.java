@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.tck;
 
 import com.mockobjects.dynamic.Mock;
@@ -48,26 +49,28 @@ import java.util.HashMap;
 
 /**
  * Utilities for creating test and Mock Mule objects
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleTestUtils {
+public class MuleTestUtils
+{
     public static UMOManager getManager(boolean disableAdminService) throws Exception
     {
         UMOManager manager;
-        if (MuleManager.isInstanciated()) {
+        if (MuleManager.isInstanciated())
+        {
             MuleManager.getInstance().dispose();
         }
         manager = MuleManager.getInstance();
-        if(disableAdminService) {
+        if (disableAdminService)
+        {
             MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         }
         manager.setModel(new SedaModel());
         MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration()
-                   .getPoolingProfile()
-                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
+        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+            PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
 
         return manager;
     }
@@ -78,8 +81,8 @@ public class MuleTestUtils {
         // need to build endpoint this way to avoid depenency to any endpoint
         // jars
         UMOConnector connector = null;
-        connector = (UMOConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-                                                         AbstractMuleTestCase.class).newInstance();
+        connector = (UMOConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+            AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
         endpoint.setConnector(connector);
@@ -93,19 +96,20 @@ public class MuleTestUtils {
     {
         UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
         UMOSession session = getTestSession(component);
-        return new MuleEvent(new MuleMessage(data, new HashMap()),
-                getTestEndpoint("test1",
-                UMOEndpoint.ENDPOINT_TYPE_SENDER),
-                session, true);
+        return new MuleEvent(new MuleMessage(data, new HashMap()), getTestEndpoint("test1",
+            UMOEndpoint.ENDPOINT_TYPE_SENDER), session, true);
     }
 
     public static UMOEventContext getTestEventContext(Object data) throws Exception
     {
-        try {
+        try
+        {
             UMOEvent event = getTestEvent(data);
             RequestContext.setEvent(event);
             return RequestContext.getEventContext();
-        } finally {
+        }
+        finally
+        {
             RequestContext.setEvent(null);
         }
     }
@@ -128,12 +132,13 @@ public class MuleTestUtils {
 
     public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
     {
-        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class.getName())));
+        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string",
+            String.class.getName())));
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
-            throws UMOException
+        throws UMOException
     {
         UMOSession session = getTestSession(getTestComponent(descriptor));
         UMOEvent event = new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
@@ -176,7 +181,8 @@ public class MuleTestUtils {
         return descriptor;
     }
 
-    public static UMOManager getTestManager() throws UMOException {
+    public static UMOManager getTestManager() throws UMOException
+    {
         UMOManager manager = MuleManager.getInstance();
         manager.setModel(new SedaModel());
         return manager;
@@ -187,43 +193,53 @@ public class MuleTestUtils {
         return new TestAgent();
     }
 
-    public static Mock getMockSession() {
+    public static Mock getMockSession()
+    {
         return new Mock(UMOSession.class, "umoSession");
     }
 
-    public static Mock getMockMessageDispatcher() {
+    public static Mock getMockMessageDispatcher()
+    {
         return new Mock(UMOMessageDispatcher.class, "umoConnectorSession");
     }
 
-    public static Mock getMockConnector() {
+    public static Mock getMockConnector()
+    {
         return new Mock(UMOConnector.class, "umoConnector");
     }
 
-    public static Mock getMockEvent() {
+    public static Mock getMockEvent()
+    {
         return new Mock(UMOEvent.class, "umoEvent");
     }
 
-    public static Mock getMockManager() {
+    public static Mock getMockManager()
+    {
         return new Mock(MuleManager.class, "muleManager");
     }
 
-    public static Mock getMockEndpoint() {
+    public static Mock getMockEndpoint()
+    {
         return new Mock(UMOEndpoint.class, "umoEndpoint");
     }
 
-    public static Mock getMockEndpointURI() {
+    public static Mock getMockEndpointURI()
+    {
         return new Mock(UMOEndpointURI.class, "umoEndpointUri");
     }
 
-    public static Mock getMockDescriptor() {
+    public static Mock getMockDescriptor()
+    {
         return new Mock(UMODescriptor.class, "umoDescriptor");
     }
 
-    public static Mock getMockTransaction() {
+    public static Mock getMockTransaction()
+    {
         return new Mock(UMOTransaction.class, "umoTransaction");
     }
 
-    public static Mock getMockTransactionFactory() {
+    public static Mock getMockTransactionFactory()
+    {
         return new Mock(UMOTransactionFactory.class, "umoTransactionFactory");
     }
 }

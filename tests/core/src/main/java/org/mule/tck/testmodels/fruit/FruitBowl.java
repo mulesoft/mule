@@ -33,7 +33,8 @@ public class FruitBowl
 
     public FruitBowl(Fruit fruit[])
     {
-        for (int i = 0; i < fruit.length; i++) {
+        for (int i = 0; i < fruit.length; i++)
+        {
             bowl.put(fruit[i].getClass(), fruit[i]);
         }
     }
@@ -57,22 +58,24 @@ public class FruitBowl
     public Object consumeFruit(FruitLover fruitlover)
     {
         logger.debug("Got a fruit lover who says: " + fruitlover.speak());
-        for (Iterator iter = bowl.values().iterator(); iter.hasNext();) {
-            ((Fruit) iter.next()).bite();
+        for (Iterator iter = bowl.values().iterator(); iter.hasNext();)
+        {
+            ((Fruit)iter.next()).bite();
         }
         return fruitlover;
     }
 
     public void setFruit(Fruit[] fruit)
     {
-        for (int i = 0; i < fruit.length; i++) {
+        for (int i = 0; i < fruit.length; i++)
+        {
             bowl.put(fruit[i].getClass(), fruit[i]);
         }
     }
 
     public Apple getApple()
     {
-        return (Apple) bowl.get(Apple.class);
+        return (Apple)bowl.get(Apple.class);
     }
 
     public void setApple(Apple apple)
@@ -82,7 +85,7 @@ public class FruitBowl
 
     public Banana getBanana()
     {
-        return (Banana) bowl.get(Banana.class);
+        return (Banana)bowl.get(Banana.class);
     }
 
     public void setBanana(Banana banana)

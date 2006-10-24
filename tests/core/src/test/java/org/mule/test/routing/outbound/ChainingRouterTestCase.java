@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
@@ -75,7 +76,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(1)), message);
-        final UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        final UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);
         session.verify();
@@ -99,7 +100,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(0)), message);
         session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(1)), message);
         session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(2)), message);
-        final UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        final UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);
         session.verify();
@@ -114,7 +115,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("dispatchEvent", C.eq(message, endpoints.get(1)), message);
-        final UMOMessage result = router.route(message, (UMOSession) session.proxy(), false);
+        final UMOMessage result = router.route(message, (UMOSession)session.proxy(), false);
         assertNull("Async call shouldn't return any result.", result);
         session.verify();
     }
@@ -125,9 +126,9 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
     public void testBrokenChain() throws Exception
     {
         final UMOMessage message = new MuleMessage("test event");
-        final UMOEndpoint endpoint1 = (UMOEndpoint) endpoints.get(0);
+        final UMOEndpoint endpoint1 = (UMOEndpoint)endpoints.get(0);
         session.expect("sendEvent", C.eq(message, endpoint1));
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), false);
+        UMOMessage result = router.route(message, (UMOSession)session.proxy(), false);
         session.verify();
         assertNull(result);
     }

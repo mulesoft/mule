@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
 import org.mule.tck.AbstractTransformerTestCase;
@@ -44,21 +45,25 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
 
     public boolean compareResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
-        return Arrays.equals((byte[]) src, (byte[]) result);
+        return Arrays.equals((byte[])src, (byte[])result);
     }
 
     public boolean compareRoundtripResults(Object src, Object result)
     {
-        if (src == null && result == null) {
+        if (src == null && result == null)
+        {
             return true;
         }
-        if (src == null || result == null) {
+        if (src == null || result == null)
+        {
             return false;
         }
         return src.equals(result);

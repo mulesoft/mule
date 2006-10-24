@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
@@ -75,14 +76,14 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event");
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        messageRouter.route(message, (UMOSession) session.proxy(), false);
+        messageRouter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(new IllegalArgumentException());
 
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        messageRouter.route(message, (UMOSession) session.proxy(), false);
+        messageRouter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
@@ -100,30 +101,32 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.setMatchAll(true);
-        messageRouter.route(message, (UMOSession) session.proxy(), false);
+        messageRouter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
     }
 
     public void testRouterWithCatchAll() throws Exception
     {
-        final int[] count1 = new int[] { 0 };
-        final int[] count2 = new int[] { 0 };
-        final int[] catchAllCount = new int[] { 0 };
+        final int[] count1 = new int[]{0};
+        final int[] count2 = new int[]{0};
+        final int[] catchAllCount = new int[]{0};
 
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
 
-        FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter() {
+        FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
+        {
             public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
-                    throws RoutingException
+                throws RoutingException
             {
                 count1[0]++;
                 return message;
             }
         };
 
-        FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter() {
+        FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
+        {
             public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
-                    throws RoutingException
+                throws RoutingException
             {
                 count2[0]++;
                 return message;
@@ -135,9 +138,10 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter1);
         messageRouter.addRouter(filterRouter2);
 
-        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy() {
+        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy()
+        {
             public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
-                    throws RoutingException
+                throws RoutingException
             {
                 catchAllCount[0]++;
                 return null;
@@ -163,15 +167,15 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);
     }
-    
-    private static class TestFilteringOutboundRouter extends FilteringOutboundRouter 
+
+    private static class TestFilteringOutboundRouter extends FilteringOutboundRouter
     {
         public void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint)
         {
             super.setMessageProperties(session, message, endpoint);
         }
     }
-    
+
     private static class TestMessageAdapter extends DefaultMessageAdapter
     {
         /**
@@ -183,12 +187,15 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         {
             super(message);
         }
-        public String getUniqueId() {
+
+        public String getUniqueId()
+        {
             return "123";
         }
     }
-    
-    public void testCorrelation() throws Exception {
+
+    public void testCorrelation() throws Exception
+    {
         TestFilteringOutboundRouter filterRouter = new TestFilteringOutboundRouter();
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
         UMOMessage message = new MuleMessage(new TestMessageAdapter(new StringBuffer()));

@@ -80,9 +80,10 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
      */
     public Object clone() throws CloneNotSupportedException
     {
-        if (containerProperty == null) {
+        if (containerProperty == null)
+        {
             throw new IllegalStateException(
-                    "Transformer cannot be cloned until all properties have been set on it");
+                "Transformer cannot be cloned until all properties have been set on it");
         }
         return super.clone();
     }
