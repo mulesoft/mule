@@ -19,7 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$
+ * TODO
  */
 public class DataSourceWrapper implements DataSource
 {

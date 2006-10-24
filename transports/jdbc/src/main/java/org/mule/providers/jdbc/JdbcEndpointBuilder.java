@@ -10,17 +10,18 @@
 
 package org.mule.providers.jdbc;
 
-import org.mule.impl.endpoint.AbstractEndpointBuilder;
-import org.mule.umo.endpoint.MalformedEndpointException;
-
 import java.net.URI;
 import java.util.Properties;
+
+import org.mule.impl.endpoint.AbstractEndpointBuilder;
+import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * Parses a JDBC style endpoint to a MuleEndpointURI
  */
 public class JdbcEndpointBuilder extends AbstractEndpointBuilder
 {
+
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         if (uri.getHost() != null && !"localhost".equals(uri.getHost()))

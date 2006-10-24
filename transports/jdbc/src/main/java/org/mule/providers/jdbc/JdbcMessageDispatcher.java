@@ -31,11 +31,7 @@ import java.util.List;
 
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a
- * database
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
+ * database.
  */
 public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 {

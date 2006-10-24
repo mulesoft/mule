@@ -48,20 +48,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
+ * TODO
  */
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {
-    // These are properties that can be overridden on the Receiver by the
-    // endpoint
+    // These are properties that can be overridden on the Receiver by the endpoint
     // declaration
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
     private static final String DEFAULT_QUERY_RUNNER = "org.apache.commons.dbutils.QueryRunner";
     private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
+
+    private static final Pattern STATEMENT_ARGS = Pattern.compile("\\$\\{[^\\}]*\\}");
 
     /* Register the SQL Exception reader if this class gets loaded */
     static
@@ -534,14 +533,13 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
      * @param params
      * @return
      */
-    public static String parseStatement(String stmt, List params)
+    public String parseStatement(String stmt, List params)
     {
         if (stmt == null)
         {
             return stmt;
         }
-        Pattern p = Pattern.compile("\\$\\{[^\\}]*\\}");
-        Matcher m = p.matcher(stmt);
+        Matcher m = STATEMENT_ARGS.matcher(stmt);
         StringBuffer sb = new StringBuffer(200);
         while (m.find())
         {

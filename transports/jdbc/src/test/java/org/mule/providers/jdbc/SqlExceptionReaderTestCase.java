@@ -19,10 +19,6 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
 {
 

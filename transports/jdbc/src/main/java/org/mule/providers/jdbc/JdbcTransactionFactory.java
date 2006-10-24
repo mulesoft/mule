@@ -15,8 +15,7 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * @author Guillaume Nodet
- * @version $Revision$
+ * TODO
  */
 public class JdbcTransactionFactory implements UMOTransactionFactory
 {

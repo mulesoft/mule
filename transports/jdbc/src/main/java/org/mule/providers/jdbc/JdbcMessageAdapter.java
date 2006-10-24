@@ -15,8 +15,7 @@ import org.mule.providers.AbstractMessageAdapter;
 import java.util.Map;
 
 /**
- * @author Guillaume Nodet
- * @version $Revision$
+ * TODO
  */
 public class JdbcMessageAdapter extends AbstractMessageAdapter
 {

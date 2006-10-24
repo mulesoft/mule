@@ -16,8 +16,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author Guillaume Nodet
- * @version $Revision$
+ * Creates JdbcMessageDispatchers.
  */
 public class JdbcMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

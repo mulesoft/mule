@@ -20,9 +20,6 @@ import java.util.Map;
 /**
  * Surfaces information about SQLExceptions such as the code and sql state. Also uses
  * the NextException to find the cause
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SQLExceptionReader implements ExceptionReader
 {

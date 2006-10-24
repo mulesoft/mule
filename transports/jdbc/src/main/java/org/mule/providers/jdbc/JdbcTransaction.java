@@ -23,8 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * @author Guillaume Nodet
- * @version $Revision$
+ * TODO
  */
 public class JdbcTransaction extends AbstractSingleResourceTransaction
 {
