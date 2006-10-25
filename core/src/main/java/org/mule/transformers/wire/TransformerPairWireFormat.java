@@ -18,6 +18,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.util.IOUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +31,12 @@ import java.io.IOException;
  */
 public class TransformerPairWireFormat implements WireFormat
 {
+
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     protected UMOTransformer inboundTransformer;
     protected UMOTransformer outboundTransformer;
 
@@ -69,8 +77,20 @@ public class TransformerPairWireFormat implements WireFormat
             Class returnClass = outboundTransformer.getReturnClass();
             if (returnClass == null)
             {
+                logger.warn("No return class was set on transformer: " + outboundTransformer + ". Attempting to work out" +
+                        "how to treat the result transformation");
                 Object result = outboundTransformer.transform(o);
-                out.write(result.toString().getBytes(MuleManager.getConfiguration().getEncoding()));
+                byte[] bytes;
+                if(result instanceof byte[])
+                {
+                    bytes = (byte[])result;
+                }
+                else
+                {
+                    bytes = result.toString().getBytes(MuleManager.getConfiguration().getEncoding());
+                }
+
+                out.write(bytes);
             }
             else if (returnClass.equals(byte[].class))
             {
