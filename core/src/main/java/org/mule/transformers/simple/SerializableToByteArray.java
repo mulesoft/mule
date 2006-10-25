@@ -38,6 +38,7 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
     {
         registerSourceType(Serializable.class);
         registerSourceType(byte[].class);
+        this.setReturnClass(byte[].class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
