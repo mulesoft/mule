@@ -10,7 +10,10 @@
 ######################################################################
 
 # Application
+if [ "$APP_NAME" = "" ]
+then
 APP_NAME="mule"
+fi
 APP_LONG_NAME="Mule"
 
 # Wrapper
@@ -38,7 +41,12 @@ MULE_OPTS="wrapper.working.dir=$STARTUP_DIR \
 PRIORITY=
 
 # Location of the pid file.
+if [ "$LOG_DIR" = "" ]
+then
 PIDDIR="."
+else
+        PIDDIR=$LOG_DIR
+fi
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -131,10 +139,13 @@ fi
 
 # Process ID
 ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
-PIDFILE="$PIDDIR/$APP_NAME.pid"
+PIDFILE="$PIDDIR/.$APP_NAME.pid"
 LOCKDIR="/var/lock/subsys"
 LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
+
+# WRAPPER LOG FILE
+LOGFILE="${PIDDIR}/${APP_NAME}.log"
 
 # Resolve the location of the 'ps' command
 PSEXE="/usr/bin/ps"
@@ -412,7 +423,7 @@ console() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE $ANCHORPROP $LOCKPROP"
+        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.logfile=$LOGFILE $ANCHORPROP $LOCKPROP"
         ######################################################################
         # Customized for Mule
         ######################################################################
@@ -429,7 +440,7 @@ start() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
+        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.logfile=$LOGFILE  wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
         ######################################################################
         # Customized for Mule
         ######################################################################
