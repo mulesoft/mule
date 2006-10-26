@@ -57,7 +57,7 @@ public abstract class AbstractSoapResourceEndpointFunctionalTestCase extends Abs
 
     protected String getDispatchAsyncComplexEndpoint1()
     {
-        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent4?method=addPerson";
+        return getSoapProvider() + ":" + getTransportProtocol() + "://mycomponent3?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2()

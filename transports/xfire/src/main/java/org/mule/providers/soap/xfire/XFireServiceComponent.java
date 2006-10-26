@@ -24,6 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.UMODescriptorAware;
+import org.mule.impl.MuleMessage;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
@@ -51,14 +52,9 @@ import java.io.InputStream;
  * The Xfire service component receives requests for Xfire services it manages and
  * marshalls requests and responses
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XFireServiceComponent implements Callable, Initialisable, Lifecycle, UMODescriptorAware
 {
-
-    public final String DEFAULT_CONTENT_TYPE = "text/html";
-
     /**
      * logger used by this class
      */
@@ -88,14 +84,20 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        logger.debug(eventContext);
+        if(logger.isDebugEnabled())
+        {
+            logger.debug(eventContext);
+        }
+
         String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
             StringUtils.EMPTY);
         if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY))
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             getXfire().generateWSDL(getServiceName(eventContext), out);
-            return out.toString();
+            UMOMessage result = new MuleMessage(out.toString(eventContext.getEncoding()));
+            result.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            return result;
         }
         else
         {

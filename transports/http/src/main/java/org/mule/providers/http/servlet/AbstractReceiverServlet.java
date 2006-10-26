@@ -12,6 +12,7 @@ package org.mule.providers.http.servlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.httpclient.Header;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.umo.UMOMessage;
@@ -20,11 +21,12 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A base servlet used to receive requests from a servlet container and route
+ * them into Mule
  */
 
 public abstract class AbstractReceiverServlet extends HttpServlet
@@ -118,7 +120,12 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             else
             {
                 httpResponse = new HttpResponse();
-                httpResponse.setBodyString(message.getAdapter().getPayloadAsString());
+                httpResponse.setBody(new ByteArrayInputStream(message.getAdapter().getPayloadAsBytes()));
+                String ct = message.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+                if(ct!=null)
+                {
+                    httpResponse.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, ct));
+                }
             }
 
             String contentType = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE).getValue();

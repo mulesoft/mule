@@ -10,18 +10,19 @@
 
 package org.mule.test.integration.providers.soap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.provider.DispatchException;
+import org.mule.test.integration.service.Person;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
@@ -180,6 +181,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         {
             assertTrue(result.getPayloadAsString().indexOf("location=\"" + location) > -1);
         }
+
+        assertTrue(result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
 
         if (logger.isDebugEnabled())
         {

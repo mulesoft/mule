@@ -10,18 +10,6 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,8 +44,24 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
- * TODO explain what this does and how, at least briefly :)
+ * The MuleUniversalChannel is an XFire Channel implementation that uses
+ * a Mule Transport under the covers. It theoretically can use any Mule transport
+ * but only transports that support streaming can be used with XFire.
+ *
+ * This channel is used for making Soap requests using XFire, not receiving them.
+ *
  */
 public class MuleUniversalChannel extends AbstractChannel
 {

@@ -10,11 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.mule.util.MapUtils;
 import org.codehaus.xfire.service.Service;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -22,12 +17,17 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.MapUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Used to register an Xfire endpoint registered with Mule and associated with a component
+ * This receiver is responsible or registering the transport endpoint i.e. http:// as well
+ * as managing the association of this transport endpoint with the Xfire service.
+ *
  */
 public class XFireMessageReceiver extends AbstractMessageReceiver
 {
@@ -56,18 +56,6 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             String namespace = MapUtils.getString(props, "namespace",
                 XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
 
-            // String soapVersionString =
-            // PropertiesHelper.getStringProperty(props, "soapVersion", "1.1");
-            //
-            // SoapVersion version = null;
-            // if(soapVersionString.equals("1.2")) {
-            // version = new Soap12();
-            // } else if(soapVersionString.equals("1.1")) {
-            // version = new Soap11();
-            // } else {
-            // throw new InitialisationException(new Message("xfire", 1,
-            // version), this);
-            // }
 
             if (props.size() == 0)
             {

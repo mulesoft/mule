@@ -420,18 +420,17 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected void processListRequest(WriterMessageAdapter response) throws AxisFault
     {
         AxisEngine engine = getAxisServer();
+        response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
         if (enableList)
         {
             Document doc = Admin.listConfig(engine);
             if (doc != null)
             {
-                response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 XMLUtils.DocumentToWriter(doc, response.getWriter());
             }
             else
             {
                 response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
-                response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
                 response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
                 response.write("<p>" + Messages.getMessage("noDeploy00") + "</p>");
             }
@@ -439,7 +438,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         else
         {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "403");
-            response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
             response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
             response.write("<p><i>?list</i> " + Messages.getMessage("disabled00") + "</p>");
         }
