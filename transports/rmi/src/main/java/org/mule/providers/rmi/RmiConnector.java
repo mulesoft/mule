@@ -17,7 +17,6 @@ import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -117,7 +116,7 @@ public class RmiConnector extends AbstractJndiConnector
 
     /**
      * Method getServerCodebase
-     * 
+     *
      * @return
      */
     public String getServerCodebase()
@@ -127,7 +126,7 @@ public class RmiConnector extends AbstractJndiConnector
 
     /**
      * Method setServerCodebase
-     * 
+     *
      * @param serverCodebase
      */
     public void setServerCodebase(String serverCodebase)
@@ -137,7 +136,7 @@ public class RmiConnector extends AbstractJndiConnector
 
     /**
      * Method getServerClassName
-     * 
+     *
      * @return
      */
     public String getServerClassName()
@@ -147,7 +146,7 @@ public class RmiConnector extends AbstractJndiConnector
 
     /**
      * Method setServerClassName
-     * 
+     *
      * @param serverClassName
      */
     public void setServerClassName(String serverClassName)
@@ -191,7 +190,7 @@ public class RmiConnector extends AbstractJndiConnector
     /**
      * Helper method for Dispatchers and Receives to extract the correct method from
      * a Remote object
-     * 
+     *
      * @param remoteObject The remote object on which to invoke the method
      * @param event The current event being processed
      * @return
@@ -221,25 +220,25 @@ public class RmiConnector extends AbstractJndiConnector
         Class[] argTypes;
 
         // Parse method args
-        
+
         Object args = event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
-        
+
         String argumentString = null;
-        
-        if (args instanceof ArrayList)
+
+        if (args instanceof List)
         {
-            List arguments = (ArrayList)args;
-            argumentString = (String)arguments.get(0);
+            List arguments = (List) args;
+            argumentString = (String) arguments.get(0);
         }
         else if(args instanceof String)
         {
             argumentString = (String)args;
         }
-        
+
         if (null != argumentString)
         {
             String[] split = argumentString.split(",");
-        
+
             argTypes = new Class[split.length];
             for (int i = 0; i < split.length; i++)
             {
