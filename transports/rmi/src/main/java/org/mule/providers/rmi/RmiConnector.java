@@ -18,6 +18,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.NamingException;
 
@@ -225,13 +226,14 @@ public class RmiConnector extends AbstractJndiConnector
         
         String argumentString = null;
         
-        try{
-            ArrayList arguments = (ArrayList)args;
+        if (args instanceof ArrayList)
+        {
+            List arguments = (ArrayList)args;
             argumentString = (String)arguments.get(0);
         }
-        catch (Exception e)
+        else if(args instanceof String)
         {
-           //Empty 
+            argumentString = (String)args;
         }
         
         if (null != argumentString)
