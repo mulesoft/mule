@@ -36,7 +36,7 @@ import java.util.Properties;
  * given Mule exception 2. Addtional Error information such as Java doc url for a
  * given exception can be resolved using this class 3. Error code mappings can be
  * looked up by providing the the protocol to map to and the Mule exception
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -356,6 +356,11 @@ public class ExceptionHelper
         {
             root = cause;
             cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause)
+            {
+                break;
+            }
         }
         return root;
     }
@@ -372,6 +377,11 @@ public class ExceptionHelper
             }
             parent = cause;
             cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause)
+            {
+                break;
+            }
         }
         return t;
     }
@@ -387,6 +397,11 @@ public class ExceptionHelper
                 umoException = (UMOException)cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause)
+            {
+                break;
+            }
         }
         return umoException;
     }
@@ -399,6 +414,11 @@ public class ExceptionHelper
         {
             exceptions.add(0, cause);
             cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause)
+            {
+                break;
+            }
         }
         return exceptions;
     }
@@ -411,6 +431,11 @@ public class ExceptionHelper
         {
             info.putAll(getExceptionReader(cause).getInfo(cause));
             cause = getExceptionReader(cause).getCause(cause);
+            // address some misbehaving exceptions, avoid endless loop
+            if (t == cause)
+            {
+                break;
+            }
         }
         return info;
     }
@@ -450,7 +475,7 @@ public class ExceptionHelper
 
     /**
      * Registers an exception reader with Mule
-     * 
+     *
      * @param reader the reader to register.
      */
     public static void registerExceptionReader(ExceptionReader reader)
@@ -460,7 +485,7 @@ public class ExceptionHelper
 
     /**
      * Gets an exception reader for the exception
-     * 
+     *
      * @param t the exception to get a reader for
      * @return either a specific reader or an instance of DefaultExceptionReader.
      *         This method never returns null;
