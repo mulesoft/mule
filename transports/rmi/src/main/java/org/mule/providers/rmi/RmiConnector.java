@@ -17,6 +17,7 @@ import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
+import java.util.ArrayList;
 
 import javax.naming.NamingException;
 
@@ -219,12 +220,24 @@ public class RmiConnector extends AbstractJndiConnector
         Class[] argTypes;
 
         // Parse method args
-        String arguments = (String)event.getMessage().getProperty(
-            RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
-
-        if (null != arguments)
+        
+        Object args = event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+        
+        String argumentString = null;
+        
+        try{
+            ArrayList arguments = (ArrayList)args;
+            argumentString = (String)arguments.get(0);
+        }
+        catch (Exception e)
         {
-            String[] split = arguments.split(",");
+           //Empty 
+        }
+        
+        if (null != argumentString)
+        {
+            String[] split = argumentString.split(",");
+        
             argTypes = new Class[split.length];
             for (int i = 0; i < split.length; i++)
             {
