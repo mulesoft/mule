@@ -7,10 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.agents;
 
-import org.mule.MuleManager;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
@@ -29,7 +30,7 @@ import java.util.List;
 
 /**
  * An agent that propergates Mule Server notifications to Jmx.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,11 +42,17 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 
     private MBeanServer mBeanServer;
     private BroadcastNotificationService broadcastNotificationMbean;
-    private boolean useInstanceIdAsDomain = true;
     private boolean registerListenerMbean = true;
     private ObjectName listenerObjectName;
     private ObjectName broadcasterObjectName;
 
+    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupport jmxSupport;
+
+
+    /**
+     * {@inheritDoc}
+     */
     protected void doInitialise() throws InitialisationException
     {
         if (getName() == null)
@@ -54,26 +61,28 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         }
         try
         {
-            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-            broadcasterObjectName = ObjectName.getInstance(getDomainName() + ":"
-                                                           + BROADCASTER_JMX_OBJECT_NAME);
+            jmxSupport = jmxSupportFactory.newJmxSupport();
+            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            broadcasterObjectName = ObjectName.getInstance(jmxSupport.getDomainName() + ":" + BROADCASTER_JMX_OBJECT_NAME);
             broadcastNotificationMbean = new BroadcastNotificationService();
             mBeanServer.registerMBean(broadcastNotificationMbean, broadcasterObjectName);
             if (registerListenerMbean)
             {
-                listenerObjectName = ObjectName.getInstance(getDomainName() + ":" + LISTENER_JMX_OBJECT_NAME);
+                listenerObjectName = ObjectName.getInstance(jmxSupport.getDomainName() + ":" + LISTENER_JMX_OBJECT_NAME);
                 NotificationListener mbean = new NotificationListener();
                 broadcastNotificationMbean.addNotificationListener(mbean, null, null);
                 mBeanServer.registerMBean(mbean, listenerObjectName);
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X,
-                "JMX Server Notification Agent"), e, this);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Server Notification Agent"), e, this);
         }
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     public void dispose()
     {
         try
@@ -82,31 +91,31 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
             {
                 mBeanServer.unregisterMBean(listenerObjectName);
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             logger.warn(e.getMessage(), e);
         }
         try
         {
             mBeanServer.unregisterMBean(broadcasterObjectName);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             logger.warn(e.getMessage(), e);
         }
         super.dispose();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void logEvent(UMOServerNotification e)
     {
-        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e,
-            e.getTimestamp(), e.toString()));
+        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e, e.getTimestamp(), e.toString()));
     }
 
     /**
-     * Should be a 1 line description of the agent
-     * 
+     * Should be a 1 line description of the agent.
+     *
      * @return description
      */
     public String getDescription()
@@ -114,26 +123,25 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         return "Jmx Notification Agent" + (registerListenerMbean ? "(Listener MBean registered)" : "");
     }
 
-    protected String getDomainName()
+
+    /**
+     * Getter for property 'jmxSupportFactory'.
+     *
+     * @return Value for property 'jmxSupportFactory'.
+     */
+    public JmxSupportFactory getJmxSupportFactory()
     {
-        if (MuleManager.getInstance().getId() != null && isUseInstanceIdAsDomain())
-        {
-            return MuleManager.getInstance().getId();
-        }
-        else
-        {
-            return "org.mule";
-        }
+        return jmxSupportFactory;
     }
 
-    public boolean isUseInstanceIdAsDomain()
+    /**
+     * Setter for property 'jmxSupportFactory'.
+     *
+     * @param jmxSupportFactory Value to set for property 'jmxSupportFactory'.
+     */
+    public void setJmxSupportFactory(JmxSupportFactory jmxSupportFactory)
     {
-        return useInstanceIdAsDomain;
-    }
-
-    public void setUseInstanceIdAsDomain(boolean useInstanceIdAsDomain)
-    {
-        this.useInstanceIdAsDomain = useInstanceIdAsDomain;
+        this.jmxSupportFactory = jmxSupportFactory;
     }
 
     public static interface BroadcastNotificationServiceMBean extends NotificationEmitter
@@ -141,28 +149,44 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         // no methods
     }
 
-    public static class BroadcastNotificationService extends NotificationBroadcasterSupport
-        implements BroadcastNotificationServiceMBean
+    public static class BroadcastNotificationService extends NotificationBroadcasterSupport implements BroadcastNotificationServiceMBean
     {
         // no methods
     }
 
     public static interface NotificationListenerMBean
     {
-        List getNotificsationList();
+        /**
+         * Getter for property 'notificsationList'.
+         *
+         * @return Value for property 'notificsationList'.
+         */
+        List getNotificationsList();
 
+        /**
+         * Getter for property 'listSize'.
+         *
+         * @return Value for property 'listSize'.
+         */
         int getListSize();
 
+        /**
+         * Setter for property 'listSize'.
+         *
+         * @param listSize Value to set for property 'listSize'.
+         */
         void setListSize(int listSize);
     }
 
-    public static class NotificationListener
-        implements NotificationListenerMBean, javax.management.NotificationListener
+    public static class NotificationListener implements NotificationListenerMBean, javax.management.NotificationListener
     {
         private int listSize = 100;
 
         private List notifs;
 
+        /**
+         * {@inheritDoc}
+         */
         public void handleNotification(Notification notification, Object o)
         {
             if (getList().size() == listSize)
@@ -172,21 +196,35 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
             getList().add(0, notification);
         }
 
-        public List getNotificsationList()
+        /**
+         * {@inheritDoc}
+         */
+        public List getNotificationsList()
         {
             return notifs;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getListSize()
         {
             return listSize;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setListSize(int listSize)
         {
             this.listSize = listSize;
         }
 
+        /**
+         * Getter for property 'list'.
+         *
+         * @return Value for property 'list'.
+         */
         protected List getList()
         {
             if (notifs == null)
