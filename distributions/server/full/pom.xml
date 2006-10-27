@@ -19,6 +19,11 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <!--
+                   Uncomment when it's published, contains wildcards functionality.
+                   Don't want to go with a SNAPSHOT yet.
+                 -->
+                <!-- version>2.2</version -->
                 <configuration>
                     <finalName>mule-${version}</finalName>
                     <descriptors>

@@ -739,8 +739,10 @@ Assembly descriptor for the full Mule distribution.
     </fileSet>
   </fileSets>
 
-  <!-- Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
-       replace the following lists with some clever wildcards. -->
+  <!--
+       TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed.
+       Update to use wildcards.
+   -->
   <dependencySets>
 
     <!-- Mule bootstrap -->
