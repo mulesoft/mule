@@ -35,29 +35,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--
-                Post-cleanup the empty jar artifact when jar package is being used
-                instead of pom (as a workaround).
-             -->
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <configuration>
-                            <tasks>
-                                <echo>Deleting empty artifact jar</echo>
-                                <delete file="${project.build.directory}/${pom.artifactId}-${pom.version}.jar"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
         </plugins>
     </build>
 </project>
