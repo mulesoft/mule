@@ -750,13 +750,17 @@ Assembly descriptor for the full Mule distribution.
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
-        <include>tanukisoft:wrapper</include>
       </includes>
     </dependencySet>
 
     <!-- Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
+      <!--
+        Uncomment if you encounter startup failures as described in
+        http://mule.mulesource.org/jira/browse/MULE-1153
+      -->
+      <!-- outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping -->
       <scope>runtime</scope>
       <includes>
         <!-- Core -->
@@ -863,9 +867,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
-
-        <!-- We already put this in /lib/boot so we don't need it in /lib/opt -->
-        <exclude>tanukisoft:wrapper</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
       </excludes>
