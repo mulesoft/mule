@@ -41,7 +41,7 @@ public class JmxLegacySupport extends JmxModernSupport
      * @throws javax.management.MalformedObjectNameException
      *          for invalid names
      */
-    public ObjectName getInstance(String name) throws MalformedObjectNameException
+    public ObjectName getObjectName(String name) throws MalformedObjectNameException
     {
         return new ObjectName(name);
     }

@@ -11,7 +11,6 @@ package org.mule.management.support;
 
 import org.mule.util.StringUtils;
 import org.mule.MuleManager;
-import org.mule.management.agents.JmxAgent;
 
 import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
@@ -21,6 +20,9 @@ import javax.management.MalformedObjectNameException;
  */
 public class JmxModernSupport implements JmxSupport
 {
+    /** Default Mule domain prefix for all instances. */
+    public static final String DEFAULT_JMX_DOMAIN_PREFIX = "Mule";
+
     /** {@inheritDoc} */
     public String escape(String input)
     {
@@ -32,13 +34,31 @@ public class JmxModernSupport implements JmxSupport
     {
         // TODO detect existing Mule domains and optionally increment a new one with a suffix
         // will need to interrogate the MBeanServer, and add some config options to the JmxAgent
-        String instanceSubDomain = StringUtils.EMPTY;
+        StringBuffer domain = new StringBuffer(DEFAULT_JMX_DOMAIN_PREFIX);
         if (MuleManager.isInstanciated())
         {
-            String instanceId = StringUtils.defaultIfEmpty(MuleManager.getInstance().getId(), "");
-            instanceSubDomain = instanceId.length() > 0 ? "." + instanceId : StringUtils.EMPTY;
+            String instanceId = StringUtils.defaultIfEmpty(MuleManager.getInstance().getId(), StringUtils.EMPTY);
+            if (instanceId.length() > 0)
+            {
+                domain.append(".").append(instanceId);
+            }
         }
-        return JmxAgent.DEFAULT_JMX_DOMAIN_PREFIX + instanceSubDomain;
+        return resolveDomainClash(domain.toString());
+    }
+
+    /**
+     * Resolve JMX domain clash by adding an incremented number suffix to the name. E.g. if
+     * 'Mule.TradeProcessor' is already registered with the accessible MBeanServer, will return
+     * 'Mule.TradeProcessor.1'. If the latter one is already registered, will return
+     * 'Mule.TradeProcessor.2' and so on.
+     * <p/>
+     * If no clash detected, returns the domain name unmodified. 
+     * @param clashingDomain domain name causing a conflict
+     * @return resolved non-conflicting domain name
+     */
+    protected String resolveDomainClash(String clashingDomain)
+    {
+        return clashingDomain;
     }
 
     /**
@@ -47,7 +67,7 @@ public class JmxModernSupport implements JmxSupport
      * @return ObjectName for MBeanServer
      * @throws MalformedObjectNameException for invalid names
      */
-    public ObjectName getInstance(String name) throws MalformedObjectNameException
+    public ObjectName getObjectName(String name) throws MalformedObjectNameException
     {
         return ObjectName.getInstance(name);
     }

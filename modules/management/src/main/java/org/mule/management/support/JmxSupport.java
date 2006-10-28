@@ -42,5 +42,5 @@ public interface JmxSupport
      * @return object name for MBeanServer consumption
      * @throws MalformedObjectNameException for invalid names
      */
-    ObjectName getInstance(String name) throws MalformedObjectNameException;
+    ObjectName getObjectName(String name) throws MalformedObjectNameException;
 }

@@ -25,6 +25,9 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -44,7 +47,7 @@ import java.util.Map;
  */
 public class Mx4jAgent implements UMOAgent
 {
-    public static final String HTTP_ADAPTER_OBJECT_NAME = "Mule:name=Mx4jHttpAdapter";
+    public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
 
     private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
 
@@ -69,6 +72,9 @@ public class Mx4jAgent implements UMOAgent
 
     // SSL/TLS socket factory config
     private Map socketFactoryProperties = new HashMap();
+
+    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupport jmxSupport;
 
     protected HttpAdaptor createAdaptor() throws Exception
     {
@@ -125,10 +131,11 @@ public class Mx4jAgent implements UMOAgent
     {
         try
         {
-            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            jmxSupport = jmxSupportFactory.newJmxSupport();
+            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
 
             adaptor = createAdaptor();
-            adaptorName = new ObjectName(HTTP_ADAPTER_OBJECT_NAME);
+            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":" + HTTP_ADAPTER_OBJECT_NAME);
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(adaptor, adaptorName);
@@ -186,12 +193,12 @@ public class Mx4jAgent implements UMOAgent
     }
 
     /**
-     * Unregister all log4j MBeans if there are any left over the old deployment
+     * Unregister all Mx4j MBeans if there are any left over the old deployment
      */
     protected void unregisterMBeansIfNecessary()
         throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
     {
-        if (mBeanServer.isRegistered(ObjectName.getInstance(HTTP_ADAPTER_OBJECT_NAME)))
+        if (mBeanServer.isRegistered(adaptorName))
         {
             mBeanServer.unregisterMBean(adaptorName);
         }
