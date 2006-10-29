@@ -251,7 +251,7 @@ public class MuleManager implements UMOManager
 
         // This is obviously just a workaround until extension modules can register
         // their own classes for notifications. Need to revisit this when the
-        // ManagementContext has been implanted properly.
+        // ManagementContext is implemented properly.
         try
         {
             Class spaceNotificationClass = ClassUtils.loadClass(
