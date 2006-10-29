@@ -42,10 +42,19 @@ public class AutoDiscoveryJmxSupportFactory implements JmxSupportFactory
         Method method = ClassUtils.getMethod("quote", new Class[]{String.class}, clazz);
 
         final boolean jmxModernAvailable = method == null;
-        JmxSupport jmxSupport = jmxModernAvailable ? new JmxLegacySupport() : new JmxModernSupport();
+        final JmxSupport jmxSupport;
+        // tertiary operand does not work anymore after hiererachy refactoring ?!
+        if (jmxModernAvailable)
+        {
+            jmxSupport = new JmxModernSupport();
+        }
+        else
+        {
+            jmxSupport = new JmxLegacySupport();
+        }
         if (logger.isDebugEnabled())
         {
-            logger.debug("JMX support class is " + jmxSupport.getClass().getName());
+            logger.debug("JMX support instance is " + jmxSupport);
         }
         return jmxSupport;
     }

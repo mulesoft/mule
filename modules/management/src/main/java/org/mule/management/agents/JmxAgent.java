@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.util.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.notifications.ModelNotification;
@@ -34,11 +35,13 @@ import org.mule.management.mbeans.StatisticsService;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxRegistrationContext;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -182,7 +185,15 @@ public class JmxAgent implements UMOAgent
             }
         };
 
-        try {
+        try
+        {
+            UMOManager manager = MuleManager.getInstance();
+            if (StringUtils.isBlank(manager.getId()))
+            {
+                // TODO i18n the message properly
+                throw new IllegalArgumentException(
+                        "Manager ID is mandatory when running with JmxAgent. Give your Mule configuration a valid ID.");
+            }
             MuleManager.getInstance().registerListener(l);
         } catch (NotificationException e) {
             throw new InitialisationException(e, this);

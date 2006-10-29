@@ -15,7 +15,7 @@ import javax.management.MalformedObjectNameException;
 /**
  * Support class for JMX 1.1 based systems.
  */
-public class JmxLegacySupport extends JmxModernSupport
+public class JmxLegacySupport extends AbstractJmxSupport
 {
 
     /**
