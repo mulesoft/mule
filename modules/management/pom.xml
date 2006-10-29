@@ -12,22 +12,6 @@
   <name>Management Extensions</name>
   <description>Management Extensions for Mule</description>
 
-  <build>
-      <plugins>
-          <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                  <excludes>
-                      <!-- TODO [andrew] Disable the failing test until the rest of the JMX changes
-                           are finalized and stable. To keep the build from being blocked.
-                      -->
-                      <exclude implementation="java.lang.String">**/Mx4jAgentTestCase.*</exclude>
-                  </excludes>
-              </configuration>
-          </plugin>
-      </plugins>
-  </build>
-
   <dependencies>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
