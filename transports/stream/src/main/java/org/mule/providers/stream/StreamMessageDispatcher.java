@@ -40,6 +40,18 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
         this.connector = (StreamConnector)endpoint.getConnector();
+
+        // apply connector-specific properties
+        if (connector instanceof SystemStreamConnector)
+        {
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
+
+            String outputMessage = (String)endpoint.getProperties().get("outputMessage");
+            if (outputMessage != null)
+            {
+                ssc.setOutputMessage(outputMessage);
+            }
+        }
     }
 
     /*
@@ -79,6 +91,15 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
             throw new DispatchException(new Message("stream", 1, streamName), event.getMessage(),
                 event.getEndpoint());
         }
+
+        if (connector instanceof SystemStreamConnector)
+	{
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
+  	    if (ssc.getOutputMessage() != null && ssc.getOutputMessage().equals("")) {
+               out.write(ssc.getOutputMessage().toString().getBytes());
+	    }
+	}
+
         Object data = event.getTransformedMessage();
         if (data instanceof byte[])
         {
