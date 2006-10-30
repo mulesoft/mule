@@ -43,6 +43,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
 
     public void testAgentsRegistrationOrder() throws Exception
     {
+        manager.setId("MuleAgentsTestCase.agentsRegistrationOrder");
         JmxAgent agentFirst = new JmxAgent();
         // If you specified "JmxAgent", it was the first one in the map,
         // but for "jmxAgent" the order was not preserved.
