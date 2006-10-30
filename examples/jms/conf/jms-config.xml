@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule-configuration id="jmsSamples" version="1.0">
+
+  <connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
+   <properties>
+    <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+    <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+   </properties>
+  </connector>
+
+  <global-endpoints>
+    <endpoint name="TestMessage1" address="quartz:/TestMessage1">
+      <properties>
+        <property name="repeatInterval" value="10000" />
+        <property name="repeatCount" value="4" />
+        <property name="startDelay" value="2000" />
+        <property name="payloadClassName" value="java.lang.String"/>
+        <property name="payload" value="This has messageType=MessageTypeA" />
+        <property name="messageType" value="MessageTypeA" />
+      </properties>
+    </endpoint>
+    <endpoint name="TestMessage2" address="quartz:/TestMessage2">
+      <properties>
+        <property name="repeatInterval" value="10000" />
+        <property name="repeatCount" value="4" />
+        <property name="startDelay" value="4000" />
+        <property name="payloadClassName" value="java.lang.String"/>
+        <property name="payload" value="This has messageType=MessageTypeB"/>
+        <property name="messageType" value="MessageTypeB" />
+      </properties>
+    </endpoint>
+    <endpoint name="Queue1In" address="jms://first.queue" connector="JMSConnector"/>
+    <endpoint name="Queue1Out" address="jms://first.queue" connector="JMSConnector"/>
+    <endpoint name="Queue2In" address="jms://second.queue" connector="JMSConnector"/>
+    <endpoint name="Queue2Out" address="jms://second.queue" connector="JMSConnector"/>
+  </global-endpoints>
+
+    <transformers>
+     <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
+     <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
+    </transformers>
+  
+    <model name="jmsSample">
+      <mule-descriptor name="filterRouting" implementation="org.mule.components.simple.PassThroughComponent">
+        <inbound-router>
+          <global-endpoint name="TestMessage1"/>
+          <global-endpoint name="TestMessage2"/>
+        </inbound-router>
+
+        <outbound-router>
+
+          <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+            <global-endpoint name="Queue1In" transformers="ObjectToJMSMessage"/>
+            <filter className="org.mule.routing.filters.MessagePropertyFilter" expression="messageType=MessageTypeA" /> 
+          </router>
+
+          <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+            <global-endpoint name="Queue2In" transformers="ObjectToJMSMessage"/>
+            <filter className="org.mule.routing.filters.MessagePropertyFilter" expression="messageType=MessageTypeB" /> 
+          </router>
+
+        </outbound-router>
+    </mule-descriptor>
+
+    <mule-descriptor name="outbound1" implementation="org.mule.components.simple.PassThroughComponent">
+        <inbound-router>
+          <global-endpoint name="Queue1Out"/>
+        </inbound-router>
+
+        <outbound-router>
+          <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+            <endpoint address="stream://System.out" transformers="JMSMessageToObject"/>
+          </router>
+        </outbound-router>
+
+    </mule-descriptor>
+
+    <mule-descriptor name="outbound2" implementation="org.mule.components.simple.PassThroughComponent">
+        <inbound-router>
+          <global-endpoint name="Queue2Out"/>
+        </inbound-router>
+
+        <outbound-router>
+          <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+            <endpoint address="file://./output" transformers="JMSMessageToObject"/>
+          </router>
+        </outbound-router>
+
+    </mule-descriptor>
+  </model>
+
+</mule-configuration>
