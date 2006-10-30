@@ -10,7 +10,7 @@
 
 package org.mule.test.config;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -203,6 +203,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             // register components
             m.getModel().registerComponent(d);
+            if (StringUtils.isBlank(m.getId()))
+            {
+                // if running with JMX agent, manager ID is mandatory
+                m.setId("" + System.currentTimeMillis());
+            }
             m.start();
         }
         catch (Exception e)
