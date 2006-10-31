@@ -75,6 +75,7 @@ public class MultiContainerContext implements UMOContainerContext
     {
         // first see if a particular container has been requested
         ContainerKeyPair realKey = null;
+        String cause = null;
         if (key instanceof String)
         {
             realKey = new ContainerKeyPair(null, key);
@@ -113,6 +114,9 @@ public class MultiContainerContext implements UMOContainerContext
                     logger.debug("Object: '" + realKey + "' not found in container: " + container.getName(),
                         e.getCause());
                 }
+                if (e.getCause() != null){
+                    cause = cause + " " + e.getCause().toString();
+                }
             }
             if (component != null)
             {
@@ -127,7 +131,7 @@ public class MultiContainerContext implements UMOContainerContext
         {
             if (realKey.isRequired())
             {
-                throw new ObjectNotFoundException(realKey.toString());
+                throw new ObjectNotFoundException(realKey.toString() + " " + cause);
             }
             else if (logger.isDebugEnabled())
             {
