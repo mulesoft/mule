@@ -15,10 +15,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
 {
 

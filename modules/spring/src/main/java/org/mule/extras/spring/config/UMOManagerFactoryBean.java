@@ -10,6 +10,10 @@
 
 package org.mule.extras.spring.config;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMOException;
@@ -25,23 +29,17 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * <code>UMOManagerFactoryBean</code> is a Spring FactoryBean used for creating a
  * MuleManager from a Spring context. The context must explicitly wire the beans
  * together. Users might want to try AutowireUMOManagerFactoryBean for a simpler and
  * cleaner spring configuration.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see AutowireUMOManagerFactoryBean
  */
 public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean
 {
-    UMOManager manager;
+    private final UMOManager manager;
 
     public UMOManagerFactoryBean() throws Exception
     {
@@ -65,21 +63,18 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
 
     public void setMessageEndpoints(Map endpoints) throws InitialisationException
     {
-        Map.Entry entry;
         for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry)iterator.next();
             manager.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
-
         }
     }
 
     public void setProperties(Map props)
     {
-        Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry)iterator.next();
             manager.setProperty(entry.getKey(), entry.getValue());
         }
     }
@@ -120,10 +115,9 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
 
     public void setInterceptorStacks(Map interceptors)
     {
-        Map.Entry entry;
         for (Iterator iterator = interceptors.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry)iterator.next();
             manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack)entry.getValue());
         }
     }
@@ -142,4 +136,5 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
     {
         manager.dispose();
     }
+
 }

@@ -10,18 +10,15 @@
 
 package org.mule.extras.spring.remoting;
 
+import java.io.ObjectOutputStream;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-import java.io.ObjectOutputStream;
-
 public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
     private static final long serialVersionUID = -7067819657247418549L;
 
     public ObjectToRemoteInvocationResultTransformer()
@@ -54,8 +51,7 @@ public class ObjectToRemoteInvocationResultTransformer extends AbstractTransform
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(rval);
             oos.close();
-            byte[] results = baos.toByteArray();
-            return results;
+            return baos.toByteArray();
         }
         catch (Exception e)
         {

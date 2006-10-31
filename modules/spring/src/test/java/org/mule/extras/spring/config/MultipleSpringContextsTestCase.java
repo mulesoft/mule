@@ -15,9 +15,6 @@ import org.mule.MuleManager;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOContainerContext;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class MultipleSpringContextsTestCase extends FunctionalTestCase
 {
 

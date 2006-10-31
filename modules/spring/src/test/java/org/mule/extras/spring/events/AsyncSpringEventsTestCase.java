@@ -10,10 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class AsyncSpringEventsTestCase extends SpringEventsTestCase
 {
 

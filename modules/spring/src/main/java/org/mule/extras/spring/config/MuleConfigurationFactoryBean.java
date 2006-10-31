@@ -24,8 +24,6 @@ import org.springframework.beans.factory.FactoryBean;
  * 
  * @deprecated use AutowireUMOManagerFactoryBean instead
  * @see AutowireUMOManagerFactoryBean
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleConfigurationFactoryBean implements FactoryBean

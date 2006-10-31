@@ -15,9 +15,6 @@ import org.springframework.context.ApplicationListener;
 /**
  * <code>MuleEventListener</code> is a interface that identifies an object as
  * wanting to receive Mule Events
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface MuleEventListener extends ApplicationListener

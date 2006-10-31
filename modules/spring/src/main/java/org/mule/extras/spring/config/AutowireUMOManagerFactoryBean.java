@@ -71,9 +71,6 @@ import java.util.Map;
  * muleInterceptorStacks A map of interceptor stacks, where the name of the stack is
  * the key and a list of interceptors is the value. Accessible using from your code
  * using AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AutowireUMOManagerFactoryBean
     implements FactoryBean, InitializingBean, DisposableBean, ApplicationContextAware

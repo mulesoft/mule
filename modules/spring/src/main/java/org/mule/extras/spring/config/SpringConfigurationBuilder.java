@@ -33,8 +33,6 @@ import org.mule.util.StringUtils;
  * run-time in to Spring Bean documents before the bean definitions are loaded. Make
  * sure that the DTD definitions for each of the document types are declared in the
  * documents.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {

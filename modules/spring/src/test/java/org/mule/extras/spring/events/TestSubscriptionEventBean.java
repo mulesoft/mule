@@ -12,9 +12,6 @@ package org.mule.extras.spring.events;
 
 /**
  * <code>TestSubscriptionEventBean</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class TestSubscriptionEventBean extends TestMuleEventBean implements MuleSubscriptionEventListener
@@ -30,4 +27,5 @@ public class TestSubscriptionEventBean extends TestMuleEventBean implements Mule
     {
         return subscriptions;
     }
+
 }

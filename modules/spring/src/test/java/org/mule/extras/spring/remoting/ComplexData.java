@@ -12,8 +12,12 @@ package org.mule.extras.spring.remoting;
 
 import java.io.Serializable;
 
+import org.mule.util.StringUtils;
+
 public class ComplexData implements Serializable
 {
+    private static final long serialVersionUID = -886414019167115007L;
+
     private String someString = "Default String";
     private Integer someInteger = new Integer(13);
 
@@ -33,16 +37,11 @@ public class ComplexData implements Serializable
     {
         try
         {
-            String foo = new String(someString);
-            if (someString == null)
-            {
-                foo = "NULL";
-            }
-            return "[ComplexData: [someString=" + foo + "][someInteger=" + someInteger + "]]";
+            String currentString = StringUtils.defaultIfEmpty(someString, "NULL");
+            return "[ComplexData: [someString=" + currentString + "][someInteger=" + someInteger + "]]";
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -67,5 +66,4 @@ public class ComplexData implements Serializable
         this.someString = someString;
     }
 
-    private static final long serialVersionUID = -886414019167115007L;
 }

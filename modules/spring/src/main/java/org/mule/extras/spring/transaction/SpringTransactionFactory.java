@@ -24,16 +24,12 @@ import org.springframework.jdbc.datasource.ConnectionHolder;
 
 /**
  * TODO: document this class
- * 
- * @version $Revision$
  */
 public class SpringTransactionFactory implements UMOTransactionFactory
 {
 
     /**
      * TODO: document this class
-     * 
-     * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
      */
     public class SpringTransaction extends AbstractSingleResourceTransaction
     {
@@ -122,7 +118,7 @@ public class SpringTransactionFactory implements UMOTransactionFactory
     /**
      * @return Returns the manager.
      */
-    public PlatformTransactionManager getManager()
+    synchronized public PlatformTransactionManager getManager()
     {
         return manager;
     }
@@ -130,7 +126,7 @@ public class SpringTransactionFactory implements UMOTransactionFactory
     /**
      * @param manager The manager to set.
      */
-    public void setManager(PlatformTransactionManager manager)
+    synchronized public void setManager(PlatformTransactionManager manager)
     {
         this.manager = manager;
     }

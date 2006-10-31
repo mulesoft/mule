@@ -15,12 +15,9 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOManager;
 import org.springframework.context.support.AbstractApplicationContext;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "mule-events-with-manager.xml";

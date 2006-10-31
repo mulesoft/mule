@@ -26,16 +26,14 @@ import org.springframework.core.io.AbstractResource;
  * class is called in to remedy this and should be used instead of, e.g.
  * {@link org.springframework.core.io.InputStreamResource}. <p/> The resource is
  * fully stored in memory.
- * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class CachedResource extends AbstractResource
 {
 
     private static final String DEFAULT_DESCRIPTION = "cached in-memory resource";
 
-    private byte[] buffer;
-    private String description;
+    private final byte[] buffer;
+    private final String description;
 
     public CachedResource(byte[] source)
     {

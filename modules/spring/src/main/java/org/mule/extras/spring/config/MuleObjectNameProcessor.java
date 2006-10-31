@@ -25,9 +25,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * <code>MuleObjectNameProcessor</code> is used to set spring ids to Mule object
  * names so the the bean id and name property on the object don't both have to be
  * set.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleObjectNameProcessor implements BeanPostProcessor
@@ -51,9 +48,8 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             }
             else if (o instanceof UMOEndpoint)
             {
-                // spring uses the class name of the object as the name if no
-                // other id is set
-                // this is no good for endpoints
+                // spring uses the class name of the object as the name if no other
+                // id is set; this is no good for endpoints
                 if ((((UMOEndpoint)o).getName() == null || overwrite)
                     && !MuleEndpoint.class.getName().equals(s))
                 {

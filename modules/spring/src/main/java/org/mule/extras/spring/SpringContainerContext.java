@@ -40,13 +40,11 @@ import org.mule.util.ClassUtils;
 /**
  * <code>SpringContainerContext</code> is a Spring Context that can expose
  * spring-managed components for use in the Mule framework.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpringContainerContext extends AbstractContainerContext implements BeanFactoryAware
 {
     public static final String SPRING_DOCTYPE_REF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n";
+
     /**
      * logger used by this class
      */

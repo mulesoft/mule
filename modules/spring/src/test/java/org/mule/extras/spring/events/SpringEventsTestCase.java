@@ -24,11 +24,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class SpringEventsTestCase extends AbstractMuleTestCase
 {
     private static final int NUMBER_OF_MESSAGES = 10;

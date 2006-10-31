@@ -17,10 +17,6 @@ import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.manager.UMOManager;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
 

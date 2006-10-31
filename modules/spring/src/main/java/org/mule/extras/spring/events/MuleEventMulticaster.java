@@ -10,6 +10,15 @@
 
 package org.mule.extras.spring.events;
 
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -57,14 +66,6 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
  * ApplicationeventMulticaster. This implementation allows Mule event to be sent and
@@ -108,8 +109,6 @@ import java.util.Set;
  * <p/>
  * </code>
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see MuleEventListener
  * @see MuleSubscriptionEventListener
  * @see ApplicationEventMulticaster
@@ -118,6 +117,7 @@ import java.util.Set;
 public class MuleEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware
 {
     public static final String EVENT_MULTICASTER_DESCRIPTOR_NAME = "muleEventMulticasterDescriptor";
+
     /**
      * logger used by this class
      */
@@ -126,7 +126,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * The set of listeners for this Multicaster
      */
-    protected Set listeners = new HashSet();
+    protected final Set listeners = Collections.synchronizedSet(new HashSet());
 
     /**
      * Determines whether events will be processed asynchronously
@@ -148,6 +148,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * MuleDescriptor for itself at runtime
      */
     protected String[] subscriptions = null;
+
     /**
      * The Spring acpplication context
      */
@@ -171,15 +172,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * Used to store parsed endpoints
      */
-    // protected Map endpointsCache = new HashMap();
     protected ExceptionListener exceptionListener = new LoggingExceptionListener();
 
     /**
-     * Adds a listener to the the Multicaster. If asynchronous is sset to true, an
+     * Adds a listener to the the Multicaster. If asynchronous is set to true, an
      * <code>AsynchronousMessageListener</code> is used to wrap the listener. This
      * listener will be initialised with a threadpool. The configuration for the
      * threadpool can be set on this multicaster of can be inherited from the
-     * MuleManager configuration, which good for most cases.
+     * MuleManager configuration, which is good for most cases.
      * 
      * @param listener the ApplicationListener to register with this Multicaster
      * @see AsynchronousEventListener

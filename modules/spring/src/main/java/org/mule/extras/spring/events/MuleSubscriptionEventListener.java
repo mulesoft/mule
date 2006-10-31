@@ -19,9 +19,6 @@ package org.mule.extras.spring.events;
  * can use more friendly names such as new String[]{ "testData", "OrdersJms",
  * "eventsHttp"}; By specifying '*' as the subscription, all events will be received
  * by this listener.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface MuleSubscriptionEventListener extends MuleEventListener

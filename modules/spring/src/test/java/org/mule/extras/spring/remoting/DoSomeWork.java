@@ -22,14 +22,11 @@ public class DoSomeWork implements WorkInterface
 
     public String executeString(String input)
     {
-        String rval = "You said " + input;
-        System.err.println("\n\n" + rval + "\n");
-        return rval;
+        return "You said " + input;
     }
 
     public ComplexData executeComplexity(ComplexData input)
     {
-        System.err.println("DoSomeWork.executeComplexity(" + input + ")");
         input.setSomeString(input.getSomeString() + " Received");
         input.setSomeInteger(new Integer(input.getSomeInteger().intValue() + 1));
         return input;

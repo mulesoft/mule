@@ -23,11 +23,10 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
  * MuleBeanDefinitionReader.
  * 
  * @see MuleBeanDefinitionReader
- * @version $Revision$
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
-    private String[] configLocations;
+    private final String[] configLocations;
 
     public MuleApplicationContext(String configLocation)
     {

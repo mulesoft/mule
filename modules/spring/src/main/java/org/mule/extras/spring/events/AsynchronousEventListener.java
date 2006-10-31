@@ -10,21 +10,18 @@
 
 package org.mule.extras.spring.events;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+
 /**
  * <code>AsynchronousEventListener</code> will spawn a thread for each Event
  * received. The thread pool passed in the constructor will determine hown many
  * threads can be executed at any time.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class AsynchronousEventListener implements MuleEventListener
@@ -37,12 +34,12 @@ public class AsynchronousEventListener implements MuleEventListener
     /**
      * The listener to delegate to
      */
-    private ApplicationListener listener;
+    private final ApplicationListener listener;
 
     /**
      * the pool that manages the threads of execution
      */
-    private ExecutorService threadPool;
+    private final ExecutorService threadPool;
 
     public AsynchronousEventListener(ExecutorService threadPool, ApplicationListener listener)
     {

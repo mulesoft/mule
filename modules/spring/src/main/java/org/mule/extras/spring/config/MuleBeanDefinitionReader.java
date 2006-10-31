@@ -40,8 +40,6 @@ import org.xml.sax.EntityResolver;
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that will
  * apply a transformation to Mule Xml configuration files before loading bean
  * definitions allowing Mule Xml config to be parsed as Spring configuration.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
 public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 {
