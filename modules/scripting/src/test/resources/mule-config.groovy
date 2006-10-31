@@ -32,6 +32,9 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 
+// need this when running with JMX
+manager.setId("GroovyScriptTestCase");
+
 //set global properties
 manager.setProperty("doCompression", "true");
 //disable the admin agent
