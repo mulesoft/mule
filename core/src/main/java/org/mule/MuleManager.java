@@ -81,6 +81,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.UUID;
 import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
@@ -137,7 +138,7 @@ public class MuleManager implements UMOManager
     /**
      * the unique id for this manager
      */
-    private String id = null;
+    private String id = UUID.getUUID();
 
     /**
      * The transaction Manager to use for global transactions
@@ -268,7 +269,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Getter method for the current singleton MuleManager
-     * 
+     *
      * @return the current singleton MuleManager
      */
     public static synchronized UMOManager getInstance()
@@ -302,7 +303,7 @@ public class MuleManager implements UMOManager
      * </code>
      * because getInstance never returns a null. If an istance is not available one
      * is created. This method queries the instance directly.
-     * 
+     *
      * @return true if the manager is instanciated
      */
     public static synchronized boolean isInstanciated()
@@ -312,7 +313,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets the current singleton MuleManager
-     * 
+     *
      * @deprecated this will go away soon.
      */
     public static synchronized void setInstance(UMOManager manager)
@@ -326,7 +327,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Gets all statisitcs for this instance
-     * 
+     *
      * @return all statisitcs for this instance
      */
     public AllStatistics getStatistics()
@@ -336,7 +337,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets statistics on this instance
-     * 
+     *
      * @param stat
      */
     public void setStatistics(AllStatistics stat)
@@ -355,7 +356,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets the configuration for the <code>MuleManager</code>.
-     * 
+     *
      * @param config the configuration object
      * @throws IllegalAccessError if the <code>MuleManager</code> has already been
      *             initialised.
@@ -833,7 +834,7 @@ public class MuleManager implements UMOManager
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
      * sessions.
-     * 
+     *
      * @throws UMOException if the the connectors or components fail to start
      */
     public synchronized void start() throws UMOException
@@ -875,7 +876,7 @@ public class MuleManager implements UMOManager
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
      * sessions.
-     * 
+     *
      * @param serverUrl the server Url for this instance
      * @throws UMOException if the the connectors or components fail to start
      */
@@ -888,7 +889,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Starts the connectors
-     * 
+     *
      * @throws MuleException if the connectors fail to start
      */
     private void startConnectors() throws UMOException
@@ -913,7 +914,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Stops the <code>MuleManager</code> which stops all sessions and connectors
-     * 
+     *
      * @throws UMOException if either any of the sessions or connectors fail to stop
      */
     public synchronized void stop() throws UMOException
@@ -942,7 +943,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Stops the connectors
-     * 
+     *
      * @throws MuleException if any of the connectors fail to stop
      */
     private void stopConnectors() throws UMOException
@@ -959,7 +960,7 @@ public class MuleManager implements UMOManager
     /**
      * If the <code>MuleManager</code> was started from the <code>MuleServer</code>
      * daemon then this will be called by the Server
-     * 
+     *
      * @param server a reference to the <code>MuleServer</code>.
      */
     void setServer(MuleServer server)
@@ -970,7 +971,7 @@ public class MuleManager implements UMOManager
     /**
      * Shuts down the whole server tring to shut down all resources cleanly on the
      * way
-     * 
+     *
      * @param e an exception that caused the <code>shutdown()</code> method to be
      *            called. If e is null the shutdown message will just display a time
      *            when the server was shutdown. Otherwise the exception information
@@ -1079,7 +1080,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Determines if the server is currently initialising
-     * 
+     *
      * @return true if if the server is currently initialising, false otherwise
      */
     public boolean isInitialising()
@@ -1107,7 +1108,7 @@ public class MuleManager implements UMOManager
      * Returns a formatted string that is a summary of the configuration of the
      * server. This is the brock of information that gets displayed when the server
      * starts
-     * 
+     *
      * @return a string summary of the server information
      */
     protected String getStartSplash()
@@ -1231,7 +1232,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Initialises all registered agents
-     * 
+     *
      * @throws InitialisationException
      */
     protected void initialiseAgents() throws InitialisationException
@@ -1298,7 +1299,7 @@ public class MuleManager implements UMOManager
     /**
      * associates a Dependency Injector container or Jndi container with Mule. This
      * can be used to integrate container managed resources with Mule resources
-     * 
+     *
      * @param container a Container context to use. By default, there is a default
      *            Mule container <code>MuleContainerContext</code> that will assume
      *            that the reference key for an oblect is a classname and will try to
@@ -1324,7 +1325,7 @@ public class MuleManager implements UMOManager
     /**
      * associates a Dependency Injector container with Mule. This can be used to
      * integrate container managed resources with Mule resources
-     * 
+     *
      * @return the container associated with the Manager
      */
     public UMOContainerContext getContainerContext()
@@ -1365,7 +1366,7 @@ public class MuleManager implements UMOManager
      * Fires a mule 'system' event. These are notifications that are fired because
      * something within the Mule instance happened such as the Model started or the
      * server is being disposed.
-     * 
+     *
      * @param e the event that occurred
      */
     protected void fireSystemEvent(UMOServerNotification e)
@@ -1384,7 +1385,7 @@ public class MuleManager implements UMOManager
      * Fires a server notification to all registered
      * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
      * notificationManager.
-     * 
+     *
      * @param notification the notification to fire. This must be of type
      *            {@link org.mule.impl.internal.notifications.CustomNotification}
      *            otherwise an exception will be thrown.
@@ -1410,10 +1411,7 @@ public class MuleManager implements UMOManager
 
     public void setId(String id)
     {
-        if (this.id == null)
-        {
-            this.id = id;
-        }
+        this.id = id;
     }
 
     public String getId()
@@ -1424,7 +1422,7 @@ public class MuleManager implements UMOManager
     /**
      * Sets the security manager used by this Mule instance to authenticate and
      * authorise incoming and outgoing event traffic and service invocations
-     * 
+     *
      * @param securityManager the security manager used by this Mule instance to
      *            authenticate and authorise incoming and outgoing event traffic and
      *            service invocations
@@ -1441,7 +1439,7 @@ public class MuleManager implements UMOManager
     /**
      * Gets the security manager used by this Mule instance to authenticate and
      * authorise incoming and outgoing event traffic and service invocations
-     * 
+     *
      * @return he security manager used by this Mule instance to authenticate and
      *         authorise incoming and outgoing event traffic and service invocations
      */
@@ -1459,7 +1457,7 @@ public class MuleManager implements UMOManager
      * called a default <code>MuleWorkManager</code> will be created using the
      * <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
      * object.
-     * 
+     *
      * @return a workManager instance used by the current MuleManager
      * @see org.mule.config.ThreadingProfile
      * @see MuleConfiguration
@@ -1478,7 +1476,7 @@ public class MuleManager implements UMOManager
      * called a default <code>MuleWorkManager</code> will be created using the
      * <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
      * object.
-     * 
+     *
      * @param workManager the workManager instance used by the current MuleManager
      * @throws IllegalStateException if the workManager has already been set.
      * @see org.mule.config.ThreadingProfile
@@ -1522,7 +1520,7 @@ public class MuleManager implements UMOManager
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.lang.Runnable#run()
          */
         public void run()
