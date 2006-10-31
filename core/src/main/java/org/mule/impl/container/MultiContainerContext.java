@@ -26,7 +26,7 @@ import java.util.TreeMap;
 /**
  * <code>MultiContainerContext</code> is a container that hosts other containers
  * from which components are queried.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -112,9 +112,6 @@ public class MultiContainerContext implements UMOContainerContext
                 {
                     logger.debug("Object: '" + realKey + "' not found in container: " + container.getName(),
                         e.getCause());
-                }
-                if (e.getCause() != null){
-                    throw new ObjectNotFoundException(e.getCause().toString());
                 }
             }
             if (component != null)
