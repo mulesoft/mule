@@ -180,6 +180,11 @@ public class AutowireUMOManagerFactoryBean
         }
     }
 
+    public void setManagerId(String managerId)
+    {
+        manager.setId(managerId);
+    }
+
     protected void createModel() throws UMOException
     {
         // set the model

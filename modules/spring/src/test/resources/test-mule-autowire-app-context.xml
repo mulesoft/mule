@@ -2,7 +2,9 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean">
+        <property name="managerId" value="SpringAutowireTestCase"/>
+    </bean>
 
     <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
 
