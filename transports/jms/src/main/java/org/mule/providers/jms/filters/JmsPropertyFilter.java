@@ -40,7 +40,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Expression value to match on
      */
-    private Object expression = null;
+    private String expression = null;
 
     /**
      * Optional regular expression pattern to search on
@@ -54,7 +54,7 @@ public class JmsPropertyFilter implements UMOFilter
             return false;
         }
     	
-        if (expression == null && pattern == null) {
+        if (StringUtils.isBlank(expression) && pattern == null) {
             logger.warn("Either no expression or pattern was specified");
             return false;
         }
@@ -75,7 +75,7 @@ public class JmsPropertyFilter implements UMOFilter
 		    } 
 		    else 
 		    {
-			return value.equals(expression.toString());
+			return value.equals(expression);
 		    }
 		}
 		else if (propertyClass.equals("java.lang.String"))
@@ -89,10 +89,22 @@ public class JmsPropertyFilter implements UMOFilter
 		    } 
 		    else 
 		    {
-			return value.equals(expression.toString());
+			return value.equals(expression);
 		    }
+		} else if (propertyClass.equals("java.lang.Integer")) {
+		    int value = m.getIntProperty(propertyName);
+		    int match = Integer.parseInt(expression);
+		    return (value == match);
+		} else if (propertyClass.equals("java.lang.Short")) {
+		    short value = m.getShortProperty(propertyName);
+		    short match = Short.parseShort(expression);
+		    return (value == match);
 		}
-	    } 
+	    } catch (NumberFormatException nfe) {
+	        logger.warn("Unable to convert expression " +
+		    expression + " to " + propertyClass + ": " + 
+	            nfe.toString());
+	    }
 	    catch (Exception e) 
 	    {
 		logger.warn("Error filtering on property " + propertyName
@@ -108,7 +120,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Sets the match expression
      */
-    public void setExpression(Object expression) 
+    public void setExpression(String expression) 
     {
         this.expression = expression;
     }
@@ -116,7 +128,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Returns the match expression
      */
-    public Object getExpression() 
+    public String getExpression() 
     {
         return expression;
     }
