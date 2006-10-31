@@ -76,11 +76,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertTrue("Should have contained a new domain.", domains.contains(testDomain + ".2"));
     }
 
-    //public void testClashingDomainsNoDuplicates() throws Exception
-    //{
-    //
-    //}
-
     public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
     {
         UMOManager manager = getManager(true);
