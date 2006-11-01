@@ -12,8 +12,6 @@ package org.mule.extras.spring.events;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +63,9 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -126,12 +127,17 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * The set of listeners for this Multicaster
      */
-    protected final Set listeners = Collections.synchronizedSet(new HashSet());
+    protected final Set listeners = new CopyOnWriteArraySet();
 
     /**
      * Determines whether events will be processed asynchronously
      */
     protected boolean asynchronous = false;
+
+    /**
+     * An ExecutorService for handling asynchronous events
+     */
+    protected ExecutorService asyncPool = null;
 
     /**
      * Any logical endpointUri mappings to register with mule. These allow for
@@ -187,17 +193,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     public void addApplicationListener(ApplicationListener listener)
     {
+        Object listenerToAdd = listener;
+
         if (asynchronous)
         {
-            AsynchronousEventListener aListener = new AsynchronousEventListener(
-                MuleManager.getConfiguration().getDefaultThreadingProfile().createPool("spring-events"),
-                listener);
-            listeners.add(aListener);
+            listenerToAdd = new AsynchronousEventListener(asyncPool, listener);
         }
-        else
-        {
-            listeners.add(listener);
-        }
+
+        listeners.add(listenerToAdd);
     }
 
     /**
@@ -299,10 +302,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             }
         }
 
-        ApplicationListener listener;
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
-            listener = (ApplicationListener)iterator.next();
+            ApplicationListener listener = (ApplicationListener)iterator.next();
             if (muleEvent != null)
             {
                 // As the asynchronous listener wraps the real listener we need to
@@ -353,7 +355,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             }
             else
             {
-                // Finally only propogate the Application event if the
+                // Finally only propagate the Application event if the
                 // ApplicationEvent interface is explicitly implemented
                 for (int i = 0; i < listener.getClass().getInterfaces().length; i++)
                 {
@@ -426,6 +428,22 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     public void setAsynchronous(boolean asynchronous)
     {
         this.asynchronous = asynchronous;
+        if (asynchronous)
+        {
+            if (asyncPool == null)
+            {
+                asyncPool = MuleManager.getConfiguration().getDefaultThreadingProfile().createPool(
+                    "spring-events");
+            }
+        }
+        else
+        {
+            if (asyncPool != null)
+            {
+                asyncPool.shutdown();
+                asyncPool = null;
+            }
+        }
     }
 
     /**
