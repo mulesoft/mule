@@ -73,7 +73,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "file://" + tempDir;
+        return "file://" + MuleManager.getConfiguration().getWorkingDirectory();
     }
 
     /*
