@@ -103,7 +103,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!--
         <repository>
             <id>sateh.com</id>
             <name>Mirror of http://repo1.maven.org/maven2/</name>
@@ -115,7 +114,7 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-        -->
+        <!--
         <repository>
             <id>sunsite.dk</id>
             <name>Mirror of http://repo1.maven.org/maven2/</name>
@@ -127,6 +126,7 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        -->
         <!--
             I don't think we need to keep this active: java.net is mirrored to
             ibiblio and sateh. It also makes downloads *horribly* slow even with a proxy,
