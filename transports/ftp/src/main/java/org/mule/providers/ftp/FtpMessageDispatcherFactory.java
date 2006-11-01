@@ -15,10 +15,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class FtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
 

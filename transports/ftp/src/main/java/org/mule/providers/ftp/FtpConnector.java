@@ -10,6 +10,11 @@
 
 package org.mule.providers.ftp;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -29,18 +34,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class FtpConnector extends AbstractServiceEnabledConnector
 {
-
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";

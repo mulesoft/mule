@@ -10,6 +10,12 @@
 
 package org.mule.providers.ftp;
 
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
@@ -26,21 +32,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class FtpMessageDispatcher extends AbstractMessageDispatcher
 {
-
-    protected FtpConnector connector;
+    protected final FtpConnector connector;
 
     public FtpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -57,34 +51,27 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
     {
         FTPClient client = null;
         UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
+
         try
         {
-
-            byte[] buf;
             Object data = event.getTransformedMessage();
+            byte[] dataBytes;
+
             if (data instanceof byte[])
             {
-                buf = (byte[])data;
+                dataBytes = (byte[])data;
             }
             else
             {
-                buf = data.toString().getBytes();
+                dataBytes = data.toString().getBytes();
             }
 
             FtpOutputStreamWrapper out = (FtpOutputStreamWrapper)getOutputStream(event.getEndpoint(),
                 event.getMessage());
             client = out.getFtpClient();
-            // we shouldn't need to do this as the call to getOutputStream will set
-            // the client up
-            // connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
-            // connector.setupFileType(client, endpoint.getProperties());
-            // if (!client.changeWorkingDirectory(uri.getPath())) {
-            // throw new IOException("Ftp error: " + client.getReplyCode());
-            // }
-            IOUtils.write(buf, out);
+            IOUtils.write(dataBytes, out);
             // This will ensure that the completePendingRequest is called
             out.close();
-
         }
         finally
         {
@@ -253,9 +240,8 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     class FtpOutputStreamWrapper extends OutputStream
     {
-
-        private FTPClient client;
-        private OutputStream out;
+        private final FTPClient client;
+        private final OutputStream out;
 
         public FtpOutputStreamWrapper(FTPClient client, OutputStream out)
         {
@@ -287,18 +273,20 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
+                // close output stream
+                out.close();
+
                 if (!client.completePendingCommand())
                 {
                     client.logout();
                     client.disconnect();
-                    client = null;
                     throw new IOException("FTP Stream failed to complete pending request");
                 }
-                super.close();
             }
             finally
             {
                 out.close();
+                super.close();
             }
         }
 

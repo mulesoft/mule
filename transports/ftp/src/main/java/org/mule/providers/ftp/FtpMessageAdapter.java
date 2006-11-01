@@ -14,10 +14,6 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class FtpMessageAdapter extends AbstractMessageAdapter
 {
     /**
@@ -25,7 +21,7 @@ public class FtpMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 7268290145485349941L;
 
-    private byte[] message;
+    private final byte[] message;
 
     public FtpMessageAdapter(Object message) throws MessagingException
     {
