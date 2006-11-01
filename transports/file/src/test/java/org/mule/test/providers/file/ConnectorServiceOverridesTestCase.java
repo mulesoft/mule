@@ -22,12 +22,9 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "test-connector-config.xml";

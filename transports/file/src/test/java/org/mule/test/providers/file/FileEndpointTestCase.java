@@ -14,14 +14,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
-
 public class FileEndpointTestCase extends AbstractMuleTestCase
 {
+
     public void testFileUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("file:///C:/temp?endpointName=fileEndpoint");

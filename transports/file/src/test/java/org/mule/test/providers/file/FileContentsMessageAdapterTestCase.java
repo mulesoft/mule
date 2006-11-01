@@ -10,6 +10,9 @@
 
 package org.mule.test.providers.file;
 
+import java.io.File;
+import java.util.Arrays;
+
 import org.apache.commons.io.FileUtils;
 import org.mule.MuleManager;
 import org.mule.providers.file.FileContentsMessageAdapter;
@@ -17,13 +20,6 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.io.File;
-import java.util.Arrays;
-
-/**
- * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision$
- */
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private String validMessageContent = "Yabbadabbadooo!";

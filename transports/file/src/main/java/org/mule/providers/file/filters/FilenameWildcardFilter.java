@@ -21,10 +21,7 @@ import java.io.FilenameFilter;
 
 /**
  * <code>FilenameWildcardFilter</code> Filters the incoming files from the read
- * From directory, based on file patterns
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * From directory, based on file patterns.
  */
 public class FilenameWildcardFilter extends WildcardFilter implements FilenameFilter
 {

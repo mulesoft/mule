@@ -10,7 +10,8 @@
 
 package org.mule.test.providers.file;
 
-import com.mockobjects.dynamic.Mock;
+import java.io.File;
+import java.util.Properties;
 
 import org.mule.MuleManager;
 import org.mule.impl.ImmutableMuleEndpoint;
@@ -24,33 +25,37 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.FileUtils;
 
-import java.io.File;
-import java.util.Properties;
+import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
     static final long POLLING_FREQUENCY = 1234;
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;
 
     private File validMessage;
+    private File tempDir;
 
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
-        if (!dir.exists())
+        tempDir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
+        if (!tempDir.exists())
         {
-            dir.mkdirs();
+            tempDir.mkdirs();
         }
-        validMessage = File.createTempFile("simple", ".mule", dir);
+        validMessage = File.createTempFile("simple", ".mule", tempDir);
         assertNotNull(validMessage);
+    }
+
+    protected void doTearDown() throws Exception
+    {
+        // TestConnector dispatches events via the test: protocol to test://test
+        // endpoints, which seems to end up in a directory called "test" :(
+        assertTrue(FileUtils.deleteTree(new File(getTestConnector().getProtocol())));
+        super.doTearDown();
     }
 
     /*
@@ -68,7 +73,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "file://" + MuleManager.getConfiguration().getWorkingDirectory();
+        return "file://" + tempDir;
     }
 
     /*

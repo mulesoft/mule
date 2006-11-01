@@ -10,18 +10,14 @@
 
 package org.mule.test.providers.file;
 
+import java.io.File;
+
 import org.mule.MuleManager;
 import org.mule.providers.file.FileMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.io.File;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private File message;

@@ -17,9 +17,6 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>FileToString</code> reads file contents into a string.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class FileToString extends FileToByteArray
 {

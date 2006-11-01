@@ -26,9 +26,6 @@ import java.io.File;
  * can obtain the contents of the message through the payload property and can get
  * the filename and directory in the properties using PROPERTY_FILENAME and
  * PROPERTY_DIRECTORY.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class FileMessageAdapter extends AbstractMessageAdapter
 {

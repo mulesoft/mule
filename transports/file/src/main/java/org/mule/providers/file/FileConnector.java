@@ -36,9 +36,6 @@ import java.util.Properties;
  * <code>FileConnector</code> is used for setting up listeners on a directory and
  * for writing files to a directory. The connecotry provides support for defining
  * file output patterns and filters for receiving files.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class FileConnector extends AbstractServiceEnabledConnector
@@ -48,8 +45,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
      */
     private static transient Log logger = LogFactory.getLog(FileConnector.class);
 
-    // These are properties that can be overridden on the Receiver by the
-    // endpoint
+    // These are properties that can be overridden on the Receiver by the endpoint
     // declaration
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILE_AGE = "fileAge";
@@ -216,7 +212,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
      */
     public String getProtocol()
     {
-        return "FILE";
+        return "file";
     }
 
     public FilenameParser getFilenameParser()

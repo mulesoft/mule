@@ -10,12 +10,12 @@
 
 package org.mule.providers.file;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
-
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.DateUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.UUID;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 /**
  * <code>SimpleFilenameParser</code> understands a limited set of tokens, namely
@@ -47,7 +47,7 @@ public class SimpleFilenameParser implements FilenameParser
     {
         if (pattern == null)
         {
-            return System.currentTimeMillis() + ".dat";
+            return UUID.getUUID() + ".dat";
         }
         else
         {

@@ -35,14 +35,10 @@ import org.mule.util.MapUtils;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
- * and
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class FileMessageDispatcher extends AbstractMessageDispatcher
 {
-    private FileConnector connector;
+    private final FileConnector connector;
 
     public FileMessageDispatcher(UMOImmutableEndpoint endpoint)
     {

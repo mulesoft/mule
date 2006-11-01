@@ -18,9 +18,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 /**
  * <code>FileMessageDispatcherFactory</code> creaes a dispatcher responsible for
  * writing files to disk
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class FileMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

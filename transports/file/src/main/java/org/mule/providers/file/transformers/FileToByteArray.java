@@ -10,21 +10,18 @@
 
 package org.mule.providers.file.transformers;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 /**
- * <code>FileToByteArray</code> reads the contents of a file as a byte array
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>FileToByteArray</code> reads the contents of a file as a byte array.
  */
 public class FileToByteArray extends AbstractTransformer
 {

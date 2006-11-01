@@ -36,23 +36,15 @@ import org.mule.util.FileUtils;
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files from a
  * directory.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class FileMessageReceiver extends PollingMessageReceiver
 {
     private String readDir = null;
-
     private String moveDir = null;
-
     private File readDirectory = null;
-
     private File moveDirectory = null;
-
     private String moveToPattern = null;
-
     private FilenameFilter filenameFilter = null;
 
     public FileMessageReceiver(UMOConnector connector,

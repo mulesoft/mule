@@ -10,7 +10,7 @@
 
 package org.mule.test.providers.file;
 
-import com.mockobjects.dynamic.Mock;
+import java.io.File;
 
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.file.FileMessageReceiver;
@@ -20,15 +20,10 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.io.File;
+import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
     File read = new File("testcasedata/read");
     File move = new File("testcasedata/move");
     Mock session = MuleTestUtils.getMockSession();
@@ -36,8 +31,8 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public void testReceiver() throws Exception
     {
         // FIX A bit hard testing receive from a unit simple as we need to reg
-        // listener etc
-        // file endpoint functiona tests for this
+        // listener etc.
+        // file endpoint functions tests for this
     }
 
     /*

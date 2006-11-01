@@ -10,19 +10,16 @@
 
 package org.mule.providers.file;
 
-import org.mule.impl.endpoint.AbstractEndpointBuilder;
-import org.mule.umo.endpoint.MalformedEndpointException;
-
 import java.net.URI;
 import java.util.Properties;
+
+import org.mule.impl.endpoint.AbstractEndpointBuilder;
+import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * <code>FileEndpointBuilder</code> File uris need some special processing because
  * the uri path can be any length, and the default resolver relies on a particular
- * path format
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * path format.
  */
 
 public class FileEndpointBuilder extends AbstractEndpointBuilder
@@ -34,6 +31,7 @@ public class FileEndpointBuilder extends AbstractEndpointBuilder
         {
             address = address.substring(2);
         }
+
         int i = address.indexOf("?");
         if (i > -1)
         {
