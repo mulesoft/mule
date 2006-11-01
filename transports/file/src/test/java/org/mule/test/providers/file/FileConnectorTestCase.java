@@ -35,13 +35,12 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;
 
     private File validMessage;
-    private File tempDir;
 
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        tempDir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
+        File tempDir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
