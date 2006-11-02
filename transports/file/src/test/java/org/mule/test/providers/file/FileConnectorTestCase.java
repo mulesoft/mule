@@ -53,7 +53,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         // TestConnector dispatches events via the test: protocol to test://test
         // endpoints, which seems to end up in a directory called "test" :(
-        assertTrue(FileUtils.deleteTree(new File(getTestConnector().getProtocol())));
+        FileUtils.deleteTree(new File(getTestConnector().getProtocol()));
         super.doTearDown();
     }
 
