@@ -28,6 +28,7 @@ import org.codehaus.xfire.soap.SoapConstants;
 import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
+import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.util.STAXUtils;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
@@ -75,7 +76,7 @@ public class MuleUniversalChannel extends AbstractChannel
      */
     protected transient final MuleClient client;
 
-    public MuleUniversalChannel(String uri, MuleUniversalTransport transport)
+    public MuleUniversalChannel(String uri, Transport transport)
     {
         setTransport(transport);
         setUri(uri);

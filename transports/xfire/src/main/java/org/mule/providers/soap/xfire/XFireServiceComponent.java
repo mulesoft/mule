@@ -42,11 +42,14 @@ import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.StringUtils;
+import org.mule.providers.soap.SoapConstants;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.Enumeration;
 
 /**
  * The Xfire service component receives requests for Xfire services it manages and
@@ -64,6 +67,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
     // manager to the component
     protected Transport transport;
+    protected String transportClass;
 
     public void setDescriptor(UMODescriptor descriptor)
     {
@@ -78,10 +82,39 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X,
                 "local channel work manager", e));
         }
-        transport = new MuleLocalTransport(wm);
+        if(transportClass == null)
+        {
+            transport = new MuleLocalTransport(wm);
+        }
+        else
+        {
+            try {
+                Class transportClazz = Class.forName(transportClass);
+                try{
+                    Constructor constructor = transportClazz.getConstructor(new Class[]{UMOWorkManager.class});
+                    transport = (Transport)constructor.newInstance(new Object[]{wm});
+                }
+                catch(NoSuchMethodException ne)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(ne.getCause());
+                    }
+                }
+            if(transport == null)
+            {
+                Constructor constructor = transportClazz.getConstructor(null);
+                transport = (Transport)constructor.newInstance(null);
+            }
+        }
+        catch(Exception e)
+        {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_LOAD_X, "xfire service transport", e));
+        }
+    }
         getTransportManager().register(transport);
     }
-
+   
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         if(logger.isDebugEnabled())
@@ -89,9 +122,27 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
             logger.debug(eventContext);
         }
 
+        boolean wsdlRequested = false;
+        
+        //if http request
         String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
             StringUtils.EMPTY);
         if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY))
+        {
+            wsdlRequested = true;
+        }
+        else //if servlet request
+        {
+            Enumeration keys = eventContext.getEndpointURI().getParams().keys();
+            while(keys.hasMoreElements()){
+                if ((keys.nextElement()).toString().equalsIgnoreCase(SoapConstants.WSDL_PROPERTY)) {
+                    wsdlRequested = true;
+                    break;
+                }
+            }
+        }
+        
+        if (wsdlRequested)
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             getXfire().generateWSDL(getServiceName(eventContext), out);
@@ -239,6 +290,11 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     public void setTransport(Transport transport)
     {
         this.transport = transport;
+    }
+    
+    public void setTransportClass(String clazz)
+    {
+        transportClass = clazz;
     }
 
     public ServiceRegistry getServiceRegistry()

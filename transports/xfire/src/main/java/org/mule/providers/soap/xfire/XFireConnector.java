@@ -10,10 +10,13 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.util.List;
+
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
 import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
@@ -48,6 +51,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
     public static final String XFIRE_PROPERTY = "xfire";
+    public static final String XFIRE_TRANSPORT = "transportClass";
+
 
     private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
 
@@ -58,6 +63,13 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     private ServiceFactory serviceFactory;
 
     private boolean enableJSR181Annotations = false;
+
+    private List clientServices = null;
+    private List clientInHandlers = null;
+    private List clientOutHandlers = null;
+    private String clientTransport = null;
+
+    private String serviceTransport = null;
 
     public XFireConnector()
     {
@@ -94,6 +106,24 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         if (xfire == null)
         {
             xfire = new DefaultXFire();
+        }
+        
+        if(clientServices != null)
+        {
+            ObjectServiceFactory factory = new ObjectServiceFactory();
+            for(int i = 0; i < clientServices.size(); i++)
+            {
+                try
+                {
+                    Class clazz = Class.forName(clientServices.get(i).toString());
+                    Service service = factory.create(clazz);
+                    xfire.getServiceRegistry().register(service);
+                }
+                catch(ClassNotFoundException e)
+                {
+                    throw new InitialisationException(new Message("xfire", 10, clientServices.get(i)), e, this);
+                }
+            }
         }
 
         if (serviceFactory == null)
@@ -154,7 +184,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             // developers to override the default configuration, say to increase
             // the threadpool
             xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
-                XFIRE_SERVICE_COMPONENT_NAME);
+                XFIRE_SERVICE_COMPONENT_NAME + getName());
             if (xfireDescriptor == null)
             {
                 xfireDescriptor = createxfireDescriptor();
@@ -171,6 +201,9 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             if (xfireDescriptor.getProperties().get(XFIRE_PROPERTY) == null)
             {
                 xfireDescriptor.getProperties().put(XFIRE_PROPERTY, xfire);
+            }
+            if (serviceTransport != null && xfireDescriptor.getProperties().get(XFIRE_TRANSPORT) == null) {
+                xfireDescriptor.getProperties().put(XFIRE_TRANSPORT, serviceTransport);
             }
             xfireDescriptor.setContainerManaged(false);
         }
@@ -236,10 +269,10 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     protected MuleDescriptor createxfireDescriptor()
     {
         MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
-            XFIRE_SERVICE_COMPONENT_NAME);
+            XFIRE_SERVICE_COMPONENT_NAME + getName());
         if (xfireDescriptor == null)
         {
-            xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME);
+            xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
             xfireDescriptor.setImplementation(XFireServiceComponent.class.getName());
         }
         return xfireDescriptor;
@@ -285,6 +318,56 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         this.enableJSR181Annotations = enableJSR181Annotations;
     }
 
+    public List getClientServices()
+    {
+        return clientServices;
+    }
+    
+    public void setClientServices(List clientServices)
+    {
+       this.clientServices = clientServices;
+    }
+    
+    public List getClientInHandlers()
+    {
+        return clientInHandlers;
+    }
+    
+    public void setClientInHandlers(List handlers)
+    {
+       clientInHandlers = handlers;
+    }
+    
+    public List getClientOutHandlers()
+    {
+       return clientOutHandlers;
+    }
+    
+    public void setClientOutHandlers(List handlers)
+    {
+       clientOutHandlers = handlers;
+    }
+    
+    public String getClientTransport()
+    {
+       return clientTransport;
+    }
+    
+    public void setClientTransport(String transportClass)
+    {
+       clientTransport = transportClass;
+    }
+    
+    public String getServiceTransport()
+    {
+       return serviceTransport;
+    }
+    
+    public void setServiceTransport(String transportClass)
+    {
+       serviceTransport = transportClass;
+    }
+    
     public void onNotification(UMOServerNotification event)
     {
         if (event.getAction() == ModelNotification.MODEL_STARTED)
@@ -298,7 +381,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             // new service and a
             // different http port the model needs to be restarted before the
             // listener is available
-            if (!MuleManager.getInstance().getModel().isComponentRegistered(XFIRE_SERVICE_COMPONENT_NAME))
+            if (!MuleManager.getInstance().getModel().isComponentRegistered(XFIRE_SERVICE_COMPONENT_NAME + getName()))
             {
                 try
                 {

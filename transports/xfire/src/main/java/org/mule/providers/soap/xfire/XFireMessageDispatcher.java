@@ -105,8 +105,11 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected String getMethod(UMOEvent event) throws DispatchException
     {
-        UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        String method = (String)endpointUri.getParams().get(MuleProperties.MULE_METHOD_PROPERTY);
+        String method = (String)event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        if (method == null) {
+            UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+            method = (String)endpointUri.getParams().get(MuleProperties.MULE_METHOD_PROPERTY);
+        }
 
         if (method == null)
         {
