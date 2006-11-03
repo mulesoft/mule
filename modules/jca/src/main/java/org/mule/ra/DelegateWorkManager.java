@@ -10,24 +10,21 @@
 
 package org.mule.ra;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOWorkManager;
-
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
+import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
+
 /**
  * <code>DelegateWorkManager</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DelegateWorkManager implements UMOWorkManager
 {
-    private WorkManager workManager;
+    private final WorkManager workManager;
 
     public DelegateWorkManager(WorkManager workManager)
     {

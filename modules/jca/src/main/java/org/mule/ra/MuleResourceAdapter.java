@@ -10,6 +10,22 @@
 
 package org.mule.ra;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
+import javax.resource.spi.ActivationSpec;
+import javax.resource.spi.BootstrapContext;
+import javax.resource.spi.ResourceAdapter;
+import javax.resource.spi.ResourceAdapterInternalException;
+import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.transaction.xa.XAResource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -28,49 +44,37 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 
-import javax.resource.NotSupportedException;
-import javax.resource.ResourceException;
-import javax.resource.spi.ActivationSpec;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.ResourceAdapter;
-import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.transaction.xa.XAResource;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * <code>MuleResourceAdapter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleResourceAdapter implements ResourceAdapter, Serializable
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 5120977744950180203L;
+    private static final long serialVersionUID = 5727648958127416509L;
 
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleResourceAdapter.class);
+    protected transient Log logger = LogFactory.getLog(this.getClass());
+
+    private transient UMOManager manager;
 
     private BootstrapContext bootstrapContext;
-
     private MuleConnectionRequestInfo info = new MuleConnectionRequestInfo();
-
-    private UMOManager manager;
-
     private Map endpoints = new HashMap();
 
     public MuleResourceAdapter()
     {
         MuleManager.getConfiguration().setModelType("jca");
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
+    {
+        ois.defaultReadObject();
+        this.logger = LogFactory.getLog(this.getClass());
+        this.manager = MuleManager.getInstance();
     }
 
     /**

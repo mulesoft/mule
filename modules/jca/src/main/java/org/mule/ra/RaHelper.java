@@ -10,8 +10,10 @@
 
 package org.mule.ra;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionRequestInfo;
@@ -19,18 +21,14 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Iterator;
-import java.util.Set;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>RaHelper</code> is a collection of helper methods used by this RA
  * implementation
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
+// @ThreadSafe
 public class RaHelper
 {
     public static PasswordCredential getPasswordCredential(final ManagedConnectionFactory mcf,

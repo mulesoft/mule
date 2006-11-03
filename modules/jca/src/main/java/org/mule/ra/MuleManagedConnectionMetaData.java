@@ -10,22 +10,19 @@
 
 package org.mule.ra;
 
+import javax.resource.ResourceException;
+import javax.resource.spi.ManagedConnectionMetaData;
+
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
-
 /**
  * <code>MuleManagedConnectionMetaData</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
 {
-    private MuleManagedConnection managedConnection;
+    private final MuleManagedConnection managedConnection;
 
     public MuleManagedConnectionMetaData(MuleManagedConnection mc)
     {

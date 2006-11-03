@@ -10,19 +10,16 @@
 
 package org.mule.ra;
 
+import java.io.Serializable;
+
+import javax.resource.spi.ConnectionRequestInfo;
+
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.StringUtils;
 
-import javax.resource.spi.ConnectionRequestInfo;
-
-import java.io.Serializable;
-
 /**
  * <code>MuleConnectionRequestInfo</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable
 {
@@ -36,6 +33,11 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
     private String username;
     private String password;
     private UMOManager manager;
+
+    public MuleConnectionRequestInfo()
+    {
+        super();
+    }
 
     public String getConfigurationBuilder()
     {

@@ -14,9 +14,6 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 
 /**
  * <code>MuleEndpointKey</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleEndpointKey
 {

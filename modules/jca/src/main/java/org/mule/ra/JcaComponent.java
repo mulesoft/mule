@@ -10,9 +10,6 @@
 
 package org.mule.ra;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -33,38 +30,34 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 /**
- * <code>JcaComponent</code> Is the type of component used in mul when embedded
- * inside an app server using JCA. If future we might want to use one of the existing
- * models
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>JcaComponent</code> Is the type of component used in Mule when embedded
+ * inside an app server using JCA. In the future we might want to use one of the
+ * existing models.
  */
 public class JcaComponent implements UMOComponent
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 7883378699629557289L;
+    private static final long serialVersionUID = -1510441245219710451L;
 
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(JcaComponent.class);
-
-    private MuleDescriptor descriptor;
+    private final MuleDescriptor descriptor;
     private UMOEntryPoint entryPoint;
     private Object component;
-
-    private boolean started = false;
+    private ComponentStatistics stats;
 
     /**
-     * Determines if the component has been initilised
+     * Determines if the component has been initialised
      */
-    private AtomicBoolean initialised = new AtomicBoolean(false);
+    private final AtomicBoolean initialised = new AtomicBoolean(false);
 
-    private ComponentStatistics stats = null;
+    /**
+     * Determines if the component has been started
+     */
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     public JcaComponent(MuleDescriptor descriptor)
     {
@@ -72,6 +65,7 @@ public class JcaComponent implements UMOComponent
         {
             throw new IllegalArgumentException("Descriptor cannot be null");
         }
+
         this.descriptor = descriptor;
     }
 
@@ -126,12 +120,12 @@ public class JcaComponent implements UMOComponent
 
     public void start() throws UMOException
     {
-        started = true;
+        started.set(true);
     }
 
     public void stop() throws UMOException
     {
-        started = false;
+        started.set(false);
     }
 
     public void dispose()
@@ -205,7 +199,7 @@ public class JcaComponent implements UMOComponent
 
     public boolean isStarted()
     {
-        return started;
+        return started.get();
     }
 
     /**
