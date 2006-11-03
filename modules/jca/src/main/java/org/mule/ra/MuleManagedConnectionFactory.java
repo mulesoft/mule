@@ -72,8 +72,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory
         final int PRIME = 31;
         int result = 1;
         result = PRIME * result + ((password == null) ? 0 : password.hashCode());
-        result = PRIME * result + ((username == null) ? 0 : username.hashCode());
-        return result;
+        return PRIME * result + ((username == null) ? 0 : username.hashCode());
     }
 
     public boolean equals(Object obj)
@@ -142,7 +141,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory
         }
         catch (Exception e)
         {
-            throw new ResourceException(e.getMessage());
+            throw new ResourceException(e);
         }
     }
 
@@ -175,8 +174,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo)
         throws ResourceException
     {
-        MuleManagedConnection mc = new MuleManagedConnection(this, subject, cxRequestInfo);
-        return mc;
+        return new MuleManagedConnection(this, subject, cxRequestInfo);
     }
 
     /**

@@ -44,8 +44,8 @@ public class JcaComponent implements UMOComponent
      */
     private static final long serialVersionUID = -1510441245219710451L;
 
-    private final MuleDescriptor descriptor;
-    private UMOEntryPoint entryPoint;
+    private transient final MuleDescriptor descriptor;
+    private transient UMOEntryPoint entryPoint;
     private Object component;
     private ComponentStatistics stats;
 

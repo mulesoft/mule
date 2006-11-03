@@ -33,6 +33,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>MuleConnection</code> TODO
@@ -135,10 +136,10 @@ public class DefaultMuleConnection implements MuleConnection
 
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
+
         try
         {
-            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
-            return message;
+            return endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
         }
         catch (Exception e)
         {
@@ -159,15 +160,15 @@ public class DefaultMuleConnection implements MuleConnection
         throws UMOException
     {
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOConnector connector = endpoint.getConnector();
 
-        if (!endpoint.getConnector().isStarted() && manager.isStarted())
+        if (!connector.isStarted() && manager.isStarted())
         {
-            endpoint.getConnector().startConnector();
+            connector.startConnector();
         }
 
         try
         {
-
             UMOSession session = new MuleSession(message,
                 ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
@@ -175,9 +176,8 @@ public class DefaultMuleConnection implements MuleConnection
             {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
-            MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
 
-            return event;
+            return new MuleEvent(message, endpoint, session, synchronous);
         }
         catch (Exception e)
         {

@@ -10,10 +10,13 @@
 
 package org.mule.ra;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import javax.resource.spi.ConnectionRequestInfo;
 
+import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.StringUtils;
@@ -26,17 +29,24 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -122686675425629280L;
+    private static final long serialVersionUID = 910828075890304726L;
+
+    private transient UMOManager manager;
 
     private String configurationBuilder = MuleXmlConfigurationBuilder.class.getName();
     private String configurations;
     private String username;
     private String password;
-    private UMOManager manager;
 
     public MuleConnectionRequestInfo()
     {
         super();
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
+    {
+        ois.defaultReadObject();
+        this.manager = MuleManager.getInstance();
     }
 
     public String getConfigurationBuilder()
@@ -94,18 +104,24 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
         this.manager = manager;
     }
 
-    public boolean equals(Object o)
+    public boolean equals(Object obj)
     {
-        if (this == o)
+        if (this == obj)
         {
             return true;
         }
-        if (!(o instanceof MuleConnectionRequestInfo))
+
+        if (obj == null)
         {
             return false;
         }
 
-        final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo)o;
+        if (this.getClass() != obj.getClass())
+        {
+            return false;
+        }
+
+        final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo)obj;
 
         if (configurationBuilder != null
                         ? !configurationBuilder.equals(muleConnectionRequestInfo.configurationBuilder)
@@ -113,18 +129,21 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
         {
             return false;
         }
+
         if (configurations != null
                         ? !configurations.equals(muleConnectionRequestInfo.configurations)
                         : muleConnectionRequestInfo.configurations != null)
         {
             return false;
         }
+
         if (password != null
                         ? !password.equals(muleConnectionRequestInfo.password)
                         : muleConnectionRequestInfo.password != null)
         {
             return false;
         }
+
         if (username != null
                         ? !username.equals(muleConnectionRequestInfo.username)
                         : muleConnectionRequestInfo.username != null)
@@ -137,22 +156,14 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
 
     public int hashCode()
     {
-        int result;
-        result = (configurationBuilder != null ? configurationBuilder.hashCode() : 0);
+        int result = (configurationBuilder != null ? configurationBuilder.hashCode() : 0);
         result = 29 * result + (configurations != null ? configurations.hashCode() : 0);
         result = 29 * result + (username != null ? username.hashCode() : 0);
-        result = 29 * result + (password != null ? password.hashCode() : 0);
-        return result;
+        return 29 * result + (password != null ? password.hashCode() : 0);
     }
 
-    public Object clone()
+    protected Object clone() throws CloneNotSupportedException
     {
-        MuleConnectionRequestInfo clone = new MuleConnectionRequestInfo();
-        clone.setConfigurationBuilder(getConfigurationBuilder());
-        clone.setConfigurations(getConfigurations());
-        clone.setManager(getManager());
-        clone.setPassword(getPassword());
-        clone.setUserName(getUserName());
-        return clone;
+        return super.clone();
     }
 }
