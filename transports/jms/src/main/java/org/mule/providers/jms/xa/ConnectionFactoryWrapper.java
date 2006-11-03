@@ -53,7 +53,7 @@ public class ConnectionFactoryWrapper
 
     protected Object factory;
     protected TransactionManager tm;
-    protected static transient Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
+    protected static Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
 
     public ConnectionFactoryWrapper(Object factory, TransactionManager tm)
     {

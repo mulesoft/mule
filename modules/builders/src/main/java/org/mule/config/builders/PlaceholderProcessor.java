@@ -47,7 +47,7 @@ public class PlaceholderProcessor
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(PlaceholderProcessor.class);
+    protected static Log logger = LogFactory.getLog(PlaceholderProcessor.class);
 
     private static boolean strategiesLoaded = false;
 

@@ -89,7 +89,7 @@ public class MuleClient implements Disposable
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleClient.class);
+    protected static Log logger = LogFactory.getLog(MuleClient.class);
 
     /**
      * the local UMOManager instance

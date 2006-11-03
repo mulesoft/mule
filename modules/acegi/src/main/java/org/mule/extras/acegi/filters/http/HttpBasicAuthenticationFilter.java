@@ -41,7 +41,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
+    protected static Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
 
     private String realm;
 

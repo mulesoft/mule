@@ -30,7 +30,7 @@ public class ObjectNameHelper
     /**
      * logger used by this class
      */
-    static transient Log logger = LogFactory.getLog(ObjectNameHelper.class);
+    static Log logger = LogFactory.getLog(ObjectNameHelper.class);
 
     public static String getEndpointName(UMOImmutableEndpoint endpoint)
     {

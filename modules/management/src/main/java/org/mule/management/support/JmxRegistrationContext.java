@@ -12,10 +12,10 @@ package org.mule.management.support;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.umo.manager.UMOServerNotification;
-import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * Stores JMX info pertinent to the currently intialising Mule manager with

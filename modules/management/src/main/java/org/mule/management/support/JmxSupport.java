@@ -10,8 +10,8 @@
 
 package org.mule.management.support;
 
-import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 /**
  * Mule JMX supporting interface.

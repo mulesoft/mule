@@ -29,7 +29,7 @@ public class AsynchronousEventListener implements MuleEventListener
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AsynchronousEventListener.class);
+    protected static Log logger = LogFactory.getLog(AsynchronousEventListener.class);
 
     /**
      * The listener to delegate to

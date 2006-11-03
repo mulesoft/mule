@@ -35,7 +35,7 @@ public class MultiContainerContext implements UMOContainerContext
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MultiContainerContext.class);
+    protected static Log logger = LogFactory.getLog(MultiContainerContext.class);
 
     private String name = "multi";
     private TreeMap containers = new TreeMap();

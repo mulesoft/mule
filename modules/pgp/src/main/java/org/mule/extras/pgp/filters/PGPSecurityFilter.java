@@ -43,7 +43,7 @@ import java.util.Collection;
  */
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
-    protected static transient Log logger = LogFactory.getLog(PGPSecurityFilter.class);
+    protected static Log logger = LogFactory.getLog(PGPSecurityFilter.class);
 
     private UMOEncryptionStrategy strategy;
 

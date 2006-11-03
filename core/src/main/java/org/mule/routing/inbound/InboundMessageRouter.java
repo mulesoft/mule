@@ -43,7 +43,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(InboundMessageRouter.class);
+    protected static Log logger = LogFactory.getLog(InboundMessageRouter.class);
 
     private List endpoints = new CopyOnWriteArrayList();
 

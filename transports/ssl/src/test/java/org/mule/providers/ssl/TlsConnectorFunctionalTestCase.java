@@ -27,7 +27,7 @@ public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCa
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(TlsConnectorFunctionalTestCase.class);
+    protected static Log logger = LogFactory.getLog(TlsConnectorFunctionalTestCase.class);
 
     private int port = 61655;
 

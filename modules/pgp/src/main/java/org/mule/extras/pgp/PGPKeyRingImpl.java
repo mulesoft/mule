@@ -30,7 +30,7 @@ import cryptix.pki.KeyBundle;
  */
 public class PGPKeyRingImpl implements PGPKeyRing
 {
-    protected static transient Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
+    protected static Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
 
     private String publicKeyRingFileName;
 

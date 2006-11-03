@@ -58,7 +58,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleResourceAdapter.class);
+    protected static Log logger = LogFactory.getLog(MuleResourceAdapter.class);
 
     private BootstrapContext bootstrapContext;
 

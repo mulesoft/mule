@@ -26,7 +26,7 @@ public class AsyncLoanBroker implements LoanBroker
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AsyncLoanBroker.class);
+    protected static Log logger = LogFactory.getLog(AsyncLoanBroker.class);
 
     private static volatile int quotes = 0;
     private static volatile int requests = 0;

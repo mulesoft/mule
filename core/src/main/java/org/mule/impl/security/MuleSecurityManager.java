@@ -43,7 +43,7 @@ public class MuleSecurityManager implements UMOSecurityManager
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleSecurityManager.class);
+    protected static Log logger = LogFactory.getLog(MuleSecurityManager.class);
 
     private Map providers = new ConcurrentHashMap();
 

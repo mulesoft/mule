@@ -28,7 +28,7 @@ public class AxisInitialisationCallback implements InitialisationCallback
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AxisInitialisationCallback.class);
+    protected static Log logger = LogFactory.getLog(AxisInitialisationCallback.class);
 
     private SOAPService service;
     private boolean invoked = false;

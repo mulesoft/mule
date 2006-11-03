@@ -32,7 +32,7 @@ public class Messages implements CoreMessageConstants
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(Messages.class);
+    protected static Log logger = LogFactory.getLog(Messages.class);
 
     public static final String DEFAULT_BUNDLE = "core";
 

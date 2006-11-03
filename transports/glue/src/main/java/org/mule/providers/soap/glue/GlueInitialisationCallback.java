@@ -33,7 +33,7 @@ public class GlueInitialisationCallback implements InitialisationCallback
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(GlueInitialisationCallback.class);
+    protected static Log logger = LogFactory.getLog(GlueInitialisationCallback.class);
 
     private IService service;
     private ServiceContext context;

@@ -59,7 +59,7 @@ public class ExceptionHelper
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ExceptionHelper.class);
+    protected static Log logger = LogFactory.getLog(ExceptionHelper.class);
 
     private static Properties errorDocs = new Properties();
     private static Properties errorCodes = new Properties();

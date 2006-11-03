@@ -44,7 +44,7 @@ public class MuleMsgProvider extends MsgProvider
 
     private AxisConnector connector;
 
-    private static transient Log logger = LogFactory.getLog(MuleMsgProvider.class);
+    private static Log logger = LogFactory.getLog(MuleMsgProvider.class);
 
     private String METHOD_BODYARRAY = "soapbodyelement";
     private String METHOD_ELEMENTARRAY = "element";

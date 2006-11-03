@@ -41,7 +41,7 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(TcpConnectorFunctionalTestCase.class);
+    protected static Log logger = LogFactory.getLog(TcpConnectorFunctionalTestCase.class);
 
     private Socket s;
     private int port = 61655;

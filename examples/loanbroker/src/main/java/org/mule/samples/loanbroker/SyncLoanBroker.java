@@ -29,7 +29,7 @@ public class SyncLoanBroker
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(SyncLoanBroker.class);
+    protected static Log logger = LogFactory.getLog(SyncLoanBroker.class);
 
     public UMOMessage getLoanQuote(LoanRequest request) throws Exception
     {

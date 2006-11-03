@@ -50,7 +50,7 @@ public class MuleServer implements Runnable
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(MuleServer.class);
+    private static Log logger = LogFactory.getLog(MuleServer.class);
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
 

@@ -9,8 +9,8 @@
  */
 package org.mule.management.support;
 
-import javax.management.ObjectName;
 import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 /**
  * Support class for JMX 1.1 based systems.

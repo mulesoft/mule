@@ -43,7 +43,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(SslConnectorFunctionalTestCase.class);
+    protected static Log logger = LogFactory.getLog(SslConnectorFunctionalTestCase.class);
 
     private int port = 61655;
     private Socket s;

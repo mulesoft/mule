@@ -48,7 +48,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(VMMessageDispatcher.class);
+    private static Log logger = LogFactory.getLog(VMMessageDispatcher.class);
 
     private VMConnector connector;
 

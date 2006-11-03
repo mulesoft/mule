@@ -26,7 +26,7 @@ public class Apple implements Fruit, Callable
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(Apple.class);
+    private static Log logger = LogFactory.getLog(Apple.class);
 
     private boolean bitten = false;
     private boolean washed = false;

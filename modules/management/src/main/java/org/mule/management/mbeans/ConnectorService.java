@@ -10,13 +10,13 @@
 
 package org.mule.management.mbeans;
 
+import java.beans.ExceptionListener;
+
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.util.ObjectNameHelper;
-
-import java.beans.ExceptionListener;
 
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:

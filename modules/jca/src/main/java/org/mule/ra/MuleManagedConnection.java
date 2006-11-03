@@ -10,11 +10,12 @@
 
 package org.mule.ra;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.security.MuleCredentials;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
@@ -26,25 +27,16 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.security.MuleCredentials;
 
 /**
  * <code>MuleManagedConnection</code> TODO
- * 
- * @version $Revision$
  */
 public class MuleManagedConnection implements ManagedConnection
 {
-    /**
-     * logger used by this class
-     */
-    private static final transient Log logger = LogFactory.getLog(MuleManagedConnection.class);
-
     private MuleManagedConnectionFactory mcf;
     private List listeners = new ArrayList();
     private Set connectionSet;

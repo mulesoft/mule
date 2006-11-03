@@ -122,7 +122,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleEventMulticaster.class);
+    protected static Log logger = LogFactory.getLog(MuleEventMulticaster.class);
 
     /**
      * The set of listeners for this Multicaster

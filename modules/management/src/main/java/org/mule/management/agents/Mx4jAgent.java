@@ -10,24 +10,9 @@
 
 package org.mule.management.agents;
 
-import mx4j.log.CommonsLogger;
-import mx4j.log.Log;
-import mx4j.tools.adaptor.http.HttpAdaptor;
-import mx4j.tools.adaptor.http.XSLTProcessor;
-import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
-import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.util.BeanUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
-import org.mule.management.support.JmxSupportFactory;
-import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.management.support.JmxSupport;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -37,9 +22,26 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+
+import mx4j.log.CommonsLogger;
+import mx4j.log.Log;
+import mx4j.tools.adaptor.http.HttpAdaptor;
+import mx4j.tools.adaptor.http.XSLTProcessor;
+import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
+import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
+
+import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.util.BeanUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,

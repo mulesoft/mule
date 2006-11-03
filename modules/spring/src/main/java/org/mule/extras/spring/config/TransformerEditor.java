@@ -26,7 +26,7 @@ public class TransformerEditor extends PropertyEditorSupport
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(TransformerEditor.class);
+    protected static Log logger = LogFactory.getLog(TransformerEditor.class);
 
     public void setAsText(String text)
     {

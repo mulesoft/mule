@@ -57,7 +57,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ImmutableMuleEndpoint.class);
+    protected static Log logger = LogFactory.getLog(ImmutableMuleEndpoint.class);
 
     /**
      * The endpoint used to communicate with the external system

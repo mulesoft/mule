@@ -38,7 +38,7 @@ public class CommonsPoolProxyPool implements ObjectPool
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(CommonsPoolProxyPool.class);
+    protected static Log logger = LogFactory.getLog(CommonsPoolProxyPool.class);
 
     /**
      * The pool that holds the MuleProxy objects

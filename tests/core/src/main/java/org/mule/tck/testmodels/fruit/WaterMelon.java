@@ -30,7 +30,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(WaterMelon.class);
+    private static Log logger = LogFactory.getLog(WaterMelon.class);
 
     private boolean bitten = false;
     private Integer seeds = new Integer(100);

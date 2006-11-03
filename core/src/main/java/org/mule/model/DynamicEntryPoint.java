@@ -45,7 +45,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(DynamicEntryPoint.class);
+    protected static Log logger = LogFactory.getLog(DynamicEntryPoint.class);
 
     private Map entryPoints = new HashMap();
     private Method currentMethod;

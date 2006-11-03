@@ -35,7 +35,7 @@ public class DefaultMuleConnectionFactory implements MuleConnectionFactory
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(DefaultMuleConnectionFactory.class);
+    protected static Log logger = LogFactory.getLog(DefaultMuleConnectionFactory.class);
 
     private transient ConnectionManager manager;
     private transient MuleManagedConnectionFactory factory;

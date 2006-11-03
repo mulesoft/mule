@@ -104,5 +104,5 @@ public class XmlRegistryStore implements RegistryStore
         return xstream;
     }
 
-    private static transient XStream xstream;
+    private static XStream xstream;
 }

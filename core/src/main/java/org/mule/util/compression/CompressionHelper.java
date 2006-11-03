@@ -30,9 +30,9 @@ public class CompressionHelper
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(CompressionHelper.class);
+    private static Log logger = LogFactory.getLog(CompressionHelper.class);
 
-    private static transient CompressionStrategy defaultStrategy;
+    private static CompressionStrategy defaultStrategy;
 
     synchronized public static CompressionStrategy getDefaultCompressionStrategy()
     {

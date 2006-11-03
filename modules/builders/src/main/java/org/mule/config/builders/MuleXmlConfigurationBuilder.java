@@ -102,7 +102,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleXmlConfigurationBuilder.class);
+    protected static Log logger = LogFactory.getLog(MuleXmlConfigurationBuilder.class);
 
     public static final String DEFAULT_ENTRY_POINT_RESOLVER = DynamicEntryPointResolver.class.getName();
     public static final String DEFAULT_LIFECYCLE_ADAPTER = DefaultLifecycleAdapter.class.getName();

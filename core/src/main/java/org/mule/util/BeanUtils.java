@@ -28,7 +28,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
     /**
      * logger used by this class
      */
-    private static transient final Log logger = LogFactory.getLog(BeanUtils.class);
+    private static final Log logger = LogFactory.getLog(BeanUtils.class);
 
     /**
      * Exception safe version of BeanUtils.populateWithoutFail

@@ -25,7 +25,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(JmsPropertyFilter.class);
+    private static Log logger = LogFactory.getLog(JmsPropertyFilter.class);
 
     /**
      * Name of the JMS property to filter on

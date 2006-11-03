@@ -68,7 +68,7 @@ public class ConnectorServiceDescriptor
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ConnectorServiceDescriptor.class);
+    protected static Log logger = LogFactory.getLog(ConnectorServiceDescriptor.class);
 
     private String protocol;
     private String serviceLocation;

@@ -45,7 +45,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractRecipientList.class);
+    protected static Log logger = LogFactory.getLog(AbstractRecipientList.class);
 
     private Map recipientCache = new ConcurrentHashMap();
 

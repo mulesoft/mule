@@ -51,7 +51,7 @@ public class WorkerContext implements Work
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(WorkerContext.class);
+    protected static Log logger = LogFactory.getLog(WorkerContext.class);
 
     /**
      * Null WorkListener used as the default WorkListener.

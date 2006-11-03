@@ -35,7 +35,7 @@ public class ContainerReference
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ContainerReference.class);
+    protected static Log logger = LogFactory.getLog(ContainerReference.class);
 
     private String propertyName;
     private String containerRef;

@@ -25,7 +25,7 @@ public class Banana implements Fruit
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(Banana.class);
+    private static Log logger = LogFactory.getLog(Banana.class);
 
     private boolean peeled = false;
     private boolean bitten = false;

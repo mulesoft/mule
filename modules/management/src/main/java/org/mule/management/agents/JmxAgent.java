@@ -9,11 +9,26 @@
  */
 package org.mule.management.agents;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.util.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.notifications.ModelNotification;
@@ -32,34 +47,18 @@ import org.mule.management.mbeans.MuleConfigurationServiceMBean;
 import org.mule.management.mbeans.MuleService;
 import org.mule.management.mbeans.MuleServiceMBean;
 import org.mule.management.mbeans.StatisticsService;
-import org.mule.management.support.JmxSupportFactory;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
-import org.mule.management.support.JmxRegistrationContext;
+import org.mule.management.support.JmxSupportFactory;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.mule.util.StringUtils;
 
 /**
  * <code>JmxAgent</code> registers MUle Jmx management beans with an MBean
@@ -73,7 +72,7 @@ public class JmxAgent implements UMOAgent
     /**
      * Logger used by this class.
      */
-    protected static transient Log logger = LogFactory.getLog(JmxAgent.class);
+    protected static Log logger = LogFactory.getLog(JmxAgent.class);
 
     /**
      * Should MBeanServer be discovered.

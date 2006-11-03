@@ -67,7 +67,7 @@ public class DefaultMuleProxy implements MuleProxy
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(DefaultMuleProxy.class);
+    private static Log logger = LogFactory.getLog(DefaultMuleProxy.class);
 
     /**
      * Holds the current event being processed

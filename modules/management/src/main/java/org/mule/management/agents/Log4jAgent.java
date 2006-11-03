@@ -10,12 +10,8 @@
 
 package org.mule.management.agents;
 
-import org.apache.log4j.jmx.HierarchyDynamicMBean;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -25,8 +21,12 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import java.util.Iterator;
-import java.util.Set;
+import org.apache.log4j.jmx.HierarchyDynamicMBean;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
 
 /**
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running

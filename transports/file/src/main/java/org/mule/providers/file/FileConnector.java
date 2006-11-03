@@ -43,7 +43,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(FileConnector.class);
+    private static Log logger = LogFactory.getLog(FileConnector.class);
 
     // These are properties that can be overridden on the Receiver by the endpoint
     // declaration

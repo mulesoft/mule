@@ -51,7 +51,7 @@ public class JcaComponent implements UMOComponent
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(JcaComponent.class);
+    protected static Log logger = LogFactory.getLog(JcaComponent.class);
 
     private MuleDescriptor descriptor;
     private UMOEntryPoint entryPoint;

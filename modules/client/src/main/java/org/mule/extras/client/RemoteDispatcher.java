@@ -59,7 +59,7 @@ public class RemoteDispatcher implements Disposable
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(RemoteDispatcher.class);
+    protected static Log logger = LogFactory.getLog(RemoteDispatcher.class);
 
     /**
      * dispatch destination

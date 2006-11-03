@@ -9,15 +9,8 @@
  */
 package org.mule.management.support;
 
-import org.mule.MuleManager;
-import org.mule.util.StringUtils;
-
-import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.MBeanServer;
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * Support class using JMX 1.2 and newer calls.

@@ -29,7 +29,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleTransactionConfig.class);
+    protected static Log logger = LogFactory.getLog(MuleTransactionConfig.class);
 
     public static final String ACTION_NONE_STRING = "NONE";
     public static final String ACTION_ALWAYS_BEGIN_STRING = "ALWAYS_BEGIN";

@@ -30,7 +30,7 @@ public class RequestContext
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(RequestContext.class);
+    private static Log logger = LogFactory.getLog(RequestContext.class);
 
     private static ThreadLocal currentEvent = new ThreadLocal();
 

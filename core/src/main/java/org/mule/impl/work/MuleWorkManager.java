@@ -57,7 +57,7 @@ public class MuleWorkManager implements UMOWorkManager
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleWorkManager.class);
+    protected static Log logger = LogFactory.getLog(MuleWorkManager.class);
 
     /**
      * Pool of threads used by this MuleWorkManager in order to process the Work

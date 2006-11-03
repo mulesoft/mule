@@ -10,10 +10,8 @@
 
 package org.mule;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-// import org.mule.registry.Registry;
-import org.mule.util.FileUtils;
+import java.io.File;
+import java.io.IOException;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -21,8 +19,9 @@ import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.util.FileUtils;
 
 /**
  * todo document

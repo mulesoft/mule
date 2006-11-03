@@ -37,7 +37,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     protected static final String HOSTNAME = "localhost";
     protected static final String ADDRESS = "test";
 
-    protected static transient Log logger = LogFactory.getLog(FtpConnectorFunctionalTestCase.class);
+    protected static Log logger = LogFactory.getLog(FtpConnectorFunctionalTestCase.class);
 
     public void testClient() throws Exception
     {

@@ -33,7 +33,7 @@ public class TemplateParser
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(TemplateParser.class);
+    protected static Log logger = LogFactory.getLog(TemplateParser.class);
 
     private Pattern pattern = null;
     private int pre = 1;

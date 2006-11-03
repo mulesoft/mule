@@ -9,13 +9,14 @@
  */
 package org.mule.management.support;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+
 import org.mule.MuleManager;
 import org.mule.util.StringUtils;
-
-import javax.management.MBeanServerFactory;
-import javax.management.MBeanServer;
-import java.util.List;
-import java.util.Arrays;
 
 public abstract class AbstractJmxSupport implements JmxSupport
 {

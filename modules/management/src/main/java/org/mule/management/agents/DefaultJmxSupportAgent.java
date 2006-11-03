@@ -10,14 +10,14 @@
 
 package org.mule.management.agents;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.UMOAgent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * todo document

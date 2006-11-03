@@ -34,7 +34,7 @@ import java.util.Collection;
  */
 public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
 {
-    protected static transient Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
+    protected static Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
 
     private PGPKeyRing keyManager;
 

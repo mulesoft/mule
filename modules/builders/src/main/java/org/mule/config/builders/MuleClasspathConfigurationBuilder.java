@@ -47,7 +47,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleClasspathConfigurationBuilder.class);
+    protected static Log logger = LogFactory.getLog(MuleClasspathConfigurationBuilder.class);
 
     public static final String MULE_CONFIGURATION_RESOURCE = "mule-config.xml";
 

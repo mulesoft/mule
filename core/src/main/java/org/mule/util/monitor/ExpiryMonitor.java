@@ -35,7 +35,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ExpiryMonitor.class);
+    protected static Log logger = LogFactory.getLog(ExpiryMonitor.class);
 
     private Timer timer;
     private Map monitors;

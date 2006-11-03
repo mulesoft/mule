@@ -29,7 +29,7 @@ public class TimerInterceptor implements UMOInterceptor
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(TimerInterceptor.class);
+    private static Log logger = LogFactory.getLog(TimerInterceptor.class);
 
     /*
      * (non-Javadoc)

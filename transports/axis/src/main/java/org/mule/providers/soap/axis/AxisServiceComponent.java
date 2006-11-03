@@ -83,7 +83,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     /**
      * logger used by this class
      */
-    protected static transient Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
+    protected static Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
 
     private static Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
 

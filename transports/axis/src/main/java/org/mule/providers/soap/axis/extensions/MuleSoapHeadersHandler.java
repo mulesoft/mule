@@ -39,7 +39,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);
+    protected static Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);
 
     public void invoke(MessageContext msgContext) throws AxisFault
     {

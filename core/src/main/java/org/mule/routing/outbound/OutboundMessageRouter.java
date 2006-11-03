@@ -44,7 +44,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(OutboundMessageRouter.class);
+    protected static Log logger = LogFactory.getLog(OutboundMessageRouter.class);
 
     public OutboundMessageRouter()
     {

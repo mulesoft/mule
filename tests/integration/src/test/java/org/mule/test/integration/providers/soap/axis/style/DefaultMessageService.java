@@ -43,7 +43,7 @@ import javax.xml.soap.SOAPException;
 public class DefaultMessageService implements MessageService
 {
 
-    private static transient Log logger = LogFactory.getLog(DefaultMessageService.class);
+    private static Log logger = LogFactory.getLog(DefaultMessageService.class);
 
     /**
      * Service method, which simply echoes back any XML it receives.

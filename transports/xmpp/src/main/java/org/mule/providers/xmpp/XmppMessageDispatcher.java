@@ -38,7 +38,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(XmppMessageDispatcher.class);
+    protected static Log logger = LogFactory.getLog(XmppMessageDispatcher.class);
 
     private XmppConnector connector;
 

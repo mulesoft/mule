@@ -33,7 +33,7 @@ public class MailUtils
     /**
      * The logger used for this class
      */
-    protected final static transient Log logger = LogFactory.getLog(MailUtils.class);
+    protected final static Log logger = LogFactory.getLog(MailUtils.class);
 
     /**
      * Creates a new Mail session based on a Url. this method will also add an Smtp

@@ -10,9 +10,9 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.RouterStatistics;
-
 import java.util.Map;
+
+import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>RouterStats</code> TODO

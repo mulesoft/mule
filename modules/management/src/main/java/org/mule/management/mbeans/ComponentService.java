@@ -10,6 +10,10 @@
 
 package org.mule.management.mbeans;
 
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -19,10 +23,6 @@ import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
-
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 /**
  * <code>ComponentService</code> exposes service information about a Mule Managed
@@ -37,7 +37,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     /**
      * logger used by this class
      */
-    private static transient Log LOGGER = LogFactory.getLog(ComponentService.class);
+    private static Log LOGGER = LogFactory.getLog(ComponentService.class);
 
     private MBeanServer server;
 

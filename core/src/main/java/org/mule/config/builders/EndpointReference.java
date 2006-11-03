@@ -43,7 +43,7 @@ public class EndpointReference
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(EndpointReference.class);
+    protected static Log logger = LogFactory.getLog(EndpointReference.class);
 
     private String propertyName;
     private String endpointName;

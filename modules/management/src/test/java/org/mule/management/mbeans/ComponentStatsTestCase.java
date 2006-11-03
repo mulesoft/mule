@@ -10,13 +10,13 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
-import org.mule.management.AbstractMuleJmxTestCase;
+import java.util.Set;
 
 import javax.management.ObjectName;
 
-import java.util.Set;
+import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
 
 public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 {

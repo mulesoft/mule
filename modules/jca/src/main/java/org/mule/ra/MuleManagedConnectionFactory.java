@@ -56,7 +56,7 @@ public class MuleManagedConnectionFactory implements ManagedConnectionFactory, S
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(MuleManagedConnectionFactory.class);
+    protected static Log logger = LogFactory.getLog(MuleManagedConnectionFactory.class);
 
     public MuleManagedConnectionFactory()
     {

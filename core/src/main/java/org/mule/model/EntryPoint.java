@@ -28,7 +28,7 @@ public class EntryPoint
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(EntryPoint.class);
+    protected static Log logger = LogFactory.getLog(EntryPoint.class);
 
     /**
      * the method on the object to invoke

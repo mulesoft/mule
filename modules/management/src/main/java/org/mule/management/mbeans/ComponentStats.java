@@ -10,14 +10,14 @@
 
 package org.mule.management.mbeans;
 
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.RouterStatistics;
-
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 /**
  * <code>ComponentStats</code> TODO
@@ -32,7 +32,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
     /**
      * logger used by this class
      */
-    private static transient Log LOGGER = LogFactory.getLog(ComponentStats.class);
+    private static Log LOGGER = LogFactory.getLog(ComponentStats.class);
 
     private MBeanServer server;
 

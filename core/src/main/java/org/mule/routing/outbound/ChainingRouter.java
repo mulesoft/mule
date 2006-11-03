@@ -35,7 +35,7 @@ public class ChainingRouter extends FilteringOutboundRouter
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ChainingRouter.class);
+    protected static Log logger = LogFactory.getLog(ChainingRouter.class);
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException

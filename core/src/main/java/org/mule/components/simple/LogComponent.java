@@ -25,7 +25,7 @@ import org.mule.util.StringMessageUtils;
  */
 public class LogComponent implements Callable, LogService
 {
-    private static transient Log logger = LogFactory.getLog(LogComponent.class);
+    private static Log logger = LogFactory.getLog(LogComponent.class);
 
     public Object onCall(UMOEventContext context) throws Exception
     {

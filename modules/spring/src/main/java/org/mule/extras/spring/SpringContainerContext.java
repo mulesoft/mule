@@ -48,7 +48,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(SpringContainerContext.class);
+    protected static Log logger = LogFactory.getLog(SpringContainerContext.class);
 
     /**
      * the application contect to use when resolving components

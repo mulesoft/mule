@@ -37,7 +37,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractEventResequencer.class);
+    protected static Log logger = LogFactory.getLog(AbstractEventResequencer.class);
 
     private Comparator comparator;
     private Map eventGroups = new HashMap();

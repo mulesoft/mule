@@ -219,7 +219,7 @@ public class MuleManager implements UMOManager
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(MuleManager.class);
+    private static Log logger = LogFactory.getLog(MuleManager.class);
 
     private ShutdownContext shutdownContext = new ShutdownContext(true, null);
 

@@ -56,7 +56,7 @@ public class ConnectorFactory
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ConnectorFactory.class);
+    protected static Log logger = LogFactory.getLog(ConnectorFactory.class);
 
     public static final int GET_OR_CREATE_CONNECTOR = 0;
     public static final int ALWAYS_CREATE_CONNECTOR = 1;

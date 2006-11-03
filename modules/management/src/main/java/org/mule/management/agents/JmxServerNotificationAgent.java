@@ -9,14 +9,8 @@
  */
 package org.mule.management.agents;
 
-import org.mule.management.support.JmxSupportFactory;
-import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.management.support.JmxSupport;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerNotification;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -25,8 +19,14 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
 import javax.management.ObjectName;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * An agent that propergates Mule Server notifications to Jmx.

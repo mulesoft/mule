@@ -10,9 +10,9 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
-
 import java.util.Date;
+
+import org.mule.umo.UMOException;
 
 /**
  * <code>MuleServiceMBean</code> is a JMX service interface for the UMOManager

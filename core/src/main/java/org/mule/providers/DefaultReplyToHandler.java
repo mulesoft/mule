@@ -47,7 +47,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+    protected static Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
 
     public DefaultReplyToHandler(UMOTransformer transformer)
     {

@@ -26,7 +26,7 @@ public class LoggingInterceptor extends EnvelopeInterceptor
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(LoggingInterceptor.class);
+    private static Log logger = LogFactory.getLog(LoggingInterceptor.class);
 
     /*
      * (non-Javadoc)

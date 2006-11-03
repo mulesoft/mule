@@ -34,7 +34,7 @@ public class TransformerReference
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(TransformerReference.class);
+    protected static Log logger = LogFactory.getLog(TransformerReference.class);
 
     private String propertyName;
     private String transformerName;
