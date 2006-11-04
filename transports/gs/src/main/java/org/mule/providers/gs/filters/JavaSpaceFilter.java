@@ -10,16 +10,14 @@
 
 package org.mule.providers.gs.filters;
 
-import net.jini.core.entry.Entry;
-import org.mule.umo.UMOFilter;
-
 import java.lang.reflect.InvocationTargetException;
 
+import net.jini.core.entry.Entry;
+
+import org.mule.umo.UMOFilter;
+
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public interface JavaSpaceFilter extends UMOFilter
 {

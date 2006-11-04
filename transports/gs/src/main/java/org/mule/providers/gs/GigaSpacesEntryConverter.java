@@ -10,9 +10,6 @@
 
 package org.mule.providers.gs;
 
-import com.gigaspaces.converter.pojo.Pojo2ExternalEntryConverter;
-import com.j_spaces.core.client.ExternalEntry;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,6 +17,9 @@ import java.util.Map;
 import net.jini.core.entry.Entry;
 
 import org.mule.umo.UMOMessage;
+
+import com.gigaspaces.converter.pojo.Pojo2ExternalEntryConverter;
+import com.j_spaces.core.client.ExternalEntry;
 
 public class GigaSpacesEntryConverter
 {

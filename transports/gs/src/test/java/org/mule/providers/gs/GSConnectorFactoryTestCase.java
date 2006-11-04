@@ -15,13 +15,9 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class GSConnectorFactoryTestCase extends AbstractMuleTestCase
 {
+
     public void testCreateFromFactory() throws Exception
     {
         MuleEndpointURI url = new MuleEndpointURI(getEndpointURI());
@@ -36,4 +32,5 @@ public class GSConnectorFactoryTestCase extends AbstractMuleTestCase
     {
         return "gs:rmi://localhoast:1000/MyContainer/JavaSpaces";
     }
+
 }

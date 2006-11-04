@@ -10,27 +10,24 @@
 
 package org.mule.providers.gs.filters;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import net.jini.core.entry.Entry;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mule.providers.gs.JiniMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
- * Configures an entry template on a JavaSpace endpoint
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Configures an entry template on a JavaSpace endpoint.
  */
 public class JavaSpaceTemplateFilter implements JavaSpaceFilter
 {
-
     public static final String NULL_VALUE = "null";
 
     protected String expectedType = null;

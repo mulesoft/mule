@@ -14,12 +14,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @version $Revision$
- */
-
 public class GSEndpointTestCase extends AbstractMuleTestCase
 {
+
     public void testHostPortUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("gs:rmi://localhost:7856/MyContainer/JavaSpaces");
@@ -31,4 +28,5 @@ public class GSEndpointTestCase extends AbstractMuleTestCase
         assertEquals("localhost", url.getHost());
         assertEquals(0, url.getParams().size());
     }
+
 }

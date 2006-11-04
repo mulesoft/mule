@@ -14,9 +14,6 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @version $Revision$
- */
 public class JiniMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 

@@ -13,10 +13,7 @@ package org.mule.providers.gs;
 import net.jini.core.entry.Entry;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class Order implements Entry
 {

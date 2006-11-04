@@ -10,14 +10,6 @@
 
 package org.mule.providers.gs.space;
 
-import com.j_spaces.core.IJSpace;
-import com.j_spaces.core.client.ExternalEntry;
-import com.j_spaces.core.client.FinderException;
-import com.j_spaces.core.client.SpaceFinder;
-
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
@@ -33,12 +25,17 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.util.ArrayUtils;
 
+import com.j_spaces.core.IJSpace;
+import com.j_spaces.core.client.ExternalEntry;
+import com.j_spaces.core.client.FinderException;
+import com.j_spaces.core.client.SpaceFinder;
+
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+
 /**
  * Represents a JavaSpace object. This is a wrapper to the underlying space. The
  * Space is created using the GigaSpaces API.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class GSSpace extends AbstractSpace
 {
@@ -50,13 +47,13 @@ public class GSSpace extends AbstractSpace
     public GSSpace(String spaceUrl) throws FinderException
     {
         super(spaceUrl);
-        findSpace(spaceUrl);
+        this.findSpace(spaceUrl);
     }
 
     public GSSpace(String spaceUrl, boolean enableMonitorEvents) throws FinderException
     {
         super(spaceUrl, enableMonitorEvents);
-        findSpace(spaceUrl);
+        this.findSpace(spaceUrl);
     }
 
     protected void findSpace(String spaceUrl) throws FinderException
@@ -77,12 +74,12 @@ public class GSSpace extends AbstractSpace
             Class valueClass = value.getClass();
             if (Entry.class.isAssignableFrom(valueClass))
             {
-                space.write((Entry)value, getTransaction(), Lease.FOREVER);
+                space.write((Entry)value, getTransaction(), lease);
             }
             else if (valueClass.isArray())
             {
                 Entry[] entryArr = (Entry[])ArrayUtils.toArrayOfComponentType((Object[])value, Entry.class);
-                space.writeMultiple(entryArr, getTransaction(), Lease.FOREVER);
+                space.writeMultiple(entryArr, getTransaction(), lease);
             }
             else
             {
@@ -120,13 +117,12 @@ public class GSSpace extends AbstractSpace
                 }
 
                 // try multiple
-                Entry[] entrys = space.takeMultiple(snapshot, getTransaction(), Integer.MAX_VALUE);
-                if (entrys != null && entrys.length > 0)
+                Entry[] entries = space.takeMultiple(snapshot, getTransaction(), Integer.MAX_VALUE);
+                if (entries != null && entries.length > 0)
                 {
-                    for (int i = 0; i < entrys.length; i++)
+                    for (int i = 0; i < entries.length; i++)
                     {
-                        Entry entry = entrys[i];
-                        queue.put(entry);
+                        queue.put(entries[i]);
                     }
                     continue;
                 }

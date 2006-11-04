@@ -10,8 +10,6 @@
 
 package org.mule.providers.gs;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.space.SpaceMessageReceiver;
@@ -21,9 +19,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-/**
- * @version $Revision$
- */
+import com.mockobjects.dynamic.Mock;
 
 public class JiniMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {

@@ -13,12 +13,9 @@ package org.mule.providers.gs;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @version $Revision$
- */
-
 public class GSConnectorTestCase extends AbstractConnectorTestCase
 {
+
     /**
      * Create and initialise an instance of your connector here. Do not actually call
      * the connect method.

@@ -18,13 +18,8 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GSConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-
     private String IN_URL = "gs:java://localhost/mule-space_container/mule-space?schema=cache";
     private String OUT_URL = "gs:java://localhost/mule-space2_container/mule-space2?schema=cache";
 

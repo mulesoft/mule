@@ -18,6 +18,9 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.mule.providers.gs.GigaSpacesEntryConverter;
 import org.mule.util.ClassUtils;
 
+/**
+ * TODO document
+ */
 public class GigaSpacesTemplateFilter extends JavaSpaceTemplateFilter
 {
     private GigaSpacesEntryConverter converter = new GigaSpacesEntryConverter();

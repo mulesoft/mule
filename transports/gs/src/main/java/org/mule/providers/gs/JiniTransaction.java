@@ -10,11 +10,12 @@
 
 package org.mule.providers.gs;
 
-import com.j_spaces.core.IJSpace;
-import com.j_spaces.core.client.LocalTransactionManager;
+import java.rmi.RemoteException;
+
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionFactory;
 import net.jini.core.transaction.server.TransactionManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.gs.space.GSSpace;
@@ -23,7 +24,8 @@ import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionRollbackException;
 import org.mule.umo.TransactionException;
 
-import java.rmi.RemoteException;
+import com.j_spaces.core.IJSpace;
+import com.j_spaces.core.client.LocalTransactionManager;
 
 /**
  * Provides a Jini Transaction wrapper so that Jini transactions can be used in Mule.
@@ -31,8 +33,6 @@ import java.rmi.RemoteException;
  * TransactionManager Must be set on the JiniTransactionFactory before any
  * transactions are begun.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see TransactionManager
  * @see JiniTransactionFactory
  */

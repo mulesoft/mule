@@ -23,8 +23,6 @@ import org.mule.util.UUID;
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.
  * 
  * @see Entry
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class JiniMessageAdapter extends AbstractMessageAdapter

@@ -20,10 +20,7 @@ import org.mule.umo.space.UMOSpaceException;
 
 /**
  * Provides a Space connector to be used with the GigaSpaces JavaSpaces
- * implementation
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * implementation.
  */
 public class GSConnector extends SpaceConnector
 {

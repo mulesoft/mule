@@ -10,13 +10,13 @@
 
 package org.mule.providers.gs;
 
-import com.j_spaces.core.client.ExternalEntry;
-
 import net.jini.core.entry.Entry;
 
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import com.j_spaces.core.client.ExternalEntry;
 
 public class GigaSpacesMessageAdapter extends AbstractMessageAdapter
 {

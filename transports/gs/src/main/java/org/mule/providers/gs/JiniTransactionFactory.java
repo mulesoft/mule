@@ -25,8 +25,6 @@ import org.mule.umo.UMOTransactionFactory;
  * sending or receiving events from a JavaSpace.
  * 
  * @see TransactionManager
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JiniTransactionFactory implements UMOTransactionFactory
 {

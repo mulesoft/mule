@@ -21,15 +21,10 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GSConnectorTransactedFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-
-    private String IN_URL = "gs:java://localhost/mule-space_container/mule-space?schema=cache";
-    private String OUT_URL = "gs:java://localhost/mule-space2_container/mule-space2?schema=cache";
+    private static final String IN_URL = "gs:java://localhost/mule-space_container/mule-space?schema=cache";
+    private static final String OUT_URL = "gs:java://localhost/mule-space2_container/mule-space2?schema=cache";
 
     // private String URL =
     // "gs:java://localhost/?address=/./mule-space?schema=cache";
@@ -84,7 +79,6 @@ public class GSConnectorTransactedFunctionalTestCase extends AbstractProviderFun
         }
         catch (MalformedEndpointException e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
@@ -98,7 +92,6 @@ public class GSConnectorTransactedFunctionalTestCase extends AbstractProviderFun
         }
         catch (MalformedEndpointException e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
@@ -111,4 +104,5 @@ public class GSConnectorTransactedFunctionalTestCase extends AbstractProviderFun
         con.setCreateMultipleTransactedReceivers(false);
         return con;
     }
+
 }

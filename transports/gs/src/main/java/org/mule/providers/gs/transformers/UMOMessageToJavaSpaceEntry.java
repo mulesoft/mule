@@ -10,22 +10,22 @@
 
 package org.mule.providers.gs.transformers;
 
-import net.jini.core.entry.Entry;
-import org.mule.providers.gs.JiniMessage;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import net.jini.core.entry.Entry;
+
+import org.mule.providers.gs.JiniMessage;
+import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * Convers an outbound event ot a JavaSpace entry that can be written to the space.
  * 
  * @see net.jini.core.entry.Entry
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer
 {
@@ -48,22 +48,27 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer
         else
         {
             String destination = context.getEndpointURI().toString();
+            UMOMessage muleMessage = context.getMessage();
+
             JiniMessage msg = new JiniMessage(destination, src);
-            msg.setMessageId(context.getMessage().getUniqueId());
-            msg.setCorrelationId(context.getMessage().getCorrelationId());
-            msg.setCorrelationGroupSize(new Integer(context.getMessage().getCorrelationGroupSize()));
-            msg.setCorrelationSequence(new Integer(context.getMessage().getCorrelationSequence()));
-            msg.setReplyTo(context.getMessage().getReplyTo());
-            msg.setEncoding(context.getMessage().getEncoding());
-            msg.setExceptionPayload(context.getMessage().getExceptionPayload());
+            msg.setMessageId(muleMessage.getUniqueId());
+            msg.setCorrelationId(muleMessage.getCorrelationId());
+            msg.setCorrelationGroupSize(new Integer(muleMessage.getCorrelationGroupSize()));
+            msg.setCorrelationSequence(new Integer(muleMessage.getCorrelationSequence()));
+            msg.setReplyTo(muleMessage.getReplyTo());
+            msg.setEncoding(muleMessage.getEncoding());
+            msg.setExceptionPayload(muleMessage.getExceptionPayload());
+
             Map props = new HashMap();
-            for (Iterator iterator = context.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
+            for (Iterator iterator = muleMessage.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String key = (String)iterator.next();
-                props.put(key, context.getMessage().getProperty(key));
+                props.put(key, muleMessage.getProperty(key));
             }
+
             msg.setProperties(props);
             return msg;
         }
     }
+
 }

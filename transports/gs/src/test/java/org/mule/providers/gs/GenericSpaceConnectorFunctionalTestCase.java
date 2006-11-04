@@ -10,6 +10,9 @@
 
 package org.mule.providers.gs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.gs.space.GSSpaceFactory;
@@ -21,18 +24,10 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-
-    private String IN_URL = "space:java://localhost/mule-space_container/mule-space?schema=cache";
-    private String OUT_URL = "space:java://localhost/mule-space2_container/mule-space2?schema=cache";
+    private static final String IN_URL = "space:java://localhost/mule-space_container/mule-space?schema=cache";
+    private static final String OUT_URL = "space:java://localhost/mule-space2_container/mule-space2?schema=cache";
 
     // private String URL =
     // "jini:java://localhost/?address=/./mule-space?schema=cache";
@@ -72,7 +67,6 @@ public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFun
         }
         catch (MalformedEndpointException e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
@@ -86,7 +80,6 @@ public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFun
         }
         catch (MalformedEndpointException e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
@@ -106,4 +99,5 @@ public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFun
         con.setServiceOverrides(serviceOverrides);
         return con;
     }
+
 }

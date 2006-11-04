@@ -10,18 +10,15 @@
 
 package org.mule.providers.gs.filters;
 
+import java.lang.reflect.InvocationTargetException;
+
 import net.jini.core.entry.Entry;
 
 import org.mule.providers.gs.JiniMessage;
 import org.mule.umo.UMOMessage;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class PojoTypeTemplateFilter implements JavaSpaceFilter
 {

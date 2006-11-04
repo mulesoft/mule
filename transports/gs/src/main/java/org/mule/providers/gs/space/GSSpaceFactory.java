@@ -10,11 +10,9 @@
 
 package org.mule.providers.gs.space;
 
-import com.j_spaces.core.IJSpace;
-import com.j_spaces.core.client.FinderException;
-import com.j_spaces.core.client.LocalTransactionManager;
 import net.jini.core.entry.Entry;
 import net.jini.core.transaction.server.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -31,13 +29,15 @@ import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
 
+import com.j_spaces.core.IJSpace;
+import com.j_spaces.core.client.FinderException;
+import com.j_spaces.core.client.LocalTransactionManager;
+
 /**
- * Creates a GigiSpaces JavaSpace
+ * Creates a GigaSpaces JavaSpace
  * 
  * @see GSSpace
  * @see net.jini.space.JavaSpace
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class GSSpaceFactory implements UMOSpaceFactory
 {

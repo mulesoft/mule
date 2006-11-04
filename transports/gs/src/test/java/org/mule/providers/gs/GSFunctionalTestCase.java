@@ -17,15 +17,12 @@ import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.umo.manager.UMOServerNotification;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 public class GSFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
 {
-
-    private static int unprocessedCount = 0;
-    private static int processedCount = 0;
+    private AtomicInteger unprocessedCount = new AtomicInteger(0);
+    private AtomicInteger processedCount = new AtomicInteger(0);
 
     protected String checkPreReqs()
     {
@@ -41,15 +38,14 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
 
     protected void doPostFunctionalSetUp() throws Exception
     {
-        unprocessedCount = 0;
-        processedCount = 0;
+        unprocessedCount.set(0);
+        processedCount.set(0);
         MuleManager.getInstance().registerListener(this);
     }
 
     protected String getConfigResources()
     {
         return "mule-space-example.xml";
-
     }
 
     public void testReceivesWithTemplates() throws Exception
@@ -65,37 +61,38 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
         Thread.sleep(2000L);
 
-        assertEquals(1, unprocessedCount);
-        assertEquals(0, processedCount);
+        assertEquals(1, unprocessedCount.get());
+        assertEquals(0, processedCount.get());
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
         Thread.sleep(1000L);
-        assertEquals(2, unprocessedCount);
-        assertEquals(0, processedCount);
+        assertEquals(2, unprocessedCount.get());
+        assertEquals(0, processedCount.get());
 
         order.setProcessed(Boolean.TRUE);
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
         Thread.sleep(1000L);
-        assertEquals(1, processedCount);
-        assertEquals(2, unprocessedCount);
+        assertEquals(1, processedCount.get());
+        assertEquals(2, unprocessedCount.get());
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
         Thread.sleep(1000L);
-        assertEquals(2, processedCount);
-        assertEquals(2, unprocessedCount);
-
+        assertEquals(2, processedCount.get());
+        assertEquals(2, unprocessedCount.get());
     }
 
     public void onNotification(UMOServerNotification notification)
     {
         if (notification.getAction() == FunctionalTestNotification.EVENT_RECEIVED)
         {
-            if (notification.getResourceIdentifier().equals("unprocessedOrders"))
+            String resource = notification.getResourceIdentifier();
+            if ("unprocessedOrders".equals(resource))
             {
-                unprocessedCount++;
+                unprocessedCount.incrementAndGet();
             }
-            else if (notification.getResourceIdentifier().equals("processedOrders"))
+            else if ("processedOrders".equals(resource))
             {
-                processedCount++;
+                processedCount.incrementAndGet();
             }
         }
     }
+
 }
