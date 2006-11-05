@@ -25,7 +25,7 @@ public class UMOMessageToGigaSpacesEntry extends AbstractEventAwareTransformer
      */
     private static final long serialVersionUID = -3378344993441495689L;
 
-    private GigaSpacesEntryConverter converter = new GigaSpacesEntryConverter();
+    private final GigaSpacesEntryConverter converter = new GigaSpacesEntryConverter();
 
     public UMOMessageToGigaSpacesEntry()
     {

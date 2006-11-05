@@ -25,8 +25,14 @@ public class GigaSpacesEntryConverter
 {
     private final Pojo2ExternalEntryConverter converter = new Pojo2ExternalEntryConverter();
 
-    public ExternalEntry toEntry(Object pojo, UMOMessage msg)
+    public Entry toEntry(Object pojo, UMOMessage msg)
     {
+        if (pojo instanceof Entry)
+        {
+            // nothing to do
+            return (Entry)pojo;
+        }
+
         ExternalEntry result = (ExternalEntry)converter.toEntry(pojo);
 
         int fieldCount = result.m_FieldsNames.length;
