@@ -15,7 +15,7 @@
     <property name="dir.build" value="build"/>
     <property name="dir.classes" value="build/classes"/>
 
-    <property name="url.maven.repo" value="http://maven.sateh.com/repository"/>
+    <property name="url.maven.repo" value="http://www.ibiblio.org/maven2"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">

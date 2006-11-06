@@ -24,7 +24,7 @@
     <property name="dir.ejb.build" value="credit-agency/build"/>
     <property name="dir.ejb.classes" value="credit-agency/build/classes"/>
 
-    <property name="url.maven.repo" value="http://maven.sateh.com/repository"/>
+    <property name="url.maven.repo" value="http://www.ibiblio.org/maven2"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
