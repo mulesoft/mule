@@ -46,14 +46,6 @@
             <version>1.2.2</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.activation</groupId>
-                    <artifactId>activation</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xmlParserAPIs</artifactId>
                 </exclusion>
@@ -91,12 +83,6 @@
             <artifactId>jdom</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
-        </dependency>
-        <!-- need to re-add javamail -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-javamail_1.3.1_spec</artifactId>
-            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>woodstox</groupId>

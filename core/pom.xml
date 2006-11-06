@@ -22,20 +22,11 @@
                 at run-time.
         ******************************************************************
         -->
+        <!-- UMOMesage attachment support; not needed for JDK 6 -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-qname_1.1_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.0.1</version>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
         </dependency>
         <!-- Used for the WorkManager API & for the Mule RA -->
         <dependency>
@@ -43,11 +34,17 @@
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
             <version>1.0.1</version>
         </dependency>
-        <!-- Not needed for JDK 6 -->
+        <!-- Used for Transactions -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.0.2_spec</artifactId>
-            <version>1.1</version>
+            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!-- Used for QNames -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-qname_1.1_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
         <!--
