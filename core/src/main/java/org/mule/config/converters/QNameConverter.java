@@ -10,20 +10,18 @@
 
 package org.mule.config.converters;
 
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.Converter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 
-import java.util.StringTokenizer;
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.beanutils.Converter;
 
 /**
- * <code>TransformerConverter</code> will obtain an endpoint name and convert it to
- * a <code>UMOConnector</code> instance by looking up the endpoint in the
- * <code>MuleManager</code>.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>QNameConverter</code> TODO document properly; see QNameConverterTestCase
+ * for now
  */
 public class QNameConverter implements Converter
 {
@@ -57,10 +55,12 @@ public class QNameConverter implements Converter
         {
             throw new ConversionException("No value specified");
         }
+
         if (value instanceof QName)
         {
             return (value);
         }
+
         String val = value.toString();
         if (val.startsWith("qname{"))
         {
@@ -79,31 +79,38 @@ public class QNameConverter implements Converter
     protected QName parseQName(String val)
     {
         StringTokenizer st = new StringTokenizer(val, ":");
-        String[] elements = new String[4];
-        int i = 0;
+        List elements = new ArrayList();
+
         while (st.hasMoreTokens())
         {
-            elements[i] = st.nextToken();
-            i++;
+            elements.add(st.nextToken());
         }
 
-        QName qname = null;
-        if (i == 1)
+        switch (elements.size())
         {
-            qname = new QName(elements[0]);
+            case 1 :
+            {
+                return new QName((String)elements.get(0));
+            }
+            case 2 :
+            {
+                return new QName((String)elements.get(0), (String)elements.get(1));
+            }
+            case 3 :
+            {
+                return new QName((String)elements.get(1) + ":" + (String)elements.get(2),
+                    (String)elements.get(0));
+            }
+            case 4 :
+            {
+                return new QName((String)elements.get(2) + ":" + (String)elements.get(3),
+                    (String)elements.get(1), (String)elements.get(0));
+            }
+            default :
+            {
+                return null;
+            }
         }
-        else if (i == 2)
-        {
-            qname = new QName(elements[0], elements[1]);
-        }
-        else if (i == 3)
-        {
-            qname = new QName(elements[1] + ":" + elements[2], elements[0]);
-        }
-        else if (i == 4)
-        {
-            qname = new QName(elements[2] + ":" + elements[3], elements[1], elements[0]);
-        }
-        return qname;
     }
+
 }
