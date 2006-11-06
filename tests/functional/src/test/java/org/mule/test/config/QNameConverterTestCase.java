@@ -10,15 +10,10 @@
 
 package org.mule.test.config;
 
-import org.mule.config.converters.QNameConverter;
-import org.mule.tck.AbstractMuleTestCase;
-
 import javax.xml.namespace.QName;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.mule.config.converters.QNameConverter;
+import org.mule.tck.AbstractMuleTestCase;
 
 public class QNameConverterTestCase extends AbstractMuleTestCase
 {
