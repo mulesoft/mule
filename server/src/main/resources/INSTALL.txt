@@ -26,6 +26,19 @@ set PATH=%PATH%;%MULE_HOME%\bin
 
 (or by using the System utility in the Control Panel for Windows NT/2000/XP)
 
++----------------------+
+| ADDITIONAL LIBRARIES |
++----------------------+
+Mule has connectors for a wide variety of technologies, however in some cases in order
+to actually use the connector, libraries are required which cannot be distributed as
+part of Mule due to licensing restrictions.  In these cases it is up to the user to
+obtain the needed libraries and place them in the $MULE_HOME/lib/user directory.
+
+As a convenience, an Ant script is provided in $MULE_HOME/lib which will download Sun
+Microsystems' javax.mail, javax.activation, and jsr223 (scripting) libraries.  This is
+recommended if you plan to use the E-mail connector or Scripting support and you are not
+using an application server which already provides them.
+
 +--------------+
 | DISTRIBUTION |
 +--------------+
