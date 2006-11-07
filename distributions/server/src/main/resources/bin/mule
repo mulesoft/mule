@@ -10,11 +10,18 @@
 ######################################################################
 
 # Application
-if [ "$APP_NAME" = "" ]
+if [ "$MULE_APP" = "" ]
 then
-APP_NAME="mule"
+	MULE_APP="mule"
+	MULE_APP_LONG="Mule"
+else
+	if [ "$MULE_APP_LONG" = "" ]
+	then
+		MULE_APP_LONG=${MULE_APP}
+	fi
 fi
-APP_LONG_NAME="Mule"
+APP_NAME=${MULE_APP}
+APP_LONG_NAME=${MULE_APP_LONG}
 
 # Wrapper
 WRAPPER_CMD="../sbin/wrapper"
@@ -41,12 +48,7 @@ MULE_OPTS="wrapper.working.dir=$STARTUP_DIR \
 PRIORITY=
 
 # Location of the pid file.
-if [ "$LOG_DIR" = "" ]
-then
 PIDDIR="."
-else
-        PIDDIR=$LOG_DIR
-fi
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -139,13 +141,14 @@ fi
 
 # Process ID
 ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
+######################################################################
+# Patched for Mule
+######################################################################
 PIDFILE="$PIDDIR/.$APP_NAME.pid"
+######################################################################
 LOCKDIR="/var/lock/subsys"
 LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
-
-# WRAPPER LOG FILE
-LOGFILE="${PIDDIR}/${APP_NAME}.log"
 
 # Resolve the location of the 'ps' command
 PSEXE="/usr/bin/ps"
@@ -392,6 +395,10 @@ getpid() {
                 #  common is during system startup after an unclean shutdown.
                 # The ps statement below looks for the specific wrapper command running as
                 #  the pid.  If it is not found then the pid file is considered to be stale.
+				######################################################################
+				# TODO: ps -o args gets truncated to 80 columns on Solaris which makes
+				# this test fail if the path is too long.
+				######################################################################
                 pidtest=`$PSEXE -p $pid -o args | grep $WRAPPER_CMD | tail -1`
                 if [ "X$pidtest" = "X" ]
                 then
@@ -423,7 +430,7 @@ console() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.logfile=$LOGFILE $ANCHORPROP $LOCKPROP"
+        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE $ANCHORPROP $LOCKPROP"
         ######################################################################
         # Customized for Mule
         ######################################################################
@@ -440,7 +447,7 @@ start() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.logfile=$LOGFILE  wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
+        COMMAND_LINE="$CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.syslog.ident=$APP_NAME wrapper.pidfile=$PIDFILE wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
         ######################################################################
         # Customized for Mule
         ######################################################################
@@ -549,9 +556,15 @@ dump() {
 ######################################################################
 # Customized for Mule
 ######################################################################
-# Export the location of this script.  This will be used in wrapper.conf
+# Export variables to be used in wrapper.conf
+
+# The location of this script.
 MULE_EXE="$REALDIR"
 export MULE_EXE
+
+# The name of the Mule application (defaults to "mule").
+export MULE_APP
+export MULE_APP_LONG
 ######################################################################
 
 case "$1" in
