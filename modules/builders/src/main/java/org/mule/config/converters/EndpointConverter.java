@@ -21,12 +21,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 
 /**
- * <code>TransformerConverter</code>will obtain an endpoint name and convert it to
- * a <code>UMOEndpoint</code> instance by looking up the proivder from the
- * <code>MuleManager</code>.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>EndpointConverter</code> TODO
  */
 public class EndpointConverter implements Converter
 {

@@ -17,9 +17,6 @@ import org.mule.util.ClassUtils;
 
 /**
  * <code>TransactionFactoryConverter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TransactionFactoryConverter implements Converter
 {

@@ -19,12 +19,7 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.util.SgmlCodec;
 
 /**
- * <code>TransformerConverter</code>will obtain an endpoint name and convert it to
- * a <code>UMOEndpoint</code> instance by looking up the proivder from the
- * <code>MuleManager</code>.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>EndpointURIConverter</code> TODO
  */
 public class EndpointURIConverter implements Converter
 {

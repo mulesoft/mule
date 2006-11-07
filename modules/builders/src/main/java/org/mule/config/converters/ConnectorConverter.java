@@ -16,12 +16,7 @@ import org.mule.MuleManager;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * <code>TransformerConverter</code> will obtain an endpoint name and convert it to
- * a <code>UMOConnector</code> instance by looking up the endpoint in the
- * <code>MuleManager</code>.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ConnectorConverter</code> TODO
  */
 public class ConnectorConverter implements Converter
 {
