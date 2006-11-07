@@ -21,6 +21,16 @@ rem Decide on the wrapper binary.
 rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
+if "%MULE_APP%" == "" (
+	set MULE_APP="mule"
+	set MULE_APP_LONG="Mule"
+)
+else (
+	if "%MULE_APP_LONG%" == "" (
+		set MULE_APP_LONG="%MULE_APP%"
+	)
+)
+
 set _WRAPPER_BASE=..\sbin\wrapper
 rem ###############################################################
 set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%-windows-x86-32.exe
