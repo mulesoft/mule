@@ -31,14 +31,14 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
-
+        
         <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-
+        
         <!-- XFire dependencies -->
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
@@ -66,12 +66,25 @@
                     <artifactId>qdox</artifactId>
                 </exclusion>
                 <!-- xfire-annotations dependends on commons-attributes,
-                    which in turn pulls in an ancient ant-1.5 ?! -->
+                which in turn pulls in an ancient ant-1.5 ?! -->
                 <exclusion>
                     <groupId>ant</groupId>
                     <artifactId>ant</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- XFire-core pulls in activation & javamail, but we need to mark these as provided -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ant</groupId>

@@ -871,6 +871,8 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
+        <exclude>javax.activation:activation</exclude>
+        <exclude>javax.mail:mail</exclude>
       </excludes>
     </dependencySet>
 

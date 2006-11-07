@@ -27,6 +27,7 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.1</version>
+            <scope>provided</scope>
         </dependency>
         <!-- Used for the WorkManager API & for the Mule RA -->
         <dependency>
@@ -38,12 +39,6 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <!-- Used for QNames -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-qname_1.1_spec</artifactId>
             <version>1.0.1</version>
         </dependency>
 
