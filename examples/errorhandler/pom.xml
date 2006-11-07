@@ -107,6 +107,10 @@
                     <groupId>activemq</groupId>
                     <artifactId>activemq-core-test</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
