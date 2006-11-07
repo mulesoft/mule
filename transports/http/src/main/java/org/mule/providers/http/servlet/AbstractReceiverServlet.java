@@ -40,6 +40,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     public static final String FEEDBACK_PROPERTY = "org.mule.servlet.feedback";
     public static final String DEFAULT_CONTENT_TYPE_PROPERTY = "org.mule.servlet.default.content.type";
 
+    /** The name of the servlet connector to use with this Servlet */
+    public static final String SERVLET_CONNECTOR_NAME_PROPERTY = "org.mule.servlet.connector.name";
+
     public static final String PAYLOAD_PARAMETER_NAME = "org.mule.servlet.payload.param";
     public static final String DEFAULT_PAYLOAD_PARAMETER_NAME = "payload";
 
@@ -128,11 +131,17 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 }
             }
 
-            String contentType = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE).getValue();
-            if (contentType == null)
+            Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
+            String contentType = null;
+            if (contentTypeHeader == null)
             {
                 contentType = defaultContentType;
             }
+            else
+            {
+                contentType = contentTypeHeader.getValue();
+            }
+
             if (!contentType.startsWith("text"))
             {
                 servletResponse.setContentType(contentType);

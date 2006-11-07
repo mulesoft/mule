@@ -16,10 +16,10 @@ import java.util.Map;
 
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet
- * engine.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * engine. It allows the MUleReceiverServlet to look up components interested in requests
+ * it receives via the servlet container.
+ *
+ * @see MuleReceiverServlet
  */
 
 public class ServletConnector extends AbstractServiceEnabledConnector

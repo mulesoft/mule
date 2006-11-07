@@ -16,10 +16,14 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.ThreadingProfile;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
+import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -31,17 +35,48 @@ import org.mule.umo.provider.UMOConnector;
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
  * listen for http requests on a particular port
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
+    public static final String JETTY_SERVLET_CONNECTOR_NAME= "_jettyConnector";
+
     private Server httpServer;
 
     public JettyHttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
         super(connector, component, endpoint);
+
+        if ("rest".equals(endpoint.getEndpointURI().getScheme()))
+        {
+            //We need to a Servlet Connecotor pointing to our servlet so the Servlets can
+            //find the listeners for incoming requests
+            ServletConnector scon = (ServletConnector) MuleManager.getInstance().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
+            if(scon!=null) {
+                throw new InitialisationException(new Message("http", 10), this);
+            }
+
+            scon = new ServletConnector();
+            scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
+            scon.setServletUrl(endpoint.getEndpointURI().getAddress());
+            try
+            {
+                MuleManager.getInstance().registerConnector(scon);
+                String path = endpoint.getEndpointURI().getPath();
+                if (StringUtils.isEmpty(path))
+                {
+                    path = "/";
+                }
+
+                UMOEndpoint ep = new MuleEndpoint("servlet://" + path.substring(1), true);
+                scon.registerListener(component, ep);
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+
     }
 
     public void doConnect() throws Exception
@@ -49,10 +84,13 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI()
             .getPort()));
-        // Todo
-        // socketListener.setMaxIdleTimeMs();
-        // socketListener.setMaxThreads();
-        // socketListener.setMinThreads();
+
+        // apply Threading settings
+        ThreadingProfile tp = connector.getReceiverThreadingProfile();
+        socketListener.setMaxIdleTimeMs((int)tp.getThreadTTL());
+        socketListener.setMaxThreads(tp.getMaxThreadsActive());
+        socketListener.setThreadsPriority(tp.getThreadPriority());
+
         httpServer.addListener(socketListener);
 
         String path = endpoint.getEndpointURI().getPath();
@@ -66,7 +104,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             path += "/";
         }
 
-        HttpContext context = httpServer.getContext(path);
+        HttpContext context = httpServer.getContext("/");
         context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
@@ -79,6 +117,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             handler.addServlet("JettyReceiverServlet", path + "*", JettyReceiverServlet.class.getName());
         }
 
+
         context.addHandler(handler);
         context.setAttribute("messageReceiver", this);
 
@@ -88,6 +127,8 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         // stop is automativcally called by Mule
     }
+
+
 
     /**
      * Template method to dispose any resources associated with this receiver. There

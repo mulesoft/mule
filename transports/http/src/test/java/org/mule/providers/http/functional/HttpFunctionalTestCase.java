@@ -27,10 +27,7 @@ import org.mule.umo.provider.UMOConnector;
 
 import java.net.URI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+
 public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
