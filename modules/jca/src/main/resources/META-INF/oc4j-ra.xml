@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<oc4j-connector-factories xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xsi:noNamespaceSchemaLocation="http://www.oracle.com/technology/oracleas/schema/oc4j-connector-factories-10_0.xsd"
+                          schema-major-version="10" schema-minor-version="0">
+    <connector-factory location="mule/ConnectionFactory" connector-name="mule-jca-${version}">
+        <connection-pooling use="private">
+            <property name="waitTimeout" value="300"/>
+            <property name="scheme" value="fixed_wait"/>
+            <property name="maxConnections" value="50"/>
+            <property name="inactivity-timeout-check" value="never"/>
+            <property name="minConnections" value="0"/>
+            <property name="initial-capacity" value="0"/>
+            <property name="inactivity-timeout" value="0"/>
+        </connection-pooling>
+        <security-config use="none">
+            <!-- TODO XSD validation complains about no content here -->
+        </security-config>
+        <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
+    </connector-factory>
+</oc4j-connector-factories>
