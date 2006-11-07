@@ -1,0 +1,13 @@
+<?xml version = "1.0"?>
+<weblogic-connector xmlns="http://www.bea.com/ns/weblogic/90">
+    <jndi-name>mule/MuleJCA</jndi-name>
+    <enable-global-access-to-classes>true</enable-global-access-to-classes>
+    <outbound-resource-adapter>
+        <connection-definition-group>
+            <connection-factory-interface>org.mule.ra.MuleConnectionFactory</connection-factory-interface>
+            <connection-instance>
+                <jndi-name>mule/ConnectionFactory</jndi-name>
+            </connection-instance>
+        </connection-definition-group>
+    </outbound-resource-adapter>
+</weblogic-connector>
