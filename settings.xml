@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
-
-  <mirrors>
-    <!-- A much faster replica of ibiblio -->
-    <mirror>
-      <mirrorOf>central</mirrorOf>
-      <name>Mergere Mirror Repository</name>
-      <url>http://repo.mergere.com/maven2</url>
-      <id>central-mirror</id>
-    </mirror>
-  </mirrors>
-
     <!--
     The following profiles are enabled by default for building the project.
     (see http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
@@ -35,4 +24,57 @@
         <activeProfile>sap</activeProfile>
         -->
     </activeProfiles>
+
+  <!-- These are mirrors of the central Maven repository at http://www.ibiblio.org/maven2 
+       You may choose the fastest ones based on your location. -->
+  <mirrors>
+    <mirror>
+      <mirrorOf>central</mirrorOf>
+      <name>Mergere Mirror Repository</name>
+      <url>http://repo.mergere.com/maven2</url>
+      <id>central-mirror</id>
+    </mirror>
+    <mirror>
+      <id>ggi-project.org</id>
+      <url>http://ftp.ggi-project.org/pub/packages/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- The Netherlands, Amsterdam -->
+    </mirror>
+    <mirror>
+      <id>planetmirror.com</id>
+      <url>http://downloads.planetmirror.com/pub/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- Australia, Queensland -->
+    </mirror>
+    <mirror>
+      <id>lsu.edu</id>
+      <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- United States, Louisiana -->
+     </mirror>
+    <mirror>
+      <id>ibiblio.net</id>
+      <url>http://www.ibiblio.net/pub/packages/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- United States, North Carolina -->
+    </mirror>
+    <mirror>
+      <id>sateh.com</id>
+      <url>http://maven.sateh.com/repository</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- The Netherlands, Amsterdam -->
+    </mirror>
+    <mirror>
+      <id>dotsrc.org</id>
+      <url>http://mirrors.dotsrc.org/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- Denmark -->
+    </mirror>
+    <mirror>
+      <id>sunsite.dk</id>
+      <url>http://mirrors.sunsite.dk/maven2</url>
+      <mirrorOf>central</mirrorOf>
+      <!-- Denmark -->
+    </mirror>
+  </mirrors>
 </settings>

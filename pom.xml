@@ -44,6 +44,7 @@
         <developerConnection>scm:svn:https://svn.codehaus.org/mule/trunk/mule</developerConnection>
         <url>http://svn.mule.codehaus.org/</url>
     </scm>
+    
     <ciManagement>
         <system>continuum</system>
         <url>http://localhost:8080/continuum</url>
@@ -56,6 +57,7 @@
             </notifier>
         </notifiers>
     </ciManagement>
+    
     <distributionManagement>
         <downloadUrl>http://mule.mulesource.org/Download</downloadUrl>
         <repository>
@@ -75,6 +77,7 @@
             <url>dav:https://dav.codehaus.org/mule/docs/</url>
         </site>
     </distributionManagement>
+    
     <repositories>
         <repository>
             <id>codehaus</id>
@@ -103,46 +106,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>sateh.com</id>
-            <name>Mirror of http://repo1.maven.org/maven2/</name>
-            <url>http://maven.sateh.com/repository</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <!--
-        <repository>
-            <id>sunsite.dk</id>
-            <name>Mirror of http://repo1.maven.org/maven2/</name>
-            <url>http://mirrors.sunsite.dk/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        -->
-        <!--
-            I don't think we need to keep this active: java.net is mirrored to
-            ibiblio and sateh. It also makes downloads *horribly* slow even with a proxy,
-            since their server does not correctly return a 404 for unresolvable artifacts
-            but instead dynamically creates the same nice error page over and over again?!
-            WTF is wrong with these people??
-        <repository>
-            <id>java.net</id>
-            <name>Java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <layout>legacy</layout>
-        </repository>
-        -->
         <repository>
             <id>apache-snapshots</id>
             <name>Snapshot repository</name>
@@ -194,7 +157,7 @@
         </pluginRepository>
         -->
     </pluginRepositories>
-
+    
     <build>
         <defaultGoal>install</defaultGoal>
 
