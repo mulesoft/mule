@@ -44,13 +44,7 @@
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
+        <!-- need to explicitly mark javax.mail as provided -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>

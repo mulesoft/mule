@@ -53,6 +53,13 @@
             <scope>test</scope>
         </dependency>
         -->
+        <!-- need to explicitly mark javax.activation as provided -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
