@@ -91,16 +91,6 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
         this.iterationCount = iterationCount;
     }
 
-    public char[] getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(char[] password)
-    {
-        this.password = password;
-    }
-
     public void setPassword(String password)
     {
         this.password = password.toCharArray();
