@@ -32,8 +32,10 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -148,23 +150,7 @@ public class UniversalSender extends BasicHandler
             // and also filter out any http related header
             if ((RequestContext.getEvent() != null) && (RequestContext.getEvent().getMessage() != null))
             {
-                UMOMessage currentMessage = RequestContext.getEvent().getMessage();
-                final String SOAP_METHODS = "soapMethods";
-
-                for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
-                {
-                    String name = (String)iterator.next();
-                    if (!StringUtils.equals(name, SOAP_METHODS)
-                        && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
-                        && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
-                        && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name,
-                            MuleProperties.MULE_USER_PROPERTY))
-                        && !HttpConstants.ALL_HEADER_NAMES.containsValue(name)
-                        && !StringUtils.equals(name, HttpConnector.HTTP_STATUS_PROPERTY))
-                    {
-                        props.put(name, currentMessage.getProperty(name));
-                    }
-                }
+                props = AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext());            
             }
 
             if (call.useSOAPAction())
