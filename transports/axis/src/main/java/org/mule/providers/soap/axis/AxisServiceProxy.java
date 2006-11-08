@@ -13,16 +13,17 @@ package org.mule.providers.soap.axis;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
@@ -62,9 +63,16 @@ public class AxisServiceProxy extends ServiceProxy
         {
             UMOMessageAdapter messageAdapter = receiver.getConnector().getMessageAdapter(args);
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
-
+            
+            // add all custom headers, filter out all mule headers (such as
+            // MULE_SESSION) except
+            // for MULE_USER header. Filter out other headers like "soapMethods" and
+            // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
+            // and also filter out any http related header
+            messageAdapter.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
+                                   
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
-
+            
             if (message != null)
             {
                 UMOExceptionPayload wsException = message.getExceptionPayload();
