@@ -32,8 +32,6 @@ import java.util.Properties;
 /**
  * <code>SpaceMessageReceiver</code> registers a listener on a Space, which can be
  * a JavaSpace, Rio space, JCache implementation of an internal Mule space.
- * 
- * @version $Revision$
  */
 public class SpaceMessageReceiver extends AbstractMessageReceiver implements Work
 {

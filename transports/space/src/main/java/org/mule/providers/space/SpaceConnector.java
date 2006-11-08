@@ -28,16 +28,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Provides generic connectivity to 'Spaces' that implment the Mule Space Api, i.e.
+ * Provides generic connectivity to 'Spaces' that implement the Mule Space API, i.e.
  * Gigaspaces, JCache implementations, Rio can be accessed as well as a mule file,
  * Journal or VM space.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpaceConnector extends AbstractServiceEnabledConnector
 {
-
     private UMOSpaceFactory spaceFactory;
     private Map spaceProperties;
     // TODO Mule 2.0: these are stored on the UMOManagementContext

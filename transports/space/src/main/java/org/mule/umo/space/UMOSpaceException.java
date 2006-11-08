@@ -15,15 +15,9 @@ import org.mule.umo.UMOException;
 
 /**
  * A base exception for all space related exceptions
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class UMOSpaceException extends UMOException
 {
-    /**
-     *
-     */
     private static final long serialVersionUID = 6618481719989683929L;
 
     public UMOSpaceException(Message message)

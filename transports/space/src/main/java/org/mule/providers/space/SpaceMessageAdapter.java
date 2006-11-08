@@ -16,9 +16,6 @@ import org.mule.util.UUID;
 
 /**
  * Wraps a JavaSpaces Entry object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpaceMessageAdapter extends AbstractMessageAdapter
 {
@@ -27,8 +24,8 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -2984429022763795361L;
 
-    private String id;
-    private Object message;
+    private final String id;
+    private final Object message;
 
     /**
      * Creates a default message adapter with properties and attachments

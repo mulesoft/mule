@@ -39,32 +39,33 @@ import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
  */
 public class GSSpace extends AbstractSpace
 {
-    private IJSpace space;
+    private final IJSpace space;
+    private final BlockingQueue queue = new LinkedBlockingQueue(1000);
+    private final long lease;
     private Entry entryTemplate;
-    private Entry snapshot = null;
-    private BlockingQueue queue = new LinkedBlockingQueue(1000);
+    private Entry snapshot;
 
-    public GSSpace(String spaceUrl) throws FinderException
+    protected GSSpace(String spaceUrl, boolean enableMonitorEvents) throws FinderException
     {
-        super(spaceUrl);
-        this.findSpace(spaceUrl);
+        this(spaceUrl, enableMonitorEvents, Lease.FOREVER);
     }
 
-    public GSSpace(String spaceUrl, boolean enableMonitorEvents) throws FinderException
+    protected GSSpace(String spaceUrl, boolean enableMonitorEvents, long lease) throws FinderException
     {
         super(spaceUrl, enableMonitorEvents);
-        this.findSpace(spaceUrl);
+        this.lease = lease;
+        this.space = (IJSpace)this.findSpace(spaceUrl);
     }
 
-    protected void findSpace(String spaceUrl) throws FinderException
+    protected JavaSpace findSpace(String spaceUrl) throws FinderException
     {
         logger.info("Connecting to space: " + spaceUrl);
-        space = (IJSpace)SpaceFinder.find(spaceUrl);
+        return (JavaSpace)SpaceFinder.find(spaceUrl);
     }
 
     public void doPut(Object value) throws UMOSpaceException
     {
-        doPut(value, Lease.FOREVER);
+        doPut(value, lease);
     }
 
     public void doPut(Object value, long lease) throws UMOSpaceException
@@ -99,6 +100,8 @@ public class GSSpace extends AbstractSpace
 
     public Object doTake(long timeout) throws UMOSpaceException
     {
+        // TODO timeout is not used yet
+
         try
         {
             if (snapshot == null)
@@ -175,7 +178,6 @@ public class GSSpace extends AbstractSpace
 
     public void beginTransaction() throws UMOSpaceException
     {
-
         try
         {
             UMOTransaction tx = transactionFactory.beginTransaction();
@@ -185,7 +187,6 @@ public class GSSpace extends AbstractSpace
         {
             throw new SpaceTransactionException(e);
         }
-
     }
 
     public void commitTransaction() throws UMOSpaceException

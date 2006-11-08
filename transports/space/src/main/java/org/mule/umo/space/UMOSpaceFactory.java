@@ -14,9 +14,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * A factory for creating Mule Space facade objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOSpaceFactory
 {

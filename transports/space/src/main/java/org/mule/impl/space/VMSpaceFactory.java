@@ -15,9 +15,6 @@ import org.mule.util.queue.MemoryPersistenceStrategy;
 /**
  * An in-memory space that is not persistent. Useful for testing or where the space
  * information is not mission critical.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class VMSpaceFactory extends DefaultSpaceFactory
 {
@@ -52,4 +49,5 @@ public class VMSpaceFactory extends DefaultSpaceFactory
         setPersistenceStrategy(new MemoryPersistenceStrategy());
         setEnableCaching(enableCaching);
     }
+
 }

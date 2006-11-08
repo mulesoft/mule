@@ -15,9 +15,6 @@ import org.mule.umo.space.UMOSpace;
 
 /**
  * Events that occur in UMOSpaces
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpaceMonitorNotification extends UMOServerNotification
 {
@@ -25,6 +22,7 @@ public class SpaceMonitorNotification extends UMOServerNotification
      * Serial version
      */
     private static final long serialVersionUID = -8723048757928555644L;
+
     public static final int SPACE_CREATED = SPACE_EVENT_ACTION_START_RANGE + 1;
     public static final int SPACE_ITEM_ADDED = SPACE_EVENT_ACTION_START_RANGE + 2;
     public static final int SPACE_ITEM_REMOVED = SPACE_EVENT_ACTION_START_RANGE + 3;
@@ -34,10 +32,10 @@ public class SpaceMonitorNotification extends UMOServerNotification
     public static final int SPACE_LISTENER_ADDED = SPACE_EVENT_ACTION_START_RANGE + 7;
     public static final int SPACE_LISTENER_REMOVED = SPACE_EVENT_ACTION_START_RANGE + 8;
 
-    private static final transient String[] ACTIONS = new String[]{"created", "item added", "item removed",
+    private static final String[] ACTIONS = new String[]{"created", "item added", "item removed",
         "item expired", "item miss", "disposed", "listener added", "listener removed"};
 
-    private Object item;
+    private final Object item;
 
     public SpaceMonitorNotification(UMOSpace space, int action, Object item)
     {
@@ -65,4 +63,5 @@ public class SpaceMonitorNotification extends UMOServerNotification
         }
         return ACTIONS[i - 1];
     }
+
 }

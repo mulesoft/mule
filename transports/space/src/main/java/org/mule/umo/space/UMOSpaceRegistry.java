@@ -12,9 +12,6 @@ package org.mule.umo.space;
 
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class UMOSpaceRegistry
 {

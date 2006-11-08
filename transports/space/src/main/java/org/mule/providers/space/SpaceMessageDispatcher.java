@@ -26,20 +26,17 @@ import org.mule.umo.space.UMOSpace;
  * accessed as well as a mule file, Journal or VM space. The dispatcher allows Mule
  * to dispatch events synchronously and asynchronusly to a space as well as make
  * receive calls to the space.
- * 
- * @version $Revision$
  */
 
 public class SpaceMessageDispatcher extends AbstractMessageDispatcher
 {
-
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    private final SpaceConnector connector;
     private UMOSpace space;
-    private SpaceConnector connector;
 
     public SpaceMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -69,7 +66,16 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        space.put(event.getTransformedMessage(), event.getTimeout());
+        long lease = event.getMessage().getLongProperty(SpaceConstants.SPACE_LEASE_PROPERTY, -1);
+        if (lease < 0)
+        {
+            // use the space defaults
+            space.put(event.getTransformedMessage());
+        }
+        else
+        {
+            space.put(event.getTransformedMessage(), lease);
+        }
     }
 
     protected UMOMessage doSend(UMOEvent event) throws Exception

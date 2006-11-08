@@ -17,9 +17,6 @@ import org.mule.umo.space.UMOSpaceException;
 /**
  * Is thrown when a space action receives an <code>InterruptedException</code> from
  * the underlying space store
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpaceActionInteruptedException extends UMOSpaceException
 {

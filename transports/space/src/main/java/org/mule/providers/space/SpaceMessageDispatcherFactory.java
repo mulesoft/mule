@@ -19,8 +19,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * <code>SpaceMessageDispatcherFactory</code> creates a space Message Disaptcher
  * 
  * @see SpaceMessageDispatcher
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class SpaceMessageDispatcherFactory implements UMOMessageDispatcherFactory

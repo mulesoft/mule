@@ -15,10 +15,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.space.UMOSpaceException;
 
 /**
- * Is thrown if an exception is thrown duringthe creation of a space.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Is thrown if an exception is thrown during the creation of a space.
  */
 public class CreateSpaceException extends UMOSpaceException
 {

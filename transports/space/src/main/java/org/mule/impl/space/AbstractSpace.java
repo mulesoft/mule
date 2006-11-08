@@ -10,7 +10,8 @@
 
 package org.mule.impl.space;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,15 +22,11 @@ import org.mule.umo.space.UMOSpaceEvent;
 import org.mule.umo.space.UMOSpaceEventListener;
 import org.mule.umo.space.UMOSpaceException;
 
-import java.util.Iterator;
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Provides core functionality for all spaces, including listenr management and
  * Server notification support.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractSpace implements UMOSpace
 {
@@ -40,21 +37,22 @@ public abstract class AbstractSpace implements UMOSpace
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected List listeners = new CopyOnWriteArrayList();
-    protected List moniterListeners = new CopyOnWriteArrayList();
+    protected List monitorListeners = new CopyOnWriteArrayList();
     protected String name;
-    protected boolean enableMonitorEvents = true;
+    protected boolean enableMonitorEvents;
     protected UMOTransactionFactory transactionFactory = null;
 
     protected AbstractSpace(String name)
     {
-        this.name = name;
-        fireMonitorEvent(SpaceMonitorNotification.SPACE_CREATED, this);
+        this(name, true);
     }
 
     protected AbstractSpace(String name, boolean enableMonitorEvents)
     {
-        this(name);
+        super();
+        this.name = name;
         this.enableMonitorEvents = enableMonitorEvents;
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_CREATED, this);
     }
 
     public void addListener(UMOSpaceEventListener listener)
@@ -71,11 +69,11 @@ public abstract class AbstractSpace implements UMOSpace
 
     public void addMonitorListener(SpaceMonitorNotificationListener listener)
     {
-        if (enableMonitorEvents == false)
+        if (!enableMonitorEvents)
         {
             logger.warn("Space monitor notifications for " + name + " space are currently disabled");
         }
-        moniterListeners.add(listener);
+        monitorListeners.add(listener);
     }
 
     public void removeMonitorListener(SpaceMonitorNotificationListener listener)
@@ -105,7 +103,6 @@ public abstract class AbstractSpace implements UMOSpace
         doPut(value, lease);
         fireListeners();
         fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_ADDED, value);
-
     }
 
     public Object take() throws UMOSpaceException

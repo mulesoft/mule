@@ -11,6 +11,7 @@
 package org.mule.providers.gs.space;
 
 import net.jini.core.entry.Entry;
+import net.jini.core.lease.Lease;
 import net.jini.core.transaction.server.TransactionManager;
 
 import org.apache.commons.logging.Log;
@@ -22,12 +23,14 @@ import org.mule.providers.gs.GSConnector;
 import org.mule.providers.gs.JiniMessage;
 import org.mule.providers.gs.JiniTransactionFactory;
 import org.mule.providers.gs.filters.JavaSpaceTemplateFilter;
+import org.mule.providers.space.SpaceConstants;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
+import org.mule.util.MapUtils;
 
 import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.client.FinderException;
@@ -41,7 +44,6 @@ import com.j_spaces.core.client.LocalTransactionManager;
  */
 public class GSSpaceFactory implements UMOSpaceFactory
 {
-
     /**
      * logger used by this class
      */
@@ -55,12 +57,12 @@ public class GSSpaceFactory implements UMOSpaceFactory
         {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "spaceIdentifier").toString());
         }
+
         try
         {
             GSSpace space = new GSSpace(spaceIdentifier, enableMonitorEvents);
             space.setEntryTemplate(createDefaultEntry(spaceIdentifier));
             return space;
-
         }
         catch (FinderException e)
         {
@@ -80,10 +82,13 @@ public class GSSpaceFactory implements UMOSpaceFactory
     {
         try
         {
-            // Todo the Spaces themselves are keyed on endpoint + any filtering
-            // information. Should that
-            // info also be included in the space name??
-            GSSpace space = new GSSpace(endpoint.getEndpointURI().toString(), enableMonitorEvents);
+            // retrieve the lease value from the endpoint or use a default
+            long leaseValue = MapUtils.getLongValue(endpoint.getProperties(),
+                SpaceConstants.SPACE_LEASE_PROPERTY, Lease.FOREVER);
+
+            // TODO the Spaces themselves are keyed on endpoint + any filtering
+            // information. Should that info also be included in the space name??
+            GSSpace space = new GSSpace(endpoint.getEndpointURI().toString(), enableMonitorEvents, leaseValue);
 
             // Because Jini uses its own transaction management we need to set the
             // Manager on the

@@ -23,13 +23,9 @@ import org.mule.util.xa.ResourceManagerSystemException;
 /**
  * As Space factory that creates a local, non-shared space. If a Jounaling or DB
  * persistence strategy is used this can be used in a clustered environment
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class DefaultSpaceFactory implements UMOSpaceFactory
 {
-
     private QueuePersistenceStrategy persistenceStrategy;
     private QueueManager queueManager;
     private boolean enableMonitorEvents = true;

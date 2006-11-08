@@ -8,14 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.impl.space;
+package org.mule.providers.space;
 
-import org.mule.umo.manager.UMOServerNotificationListener;
-
-/**
- * Observer interface for Sapce notifications
- */
-public interface SpaceMonitorNotificationListener extends UMOServerNotificationListener
+public class SpaceConstants
 {
-    // no methods
+
+    public static final String SPACE_LEASE_PROPERTY = "lease";
+
 }

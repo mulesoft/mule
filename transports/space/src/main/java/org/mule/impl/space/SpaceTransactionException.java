@@ -17,9 +17,6 @@ import org.mule.umo.space.UMOSpaceException;
 /**
  * Is thrown when an error occurs during begin, commit or rollback of a transaction.
  * There will always be a cause exception.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpaceTransactionException extends UMOSpaceException
 {
@@ -30,7 +27,7 @@ public class SpaceTransactionException extends UMOSpaceException
 
     public SpaceTransactionException(Throwable cause)
     {
-        // todo better message
+        // TODO better message
         super(new Message(Messages.FAILED_TO_INVOKE_X, "transaction"), cause);
     }
 }

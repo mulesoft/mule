@@ -28,9 +28,6 @@ import java.util.List;
 /**
  * Creates a transaction and persistent local space. This should not be used in a
  * clustered environment
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultSpace extends AbstractSpace
 {

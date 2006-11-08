@@ -28,9 +28,6 @@ import java.util.Properties;
 
 /**
  * Registers a transacted message listener on a Space.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TransactedSpaceMessageReceiver extends TransactedPollingMessageReceiver
 {
