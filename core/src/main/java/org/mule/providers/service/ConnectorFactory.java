@@ -303,8 +303,22 @@ public class ConnectorFactory
         {
 
             String location = SpiUtils.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
-            InputStream is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol,
+            InputStream is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol + ".properties",
                 ConnectorFactory.class);
+
+
+            //RM* Todo this can be removed in Mule 2.0
+            if (is == null)
+            {
+                //The legacy connector decriptors did did not use file extensions
+                is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol,
+                ConnectorFactory.class);
+                if(is==null)
+                {
+                    logger.warn("The transport " + protocol + " is using a legacy style of descriptor. This needs to be updated."
+                     + " Future versions of Mule will not work with this connector descriptor.");
+                }
+            }
             try
             {
                 if (is != null)
