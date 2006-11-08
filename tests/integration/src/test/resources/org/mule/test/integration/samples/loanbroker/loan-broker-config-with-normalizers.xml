@@ -27,7 +27,7 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService/getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>
-        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
+        <endpoint-identifier name="LenderService" value="vm://LenderService"/>
         <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>
         <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>
         <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>

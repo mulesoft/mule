@@ -16,10 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+
 public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -38,7 +35,7 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 
         try
         {
-            message = client.receive("jms://DLQ", 6000000);
+            message = client.receive("jms://DLQ", 20000);
         }
         catch (UMOException e)
         {

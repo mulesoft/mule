@@ -80,7 +80,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="TestComponent5"
-            inboundEndpoint="vm://localhost/some.queue?createConnector=testConnector2"
+            inboundEndpoint="vm://some.queue?createConnector=testConnector2"
             implementation="org.mule.test.integration.service.TestComponent">
 
             <outbound-router>

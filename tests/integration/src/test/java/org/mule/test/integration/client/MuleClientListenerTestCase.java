@@ -22,10 +22,7 @@ import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+
 public class MuleClientListenerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -96,7 +93,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
     public void testRegisterListenerVm() throws Exception
     {
-        doTestRegisterListener("vm://localhost/test.queue", false);
+        doTestRegisterListener("vm://test.queue", false);
     }
 
     public void testRegisterListenerTcp() throws Exception

@@ -51,7 +51,7 @@
 
     <model name="model">
         <mule-descriptor name="TestReceiverUMO"
-            inboundEndpoint="vm://localhost/test.queue"
+            inboundEndpoint="vm://test.queue"
             outboundEndpoint="stream://System.out"
             implementation="org.mule.test.integration.service.TestReceiver">
         </mule-descriptor>

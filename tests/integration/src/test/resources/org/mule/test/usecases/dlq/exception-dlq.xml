@@ -40,7 +40,7 @@
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
             <!-- how many times to try and deliver a redelivered message -->
-            <property name="maxRedelivery" value="2"/>
+            <property name="maxRedelivery" value="1"/>
         </properties>
         <!-- this exception strategy will forward the current message to a jms queue
         and will do so in the current transaction if it is available

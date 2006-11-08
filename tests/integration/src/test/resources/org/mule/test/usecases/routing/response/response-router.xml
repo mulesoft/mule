@@ -90,7 +90,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor implementation="org.mule.test.usecases.service.TestReceiver" name="W10FO">
+        <mule-descriptor implementation="org.mule.test.integration.service.TestReceiver" name="W10FO">
             <inbound-router>
                 <endpoint address="vm://getFO" transformers="ByteArrayToString"/>
             </inbound-router>
