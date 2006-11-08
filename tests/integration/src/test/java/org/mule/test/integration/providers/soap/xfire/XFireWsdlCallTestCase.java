@@ -29,7 +29,7 @@ import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class XFireWsdlCallTestCase_ extends FunctionalTestCase
+public class XFireWsdlCallTestCase extends FunctionalTestCase
 {
     public static final int HTTP_PORT = 18088;
 
