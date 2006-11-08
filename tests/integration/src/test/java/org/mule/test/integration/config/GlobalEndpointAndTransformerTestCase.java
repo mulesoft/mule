@@ -19,7 +19,7 @@ import org.mule.umo.UMOMessage;
 /*
  * This test has been added due to MULE-610
  */
-public class GlobalEndpointAndTransfromerTestCase extends FunctionalTestCase
+public class GlobalEndpointAndTransformerTestCase extends FunctionalTestCase
 {
     
     public void testNormal() throws UMOException
