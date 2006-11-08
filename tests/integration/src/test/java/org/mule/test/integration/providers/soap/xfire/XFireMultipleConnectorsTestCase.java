@@ -15,10 +15,10 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class XFireMultipleConnectorTestCase extends FunctionalTestCase
+public class XFireMultipleConnectorsTestCase extends FunctionalTestCase
 {
 
-    public XFireMultipleConnectorTestCase()
+    public XFireMultipleConnectorsTestCase()
     {
         super();
         this.setDisposeManagerPerSuite(true);
@@ -26,7 +26,7 @@ public class XFireMultipleConnectorTestCase extends FunctionalTestCase
     
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/providers/soap/xfire/xfire_multiple_connector.xml";
+        return "org/mule/test/integration/providers/soap/xfire/xfire-multiple-connectors.xml";
     }
     
     public void testXFireConnector1() throws Exception
