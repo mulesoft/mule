@@ -26,7 +26,6 @@ import org.mule.umo.routing.RoutingException;
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
  * endpoints using the result of the first and the input for the second
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
@@ -69,18 +68,15 @@ public class ChainingRouter extends FilteringOutboundRouter
                 if (!lastEndpointInChain)
                 {
 
-                    UMOMessage tempResult = send(session, intermediaryResult, endpoint);
+                    UMOMessage localResult = send(session, intermediaryResult, endpoint);
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)
-                    if (tempResult != null && intermediaryResult != null)
+                    if (localResult != null && intermediaryResult != null)
                     {
-                        tempResult.setCorrelationId(intermediaryResult.getCorrelationId());
-                        tempResult.setCorrelationSequence(intermediaryResult.getCorrelationSequence());
-                        tempResult.setCorrelationGroupSize(intermediaryResult.getCorrelationGroupSize());
-                        tempResult.setReplyTo(intermediaryResult.getReplyTo());
+                        processIntermediaryResult(localResult, intermediaryResult);
                     }
-                    intermediaryResult = tempResult;
+                    intermediaryResult = localResult;
 
                     if (logger.isDebugEnabled())
                     {
@@ -136,4 +132,31 @@ public class ChainingRouter extends FilteringOutboundRouter
         super.addEndpoint(endpoint);
     }
 
+    /**
+     * Process intermediary result of invocation. The method will be invoked
+     * <strong>only</strong> if both local and intermediary results are available
+     * (not null).
+     * <p/>
+     * Overriding methods must call <code>super(localResult, intermediaryResult)</code>,
+     * unless they are modifying the correlation workflow (if you know what that means,
+     * you know what you are doing and when to do it).
+     * <p/>
+     * Default implementation propagates
+     * the following properties:
+     * <ul>
+     * <li>correlationId
+     * <li>correlationSequence
+     * <li>correlationGroupSize
+     * <li>replyTo
+     * </ul>
+     * @param localResult result of the last endpoint invocation
+     * @param intermediaryResult the message travelling across the endpoints
+     */
+    protected void processIntermediaryResult(UMOMessage localResult, UMOMessage intermediaryResult)
+    {
+        localResult.setCorrelationId(intermediaryResult.getCorrelationId());
+        localResult.setCorrelationSequence(intermediaryResult.getCorrelationSequence());
+        localResult.setCorrelationGroupSize(intermediaryResult.getCorrelationGroupSize());
+        localResult.setReplyTo(intermediaryResult.getReplyTo());
+    }
 }
