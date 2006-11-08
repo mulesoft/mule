@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+	
+	<container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="org/mule/test/integration/providers/soap/axis/spring-security-context.xml"/>
+        </properties>
+    </container-context>
+	
+	<security-manager>
+        <security-provider name="memory-dao" className="org.mule.extras.acegi.AcegiProviderAdapter">
+            <properties>
+                <container-property name="delegate" reference="daoAuthenticationProvider"/>
+            </properties>
+        </security-provider>
+    </security-manager>
+	
+	<connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:18088/services"/>
+        </properties>
+    </connector>
+	
+	<transformers>
+		<transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToString"/>
+	</transformers>
+	
+    <model name="test">
+        <mule-descriptor name="mycomponent" implementation="org.mule.components.simple.EchoComponent">
+			<inbound-router>
+				<endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
+					<security-filter className="org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter">
+						<properties>
+							<property value="mule-realm" name="realm"/>
+						</properties>
+					</security-filter>
+				</endpoint>
+			</inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>
