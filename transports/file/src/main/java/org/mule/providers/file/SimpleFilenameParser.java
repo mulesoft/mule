@@ -38,10 +38,10 @@ public class SimpleFilenameParser implements FilenameParser
 {
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
 
-    private AtomicLong count = new AtomicLong(0);
+    private final TemplateParser antParser = TemplateParser.createAntStyleParser();
+    private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
 
-    private TemplateParser antParser = TemplateParser.createAntStyleParser();
-    private TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
+    private final AtomicLong count = new AtomicLong(0);
 
     public String getFilename(UMOMessageAdapter adapter, String pattern)
     {
@@ -51,17 +51,14 @@ public class SimpleFilenameParser implements FilenameParser
         }
         else
         {
-            String result;
             if (pattern.indexOf('{') > -1)
             {
-                result = getFilename(adapter, pattern, antParser);
+                return getFilename(adapter, pattern, antParser);
             }
             else
             {
-                result = getFilename(adapter, pattern, squareParser);
+                return getFilename(adapter, pattern, squareParser);
             }
-
-            return result;
         }
     }
 
@@ -96,7 +93,7 @@ public class SimpleFilenameParser implements FilenameParser
                 {
                     if (token.startsWith("ORIGINALNAME"))
                     {
-                        return adapter.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+                        return adapter.getStringProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, null);
                     }
                     else
                     {

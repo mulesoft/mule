@@ -14,19 +14,30 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.SimpleFilenameParser;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * Test the syntax of the SimpleFilename parser
  */
 public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 {
+    private SimpleFilenameParser parser;
+    private UMOMessageAdapter adapter;
+
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        parser = new SimpleFilenameParser();
+
+        adapter = new DefaultMessageAdapter("hello");
+        adapter.setProperty("foo", "bar");
+        adapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
+        adapter.setProperty(FileConnector.PROPERTY_FILENAME, "newName");
+    }
 
     public void testAntStyleParsing()
     {
-        SimpleFilenameParser parser = new SimpleFilenameParser();
-        DefaultMessageAdapter adapter = new DefaultMessageAdapter("hello");
-        adapter.setProperty("foo", "bar");
-        adapter.setProperty(FileConnector.PROPERTY_FILENAME, "blah");
         String result = parser.getFilename(adapter, "Test1_${COUNT}.txt");
         assertEquals("Test1_0.txt", result);
 
@@ -46,7 +57,7 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test6_1.txt", result);
 
         result = parser.getFilename(adapter, "Test7_${ORIGINALNAME}.txt");
-        assertEquals("Test7_blah.txt", result);
+        assertEquals("Test7_originalName.txt", result);
 
         result = parser.getFilename(adapter, "Test8_${foo}.txt");
         assertEquals("Test8_bar.txt", result);
@@ -58,10 +69,6 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 
     public void testSquareStyleParsing()
     {
-        SimpleFilenameParser parser = new SimpleFilenameParser();
-        DefaultMessageAdapter adapter = new DefaultMessageAdapter("hello");
-        adapter.setProperty("foo", "bar");
-        adapter.setProperty(FileConnector.PROPERTY_FILENAME, "blah");
         String result = parser.getFilename(adapter, "Test1_[COUNT].txt");
         assertEquals("Test1_0.txt", result);
 
@@ -81,7 +88,7 @@ public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test6_1.txt", result);
 
         result = parser.getFilename(adapter, "Test7_[ORIGINALNAME].txt");
-        assertEquals("Test7_blah.txt", result);
+        assertEquals("Test7_originalName.txt", result);
 
         result = parser.getFilename(adapter, "Test8_[foo].txt");
         assertEquals("Test8_bar.txt", result);
