@@ -30,43 +30,34 @@ public class DefaultMuleClassPathConfig
 
     private List urls = new LinkedList();
 
-    private String muleHome;
-
     /**
      * Constructs a new DefaultMuleClassPathConfig.
      */
-    public DefaultMuleClassPathConfig()
+    public DefaultMuleClassPathConfig(File muleHome)
     {
-        muleHome = System.getProperty("mule.home");
-        if (muleHome == null || muleHome.trim().length() == 0)
-        {
-            throw new IllegalArgumentException(
-                "Either MULE_HOME is not set or mule.home system property is missing.");
-        }
-
         try
         {
             // if trailing slash is specified, the folder will be added (e.g. for
             // properties files)
-            addURL(new URL("file:///" + muleHome + FOLDER_USER + "/"));
-            addURL(new URL("file:///" + muleHome + FOLDER_MULE + "/"));
-            addURL(new URL("file:///" + muleHome + FOLDER_OPT + "/"));
+            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_USER + "/"));
+            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_MULE + "/"));
+            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_OPT + "/"));
 
-            File[] muleJars = listJars(FOLDER_USER);
+            File[] muleJars = listJars(muleHome, FOLDER_USER);
             for (int i = 0; i < muleJars.length; i++)
             {
                 File jar = muleJars[i];
                 addURL(jar.toURL());
             }
 
-            muleJars = listJars(FOLDER_MULE);
+            muleJars = listJars(muleHome, FOLDER_MULE);
             for (int i = 0; i < muleJars.length; i++)
             {
                 File jar = muleJars[i];
                 addURL(jar.toURL());
             }
 
-            muleJars = listJars(FOLDER_OPT);
+            muleJars = listJars(muleHome, FOLDER_OPT);
             for (int i = 0; i < muleJars.length; i++)
             {
                 File jar = muleJars[i];
@@ -83,7 +74,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Getter for property 'urls'.
-     * 
+     *
      * @return A copy of 'urls'. Items are java.net.URL
      */
     public List getURLs()
@@ -93,7 +84,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Setter for property 'urls'.
-     * 
+     *
      * @param urls Value to set for property 'urls'.
      */
     public void addURLs(List urls)
@@ -106,7 +97,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Add a URL to Mule's classpath.
-     * 
+     *
      * @param url folder (should end with a slash) or jar path
      */
     public void addURL(URL url)
@@ -116,14 +107,13 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Find and if necessary filter the jars for classpath.
-     * 
+     *
      * @param muleSubfolder folder under Mule home to list
      * @return a list
      */
-    protected File[] listJars(String muleSubfolder)
+    protected File[] listJars(File muleHome, String muleSubfolder)
     {
-        String fullPath = muleHome + muleSubfolder;
-        File path = new File(fullPath);
+        File path = new File(muleHome, muleSubfolder);
 
         File[] jars = path.listFiles(new FileFilter()
         {

@@ -34,10 +34,10 @@ to actually use the connector, libraries are required which cannot be distribute
 part of Mule due to licensing restrictions.  In these cases it is up to the user to
 obtain the needed libraries and place them in the $MULE_HOME/lib/user directory.
 
-As a convenience, an Ant script is provided in $MULE_HOME/lib which will download Sun
-Microsystems' javax.mail, javax.activation, and jsr223 (scripting) libraries.  This is
-recommended if you plan to use the E-mail connector or Scripting support and you are not
-using an application server which already provides them.
+As a convenience, the very first time Mule is started, it will try to download Sun
+Microsystems' javax.mail, javax.activation, and jsr223 (scripting) libraries.  If you
+are behind a firewall, you may need to configure your HTTP proxy settings in the file
+$MULE_HOME/conf/wrapper.conf in order for this download to work.
 
 +--------------+
 | DISTRIBUTION |

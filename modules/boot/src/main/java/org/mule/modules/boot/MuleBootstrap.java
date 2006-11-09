@@ -10,15 +10,18 @@
 
 package org.mule.modules.boot;
 
-import org.mule.MuleServer;
-import org.mule.util.SystemUtils;
-import org.tanukisoftware.wrapper.WrapperSimpleApp;
-
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
+
+import org.mule.MuleServer;
+import org.mule.util.ClassUtils;
+import org.mule.util.SystemUtils;
+import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
 /**
  * Determine which is the main class to run and delegate control to the Java Service
@@ -38,12 +41,55 @@ public class MuleBootstrap
 
     /**
      * Entry point.
-     * 
+     *
      * @param args command-line arguments
      * @throws Exception in case of any fatal problem
      */
     public static void main(String args[]) throws Exception
     {
+        // Make sure MULE_HOME is set.
+        File muleHome = null;
+        String muleHomeVar = System.getProperty("mule.home");
+        // Note: we can't use StringUtils.isBlank() here because we don't have that library yet.
+        if (muleHomeVar != null && !muleHomeVar.trim().equals("")) {
+            muleHome = new File(muleHomeVar);
+        }
+        if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory()) {
+            throw new IllegalArgumentException(
+                "Either MULE_HOME is not set or does not contain a valid directory.");
+        }
+
+        // Build up a list of libraries from $MULE_HOME/lib/* and add them to the classpath.
+        DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(muleHome);
+        addLibrariesToClasspath(classPath.getURLs());
+
+        // One-time download to get libraries not included in the Mule distribution due
+        // to silly licensing restrictions.
+        if (!ClassUtils.isClassOnPath("javax.activation.DataSource", MuleBootstrap.class)) {
+            LibraryDownloader downloader = new LibraryDownloader(muleHome);
+            addLibrariesToClasspath(downloader.downloadLibraries());
+        }
+
+        // the core jar has been added dynamically, this construct will run with
+        // a new Mule classpath now
+        String mainClassName = SystemUtils.getCommandLineOption("-main", args);
+
+        if (mainClassName == null)
+        {
+            mainClassName = MuleServer.class.getName();
+        }
+
+        // Add the main class name as the first argument to the Wrapper.
+        String[] appArgs = new String[args.length + 1];
+        appArgs[0] = mainClassName;
+        System.arraycopy(args, 0, appArgs, 1, args.length);
+
+        // Call the wrapper
+        WrapperSimpleApp.main(appArgs);
+    }
+
+    private static void addLibrariesToClasspath(List urls)
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         ClassLoader sys = ClassLoader.getSystemClassLoader();
         if (!(sys instanceof URLClassLoader))
@@ -72,9 +118,6 @@ public class MuleBootstrap
          * not modified in those scenarios.
          */
 
-        DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig();
-        // get mule classpath urls pointing to jars and folders
-        List urls = classPath.getURLs();
         // get a Method ref from the normal class, but invoke on a proprietary parent
         // object,
         // as this method is usually protected in those classloaders
@@ -87,22 +130,5 @@ public class MuleBootstrap
             // System.out.println("Adding: " + url.toExternalForm());
             methodAddUrl.invoke(sysCl, new Object[]{url});
         }
-
-        // the core jar has been added dynamically, this construct will run with
-        // a new Mule classpath now
-        String mainClassName = SystemUtils.getCommandLineOption("-main", args);
-
-        if (mainClassName == null)
-        {
-            mainClassName = MuleServer.class.getName();
-        }
-
-        // Add the main class name as the first argument to the Wrapper.
-        String[] appArgs = new String[args.length + 1];
-        appArgs[0] = mainClassName;
-        System.arraycopy(args, 0, appArgs, 1, args.length);
-
-        // Call the wrapper
-        WrapperSimpleApp.main(appArgs);
     }
 }

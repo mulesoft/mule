@@ -33,6 +33,22 @@ import org.mule.MuleManager;
 // @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
+    public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
+        if (destination.exists() && !destination.canWrite()) {
+            throw new IOException("Destination file does not exist or is not writeable");
+        }
+
+        try {
+            FileOutputStream output = new FileOutputStream(destination);
+            try {
+                IOUtils.copy(input, output);
+            } finally {
+                IOUtils.closeQuietly(output);
+            }
+        } finally {
+            IOUtils.closeQuietly(input);
+        }
+    }
 
     // TODO Document me!
     public static File createFile(String filename) throws IOException
@@ -79,7 +95,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     /**
      * Reads the incoming String into a file at at the given destination.
-     * 
+     *
      * @param filename name and path of the file to create
      * @param data the contents of the file
      * @return the new file.

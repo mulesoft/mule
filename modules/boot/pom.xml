@@ -13,10 +13,16 @@
   <description>Classes used to boot up the Mule server</description>
 
   <dependencies>
-  	<dependency>
-            <groupId>tanukisoft</groupId>
-            <artifactId>wrapper</artifactId>
-            <version>3.2.1</version>
-    </dependency>
+          <dependency>
+                <groupId>tanukisoft</groupId>
+                <artifactId>wrapper</artifactId>
+                <version>3.2.1</version>
+        </dependency>
+        <!-- Needed for 3rd-party library download. -->
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.0.1</version>
+        </dependency>
   </dependencies>
 </project>
