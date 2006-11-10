@@ -56,11 +56,11 @@ public class Jms102bSupport extends Jms11Support
         }
         if (connectionFactory instanceof QueueConnectionFactory)
         {
-            return ((QueueConnectionFactory)connectionFactory).createQueueConnection(username, password);
+            return ((QueueConnectionFactory) connectionFactory).createQueueConnection(username, password);
         }
         else if (connectionFactory instanceof TopicConnectionFactory)
         {
-            return ((TopicConnectionFactory)connectionFactory).createTopicConnection(username, password);
+            return ((TopicConnectionFactory) connectionFactory).createTopicConnection(username, password);
         }
         else
         {
@@ -77,11 +77,11 @@ public class Jms102bSupport extends Jms11Support
         }
         if (connectionFactory instanceof QueueConnectionFactory)
         {
-            return ((QueueConnectionFactory)connectionFactory).createQueueConnection();
+            return ((QueueConnectionFactory) connectionFactory).createQueueConnection();
         }
         else if (connectionFactory instanceof TopicConnectionFactory)
         {
-            return ((TopicConnectionFactory)connectionFactory).createTopicConnection();
+            return ((TopicConnectionFactory) connectionFactory).createTopicConnection();
         }
         else
         {
@@ -98,11 +98,11 @@ public class Jms102bSupport extends Jms11Support
     {
         if (topic && connection instanceof TopicConnection)
         {
-            return ((TopicConnection)connection).createTopicSession(noLocal, ackMode);
+            return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
         }
         else if (connection instanceof QueueConnection)
         {
-            return ((QueueConnection)connection).createQueueSession(transacted, ackMode);
+            return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
         }
         else
         {
@@ -121,23 +121,22 @@ public class Jms102bSupport extends Jms11Support
         {
             if (durableName == null)
             {
-                return ((TopicSession)session).createSubscriber((Topic)destination, messageSelector, noLocal);
+                return ((TopicSession) session).createSubscriber((Topic) destination, messageSelector, noLocal);
             }
             else
             {
-                return ((TopicSession)session).createDurableSubscriber((Topic)destination, messageSelector,
-                    durableName, noLocal);
+                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
             }
         }
         else if (session instanceof QueueSession)
         {
             if (messageSelector != null)
             {
-                return ((QueueSession)session).createReceiver((Queue)destination, messageSelector);
+                return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
             }
             else
             {
-                return ((QueueSession)session).createReceiver((Queue)destination);
+                return ((QueueSession) session).createReceiver((Queue) destination);
             }
         }
         else
@@ -151,11 +150,11 @@ public class Jms102bSupport extends Jms11Support
     {
         if (topic && session instanceof TopicSession)
         {
-            return ((TopicSession)session).createPublisher((Topic)dest);
+            return ((TopicSession) session).createPublisher((Topic) dest);
         }
         else if (session instanceof QueueSession)
         {
-            return ((QueueSession)session).createSender((Queue)dest);
+            return ((QueueSession) session).createSender((Queue) dest);
         }
         else
         {
@@ -194,11 +193,11 @@ public class Jms102bSupport extends Jms11Support
 
         if (topic)
         {
-            return ((TopicSession)session).createTopic(name);
+            return session.createTopic(name);
         }
         else
         {
-            return ((QueueSession)session).createQueue(name);
+            return session.createQueue(name);
         }
     }
 
@@ -211,12 +210,12 @@ public class Jms102bSupport extends Jms11Support
     {
         if (topic && producer instanceof TopicPublisher)
         {
-            ((TopicPublisher)producer).publish(message, (persistent
+            ((TopicPublisher) producer).publish(message, (persistent
                             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
         else if (producer instanceof QueueSender)
         {
-            ((QueueSender)producer).send(message, (persistent
+            producer.send(message, (persistent
                             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
         else
@@ -235,12 +234,12 @@ public class Jms102bSupport extends Jms11Support
     {
         if (topic && producer instanceof TopicPublisher)
         {
-            ((TopicPublisher)producer).publish((Topic)dest, message, (persistent
+            ((TopicPublisher) producer).publish((Topic) dest, message, (persistent
                             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
         else if (producer instanceof QueueSender)
         {
-            ((QueueSender)producer).send((Queue)dest, message, (persistent
+            ((QueueSender) producer).send((Queue) dest, message, (persistent
                             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
         else

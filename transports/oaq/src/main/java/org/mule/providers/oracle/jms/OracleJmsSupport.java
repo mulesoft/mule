@@ -82,7 +82,7 @@ public class OracleJmsSupport extends Jms102bSupport
                                                  String username,
                                                  String password) throws JMSException
     {
-        return new OracleJmsConnection((OracleJmsConnector)connector);
+        return new OracleJmsConnection((OracleJmsConnector) connector);
     }
 
     /**
@@ -111,25 +111,25 @@ public class OracleJmsSupport extends Jms102bSupport
             {
                 if (durableName == null)
                 {
-                    return ((AQjmsSession)session).createSubscriber((Topic)destination, messageSelector,
+                    return ((AQjmsSession) session).createSubscriber((Topic) destination, messageSelector,
                         noLocal);
                 }
                 else
                 {
-                    return ((AQjmsSession)session).createDurableSubscriber((Topic)destination,
-                        messageSelector, durableName, noLocal, payloadFactory);
+                    return ((AQjmsSession) session).createDurableSubscriber((Topic) destination,
+                        durableName, messageSelector, noLocal, payloadFactory);
                 }
             }
             else if (session instanceof QueueSession)
             {
                 if (messageSelector != null)
                 {
-                    return ((AQjmsSession)session).createReceiver((Queue)destination, messageSelector,
+                    return ((AQjmsSession) session).createReceiver((Queue) destination, messageSelector,
                         payloadFactory);
                 }
                 else
                 {
-                    return ((AQjmsSession)session).createReceiver((Queue)destination, payloadFactory);
+                    return ((AQjmsSession) session).createReceiver((Queue) destination, payloadFactory);
                 }
             }
             else
@@ -153,14 +153,18 @@ public class OracleJmsSupport extends Jms102bSupport
     {
         Destination dest = super.createDestination(session, name, topic);
         if (dest != null)
+        {
             return dest;
+        }
         else
+        {
             throw new JMSException(
-                "Oracle JMS was unable to bind to the "
-                                + (topic ? "topic" : "queue")
-                                + ": "
-                                + name
-                                + " but gives no exception nor error message to explain why (that's what you get for using proprietary software...)");
+                    "Oracle JMS was unable to bind to the "
+                            + (topic ? "topic" : "queue")
+                            + ": "
+                            + name
+                            + " but gives no exception nor error message to explain why (that's what you get for using proprietary software...)");
+        }
     }
 
     /**
@@ -177,9 +181,13 @@ public class OracleJmsSupport extends Jms102bSupport
     {
         Destination dest = super.createTemporaryDestination(session, topic);
         if (dest != null)
+        {
             return dest;
+        }
         else
+        {
             throw new JMSException("Unable to create temporary " + (topic ? "topic" : "queue"));
+        }
     }
 
     /**
@@ -192,14 +200,14 @@ public class OracleJmsSupport extends Jms102bSupport
     {
 
         // Get the global property set on the connector, if any.
-        String payloadFactoryClass = ((OracleJmsConnector)connector).getPayloadFactory();
+        String payloadFactoryClass = ((OracleJmsConnector) connector).getPayloadFactory();
 
         // If the property has been set for this endpoint, it overrides the global
         // setting.
         if ((endpointProperties != null)
             && (endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY) != null))
         {
-            payloadFactoryClass = (String)endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY);
+            payloadFactoryClass = (String) endpointProperties.get(OracleJmsConnector.PAYLOADFACTORY_PROPERTY);
         }
 
         Object payloadFactory = null;
@@ -208,6 +216,7 @@ public class OracleJmsSupport extends Jms102bSupport
             Throwable ex = null;
             try
             {
+                // TODO ClassUtils call is more suitable here
                 payloadFactory = Class.forName(payloadFactoryClass).newInstance();
             }
             catch (ClassNotFoundException e)
@@ -223,8 +232,10 @@ public class OracleJmsSupport extends Jms102bSupport
                 ex = e;
             }
             if (ex != null)
+            {
                 throw new JMSException("Unable to instantiate payload factory class " + payloadFactoryClass
-                                       + ": " + ex.getMessage());
+                        + ": " + ex.getMessage());
+            }
         }
         return payloadFactory;
     }

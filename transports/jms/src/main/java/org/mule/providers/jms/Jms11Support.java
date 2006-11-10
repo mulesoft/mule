@@ -108,7 +108,7 @@ public class Jms11Support implements JmsSupport
         {
             if (topic)
             {
-                return session.createDurableSubscriber((Topic)destination, durableName, messageSelector,
+                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector,
                     noLocal);
             }
             else
