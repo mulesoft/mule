@@ -42,14 +42,6 @@
             <!-- how many times to try and deliver a redelivered message -->
             <property name="maxRedelivery" value="1"/>
         </properties>
-        <!-- this exception strategy will forward the current message to a jms queue
-        and will do so in the current transaction if it is available
-        -->
-        <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
-            <endpoint address="jms://DLQ">
-                <transaction action="JOIN_IF_POSSIBLE"/>
-            </endpoint>
-        </exception-strategy>
     </connector>
 
     <model name="dev">
@@ -67,7 +59,15 @@
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="jms://out.queue"/>
                 </router>
-            </outbound-router>
+            </outbound-router>			
+			<!-- this exception strategy will forward the current message to a jms queue
+        	and will do so in the current transaction if it is available
+			-->
+			<exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
+				<endpoint address="jms://DLQ">
+					<transaction action="JOIN_IF_POSSIBLE"/>
+				</endpoint>
+			</exception-strategy>
         </mule-descriptor>
     </model>
 </mule-configuration>
