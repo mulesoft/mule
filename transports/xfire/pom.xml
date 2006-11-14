@@ -56,6 +56,11 @@
             <artifactId>xfire-aegis</artifactId>
             <version>1.2.2</version>
         </dependency>
+		<dependency>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>xfire-ws-security</artifactId>
+            <version>1.2</version>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-annotations</artifactId>
@@ -95,6 +100,11 @@
             <groupId>woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>3.0.2</version>
+        </dependency>
+		<dependency>
+            <groupId>wss4j</groupId>
+            <artifactId>wss4j</artifactId>
+            <version>1.5.0</version>
         </dependency>
     </dependencies>
 </project>

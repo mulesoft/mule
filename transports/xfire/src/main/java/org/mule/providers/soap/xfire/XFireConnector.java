@@ -11,6 +11,7 @@
 package org.mule.providers.soap.xfire;
 
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
@@ -46,13 +47,13 @@ import org.mule.util.SystemUtils;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XFireConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener
+public class XFireConnector extends AbstractServiceEnabledConnector
+    implements ModelNotificationListener
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
     public static final String XFIRE_PROPERTY = "xfire";
     public static final String XFIRE_TRANSPORT = "transportClass";
-
 
     private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
 
@@ -70,6 +71,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     private String clientTransport = null;
 
     private String serviceTransport = null;
+    private Map wsSecurity;
 
     public XFireConnector()
     {
@@ -107,11 +109,11 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         {
             xfire = new DefaultXFire();
         }
-        
-        if(clientServices != null)
+
+        if (clientServices != null)
         {
             ObjectServiceFactory factory = new ObjectServiceFactory();
-            for(int i = 0; i < clientServices.size(); i++)
+            for (int i = 0; i < clientServices.size(); i++)
             {
                 try
                 {
@@ -119,9 +121,10 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
                     Service service = factory.create(clazz);
                     xfire.getServiceRegistry().register(service);
                 }
-                catch(ClassNotFoundException e)
+                catch (ClassNotFoundException e)
                 {
-                    throw new InitialisationException(new Message("xfire", 10, clientServices.get(i)), e, this);
+                    throw new InitialisationException(new Message("xfire", 10, clientServices
+                        .get(i)), e, this);
                 }
             }
         }
@@ -137,14 +140,14 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
                 }
                 try
                 {
-                    WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS,
-                        null, this.getClass());
+                    WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
+                        CLASSNAME_ANNOTATIONS, null, this.getClass());
                     serviceFactory = new AnnotationServiceFactory(wa, xfire.getTransportManager());
                 }
                 catch (Exception ex)
                 {
-                    throw new InitialisationException(new Message("xfire", 10, CLASSNAME_ANNOTATIONS), ex,
-                        this);
+                    throw new InitialisationException(new Message("xfire", 10,
+                        CLASSNAME_ANNOTATIONS), ex, this);
                 }
             }
             else
@@ -202,7 +205,9 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             {
                 xfireDescriptor.getProperties().put(XFIRE_PROPERTY, xfire);
             }
-            if (serviceTransport != null && xfireDescriptor.getProperties().get(XFIRE_TRANSPORT) == null) {
+            if (serviceTransport != null
+                && xfireDescriptor.getProperties().get(XFIRE_TRANSPORT) == null)
+            {
                 xfireDescriptor.getProperties().put(XFIRE_TRANSPORT, serviceTransport);
             }
             xfireDescriptor.setContainerManaged(false);
@@ -234,12 +239,13 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         // If we are using sockets then we need to set the endpoint name appropiately
         // and if using http/https
         // we need to default to POST and set the Content-Type
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
-            || scheme.equals("servlet"))
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl")
+            || scheme.equals("tcp") || scheme.equals("servlet"))
         {
             endpoint += "/" + serviceName;
             receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-            receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE,
+                "text/xml");
         }
 
         UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
@@ -268,8 +274,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     protected MuleDescriptor createxfireDescriptor()
     {
-        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
-            XFIRE_SERVICE_COMPONENT_NAME + getName());
+        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel()
+            .getDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
         if (xfireDescriptor == null)
         {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
@@ -304,7 +310,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         }
         else
         {
-            return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+            return endpoint.getEndpointURI().getAddress() + "/"
+                   + component.getDescriptor().getName();
         }
     }
 
@@ -322,52 +329,52 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
     {
         return clientServices;
     }
-    
+
     public void setClientServices(List clientServices)
     {
-       this.clientServices = clientServices;
+        this.clientServices = clientServices;
     }
-    
+
     public List getClientInHandlers()
     {
         return clientInHandlers;
     }
-    
+
     public void setClientInHandlers(List handlers)
     {
-       clientInHandlers = handlers;
+        clientInHandlers = handlers;
     }
-    
+
     public List getClientOutHandlers()
     {
-       return clientOutHandlers;
+        return clientOutHandlers;
     }
-    
+
     public void setClientOutHandlers(List handlers)
     {
-       clientOutHandlers = handlers;
+        clientOutHandlers = handlers;
     }
-    
+
     public String getClientTransport()
     {
-       return clientTransport;
+        return clientTransport;
     }
-    
+
     public void setClientTransport(String transportClass)
     {
-       clientTransport = transportClass;
+        clientTransport = transportClass;
     }
-    
+
     public String getServiceTransport()
     {
-       return serviceTransport;
+        return serviceTransport;
     }
-    
+
     public void setServiceTransport(String transportClass)
     {
-       serviceTransport = transportClass;
+        serviceTransport = transportClass;
     }
-    
+
     public void onNotification(UMOServerNotification event)
     {
         if (event.getAction() == ModelNotification.MODEL_STARTED)
@@ -381,7 +388,8 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
             // new service and a
             // different http port the model needs to be restarted before the
             // listener is available
-            if (!MuleManager.getInstance().getModel().isComponentRegistered(XFIRE_SERVICE_COMPONENT_NAME + getName()))
+            if (!MuleManager.getInstance().getModel().isComponentRegistered(
+                XFIRE_SERVICE_COMPONENT_NAME + getName()))
             {
                 try
                 {
@@ -407,4 +415,13 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         }
     }
 
+    public Map getWsSecurity()
+    {
+        return wsSecurity;
+    }
+
+    public void setWsSecurity(Map wsSecurity)
+    {
+        this.wsSecurity = wsSecurity;
+    }
 }
