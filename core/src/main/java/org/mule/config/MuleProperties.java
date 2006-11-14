@@ -55,7 +55,7 @@ public interface MuleProperties
      * configured, The default is true
      */
     public final String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
-                                                                  + ".start.after.config";
+                                                                  + "start.after.config";
 
     // End System properties
 
