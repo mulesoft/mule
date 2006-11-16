@@ -10,55 +10,25 @@
 
 package org.mule.transformers.codec;
 
-import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.SgmlCodec;
-
-import java.io.UnsupportedEncodingException;
 
 /**
- * Decodes a string containing SGML entities
+ * Decodes a String containing XML entities into its proper XML representation
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @deprecated use XMLEntityDecoder instead
  */
-public class SgmlEntityDecoder extends AbstractTransformer
+public class SgmlEntityDecoder extends XMLEntityDecoder
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 7958646035249197129L;
 
-    public SgmlEntityDecoder()
-    {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        setReturnClass(String.class);
-    }
-
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src instanceof byte[])
-        {
-            if (encoding != null)
-            {
-                try
-                {
-                    return SgmlCodec.decodeString(new String((byte[])src, encoding));
-                }
-                catch (UnsupportedEncodingException ex)
-                {
-                    return SgmlCodec.decodeString(new String((byte[])src));
-                }
-            }
-            else
-            {
-                return SgmlCodec.decodeString(new String((byte[])src));
-            }
-        }
-        else
-        {
-            return SgmlCodec.decodeString(src.toString());
-        }
+        logger.warn(this.getClass().getName() + " is deprecated; please use "
+                    + this.getClass().getSuperclass().getName());
+        return super.doTransform(src, encoding);
     }
+
 }
