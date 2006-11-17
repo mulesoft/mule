@@ -83,6 +83,8 @@ Assembly descriptor for the Mule JCA distribution.
                 <!-- Transaction manager will usually be provided by the container -->
                 <!--<exclude>org.mule.modules:mule-module-jotm</exclude>-->
                 <!-- 3rd-party libs -->
+                <exclude>javax.activation:activation</exclude>
+                <exclude>javax.mail:mail</exclude>
                 <exclude>junit:junit</exclude>
                 <!-- Examples -->
                 <exclude>org.mule.examples:mule-example-echo</exclude>
