@@ -17,7 +17,7 @@ import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 
-public class XXFireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
+public class XFireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
 {
     protected MuleDescriptor descriptor;
 
