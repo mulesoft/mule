@@ -19,10 +19,7 @@ import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.umo.UMOEvent;
 
 /**
- * Writes the Mule Soap Header to the outgoing request
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Writes the Mule Soap Header to the outgoing request.
  */
 public class MuleHeadersOutHandler extends AbstractHandler
 {

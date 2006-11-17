@@ -25,23 +25,21 @@ import org.mule.providers.soap.xfire.MuleInvoker;
 import org.mule.umo.manager.UMOWorkManager;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class MuleLocalTransport extends AbstractTransport implements SoapTransport, WSDL11Transport
 {
+    public static final String BINDING_ID = "urn:xfire:transport:local";
+    public static final String URI_PREFIX = "xfire.local://";
+
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public final static String BINDING_ID = "urn:xfire:transport:local";
-    public final static String URI_PREFIX = "xfire.local://";
     private Session session;
     private boolean maintainSession;
-    protected UMOWorkManager workManager;
+    protected final UMOWorkManager workManager;
 
     public MuleLocalTransport(UMOWorkManager workManager)
     {

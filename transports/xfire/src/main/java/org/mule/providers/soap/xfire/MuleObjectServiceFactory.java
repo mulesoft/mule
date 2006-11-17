@@ -23,15 +23,12 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class MuleObjectServiceFactory extends ObjectServiceFactory
 {
 
-    protected Set excludedMethods;
+    protected final Set excludedMethods = new HashSet();
 
     /**
      * Initializes a new instance of the <code>ObjectServiceFactory</code>.
@@ -44,8 +41,7 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory
 
     protected void initExcludedMethods()
     {
-        excludedMethods = new HashSet();
-
+        // JDK methods to be ignored
         addIgnoredMethods("java.lang.Object");
         addIgnoredMethods("java.lang.Throwable");
         addIgnoredMethods("org.omg.CORBA_2_3.portable.ObjectImpl");
@@ -53,7 +49,7 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory
         addIgnoredMethods("javax.ejb.EJBObject");
         addIgnoredMethods("javax.rmi.CORBA.Stub");
 
-        // Mule ignorred methods
+        // Mule methods to be ignored
         addIgnoredMethods(Callable.class.getName());
         addIgnoredMethods(Initialisable.class.getName());
         addIgnoredMethods(Disposable.class.getName());
@@ -104,4 +100,5 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory
     {
         return method.getName();
     }
+
 }

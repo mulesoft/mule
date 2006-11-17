@@ -13,10 +13,7 @@ package org.mule.providers.soap.xfire.wsdl;
 import org.mule.providers.soap.xfire.XFireConnector;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class XFireWsdlConnector extends XFireConnector
 {

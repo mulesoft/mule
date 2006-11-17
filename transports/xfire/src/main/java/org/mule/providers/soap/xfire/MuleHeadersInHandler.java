@@ -18,14 +18,11 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.soap.MuleSoapHeaders;
 
 /**
- * Reads the Mule Soap Header and sets the various header properties on the context
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Reads the Mule Soap Header and sets the various header properties on the context.
  */
 public class MuleHeadersInHandler extends AbstractHandler
 {
-    protected Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
+    protected final Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
         MuleSoapHeaders.MULE_10_ACTOR);
 
     /**

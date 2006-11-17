@@ -23,9 +23,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 {

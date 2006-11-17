@@ -10,7 +10,20 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +39,7 @@ import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Session;
+import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.util.STAXUtils;
 import org.mule.MuleException;
 import org.mule.impl.message.ExceptionPayload;
@@ -35,40 +49,23 @@ import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.StringUtils;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-
-import org.codehaus.xfire.transport.Transport;
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class MuleLocalChannel extends AbstractChannel
 {
+    protected static final String SENDER_URI = "senderUri";
+    protected static final String OLD_CONTEXT = "urn:xfire:transport:local:oldContext";
+    protected static final String DEFAULT_WS_IN_DENCRYPTION_FILE = "insecurity.properties";
+
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected static final String SENDER_URI = "senderUri";
-    protected static final String OLD_CONTEXT = "urn:xfire:transport:local:oldContext";
-    protected static final String DEFAULT_WS_IN_DENCRYPTION_FILE = "insecurity.properties";
-
     private final Session session;
-
     protected UMOWorkManager workManager;
 
     public MuleLocalChannel(String uri, Transport transport, Session session)
@@ -90,8 +87,8 @@ public class MuleLocalChannel extends AbstractChannel
             final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
             if (out != null)
             {
-                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message
-                    .getEncoding(), context);
+                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
+                    context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
@@ -99,8 +96,7 @@ public class MuleLocalChannel extends AbstractChannel
             {
                 MessageContext oldContext = (MessageContext)context.getProperty(OLD_CONTEXT);
 
-                sendViaNewChannel(context, oldContext, message, (String)context
-                    .getProperty(SENDER_URI));
+                sendViaNewChannel(context, oldContext, message, (String)context.getProperty(SENDER_URI));
             }
         }
         else
@@ -238,8 +234,8 @@ public class MuleLocalChannel extends AbstractChannel
         {
             try
             {
-                final XMLStreamReader reader = STAXUtils.createXMLStreamReader(stream, message
-                    .getEncoding(), context);
+                final XMLStreamReader reader = STAXUtils.createXMLStreamReader(stream, message.getEncoding(),
+                    context);
                 final InMessage inMessage = new InMessage(reader, uri);
                 inMessage.setEncoding(message.getEncoding());
 
@@ -287,8 +283,8 @@ public class MuleLocalChannel extends AbstractChannel
         {
             try
             {
-                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(stream, message
-                    .getEncoding(), context);
+                final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(stream, message.getEncoding(),
+                    context);
                 message.getSerializer().writeMessage(message, writer, context);
 
                 writer.close();
@@ -360,14 +356,12 @@ public class MuleLocalChannel extends AbstractChannel
             // Ws Security
             if (ctx.getMessage().getProperty(WSHandlerConstants.ACTION) != null)
             {
-                context.setProperty(WSHandlerConstants.ACTION, ctx.getMessage().getProperty(
-                    "action"));
-                context.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, ctx.getMessage()
-                    .getProperty(WSHandlerConstants.PW_CALLBACK_CLASS));
+                context.setProperty(WSHandlerConstants.ACTION, ctx.getMessage().getProperty("action"));
+                context.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, ctx.getMessage().getProperty(
+                    WSHandlerConstants.PW_CALLBACK_CLASS));
                 if (ctx.getMessage().getProperty("action").equals(WSHandlerConstants.ENCRYPT))
                 {
-                    context.setProperty(WSHandlerConstants.DEC_PROP_FILE,
-                        DEFAULT_WS_IN_DENCRYPTION_FILE);
+                    context.setProperty(WSHandlerConstants.DEC_PROP_FILE, DEFAULT_WS_IN_DENCRYPTION_FILE);
                 }
             }
 
@@ -377,8 +371,7 @@ public class MuleLocalChannel extends AbstractChannel
             Object payload = ctx.getMessage().getPayload();
             if (payload instanceof InputStream)
             {
-                reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(),
-                    context);
+                reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
             }
             else if (payload instanceof Reader)
             {
@@ -407,14 +400,12 @@ public class MuleLocalChannel extends AbstractChannel
                 if (fault != null && fault.getBody() != null)
                 {
                     result = resultStream.toString(fault.getEncoding());
-                    ExceptionPayload exceptionPayload = new ExceptionPayload(new Exception(result
-                        .toString()));
+                    ExceptionPayload exceptionPayload = new ExceptionPayload(new Exception(result.toString()));
                     ctx.getMessage().setExceptionPayload(exceptionPayload);
                 }
                 else if (context.getExchange().hasOutMessage())
                 {
-                    result = resultStream.toString(context.getExchange().getOutMessage()
-                        .getEncoding());
+                    result = resultStream.toString(context.getExchange().getOutMessage().getEncoding());
                 }
             }
             catch (UnsupportedEncodingException e1)

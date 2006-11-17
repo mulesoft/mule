@@ -15,13 +15,9 @@ import org.mule.umo.UMOSession;
 
 /**
  * Mules session wrapper for XFire
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XFireMuleSession implements Session
 {
-
     UMOSession session;
 
     public XFireMuleSession(UMOSession session)

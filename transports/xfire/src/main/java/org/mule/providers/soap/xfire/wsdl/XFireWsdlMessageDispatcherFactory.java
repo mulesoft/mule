@@ -17,9 +17,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates an XFire WSDL Message Dispatcher
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XFireWsdlMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

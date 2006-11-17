@@ -28,10 +28,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
- * attahcments and Mule headers
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * attachments and Mule headers.
  */
 public class XFireMessageAdapter extends AbstractMessageAdapter
 {
@@ -40,7 +37,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 419878758858206446L;
 
-    private Object payload;
+    private final Object payload;
     private MessageContext messageContext;
 
     private UMOTransformer trans = new SerializableToByteArray();

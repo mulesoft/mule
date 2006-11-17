@@ -26,15 +26,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * Invokes a Mule Service via an Xfire binding
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Invokes a Mule Service via an XFire binding.
  */
 public class MuleInvoker implements Invoker
 {
-    private AbstractMessageReceiver receiver;
-    private boolean synchronous = true;
+    private final AbstractMessageReceiver receiver;
+    private final boolean synchronous;
 
     public MuleInvoker(AbstractMessageReceiver receiver, boolean synchronous)
     {

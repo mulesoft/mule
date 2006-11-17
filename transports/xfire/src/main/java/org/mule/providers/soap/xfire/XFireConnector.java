@@ -43,9 +43,6 @@ import org.mule.util.SystemUtils;
 
 /**
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XFireConnector extends AbstractServiceEnabledConnector
     implements ModelNotificationListener

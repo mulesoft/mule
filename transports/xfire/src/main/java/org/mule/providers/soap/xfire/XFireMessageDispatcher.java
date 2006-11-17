@@ -10,6 +10,18 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
@@ -36,27 +48,12 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.TemplateParser;
 
-import javax.activation.DataHandler;
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 /**
- * The XfireMessageDispatcher is used for making Soap client requests to remote
- * services using the Xfire soap stack
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * The XFireMessageDispatcher is used for making Soap client requests to remote
+ * services.
  */
 public class XFireMessageDispatcher extends AbstractMessageDispatcher
 {
-
     protected XFireConnector connector;
     protected ObjectPool clientPool;
 
@@ -95,8 +92,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
                     if (!inList.contains("org.codehaus.xfire.security.wss4j.WSS4JInHandler"))
                     {
-                        Class clazz = Class
-                            .forName("org.codehaus.xfire.security.wss4j.WSS4JInHandler");
+                        Class clazz = Class.forName("org.codehaus.xfire.security.wss4j.WSS4JInHandler");
                         Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                         service.addInHandler(handler);
                     }
@@ -122,8 +118,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
                     if (!outList.contains("org.codehaus.xfire.security.wss4j.WSS4JOutHandler"))
                     {
-                        Class clazz = Class
-                            .forName("org.codehaus.xfire.security.wss4j.WSS4JOutHandler");
+                        Class clazz = Class.forName("org.codehaus.xfire.security.wss4j.WSS4JOutHandler");
                         Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                         service.addOutHandler(handler);
                     }
@@ -138,8 +133,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             }
             try
             {
-                clientPool = new StackObjectPool(new XFireClientPoolFactory(endpoint, service,
-                    xfire));
+                clientPool = new StackObjectPool(new XFireClientPoolFactory(endpoint, service, xfire));
                 clientPool.addObject();
             }
             catch (Exception ex)
@@ -175,12 +169,11 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
         if (method == null)
         {
-            method = (String)event.getEndpoint().getProperties().get(
-                MuleProperties.MULE_METHOD_PROPERTY);
+            method = (String)event.getEndpoint().getProperties().get(MuleProperties.MULE_METHOD_PROPERTY);
             if (method == null)
             {
-                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event
-                    .getMessage(), event.getEndpoint());
+                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
+                    event.getEndpoint());
             }
         }
         return method;
@@ -228,8 +221,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
             String method = getMethod(event);
             // Set custom soap action if set on the event or endpoint
-            String soapAction = (String)event.getMessage().getProperty(
-                SoapConstants.SOAP_ACTION_PROPERTY);
+            String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
             if (soapAction != null)
             {
                 soapAction = parseSoapAction(soapAction, new QName(method), event);
@@ -254,14 +246,14 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
                 client.setProperty(WSHandlerConstants.PASSWORD_TYPE, passwordType);
                 client.setProperty(WSHandlerConstants.USER, event.getMessage().getProperty(
                     WSHandlerConstants.USER));
-                client.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, event.getMessage()
-                    .getProperty(WSHandlerConstants.PW_CALLBACK_CLASS));
+                client.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, event.getMessage().getProperty(
+                    WSHandlerConstants.PW_CALLBACK_CLASS));
 
                 // if encrypted
                 if (event.getMessage().getProperty(WSHandlerConstants.ENC_PROP_FILE) != null)
                 {
-                    client.setProperty(WSHandlerConstants.ENC_PROP_FILE, event.getMessage()
-                        .getProperty(WSHandlerConstants.ENC_PROP_FILE));
+                    client.setProperty(WSHandlerConstants.ENC_PROP_FILE, event.getMessage().getProperty(
+                        WSHandlerConstants.ENC_PROP_FILE));
                 }
             }
 
@@ -413,9 +405,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         properties.put("hostInfo", endpointURI.getScheme()
                                    + "://"
                                    + endpointURI.getHost()
-                                   + (endpointURI.getPort() > -1 ? ":"
-                                                                   + String.valueOf(endpointURI
-                                                                       .getPort()) : ""));
+                                   + (endpointURI.getPort() > -1
+                                                   ? ":" + String.valueOf(endpointURI.getPort()) : ""));
         if (event.getComponent() != null)
         {
             properties.put("serviceName", event.getComponent().getDescriptor().getName());
