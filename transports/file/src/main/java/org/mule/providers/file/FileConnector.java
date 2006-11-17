@@ -17,6 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
+import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
@@ -56,6 +57,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_MOVE_TO_DIRECTORY = "moveToDirectory";
     public static final String PROPERTY_DELETE_ON_READ = "autoDelete";
     public static final String PROPERTY_DIRECTORY = "directory";
+    public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
+    public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
@@ -169,6 +172,16 @@ public class FileConnector extends AbstractServiceEnabledConnector
                 {
                     logger.error("Failed to set fileAge", ex1);
                 }
+            }
+            Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
+            if (srvOverride != null) {
+                if (serviceOverrides == null) {
+                    serviceOverrides = new Properties();
+                }
+                serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
+                    NoActionTransformer.class.getName());
+                serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
+                    NoActionTransformer.class.getName());
             }
         }
 

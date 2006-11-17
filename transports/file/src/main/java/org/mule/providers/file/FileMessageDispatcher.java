@@ -91,6 +91,14 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         throws UMOException
     {
         String address = endpoint.getEndpointURI().getAddress();
+        String writeToDirectory = message.getStringProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null); 
+         if (writeToDirectory == null) { 
+             writeToDirectory = connector.getWriteToDirectory(); 
+         } 
+         if (writeToDirectory!=null) { 
+             address = connector.getFilenameParser().getFilename(message, writeToDirectory); 
+         } 
+        
         String filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
 
         try
