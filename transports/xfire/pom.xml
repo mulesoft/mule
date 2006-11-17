@@ -59,7 +59,27 @@
 		<dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-ws-security</artifactId>
-            <version>1.2</version>
+            <version>1.2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.xfire</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- re-add BouncyCastle provider for JDK 1.4 -->
+        <dependency>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>bcprov-jdk14</artifactId>
+            <version>133</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
