@@ -91,33 +91,42 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         throws UMOException
     {
         String address = endpoint.getEndpointURI().getAddress();
-        String writeToDirectory = message.getStringProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null); 
-         if (writeToDirectory == null) { 
-             writeToDirectory = connector.getWriteToDirectory(); 
-         } 
-         if (writeToDirectory!=null) { 
-             address = connector.getFilenameParser().getFilename(message, writeToDirectory); 
-         } 
-        
-        String filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+        String writeToDirectory = message.getStringProperty(
+            FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
+        if (writeToDirectory == null)
+        {
+            writeToDirectory = connector.getWriteToDirectory();
+        }
+        if (writeToDirectory != null)
+        {
+            address = connector.getFilenameParser().getFilename(message, writeToDirectory);
+        }
 
+        String filename = null;
+        String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+        if (outPattern == null)
+        {
+            outPattern = connector.getOutputPattern();
+        }
         try
         {
-            if (filename == null)
+            if (outPattern != null)
             {
-                String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
-                if (outPattern == null)
-                {
-                    outPattern = connector.getOutputPattern();
-                }
                 filename = generateFilename(message, outPattern);
+            }
+            else
+            {
+                filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+                if (filename == null)
+                {
+                    filename = generateFilename(message, null);
+                }
             }
 
             if (filename == null)
             {
                 throw new IOException("Filename is null");
             }
-
             File file = FileUtils.createFile(address + "/" + filename);
             if (logger.isInfoEnabled())
             {
@@ -129,8 +138,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (IOException e)
         {
-            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint,
-                e);
+            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message,
+                endpoint, e);
         }
     }
 
@@ -197,11 +206,12 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 if (connector.getMoveToDirectory() != null)
                 {
                     {
-                        File destinationFile = new File(connector.getMoveToDirectory(), result.getName());
+                        File destinationFile = new File(connector.getMoveToDirectory(), result
+                            .getName());
                         if (!result.renameTo(destinationFile))
                         {
-                            logger.error("Failed to move file: " + result.getAbsolutePath() + " to "
-                                         + destinationFile.getAbsolutePath());
+                            logger.error("Failed to move file: " + result.getAbsolutePath()
+                                         + " to " + destinationFile.getAbsolutePath());
                         }
                     }
                 }
