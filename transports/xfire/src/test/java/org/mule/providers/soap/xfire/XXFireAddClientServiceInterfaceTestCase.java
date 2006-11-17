@@ -17,7 +17,7 @@ import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 
-public class XfireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
+public class XXFireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
 {
     protected MuleDescriptor descriptor;
 
@@ -41,9 +41,9 @@ public class XfireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
             connector.dispose();
         }
     }
-    
+
     public void testXfireAddClientServiceInterface() throws Exception
-    {  
+    {
         assertNotNull(connector.getXfire().getServiceRegistry().getService("EchoService"));
     }
 }
