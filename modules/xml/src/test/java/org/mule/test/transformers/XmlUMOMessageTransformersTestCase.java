@@ -10,6 +10,9 @@
 
 package org.mule.test.transformers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -20,13 +23,6 @@ import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private UMOMessage testObject = null;
@@ -73,10 +69,11 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
         return "<org.mule.impl.MuleMessage>\n"
                + "  <adapter class=\"org.mule.providers.DefaultMessageAdapter\">\n"
                + "    <message class=\"string\">test</message>\n"
-               + "    <id>"
-               + testObject.getUniqueId()
-               + "</id>\n"
                + "    <properties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\">\n"
+               + "      <entry>\n"
+               + "        <string>string</string>\n"
+               + "        <string>hello</string>\n"
+               + "      </entry>\n"
                + "      <entry>\n"
                + "        <string>object</string>\n"
                + "        <org.mule.tck.testmodels.fruit.Apple>\n"
@@ -85,16 +82,15 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "        </org.mule.tck.testmodels.fruit.Apple>\n"
                + "      </entry>\n"
                + "      <entry>\n"
-               + "        <string>string</string>\n"
-               + "        <string>hello</string>\n"
-               + "      </entry>\n"
-               + "      <entry>\n"
                + "        <string>number</string>\n"
                + "        <int>1</int>\n"
                + "      </entry>\n"
                + "    </properties>\n"
-               + "    <attachments  class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
-               + "    <encoding>UTF-8</encoding>\n" + "  </adapter>\n" + "</org.mule.impl.MuleMessage>";
+               + "    <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
+               + "    <encoding>UTF-8</encoding>\n"
+               + "    <id>" + testObject.getUniqueId() + "</id>\n"
+               + "  </adapter>\n"
+               + "</org.mule.impl.MuleMessage>";
     }
 
     public boolean compareRoundtripResults(Object src, Object result)

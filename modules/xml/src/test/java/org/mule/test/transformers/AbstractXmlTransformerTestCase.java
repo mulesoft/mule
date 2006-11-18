@@ -11,6 +11,7 @@
 package org.mule.test.transformers;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.mule.tck.AbstractTransformerTestCase;
 
 /**
@@ -18,6 +19,12 @@ import org.mule.tck.AbstractTransformerTestCase;
  */
 public abstract class AbstractXmlTransformerTestCase extends AbstractTransformerTestCase
 {
+
+    protected AbstractXmlTransformerTestCase()
+    {
+        super();
+        XMLUnit.setIgnoreWhitespace(true);
+    }
 
     /**
      * Different JVMs serialize fields to XML in a different order. Make sure we DO
