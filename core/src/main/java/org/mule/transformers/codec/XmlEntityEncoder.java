@@ -17,16 +17,16 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.XMLEntityCodec;
 
 /**
- * Decodes a String or byte[] containing XML entities
+ * Encodes a string with XML entities
  */
-public class XXmlEntityDecoder extends AbstractTransformer
+public class XmlEntityEncoder extends AbstractTransformer
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -3198566471610838679L;
+    private static final long serialVersionUID = -6652088350713495578L;
 
-    public XXmlEntityDecoder()
+    public XmlEntityEncoder()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
@@ -48,7 +48,7 @@ public class XXmlEntityDecoder extends AbstractTransformer
                 data = (String)src;
             }
 
-            return XMLEntityCodec.decodeString(data);
+            return XMLEntityCodec.encodeString(data);
         }
         catch (Exception ex)
         {
@@ -57,5 +57,4 @@ public class XXmlEntityDecoder extends AbstractTransformer
 
         }
     }
-
 }
