@@ -10,25 +10,23 @@
 
 package org.mule.transformers.codec;
 
-import org.mule.umo.transformer.TransformerException;
-
 /**
  * Encodes an XML String into entity-encoded form
  * 
- * @deprecated use XMLEntityEncoder instead
+ * @deprecated use {@link XmlEntityEncoder} instead
  */
-public class SgmlEntityEncoder extends XMLEntityEncoder
+public class SgmlEntityEncoder extends XmlEntityEncoder
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 4229616539951956886L;
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public SgmlEntityEncoder()
     {
+        super();
         logger.warn(this.getClass().getName() + " is deprecated; please use "
                     + this.getClass().getSuperclass().getName());
-        return super.doTransform(src, encoding);
     }
 
 }
