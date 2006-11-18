@@ -48,7 +48,9 @@ public class XStreamFactory
 
         // We must always register this converter as the Mule Message uses
         // ConcurrentHashMaps, but XStream currently does not support them out of the
-        // box
+        // box.
+        // TODO see MULE-1151 on how to upgrade this code to be XStream-1.2
+        // compliant, maybe for Mule 1.4/2.0.
         xstream.registerConverter(new XStreamFactory.ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
 
         if (aliases != null)
