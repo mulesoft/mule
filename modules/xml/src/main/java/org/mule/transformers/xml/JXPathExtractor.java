@@ -29,10 +29,6 @@ import org.mule.umo.transformer.TransformerException;
  * {@link #singleResult} property to <code>false</code>. In this case a
  * {@link List} of values will be returned. Note the property is currently ignored
  * for non-String/XML payloads.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
  */
 public class JXPathExtractor extends AbstractTransformer
 {

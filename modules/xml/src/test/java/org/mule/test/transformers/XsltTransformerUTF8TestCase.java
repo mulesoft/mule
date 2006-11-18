@@ -14,10 +14,6 @@ import org.mule.transformers.xml.XsltTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
 {
 

@@ -28,9 +28,6 @@ import java.util.List;
  * expressions, each of which result in an object that will be used as an argument to
  * the method called on the component. The <i>afterExpression</i> is a single
  * expression that will be used to set a value on the orginal payload.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JXPathNormalizerInterceptor extends MessageNormalizerInterceptor
 {

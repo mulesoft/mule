@@ -21,9 +21,6 @@ import org.mule.umo.transformer.TransformerException;
  * constructor. If <code>UMOMessage</code> is added as a source type on this
  * transformer then the UMOMessage will be serialised. This is useful for transports
  * such as tcp where the message headers would normally be lost.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ObjectToXml extends AbstractXStreamTransformer

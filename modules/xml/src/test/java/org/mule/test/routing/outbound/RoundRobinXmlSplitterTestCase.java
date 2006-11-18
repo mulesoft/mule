@@ -29,11 +29,6 @@ import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 {
     private UMOEndpoint endpoint1;

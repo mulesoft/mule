@@ -33,30 +33,24 @@ import org.mule.util.IOUtils;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other
- * XML-ish) object
+ * XML-ish) object.
  * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stephane</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Moller</a>
- * @version $Revision$
  */
 
 public class XsltTransformer extends AbstractXmlTransformer
 {
     /**
-     * Serail version
+     * Serial version
      */
     private static final long serialVersionUID = -6958917343589717387L;
 
-    private ObjectPool transformerPool;
-
-    private int maxIdleTransformers = 2;
-
-    private String xslFile;
-
-    private String xslt;
-
+    // always keep at least 1 XSLT Transformer ready
     private static final int MIN_IDLE = 1;
+
+    private ObjectPool transformerPool;
+    private int maxIdleTransformers = 2;
+    private String xslFile;
+    private String xslt;
 
     public XsltTransformer()
     {

@@ -22,10 +22,6 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
-/**
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen M?ller</a>
- * @version $Revision$
- */
 public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 {
     private String srcData;

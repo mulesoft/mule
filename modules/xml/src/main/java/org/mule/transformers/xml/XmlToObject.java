@@ -22,8 +22,6 @@ import org.mule.umo.transformer.TransformerException;
  * interfaces including Serializable and you don't even need to specify a default
  * constructor.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see org.mule.transformers.xml.ObjectToXml
  */
 
@@ -34,7 +32,7 @@ public class XmlToObject extends AbstractXStreamTransformer
      */
     private static final long serialVersionUID = -2804761502812600068L;
 
-    private DomDocumentToXml domTransformer = new DomDocumentToXml();
+    private final DomDocumentToXml domTransformer = new DomDocumentToXml();
 
     public XmlToObject()
     {

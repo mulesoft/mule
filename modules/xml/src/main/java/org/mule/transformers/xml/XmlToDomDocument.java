@@ -19,11 +19,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
 /**
- * <code>XmlToDomDocument</code> Transform a XML String to org.w3c.dom.Document.
- * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
- * @version $Revision$
+ * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
  */
 public class XmlToDomDocument extends AbstractXmlTransformer
 {

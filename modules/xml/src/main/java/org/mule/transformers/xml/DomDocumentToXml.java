@@ -14,9 +14,6 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
- * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
- * @version $Revision$
  */
 public class DomDocumentToXml extends AbstractXmlTransformer
 {

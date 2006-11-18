@@ -20,10 +20,6 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 import org.w3c.dom.Document;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 {
 

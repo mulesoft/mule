@@ -33,13 +33,10 @@ import org.mule.transformers.AbstractTransformer;
 
 /**
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
- * other XML-ish) object
- * 
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
- * @version $Revision$
+ * other XML-ish) object.
  */
 
-abstract public class AbstractXmlTransformer extends AbstractTransformer
+public abstract class AbstractXmlTransformer extends AbstractTransformer
 {
 
     public AbstractXmlTransformer()

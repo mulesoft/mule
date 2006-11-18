@@ -29,11 +29,6 @@ import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
-
 public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 {
     private UMOEndpoint endpoint1;
