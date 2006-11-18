@@ -99,7 +99,18 @@
                     <groupId>jython</groupId>
                     <artifactId>jython</artifactId>
                 </exclusion>
+                <exclusion>
+                   <!-- exclude old XStream --> 
+                   <groupId>xstream</groupId>
+                   <artifactId>xstream</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <!-- re-add XStream -->
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.2.1</version>
         </dependency>
         
         <!-- TODO JUnit should get included from the parent pom.xml but it is not visible for some
