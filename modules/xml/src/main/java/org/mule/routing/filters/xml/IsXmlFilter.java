@@ -11,11 +11,9 @@
 package org.mule.routing.filters.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
@@ -23,9 +21,7 @@ import org.xml.sax.InputSource;
 
 /**
  * <code>IsXmlFilter</code> accepts a String or byte[] if its contents are valid
- * XML.
- * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+ * (well-formed) XML.
  */
 public class IsXmlFilter implements UMOFilter
 {
@@ -46,7 +42,7 @@ public class IsXmlFilter implements UMOFilter
         {
             if (obj instanceof String)
             {
-                DocumentHelper.parseText((String)obj);
+                new SAXReader().read(new StringReader((String)obj));
             }
             else if (obj instanceof byte[])
             {
@@ -54,17 +50,15 @@ public class IsXmlFilter implements UMOFilter
             }
             else
             {
-                throw new DocumentException("Object must be a string or byte array");
+                throw new DocumentException("Object must be a String or byte array");
             }
-            log.debug("Filter result = true (message is valid XML)");
+
             return true;
         }
         catch (DocumentException e)
         {
-            log.debug("Filter result = false (message is not valid XML): " + e.getMessage());
             return false;
         }
     }
 
-    private static Log log = LogFactory.getLog(IsXmlFilter.class);
 }
