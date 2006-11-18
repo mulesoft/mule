@@ -32,7 +32,7 @@
 
     <transformers>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
-        <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
+        <transformer name="XmlDecoder" className="org.mule.transformers.codec.XmlEntityDecoder"/>
         <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
             <properties>
                 <property name="xslFile" value="xsl/soap-stock.xsl"/>
@@ -56,7 +56,7 @@
                 for the next endpoint.  In this case it writes it out to System.out -->
                 <router className="org.mule.routing.outbound.ChainingRouter">
                     <endpoint address="wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
-                    <endpoint address="stream://System.out" transformers="SgmlDecoder Xslt XmlToObject"/>
+                    <endpoint address="stream://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
