@@ -32,16 +32,13 @@ import org.picocontainer.defaults.SimpleReference;
 /**
  * <code>PicoContainerContext</code> is a Pico Context that can expose pico-managed
  * components for use in the Mule framework.
- * 
- * @author <a href="mailto:antonio.lopez@4clerks.com">Antonio Lopez</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class PicoContainerContext extends AbstractContainerContext
 {
     public static final String CONFIGEXTENSION = "CONFIG";
 
     private String extension = ScriptedContainerBuilderFactory.XML;
+
     /**
      * The url of the config file to use
      */

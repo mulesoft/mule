@@ -13,10 +13,6 @@ package org.mule.extras.picocontainer;
 import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.umo.manager.UMOContainerContext;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class PicoContainerContextTestCase extends AbstractContainerContextTestCase
 {
 
