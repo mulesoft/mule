@@ -11,8 +11,8 @@
 package org.mule.test.transformers.codec;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.transformers.codec.XMLEntityDecoder;
-import org.mule.transformers.codec.XMLEntityEncoder;
+import org.mule.transformers.codec.XmlEntityDecoder;
+import org.mule.transformers.codec.XmlEntityEncoder;
 import org.mule.umo.transformer.UMOTransformer;
 
 public class XMLEntityTransformersTestCase extends AbstractTransformerTestCase
@@ -44,7 +44,7 @@ public class XMLEntityTransformersTestCase extends AbstractTransformerTestCase
      */
     public UMOTransformer getTransformer()
     {
-        return new XMLEntityEncoder();
+        return new XmlEntityEncoder();
     }
 
     /*
@@ -54,7 +54,7 @@ public class XMLEntityTransformersTestCase extends AbstractTransformerTestCase
      */
     public UMOTransformer getRoundTripTransformer()
     {
-        return new XMLEntityDecoder();
+        return new XmlEntityDecoder();
     }
 
 }
