@@ -245,14 +245,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 }
                 else
                 {
-                    if (zip != null)
-                    {
-                        InputStream is = zip.getInputStream(entry);
-                        OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-                        IOUtils.copy(is, os);
-                        IOUtils.closeQuietly(is);
-                        IOUtils.closeQuietly(os);
-                    }
+                    InputStream is = zip.getInputStream(entry);
+                    OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+                    IOUtils.copy(is, os);
+                    IOUtils.closeQuietly(is);
+                    IOUtils.closeQuietly(os);
                 }
             }
         }
