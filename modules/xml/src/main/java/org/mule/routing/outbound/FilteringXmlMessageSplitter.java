@@ -21,6 +21,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 import org.xml.sax.SAXException;
 
 import java.io.InputStream;
@@ -41,9 +42,6 @@ import java.util.Map;
  * turned off. <p/> You may reference an external schema from the classpath by using
  * the <code>externalSchemaLocation</code> property. <p/> Note that each part
  * returned is actually returned as a new Document.
- * 
- * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 {
@@ -68,7 +66,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
     public void setSplitExpression(String splitExpression)
     {
-        this.splitExpression = splitExpression;
+        this.splitExpression = StringUtils.trimToEmpty(splitExpression);
     }
 
     public void setNamespaces(Map namespaces)
@@ -115,7 +113,6 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      */
     protected void initialise(UMOMessage message)
     {
-        splitExpression = splitExpression.trim();
         if (logger.isDebugEnabled())
         {
             if (splitExpression.length() == 0)
