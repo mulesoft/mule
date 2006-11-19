@@ -34,6 +34,7 @@ import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
 import org.mule.umo.security.provider.SecurityProviderFactory;
 import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.IOUtils;
+import org.mule.util.FileUtils;
 
 /**
  * This MBean creates SSLServerSocket instances.
@@ -217,7 +218,7 @@ public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketF
             {
                 // Let's look at the file system, maybe that the name provided is in
                 // fact a file path
-                File fle = new java.io.File(m_keyStoreName);
+                File fle = FileUtils.newFile(m_keyStoreName);
                 if (fle.exists()) keyStoreStream = new FileInputStream(fle);
             }
             if (keyStoreStream == null) throw new IOException("Cannot find KeyStore " + m_keyStoreName);

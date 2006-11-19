@@ -21,6 +21,7 @@ import java.util.List;
 import org.mule.MuleServer;
 import org.mule.util.ClassUtils;
 import org.mule.util.SystemUtils;
+import org.mule.util.FileUtils;
 import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
 /**
@@ -52,7 +53,7 @@ public class MuleBootstrap
         String muleHomeVar = System.getProperty("mule.home");
         // Note: we can't use StringUtils.isBlank() here because we don't have that library yet.
         if (muleHomeVar != null && !muleHomeVar.trim().equals("")) {
-            muleHome = new File(muleHomeVar);
+            muleHome = FileUtils.newFile(muleHomeVar);
         }
         if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory()) {
             throw new IllegalArgumentException(

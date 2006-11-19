@@ -12,6 +12,7 @@ package org.mule.registry.impl;
 
 import org.mule.ManagementContext;
 import org.mule.MuleManager;
+import org.mule.util.FileUtils;
 import org.mule.registry.Assembly;
 import org.mule.registry.ComponentType;
 import org.mule.registry.Library;
@@ -30,9 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- */
 public abstract class AbstractRegistry implements Registry
 {
 
@@ -414,7 +412,7 @@ public abstract class AbstractRegistry implements Registry
             unit.setRegistryComponent(component);
             try
             {
-                unit.setInstallRoot(new File(installDir).getAbsoluteFile().getCanonicalPath());
+                unit.setInstallRoot(FileUtils.newFile(installDir).getAbsoluteFile().getCanonicalPath());
             }
             catch (IOException e)
             {

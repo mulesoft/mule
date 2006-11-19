@@ -20,6 +20,7 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
 import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
 
@@ -32,8 +33,6 @@ import java.net.URL;
  * components in Mule. This component also supports reloading if the script file
  * changes (providing the file is on the file system)
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractScriptComponent
     implements Initialisable, Lifecycle, UMODescriptorAware, FileListener, Callable
@@ -81,7 +80,7 @@ public abstract class AbstractScriptComponent
         }
         if (autoReload)
         {
-            File f = new File(getScript());
+            File f = FileUtils.newFile(getScript());
             if (f.exists())
             {
                 monitor = new FileMonitor(reloadInterval);
@@ -98,7 +97,7 @@ public abstract class AbstractScriptComponent
 
     protected URL getScriptUrl(String scriptLocation)
     {
-        File f = new File(scriptLocation);
+        File f = FileUtils.newFile(scriptLocation);
         if (f.exists())
         {
             try

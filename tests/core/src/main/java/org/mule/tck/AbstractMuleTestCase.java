@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,7 +123,6 @@ public abstract class AbstractMuleTestCase extends TestCase
      * required server If the current environment does not have the preReqs of the
      * test return false and the test will be skipped.
      * 
-     * @return
      */
     protected String checkPreReqs()
     {
@@ -255,8 +253,8 @@ public abstract class AbstractMuleTestCase extends TestCase
         {
             MuleManager.getInstance().dispose();
         }
-        FileUtils.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
-        FileUtils.deleteTree(new File("./ActiveMQ"));
+        FileUtils.deleteTree(FileUtils.newFile(MuleManager.getConfiguration().getWorkingDirectory()));
+        FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
         MuleManager.setConfiguration(new MuleConfiguration());
     }
 

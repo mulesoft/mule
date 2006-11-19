@@ -17,15 +17,11 @@ import org.mule.registry.RegistryDescriptor;
 import org.mule.registry.RegistryException;
 import org.mule.util.FileUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- */
 public abstract class AbstractLibrary extends AbstractEntry implements Library
 {
 
@@ -124,7 +120,7 @@ public abstract class AbstractLibrary extends AbstractEntry implements Library
         {
             throw new RegistryException(e);
         }
-        FileUtils.deleteTree(new File(getInstallRoot()));
+        FileUtils.deleteTree(FileUtils.newFile(getInstallRoot()));
         getRegistry().removeLibrary(this);
         setCurrentState(UNKNOWN);
     }

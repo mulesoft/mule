@@ -35,8 +35,6 @@ import java.util.Map;
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
  * and logs them and can optionally route them to an endpoint
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
@@ -102,7 +100,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                 eventLogger = Logger.getLogger(logName);
                 if (logFile != null)
                 {
-                    File f = new File(logFile);
+                    File f = FileUtils.newFile(logFile);
                     if (!f.exists())
                     {
                         FileUtils.createFile(logFile);

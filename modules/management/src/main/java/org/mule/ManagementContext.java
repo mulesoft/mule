@@ -23,12 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.FileUtils;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ManagementContext
 {
 
@@ -226,7 +220,7 @@ public class ManagementContext
 
     public void deleteDir(String dir)
     {
-        deleteDir(new File(dir));
+        deleteDir(FileUtils.newFile(dir));
     }
 
     public void deleteDir(File dir)

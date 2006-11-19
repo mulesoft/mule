@@ -17,18 +17,11 @@ import org.mule.registry.RegistryException;
 import org.mule.registry.Unit;
 import org.mule.util.FileUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractAssembly extends AbstractEntry implements Assembly
 {
 
@@ -181,7 +174,7 @@ public abstract class AbstractAssembly extends AbstractEntry implements Assembly
             units[i].undeploy();
             // TODO: read output from undeploy() to analyse result
         }
-        FileUtils.deleteTree(new File(getInstallRoot()));
+        FileUtils.deleteTree(FileUtils.newFile(getInstallRoot()));
         getRegistry().removeAssembly(this);
         setCurrentState(UNKNOWN);
         // TODO: return info

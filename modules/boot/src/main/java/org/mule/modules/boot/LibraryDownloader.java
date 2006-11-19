@@ -52,7 +52,7 @@ public class LibraryDownloader {
 
         String mavenRepoVar = System.getProperty("m2.repo");
         if (!StringUtils.isBlank(mavenRepoVar)) {
-            mavenRepo = new File(mavenRepoVar);
+            mavenRepo = FileUtils.newFile(mavenRepoVar);
             if (!mavenRepo.exists() || !mavenRepo.isDirectory()) {
                 mavenRepo = null;
             }

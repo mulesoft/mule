@@ -147,7 +147,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             try
             {
-                File file = new File(resourceName);
+                File file = FileUtils.newFile(resourceName);
                 if (file.exists())
                 {
                     url = file.getAbsoluteFile().toURL();

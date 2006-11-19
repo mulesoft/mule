@@ -33,8 +33,6 @@ import java.util.Set;
  * implementation is simple and not suitable in a failover environment, this is
  * because previously received message Ids are stored in memory and not persisted.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class IdempotentReceiver extends SelectiveConsumer
@@ -109,7 +107,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     protected synchronized void load(UMOEvent event) throws RoutingException
     {
         this.componentName = event.getComponent().getDescriptor().getName();
-        idStore = new File(storePath + "/muleComponent_" + componentName + ".store");
+        idStore = FileUtils.newFile(storePath + "/muleComponent_" + componentName + ".store");
         if (disablePersistence)
         {
             return;

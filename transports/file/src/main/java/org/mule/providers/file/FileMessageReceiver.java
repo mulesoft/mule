@@ -262,7 +262,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         boolean result = false;
         try
         {
-            result = this.moveFile(sourceFile, new File(destinationFilePath));
+            result = this.moveFile(sourceFile, FileUtils.newFile(destinationFilePath));
         }
         catch (Throwable t)
         {

@@ -20,11 +20,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>FileUtils</code> contains useful methods for dealing with files &
@@ -53,7 +56,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     // TODO Document me!
     public static File createFile(String filename) throws IOException
     {
-        File file = new File(filename);
+        File file = FileUtils.newFile(filename);
         if (!file.canWrite())
         {
             String dirName = file.getPath();
@@ -61,7 +64,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             if (i > -1)
             {
                 dirName = dirName.substring(0, i);
-                File dir = new File(dirName);
+                File dir = FileUtils.newFile(dirName);
                 dir.mkdirs();
             }
             file.createNewFile();
@@ -81,7 +84,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     // TODO Document me!
     public static File openDirectory(String directory) throws IOException
     {
-        File dir = new File(directory);
+        File dir = FileUtils.newFile(directory);
         if (!dir.exists())
         {
             dir.mkdirs();
@@ -262,4 +265,101 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
     }
 
+    /**
+     * Workaround for JDK bug <a href="http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4117557">
+     * 4117557</a>. More in-context information at
+     * <a href="http://mule.mulesource.org/jira/browse/MULE-1112">MULE-1112</a>
+     * <p/>
+     * Factory methods correspond to constructors of the <code>java.io.File class</code>.
+     * No physical file created in this method.
+     *
+     * @see File
+     *
+     */
+    public static File newFile(String pathName)
+    {
+        try
+        {
+            return new File(pathName).getCanonicalFile();
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(
+                    Message.createStaticMessage("Unable to create a canonical file for " + pathName), e);
+        }
+    }
+
+    /**
+     * Workaround for JDK bug <a href="http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4117557">
+     * 4117557</a>. More in-context information at
+     * <a href="http://mule.mulesource.org/jira/browse/MULE-1112">MULE-1112</a>
+     * <p/>
+     * Factory methods correspond to constructors of the <code>java.io.File class</code>.
+     * No physical file created in this method.
+     *
+     * @see File
+     *
+     */
+    public static File newFile(URI uri)
+    {
+        try
+        {
+            return new File(uri).getCanonicalFile();
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(
+                    Message.createStaticMessage("Unable to create a canonical file for " + uri), e);
+        }
+    }
+
+    /**
+     * Workaround for JDK bug <a href="http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4117557">
+     * 4117557</a>. More in-context information at
+     * <a href="http://mule.mulesource.org/jira/browse/MULE-1112">MULE-1112</a>
+     * <p/>
+     * Factory methods correspond to constructors of the <code>java.io.File class</code>.
+     * No physical file created in this method.
+     *
+     * @see File
+     *
+     */
+    public static File newFile(File parent, String child)
+    {
+        try
+        {
+            return new File(parent, child).getCanonicalFile();
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(
+                    Message.createStaticMessage("Unable to create a canonical file for parent: " +
+                            parent + " and child: " + child), e);
+        }
+    }
+
+    /**
+     * Workaround for JDK bug <a href="http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4117557">
+     * 4117557</a>. More in-context information at
+     * <a href="http://mule.mulesource.org/jira/browse/MULE-1112">MULE-1112</a>
+     * <p/>
+     * Factory methods correspond to constructors of the <code>java.io.File class</code>.
+     * No physical file created in this method.
+     *
+     * @see File
+     *
+     */
+    public static File newFile(String parent, String child)
+    {
+        try
+        {
+            return new File(parent, child).getCanonicalFile();
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(
+                    Message.createStaticMessage("Unable to create a canonical file for parent: " +
+                            parent + " and child: " + child), e);
+        }
+    }
 }

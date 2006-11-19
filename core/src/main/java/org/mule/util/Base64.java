@@ -887,7 +887,7 @@ public class Base64
         try
         {
             // Set up some useful variables
-            File file = new File(filename);
+            File file = FileUtils.newFile(filename);
             byte[] buffer = null;
             int length = 0;
             int numBytes = 0;
@@ -940,7 +940,7 @@ public class Base64
         try
         {
             // Set up some useful variables
-            File file = new File(filename);
+            File file = FileUtils.newFile(filename);
             byte[] buffer = new byte[(int)(file.length() * 1.4)];
             int length = 0;
             int numBytes = 0;

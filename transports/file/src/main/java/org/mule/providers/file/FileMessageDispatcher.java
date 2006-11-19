@@ -102,7 +102,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             address = connector.getFilenameParser().getFilename(message, writeToDirectory);
         }
 
-        String filename = null;
+        String filename;
         String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
         if (outPattern == null)
         {
@@ -146,7 +146,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     /**
      * There is no associated session for a file connector
      * 
-     * @return
      * @throws UMOException
      */
     public Object getDelegateSession() throws UMOException
@@ -169,7 +168,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
 
-        File file = new File(endpoint.getEndpointURI().getAddress());
+        File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
         String filter = (String)endpoint.getProperty("filter");
@@ -224,8 +223,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
 
     private File getNextFile(String dir, FilenameFilter filter) throws UMOException
     {
-        File[] files = new File[]{};
-        File file = new File(dir);
+        File[] files;
+        File file = FileUtils.newFile(dir);
         File result = null;
         try
         {

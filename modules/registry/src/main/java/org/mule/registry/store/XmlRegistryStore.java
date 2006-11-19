@@ -14,25 +14,19 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import org.mule.ManagementContext;
+import org.mule.util.FileUtils;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryException;
 import org.mule.registry.RegistryFactory;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.impl.AbstractRegistry;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class XmlRegistryStore implements RegistryStore
 {
 
@@ -49,7 +43,7 @@ public class XmlRegistryStore implements RegistryStore
         {
             try
             {
-                Writer w = new FileWriter(new File(registry.getStoreLocation()));
+                Writer w = new FileWriter(FileUtils.newFile(registry.getStoreLocation()));
                 getXStream().toXML(registry, w);
                 w.close();
             }
