@@ -73,6 +73,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         {
             writeStmt = str;
         }
+        writeStmt = StringUtils.trimToEmpty(writeStmt);
         if (StringUtils.isBlank(writeStmt))
         {
             throw new IllegalArgumentException("Missing a write statement");
