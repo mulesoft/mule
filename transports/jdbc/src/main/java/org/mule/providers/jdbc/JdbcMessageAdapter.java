@@ -12,11 +12,6 @@ package org.mule.providers.jdbc;
 
 import org.mule.providers.AbstractMessageAdapter;
 
-import java.util.Map;
-
-/**
- * TODO
- */
 public class JdbcMessageAdapter extends AbstractMessageAdapter
 {
     /**
@@ -24,11 +19,11 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 6770314376258549559L;
 
-    private Map map;
+    private Object payload;
 
     public JdbcMessageAdapter(Object obj)
     {
-        this.map = (Map)obj;
+        this.payload = obj;
     }
 
     /**
@@ -41,7 +36,7 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        return map.toString();
+        return payload.toString();
     }
 
     /*
@@ -51,7 +46,7 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return map.toString().getBytes();
+        return payload.toString().getBytes();
     }
 
     /*
@@ -61,7 +56,7 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
      */
     public Object getPayload()
     {
-        return map;
+        return payload;
     }
 
 }

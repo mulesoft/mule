@@ -47,9 +47,6 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * TODO
- */
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {
     // These are properties that can be overridden on the Receiver by the endpoint
@@ -96,7 +93,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         Map props = endpoint.getProperties();
         if (props != null)
         {
-            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
+            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
                 pollingFrequency = Long.parseLong(tempPolling);
@@ -471,7 +468,8 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     {
         try
         {
-            return (ResultSetHandler)Class.forName(getResultSetHandler()).newInstance();
+            return (ResultSetHandler) ClassUtils.instanciateClass(getResultSetHandler(),
+                                                                  ClassUtils.NO_ARGS);
         }
         catch (Exception e)
         {
@@ -515,7 +513,8 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     {
         try
         {
-            return (QueryRunner)Class.forName(getQueryRunner()).newInstance();
+            return (QueryRunner) ClassUtils.instanciateClass(getQueryRunner(),
+                                                             ClassUtils.NO_ARGS);
         }
         catch (Exception e)
         {

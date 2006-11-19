@@ -10,7 +10,6 @@
 
 package org.mule.providers.jdbc;
 
-import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -170,7 +169,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             do
             {
                 result = connector.createQueryRunner().query(con, readStmt,
-                    connector.getParams(endpoint, readParams, null), new MapHandler());
+                    connector.getParams(endpoint, readParams, null), connector.createResultSetHandler());
                 if (result != null)
                 {
                     if (logger.isDebugEnabled())
