@@ -52,7 +52,7 @@ public class LibraryDownloader {
 
         String mavenRepoVar = System.getProperty("m2.repo");
         if (!StringUtils.isBlank(mavenRepoVar)) {
-            mavenRepo = FileUtils.newFile(mavenRepoVar);
+            mavenRepo = new File(mavenRepoVar).getAbsoluteFile();
             if (!mavenRepo.exists() || !mavenRepo.isDirectory()) {
                 mavenRepo = null;
             }
@@ -106,11 +106,12 @@ public class LibraryDownloader {
     }
 
     private URL copyLibrary(String path, String destinationFileName) throws IOException {
-        File sourceFile = new File(mavenRepo, path);
+        File sourceFile = new File(mavenRepo, path).getCanonicalFile();
         if (sourceFile.exists()) {
             System.out.print("Copying from local repository " + sourceFile.getAbsolutePath() + " ...");
             File destinationFile =
-                new File(new File(muleHome, DefaultMuleClassPathConfig.FOLDER_USER), destinationFileName);
+                new File(new File(muleHome, DefaultMuleClassPathConfig.FOLDER_USER).getCanonicalFile(),
+                         destinationFileName).getCanonicalFile();
             FileUtils.copyFile(sourceFile, destinationFile);
             System.out.println("done");
             return destinationFile.toURL();
