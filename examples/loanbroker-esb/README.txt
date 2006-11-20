@@ -7,7 +7,7 @@ Integration Patterns book.
 This example demonstrates the Loan Broker using a typical ESB architecture with a shared
 Message Bus.
 
-For more information, refer to http://mule.mulesource.org/Examples
+For more information, refer to http://mule.mulesource.org/wiki/display/MULE/Examples
 
 +----------------------+
 | Building the example |
