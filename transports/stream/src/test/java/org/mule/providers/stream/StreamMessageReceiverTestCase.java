@@ -23,10 +23,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
 
@@ -34,7 +30,7 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
     {
         // FIX A bit hard testing receive from a unit test as we need to reg
         // listener etc
-        // file endpoint functiona tests for this
+        // file endpoint functions tests for this
     }
 
     public void testOtherProperties() throws Exception

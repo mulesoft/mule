@@ -14,10 +14,7 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
- * <code>StreamMessageAdapter</code>
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StreamMessageAdapter</code> TODO document
  */
 public class StreamMessageAdapter extends AbstractMessageAdapter
 {
@@ -26,11 +23,19 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 3094357859680956607L;
 
-    private String message = null;
+    // TODO shouldn't this be an Object, for handling at least byte[]s too?
+    private final String message;
 
     public StreamMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
-        setMessage(message);
+        if (message instanceof String)
+        {
+            this.message = (String)message;
+        }
+        else
+        {
+            throw new MessageTypeNotSupportedException(message, StreamMessageAdapter.class);
+        }
     }
 
     /**
@@ -66,18 +71,4 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /**
-     * @param message new value for the message
-     */
-    private void setMessage(Object message) throws MessageTypeNotSupportedException
-    {
-        if (message instanceof String)
-        {
-            this.message = (String)message;
-        }
-        else
-        {
-            throw new MessageTypeNotSupportedException(message, StreamMessageAdapter.class);
-        }
-    }
 }

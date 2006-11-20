@@ -14,12 +14,6 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * <code>StreamMessageAdapterTestCase</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class StreamMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 

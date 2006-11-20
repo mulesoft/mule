@@ -23,13 +23,11 @@ import org.mule.util.StringUtils;
 import java.io.OutputStream;
 
 /**
- * <code>StreamMessageDispatcher</code> A simple stream dispatcher that obtains a
- * stream from the Stream Connector to write to. This only really useful for testing
- * purposes right now when writing to System.in and System.out. However, it is
- * feesable to set any outputstream on the Stream connector and have that written to.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StreamMessageDispatcher</code> is a simple stream dispatcher that obtains
+ * a stream from the Stream Connector to write to. This is only really useful for
+ * testing purposes right now when writing to System.in and System.out. However, it
+ * is feasible to set any OutputStream on the Stream connector and have that written
+ * to.
  */
 
 public class StreamMessageDispatcher extends AbstractMessageDispatcher
@@ -45,9 +43,9 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         // apply connector-specific properties
         if (connector instanceof SystemStreamConnector)
         {
-            SystemStreamConnector ssc = (SystemStreamConnector) connector;
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
 
-            String outputMessage = (String) endpoint.getProperties().get("outputMessage");
+            String outputMessage = (String)endpoint.getProperties().get("outputMessage");
             if (outputMessage != null)
             {
                 ssc.setOutputMessage(outputMessage);
@@ -57,7 +55,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -67,7 +65,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
      */
     protected void doDispatch(UMOEvent event) throws Exception
@@ -95,7 +93,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
         if (connector instanceof SystemStreamConnector)
         {
-            SystemStreamConnector ssc = (SystemStreamConnector) connector;
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
             if (StringUtils.isNotBlank(ssc.getOutputMessage()))
             {
                 out.write(ssc.getOutputMessage().toString().getBytes());
@@ -116,7 +114,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception
@@ -127,7 +125,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     *
+     * 
      * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
