@@ -16,15 +16,13 @@ import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
-import org.mule.util.SgmlCodec;
+import org.mule.util.XMLEntityCodec;
 
 /**
  * <code>EndpointURIConverter</code> TODO
  */
 public class EndpointURIConverter implements Converter
 {
-
-    // --------------------------------------------------------- Public Methods
 
     /**
      * Convert the specified input object into an output object of the specified
@@ -37,19 +35,21 @@ public class EndpointURIConverter implements Converter
      */
     public Object convert(Class type, Object value)
     {
-        UMOManager manager = MuleManager.getInstance();
         if (value == null)
         {
             throw new ConversionException("No value specified");
         }
+
         if (value instanceof UMOEndpointURI)
         {
             return value;
         }
+
         try
         {
+            UMOManager manager = MuleManager.getInstance();
             String endpoint = manager.lookupEndpointIdentifier(value.toString(), value.toString());
-            endpoint = SgmlCodec.decodeString(endpoint);
+            endpoint = XMLEntityCodec.decodeString(endpoint);
             return new MuleEndpointURI(endpoint);
         }
         catch (Exception e)
@@ -57,4 +57,5 @@ public class EndpointURIConverter implements Converter
             throw new ConversionException(e);
         }
     }
+
 }
