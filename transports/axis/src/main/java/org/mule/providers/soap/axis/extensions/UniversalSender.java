@@ -10,7 +10,13 @@
 
 package org.mule.providers.soap.axis.extensions;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -28,14 +34,11 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -44,20 +47,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.util.StringUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class UniversalSender extends BasicHandler
 {
@@ -71,7 +63,7 @@ public class UniversalSender extends BasicHandler
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected Map endpointsCache = new ConcurrentHashMap();
+    protected Map endpointsCache = new HashMap();
 
     public void invoke(MessageContext msgContext) throws AxisFault
     {
@@ -230,25 +222,28 @@ public class UniversalSender extends BasicHandler
         UMOEndpoint ep;
         if (axis != null)
         {
-            ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
-            if (ep == null)
+            synchronized (endpointsCache)
             {
-                updateEndpointCache(axis.getOutboundRouter());
                 ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
                 if (ep == null)
                 {
-                    logger.debug("Dispatch Endpoint uri: " + uri
-                                 + " not found on the cache. Creating the endpoint instead.");
-                    ep = new MuleEndpoint(uri, false);
+                    updateEndpointCache(axis.getOutboundRouter());
+                    ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
+                    if (ep == null)
+                    {
+                        logger.debug("Dispatch Endpoint uri: " + uri
+                                     + " not found on the cache. Creating the endpoint instead.");
+                        ep = new MuleEndpoint(uri, false);
+                    }
+                    else
+                    {
+                        logger.info("Found endpoint: " + uri + " on the Axis service component");
+                    }
                 }
                 else
                 {
                     logger.info("Found endpoint: " + uri + " on the Axis service component");
                 }
-            }
-            else
-            {
-                logger.info("Found endpoint: " + uri + " on the Axis service component");
             }
         }
         else

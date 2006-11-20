@@ -10,6 +10,18 @@
 
 package org.mule.providers.soap.axis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPEnvelope;
+
 import org.apache.axis.AxisProperties;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.Message;
@@ -42,17 +54,6 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
 import org.mule.util.TemplateParser;
 
-import javax.activation.DataHandler;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the Axis
  * soap client.
@@ -60,13 +61,10 @@ import java.util.Properties;
 public class AxisMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    private Map callParameters;
-
     protected EngineConfiguration clientConfig;
-
     protected AxisConnector connector;
-
     protected Service service;
+    private Map callParameters;
 
     public AxisMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -96,7 +94,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    protected EngineConfiguration getClientConfig(UMOImmutableEndpoint endpoint)
+    protected synchronized EngineConfiguration getClientConfig(UMOImmutableEndpoint endpoint)
     {
         if (clientConfig == null)
         {
@@ -120,8 +118,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         // Create a simple axis service without wsdl
         EngineConfiguration config = getClientConfig(endpoint);
-        Service service = new Service(config);
-        return service;
+        return new Service(config);
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
@@ -173,11 +170,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
         else if (method instanceof SoapMethod)
         {
-            if (callParameters == null)
+            synchronized (this)
             {
-                callParameters = new HashMap();
+                if (callParameters == null)
+                {
+                    callParameters = new HashMap();
+                }
+                callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
             }
-            callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
         }
 
         Call call = (Call)service.createCall();
@@ -541,17 +541,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private void setCallParams(Call call, UMOEvent event, QName method) throws ClassNotFoundException
     {
-        if (callParameters == null)
+        synchronized (this)
         {
-            loadCallParams(event, method.getNamespaceURI());
+            if (callParameters == null)
+            {
+                loadCallParams(event, method.getNamespaceURI());
+            }
         }
 
-        SoapMethod soapMethod;
-        soapMethod = (SoapMethod)event.getMessage().removeProperty(MuleProperties.MULE_SOAP_METHOD);
+        SoapMethod soapMethod = (SoapMethod)event.getMessage()
+            .removeProperty(MuleProperties.MULE_SOAP_METHOD);
         if (soapMethod == null)
         {
             soapMethod = (SoapMethod)callParameters.get(method.getLocalPart());
         }
+
         if (soapMethod != null)
         {
             for (Iterator iterator = soapMethod.getNamedParameters().iterator(); iterator.hasNext();)
@@ -568,6 +572,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
+
             call.setOperationName(soapMethod.getName());
         }
     }
