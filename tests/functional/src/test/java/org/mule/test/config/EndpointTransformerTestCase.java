@@ -17,9 +17,6 @@ import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
 public class EndpointTransformerTestCase extends TestCase
 {
 

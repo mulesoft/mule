@@ -16,8 +16,6 @@ import org.mule.umo.model.UMOModel;
 
 /**
  * Test for MULE-858
- * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class MuleXmlConfigBuilderSplitComponentsTestCase extends FunctionalTestCase
 {

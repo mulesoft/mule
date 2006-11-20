@@ -15,10 +15,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document
  */
 public class FunctionalTestNotification extends CustomNotification
 {
@@ -29,9 +26,8 @@ public class FunctionalTestNotification extends CustomNotification
 
     public static final int EVENT_RECEIVED = -999999;
 
-    private Object replyMessage = null;
-
-    private UMOEventContext eventContext;
+    private final Object replyMessage;
+    private final UMOEventContext eventContext;
 
     public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action)
         throws TransformerException

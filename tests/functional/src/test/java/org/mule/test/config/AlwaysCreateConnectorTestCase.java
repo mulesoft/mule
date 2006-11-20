@@ -13,10 +13,6 @@ package org.mule.test.config;
 import org.mule.MuleManager;
 import org.mule.tck.FunctionalTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class AlwaysCreateConnectorTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()

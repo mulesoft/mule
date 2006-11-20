@@ -10,6 +10,8 @@
 
 package org.mule.tck;
 
+import java.util.Map;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -49,15 +51,9 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
+
     public void testManagerConfig() throws Exception
     {
         assertNotNull(MuleManager.getInstance().getTransactionManager());

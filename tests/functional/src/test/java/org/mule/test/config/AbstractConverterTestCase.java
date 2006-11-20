@@ -10,23 +10,18 @@
 
 package org.mule.test.config;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.apache.commons.beanutils.Converter;
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 {
 
-    public void testnullConverter()
+    public void testNullConverter()
     {
         try
         {

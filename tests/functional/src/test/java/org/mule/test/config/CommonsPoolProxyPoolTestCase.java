@@ -16,10 +16,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
 public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase
 {
 

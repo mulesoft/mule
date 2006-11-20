@@ -14,11 +14,6 @@ import org.apache.commons.beanutils.Converter;
 import org.mule.config.converters.ConnectorConverter;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ConnectorConverterTestCase extends AbstractConverterTestCase
 {
     public Converter getConverter()

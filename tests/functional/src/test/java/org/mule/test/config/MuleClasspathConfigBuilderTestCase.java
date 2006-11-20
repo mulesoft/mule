@@ -18,8 +18,6 @@ import org.mule.config.builders.MuleClasspathConfigurationBuilder;
  * Test Case for MuleClasspathCofigurationBuilder. It borrows everything from the
  * corresponding MuleXml config builder and just substitute the builder itself since
  * the config files are in the tests classpath.
- * 
- * @author Massimo Lusetti <mlusetti@gmail.com>
  */
 public class MuleClasspathConfigBuilderTestCase extends MuleXmlConfigBuilderTestCase
 {

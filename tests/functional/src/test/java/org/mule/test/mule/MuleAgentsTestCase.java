@@ -15,15 +15,8 @@ import org.mule.management.agents.Mx4jAgent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
-
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
-
     private UMOManager manager;
 
     /**
@@ -37,7 +30,6 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
     public void testRemoveNonExistentAgent() throws Exception
     {
         manager.unregisterAgent("DOES_NOT_EXIST");
-
         // should not throw NPE
     }
 

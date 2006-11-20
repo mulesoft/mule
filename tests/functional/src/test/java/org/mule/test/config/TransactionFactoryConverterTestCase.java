@@ -15,13 +15,9 @@ import org.mule.config.converters.TransactionFactoryConverter;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class TransactionFactoryConverterTestCase extends AbstractConverterTestCase
 {
+
     public Converter getConverter()
     {
         return new TransactionFactoryConverter();

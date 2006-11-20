@@ -16,13 +16,9 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class EndpointConverterTestCase extends AbstractMuleTestCase
 {
+
     public Converter getConverter()
     {
         return new EndpointConverter();

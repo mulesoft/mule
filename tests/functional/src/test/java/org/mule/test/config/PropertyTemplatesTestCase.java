@@ -10,6 +10,9 @@
 
 package org.mule.test.config;
 
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
@@ -17,13 +20,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class PropertyTemplatesTestCase extends FunctionalTestCase
 {
 

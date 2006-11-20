@@ -10,6 +10,9 @@
 
 package org.mule.tck;
 
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.MuleDescriptor;
@@ -40,16 +43,9 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
 {
+
     protected AbstractScriptConfigBuilderTestCase()
     {
         setDisposeManagerPerSuite(true);

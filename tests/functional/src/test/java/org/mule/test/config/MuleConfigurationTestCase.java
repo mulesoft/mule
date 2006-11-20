@@ -15,13 +15,9 @@ import org.mule.config.PoolingProfile;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ObjectPool;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class MuleConfigurationTestCase extends AbstractMuleTestCase
 {
+
     public void testconfigurationDefaults()
     {
         MuleConfiguration mc = new MuleConfiguration();

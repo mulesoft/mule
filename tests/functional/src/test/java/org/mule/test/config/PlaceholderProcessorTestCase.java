@@ -15,11 +15,9 @@ import org.mule.config.builders.PlaceholderProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class PlaceholderProcessorTestCase extends AbstractMuleTestCase
 {
+
     public void testSecondPropNameLongerThanValue() throws Exception
     {
         final UMOManager manager = MuleManager.getInstance();
