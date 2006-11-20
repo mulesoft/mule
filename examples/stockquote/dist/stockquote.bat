@@ -6,7 +6,7 @@ REM Any changes to the files in .\conf will take precedence over those deployed 
 SET MULE_LIB=.\conf
 
 ECHO (make sure you have configured your HTTP proxy if behind a firewall - see README.txt)
-ECHO
+ECHO.
 ECHO The Stock Quote example is available in three variations:
 ECHO   1. REST
 ECHO   2. SOAP
