@@ -243,7 +243,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
             }
 
-            logger.debug("Sending message of type " + msg.getClass().getName());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Sending message of type " + msg.getClass().getName());
+            }
+
             if (consumer != null && topic)
             {
                 // need to register a listener for a topic
@@ -254,7 +258,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
                 int timeout = event.getTimeout();
-                logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+                }
+
                 l.await(timeout, TimeUnit.MILLISECONDS);
                 consumer.setMessageListener(null);
                 listener.release();
@@ -277,7 +286,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 if (consumer != null)
                 {
                     int timeout = event.getTimeout();
-                    logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+                    }
+
                     Message result = consumer.receive(timeout);
                     if (result == null)
                     {
@@ -449,9 +463,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     private class ReplyToListener implements MessageListener
     {
-        private Latch latch;
-        private Message message;
-        private WaitableBoolean released = new WaitableBoolean(false);
+        private final Latch latch;
+        private volatile Message message;
+        private final WaitableBoolean released = new WaitableBoolean(false);
 
         public ReplyToListener(Latch latch)
         {
