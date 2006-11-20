@@ -23,13 +23,13 @@ The distribution you have downloaded contains the following:
 | GETTING STARTED |
 +-----------------+
 Take a look at the latest documentation on our website:
-http://mule.mulesource.org/Getting+Started+Guide
+http://mule.mulesource.org/wiki/display/MULE/Getting+Started+Guide
 
 User Guide:
-http://mule.mulesource.org/User+Guide
+http://mule.mulesource.org/wiki/display/MULE/User+Guide
 
 Example Applications:
-http://mule.mulesource.org/Mule+Examples
+http://mule.mulesource.org/wiki/display/MULE/Mule+Examples
 
 +----------+
 | FEEDBACK |
