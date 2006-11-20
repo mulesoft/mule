@@ -16,11 +16,6 @@ import org.apache.commons.lang.MuleEntities;
 public class XMLEntityCodec
 {
 
-    protected XMLEntityCodec()
-    {
-        // this should be private once SgmlCodec is removed
-    }
-
     public static String encodeString(String str)
     {
         if (StringUtils.isEmpty(str))
