@@ -10,6 +10,8 @@
 
 package org.mule.providers.file;
 
+import java.io.File;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
@@ -18,8 +20,6 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-
-import java.io.File;
 
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
@@ -32,12 +32,11 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -7537351654335754190L;
+    private static final long serialVersionUID = 4127485947547548996L;
 
-    private FileToByteArray transformer = new FileToByteArray();
+    private static final FileToByteArray transformer = new FileToByteArray();
 
     private File file = null;
-
     private byte[] contents = null;
 
     public FileMessageAdapter(Object message) throws MessagingException
