@@ -14,14 +14,9 @@ import org.mule.samples.loanbroker.BankQuoteRequest;
 
 /**
  * <code>CreditAgencyService</code> the service that provides a credit score for a
- * customer
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * customer.
  */
 public interface CreditAgencyService
 {
-    // CreditProfile getCreditProfile(Customer customer);
-
     BankQuoteRequest getCreditProfile(BankQuoteRequest request);
 }

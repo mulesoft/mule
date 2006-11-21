@@ -14,9 +14,6 @@ import java.io.Serializable;
 
 /**
  * <code>Customer</code> the loan broker customer
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class Customer implements Serializable
 {

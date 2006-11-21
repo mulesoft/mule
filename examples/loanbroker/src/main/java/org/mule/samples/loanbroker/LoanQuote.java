@@ -14,9 +14,6 @@ import java.io.Serializable;
 
 /**
  * <code>LoanQuote</code> is a loan quote from a bank
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class LoanQuote implements Serializable

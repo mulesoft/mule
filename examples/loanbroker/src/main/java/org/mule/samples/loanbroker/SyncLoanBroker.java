@@ -19,10 +19,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>SyncLoanBroker</code> is a synchronous Loan Broker that makes the calls to
- * various components through the event context synchronously
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * various components through the event context synchronously.
  */
 public class SyncLoanBroker
 {
@@ -33,10 +30,10 @@ public class SyncLoanBroker
 
     public UMOMessage getLoanQuote(LoanRequest request) throws Exception
     {
-
         logger.info("\nClient " + request.getCustomer().getName() + " with ssn= "
                     + request.getCustomer().getSsn() + " requests a loan of amount= "
                     + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
+
         BankQuoteRequest bqr = new BankQuoteRequest();
         bqr.setLoanRequest(request);
         UMOEventContext context = RequestContext.getEventContext();

@@ -21,11 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <code>DefaultLenderService</code> is responsible for contacting the relivant
+ * <code>DefaultLenderService</code> is responsible for contacting the relevant
  * banks depending on the amount of the loan
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultLenderService
 {
@@ -45,10 +42,10 @@ public class DefaultLenderService
     {
         Bank[] lenders;
         if ((loanAmount.doubleValue() >= 20000)) // &&
-                                                    // (creditProfile.getCreditScore()
-                                                    // >= 600) &&
-                                                    // (creditProfile.getCreditHistoryLength()
-                                                    // >= 8))
+        // (creditProfile.getCreditScore()
+        // >= 600) &&
+        // (creditProfile.getCreditHistoryLength()
+        // >= 8))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank1", getEndpoint("Bank1"));
@@ -56,13 +53,13 @@ public class DefaultLenderService
 
         }
         else if (((loanAmount.doubleValue() >= 10000) && (loanAmount.doubleValue() <= 19999))) // &&
-                                                                                                // (creditProfile.getCreditScore()
-                                                                                                // >=
-                                                                                                // 400)
-                                                                                                // &&
-                                                                                                // (creditProfile.getCreditHistoryLength()
-                                                                                                // >=
-                                                                                                // 3))
+        // (creditProfile.getCreditScore()
+        // >=
+        // 400)
+        // &&
+        // (creditProfile.getCreditHistoryLength()
+        // >=
+        // 3))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank3", getEndpoint("Bank3"));
@@ -97,7 +94,7 @@ public class DefaultLenderService
         String endpoint = MuleManager.getInstance().lookupEndpointIdentifier(name, null);
 
         if (endpoint.startsWith("axis") || endpoint.startsWith("xfire") || endpoint.startsWith("glue")
-            || endpoint.startsWith("soap"))
+                        || endpoint.startsWith("soap"))
         {
             int i = endpoint.indexOf('?');
             if (i > -1)

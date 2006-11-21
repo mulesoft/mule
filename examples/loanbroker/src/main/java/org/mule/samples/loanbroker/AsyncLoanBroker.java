@@ -14,12 +14,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.samples.loanbroker.service.LoanBroker;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * <code>LoanBroker</code> is the Service that starts the loan request process. The
  * broker also receives the final quote.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AsyncLoanBroker implements LoanBroker
 {
@@ -28,8 +27,8 @@ public class AsyncLoanBroker implements LoanBroker
      */
     protected static Log logger = LogFactory.getLog(AsyncLoanBroker.class);
 
-    private static volatile int quotes = 0;
-    private static volatile int requests = 0;
+    private final AtomicInteger quotes = new AtomicInteger(0);
+    private final AtomicInteger requests = new AtomicInteger(0);
 
     public AsyncLoanBroker()
     {
@@ -39,8 +38,8 @@ public class AsyncLoanBroker implements LoanBroker
     public BankQuoteRequest getLoanQuote(LoanRequest request)
     {
         logger.info("\nClient " + request.getCustomer().getName() + " with ssn= "
-                    + request.getCustomer().getSsn() + " requests a loan of amount= "
-                    + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
+                        + request.getCustomer().getSsn() + " requests a loan of amount= "
+                        + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
         BankQuoteRequest bqr = new BankQuoteRequest();
         bqr.setLoanRequest(request);
         return bqr;
@@ -54,12 +53,12 @@ public class AsyncLoanBroker implements LoanBroker
 
     public int incQuotes()
     {
-        return ++quotes;
+        return quotes.incrementAndGet();
     }
 
     public int incRequests()
     {
-        return ++requests;
+        return requests.incrementAndGet();
     }
 
 }

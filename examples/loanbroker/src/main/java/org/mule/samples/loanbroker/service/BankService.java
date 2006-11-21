@@ -16,9 +16,6 @@ import org.mule.samples.loanbroker.LoanQuote;
 /**
  * <code>BankService</code> is a representation of a bank form which to obtain loan
  * quotes.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface BankService
 {

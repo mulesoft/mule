@@ -15,12 +15,10 @@ import org.mule.samples.loanbroker.service.CreditAgencyService;
 /**
  * <code>DefaultCreditAgencyService</code> the service that provides a credit score
  * for a customer
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultCreditAgencyService implements CreditAgencyService
 {
+
     public int getCreditScore(int ssn)
     {
         int credit_score;

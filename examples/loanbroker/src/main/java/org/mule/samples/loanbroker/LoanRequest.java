@@ -14,9 +14,6 @@ import java.io.Serializable;
 
 /**
  * <code>LoanRequest</code> is the request sent by the the LoanBroker
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class LoanRequest implements Serializable
 {

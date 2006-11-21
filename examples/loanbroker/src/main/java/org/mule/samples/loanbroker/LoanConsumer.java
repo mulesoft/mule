@@ -28,14 +28,10 @@ import java.util.List;
 /**
  * <code>LoanConsumer</code> is a loan broker client app that uses command line
  * prompts to obtain loan requests
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class LoanConsumer
 {
-
     private static boolean synchronous = false;
 
     private List customers = new ArrayList();

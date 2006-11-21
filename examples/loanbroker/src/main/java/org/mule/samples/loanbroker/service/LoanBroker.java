@@ -16,10 +16,7 @@ import org.mule.samples.loanbroker.LoanRequest;
 
 /**
  * <code>LoanBroker</code> is the Servie that starts the loan request process. The
- * broker also receives the final quote
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * broker also receives the final quote.
  */
 public interface LoanBroker
 {
