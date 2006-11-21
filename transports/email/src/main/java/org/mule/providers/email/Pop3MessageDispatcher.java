@@ -23,6 +23,7 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
@@ -58,16 +59,16 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
                 inbox = Pop3Connector.MAILBOX;
             }
 
-            URLName url = new URLName(endpoint.getEndpointURI().getScheme(), endpoint.getEndpointURI()
-                .getHost(), endpoint.getEndpointURI().getPort(), inbox, endpoint.getEndpointURI()
-                .getUsername(), endpoint.getEndpointURI().getPassword());
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+            URLName url = new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox,
+                uri.getUsername(), uri.getPassword());
 
             session = MailUtils.createMailSession(url, connector);
             session.setDebug(logger.isDebugEnabled());
 
             Store store = session.getStore(url);
-            store.connect(endpoint.getEndpointURI().getHost(), endpoint.getEndpointURI().getPort(),
-                endpoint.getEndpointURI().getUsername(), endpoint.getEndpointURI().getPassword());
+            store.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+
             folder = store.getFolder(inbox);
             if (!folder.isOpen())
             {
@@ -147,9 +148,8 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected synchronized UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
-
         long t0 = System.currentTimeMillis();
         if (timeout < 0)
         {
@@ -172,11 +172,13 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
                 else if (count == -1)
                 {
                     throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                                                 + " as folder is closed");
+                                    + " as folder is closed");
                 }
             }
+
             long sleep = Math.min(this.connector.getCheckFrequency(), timeout
-                                                                      - (System.currentTimeMillis() - t0));
+                            - (System.currentTimeMillis() - t0));
+
             if (sleep > 0)
             {
                 if (logger.isDebugEnabled())
