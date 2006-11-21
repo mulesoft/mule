@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="axis_https_test" version="1.0">
+	<connector name="HttpsConnector" className="org.mule.providers.http.HttpsConnector">
+		<properties>
+			<property name="keyStore" value="serverKeystore"/>			
+			<property name="storePassword" value="mulepassword" /> 
+            <property name="keyPassword" value="mulepassword" /> 
+            <property name="trustStorePassword" value="mulepassword" /> 
+            <property name="trustStore" value="trustStore"/> 
+            <property name="requireClientAuthentication" value="false" /> 
+		</properties>
+	</connector>
+	
+	<model name="Https_Test_Model">
+		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.EchoComponent">
+			<inbound-router>
+				<endpoint address="axis:https://localhost:82"/>
+			</inbound-router>
+		</mule-descriptor>
+	</model>
+</mule-configuration>
