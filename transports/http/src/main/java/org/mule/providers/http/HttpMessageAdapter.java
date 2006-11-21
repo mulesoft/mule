@@ -25,21 +25,18 @@ import java.util.Map;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
- * payload and heads available a standard message adapter
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * payload and headers available as standard message adapter.
  */
 public class HttpMessageAdapter extends AbstractMessageAdapter
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 8594774572236357598L;
+    private static final long serialVersionUID = -1544495479333000422L;
 
-    private Object message = null;
-    private UMOTransformer trans = new SerializableToByteArray();
+    private static final UMOTransformer transformer = new SerializableToByteArray();
 
+    private final Object message;
     private boolean http11 = true;
 
     public HttpMessageAdapter(Object message) throws MessagingException
@@ -136,7 +133,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         else
         {
-            return (byte[])trans.transform(message);
+            return (byte[])transformer.transform(message);
         }
     }
 

@@ -10,6 +10,15 @@
 
 package org.mule.providers.http;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -47,27 +56,14 @@ import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.ConnectException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
 /**
- * <p>
- * <code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
  */
 public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 {
-    private HttpConnector connector;
-    private HttpClient client = null;
-    private UMOTransformer receiveTransformer;
+    private final HttpConnector connector;
+    private volatile HttpClient client = null;
+    private final UMOTransformer receiveTransformer;
 
     public HttpClientMessageDispatcher(UMOImmutableEndpoint endpoint)
     {

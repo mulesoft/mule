@@ -10,6 +10,15 @@
 
 package org.mule.providers.http.servlet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.SystemUtils;
@@ -22,20 +31,9 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
- * <code>HttpRequestMessageAdapter</code> is a MUle message adapter for
- * javax.servletHttpServletRequest objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>HttpRequestMessageAdapter</code> is a Mule message adapter for
+ * javax.servletHttpServletRequest objects.
  */
 
 public class HttpRequestMessageAdapter extends AbstractMessageAdapter
@@ -174,7 +172,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
             // Check if a payload parameter has been set, if so use it
             // otherwise we'll use the request payload
-            String payloadParam = (String)request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
+            String payloadParam = (String)request
+                .getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
 
             if (payloadParam == null)
             {
@@ -221,7 +220,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     public String getUniqueId()
     {
-
         HttpSession session = null;
 
         try
@@ -265,7 +263,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
         setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, replyTo);
-
     }
 
     /**
