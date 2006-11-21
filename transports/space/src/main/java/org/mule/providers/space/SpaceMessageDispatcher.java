@@ -36,7 +36,7 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final SpaceConnector connector;
-    private UMOSpace space;
+    private volatile UMOSpace space;
 
     public SpaceMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
