@@ -32,10 +32,11 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 1813666286228639967L;
+    private static final long serialVersionUID = 7330508491857055854L;
 
-    private Object message;
-    private UMOTransformer trans = new SerializableToByteArray();
+    private static final UMOTransformer transformer = new SerializableToByteArray();
+
+    private final Object message;
 
     public GlueMessageAdapter(Object message)
     {
@@ -99,7 +100,7 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[])trans.transform(message);
+        return (byte[])transformer.transform(message);
     }
 
     /**
