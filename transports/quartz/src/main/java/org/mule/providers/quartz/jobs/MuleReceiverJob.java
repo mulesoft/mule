@@ -25,10 +25,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * Invokes a Quartz Message receiver with the payload attached to the quartz job
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Invokes a Quartz Message receiver with the payload attached to the Quartz job.
  */
 public class MuleReceiverJob implements Job
 {

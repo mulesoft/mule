@@ -24,10 +24,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * Will receive on an endpoint and dispatch the result on another
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Will receive on an endpoint and dispatch the result on another.
  */
 public class MuleClientReceiveJob implements Job
 {

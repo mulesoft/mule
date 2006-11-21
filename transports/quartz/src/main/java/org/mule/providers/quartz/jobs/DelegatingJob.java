@@ -27,8 +27,6 @@ import org.quartz.JobExecutionException;
  * the job is fired it will have a NullPayload)
  * 
  * @see org.mule.providers.NullPayload
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DelegatingJob implements Job
 {

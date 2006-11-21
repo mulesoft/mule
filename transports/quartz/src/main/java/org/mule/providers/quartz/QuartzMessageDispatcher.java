@@ -35,9 +35,6 @@ import java.util.Iterator;
  * Can schedule a Job with the Quartz scheduler. The event must contain the Job to
  * invoke or have it set as a property. Time triggger properties can be set on the
  * event to control how and when the event is fired.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 {

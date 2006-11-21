@@ -23,10 +23,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * Will dispatch to a Mule endpoint using the Mule client
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Will dispatch to a Mule endpoint using the Mule client.
  */
 public class MuleClientDispatchJob implements Job
 {

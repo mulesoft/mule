@@ -31,18 +31,14 @@ import java.util.Date;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the
- * component associated with this receiver
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * component associated with this receiver.
  */
 public class QuartzMessageReceiver extends AbstractMessageReceiver
 {
 
     public static final String QUARTZ_RECEIVER_PROPERTY = "mule.quartz.receiver";
 
-    private QuartzConnector connector = null;
+    private final QuartzConnector connector;
 
     public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException

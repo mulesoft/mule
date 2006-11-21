@@ -25,11 +25,7 @@ import java.util.Properties;
 
 /**
  * Creates a connection to a Quartz sheduler. This allows events to be sheduled at
- * specific times, with repeat occurences
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * specific times, with repeated occurences.
  */
 public class QuartzConnector extends AbstractServiceEnabledConnector
 {

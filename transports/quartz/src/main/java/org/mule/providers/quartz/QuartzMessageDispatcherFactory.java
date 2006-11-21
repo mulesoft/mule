@@ -16,10 +16,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * Creates a QuartzMessageDispatcher instance
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Creates a QuartzMessageDispatcher instance.
  */
 public class QuartzMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {

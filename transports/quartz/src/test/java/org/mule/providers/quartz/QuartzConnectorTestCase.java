@@ -13,10 +13,6 @@ package org.mule.providers.quartz;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class QuartzConnectorTestCase extends AbstractConnectorTestCase
 {
 
