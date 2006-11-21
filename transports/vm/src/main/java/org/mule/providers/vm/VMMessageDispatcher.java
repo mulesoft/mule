@@ -10,8 +10,11 @@
 
 package org.mule.providers.vm;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,29 +33,14 @@ import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction
  * between components.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public class VMMessageDispatcher extends AbstractMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    private static Log logger = LogFactory.getLog(VMMessageDispatcher.class);
-
-    private VMConnector connector;
-
-    private ObjectToByteArray objectToByteArray;
+    private final VMConnector connector;
+    private final ObjectToByteArray objectToByteArray;
 
     public VMMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -80,20 +68,19 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      *            no data becomes available before the timeout elapses, null will be
      *            returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     *         returned if no data was available
+     * @throws Exception if the call to the underlying protocol causes an exception
      */
     protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
-
         if (!connector.isQueueEvents())
         {
             throw new UnsupportedOperationException("Receive only supported on the VM Queue Connector");
         }
-        QueueSession queueSession;
+
         try
         {
-            queueSession = connector.getQueueSession();
+            QueueSession queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
             if (queue == null)
             {
