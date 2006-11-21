@@ -19,7 +19,7 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 6770314376258549559L;
 
-    private Object payload;
+    private final Object payload;
 
     public JdbcMessageAdapter(Object obj)
     {
