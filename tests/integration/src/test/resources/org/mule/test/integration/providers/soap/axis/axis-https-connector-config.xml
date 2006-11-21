@@ -18,7 +18,7 @@
 	<model name="Https_Test_Model">
 		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.EchoComponent">
 			<inbound-router>
-				<endpoint address="axis:https://localhost:82"/>
+				<endpoint address="axis:https://localhost:8000"/>
 			</inbound-router>
 		</mule-descriptor>
 	</model>
