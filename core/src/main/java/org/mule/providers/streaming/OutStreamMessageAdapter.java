@@ -20,10 +20,7 @@ import java.io.OutputStream;
 
 /**
  * <code>StreamMessageAdapter</code> wraps an java.io.OutputStream and allows meta
- * information to be associated with the stream
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * information to be associated with the stream.
  */
 public class OutStreamMessageAdapter extends AbstractMessageAdapter
 {
@@ -32,7 +29,7 @@ public class OutStreamMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -299373598028203772L;
 
-    private OutputStream out;
+    private final OutputStream out;
 
     public OutStreamMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

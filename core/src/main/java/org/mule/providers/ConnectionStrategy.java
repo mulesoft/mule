@@ -14,9 +14,6 @@ import org.mule.umo.provider.UMOConnectable;
 
 /**
  * Allows developers to plug in customised reconnection behaviour
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface ConnectionStrategy

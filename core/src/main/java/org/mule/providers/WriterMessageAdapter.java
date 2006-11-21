@@ -18,10 +18,7 @@ import java.io.Writer;
 
 /**
  * <code>WriterMessageAdapter</code> wraps a java.io.StringWriter and allows meta
- * information to be associated with the writer
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * information to be associated with the Writer.
  */
 public class WriterMessageAdapter extends AbstractMessageAdapter
 {
@@ -30,7 +27,7 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -1065602752454818625L;
 
-    private StringWriter writer;
+    private final StringWriter writer;
 
     public WriterMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

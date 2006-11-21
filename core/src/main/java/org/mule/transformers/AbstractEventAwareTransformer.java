@@ -27,8 +27,6 @@ import org.mule.umo.transformer.TransformerException;
  * 
  * @see org.mule.umo.UMOMessage
  * @see org.mule.impl.MuleMessage
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractEventAwareTransformer extends AbstractTransformer

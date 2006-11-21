@@ -22,10 +22,7 @@ import java.io.Serializable;
  * <code>SerializableToByteArray</code> converts a serializable object or a String
  * to a byte array. If <code>UMOMessage</code> is added as a source type on this
  * transformer then the UMOMessage will be serialised. This is useful for transports
- * such as tcp where the message headers would normally be lost.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * such as TCP where the message headers would normally be lost.
  */
 public class SerializableToByteArray extends AbstractEventAwareTransformer
 {

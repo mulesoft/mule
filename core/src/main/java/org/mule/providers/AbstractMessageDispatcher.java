@@ -10,7 +10,11 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.beans.ExceptionListener;
+import java.io.OutputStream;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,11 +29,11 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
@@ -39,18 +43,11 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkManager;
-
-import java.beans.ExceptionListener;
-import java.io.OutputStream;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p/> <code>AbstractMessageDispatcher</code> provides a default dispatch (client)
  * support for handling threads lifecycle and validation.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher, ExceptionListener
 {
@@ -64,8 +61,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     protected UMOWorkManager workManager = null;
 
-    protected UMOImmutableEndpoint endpoint;
-    protected AbstractConnector connector;
+    protected final UMOImmutableEndpoint endpoint;
+    protected final AbstractConnector connector;
 
     protected boolean disposed = false;
 
@@ -73,21 +70,20 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected ConnectionStrategy connectionStrategy;
 
-    protected WaitableBoolean connected = new WaitableBoolean(false);
-
-    private AtomicBoolean connecting = new AtomicBoolean(false);
+    protected final WaitableBoolean connected = new WaitableBoolean(false);
+    private final AtomicBoolean connecting = new AtomicBoolean(false);
 
     public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         this.connector = (AbstractConnector)endpoint.getConnector();
+
         connectionStrategy = connector.getConnectionStrategy();
         if (connectionStrategy instanceof AbstractConnectionStrategy)
         {
             // We don't want to do threading in the dispatcher because we're either
             // already running in a worker thread (asynchronous) or we need to
-            // complete the operation
-            // in a single thread
+            // complete the operation in a single thread
             ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(false);
         }
 
@@ -307,10 +303,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     public final UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
-
         try
         {
-
             try
             {
                 // Make sure we are connected
@@ -360,7 +354,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             dispose();
         }
-
     }
 
     public final boolean isDisposed()
@@ -426,8 +419,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         if (event.getEndpoint().getConnector().isRemoteSyncEnabled())
         {
             remoteSync = event.getEndpoint().isRemoteSync()
-                         || event.getMessage().getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
-                             false);
+                            || event.getMessage().getBooleanProperty(
+                                MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if (remoteSync)
             {
                 // component will be null for client calls
@@ -460,12 +453,13 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         return null;
     }
 
-    public void connect() throws Exception
+    public synchronized void connect() throws Exception
     {
         if (connected.get())
         {
             return;
         }
+
         if (disposed)
         {
             if (logger.isWarnEnabled())
@@ -473,10 +467,12 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 logger.warn("Dispatcher has been disposed. Cannot connector resource");
             }
         }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
         }
+
         if (connecting.compareAndSet(false, true))
         {
             connectionStrategy.connect(this);
@@ -503,17 +499,18 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 throw new ConnectException(e, this);
             }
         }
+
         connected.set(true);
         connecting.set(false);
     }
 
-    public void disconnect() throws Exception
+    public synchronized void disconnect() throws Exception
     {
-
         if (logger.isDebugEnabled())
         {
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
+
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
@@ -541,7 +538,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         return endpoint.getEndpointURI().toString();
     }
 
-    public void reconnect() throws Exception
+    public synchronized void reconnect() throws Exception
     {
         disconnect();
         connect();

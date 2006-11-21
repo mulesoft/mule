@@ -21,9 +21,6 @@ import org.mule.umo.provider.UMOConnectable;
  * A simple connection retry strategy where the a connection will be attempted X
  * number of retryCount every Y milliseconds. The <i>retryCount</i> and <i>frequency</i>
  * properties can be set to customise the behaviour.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
