@@ -35,7 +35,7 @@ public class JbiMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 642776588124612798L;
 
-    private NormalizedMessage message;
+    private final NormalizedMessage message;
 
     public JbiMessageAdapter(Object message) throws MessagingException
     {
