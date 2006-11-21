@@ -24,7 +24,7 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -1765089871661318129L;
 
-    private Object message;
+    private final Object message;
 
     public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {

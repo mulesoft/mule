@@ -10,6 +10,11 @@
 
 package org.mule.providers.rmi;
 
+import java.lang.reflect.Method;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -21,28 +26,17 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.rmi.RMISecurityManager;
-import java.rmi.Remote;
-import java.util.Collections;
-
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
  * RMI-JRMP.
  */
 public class RmiMessageDispatcher extends AbstractMessageDispatcher
 {
-
     protected static Log logger = LogFactory.getLog(RmiMessageDispatcher.class);
 
-    private RmiConnector connector;
-
-    protected InetAddress inetAddress;
-
-    protected Remote remoteObject;
-
-    protected Method invokedMethod;
+    private final RmiConnector connector;
+    protected volatile Remote remoteObject;
+    protected volatile Method invokedMethod;
 
     public RmiMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -77,16 +71,14 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     private Object[] getArgs(UMOEvent event) throws TransformerException
     {
         Object payload = event.getTransformedMessage();
-        Object[] args;
         if (payload instanceof Object[])
         {
-            args = (Object[])payload;
+            return (Object[])payload;
         }
         else
         {
-            args = new Object[]{payload};
+            return new Object[]{payload};
         }
-        return args;
     }
 
     /*
@@ -96,7 +88,6 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
      */
     protected void doDispatch(UMOEvent event) throws Exception
     {
-
         Object[] arguments = getArgs(event);
         if (invokedMethod == null)
         {
@@ -112,12 +103,11 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-
-        UMOMessage resultMessage;
         if (invokedMethod == null)
         {
             invokedMethod = connector.getMethodObject(remoteObject, event);
         }
+
         Object[] arguments = getArgs(event);
         Object result = invokedMethod.invoke(remoteObject, arguments);
 
@@ -127,11 +117,8 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(),
-                Collections.EMPTY_MAP);
+            return new MuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP);
         }
-
-        return resultMessage;
     }
 
     /**
