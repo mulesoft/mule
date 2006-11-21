@@ -31,7 +31,7 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -4003299444661664762L;
 
-    private Packet message;
+    private final Packet message;
 
     public XmppMessageAdapter(Object message) throws MessagingException
     {
