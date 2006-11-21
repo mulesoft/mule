@@ -27,7 +27,7 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * <code>XFireMessageAdapter</code> Wrapps an XFire MessageContext, reading
+ * <code>XFireMessageAdapter</code> wraps an XFire MessageContext, reading
  * attachments and Mule headers.
  */
 public class XFireMessageAdapter extends AbstractMessageAdapter
