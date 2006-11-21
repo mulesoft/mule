@@ -47,8 +47,8 @@ public class MapUtilsTestCase extends TestCase
     {
         List strings = Arrays.asList(new String[]{"foo"});
 
-        Map m = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings.iterator(),
-            strings.iterator());
+        Map m = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings.iterator(), strings
+            .iterator());
 
         assertEquals("foo", m.get("foo"));
         assertEquals("foo", m.get("Foo"));
@@ -83,10 +83,15 @@ public class MapUtilsTestCase extends TestCase
         Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo", "foozle"}, new Object[]{
             "bar", "doozle"});
 
-        assertEquals("{foo=bar, foozle=doozle}", MapUtils.toString(props, false));
+        String result = MapUtils.toString(props, false);
+        assertTrue(result.indexOf("foo=bar") != -1);
+        assertTrue(result.indexOf("foozle=doozle") != -1);
 
-        assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR
-                     + "foozle=doozle" + SystemUtils.LINE_SEPARATOR + "}", MapUtils.toString(props, true));
+        result = MapUtils.toString(props, true);
+        assertTrue(result.startsWith("{" + SystemUtils.LINE_SEPARATOR));
+        assertTrue(result.indexOf("foo=bar") != -1);
+        assertTrue(result.indexOf("foozle=doozle") != -1);
+        assertTrue(result.endsWith(SystemUtils.LINE_SEPARATOR + "}"));
     }
 
 }
