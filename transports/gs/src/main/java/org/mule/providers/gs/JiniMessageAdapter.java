@@ -32,8 +32,8 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 3480872474322069206L;
 
-    protected Entry message;
-    protected String id;
+    protected final Entry message;
+    protected final String id;
 
     public JiniMessageAdapter(Object message) throws MessagingException
     {
@@ -56,11 +56,12 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
             JiniMessage jm = (JiniMessage)this.message;
 
             // accept or create
-            this.id = jm.getMessageId();
-            if (this.id == null)
+            String msgId = jm.getMessageId();
+            if (msgId == null)
             {
-                id = UUID.getUUID();
+                msgId = UUID.getUUID();
             }
+            this.id = msgId;
 
             // accept null
             this.setCorrelationId(jm.getCorrelationId());

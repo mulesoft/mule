@@ -23,9 +23,9 @@ public class GigaSpacesMessageAdapter extends AbstractMessageAdapter
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -7125632542442640739L;
+    private static final long serialVersionUID = 2895659875976934721L;
 
-    private final GigaSpacesEntryConverter converter = new GigaSpacesEntryConverter();
+    private static final GigaSpacesEntryConverter converter = new GigaSpacesEntryConverter();
 
     private final Object message;
 
