@@ -32,8 +32,7 @@ import java.io.OutputStream;
 
 public class StreamMessageDispatcher extends AbstractMessageDispatcher
 {
-
-    private StreamConnector connector;
+    private final StreamConnector connector;
 
     public StreamMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -68,10 +67,11 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
      */
-    protected void doDispatch(UMOEvent event) throws Exception
+    protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
-        OutputStream out = null;
+        OutputStream out;
         String streamName = event.getEndpoint().getEndpointURI().getAddress();
+
         if (StreamConnector.STREAM_SYSTEM_OUT.equalsIgnoreCase(streamName))
         {
             out = System.out;
@@ -109,6 +109,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         {
             out.write(data.toString().getBytes());
         }
+
         out.flush();
     }
 
