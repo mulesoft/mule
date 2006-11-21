@@ -32,7 +32,7 @@ import org.mule.umo.provider.UMOConnector;
 
 public class UdpMessageDispatcher extends AbstractMessageDispatcher
 {
-    protected UdpConnector connector;
+    protected final UdpConnector connector;
     protected InetAddress inetAddress;
     protected DatagramSocket socket;
     protected int port;
@@ -78,7 +78,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         return socket;
     }
 
-    protected void doDispatch(UMOEvent event) throws Exception
+    protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
         byte[] payload = event.getTransformedMessageAsBytes();
         write(socket, payload);
@@ -95,7 +95,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         socket.send(packet);
     }
 
-    protected UMOMessage doSend(UMOEvent event) throws Exception
+    protected synchronized UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
@@ -106,8 +106,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             {
                 return null;
             }
-            UMOMessage message = new MuleMessage(connector.getMessageAdapter(result), event.getMessage());
-            return message;
+            return new MuleMessage(connector.getMessageAdapter(result), event.getMessage());
         }
         else
         {
@@ -144,15 +143,14 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected synchronized UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
     {
         DatagramPacket result = receive(socket, (int)timeout);
         if (result == null)
         {
             return null;
         }
-        UMOMessage message = new MuleMessage(connector.getMessageAdapter(result), (Map)null);
-        return message;
+        return new MuleMessage(connector.getMessageAdapter(result), (Map)null);
     }
 
     public Object getDelegateSession() throws UMOException
