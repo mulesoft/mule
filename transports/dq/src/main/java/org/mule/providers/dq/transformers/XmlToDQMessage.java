@@ -20,9 +20,7 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code> XmlToDQMessage</code> Will convert an xml string to a DQMessage.
- * 
- * @author m999svm
+ * <code> XmlToDQMessage</code> will convert an XML string to a DQMessage.
  */
 public class XmlToDQMessage extends AbstractTransformer
 {
@@ -45,25 +43,16 @@ public class XmlToDQMessage extends AbstractTransformer
      */
     public final Object doTransform(final Object src, String encoding) throws TransformerException
     {
-        String xml = (String)src;
-        DQMessage msg;
-
         try
         {
+            DQMessage msg = new DQMessage();
+            Document document = DocumentHelper.parseText((String)src);
 
-            Document document = DocumentHelper.parseText(xml);
-            msg = new DQMessage();
-
-            Element root = document.getRootElement();
-            String name;
-            String value;
-            Element element;
-
-            for (Iterator i = root.elementIterator(); i.hasNext();)
+            for (Iterator i = document.getRootElement().elementIterator(); i.hasNext();)
             {
-                element = (Element)i.next();
-                name = element.attributeValue(DQMessage.XML_NAME);
-                value = element.getTextTrim();
+                Element element = (Element)i.next();
+                String name = element.attributeValue(DQMessage.XML_NAME);
+                String value = element.getTextTrim();
                 msg.addEntry(name, value);
             }
 

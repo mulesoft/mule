@@ -18,12 +18,10 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * <code>DQEndpointBuilder</code> constructs an endpoint used by AS400 data queues
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DQEndpointBuilder extends ResourceNameEndpointBuilder
 {
+
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         String lib = (String)props.get("lib");
@@ -49,6 +47,7 @@ public class DQEndpointBuilder extends ResourceNameEndpointBuilder
             }
             address = lib + uri.getHost();
         }
+
         // Resource info
         // int x = address.indexOf(":");
         // if(x > -1) {

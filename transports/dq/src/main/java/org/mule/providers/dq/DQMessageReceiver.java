@@ -26,11 +26,10 @@ import com.ibm.as400.access.DataQueueEntry;
 import com.ibm.as400.access.RecordFormat;
 
 /**
- * @author m999svm <p/> DQMessageReceiver
+ * DQMessageReceiver TODO document
  */
 public class DQMessageReceiver extends PollingMessageReceiver
 {
-
     private DataQueue dataQueue = null;
     private RecordFormat format = null;
 

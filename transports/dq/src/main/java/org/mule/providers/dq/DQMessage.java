@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author m999svm <code>DQMessage</code> An encapsulation of a dataqueue message.
+ * <code>DQMessage</code> is an encapsulation of a DataQueue message.
  */
 public class DQMessage implements Serializable
 {

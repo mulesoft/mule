@@ -10,12 +10,6 @@
 
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.AS400Text;
-import com.ibm.as400.access.CharacterFieldDescription;
-import com.ibm.as400.access.Record;
-import com.ibm.as400.access.RecordFormat;
-
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -26,8 +20,14 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.mule.util.IOUtils;
 
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.CharacterFieldDescription;
+import com.ibm.as400.access.Record;
+import com.ibm.as400.access.RecordFormat;
+
 /**
- * @author m999svm <p/> DQMessageUtils utility class for DQMessage
+ * DQMessageUtils utility class for DQMessage
  */
 public final class DQMessageUtils
 {
@@ -128,7 +128,7 @@ public final class DQMessageUtils
             if (input == null)
             {
                 throw new Exception("Failed to read record descriptor  (" + recordDescriptor
-                                    + ") cannot be found ");
+                                + ") cannot be found ");
             }
             recordFormat = parse(input, as400);
         }
@@ -153,21 +153,15 @@ public final class DQMessageUtils
      */
     private static RecordFormat parse(final InputStream stream, final AS400 as400) throws Exception
     {
-
         SAXReader reader = new SAXReader();
         Document document = reader.read(stream);
-
         RecordFormat rec = new RecordFormat();
-        Element root = document.getRootElement();
-        String name;
-        int length;
-        Element element;
 
-        for (Iterator i = root.elementIterator(); i.hasNext();)
+        for (Iterator i = document.getRootElement().elementIterator(); i.hasNext();)
         {
-            element = (Element)i.next();
-            name = element.attributeValue("name");
-            length = Integer.decode(element.attributeValue("length")).intValue();
+            Element element = (Element)i.next();
+            String name = element.attributeValue("name");
+            int length = Integer.decode(element.attributeValue("length")).intValue();
             addCharacterField(rec, length, name, as400);
         }
 

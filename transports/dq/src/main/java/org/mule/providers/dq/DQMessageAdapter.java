@@ -17,19 +17,17 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 /**
  * <code>DQMessageAdapter</code> provides a wrapper for a DataQueue Message. Users
  * can obtain the contents of the message through the payload property.
- * 
- * @author m999svm
  */
 public class DQMessageAdapter extends AbstractMessageAdapter
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -6632611786578024078L;
+    private static final long serialVersionUID = -7484858345063740661L;
 
-    private DQMessage message;
+    private static final SerializableToByteArray serializableToByteArray = new SerializableToByteArray();
 
-    SerializableToByteArray serializableToByteArray;
+    private final DQMessage message;
 
     /**
      * Constructor
@@ -62,10 +60,6 @@ public class DQMessageAdapter extends AbstractMessageAdapter
 
     public final byte[] getPayloadAsBytes() throws Exception
     {
-        if (serializableToByteArray == null)
-        {
-            serializableToByteArray = new SerializableToByteArray();
-        }
         return (byte[])serializableToByteArray.doTransform(message, getEncoding());
     }
 

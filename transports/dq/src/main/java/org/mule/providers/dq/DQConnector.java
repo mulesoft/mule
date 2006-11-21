@@ -10,9 +10,8 @@
 
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.DataQueue;
-import com.ibm.as400.access.RecordFormat;
+import java.util.Map;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -22,13 +21,14 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.util.Map;
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.RecordFormat;
 
 /**
- * @author m999svm <p/> <code>DQConnector</code> A delegate provider that
- *         encapsulates a As400 DataQueue provider. The properties hostname, userId
- *         and password must be set for connection. The Message Queue location is the
- *         provider EndPoint.
+ * <code>DQConnector</code> is a delegate provider that encapsulates an AS400
+ * DataQueue provider. The properties hostname, userId and password must be set for
+ * connection. The Message Queue location is the provider endpoint.
  */
 
 public class DQConnector extends AbstractServiceEnabledConnector
@@ -36,10 +36,12 @@ public class DQConnector extends AbstractServiceEnabledConnector
     public static final String LIB_PROPERTY = "lib";
     public static final String RECORD_DESCRIPTOR_PROPERTY = "recordDescriptor";
     private static final long DEFAULT_POLLING = 1000;
+
     /**
-     * Pooling frequency property name*
+     * Polling frequency property name
      */
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
+
     private Long pollingFrequency = new Long(DEFAULT_POLLING);
     private String hostname;
     private String username;
@@ -65,10 +67,12 @@ public class DQConnector extends AbstractServiceEnabledConnector
                 pollingFrequency = new Long(tempPolling);
             }
         }
+
         if (pollingFrequency.longValue() <= 0)
         {
             pollingFrequency = new Long(DEFAULT_POLLING);
         }
+
         logger.debug("set polling frequency to: " + pollingFrequency);
 
         // TODO Can we include the Lib as part of the URI
@@ -184,8 +188,7 @@ public class DQConnector extends AbstractServiceEnabledConnector
             catch (Exception e)
             {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: "
-                                                                                      + recordFormat), e,
-                    this);
+                                + recordFormat), e, this);
             }
 
         }

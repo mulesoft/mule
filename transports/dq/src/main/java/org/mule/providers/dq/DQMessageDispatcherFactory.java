@@ -16,7 +16,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author m999svm DQMessageDispatcherFactory
+ * DQMessageDispatcherFactory
  */
 public class DQMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
