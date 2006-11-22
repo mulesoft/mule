@@ -864,6 +864,9 @@ public abstract class AbstractConnector
         return new DefaultReplyToHandler(defaultResponseTransformer);
     }
 
+    /**
+     * @deprecated this method will go away soon.
+     */
     public Map getDispatchers()
     {
         return dispatchers;
