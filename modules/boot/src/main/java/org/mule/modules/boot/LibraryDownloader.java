@@ -104,7 +104,6 @@ public class LibraryDownloader {
     }
 
     private URL getLibrary(String repository, String path, String destinationFileName) throws IOException {
-        WrapperManager.signalStarting(STARTUP_TIMEOUT);
         URL url = null;
         if (mavenRepo != null) {
             url = copyLibrary(path, destinationFileName);
