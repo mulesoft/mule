@@ -13,6 +13,7 @@ package org.mule.modules.boot;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,10 @@ import org.mule.util.FileUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 
+import org.tanukisoftware.wrapper.WrapperManager;
+
 public class LibraryDownloader {
+    static final int STARTUP_TIMEOUT = 120000;
     static final String REPO_CENTRAL = "http://www.ibiblio.org/maven2";
     static final String REPO_MULESOURCE = "http://dist.codehaus.org/mule/dependencies/maven2";
 
@@ -86,6 +90,11 @@ public class LibraryDownloader {
             libraries.add(getLibrary(REPO_MULESOURCE,
                 "/script/jsr223/1.0/jsr223-1.0.jar", "jsr223.jar"));
             return libraries;
+        } catch (UnknownHostException uhe) {
+            System.err.println();
+            IOException ex = new IOException("Unable to reach a remote repository, this is most likely because you are behind a firewall and have not configured your HTTP proxy settings in $MULE_HOME/conf/wrapper.conf.");
+            ex.initCause(uhe);
+            throw ex;
         } catch (ConnectTimeoutException e) {
             System.err.println();
             IOException ex = new IOException("Unable to reach a remote repository, this is most likely because you are behind a firewall and have not configured your HTTP proxy settings in $MULE_HOME/conf/wrapper.conf.");
@@ -95,6 +104,7 @@ public class LibraryDownloader {
     }
 
     private URL getLibrary(String repository, String path, String destinationFileName) throws IOException {
+        WrapperManager.signalStarting(STARTUP_TIMEOUT);
         URL url = null;
         if (mavenRepo != null) {
             url = copyLibrary(path, destinationFileName);
