@@ -15,7 +15,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 import org.apache.commons.io.IOUtils;
 import org.mule.MuleException;
@@ -126,6 +128,12 @@ public class FileMessageReceiver extends PollingMessageReceiver
             }
         }
 
+        // don't process a file that is locked by another process (probably still being written)
+        if (!attemptFileLock(sourceFile))
+        {
+            return;
+        }
+
         File destinationFile = null;
         String sourceFileOriginalName = sourceFile.getName();
         UMOMessageAdapter msgAdapter = connector.getMessageAdapter(sourceFile);
@@ -138,11 +146,12 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
             if (moveToPattern != null)
             {
-                destinationFileName = ((FileConnector)connector).getFilenameParser().getFilename(msgAdapter,
+                destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(msgAdapter,
                     moveToPattern);
             }
 
-            destinationFile = new File(moveDir, destinationFileName);
+            // don't use new File() directly, see MULE-1112
+            destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
         boolean fileWasMoved = false;
@@ -160,7 +169,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                 // move sourceFile to new destination
                 fileWasMoved = this.moveFile(sourceFile, destinationFile);
 
-                // move didn't work - bail out (will attempty rollback)
+                // move didn't work - bail out (will attempt rollback)
                 if (!fileWasMoved)
                 {
                     throw new MuleException(new Message("file", 4, sourceFile.getAbsolutePath(),
@@ -175,7 +184,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.
-            if (((FileConnector)connector).isAutoDelete())
+            if (((FileConnector) connector).isAutoDelete())
             {
                 // no moveTo directory
                 if (destinationFile == null)
@@ -213,6 +222,66 @@ public class FileMessageReceiver extends PollingMessageReceiver
                 e);
             this.handleException(ex);
         }
+    }
+
+    /**
+     * Try to acquire a lock on a file and release it immediately. Usually used as a quick check to
+     * see if another process is still holding onto the file, e.g. a large file (more than 100MB) is
+     * still being written to.
+     * @param sourceFile file to check
+     * @return <code>true</code> if the file can be locked
+     */
+    protected boolean attemptFileLock(final File sourceFile)
+    {
+        // check if the file can be processed, be sure that it's not still being written
+        // if the file can't be locked don't process it yet, since creating
+        // a new FileInputStream() will throw an exception
+        FileLock lock = null;
+        FileChannel channel = null;
+        boolean fileCanBeLocked = false;
+        try
+        {
+            channel = new RandomAccessFile(sourceFile, "rw").getChannel();
+
+            // Try acquiring the lock without blocking. This method returns
+            // null or throws an exception if the file is already locked.
+            lock = channel.tryLock();
+        }
+        catch (IOException e)
+        {
+            // unable to create a lock
+        }
+        finally {
+            if (lock != null)
+            {
+                // if lock is null the file is locked by another process
+                fileCanBeLocked = true;
+                try
+                {
+                    // Release the lock
+                    lock.release();
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+
+            if (channel != null)
+            {
+                try
+                {
+                    // Close the file
+                    channel.close();
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+        }
+
+        return fileCanBeLocked;
     }
 
     /**
