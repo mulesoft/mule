@@ -11,10 +11,7 @@
 package org.mule.util;
 
 /**
- * The Encoder contains methods that convert characters to Character entities as
- * defined by http://www.w3.org/TR/REC-html40/sgml/entities.html.
- * 
- * @deprecated This class will go away soon; use XMLEntityCodec instead.
+ * @deprecated This class will go away soon; use {@link XMLEntityCodec} instead.
  */
 // @ThreadSafe
 public class SgmlCodec extends XMLEntityCodec
