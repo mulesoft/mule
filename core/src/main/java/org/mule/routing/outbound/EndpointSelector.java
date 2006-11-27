@@ -21,18 +21,23 @@ import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>EndpointSelector</code> selects the outgoing endpoint by name based on a
- * message property ("endpoint" by default). <outbound-router> <router
- * className="org.mule.routing.outbound.EndpointSelector"> <endpoint name="dest1"
- * address="jms://queue1" /> <endpoint name="dest2" address="jms://queue2" />
- * <endpoint name="dest3" address="jms://queue3" /> <properties> <property
- * name="selector" value="endpoint" /> </properties> </router> </outbound-router>
- * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+ * <code>EndpointSelector</code> selects the outgoing endpoint based on a
+ * message property ("endpoint" by default).  It will first try to match the
+ * endpoint by name and then by address.
+ *
+ * <outbound-router>
+ *      <router className="org.mule.routing.outbound.EndpointSelector">
+ *          <endpoint name="dest1" address="jms://queue1" />
+ *          <endpoint name="dest2" address="jms://queue2" />
+ *          <endpoint name="dest3" address="jms://queue3" />
+ *          <properties>
+ *              <property name="selector" value="endpoint" />
+ *          </properties>
+ *      </router>
+ * </outbound-router>
  */
 public class EndpointSelector extends FilteringOutboundRouter
 {
-
     private String selectorProperty = "endpoint";
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
@@ -78,6 +83,10 @@ public class EndpointSelector extends FilteringOutboundRouter
         {
             ep = (UMOEndpoint)iterator.next();
             if (endpointName.equals(ep.getName()))
+            {
+                return ep;
+            }
+            else if (endpointName.equals(ep.getEndpointURI().getAddress()))
             {
                 return ep;
             }
