@@ -13,6 +13,7 @@ package org.mule.routing.inbound;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleProperties;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.MessagingException;
@@ -24,6 +25,7 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +35,7 @@ import java.util.List;
  * invoked when an event is received It is responsible for manageing a collection of
  * routers and also executing the routing logic. Each router must match against the
  * current event for the event to be routed.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
@@ -54,6 +56,12 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
 
     public UMOMessage route(UMOEvent event) throws MessagingException
     {
+        String inboundEndpoint = event.getEndpoint().getName();
+        if (StringUtils.isBlank(inboundEndpoint)) {
+            inboundEndpoint = event.getEndpoint().getEndpointURI().getAddress();
+        }
+        event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
+
         if (endpoints.size() > 0 && routers.size() == 0)
         {
             addRouter(new InboundPassThroughRouter());
@@ -142,6 +150,11 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
                     {
                         for (int i = 0; i < eventsToRoute.length; i++)
                         {
+                            // Set the originating endpoint so we'll know where this event came from further down the pipeline.
+                            if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null) {
+                                event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
+                            }
+
                             if (event.isSynchronous())
                             {
                                 messageResult = send(eventsToRoute[i]);
