@@ -39,7 +39,7 @@ public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);

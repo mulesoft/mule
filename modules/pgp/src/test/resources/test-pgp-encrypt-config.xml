@@ -27,7 +27,7 @@
     <model name="test">
         <mule-descriptor name="echo" implementation="org.mule.extras.pgp.EchoMsg">
             <inbound-router>
-                <endpoint address="vm://localhost/echo">
+                <endpoint address="vm://echo">
                     <security-filter className="org.mule.extras.pgp.filters.PGPSecurityFilter">
                         <properties>
                             <property name="strategyName" value="KBE"/>

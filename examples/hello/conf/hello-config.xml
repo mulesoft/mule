@@ -87,7 +87,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://localhost/chitchatter"/>
+                    <endpoint address="vm://chitchatter"/>
                 </router>
             </outbound-router>
             <!--
@@ -100,7 +100,7 @@
             implementation="org.mule.samples.hello.ChitChatter">
 
             <inbound-router>
-                <endpoint address="vm://localhost/chitchatter" transformers="NameStringToChatString"/>
+                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

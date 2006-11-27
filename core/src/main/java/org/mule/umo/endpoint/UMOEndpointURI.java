@@ -19,13 +19,11 @@ import java.util.Properties;
  * received. The url defines the protocol, the endpointUri destination of the message
  * and optionally the endpoint to use when dispatching the event. Mule urls take the
  * form of - protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e. vm://localhost/vmProvider/my.object or
- * vm://my.object The protocol can be any of any conector registered with Mule. The
+ * protocol://[host]:[port]/endpointUri i.e. vm://my.object or
+ * The protocol can be any of any conector registered with Mule. The
  * endpoint name if specified must be the name of a register global endpoint The
  * endpointUri can be any endpointUri recognised by the endpoint type.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEndpointURI extends Serializable
 {

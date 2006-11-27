@@ -23,7 +23,7 @@
     <model name="test">
 		<mule-descriptor name="TestUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
 			<inbound-router>
-				<endpoint address="vm://localhost/test">
+				<endpoint address="vm://test">
 					<security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
 	                         <properties>
 		                         <property name="strategyName" value="PBE"/>

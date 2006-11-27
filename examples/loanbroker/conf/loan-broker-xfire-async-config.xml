@@ -34,7 +34,7 @@
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="xfire:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="xfire:http://localhost:18080/mule"/>
-        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
+        <endpoint-identifier name="LenderService" value="vm://LenderService"/>
         <endpoint-identifier name="Bank1" value="xfire:http://localhost:10080/mule"/>
         <endpoint-identifier name="Bank2" value="xfire:http://localhost:20080/mule"/>
         <endpoint-identifier name="Bank3" value="xfire:http://localhost:30080/mule"/>

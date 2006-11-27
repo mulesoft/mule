@@ -41,7 +41,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         in.close();
 
         MuleClient client = new MuleClient();
-        client.send("vm://localhost/echo", new String(msg), null);
+        client.send("vm://echo", new String(msg), null);
     }
 
     public void testAuthenticationNotAuthorised() throws Exception
@@ -49,7 +49,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         try
         {
             MuleClient client = new MuleClient();
-            client.send("vm://localhost/echo", new String("An unsigned message"), null);
+            client.send("vm://echo", new String("An unsigned message"), null);
             fail("The request is not signed");
         }
         catch (UnauthorisedException e)

@@ -539,7 +539,7 @@ Jndi
     endpoint as long as it is declared in a <i>endpoint</i> block.
     Example uris are:
     <ul>
-        <li>vm://localhost/test.queue?transformers=ObjectToXml</li>
+        <li>vm://test.queue?transformers=ObjectToXml</li>
         <li>pop3://ross:password@mail.muleumo.org?createConnector=ALWAYS</li>
         <li>file:///C:/temp/mule?transformers=FileMessageToObject</li>
     </ul>

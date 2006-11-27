@@ -22,23 +22,23 @@ public class VMEndpointTestCase extends AbstractMuleTestCase
 {
     public void testUrlWithConnector() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("vm://localhost/some.queue?createConnector=vmConnector2");
+        UMOEndpointURI url = new MuleEndpointURI("vm://some.queue?createConnector=vmConnector2");
         assertEquals("vm", url.getScheme());
         assertEquals("some.queue", url.getAddress());
         assertNull(url.getEndpointName());
         assertNotNull(url.getConnectorName());
         assertEquals("vmConnector2", url.getConnectorName());
-        assertEquals("vm://localhost/some.queue?createConnector=vmConnector2", url.toString());
+        assertEquals("vm://some.queue?createConnector=vmConnector2", url.toString());
         assertEquals(1, url.getParams().size());
     }
 
     public void testUrlWithProvider() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("vm://vmProvider/some.queue");
+        UMOEndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider");
         assertEquals("vm", url.getScheme());
         assertEquals("some.queue", url.getAddress());
         assertEquals("vmProvider", url.getEndpointName());
-        assertEquals("vm://vmProvider/some.queue", url.toString());
-        assertEquals(0, url.getParams().size());
+        assertEquals("vm://some.queue?endpointName=vmProvider", url.toString());
+        assertEquals(1, url.getParams().size());
     }
 }

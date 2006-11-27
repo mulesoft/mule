@@ -39,7 +39,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -56,7 +56,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -73,7 +73,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -89,7 +89,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -105,7 +105,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://localhost/test", "Test", props);
+        UMOMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);

@@ -19,7 +19,7 @@ that receives the results form each of the banks and selects the lowest quote.
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
         <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
-        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService?method=setLenderList"/>
+        <endpoint-identifier name="LenderService" value="vm://LenderService?method=setLenderList"/>
         <!-- The method parameter for the bank endpoints is added programmitcally when the bank objects are
         created -->
         <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>

@@ -43,7 +43,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public UMOEndpointURI build(URI uri) throws MalformedEndpointException
     {
         Properties props = getPropertiesForURI(uri);
-        if (address == null)
+        String replaceAddress = null;
+        //If the address has been set as a parameter on the URI, then we must ensure that that value is used
+        //for the address. We still call the setEndpoint() method so that other information on the URI
+        //is still processed
+        if (address != null)
+        {
+            replaceAddress = address;
+            setEndpoint(uri, props);
+            address = replaceAddress;
+        }
+        else
         {
             setEndpoint(uri, props);
         }

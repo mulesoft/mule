@@ -900,7 +900,7 @@ public class MuleClient implements Disposable
         else
         {
             UMOConnector connector = null;
-            UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://localhost/mule.client");
+            UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
             connector = ConnectorFactory.createConnector(defaultEndpointUri);
             manager.registerConnector(connector);
             connector.startConnector();
