@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesource.org/schema/mule/core/2.0"
+            attributeFormDefault="unqualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/endpoint" schemaLocation="mule-endpoint.xsd"/>-->
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <!--<xsd:include namespace="http://mule.mulesource.org/schema/filter" schemaLocation="mule-filter.xsd"/>-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/properties" schemaLocation="mule-properties.xsd"/>-->
+
+
+    <!--<xsd:schema xmlns="http://mule.mulesource.org/schema/mule" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:interceptor="http://mule.mulesource.org/schema/interceptor" xmlns:container="http://mule.mulesource.org/schema/containers" xmlns:connector="http://mule.mulesource.org/schema/connector" xmlns:agent="http://mule.mulesource.org/schema/agent" xmlns:shared="http://mule.mulesource.org/schema/shared" xmlns:model="http://mule.mulesource.org/schema/model" xmlns:transformer="http://mule.mulesource.org/schema/transformer" xmlns:endpoint="http://mule.mulesource.org/schema/endpoint" targetNamespace="http://mule.mulesource.org/schema/mule" elementFormDefault="qualified" attributeFormDefault="unqualified">-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/interceptor" schemaLocation="mule-interceptor.xsd"/>-->
+    <!--<xsd:include schemaLocation="http://mule.mulesource.org/schema/shared"/>-->
+    <!--<xsd:include  schemaLocation="http://mule.mulesource.org/schema/model"/>-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/containers" schemaLocation="mule-container.xsd"/>-->
+    <!--<xsd:include schemaLocation="http://mule.mulesource.org/schema/connector"/>-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/agent" schemaLocation="mule-agent.xsd"/>-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/transformer" schemaLocation="mule-transformer.xsd"/>-->
+    <!--<xsd:import namespace="http://mule.mulesource.org/schema/endpoint" schemaLocation="http://mule.mulesource.org/schema/endpoint"/>-->
+
+    <xsd:element name="endpoint" type="endpointType"/>
+
+    <xsd:element name="model-seda" type="sedaModelType"/>
+    <xsd:element name="model-custom" type="customModelType"/>
+
+
+    <!--<xsd:element name="security-manager" type="shared:securityManagerType" minOccurs="0"/>-->
+    <!--xsd:element name="transaction-manager" type="transaction-managerType" minOccurs="0"/-->
+    <!--<xsd:element name="connectors" minOccurs="0">-->
+    <!--<xsd:complexType>-->
+    <!--<xsd:sequence>-->
+    <!--<xsd:element ref="connector:custom" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--</xsd:sequence>-->
+    <!--</xsd:complexType>-->
+    <!--</xsd:element>-->
+    <!--<xsd:element name="endpoint-identifiers" type="endpointIdentifiersType" minOccurs="0"/>-->
+    <!--<xsd:element name="transformers" minOccurs="0">-->
+    <!--<xsd:complexType>-->
+    <!--<xsd:sequence>-->
+    <!--<xsd:element ref="transformer:custom" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--<xsd:element ref="transformer:object-to-xml" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--<xsd:element ref="transformer:xml-to-object" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--</xsd:sequence>-->
+    <!--</xsd:complexType>-->
+    <!--</xsd:element>-->
+    <!--<xsd:element name="global-endpoints" minOccurs="0">-->
+    <!--<xsd:complexType>-->
+    <!--<xsd:sequence>-->
+
+
+    <!--</xsd:sequence>-->
+    <!--</xsd:complexType>-->
+    <!--</xsd:element>-->
+    <!--<xsd:element name="interceptor-stack" type="interceptor:interceptorStackType" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--<xsd:element name="model" type="model:modelType" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--</xsd:choice>-->
+    <!--</xsd:sequence>-->
+    <!-- -->
+    <!--<xsd:attribute name="id" type="xsd:string"/>-->
+    <!--<xsd:attribute name="version" use="required">-->
+    <!--<xsd:simpleType>-->
+    <!--<xsd:restriction base="xsd:NMTOKEN">-->
+    <!--<xsd:enumeration value="2.0"/>-->
+    <!--</xsd:restriction>-->
+    <!--</xsd:simpleType>-->
+    <!--</xsd:attribute>-->
+    <!-- -->
+    <!--</xsd:complexType>-->
+    <!-- -->
+    <!--<xsd:complexType name="muleEnvironmentPropertiesType" mixed="true">-->
+    <!--<xsd:sequence>-->
+    <!--<xsd:element name="threading-profile" type="shared:threadingProfileType" minOccurs="0" maxOccurs="unbounded"/>-->
+    <!--<xsd:element name="pooling-profile" type="shared:poolingProfileType" minOccurs="0"/>-->
+    <!--<xsd:element name="queue-profile" type="shared:queueProfileType" minOccurs="0"/>-->
+    <!--<xsd:element name="persistence-strategy" type="shared:persistenceStrategyType" minOccurs="0"/>-->
+    <!--<xsd:element name="connection-strategy" type="connector:connectionStrategyType" minOccurs="0"/>-->
+    <!--</xsd:sequence>-->
+    <!--<xsd:attribute name="synchronous" type="xsd:boolean" default="false"/>-->
+    <!--<xsd:attribute name="model" type="xsd:string"/>-->
+    <!--<xsd:attribute name="workingDirectory" type="xsd:string" default="./.mule"/>-->
+    <!--<xsd:attribute name="synchronousEventTimeout" type="xsd:string"/>-->
+    <!--<xsd:attribute name="encoding" type="xsd:string"/>-->
+    <!--<xsd:attribute name="transactionTimeout" type="xsd:string"/>-->
+    <!--<xsd:attribute name="remoteSync" type="xsd:boolean" default="false"/>-->
+    <!--<xsd:attribute name="embedded" type="xsd:boolean" default="false"/>-->
+    <!--<xsd:attribute name="serverUrl" type="xsd:string"/>-->
+    <!--<xsd:attribute name="recoverableMode" type="xsd:boolean" default="false"/>-->
+    <!--<xsd:attribute name="clientMode" type="xsd:boolean" default="false"/>-->
+    <!--<xsd:attribute name="enableMessageEvents" type="xsd:boolean" default="false"/>-->
+    <!--</xsd:complexType>-->
+    <!--<xsd:complexType name="endpointIdentifiersType" mixed="true">-->
+    <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+    <!--<xsd:attribute name="value" type="xsd:string" use="required"/>-->
+    <!--</xsd:complexType>-->
+
+
+    <!--==============================================================-->
+    <!--   Endpoint elements                                          -->
+    <!--==============================================================-->
+
+
+    <xsd:complexType name="endpointType" mixed="true">
+        <xsd:choice>
+            <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
+            <!--<xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>-->
+            <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
+            <!--<xsd:any namespace="##other" processContents="strict" minOccurs="0"-->
+            <!--maxOccurs="unbounded"/>-->
+        </xsd:choice>
+        <xsd:attribute name="transformers" type="xsd:IDREFS"/>
+        <xsd:attribute name="synchronous" type="xsd:boolean"/>
+        <xsd:attribute name="remoteSync" type="xsd:boolean"/>
+        <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="id" type="xsd:ID" use="optional"/>
+        <xsd:attribute name="address" type="xsd:string" use="required"/>
+        <xsd:attribute name="connector" type="xsd:IDREF"/>
+        <xsd:attribute name="createConnector">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="FIND_OR_CREATE"/>
+                    <xsd:enumeration value="ALWAYS_CREATE"/>
+                    <xsd:enumeration value="NEVER_CREATE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="endpointRefType" mixed="true">
+        <xsd:attribute name="id" type="xsd:IDREF" use="required"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="transactionType" mixed="true">
+        <xsd:attribute name="factory" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="action">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="NONE"/>
+                    <xsd:enumeration value="ALWAYS_BEGIN"/>
+                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
+                    <xsd:enumeration value="ALWAYS_JOIN"/>
+                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="replyToType">
+        <xsd:attribute name="address" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   Filter elements                                          -->
+    <!--==============================================================-->
+
+    <xsd:group name="filters">
+        <xsd:choice>
+            <xsd:element name="and" type="collectionFilterType"/>
+            <xsd:element name="or" type="collectionFilterType"/>
+            <xsd:element name="xpath" type="expressionFilterType"/>
+            <xsd:element name="jxpath" type="expressionFilterType"/>
+            <xsd:element name="exception-type" type="typeFilterType"/>
+            <xsd:element name="payload-type" type="typeFilterType"/>
+            <xsd:element name="wildcard" type="expressionFilterType"/>
+            <xsd:element name="ognl" type="expressionFilterType"/>
+            <xsd:element name="regex" type="expressionFilterType"/>
+            <xsd:element name="message-property" type="expressionFilterType"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:complexType name="collectionFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="filterType">
+                <xsd:group ref="filters" maxOccurs="unbounded" minOccurs="2"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="expressionFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="filterType">
+                <xsd:attribute name="expression" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="typeFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="filterType">
+                <xsd:attribute name="expectedType" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="filterType" mixed="true">
+        <xsd:attribute name="not" type="xsd:boolean"/>
+    </xsd:complexType>
+
+
+    <!-- Todo schemas for each security filter type -->
+    <xsd:complexType name="securityFilterType" mixed="true">
+        <xsd:sequence>
+            <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="useProviders" type="xsd:IDREFS"/>
+        <xsd:attribute name="className" type="xsd:NMTOKEN" use="required"/>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   Transformer elements                                          -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="transfomrersType">
+
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="class"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="property" type="spring:propertyType"/>
+        </xsd:choice>
+        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="returnClass" type="xsd:string"/>
+        <xsd:attribute name="ignoreBadInput" type="xsd:boolean"/>
+
+    </xsd:complexType>
+
+    <xsd:element name="custom-transformer">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="transfomrersType">
+                    <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+
+    <!-- Todo specific Transformer types -->
+
+    <!--==============================================================-->
+    <!--   Shared elements                                             -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="container-contextType">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="id" type="xsd:string"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="encryptionStrategyType">
+        <xsd:choice>
+            <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="persistenceStrategyType">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="className" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="poolingProfileType">
+        <xsd:attribute name="maxActive" type="xsd:string"/>
+        <xsd:attribute name="maxIdle" type="xsd:string"/>
+        <xsd:attribute name="initialisationPolicy" default="INITIALISE_FIRST">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="INITIALISE_NONE"/>
+                    <xsd:enumeration value="INITIALISE_FIRST"/>
+                    <xsd:enumeration value="INITIALISE_ALL"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="exhaustedAction" default="GROW">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="GROW"/>
+                    <xsd:enumeration value="WAIT"/>
+                    <xsd:enumeration value="FAIL"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="maxWait" type="xsd:string"/>
+        <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="queueProfileType">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="maxOutstandingMessages" type="xsd:string"/>
+        <xsd:attribute name="persistent" type="xsd:boolean" default="false"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="securityManagerType">
+        <xsd:sequence>
+            <xsd:element name="security-provider" type="securityProviderType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="encryption-strategy" type="encryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="className" type="xsd:string"/>
+        <xsd:attribute name="ref" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="securityProviderType">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="className" type="xsd:string"/>
+        <xsd:attribute name="ref" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="threadingProfileType">
+        <xsd:attribute name="type" default="default">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="receiver"/>
+                    <xsd:enumeration value="dispatcher"/>
+                    <xsd:enumeration value="component"/>
+                    <xsd:enumeration value="default"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="maxThreadsActive" type="xsd:string"/>
+        <xsd:attribute name="maxThreadsIdle" type="xsd:string"/>
+        <xsd:attribute name="threadTTL" type="xsd:string"/>
+        <xsd:attribute name="poolExhaustedAction" default="RUN">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="WAIT"/>
+                    <xsd:enumeration value="DISCARD"/>
+                    <xsd:enumeration value="DISCARD_OLDEST"/>
+                    <xsd:enumeration value="ABORT"/>
+                    <xsd:enumeration value="RUN"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="threadWaitTimeout" type="xsd:string"/>
+        <xsd:attribute name="doThreading" type="xsd:boolean" default="true"/>
+        <xsd:attribute name="maxBufferSize" type="xsd:string"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="exceptionStrategyType">
+        <xsd:choice>
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   Connector elements                                          -->
+    <!--==============================================================-->
+
+
+    <xsd:complexType name="connectorType">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="exception-strategy" type="exceptionStrategyType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="receiver-connection-strategy" type="connectionStrategyType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="dispatcher-connection-strategy" type="connectionStrategyType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
+            <xsd:any namespace="##other"
+                     minOccurs="0" maxOccurs="unbounded"
+                     processContents="strict"/>
+        </xsd:choice>
+
+        <xsd:attribute name="id" type="xsd:ID" use="required"/>
+        <xsd:attribute name="createDispatcherPerRequest" type="xsd:boolean"/>
+        <xsd:attribute name="createMultipleTransactedReceivers" type="xsd:boolean"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="serviceOverridesType">
+        <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="dispatcherFactory" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="inboundTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="outboundTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="responseTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="endpointBuilder" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="messageAdapter" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="streamMessageAdapter" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="connectionStrategyType" mixed="true">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+    </xsd:complexType>
+
+    <!-- Custom connector element -->
+    <xsd:element name="custom-connector">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="connectorType">
+                    <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <!--==============================================================-->
+    <!--   Model Types                                                -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="sedaModelType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="modelType">
+                <xsd:sequence>
+                    <xsd:element name="entry-point-resolver" type="entrypointResolverType" minOccurs="0"/>
+                    <xsd:element name="component-factory" type="componentFactoryType" minOccurs="0"/>
+                    <xsd:element name="component-lifecycle-adapter-factory" type="componentLifecycleAdapterFactoryType"
+                                 minOccurs="0"/>
+                    <xsd:element name="component-pool-factory" type="componentPoolFactoryType" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="customModelType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="modelType">
+                <xsd:sequence>
+                    <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                             maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="modelType" mixed="true">
+        <xsd:choice>
+            <xsd:element name="exception-strategy" type="exceptionStrategyType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="service" type="muleServiceType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   Model elements                                          -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="componentFactoryType">
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="componentLifecycleAdapterFactoryType">
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="componentPoolFactoryType">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="entrypointResolverType">
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+
+    <!--==============================================================-->
+    <!--   Mule Service Descriptor                                    -->
+    <!--==============================================================-->
+
+    <!--<xsd:element name="service" type="muleServiceType"/>-->
+
+    <xsd:complexType name="muleServiceType">
+        <xsd:sequence>
+            <xsd:element name="inbound-router" type="inboundRouterType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="outbound-router" type="outboundRouterType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="response-router" type="responseRouterType" minOccurs="0" maxOccurs="1"/>
+            <!--<xsd:element name="interceptor" type="interceptor:interceptorType" minOccurs="0" maxOccurs="unbounded"/>-->
+            <xsd:element name="threading-profile" type="threadingProfileType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="pooling-profile" type="poolingProfileType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="exception-strategy" type="exceptionStrategyType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:ID" use="required"/>
+        <xsd:attribute name="ref" type="xsd:string"/>
+        <xsd:attribute name="implementation" type="xsd:string" use="required"/>
+        <xsd:attribute name="version" type="xsd:string"/>
+        <xsd:attribute name="containerManaged" type="xsd:boolean" default="true"/>
+        <xsd:attribute name="singleton" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="initialState" default="started">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="started"/>
+                    <xsd:enumeration value="stopped"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--  Routers Core                                                -->
+    <!--==============================================================-->
+
+
+    <xsd:complexType name="inboundRouterType">
+        <xsd:choice>
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            <xsd:element name="catch-all-strategy" type="catchAllStrategyType" minOccurs="0"/>
+            <xsd:element name="router" type="routerType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="matchAll" type="xsd:boolean" default="false"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="responseRouterType">
+        <xsd:choice>
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            <xsd:element name="router" type="routerType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="transformers" type="xsd:IDREFS"/>
+        <xsd:attribute name="timeout" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="outboundRouterType">
+        <xsd:sequence>
+            <xsd:element name="catch-all-strategy" type="catchAllStrategyType" minOccurs="0"/>
+            <xsd:element name="router" type="routerType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="matchAll" type="xsd:boolean" default="false"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="routerType">
+        <xsd:choice>
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
+            <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
+            <xsd:element name="filter" type="filterType" minOccurs="0"/>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="ALWAYS"/>
+                    <xsd:enumeration value="NEVER"/>
+                    <xsd:enumeration value="IF_NOT_SET"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="catchAllStrategyType">
+        <xsd:sequence>
+            <xsd:choice>
+                <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+                <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            </xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <!-- Todo mapping for different router types -->
+
+    <!--==============================================================-->
+    <!--  Interceptors                                             -->
+    <!--==============================================================-->
+
+    <xsd:element name="logging" type="interceptorType"/>
+    <xsd:element name="timing" type="interceptorType"/>
+    <xsd:element name="stack-ref" type="stackRefInterceptorType"/>
+    <xsd:element name="custom" type="customInterceptorType"/>
+
+    <xsd:element name="stack" type="interceptorStackType"/>
+
+    <xsd:complexType name="stackRefInterceptorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="interceptorType">
+                <xsd:attribute name="name" type="xsd:IDREF"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="customInterceptorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="interceptorType">
+                <xsd:attribute name="className" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="interceptorType" mixed="true">
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="interceptorStackType">
+        <xsd:sequence>
+            <xsd:element name="interceptor" type="interceptorType" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="lookup-ref" type="xsd:string"/>
+    </xsd:complexType>
+
+    <!-- Object base type -->
+    <xsd:complexType name="muleObjectType">
+        <xsd:choice>
+            <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <!--<xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>-->
+        </xsd:choice>
+        <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+
+</xsd:schema>
