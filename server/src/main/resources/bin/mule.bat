@@ -22,11 +22,11 @@ rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
 if "%MULE_APP%" == "" (
-	set MULE_APP="mule"
-	set MULE_APP_LONG="Mule"
+	set MULE_APP=mule
+	set MULE_APP_LONG=Mule
 ) else (
 	if "%MULE_APP_LONG%" == "" (
-		set MULE_APP_LONG="%MULE_APP%"
+		set MULE_APP_LONG=%MULE_APP%
 	)
 )
 

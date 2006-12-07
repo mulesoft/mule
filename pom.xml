@@ -71,6 +71,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-bpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-dq</artifactId>
             <version>${version}</version>
         </dependency>

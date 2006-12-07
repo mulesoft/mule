@@ -18,6 +18,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule:mule-core</include>
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-axis</include>
+        <include>org.mule.transports:mule-transport-bpm</include>
         <include>org.mule.transports:mule-transport-dq</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
