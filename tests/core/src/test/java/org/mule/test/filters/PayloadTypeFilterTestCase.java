@@ -14,12 +14,22 @@ import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
 {
+
+    public void testPayloadTypeFilterNoExpectedType()
+    {
+        PayloadTypeFilter filter = new PayloadTypeFilter();
+        assertNull(filter.getExpectedType());
+        assertFalse(filter.accept(new MuleMessage("test")));
+
+        filter.setExpectedType(String.class);
+        assertTrue(filter.accept(new MuleMessage("test")));
+
+        filter.setExpectedType(null);
+        assertFalse(filter.accept(new MuleMessage("test")));
+    }
+
     public void testPayloadTypeFilter()
     {
         PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
@@ -31,4 +41,5 @@ public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(new MuleMessage("test")));
         assertTrue(!filter.accept(new MuleMessage(new Exception("test"))));
     }
+
 }

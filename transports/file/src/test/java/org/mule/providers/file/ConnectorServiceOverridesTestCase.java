@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.providers.file;
+package org.mule.providers.file;
 
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;

@@ -13,14 +13,26 @@ package org.mule.test.filters;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class RegExFilterTestCase extends AbstractMuleTestCase
 {
-    public void testWildcardFilter()
+
+    public void testRegexFilterNoPattern()
+    {
+        // start with default
+        RegExFilter filter = new RegExFilter();
+        assertNull(filter.getPattern());
+        assertFalse(filter.accept("No tengo dinero"));
+
+        // activate a pattern
+        filter.setPattern("(.*) brown fox");
+        assertTrue(filter.accept("The quick brown fox"));
+
+        // remove pattern again, i.e. block all
+        filter.setPattern(null);
+        assertFalse(filter.accept("oh-oh"));
+    }
+
+    public void testRegexFilter()
     {
 
         RegExFilter filter = new RegExFilter("The quick (.*)");

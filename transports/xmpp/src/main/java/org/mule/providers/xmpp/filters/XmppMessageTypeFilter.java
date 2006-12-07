@@ -15,9 +15,6 @@ import org.jivesoftware.smack.packet.Message;
 
 /**
  * <code>XmppMessageTypeFilter</code> is an Xmpp MessageTypeFilter adapter.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppMessageTypeFilter extends XmppFromContainsFilter
 {

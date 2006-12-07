@@ -14,11 +14,8 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>EqualsFilter</code> is a filer for comparing two objects using the
+ * <code>EqualsFilter</code> is a filter for comparing two objects using the
  * equals() method.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EqualsFilter implements UMOFilter, ObjectFilter
 {
@@ -45,10 +42,12 @@ public class EqualsFilter implements UMOFilter, ObjectFilter
         {
             return true;
         }
+
         if (object == null || pattern == null)
         {
             return false;
         }
+
         return pattern.equals(object);
     }
 

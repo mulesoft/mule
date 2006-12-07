@@ -10,8 +10,11 @@
 
 package org.mule.impl.model;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.beans.ExceptionListener;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -35,17 +38,14 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The model
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
  * responsible for maintaining the UMOs instances and their configuration.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractModel implements UMOModel
 {
@@ -58,12 +58,12 @@ public abstract class AbstractModel implements UMOModel
     private UMOEntryPointResolver entryPointResolver;
     private UMOLifecycleAdapterFactory lifecycleAdapterFactory;
 
-    private ConcurrentHashMap components;
+    private Map components;
 
     /**
      * Collection for mule descriptors registered in this Manager
      */
-    protected ConcurrentHashMap descriptors;
+    protected Map descriptors;
 
     private AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -80,7 +80,7 @@ public abstract class AbstractModel implements UMOModel
         // resolver and exceptionstrategy.
         entryPointResolver = new DynamicEntryPointResolver();
         lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
-        components = new ConcurrentHashMap();
+        components = new ConcurrentSkipListMap();
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
         name = "mule";

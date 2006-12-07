@@ -13,12 +13,22 @@ package org.mule.test.filters;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class EqualsFilterTestCase extends AbstractMuleTestCase
 {
+
+    public void testEqualsFilterNoPattern()
+    {
+        EqualsFilter filter = new EqualsFilter();
+        assertNull(filter.getPattern());
+        assertFalse(filter.accept("foo"));
+
+        filter.setPattern("foo");
+        assertTrue(filter.accept("foo"));
+
+        filter.setPattern(null);
+        assertFalse(filter.accept("foo"));
+    }
+
     public void testEqualsFilter()
     {
         Exception obj = new Exception("test");
@@ -31,4 +41,5 @@ public class EqualsFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept("Hello"));
         assertTrue(!filter.accept("Helo"));
     }
+
 }

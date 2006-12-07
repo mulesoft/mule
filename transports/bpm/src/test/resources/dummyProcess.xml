@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition name="dummyProcess"> 
+
+  <description>Dummy process</description>
+
+  <start-state name="start">
+    <transition to="dummyState" />
+  </start-state>
+
+  <state name="dummyState">
+    <transition to="end"/>
+  </state>
+
+  <end-state name="end" />
+
+</process-definition>

@@ -31,6 +31,7 @@ Assembly descriptor for the Mule JCA distribution.
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-axis</include>
+        		<include>org.mule.transports:mule-transport-bpm</include>
                 <include>org.mule.transports:mule-transport-dq</include>
                 <include>org.mule.transports:mule-transport-ejb</include>
                 <include>org.mule.transports:mule-transport-email</include>

@@ -17,12 +17,10 @@ import org.mule.umo.UMOMessage;
  * A filter that accepts messages that have an exception payload. An Exception type
  * can also be set on this filter to allow it to accept Exception messages of a
  * particular Exception class only.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ExceptionTypeFilter extends PayloadTypeFilter
 {
+
     public ExceptionTypeFilter()
     {
         super();

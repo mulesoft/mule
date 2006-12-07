@@ -14,9 +14,6 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppThreadFilter</code> is an Xmpp ThreadFilter adapter.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppThreadFilter extends XmppFromContainsFilter
 {

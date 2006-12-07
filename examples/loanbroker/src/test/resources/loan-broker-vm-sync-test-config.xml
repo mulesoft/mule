@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Loan_broker_Synchronous_Sample" version="1.0">
+    <description>
+    This loan broker example is modeled on the Enterprise integration Patterns book
+    sample.
+    This implementation differs in that this configuration uses an synchronous
+    model where each component is invoked from the LoanBroker component.
+    </description>
+
+    <mule-environment-properties synchronous="true" serverUrl=""/>
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
+        <endpoint-identifier name="CreditAgency" value="vm://CreditAgency"/>
+        <endpoint-identifier name="CreditAgencyReceiver" value="vm://CreditAgency"/>
+        <endpoint-identifier name="LenderService" value="vm://LenderService?method=setLenderList"/>
+        <!-- The method parameter for the bank endpoints is added programmitcally when the bank objects are
+        created -->
+        <endpoint-identifier name="Bank1" value="vm://bank.1"/>
+        <endpoint-identifier name="Bank2" value="vm://bank.2"/>
+        <endpoint-identifier name="Bank3" value="vm://bank.3"/>
+        <endpoint-identifier name="Bank4" value="vm://bank.4"/>
+        <endpoint-identifier name="Bank5" value="vm://bank.5"/>
+    </endpoint-identifiers>
+
+    <model name="loan-broker">
+        <mule-descriptor name="LoanBroker"
+            implementation="org.mule.samples.loanbroker.SyncLoanBroker">
+            <inbound-router>
+                <endpoint address="LoanBrokerRequests"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="CreditAgency"/>
+                    <filter expression="/loanRequest/creditProfile = null" className="org.mule.routing.filters.xml.JXPathFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="LenderService"/>
+                    <filter expression="/lenders = null" className="org.mule.routing.filters.xml.JXPathFilter"/>
+                </router>
+            </outbound-router>
+            <response-router timeout="10000">
+                <endpoint address="LoanBrokerQuotes"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="CreditAgencyService"
+            inboundEndpoint="CreditAgencyReceiver"
+            implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+        </mule-descriptor>
+
+        <mule-descriptor name="LenderService"
+            inboundEndpoint="LenderService"
+            implementation="org.mule.samples.loanbroker.DefaultLenderService">
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank1"
+            inboundEndpoint="Bank1"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2"
+            inboundEndpoint="Bank2"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3"
+            inboundEndpoint="Bank3"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4"
+            inboundEndpoint="Bank4"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5"
+            inboundEndpoint="Bank5"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -14,13 +14,10 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppPacketTypeFilter</code> is an Xmpp PacketTypeFilter adapter.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppPacketTypeFilter extends AbstractXmppFilter
 {
-    private Class expectedType;
+    private volatile Class expectedType;
 
     public XmppPacketTypeFilter()
     {

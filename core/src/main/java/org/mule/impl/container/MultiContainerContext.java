@@ -26,9 +26,6 @@ import java.util.TreeMap;
 /**
  * <code>MultiContainerContext</code> is a container that hosts other containers
  * from which components are queried.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MultiContainerContext implements UMOContainerContext
 {
@@ -120,9 +117,9 @@ public class MultiContainerContext implements UMOContainerContext
             }
             if (component != null)
             {
-                if (logger.isInfoEnabled())
+                if (logger.isDebugEnabled())
                 {
-                    logger.info("Object: '" + realKey + "' found in container: " + container.getName());
+                    logger.debug("Object: '" + realKey + "' found in container: " + container.getName());
                 }
                 break;
             }

@@ -17,15 +17,25 @@ import org.mule.umo.UMOMessage;
 
 public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestCase
 {
-    // only shoot 10 requests for now
-    public static final int REQUESTS = 10;
+    
+    public AxisLoanBrokerSynchronousFunctionalTestCase()
+    {
+        super();
+        setDisposeManagerPerSuite(true);
+    }
 
     protected String getConfigResources()
     {
         return "loan-broker-axis-sync-test-config.xml";
     }
 
-    public void _testSingleLoanRequest() throws Exception
+    // fire 100 requests as default
+    protected int getNumberOfRequests()
+    {
+        return 100;
+    }
+
+    public void testSingleLoanRequest() throws Exception
     {
         MuleClient client = new MuleClient();
         Customer c = new Customer("Ross Mason", 1234);
@@ -46,21 +56,23 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
         requests[0] = new LoanRequest(c, 100000, 48);
         requests[1] = new LoanRequest(c, 1000, 12);
         requests[2] = new LoanRequest(c, 10, 24);
-        UMOMessage result;
-        int i = 0;
+
         long start = System.currentTimeMillis();
+
+        int numRequests = this.getNumberOfRequests();
+        int i = 0;
+
         try
         {
-            for (; i < REQUESTS; i++)
+            for (; i < numRequests; i++)
             {
                 LoanRequest loanRequest = requests[i % 3];
 
                 // must set the CreditProfile to null otherwise the first
-                // JXPathFilter
-                // will be bypassed and CreditAgency component will be bypassed as
-                // well!!
+                // JXPathFilter will be bypassed and CreditAgency component will be
+                // bypassed as well!
                 loanRequest.setCreditProfile(null);
-                result = client.send("vm://LoanBrokerRequests", loanRequest, null);
+                UMOMessage result = client.send("vm://LoanBrokerRequests", loanRequest, null);
                 assertNotNull(result);
                 assertFalse("received a NullPayload", result.getPayload() instanceof NullPayload);
                 assertTrue("did not receive a LoanQuote but: " + result.getPayload(),
@@ -71,11 +83,11 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
         }
         finally
         {
-            System.out.println("Requests processed was: " + i);
             long el = System.currentTimeMillis() - start;
-            System.out.println("Total running time was: " + el);
-            float mps = 1000 / (el / REQUESTS);
-            System.out.println("MPS: " + mps + " (no warm up)");
+            System.out.println("Total running time was: " + el + "ms");
+            System.out.println("Requests processed was: " + i);
+            int mps = (int)(numRequests/((double)el/(double)1000));
+            System.out.println("Msg/sec: " + mps + " (no warm up)");
         }
     }
 }

@@ -14,10 +14,7 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>OrFilter</code> accepts if the leftFilter or rightFilter filter accept
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>OrFilter</code> accepts if the leftFilter or rightFilter filter accept.
  */
 
 public class OrFilter implements UMOFilter
@@ -58,6 +55,8 @@ public class OrFilter implements UMOFilter
 
     public boolean accept(UMOMessage message)
     {
-        return leftFilter.accept(message) || rightFilter.accept(message);
+        return ((leftFilter != null && leftFilter.accept(message)) || (rightFilter != null && rightFilter
+            .accept(message)));
     }
+
 }

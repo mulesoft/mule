@@ -11,24 +11,40 @@
 package org.mule.test.filters;
 
 import org.mule.impl.MuleMessage;
+import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class LogicFiltersTestCase extends AbstractMuleTestCase
 {
+
     public void testAndFilter()
     {
+        AndFilter filter = new AndFilter();
+        assertNull(filter.getLeftFilter());
+        assertNull(filter.getRightFilter());
+
+        // both null
+        assertFalse(filter.accept(new MuleMessage("foo")));
+
+        // left set, right null
+        filter.setLeftFilter(new EqualsFilter("foo"));
+        assertFalse(filter.accept(new MuleMessage("foo")));
+
+        // right set too, but does not accept
+        filter.setRightFilter(new EqualsFilter("foo"));
+        assertFalse(filter.accept(new MuleMessage("bar")));
+
+        // both accept
+        filter.setRightFilter(new EqualsFilter("foo"));
+        assertTrue(filter.accept(new MuleMessage("foo")));
+
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.*");
-        AndFilter filter = new AndFilter(left, right);
+        filter = new AndFilter(left, right);
         assertNotNull(filter.getLeftFilter());
         assertNotNull(filter.getRightFilter());
 
@@ -47,9 +63,14 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
 
     public void testOrFilter()
     {
+        OrFilter filter = new OrFilter();
+        assertNull(filter.getLeftFilter());
+        assertNull(filter.getRightFilter());
+        assertFalse(filter.accept(new MuleMessage("foo")));
+
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.b*");
-        OrFilter filter = new OrFilter(left, right);
+        filter = new OrFilter(left, right);
         assertNotNull(filter.getLeftFilter());
         assertNotNull(filter.getRightFilter());
 
@@ -70,8 +91,13 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
 
     public void testNotFilter()
     {
+        NotFilter notFilter = new NotFilter();
+        assertNull(notFilter.getFilter());
+        assertFalse(notFilter.accept(new MuleMessage("foo")));
+        assertFalse(notFilter.accept(new MuleMessage(null)));
+
         WildcardFilter filter = new WildcardFilter("blah.blah.*");
-        NotFilter notFilter = new NotFilter(filter);
+        notFilter = new NotFilter(filter);
         assertNotNull(notFilter.getFilter());
 
         assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
@@ -82,4 +108,5 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
         assertTrue(!notFilter.accept(new MuleMessage("blah.blah.blah")));
     }
+
 }

@@ -15,12 +15,9 @@ import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 {
+
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
@@ -66,7 +63,10 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 
     public void testMessagePropertyFilterDodgyValues() throws Exception
     {
-        MessagePropertyFilter filter = new MessagePropertyFilter("foo = bar");
+        MessagePropertyFilter filter = new MessagePropertyFilter();
+        assertFalse(filter.accept(null));
+
+        filter = new MessagePropertyFilter("foo = bar");
         UMOMessage message = new MuleMessage("blah");
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));

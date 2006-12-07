@@ -17,14 +17,11 @@ import org.mule.umo.UMOMessage;
  * <code>MessagePropertyFilter</code> can be used to filter against properties on
  * an event. This can be very useful as the event properties represent all the meta
  * information about the event from the underlying transport, so for an event
- * received over Http you can check for Http Headers or For Jms you can check for Jms
- * Headers. The pattern should be expresed as a key/value pair i.e.
- * propertyName=value If you want to compare more than one property you can use the
- * logic filters for And, Or and Not expressions. By default the comparison is case
- * sensitive you you can sent the <i>caseSensitive</i> property to override this.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * received over HTTP you can check for HTTP headers etc. The pattern should be
+ * expressed as a key/value pair, i.e. "propertyName=value". If you want to compare
+ * more than one property you can use the logic filters for And, Or and Not
+ * expressions. By default the comparison is case sensitive; you can set the
+ * <i>caseSensitive</i> property to override this.
  */
 public class MessagePropertyFilter implements UMOFilter
 {
@@ -46,7 +43,13 @@ public class MessagePropertyFilter implements UMOFilter
 
     public boolean accept(UMOMessage message)
     {
+        if (message == null)
+        {
+            return false;
+        }
+
         Object value = message.getProperty(propertyName);
+
         if (value == null)
         {
             return compare(null, propertyValue);
@@ -63,15 +66,19 @@ public class MessagePropertyFilter implements UMOFilter
         {
             return true;
         }
+
         if (value1 == null)
         {
             value1 = "null";
         }
+
         if (value2 == null)
         {
             value2 = "null";
         }
+
         boolean result = false;
+
         if (caseSensitive)
         {
             result = value1.equals(value2);
@@ -80,21 +87,22 @@ public class MessagePropertyFilter implements UMOFilter
         {
             result = value1.equalsIgnoreCase(value2);
         }
+
         return (not ? !result : result);
     }
 
     public String getExpression()
     {
-        return propertyName + "=" + propertyValue;
+        return propertyName + '=' + propertyValue;
     }
 
     public void setExpression(String expression)
     {
-        int i = expression.indexOf("=");
+        int i = expression.indexOf('=');
         if (i == -1)
         {
             throw new IllegalArgumentException(
-                "Pattern is malformed it should be a key value pair i.e. property=value: " + expression);
+                "Pattern is malformed - it should be a key value pair, i.e. property=value: " + expression);
         }
         else
         {
@@ -120,4 +128,5 @@ public class MessagePropertyFilter implements UMOFilter
     {
         this.caseSensitive = caseSensitive;
     }
+
 }

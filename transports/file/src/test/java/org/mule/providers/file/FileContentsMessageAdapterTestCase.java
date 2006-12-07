@@ -8,14 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.providers.file;
+package org.mule.providers.file;
 
 import java.io.File;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.mule.MuleManager;
-import org.mule.providers.file.FileContentsMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -123,6 +122,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 }
 
 // need this since setMessage is protected and we're in a different package
+// TODO refactor, this is no longer required, as tests mirror the original class hierarchy
 class AccessibleFCMAdapter extends FileContentsMessageAdapter
 {
     private static final long serialVersionUID = -985644721173808557L;

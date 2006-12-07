@@ -14,7 +14,7 @@
     in this file.
     </description>
 
-    <mule-environment-properties serverUrl="" enableMessageEvents="true" >
+    <mule-environment-properties serverUrl="" enableMessageEvents="false" >
         <threading-profile maxBufferSize="0" maxThreadsActive="5" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="3000000"/>
         <pooling-profile maxActive="5" maxIdle="5" exhaustedAction="GROW" maxWait="1000"/>
         <queue-profile maxOutstandingMessages="200"/>

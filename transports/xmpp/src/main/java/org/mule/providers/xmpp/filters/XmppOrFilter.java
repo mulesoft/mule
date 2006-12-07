@@ -15,9 +15,6 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppAndFilter</code> an Xmpp OR filter
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppOrFilter extends XmppAndFilter
 {

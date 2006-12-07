@@ -25,6 +25,7 @@ import javax.mail.URLName;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
@@ -298,9 +299,11 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
             if (filename == null)
             {
                 Address[] from = msg.getFrom();
-                if (from != null)
+                if (from != null && from.length > 0)
                 {
-                    filename = from[0].toString();
+                    filename = from[0] instanceof InternetAddress
+                            ? ((InternetAddress) from[0]).getAddress()
+                            : from[0].toString();
                 }
                 else
                 {

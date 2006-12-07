@@ -26,6 +26,7 @@ import org.mule.providers.email.MailMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
 
 /**
  * Transforms a javax.mail.Message to a UMOMessage, with support for attachments
@@ -92,7 +93,7 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         BodyPart part = new MimeBodyPart();
         part.setDataHandler(handler);
         part.setDescription(name);
-        part.setFileName(handler.getName());
+        part.setFileName(StringUtils.defaultString(handler.getName(), name));
         return part;
     }
 
@@ -100,19 +101,19 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         throws MessagingException, TransformerException, IOException
     {
 
-        DataHandler handler = null;
+        DataHandler handler;
         if (payload instanceof String)
         {
             handler = new DataHandler(new PlainTextDataSource(contentType, payload.toString()));
+        }
+        else if (payload instanceof byte[])
+        {
+            handler = new DataHandler(new ByteArrayDataSource((byte[])payload, contentType));
         }
         else if (payload instanceof Serializable)
         {
             handler = new DataHandler(new ByteArrayDataSource(
                 (byte[])new SerializableToByteArray().transform(payload), contentType));
-        }
-        else if (payload instanceof byte[])
-        {
-            handler = new DataHandler(new ByteArrayDataSource((byte[])payload, contentType));
         }
         else
         {

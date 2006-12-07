@@ -25,6 +25,8 @@ import java.util.Properties;
  */
 public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
 {
+    //TODO THis endpoint builder is redundant I think. We should be able to use the URL endpoint builder.
+    //It depends on where deriving classes can work with the URL endpoint builder, but there are a lot of similarities
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         // Check and handle '@' symbols in the user info
@@ -68,10 +70,6 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
                     address = userInfo + "@" + address;
                 }
             }
-        }
-        else
-        {
-            throw new MalformedEndpointException(uri.toString(), new Exception("User info is not set"));
         }
     }
 }

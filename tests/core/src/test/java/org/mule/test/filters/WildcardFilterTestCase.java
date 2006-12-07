@@ -13,12 +13,24 @@ package org.mule.test.filters;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class WildcardFilterTestCase extends AbstractMuleTestCase
 {
+
+    public void testWildcardFilterNoPattern()
+    {
+        // start with default
+        WildcardFilter filter = new WildcardFilter();
+        assertFalse(filter.accept("No tengo dinero"));
+
+        // activate a pattern
+        filter.setPattern("* brown fox");
+        assertTrue(filter.accept("The quick brown fox"));
+
+        // remove pattern again, i.e. block all
+        filter.setPattern(null);
+        assertFalse(filter.accept("oh-oh"));
+    }
+
     public void testWildcardFilterPostfix()
     {
         WildcardFilter filter = new WildcardFilter("The quick *");
@@ -92,4 +104,5 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         filter.setCaseSensitive(false);
         assertTrue(filter.accept("The quick Brown fox"));
     }
+
 }

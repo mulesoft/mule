@@ -17,14 +17,11 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>AbstractXmppFilter</code> is a filter adapter so that Smack Filters can be
- * configured as Mule filters
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * configured as Mule filters.
  */
 public abstract class AbstractXmppFilter implements UMOFilter, PacketFilter
 {
-    protected PacketFilter delegate;
+    protected volatile PacketFilter delegate;
 
     public boolean accept(Packet packet)
     {
@@ -32,6 +29,7 @@ public abstract class AbstractXmppFilter implements UMOFilter, PacketFilter
         {
             delegate = createFilter();
         }
+
         return delegate.accept(packet);
     }
 
@@ -42,4 +40,5 @@ public abstract class AbstractXmppFilter implements UMOFilter, PacketFilter
     }
 
     protected abstract PacketFilter createFilter();
+
 }

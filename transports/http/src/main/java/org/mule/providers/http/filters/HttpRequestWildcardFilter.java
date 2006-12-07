@@ -15,14 +15,12 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>HttpRequestWildcardFilter</code> filters out wildcard Url expressions. you
- * can use a comma separated list of url patterns such as- *.gif, *blah*
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>HttpRequestWildcardFilter</code> filters out wildcard URL expressions. You
+ * can use a comma-separated list of URL patterns such as "*.gif, *blah*".
  */
 public class HttpRequestWildcardFilter extends WildcardFilter
 {
+
     public HttpRequestWildcardFilter()
     {
         super();
@@ -39,6 +37,8 @@ public class HttpRequestWildcardFilter extends WildcardFilter
         {
             object = ((UMOMessage)object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         }
+
         return super.accept(object);
     }
+
 }

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.providers.file;
+package org.mule.providers.file;
 
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.file.FileConnector;

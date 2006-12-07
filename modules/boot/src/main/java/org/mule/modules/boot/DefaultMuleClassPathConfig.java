@@ -33,7 +33,7 @@ public class DefaultMuleClassPathConfig
     /**
      * Constructs a new DefaultMuleClassPathConfig.
      */
-    public DefaultMuleClassPathConfig(File muleHome)
+    public DefaultMuleClassPathConfig(File muleHome, File muleBase)
     {
         try
         {
@@ -64,6 +64,19 @@ public class DefaultMuleClassPathConfig
                 addURL(jar.toURL());
             }
 
+            /**
+             * Pick up any local jars, if there are any
+             */
+            if (muleHome != muleBase)
+            {
+                addURL(new URL("file://" + muleBase.getAbsolutePath() + FOLDER_USER + "/"));
+                muleJars = listJars(muleBase, FOLDER_USER);
+                for (int i = 0; i < muleJars.length; i++)
+                {
+                    File jar = muleJars[i];
+                    addURL(jar.toURL());
+                }
+            }
         }
         catch (MalformedURLException e)
         {
@@ -108,12 +121,12 @@ public class DefaultMuleClassPathConfig
     /**
      * Find and if necessary filter the jars for classpath.
      *
-     * @param muleSubfolder folder under Mule home to list
+     * @param muleSubfolder folder under the Mule directory to list
      * @return a list
      */
-    protected File[] listJars(File muleHome, String muleSubfolder)
+    protected File[] listJars(File muleDir, String muleSubfolder)
     {
-        File path = new File(muleHome, muleSubfolder);
+        File path = new File(muleDir, muleSubfolder);
 
         File[] jars = path.listFiles(new FileFilter()
         {

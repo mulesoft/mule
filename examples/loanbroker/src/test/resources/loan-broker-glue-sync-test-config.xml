@@ -44,14 +44,15 @@
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="CreditAgency"/>
-                    <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                    <filter expression="/loanRequest/creditProfile = null" className="org.mule.routing.filters.xml.JXPathFilter"/>
                 </router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="LenderService"/>
-                    <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                    <filter expression="/lenders = null" className="org.mule.routing.filters.xml.JXPathFilter"/>
                 </router>
             </outbound-router>
-            <response-router timeout="10000">
+            <!--<response-router timeout="10000">-->
+			<response-router timeout="10000000">
                 <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
             </response-router>
@@ -66,10 +67,6 @@
             inboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultLenderService">
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote"
-                        className="org.mule.routing.filters.PayloadTypeFilter" />
-                </router>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
                     <reply-to address="LoanBrokerQuotes"/>
                     <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>

@@ -1,0 +1,4 @@
+connector=org.mule.providers.bpm.ProcessConnector
+message.receiver=org.mule.providers.bpm.ProcessMessageReceiver
+message.adapter=org.mule.providers.DefaultMessageAdapter
+dispatcher.factory=org.mule.providers.bpm.ProcessMessageDispatcherFactory

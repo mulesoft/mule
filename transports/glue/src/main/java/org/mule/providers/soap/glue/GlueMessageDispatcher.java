@@ -87,6 +87,10 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
     {
 
         String method = event.getMessage().getStringProperty(MuleProperties.MULE_METHOD_PROPERTY, null);
+        if (method == null)
+        {
+            method = (String)event.getEndpoint().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        }
         setContext(event);
 
         Object payload = event.getTransformedMessage();

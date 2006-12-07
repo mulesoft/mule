@@ -11,10 +11,7 @@
 package org.mule.routing.filters;
 
 /**
- * Interface for filtering any kind of objects.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * Interface for filtering any kind of object.
  */
 public interface ObjectFilter
 {

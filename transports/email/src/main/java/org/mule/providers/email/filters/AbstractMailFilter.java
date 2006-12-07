@@ -30,6 +30,11 @@ public abstract class AbstractMailFilter implements UMOFilter
 
     public final boolean accept(UMOMessage message)
     {
+        if (message == null)
+        {
+            return false;
+        }
+
         Object object = message.getPayload();
         if (object instanceof Message)
         {

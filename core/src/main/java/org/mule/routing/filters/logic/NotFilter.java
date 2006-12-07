@@ -14,10 +14,7 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>NotFilter</code> accepts if the filter does not accept
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>NotFilter</code> accepts if the filter does not accept.
  */
 
 public class NotFilter implements UMOFilter
@@ -46,6 +43,7 @@ public class NotFilter implements UMOFilter
 
     public boolean accept(UMOMessage message)
     {
-        return !filter.accept(message);
+        return (filter != null ? !filter.accept(message) : false);
     }
+
 }

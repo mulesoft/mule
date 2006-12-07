@@ -15,6 +15,7 @@
 
     <modules>
         <module>axis</module>
+        <module>bpm</module>
         <module>dq</module>
         <module>ejb</module>
         <module>email</module>

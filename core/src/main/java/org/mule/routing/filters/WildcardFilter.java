@@ -17,23 +17,20 @@ import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
 
 /**
- * <code>WildcardFilter</code> is used to match wildcard string. It performs
- * matches with * i.e. jms.events.* would catch jms.events.customer
- * jms.events.receipts This filter accepts a comma separented list of patterns so
- * more than one filter pattenr can be matched for a given argument i.e.-
- * jms.events.*, jms.actions.* will match jms.events.system and jms.actions but not
- * jms.queue
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>WildcardFilter</code> is used to match Strings against wildcards. It
+ * performs matches with "*", i.e. "jms.events.*" would catch "jms.events.customer"
+ * and "jms.events.receipts". This filter accepts a comma-separated list of patterns,
+ * so more than one filter pattern can be matched for a given argument:
+ * "jms.events.*, jms.actions.*" will match "jms.events.system" and "jms.actions" but
+ * not "jms.queue".
  */
 
 public class WildcardFilter implements UMOFilter, ObjectFilter
 {
-    private static final Log LOGGER = LogFactory.getLog(WildcardFilter.class);
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
-    protected String[] patterns;
     protected String pattern;
+    protected String[] patterns;
     private boolean caseSensitive = true;
 
     public WildcardFilter()
@@ -43,7 +40,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
 
     public WildcardFilter(String pattern)
     {
-        setPattern(pattern);
+        this.setPattern(pattern);
     }
 
     public boolean accept(UMOMessage message)
@@ -54,7 +51,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         }
         catch (Exception e)
         {
-            LOGGER.warn("An exception occured while filtering", e);
+            logger.warn("An exception occured while filtering", e);
             return false;
         }
     }
@@ -66,50 +63,55 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
             return false;
         }
 
-        boolean match = false;
-        for (int x = 0; x < patterns.length; x++)
+        if (patterns != null)
         {
-            String pattern = patterns[x];
-
-            String string = object.toString();
-            if ("*".equals(pattern) || "**".equals(pattern))
+            for (int x = 0; x < patterns.length; x++)
             {
-                return true;
-            }
+                boolean foundMatch;
+                String pattern = patterns[x];
 
-            int i = pattern.indexOf('*');
-
-            if (!isCaseSensitive())
-            {
-                pattern = pattern.toLowerCase();
-                string = string.toLowerCase();
-            }
-
-            if (i == -1)
-            {
-                match = pattern.equals(string);
-            }
-            else
-            {
-                int i2 = pattern.indexOf('*', i + 1);
-                if (i2 > 1)
+                if ("*".equals(pattern) || "**".equals(pattern))
                 {
-                    match = string.indexOf(pattern.substring(1, i2)) > -1;
+                    return true;
                 }
-                else if (i == 0)
+
+                String candidate = object.toString();
+
+                if (!isCaseSensitive())
                 {
-                    match = string.endsWith(pattern.substring(1));
+                    pattern = pattern.toLowerCase();
+                    candidate = candidate.toLowerCase();
+                }
+
+                int i = pattern.indexOf('*');
+                if (i == -1)
+                {
+                    foundMatch = pattern.equals(candidate);
                 }
                 else
                 {
-                    match = string.startsWith(pattern.substring(0, i));
+                    int i2 = pattern.indexOf('*', i + 1);
+                    if (i2 > 1)
+                    {
+                        foundMatch = candidate.indexOf(pattern.substring(1, i2)) > -1;
+                    }
+                    else if (i == 0)
+                    {
+                        foundMatch = candidate.endsWith(pattern.substring(1));
+                    }
+                    else
+                    {
+                        foundMatch = candidate.startsWith(pattern.substring(0, i));
+                    }
+                }
+
+                if (foundMatch)
+                {
+                    return true;
                 }
             }
-            if (match)
-            {
-                return true;
-            }
         }
+
         return false;
     }
 
@@ -133,4 +135,5 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     {
         this.caseSensitive = caseSensitive;
     }
+
 }

@@ -39,6 +39,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 
     public static final String LISTENER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationListener";
     public static final String BROADCASTER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationBroadcaster";
+    public static final String DEFAULT_AGENT_NAME = "Jmx Notification Agent";
 
     private MBeanServer mBeanServer;
     private BroadcastNotificationService broadcastNotificationMbean;
@@ -50,15 +51,17 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     private JmxSupport jmxSupport;
 
 
+    public JmxServerNotificationAgent()
+    {
+        // set default name, overridable by config
+        setName(DEFAULT_AGENT_NAME);
+    }
+
     /**
      * {@inheritDoc}
      */
     protected void doInitialise() throws InitialisationException
     {
-        if (getName() == null)
-        {
-            setName("Jmx Notification Agent");
-        }
         try
         {
             jmxSupport = jmxSupportFactory.newJmxSupport();
@@ -120,7 +123,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
      */
     public String getDescription()
     {
-        return "Jmx Notification Agent" + (registerListenerMbean ? "(Listener MBean registered)" : "");
+        return DEFAULT_AGENT_NAME + (registerListenerMbean ? " (Listener MBean registered)" : "");
     }
 
 

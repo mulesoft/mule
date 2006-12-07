@@ -14,9 +14,6 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppPacketIDFilter</code> is an Xmpp PacketIDFilter adapter.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppPacketIDFilter extends XmppFromContainsFilter
 {

@@ -10,20 +10,20 @@
 
 package org.mule.samples.loanbroker;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.DateUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>LoanConsumer</code> is a loan broker client app that uses command line
@@ -201,11 +201,9 @@ public class LoanConsumer
         int response = 0;
         String provider = "axis";
 
-        while (response != 'a' && /* response != 'g' && */response != 'x')
+        while (response != 'a' && response != 'g' && response != 'x')
         {
-            // System.out.println("\nWhich SOAP stack would you like to use: [a]xis,
-            // [g]lue or [x]fire?");
-            System.out.println("\nWhich SOAP stack would you like to use: [a]xis or [x]fire?");
+            System.out.println("\nWhich SOAP stack would you like to use: [a]xis, [g]lue or [x]fire?");
             response = readCharacter();
             switch (response)
             {
@@ -215,12 +213,11 @@ public class LoanConsumer
                     break;
                 }
 
-                    // TODO re-enable glue when the locahost/IP issue is fixed
-                    // case 'g':
-                    // {
-                    // provider = "glue";
-                    // break;
-                    // }
+                case 'g' :
+                {
+                    provider = "glue";
+                    break;
+                }
 
                 case 'x' :
                 {

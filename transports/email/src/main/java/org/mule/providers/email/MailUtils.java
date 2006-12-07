@@ -126,7 +126,7 @@ public class MailUtils
             {
                 // reset authentication property so smtp is not affected (MULE-464)
                 props.put("mail." + protocol + ".auth", "false");
-                session = Session.getDefaultInstance(props, null);
+                session = Session.getInstance(props, null);
             }
         }
 

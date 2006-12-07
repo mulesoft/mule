@@ -15,14 +15,11 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppAndFilter</code> an Xmpp AND filter
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class XmppAndFilter extends AbstractXmppFilter
 {
-    private PacketFilter leftFilter;
-    private PacketFilter rightFilter;
+    private volatile PacketFilter leftFilter;
+    private volatile PacketFilter rightFilter;
 
     public XmppAndFilter()
     {
