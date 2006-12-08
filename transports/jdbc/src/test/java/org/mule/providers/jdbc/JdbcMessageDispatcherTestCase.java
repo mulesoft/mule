@@ -3,24 +3,23 @@
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * The software in this package is published under the terms of the BSD style
+ * The software in this package is published under the terms of the MuleSource MPL
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.providers.jdbc;
 
 import com.mockobjects.dynamic.Mock;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.impl.ImmutableMuleEndpoint;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.ResultSet;
-
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
+import java.sql.SQLException;
 
 public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 {

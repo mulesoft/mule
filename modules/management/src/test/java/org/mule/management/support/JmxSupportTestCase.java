@@ -3,21 +3,20 @@
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * The software in this package is published under the terms of the BSD style
+ * The software in this package is published under the terms of the MuleSource MPL
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.management.support;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.management.ObjectName;
-
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.mbeans.StatisticsService;
 import org.mule.umo.manager.UMOManager;
+
+import javax.management.ObjectName;
+import java.util.Arrays;
+import java.util.List;
 
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {

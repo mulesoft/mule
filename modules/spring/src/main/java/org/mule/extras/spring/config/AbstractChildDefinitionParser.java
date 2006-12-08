@@ -1,15 +1,11 @@
 /*
- * $Header: /opt/cvsroot/mule2/mule-core/src/main/java/org/mule/spring/config/AbstractChildDefinitionParser.java,v 1.1 2006/02/01 19:42:11 rossmason Exp $
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
- * http://www.symphonysoft.com
- *
- * The software in this package is published under the terms of the BSD
- * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file.
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.extras.spring.config;
 
