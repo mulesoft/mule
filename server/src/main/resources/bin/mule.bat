@@ -21,6 +21,16 @@ rem Decide on the wrapper binary.
 rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
+
+rem MULE_HOME must be set
+if "%MULE_HOME%" == "" (
+   echo "You must set the MULE_HOME environment variable before starting Mule"
+   goto :eof
+)
+
+rem If MULE_BASE is not set, set it to MULE_HOME
+if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
+
 if "%MULE_APP%" == "" (
 	set MULE_APP=mule
 	set MULE_APP_LONG=Mule
@@ -30,18 +40,19 @@ if "%MULE_APP%" == "" (
 	)
 )
 
-set _WRAPPER_BASE=..\sbin\wrapper
+set _WRAPPER_BASE=%MULE_HOME%\sbin\wrapper
+
 rem ###############################################################
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%-windows-x86-32.exe
+set _WRAPPER_EXE=%_WRAPPER_BASE%-windows-x86-32.exe
 if exist "%_WRAPPER_EXE%" goto validate
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%-windows-x86-64.exe
+set _WRAPPER_EXE=%_WRAPPER_BASE%-windows-x86-64.exe
 if exist "%_WRAPPER_EXE%" goto validate
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%.exe
+set _WRAPPER_EXE=%_WRAPPER_BASE%.exe
 if exist "%_WRAPPER_EXE%" goto validate
 echo Unable to locate a Wrapper executable using any of the following names:
-echo %_REALPATH%%_WRAPPER_BASE%-windows-x86-32.exe
-echo %_REALPATH%%_WRAPPER_BASE%-windows-x86-64.exe
-echo %_REALPATH%%_WRAPPER_BASE%.exe
+echo %_WRAPPER_BASE%-windows-x86-32.exe
+echo %_WRAPPER_BASE%-windows-x86-64.exe
+echo %_WRAPPER_BASE%.exe
 pause
 goto :eof
 
@@ -77,7 +88,7 @@ set MULE_EXE=%_REALPATH%
 
 rem Mule options: Set the working directory to the current one and pass all command-line
 rem options (-config, -builder, etc.) straight through to the main() method.
-set MULE_OPTS=wrapper.working.dir="%CD%" wrapper.app.parameter.1=%1 wrapper.app.parameter.2=%2  wrapper.app.parameter.3=%3  wrapper.app.parameter.4=%4  wrapper.app.parameter.5=%5  wrapper.app.parameter.6=%6  wrapper.app.parameter.7=%7  wrapper.app.parameter.8=%8 wrapper.app.parameter.9=%9
+set MULE_OPTS=set.MULE_APP=%MULE_APP% set.MULE_APP_LONG=%MULE_APP_LONG% set.MULE_EXE=%MULE_EXE% set.MULE_LIB=%MULE_LIB% wrapper.working.dir="%CD%" wrapper.app.parameter.1=%1 wrapper.app.parameter.2=%2  wrapper.app.parameter.3=%3  wrapper.app.parameter.4=%4  wrapper.app.parameter.5=%5  wrapper.app.parameter.6=%6  wrapper.app.parameter.7=%7  wrapper.app.parameter.8=%8 wrapper.app.parameter.9=%9 
 rem ###############################################################
 
 rem
