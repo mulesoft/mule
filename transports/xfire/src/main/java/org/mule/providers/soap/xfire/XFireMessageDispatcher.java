@@ -10,28 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.StackObjectPool;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.client.Client;
-import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.service.OperationInfo;
-import org.codehaus.xfire.service.Service;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -47,6 +25,27 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.TemplateParser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.StackObjectPool;
+import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.client.Client;
+import org.codehaus.xfire.handler.Handler;
+import org.codehaus.xfire.service.OperationInfo;
+import org.codehaus.xfire.service.Service;
 
 /**
  * The XFireMessageDispatcher is used for making Soap client requests to remote
@@ -76,61 +75,29 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw new FatalConnectException(new Message("xfire", 8, serviceName), this);
             }
-
-            // Add Security Handlers
-            if (connector.getWsSecurity() != null)
+            
+            List inList = connector.getServerInHandlers();
+            if(inList != null)
             {
-
-                if (connector.getWsSecurity().get("serviceInHandlers") != null)
+                for(int i = 0; i < inList.size(); i++)
                 {
-                    List inList = (List)connector.getWsSecurity().get("serviceInHandlers");
-                    for (int i = 0; i < inList.size(); i++)
-                    {
-                        Class clazz = Class.forName(inList.get(i).toString());
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addInHandler(handler);
-                    }
-
-                    if (!inList.contains("org.codehaus.xfire.security.wss4j.WSS4JInHandler"))
-                    {
-                        Class clazz = Class.forName("org.codehaus.xfire.security.wss4j.WSS4JInHandler");
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addInHandler(handler);
-                    }
-
-                    if (!inList.contains("org.codehaus.xfire.util.dom.DOMInHandler"))
-                    {
-                        Class clazz = Class.forName("org.codehaus.xfire.util.dom.DOMInHandler");
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addInHandler(handler);
-                    }
-                }
-
-                if (connector.getWsSecurity().get("serviceOutHandlers") != null)
-                {
-                    List outList = (List)connector.getWsSecurity().get("serviceOutHandlers");
-                    for (int i = 0; i < outList.size(); i++)
-                    {
-                        Class clazz = Class.forName(outList.get(i).toString());
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addOutHandler(handler);
-                    }
-
-                    if (!outList.contains("org.codehaus.xfire.security.wss4j.WSS4JOutHandler"))
-                    {
-                        Class clazz = Class.forName("org.codehaus.xfire.security.wss4j.WSS4JOutHandler");
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addOutHandler(handler);
-                    }
-
-                    if (!outList.contains("org.codehaus.xfire.util.dom.DOMOutHandler"))
-                    {
-                        Class clazz = Class.forName("org.codehaus.xfire.util.dom.DOMOutHandler");
-                        Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
-                        service.addOutHandler(handler);
-                    }
+                    Class clazz = Class.forName(inList.get(i).toString());
+                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    service.addInHandler(handler);
                 }
             }
+            
+            List outList = connector.getServerOutHandlers();
+            if(outList != null)
+            {
+                for(int i = 0; i < outList.size(); i++)
+                {
+                    Class clazz = Class.forName(outList.get(i).toString());
+                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    service.addOutHandler(handler);
+                }
+            }
+
             try
             {
                 clientPool = new StackObjectPool(new XFireClientPoolFactory(endpoint, service, xfire));
@@ -160,22 +127,25 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected String getMethod(UMOEvent event) throws DispatchException
     {
-        String method = (String)event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        String method = (String)event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);     
+                
         if (method == null)
         {
             UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
             method = (String)endpointUri.getParams().get(MuleProperties.MULE_METHOD_PROPERTY);
         }
-
+        
         if (method == null)
         {
             method = (String)event.getEndpoint().getProperties().get(MuleProperties.MULE_METHOD_PROPERTY);
-            if (method == null)
-            {
-                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
-                    event.getEndpoint());
-            }
+        }   
+        
+        if (method == null)
+        {
+            throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
+               event.getEndpoint());
         }
+                
         return method;
     }
 
@@ -213,7 +183,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         Client client = null;
-
+                
         try
         {
             client = (Client)clientPool.borrowObject();
@@ -228,32 +198,17 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
                 client.setProperty(org.codehaus.xfire.soap.SoapConstants.SOAP_ACTION, soapAction);
             }
 
-            // Ws Security
-            if (event.getMessage().getProperty(WSHandlerConstants.ACTION) != null)
-            {
-                client.setProperty(WSHandlerConstants.ACTION, event.getMessage().getProperty(
-                    WSHandlerConstants.ACTION));
-
-                String passwordType;
-                if (event.getMessage().getProperty(WSConstants.PW_DIGEST) != null)
-                {
-                    passwordType = WSConstants.PW_DIGEST;
+            // Set Custom Headers on the client
+            Object[] arr = event.getMessage().getPropertyNames().toArray();
+            String head;
+            for (int i = 0; i < arr.length; i++){
+                head = "";
+                String test = (String)arr[i];
+                for (int j = 0; j < 4; j++){
+                    head = head + test.charAt(j);
                 }
-                else
-                {
-                    passwordType = WSConstants.PW_TEXT;
-                }
-                client.setProperty(WSHandlerConstants.PASSWORD_TYPE, passwordType);
-                client.setProperty(WSHandlerConstants.USER, event.getMessage().getProperty(
-                    WSHandlerConstants.USER));
-                client.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, event.getMessage().getProperty(
-                    WSHandlerConstants.PW_CALLBACK_CLASS));
-
-                // if encrypted
-                if (event.getMessage().getProperty(WSHandlerConstants.ENC_PROP_FILE) != null)
-                {
-                    client.setProperty(WSHandlerConstants.ENC_PROP_FILE, event.getMessage().getProperty(
-                        WSHandlerConstants.ENC_PROP_FILE));
+                if ((head != null)&&(!head.equals("MULE"))){
+                    client.setProperty((String)arr[i], event.getMessage().getProperty((String)arr[i]));
                 }
             }
 

@@ -41,7 +41,7 @@ public class MuleAdminAgent implements UMOAgent
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleAdminAgent.class);
+    protected static final Log logger = LogFactory.getLog(MuleAdminAgent.class);
 
     private WireFormat wireFormat;
 

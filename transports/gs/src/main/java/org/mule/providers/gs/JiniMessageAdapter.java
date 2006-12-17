@@ -10,14 +10,15 @@
 
 package org.mule.providers.gs;
 
-import net.jini.core.entry.Entry;
-
-import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.UUID;
+
+import org.apache.commons.lang.StringUtils;
+
+import net.jini.core.entry.Entry;
 
 /**
  * <code>JiniMessageAdapter</code> wraps a JavaSpaceMessage entry.
@@ -79,7 +80,7 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
             // accept or default
             this.setEncoding(StringUtils.defaultIfEmpty(jm.getEncoding(), MuleManager.getConfiguration()
-                .getEncoding()));
+                .getDefaultEncoding()));
 
             // accept null
             this.setExceptionPayload(jm.getExceptionPayload());

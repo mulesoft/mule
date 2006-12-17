@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireException;
@@ -58,8 +57,7 @@ public class MuleLocalChannel extends AbstractChannel
 {
     protected static final String SENDER_URI = "senderUri";
     protected static final String OLD_CONTEXT = "urn:xfire:transport:local:oldContext";
-    protected static final String DEFAULT_WS_IN_DENCRYPTION_FILE = "insecurity.properties";
-
+    
     /**
      * logger used by this class
      */
@@ -341,6 +339,7 @@ public class MuleLocalChannel extends AbstractChannel
         try
         {
             MessageContext context = new MessageContext();
+  
             XFire xfire = (XFire)ctx.getComponentDescriptor().getProperties().get(
                 XFireConnector.XFIRE_PROPERTY);
 
@@ -352,18 +351,6 @@ public class MuleLocalChannel extends AbstractChannel
 
             // Return the result to us, not to the sender.
             context.setProperty(Channel.BACKCHANNEL_URI, resultStream);
-
-            // Ws Security
-            if (ctx.getMessage().getProperty(WSHandlerConstants.ACTION) != null)
-            {
-                context.setProperty(WSHandlerConstants.ACTION, ctx.getMessage().getProperty("action"));
-                context.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, ctx.getMessage().getProperty(
-                    WSHandlerConstants.PW_CALLBACK_CLASS));
-                if (ctx.getMessage().getProperty("action").equals(WSHandlerConstants.ENCRYPT))
-                {
-                    context.setProperty(WSHandlerConstants.DEC_PROP_FILE, DEFAULT_WS_IN_DENCRYPTION_FILE);
-                }
-            }
 
             XMLStreamReader reader;
 

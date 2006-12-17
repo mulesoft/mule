@@ -10,13 +10,7 @@
 
 package org.mule.transaction;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public interface TransactionCallback
 {
-
     Object doInTransaction() throws Exception;
-
 }

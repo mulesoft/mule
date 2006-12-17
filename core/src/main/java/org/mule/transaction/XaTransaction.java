@@ -10,10 +10,8 @@
 
 package org.mule.transaction;
 
-import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.TransactionException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
@@ -21,21 +19,18 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
 
 /**
- * <p>
  * <code>XaTransaction</code> represents an XA transaction in Mule.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class XaTransaction extends AbstractTransaction
 {
     /**
-     * The inner jta transaction
+     * The inner JTA transaction
      */
     private Transaction transaction = null;
 
@@ -60,15 +55,20 @@ public class XaTransaction extends AbstractTransaction
     protected void doBegin() throws TransactionException
     {
         TransactionManager txManager = MuleManager.getInstance().getTransactionManager();
+
         if (txManager == null)
         {
             throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
                 "Transaction Manager").getMessage());
         }
+
         try
         {
             txManager.begin();
-            transaction = txManager.getTransaction();
+            synchronized (this)
+            {
+                transaction = txManager.getTransaction();
+            }
         }
         catch (Exception e)
         {
@@ -85,7 +85,10 @@ public class XaTransaction extends AbstractTransaction
     {
         try
         {
-            transaction.commit();
+            synchronized (this)
+            {
+                transaction.commit();
+            }
         }
         catch (RollbackException e)
         {
@@ -110,7 +113,10 @@ public class XaTransaction extends AbstractTransaction
     {
         try
         {
-            transaction.rollback();
+            synchronized (this)
+            {
+                transaction.rollback();
+            }
         }
         catch (SystemException e)
         {
@@ -126,17 +132,21 @@ public class XaTransaction extends AbstractTransaction
      */
     public int getStatus() throws TransactionStatusException
     {
-        if (transaction == null)
+        synchronized (this)
         {
-            return STATUS_NO_TRANSACTION;
-        }
-        try
-        {
-            return transaction.getStatus();
-        }
-        catch (SystemException e)
-        {
-            throw new TransactionStatusException(e);
+            if (transaction == null)
+            {
+                return STATUS_NO_TRANSACTION;
+            }
+
+            try
+            {
+                return transaction.getStatus();
+            }
+            catch (SystemException e)
+            {
+                throw new TransactionStatusException(e);
+            }
         }
     }
 
@@ -149,7 +159,10 @@ public class XaTransaction extends AbstractTransaction
     {
         try
         {
-            transaction.setRollbackOnly();
+            synchronized (this)
+            {
+                transaction.setRollbackOnly();
+            }
         }
         catch (SystemException e)
         {
@@ -164,7 +177,10 @@ public class XaTransaction extends AbstractTransaction
      */
     public Object getResource(Object key)
     {
-        return resources == null ? null : resources.get(key);
+        synchronized (this)
+        {
+            return resources == null ? null : resources.get(key);
+        }
     }
 
     /*
@@ -174,7 +190,10 @@ public class XaTransaction extends AbstractTransaction
      */
     public boolean hasResource(Object key)
     {
-        return resources != null && resources.containsKey(key);
+        synchronized (this)
+        {
+            return resources != null && resources.containsKey(key);
+        }
     }
 
     /*
@@ -185,15 +204,20 @@ public class XaTransaction extends AbstractTransaction
      */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
-        if (resources == null)
+        synchronized (this)
         {
-            resources = new HashMap();
+            if (resources == null)
+            {
+                resources = new HashMap();
+            }
+
+            if (resources.containsKey(key))
+            {
+                throw new IllegalTransactionStateException(new Message(
+                    Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
+            }
+
+            resources.put(key, resource);
         }
-        if (resources.containsKey(key))
-        {
-            throw new IllegalTransactionStateException(new Message(
-                Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
-        }
-        resources.put(key, resource);
     }
 }

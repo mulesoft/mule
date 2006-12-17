@@ -10,22 +10,19 @@
 
 package org.mule.transformers.script;
 
+import javax.script.CompiledScript;
+import javax.script.Namespace;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 
-import javax.script.CompiledScript;
-import javax.script.Namespace;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
 /**
- * Will run a script to perform transformation on an object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Runs a script to perform transformation on an object.
  */
 public class ScriptTransformer extends AbstractEventAwareTransformer
 {
@@ -39,14 +36,13 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
     public ScriptTransformer()
     {
         scriptable = new Scriptable();
-
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-
         Namespace ns = getScriptEngine().createNamespace();
         populateNamespace(ns, context, src);
+
         try
         {
             return scriptable.runScript(ns);
@@ -149,4 +145,5 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
         trans.setScriptable(scriptable);
         return trans;
     }
+
 }

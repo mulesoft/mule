@@ -92,7 +92,6 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Response Message Received from: " + endpoint.getEndpointURI());
-                        logger.debug(responseMessage);
                     }
                     if (logger.isTraceEnabled())
                     {

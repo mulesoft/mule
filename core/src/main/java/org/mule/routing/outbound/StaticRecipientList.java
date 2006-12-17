@@ -10,11 +10,13 @@
 
 package org.mule.routing.outbound;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
 
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
@@ -25,31 +27,32 @@ import java.util.List;
 public class StaticRecipientList extends AbstractRecipientList
 {
     public static final String RECIPIENTS_PROPERTY = "recipients";
+    public static final String RECIPIENT_DELIMITER = ",";
 
-    protected String delim = ",";
+    private volatile CopyOnWriteArrayList recipients = new CopyOnWriteArrayList();
 
-    private CopyOnWriteArrayList recipients = new CopyOnWriteArrayList();
-
-    protected CopyOnWriteArrayList getRecipients(UMOMessage message)
+    protected List getRecipients(UMOMessage message)
     {
         Object msgRecipients = message.removeProperty(RECIPIENTS_PROPERTY);
-        CopyOnWriteArrayList list;
 
         if (msgRecipients == null)
         {
-            list = recipients;
+            return recipients;
         }
         else if (msgRecipients instanceof String)
         {
-            list = new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(),
+            return new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(),
                 getListDelimiter()));
+        }
+        else if (msgRecipients instanceof List)
+        {
+            return new CopyOnWriteArrayList((List)msgRecipients);
         }
         else
         {
-            list = new CopyOnWriteArrayList((List)msgRecipients);
+            logger.warn("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
+            return Collections.EMPTY_LIST;
         }
-
-        return list;
     }
 
     public List getRecipients()
@@ -71,13 +74,13 @@ public class StaticRecipientList extends AbstractRecipientList
 
     /**
      * Overloading classes can change the delimiter used to separate entries in the
-     * recipient list By default a ',' is used.
+     * recipient list. By default a ',' is used.
      * 
      * @return The list delimiter to use
      */
     protected String getListDelimiter()
     {
-        return delim;
+        return RECIPIENT_DELIMITER;
     }
 
 }

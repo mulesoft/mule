@@ -79,8 +79,6 @@ public class JcaComponent implements UMOComponent
         try
         {
             // Invoke method
-            // TODO is there anything we can/should do with the return result from
-            // invoke()?
             entryPoint.invoke(component, RequestContext.getEventContext());
         }
         catch (Exception e)

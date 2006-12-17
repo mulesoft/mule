@@ -10,6 +10,10 @@
 
 package org.mule.routing.outbound;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -28,16 +32,9 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.TemplateParser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter
  * set.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class FilteringOutboundRouter extends AbstractOutboundRouter
@@ -48,7 +45,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
     private boolean useTemplates = false;
 
-    // We used Square templates as they can exist as part of an uri.
+    // We used Square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)

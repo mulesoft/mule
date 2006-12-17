@@ -10,16 +10,16 @@
 
 package org.mule.test.transaction;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 
+import com.mockobjects.dynamic.Mock;
+
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
-    TransactionCoordination tc;
+    volatile TransactionCoordination tc;
 
     protected void doSetUp() throws Exception
     {
@@ -69,14 +69,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testUnbindTransactionWithoutBound() throws Exception
     {
         assertNull(tc.getTransaction());
-        // try {
         Mock mockTx = new Mock(UMOTransaction.class, "trans");
         UMOTransaction tx = (UMOTransaction)mockTx.proxy();
         tc.unbindTransaction(tx);
-        // fail();
-        // } catch (IllegalTransactionStateException e) {
-        // // expected
-        // }
     }
 
     public void testSetInstanceWithBound() throws Exception

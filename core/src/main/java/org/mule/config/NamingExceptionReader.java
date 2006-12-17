@@ -13,18 +13,12 @@ package org.mule.config;
 import javax.naming.Name;
 import javax.naming.NamingException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class NamingExceptionReader implements ExceptionReader
 {
-
     /**
      * Displayed when no remaining or resolved name found.
      */
@@ -32,14 +26,12 @@ public class NamingExceptionReader implements ExceptionReader
 
     public String getMessage(Throwable t)
     {
-        NamingException e = (NamingException)t;
-        return e.toString(true);
+        return (t instanceof NamingException ? ((NamingException)t).toString(true) : "<unknown>");
     }
 
     public Throwable getCause(Throwable t)
     {
-        NamingException e = (NamingException)t;
-        return e.getRootCause();
+        return (t instanceof NamingException ? ((NamingException)t).getCause() : null);
     }
 
     public Class getExceptionType()
@@ -55,13 +47,20 @@ public class NamingExceptionReader implements ExceptionReader
      */
     public Map getInfo(Throwable t)
     {
-        NamingException e = (NamingException)t;
-        Map info = new HashMap();
-        final Name remainingName = e.getRemainingName();
-        final Name resolvedName = e.getResolvedName();
-        info.put("Remaining Name", remainingName == null
-                        ? MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
-        info.put("Resolved Name", resolvedName == null ? MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
-        return info;
+        if (t instanceof NamingException)
+        {
+            NamingException e = (NamingException)t;
+            Map info = new HashMap();
+            final Name remainingName = e.getRemainingName();
+            final Name resolvedName = e.getResolvedName();
+            info.put("Remaining Name", remainingName == null
+                            ? MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
+            info.put("Resolved Name", resolvedName == null ? MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
+            return info;
+        }
+        else
+        {
+            return Collections.EMPTY_MAP;
+        }
     }
 }

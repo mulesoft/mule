@@ -100,7 +100,7 @@ public class AllStatistics
         }
     }
 
-    public long getStartTime()
+    public synchronized long getStartTime()
     {
         return startTime;
     }

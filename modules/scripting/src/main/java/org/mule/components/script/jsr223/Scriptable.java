@@ -34,10 +34,7 @@ import org.mule.util.IOUtils;
 
 /**
  * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
- * javaScript, Groovy or Rhino to be embedded as Mule components
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * javaScript, Groovy or Rhino to be embedded as Mule components.
  */
 public class Scriptable implements Initialisable
 {

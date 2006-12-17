@@ -6,6 +6,12 @@ if [ -z "$MULE_HOME" ] ; then
   export MULE_HOME
 fi
 
+# If MULE_BASE is not set, make it MULE_HOME
+if [ -z "$MULE_BASE" ] ; then
+  MULE_BASE=$MULE_HOME
+  export MULE_BASE
+fi
+
 # Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
@@ -21,11 +27,11 @@ read i
 
 if [ 1 = $i ]
 then
-    exec $MULE_HOME/bin/mule -config ./conf/rest-config.xml
+    exec $MULE_BASE/bin/mule -config ./conf/rest-config.xml
 elif [ 2 = $i ]
 then
-    exec $MULE_HOME/bin/mule -config ./conf/soap-config.xml
+    exec $MULE_BASE/bin/mule -config ./conf/soap-config.xml
 elif [ 3 = $i ]
 then
-    exec $MULE_HOME/bin/mule -config ./conf/wsdl-config.xml
+    exec $MULE_BASE/bin/mule -config ./conf/wsdl-config.xml
 fi

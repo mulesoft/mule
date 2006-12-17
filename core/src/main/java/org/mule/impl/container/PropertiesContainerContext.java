@@ -101,8 +101,8 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(systemProperties, value.toString());
-                value = templateParser.parse(MuleManager.getInstance().getProperties(), value.toString());
+                value = templateParser.parse(systemProperties, value);
+                value = templateParser.parse(MuleManager.getInstance().getProperties(), value);
                 System.setProperty(entry.getKey().toString(), value);
             }
         }
@@ -137,7 +137,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(MuleManager.getInstance().getProperties(), value.toString());
+                value = templateParser.parse(MuleManager.getInstance().getProperties(), value);
                 MuleManager.getInstance().setProperty(entry.getKey(), value);
             }
         }

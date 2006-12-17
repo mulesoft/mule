@@ -148,7 +148,12 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     try
                     {
                         socket.receive(packet);
-                        logger.trace("Received packet on: " + inetAddress.toString());
+
+                        if (logger.isTraceEnabled())
+                        {
+                            logger.trace("Received packet on: " + inetAddress.toString());
+                        }
+
                         Work work = createWork(packet);
                         try
                         {

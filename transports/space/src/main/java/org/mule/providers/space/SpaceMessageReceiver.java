@@ -94,7 +94,7 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
                     Work work = createWork(space, message);
                     try
                     {
-                        getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
+                        getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
                     }
                     catch (WorkException e)
                     {

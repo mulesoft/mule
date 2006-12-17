@@ -10,8 +10,9 @@
 
 package org.mule.routing.outbound;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,18 +27,13 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <code>AbstractRecipientList</code> is used to dispatch a single event to
  * multiple recipients over the same transport. The recipient endpoints can be
  * configured statically or can be obtained from the message payload.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractRecipientList extends FilteringOutboundRouter
@@ -45,9 +41,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AbstractRecipientList.class);
+    protected final Log logger = LogFactory.getLog(getClass());
 
-    private Map recipientCache = new ConcurrentHashMap();
+    private final ConcurrentMap recipientCache = new ConcurrentHashMap();
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
@@ -96,7 +92,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("No result was returned for sync call to: "
-                                         + endpoint.getEndpointURI());
+                                            + endpoint.getEndpointURI());
                         }
                     }
                 }
@@ -111,17 +107,17 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        if (results.size() == 1)
-        {
-            return new MuleMessage(results.get(0), result);
-        }
-        else if (results.size() == 0)
+        if (results.size() == 0)
         {
             return null;
         }
+        else if (results.size() == 1)
+        {
+            return new MuleMessage(results.get(0), result);
+        }
         else
         {
-            return new MuleMessage(results, (result == null ? null : result));
+            return new MuleMessage(results, result);
         }
     }
 
@@ -129,10 +125,12 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     {
         UMOEndpointURI endpointUri = null;
         UMOEndpoint endpoint = (UMOEndpoint)recipientCache.get(recipient);
+
         if (endpoint != null)
         {
             return endpoint;
         }
+
         try
         {
             endpointUri = new MuleEndpointURI(recipient);
@@ -142,14 +140,21 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             throw new RoutingException(message, endpoint, e);
         }
-        recipientCache.put(recipient, endpoint);
+
+        UMOEndpoint existingEndpoint = (UMOEndpoint)recipientCache.putIfAbsent(recipient, endpoint);
+        if (existingEndpoint != null)
+        {
+            endpoint = existingEndpoint;
+        }
+
         return endpoint;
     }
 
-    protected abstract CopyOnWriteArrayList getRecipients(UMOMessage message);
+    protected abstract List getRecipients(UMOMessage message);
 
     public boolean isDynamicEndpoints()
     {
         return true;
     }
+
 }

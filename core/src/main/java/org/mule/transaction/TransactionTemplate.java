@@ -10,6 +10,8 @@
 
 package org.mule.transaction;
 
+import java.beans.ExceptionListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -17,20 +19,12 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 
-import java.beans.ExceptionListener;
-
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class TransactionTemplate
 {
+    private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
 
-    private static final transient Log logger = LogFactory.getLog(TransactionTemplate.class);
-
-    private UMOTransactionConfig config;
-
-    private ExceptionListener exceptionListener;
+    private final UMOTransactionConfig config;
+    private final ExceptionListener exceptionListener;
 
     public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener)
     {
@@ -66,7 +60,7 @@ public class TransactionTemplate
             }
 
             if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN
-                || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN)
+                            || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN)
             {
                 logger.debug("Beginning transaction");
                 tx = config.getFactory().beginTransaction();
@@ -98,13 +92,15 @@ public class TransactionTemplate
             {
                 if (exceptionListener != null)
                 {
-                    logger.info("Exception Caught in Transaction template.  Handing off to exception handler: "
-                                + exceptionListener);
+                    logger
+                        .info("Exception Caught in Transaction template.  Handing off to exception handler: "
+                                        + exceptionListener);
                     exceptionListener.exceptionThrown(e);
                 }
                 else
                 {
-                    logger.info("Exception Caught in Transaction template without any exception listeners defined, exception is rethrown.");
+                    logger
+                        .info("Exception Caught in Transaction template without any exception listeners defined, exception is rethrown.");
                     if (tx != null)
                     {
                         tx.setRollbackOnly();

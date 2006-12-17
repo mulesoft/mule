@@ -17,7 +17,7 @@ import org.mule.umo.UMOMessage;
 
 public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestCase
 {
-    
+
     public AxisLoanBrokerSynchronousFunctionalTestCase()
     {
         super();
@@ -29,11 +29,12 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends FunctionalTestC
         return "loan-broker-axis-sync-test-config.xml";
     }
 
-    // fire 100 requests as default
     protected int getNumberOfRequests()
     {
+    // fire 100 requests as default
         return 100;
     }
+
 
     public void testSingleLoanRequest() throws Exception
     {

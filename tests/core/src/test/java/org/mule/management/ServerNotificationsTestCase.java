@@ -10,9 +10,6 @@
 
 package org.mule.management;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
 import org.mule.impl.internal.notifications.CustomNotification;
@@ -26,33 +23,44 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerNotification;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 public class ServerNotificationsTestCase extends AbstractMuleTestCase
     implements ModelNotificationListener, ManagerNotificationListener
 {
 
-    private boolean managerStopped = false;
-    private boolean modelStopped = false;
-    private int componentStartedCount = 0;
-    private int customNotificationCount = 0;
+    private final AtomicBoolean managerStopped = new AtomicBoolean(false);
+    private final AtomicBoolean modelStopped = new AtomicBoolean(false);
+    private final AtomicInteger componentStartedCount = new AtomicInteger(0);
+    private final AtomicInteger customNotificationCount = new AtomicInteger(0);
 
     public void testStandardNotifications() throws Exception
     {
-
         UMOManager m = getManager(true);
         m.start();
         m.registerListener(this);
         m.stop();
-        assertTrue(modelStopped);
-        assertTrue(managerStopped);
+        assertTrue(modelStopped.get());
+        assertTrue(managerStopped.get());
+    }
+
+    public void testUnregistering() throws Exception
+    {
+        UMOManager m = getManager(true);
+        m.start();
+        m.registerListener(this);
+        m.unregisterListener(this);
+        m.stop();
+        // these should still be false because we unregistered ourselves
+        assertFalse(modelStopped.get());
+        assertFalse(managerStopped.get());
     }
 
     public void testStandardNotificationsWithSubscription() throws Exception
     {
-
         final CountDownLatch latch = new CountDownLatch(1);
         UMOManager m = getManager(true);
         m.start();
@@ -62,7 +70,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             {
                 if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
                 {
-                    componentStartedCount++;
+                    componentStartedCount.incrementAndGet();
                     assertEquals("component1", notification.getResourceIdentifier());
                     latch.countDown();
                 }
@@ -74,12 +82,11 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(1, componentStartedCount);
+        assertEquals(1, componentStartedCount.get());
     }
 
     public void testStandardNotificationsWithWildcardSubscription() throws Exception
     {
-
         final CountDownLatch latch = new CountDownLatch(2);
 
         UMOManager m = getManager(true);
@@ -90,7 +97,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             {
                 if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
                 {
-                    componentStartedCount++;
+                    componentStartedCount.incrementAndGet();
                     assertFalse("noMatchComponent".equals(notification.getResourceIdentifier()));
                     latch.countDown();
                 }
@@ -103,12 +110,11 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, componentStartedCount);
+        assertEquals(2, componentStartedCount.get());
     }
 
     public void testCustomNotifications() throws Exception
     {
-
         final CountDownLatch latch = new CountDownLatch(2);
 
         UMOManager m = getManager(true);
@@ -119,7 +125,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             {
                 if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
                 {
-                    customNotificationCount++;
+                    customNotificationCount.incrementAndGet();
                     assertEquals("hello", notification.getSource());
                     latch.countDown();
                 }
@@ -131,7 +137,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, customNotificationCount);
+        assertEquals(2, customNotificationCount.get());
     }
 
     public void testCustomNotificationsWithWildcardSubscription() throws Exception
@@ -147,7 +153,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             {
                 if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
                 {
-                    customNotificationCount++;
+                    customNotificationCount.incrementAndGet();
                     assertFalse("e quick bro".equals(notification.getResourceIdentifier()));
                     latch.countDown();
                 }
@@ -161,18 +167,18 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, customNotificationCount);
+        assertEquals(2, customNotificationCount.get());
     }
 
     public void onNotification(UMOServerNotification notification)
     {
         if (notification.getAction() == ModelNotification.MODEL_STOPPED)
         {
-            modelStopped = true;
+            modelStopped.set(true);
         }
         else if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
         {
-            managerStopped = true;
+            managerStopped.set(true);
         }
     }
 

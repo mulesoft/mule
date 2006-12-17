@@ -277,7 +277,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         if (logger.isDebugEnabled())
         {
             logger.debug("Message Received from: " + endpoint.getEndpointURI());
-            logger.debug(message);
         }
         if (logger.isTraceEnabled())
         {

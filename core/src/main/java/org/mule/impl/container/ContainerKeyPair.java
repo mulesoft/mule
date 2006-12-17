@@ -14,20 +14,18 @@ package org.mule.impl.container;
  * <code>ContainerKeyPair</code> is a key strategy that binds a container reference
  * with a container name. This object isn't used directly by users, but it is used
  * when the the Mule XML configuration is processed.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ContainerKeyPair
 {
-    private String containerName;
-    private Object key;
-    private boolean required = true;
+    private final String containerName;
+    private final Object key;
+    private final boolean required;
 
     public ContainerKeyPair(String containerName, Object key)
     {
         this.containerName = containerName;
         this.key = key;
+        this.required = true;
     }
 
     public ContainerKeyPair(String containerName, Object key, boolean required)
@@ -81,9 +79,6 @@ public class ContainerKeyPair
 
     public int hashCode()
     {
-        int result;
-        result = containerName.hashCode();
-        result = 29 * result + key.hashCode();
-        return result;
+        return 29 * containerName.hashCode() + key.hashCode();
     }
 }

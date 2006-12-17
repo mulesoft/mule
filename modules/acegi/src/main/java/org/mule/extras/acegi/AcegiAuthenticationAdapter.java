@@ -72,7 +72,7 @@ public class AcegiAuthenticationAdapter implements UMOAuthentication
 
     public boolean equals(Object another)
     {
-        return AcegiAuthenticationAdapter.this.equals(another);
+        return delegate.equals(another);
     }
 
     public String getName()

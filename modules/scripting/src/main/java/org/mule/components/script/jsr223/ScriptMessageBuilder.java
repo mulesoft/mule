@@ -10,6 +10,12 @@
 
 package org.mule.components.script.jsr223;
 
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Namespace;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
 import org.mule.components.builder.AbstractMessageBuilder;
 import org.mule.components.builder.MessageBuilderException;
 import org.mule.umo.UMOEventContext;
@@ -18,17 +24,8 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.Namespace;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
 /**
- * A message builder component that can execute message building as a script
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A message builder component that can execute message building as a script.
  */
 public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable
 {

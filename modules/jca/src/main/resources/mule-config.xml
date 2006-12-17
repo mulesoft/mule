@@ -22,7 +22,7 @@
         <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
     </agents>
 
-    <model name="Dummy">
+    <model name="main" type="jca">
 
     </model>
 

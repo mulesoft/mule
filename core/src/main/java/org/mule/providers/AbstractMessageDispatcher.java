@@ -148,7 +148,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
                 if (doThreading && !event.isSynchronous() && tx == null)
                 {
-                    workManager.scheduleWork(new Worker(event), WorkManager.IMMEDIATE, null, connector);
+                    workManager.scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
                 }
                 else
                 {

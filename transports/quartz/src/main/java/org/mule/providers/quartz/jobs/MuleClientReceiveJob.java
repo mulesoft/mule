@@ -10,14 +10,15 @@
 
 package org.mule.providers.quartz.jobs;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -50,7 +51,7 @@ public class MuleClientReceiveJob implements Job
             throw new JobExecutionException(new Message("quartz", 4,
                 QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT).getMessage());
         }
-        long timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
+        long timeout = MuleManager.getConfiguration().getDefaultSynchronousEventTimeout();
         String timeoutString = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_RECEIVE_TIMEOUT);
         if (timeoutString != null)
         {

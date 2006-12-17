@@ -23,4 +23,9 @@ public class XFireLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBroker
         return "loan-broker-xfire-sync-test-config.xml";
     }
 
+    protected int getNumberOfRequests()
+    {
+        return 10;
+    }
+
 }

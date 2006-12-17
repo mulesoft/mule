@@ -10,24 +10,22 @@
 
 package org.mule.util.xa;
 
-import org.apache.commons.logging.Log;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-
-import javax.transaction.Status;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import javax.transaction.Status;
+
+import org.apache.commons.logging.Log;
+
 /**
  * This code is based on code coming from the <a
  * href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
  * project.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public abstract class AbstractResourceManager
 {
@@ -75,7 +73,8 @@ public abstract class AbstractResourceManager
         operationMode = OPERATION_MODE_STARTED;
         if (dirty)
         {
-            logger.warn("Started ResourceManager, but in dirty mode only (Recovery of pending transactions failed)");
+            logger
+                .warn("Started ResourceManager, but in dirty mode only (Recovery of pending transactions failed)");
         }
         else
         {
@@ -176,14 +175,14 @@ public abstract class AbstractResourceManager
      */
     public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
     {
-        AbstractTransactionContext context = createTransactionContext(session);
-        return context;
+        return createTransactionContext(session);
     }
 
     public void beginTransaction(AbstractTransactionContext context) throws ResourceManagerException
     {
-        assureStarted(); // can only start a new transaction when not already
-        // stopping
+        // can only start a new transaction when not already stopping
+        assureStarted();
+
         synchronized (context)
         {
             if (logger.isDebugEnabled())
@@ -369,7 +368,7 @@ public abstract class AbstractResourceManager
                 if (!context.finished)
                 {
                     logger.info("Waiting for tx " + context + " to finish for " + remainingTimeout
-                                + " milli seconds");
+                                    + " milli seconds");
                 }
                 while (!context.finished && remainingTimeout > 0)
                 {
@@ -407,7 +406,7 @@ public abstract class AbstractResourceManager
     protected void setDirty(AbstractTransactionContext context, Throwable t)
     {
         logger.error("Fatal error during critical commit/rollback of transaction " + context
-                     + ", setting resource manager to dirty.", t);
+                        + ", setting resource manager to dirty.", t);
         dirty = true;
     }
 

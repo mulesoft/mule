@@ -18,10 +18,7 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 
 /**
- * This base class provides low level features for transactions
- * 
- * @author Guillaume Nodet
- * @version $Revision$
+ * This base class provides low level features for transactions.
  */
 public abstract class AbstractTransaction implements UMOTransaction
 {
@@ -76,10 +73,9 @@ public abstract class AbstractTransaction implements UMOTransaction
      */
     public void begin() throws TransactionException
     {
-        if (logger.isDebugEnabled()) logger.debug("Beginning transaction");
+        logger.debug("Beginning transaction");
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
-
     }
 
     /*
@@ -91,18 +87,19 @@ public abstract class AbstractTransaction implements UMOTransaction
     {
         try
         {
-            if (logger.isDebugEnabled()) logger.debug("Committing transaction");
+            logger.debug("Committing transaction");
+
             if (isRollbackOnly())
             {
                 throw new IllegalTransactionStateException(new Message(Messages.TX_MARKED_FOR_ROLLBACK));
             }
+
             doCommit();
         }
         finally
         {
             TransactionCoordination.getInstance().unbindTransaction(this);
         }
-
     }
 
     /*

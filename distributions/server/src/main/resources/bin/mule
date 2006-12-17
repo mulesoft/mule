@@ -9,6 +9,18 @@
 # Customized for Mule
 ######################################################################
 
+# Check for MULE_HOME
+if [ -z "$MULE_HOME" ] ; then
+    echo "You must specify the MULE_HOME environment variable before starting Mule"
+    exit -1
+fi
+
+# If MULE_BASE is not set, set it to MULE_HOME
+if [ -z "$MULE_BASE" ] ; then
+    MULE_BASE=$MULE_HOME
+    export MULE_BASE
+fi
+
 # Application
 if [ "$MULE_APP" = "" ]
 then
@@ -24,7 +36,7 @@ APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
 
 # Wrapper
-WRAPPER_CMD="../sbin/wrapper"
+WRAPPER_CMD="${MULE_HOME}/sbin/wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Set the startup directory so that any relative paths can be resolved later.

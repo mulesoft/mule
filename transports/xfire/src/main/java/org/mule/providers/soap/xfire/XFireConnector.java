@@ -11,7 +11,6 @@
 package org.mule.providers.soap.xfire;
 
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
@@ -68,7 +67,31 @@ public class XFireConnector extends AbstractServiceEnabledConnector
     private String clientTransport = null;
 
     private String serviceTransport = null;
-    private Map wsSecurity;
+    private List serverInHandlers = null;
+    private List serverOutHandlers = null;
+    
+    private String wsDecryptionFile = null;
+    private String wsSignatureFile = null;
+    
+    public String getWsDecryptionFile()
+    {
+        return wsDecryptionFile;
+    }
+
+    public void setWsDecryptionFile(String wsDecryptionFile)
+    {
+        this.wsDecryptionFile = wsDecryptionFile;
+    }
+
+    public String getWsSignatureFile()
+    {
+        return wsSignatureFile;
+    }
+
+    public void setWsSignatureFile(String wsSignatureFile)
+    {
+        this.wsSignatureFile = wsSignatureFile;
+    }
 
     public XFireConnector()
     {
@@ -412,13 +435,23 @@ public class XFireConnector extends AbstractServiceEnabledConnector
         }
     }
 
-    public Map getWsSecurity()
+    public List getServerInHandlers()
     {
-        return wsSecurity;
+        return serverInHandlers;
     }
 
-    public void setWsSecurity(Map wsSecurity)
+    public void setServerInHandlers(List serverInHandlers)
     {
-        this.wsSecurity = wsSecurity;
+        this.serverInHandlers = serverInHandlers;
+    }
+
+    public List getServerOutHandlers()
+    {
+        return serverOutHandlers;
+    }
+
+    public void setServerOutHandlers(List serverOutHandlers)
+    {
+        this.serverOutHandlers = serverOutHandlers;
     }
 }

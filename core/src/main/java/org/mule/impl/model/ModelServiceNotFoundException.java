@@ -15,9 +15,6 @@ import org.mule.umo.model.ModelException;
 
 /**
  * Is thrown when a model service name is specified and cannot be found or loaded
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ModelServiceNotFoundException extends ModelException
 {

@@ -21,11 +21,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Will locate the model service in META-INF/service using the model type as the key.
- * Then construct the model
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Will locate the model service in META-INF/service using the model type as the key
+ * and construct the model.
  */
 public class ModelFactory
 {

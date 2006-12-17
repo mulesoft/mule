@@ -44,20 +44,17 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * <code>MuleWorkManager</code> is a Jca Work manager implementation used to manage
+ * <code>MuleWorkManager</code> is a JCA Work manager implementation used to manage
  * thread allocation for Mule components and connectors This code has been adapted
  * from the Geronimo implementation, and the different pool executors have be used
- * directly from Geronimo
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * directly from Geronimo.
  */
 public class MuleWorkManager implements UMOWorkManager
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleWorkManager.class);
+    protected static final Log logger = LogFactory.getLog(MuleWorkManager.class);
 
     /**
      * Pool of threads used by this MuleWorkManager in order to process the Work

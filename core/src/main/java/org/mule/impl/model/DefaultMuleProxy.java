@@ -57,9 +57,6 @@ import java.util.Map;
 /**
  * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
  * can be executed in it's own thread.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class DefaultMuleProxy implements MuleProxy
@@ -236,7 +233,10 @@ public class DefaultMuleProxy implements MuleProxy
      */
     public Object onCall(UMOEvent event) throws UMOException
     {
-        logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
+        }
 
         UMOMessage returnMessage = null;
         try
@@ -410,7 +410,11 @@ public class DefaultMuleProxy implements MuleProxy
     {
         if (returnMessage != null && returnMessage.getReplyTo() != null)
         {
-            logger.info("sending reply to: " + returnMessage.getReplyTo());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("sending reply to: " + returnMessage.getReplyTo());
+            }
+
             UMOEndpointURI endpointUri = new MuleEndpointURI(returnMessage.getReplyTo().toString());
 
             // get the endpointUri for this uri
@@ -426,7 +430,12 @@ public class DefaultMuleProxy implements MuleProxy
 
             // queue the event
             onEvent(queueSession, replyToEvent);
-            logger.info("reply to sent: " + returnMessage.getReplyTo());
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("reply to sent: " + returnMessage.getReplyTo());
+            }
+
             if (stat.isEnabled())
             {
                 stat.incSentReplyToEvent();
@@ -441,7 +450,10 @@ public class DefaultMuleProxy implements MuleProxy
      */
     public void run()
     {
-        logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
+        }
 
         try
         {
@@ -509,7 +521,6 @@ public class DefaultMuleProxy implements MuleProxy
         }
         finally
         {
-
             try
             {
                 proxyPool.returnObject(this);

@@ -312,8 +312,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         try
         {
-            Object c = BeanUtils.cloneBean(this);
-            return c;
+            return BeanUtils.cloneBean(this);
         }
         catch (Exception e)
         {

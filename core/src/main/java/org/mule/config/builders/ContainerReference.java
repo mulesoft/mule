@@ -25,17 +25,14 @@ import java.util.Map;
 /**
  * <code>ContainerReference</code> maintains a container reference for the
  * MuleXmlConfigurationBuilder that gets wired once the configuration documents have
- * been loaded
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * been loaded.
  */
 public class ContainerReference
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(ContainerReference.class);
+    protected static final Log logger = LogFactory.getLog(ContainerReference.class);
 
     private String propertyName;
     private String containerRef;

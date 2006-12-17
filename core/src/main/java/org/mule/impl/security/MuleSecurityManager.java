@@ -32,10 +32,7 @@ import java.util.Map;
 
 /**
  * <code>MuleSecurityManager</code> is a default implementation security manager
- * for a Mule instance
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * for a Mule instance.
  */
 
 public class MuleSecurityManager implements UMOSecurityManager
@@ -43,10 +40,9 @@ public class MuleSecurityManager implements UMOSecurityManager
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleSecurityManager.class);
+    protected static final Log logger = LogFactory.getLog(MuleSecurityManager.class);
 
     private Map providers = new ConcurrentHashMap();
-
     private Map cryptoStrategies = new ConcurrentHashMap();
 
     public void initialise() throws InitialisationException
@@ -77,7 +73,10 @@ public class MuleSecurityManager implements UMOSecurityManager
 
             if (provider.supports(toTest))
             {
-                logger.debug("Authentication attempt using " + provider.getClass().getName());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Authentication attempt using " + provider.getClass().getName());
+                }
 
                 UMOAuthentication result = provider.authenticate(authentication);
 

@@ -19,16 +19,13 @@ import java.lang.reflect.Method;
 /**
  * <code>EntryPoint</code> is a method on a Mule-managed component that is invoked
  * when an event for the component is received.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EntryPoint
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(EntryPoint.class);
+    protected static final Log logger = LogFactory.getLog(EntryPoint.class);
 
     /**
      * the method on the object to invoke

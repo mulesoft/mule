@@ -10,11 +10,6 @@
 
 package org.mule.impl.container;
 
-/**
- * @inheritDoc
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DescriptorContainerKeyPair extends ContainerKeyPair
 {
     private String descriptorName;
@@ -33,7 +28,7 @@ public class DescriptorContainerKeyPair extends ContainerKeyPair
     public String toFullString()
     {
         return "Descriptor Container Key{name=" + descriptorName + ", key=" + getKey().toString()
-               + ", container=" + getContainerName() + ", required=" + isRequired() + "}";
+                        + ", container=" + getContainerName() + ", required=" + isRequired() + "}";
     }
 
     public boolean equals(Object o)
@@ -53,8 +48,6 @@ public class DescriptorContainerKeyPair extends ContainerKeyPair
 
     public int hashCode()
     {
-        int result = super.hashCode();
-        result = 29 * result + (descriptorName != null ? descriptorName.hashCode() : 0);
-        return result;
+        return 29 * super.hashCode() + (descriptorName != null ? descriptorName.hashCode() : 0);
     }
 }

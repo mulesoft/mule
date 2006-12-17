@@ -10,19 +10,19 @@
 
 package org.mule.impl.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ObjectFactory;
-import org.mule.util.StringMessageUtils;
+import java.security.GeneralSecurityException;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.KeySpec;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import java.security.GeneralSecurityException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.KeySpec;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.ObjectFactory;
+import org.mule.util.StringMessageUtils;
 
 /**
  * SecretKey based encryption using JCE. Users must specify a key as an array of
@@ -32,8 +32,6 @@ import java.security.spec.KeySpec;
  * specify any valid algorithm supported by JCE.
  * 
  * @see ObjectFactory
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
 {
@@ -81,17 +79,12 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
         return null;
     }
 
-    public byte[] getkey()
-    {
-        return key;
-    }
-
-    public void setkey(byte[] rawKey)
+    public void setKey(byte[] rawKey)
     {
         this.key = rawKey;
     }
 
-    public void setkey(String rawKey)
+    public void setKey(String rawKey)
     {
         this.key = StringMessageUtils.getBytes(rawKey);
     }
@@ -108,7 +101,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
 
     protected SecretKey getSecretKey() throws GeneralSecurityException
     {
-        KeyGenerator kgen = KeyGenerator.getInstance(algorithm);
-        return kgen.generateKey();
+        return KeyGenerator.getInstance(algorithm).generateKey();
     }
+
 }

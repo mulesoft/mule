@@ -26,10 +26,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.io.File;
+
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-
-import java.io.File;
 
 /**
  * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
@@ -41,11 +41,13 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
     {
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+
+        SedaModel model = new SedaModel();
+        model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        manager.setModel(new SedaModel());
+        manager.setModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();

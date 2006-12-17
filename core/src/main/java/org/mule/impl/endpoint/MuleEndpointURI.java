@@ -10,6 +10,10 @@
 
 package org.mule.impl.endpoint;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,20 +25,15 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Properties;
-
 /**
  * <code>MuleEndpointURI</code> is used to determine how a message is sent of
  * received. The url defines the protocol, the endpointUri destination of the message
  * and optionally the endpoint to use when dispatching the event. Mule urls take the
  * form of - protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e. vm:///my.object or
- * The protocol can be any of any connector registered with Mule. The
- * endpoint name if specified must be the name of a register global endpoint The
- * endpointUri can be any endpointUri recognised by the endpoint type.
- * 
+ * protocol://[host]:[port]/endpointUri i.e. vm:///my.object or The protocol can be
+ * any of any connector registered with Mule. The endpoint name if specified must be
+ * the name of a register global endpoint The endpointUri can be any endpointUri
+ * recognised by the endpoint type.
  */
 
 public class MuleEndpointURI implements UMOEndpointURI
@@ -43,10 +42,11 @@ public class MuleEndpointURI implements UMOEndpointURI
      * Serial version
      */
     private static final long serialVersionUID = 3906735768171252877L;
+
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleEndpointURI.class);
+    protected static final Log logger = LogFactory.getLog(MuleEndpointURI.class);
 
     public static boolean isMuleUri(String url)
     {
@@ -510,8 +510,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public int hashCode()
     {
-        int result;
-        result = (address != null ? address.hashCode() : 0);
+        int result = (address != null ? address.hashCode() : 0);
         result = 29 * result + (filterAddress != null ? filterAddress.hashCode() : 0);
         result = 29 * result + (endpointName != null ? endpointName.hashCode() : 0);
         result = 29 * result + (connectorName != null ? connectorName.hashCode() : 0);
@@ -521,7 +520,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         result = 29 * result + (params != null ? params.hashCode() : 0);
         result = 29 * result + (uri != null ? uri.hashCode() : 0);
         result = 29 * result + (schemeMetaInfo != null ? schemeMetaInfo.hashCode() : 0);
-        result = 29 * result + (resourceInfo != null ? resourceInfo.hashCode() : 0);
-        return result;
+        return 29 * result + (resourceInfo != null ? resourceInfo.hashCode() : 0);
     }
 }

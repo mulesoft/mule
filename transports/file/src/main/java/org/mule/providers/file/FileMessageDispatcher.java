@@ -10,13 +10,6 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLDecoder;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -32,6 +25,13 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.FileUtils;
 import org.mule.util.MapUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLDecoder;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
@@ -174,7 +174,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         String filter = (String)endpoint.getProperty("filter");
         if (filter != null)
         {
-            filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
+            filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getDefaultEncoding());
             filenameFilter = new FilenameWildcardFilter(filter);
         }
         if (file.exists())

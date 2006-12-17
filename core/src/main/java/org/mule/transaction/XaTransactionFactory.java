@@ -17,15 +17,12 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * <code>XaTransactionFactory</code> Is used to create/retreive a Transaction from
+ * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from
  * a transaction manager configured on the MuleManager.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class XaTransactionFactory implements UMOTransactionFactory
 {
+
     public XaTransactionFactory()
     {
         super();

@@ -183,7 +183,10 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     public Object onCall(UMOEvent event) throws UMOException
     {
-        logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
+        }
 
         UMOMessage returnMessage = null;
         try
@@ -383,7 +386,10 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     public void run()
     {
-        logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
+        }
 
         try
         {

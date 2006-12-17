@@ -664,10 +664,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public int hashCode()
     {
-        int result;
-        result = id.hashCode();
-        result = 29 * result + (message != null ? message.hashCode() : 0);
-        return result;
+        return 29 * id.hashCode() + (message != null ? message.hashCode() : 0);
     }
 
     public boolean isSynchronous()

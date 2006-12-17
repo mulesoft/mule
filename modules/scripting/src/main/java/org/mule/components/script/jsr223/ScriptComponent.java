@@ -10,8 +10,8 @@
 
 package org.mule.components.script.jsr223;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.script.Namespace;
+
 import org.mule.MuleManager;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
@@ -19,28 +19,16 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.MuleLogger;
 
-import javax.script.Namespace;
-
 /**
  * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
- * javaScript, Groovy or Rhino to be embedded as Mule components
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * JavaScript, Groovy or Rhino to be embedded as Mule components.
  */
 public class ScriptComponent extends Scriptable implements Callable
 {
-
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
-
     private Namespace namespace;
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-
         super.initialise();
         namespace = getScriptEngine().createNamespace();
     }
@@ -71,4 +59,5 @@ public class ScriptComponent extends Scriptable implements Callable
     {
         return namespace;
     }
+
 }

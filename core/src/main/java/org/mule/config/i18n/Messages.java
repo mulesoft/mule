@@ -23,16 +23,13 @@ import java.util.ResourceBundle;
 /**
  * <code>Messages</code> provides facilities for constructing <code>Message</code>
  * objects and access to core message constants.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class Messages implements CoreMessageConstants
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(Messages.class);
+    protected static final Log logger = LogFactory.getLog(Messages.class);
 
     public static final String DEFAULT_BUNDLE = "core";
 

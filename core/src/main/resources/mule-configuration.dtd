@@ -863,7 +863,7 @@ The type of Model to use for component processing for this Mule instance.  The d
 at http://mule.codehaus.org/Models
 The custom model can be used to specify a custom model type.  In which case you must supply a className.
 -->
-<!ATTLIST model type           (seda | direct | pipeline | jms | jms-clustered | jcyclone | custom)             "seda">
+<!ATTLIST model type           (seda | direct | pipeline | jms | jms-clustered | jcyclone | jca | custom)             "seda">
 
 <!--
     The class used for instanciate the model if a custom model type is being used.  The class must implement

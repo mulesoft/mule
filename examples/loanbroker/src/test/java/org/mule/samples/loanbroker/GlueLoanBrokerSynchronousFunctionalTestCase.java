@@ -23,4 +23,9 @@ public class GlueLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerS
         return "loan-broker-glue-sync-test-config.xml";
     }
 
+    protected int getNumberOfRequests()
+    {
+        return 100;
+    }
+
 }

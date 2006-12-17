@@ -10,7 +10,6 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.MessagingException;
@@ -19,28 +18,25 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
-import org.mule.util.StringUtils;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
  * another transport without invoking a component. This can be used to implement a
  * bridge accross defferent transports.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ForwardingConsumer extends SelectiveConsumer
 {
+
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if (super.process(event) != null)
         {
-
             UMOOutboundMessageRouter router = event.getComponent().getDescriptor().getOutboundRouter();
-            // Set the stopFurtherProcessing flag to true
-            // to inform the InboundMessageRouter not to route
-            // these events to the component
+
+            // Set the stopFurtherProcessing flag to true to inform the
+            // InboundMessageRouter not to route these events to the component
             event.setStopFurtherProcessing(true);
+
             if (router == null)
             {
                 logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
@@ -54,8 +50,7 @@ public class ForwardingConsumer extends SelectiveConsumer
 
                     UMOMessage response = router.route(message, event.getSession(), event.isSynchronous());
                     // TODO What's the correct behaviour for async endpoints?
-                    // maybe let router.route() return a Future for the returned
-                    // msg?
+                    // maybe let router.route() return a Future for the returned msg?
                     if (response != null)
                     {
                         return new UMOEvent[]{new MuleEvent(response, event)};

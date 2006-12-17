@@ -27,9 +27,6 @@ import org.mule.umo.routing.RoutingException;
  * exception is thrown. <p/> The router will override the sync/async mode of the
  * endpoint and force the sync mode for all endpoints except the last one.
  * <code>remoteSync</code> is also enforced.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ExceptionBasedRouter extends FilteringOutboundRouter
@@ -38,12 +35,13 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        UMOMessage result = null;
-        final int endpointsCount = endpoints.size();
-        if (endpoints == null || endpointsCount == 0)
+        if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
+
+        final int endpointsCount = endpoints.size();
+
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
         {
             boolean correlationSet = message.getCorrelationId() != null;
@@ -58,9 +56,11 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             }
         }
 
+        UMOMessage result = null;
         // need that ref for an error message
         UMOEndpoint endpoint = null;
         boolean success = false;
+
         synchronized (endpoints)
         {
             for (int i = 0; i < endpointsCount; i++)
@@ -112,10 +112,12 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                 }
             }
         }
+
         if (!success)
         {
             throw new CouldNotRouteOutboundMessageException(message, endpoint);
         }
+
         return result;
     }
 

@@ -21,19 +21,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>GZipCompression</code> a CompressionStrategy implementation using the GZip
- * library included in the JDK java.util.zip. This is the default CompressionStrategy
- * used by the CompressionHelper discovery when no other implementation is discovered
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>GZipCompression</code> is a CompressionStrategy implementation using the
+ * GZip library included in the JDK java.util.zip. This is the default
+ * CompressionStrategy used by the CompressionHelper discovery when no other
+ * implementation is discovered.
  */
 public class GZipCompression implements CompressionStrategy
 {
     /**
      * The logger for this class
      */
-    private static final transient Log logger = LogFactory.getLog(GZipCompression.class);
+    private static final Log logger = LogFactory.getLog(GZipCompression.class);
 
     /**
      * Determines if a byte array is compressed. The java.util.zip GZip

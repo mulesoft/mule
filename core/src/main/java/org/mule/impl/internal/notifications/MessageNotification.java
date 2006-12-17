@@ -21,9 +21,6 @@ import org.mule.umo.provider.UMOConnectable;
 /**
  * These notifications are fire when either a message is received via an endpoint, or
  * dispatcher of if a receive call is made on a dispatcher.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MessageNotification extends UMOServerNotification
 {
@@ -35,7 +32,7 @@ public class MessageNotification extends UMOServerNotification
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MessageNotification.class);
+    protected static final Log logger = LogFactory.getLog(MessageNotification.class);
 
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_DISPATCHED = MESSAGE_EVENT_ACTION_START_RANGE + 2;
@@ -60,10 +57,11 @@ public class MessageNotification extends UMOServerNotification
 
     protected static UMOMessage cloneMessage(UMOMessage message)
     {
-        // Todo we probably need to support deep cloning here
-        Object clonePayload = message.getPayload();
-        UMOMessage clone = new MuleMessage(clonePayload, message);
-        return clone;
+        // TODO we probably need to support deep cloning here
+        synchronized (message)
+        {
+            return new MuleMessage(message.getPayload(), message);
+        }
     }
 
     protected String getPayloadToString()
@@ -88,8 +86,8 @@ public class MessageNotification extends UMOServerNotification
     public String toString()
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint.getEndpointURI()
-               + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + ", serverId=" + serverId
-               + ", message: " + source + "}";
+                        + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + ", serverId="
+                        + serverId + ", message: " + source + "}";
     }
 
     public UMOImmutableEndpoint getEndpoint()

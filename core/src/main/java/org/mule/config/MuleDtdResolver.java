@@ -41,7 +41,7 @@ public class MuleDtdResolver implements EntityResolver
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleDtdResolver.class);
+    protected static final Log logger = LogFactory.getLog(MuleDtdResolver.class);
 
     public static final String DEFAULT_MULE_DTD = "mule-configuration.dtd";
     private String dtdName = null;

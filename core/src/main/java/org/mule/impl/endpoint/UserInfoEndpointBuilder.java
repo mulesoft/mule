@@ -29,6 +29,19 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
     //It depends on where deriving classes can work with the URL endpoint builder, but there are a lot of similarities
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
+        // Added by Lajos 2006-12-14 per Ross
+        if(uri.getHost()==null)
+        {
+            if(props.getProperty("address")==null)
+            {
+                throw new MalformedEndpointException(uri.toString());
+            }
+            else
+            {
+                return;
+            }
+        }
+
         // Check and handle '@' symbols in the user info
         address = uri.getHost();
         int a = address.indexOf(".");

@@ -14,9 +14,6 @@ import org.mule.umo.UMOEventContext;
 
 /**
  * <code>UMOEntryPoint</code> defines the current entry method on a component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEntryPoint
 {

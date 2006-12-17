@@ -29,16 +29,13 @@ import java.util.List;
 /**
  * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects. This
  * pool is a jakarta commons-pool implementation.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class CommonsPoolProxyPool implements ObjectPool
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(CommonsPoolProxyPool.class);
+    protected static final Log logger = LogFactory.getLog(CommonsPoolProxyPool.class);
 
     /**
      * The pool that holds the MuleProxy objects

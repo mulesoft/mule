@@ -307,7 +307,7 @@ public class ConnectorFactory
                 ConnectorFactory.class);
 
 
-            //RM* Todo this can be removed in Mule 2.0
+            // TODO RM: this can be removed in Mule 2.0
             if (is == null)
             {
                 //The legacy connector decriptors did did not use file extensions
@@ -406,8 +406,8 @@ public class ConnectorFactory
 
     private static class CSDKey
     {
-        private Map overrides;
-        private String protocol;
+        private final Map overrides;
+        private final String protocol;
 
         public CSDKey(String protocol, Map overrides)
         {
@@ -442,10 +442,7 @@ public class ConnectorFactory
 
         public int hashCode()
         {
-            int result;
-            result = (overrides != null ? overrides.hashCode() : 0);
-            result = 29 * result + protocol.hashCode();
-            return result;
+            return 29 * (overrides != null ? overrides.hashCode() : 0) + protocol.hashCode();
         }
     }
 }

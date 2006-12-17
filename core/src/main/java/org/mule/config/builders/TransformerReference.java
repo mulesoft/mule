@@ -24,21 +24,18 @@ import org.mule.util.MuleObjectHelper;
  * Transformers are clones when they are looked up, if there are container properties
  * set on the transformer the clone will have an inconsistent state if container
  * properties have not been resolved. This class holds the refernece and is invoked
- * after the thcontainer properties are resolved
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * after the container properties are resolved.
  */
 public class TransformerReference
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(TransformerReference.class);
+    protected static final Log logger = LogFactory.getLog(TransformerReference.class);
 
-    private String propertyName;
-    private String transformerName;
-    private Object object;
+    private final String propertyName;
+    private final String transformerName;
+    private final Object object;
 
     public TransformerReference(String propertyName, String transformerName, Object object)
     {

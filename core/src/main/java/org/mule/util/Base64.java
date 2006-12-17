@@ -700,8 +700,8 @@ public class Base64
             } // end if: white space, equals sign or better
             else
             {
-                new IllegalArgumentException("Bad Base64 input character at " + i + ": " + source[i]
-                                             + "(decimal)");
+                throw new IllegalArgumentException("Bad Base64 input character at " + i + ": " + source[i]
+                                + "(decimal)");
             } // end else:
         } // each input character
 

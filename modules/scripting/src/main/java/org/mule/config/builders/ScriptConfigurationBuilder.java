@@ -16,8 +16,6 @@ import java.util.Properties;
 import javax.script.CompiledScript;
 import javax.script.Namespace;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
@@ -30,18 +28,13 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.util.PropertiesUtils;
 
 /**
- * Will configure a MuleManager from one or more script files
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * Configures a MuleManager from one or more script files.
  */
 public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder
 {
 
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
+
     protected UMOManager manager = null;
     protected QuickConfigurationBuilder builder = null;
     protected boolean initialised = false;

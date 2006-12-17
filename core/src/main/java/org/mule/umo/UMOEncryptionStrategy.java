@@ -19,9 +19,6 @@ import org.mule.umo.security.CryptoFailureException;
  * relivant with the encryption method being used. for example for Password Based
  * Encryption (PBE) a password, salt, iteration count and algorithm may be set on the
  * strategy.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEncryptionStrategy extends Initialisable
 {

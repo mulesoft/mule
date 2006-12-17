@@ -42,8 +42,6 @@ import javax.resource.spi.work.WorkRejectedException;
 
 /**
  * <code>WorkerContext</code> TODO
- * 
- * @version $Revision$
  */
 public class WorkerContext implements Work
 {
@@ -51,7 +49,7 @@ public class WorkerContext implements Work
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(WorkerContext.class);
+    protected static final Log logger = LogFactory.getLog(WorkerContext.class);
 
     /**
      * Null WorkListener used as the default WorkListener.
@@ -86,11 +84,6 @@ public class WorkerContext implements Work
     private Work worker;
 
     /**
-     * Indicates if this work has been accepted.
-     */
-    // Never read locally
-    // private boolean isAccepted;
-    /**
      * System.currentTimeMillis() when the wrapped Work has been accepted.
      */
     private long acceptedTime;
@@ -124,12 +117,12 @@ public class WorkerContext implements Work
     /**
      * A latch, which is released when the work is started.
      */
-    private Latch startLatch = new Latch();
+    private final Latch startLatch = new Latch();
 
     /**
      * A latch, which is released when the work is completed.
      */
-    private Latch endLatch = new Latch();
+    private final Latch endLatch = new Latch();
 
     /**
      * Create a WorkWrapper.
@@ -385,7 +378,7 @@ public class WorkerContext implements Work
      * @return Latch that a caller can acquire to wait for the start of a work
      *         execution.
      */
-    public synchronized Latch provideStartLatch()
+    public Latch provideStartLatch()
     {
         return startLatch;
     }
@@ -396,13 +389,13 @@ public class WorkerContext implements Work
      * @return Latch that a caller can acquire to wait for the end of a work
      *         execution.
      */
-    public synchronized Latch provideEndLatch()
+    public Latch provideEndLatch()
     {
         return endLatch;
     }
 
     public String toString()
     {
-        return "Work :" + worker;
+        return "Work: " + worker;
     }
 }

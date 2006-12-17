@@ -89,7 +89,7 @@ public class StringMessageUtils
                     }
                     else
                     {
-                        x = msg.lastIndexOf(" ");
+                        x = msg.lastIndexOf(' ');
                         if (x > -1 && len == trimLength)
                         {
                             msg = msg.substring(0, x);

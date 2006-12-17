@@ -62,7 +62,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleManagerComponent.class);
+    protected static final Log logger = LogFactory.getLog(MuleManagerComponent.class);
 
     public static final String MANAGER_COMPONENT_NAME = "_muleManagerComponent";
     public static final String MANAGER_ENDPOINT_NAME = "_muleManagerEndpoint";

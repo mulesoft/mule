@@ -41,7 +41,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
+    protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
     private Object component;
     private UMODescriptor descriptor;

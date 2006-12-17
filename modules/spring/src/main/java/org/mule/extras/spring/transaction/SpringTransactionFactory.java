@@ -10,17 +10,15 @@
 
 package org.mule.extras.spring.transaction;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
+import org.springframework.jdbc.datasource.ConnectionHolder;
+import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.jms.connection.JmsResourceHolder;
-import org.springframework.jdbc.datasource.ConnectionHolder;
 
 /**
  * TODO: document this class
@@ -28,17 +26,45 @@ import org.springframework.jdbc.datasource.ConnectionHolder;
 public class SpringTransactionFactory implements UMOTransactionFactory
 {
 
+    private PlatformTransactionManager manager;
+
+    public SpringTransactionFactory()
+    {
+        super();
+    }
+
+    public UMOTransaction beginTransaction() throws TransactionException
+    {
+        return new SpringTransaction();
+    }
+
+    public boolean isTransacted()
+    {
+        return true;
+    }
+
+    /**
+     * @return Returns the manager.
+     */
+    synchronized public PlatformTransactionManager getManager()
+    {
+        return manager;
+    }
+
+    /**
+     * @param manager The manager to set.
+     */
+    synchronized public void setManager(PlatformTransactionManager manager)
+    {
+        this.manager = manager;
+    }
+
     /**
      * TODO: document this class
      */
     public class SpringTransaction extends AbstractSingleResourceTransaction
     {
-
-        protected TransactionStatus status;
-        protected AtomicBoolean started = new AtomicBoolean(false);
-        protected AtomicBoolean committed = new AtomicBoolean(false);
-        protected AtomicBoolean rolledBack = new AtomicBoolean(false);
-        protected AtomicBoolean rollbackOnly = new AtomicBoolean(false);
+        protected final TransactionStatus status;
 
         public SpringTransaction()
         {
@@ -96,39 +122,6 @@ public class SpringTransactionFactory implements UMOTransactionFactory
             status.setRollbackOnly();
         }
 
-    }
-
-    private PlatformTransactionManager manager;
-
-    public SpringTransactionFactory()
-    {
-        super();
-    }
-
-    public UMOTransaction beginTransaction() throws TransactionException
-    {
-        return new SpringTransaction();
-    }
-
-    public boolean isTransacted()
-    {
-        return true;
-    }
-
-    /**
-     * @return Returns the manager.
-     */
-    synchronized public PlatformTransactionManager getManager()
-    {
-        return manager;
-    }
-
-    /**
-     * @param manager The manager to set.
-     */
-    synchronized public void setManager(PlatformTransactionManager manager)
-    {
-        this.manager = manager;
     }
 
 }

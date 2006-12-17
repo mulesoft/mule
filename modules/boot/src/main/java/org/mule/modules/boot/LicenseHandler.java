@@ -184,9 +184,9 @@ public class LicenseHandler
         File tempJar = createAckJarFile(licenseType, licenseVersion);
 
         if (!muleLib.canWrite()) {
-            // If we can't write to MULE_HOME/lib/mule, try MULE_BASE/lib/boot
-            if (muleHome != muleBase) {
-                muleLib = new File(muleBase, "lib/boot");
+            // If we can't write to MULE_HOME/lib/mule, try MULE_BASE/lib/user
+            if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile())) {
+                muleLib = new File(muleBase, "lib/user");
 
                 if (!muleLib.canWrite())
                     throw new Exception("No write permissions for " + ackJarName + " in either MULE_HOME or MULE_BASE");
@@ -199,6 +199,9 @@ public class LicenseHandler
         // Now we have a directory to create the jar to, so let's rename 
         // the temporary one
         File newJarFile = new File(muleLib, ackJarName);
+        if (newJarFile.exists())
+            throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath() + " a file with this name already exists!");
+
         if (!tempJar.renameTo(newJarFile))
             throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath());
     }
@@ -252,10 +255,6 @@ public class LicenseHandler
         } finally {
             if (fis != null) {
                 try { fis.close(); } catch (Exception e) { }
-            }
-
-            if (newJar != null) {
-                try { newJar.close(); } catch (Exception e) { }
             }
         }
         

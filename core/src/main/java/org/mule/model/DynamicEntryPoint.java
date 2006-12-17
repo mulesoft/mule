@@ -35,9 +35,6 @@ import java.util.Map;
  * the event payload type as the argument. An entry point will try and be matched for
  * different argument types so it's possible to have multiple entry points on a
  * single component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class DynamicEntryPoint implements UMOEntryPoint
@@ -45,7 +42,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(DynamicEntryPoint.class);
+    protected static final Log logger = LogFactory.getLog(DynamicEntryPoint.class);
 
     private Map entryPoints = new HashMap();
     private Method currentMethod;

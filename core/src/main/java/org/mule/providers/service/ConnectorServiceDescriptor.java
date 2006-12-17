@@ -764,8 +764,7 @@ public class ConnectorServiceDescriptor
 
     public int hashCode()
     {
-        int result;
-        result = (protocol != null ? protocol.hashCode() : 0);
+        int result = (protocol != null ? protocol.hashCode() : 0);
         result = 29 * result + (serviceLocation != null ? serviceLocation.hashCode() : 0);
         result = 29 * result + (serviceError != null ? serviceError.hashCode() : 0);
         result = 29 * result + (serviceFinder != null ? serviceFinder.hashCode() : 0);
@@ -784,7 +783,7 @@ public class ConnectorServiceDescriptor
                  + (defaultOutboundTransformer != null ? defaultOutboundTransformer.hashCode() : 0);
         result = 29 * result
                  + (defaultResponseTransformer != null ? defaultResponseTransformer.hashCode() : 0);
-        result = 29 * result + (properties != null ? properties.hashCode() : 0);
-        return result;
+        return 29 * result + (properties != null ? properties.hashCode() : 0);
     }
+
 }

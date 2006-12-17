@@ -13,11 +13,7 @@ package org.mule.transaction;
 import org.mule.config.i18n.Message;
 
 /**
- * <p>
  * <code>IllegalTransactionStateException</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class IllegalTransactionStateException extends TransactionStatusException
 {
@@ -42,4 +38,5 @@ public class IllegalTransactionStateException extends TransactionStatusException
     {
         super(message, cause);
     }
+
 }

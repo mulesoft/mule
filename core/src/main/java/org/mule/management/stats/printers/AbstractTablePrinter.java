@@ -10,9 +10,6 @@
 
 package org.mule.management.stats.printers;
 
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
-
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -22,11 +19,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
+
 /**
  * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AbstractTablePrinter extends PrintWriter
 {
@@ -115,11 +112,11 @@ public class AbstractTablePrinter extends PrintWriter
         int i = getRouterInfo(stats.getInboundRouterStat(), col, 21);
         i = getRouterInfo(stats.getOutboundRouterStat(), col, i);
         col[i] = String.valueOf(stats.getSamplePeriod());
-
     }
 
     protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
     {
+        // TODO what's the deal with the +/- signs?
         if (stats.isInbound())
         {
             col[index++] = "-";
@@ -139,13 +136,17 @@ public class AbstractTablePrinter extends PrintWriter
         col[index++] = "-";
         if (!routed.isEmpty())
         {
-            Iterator it = routed.keySet().iterator();
+            Iterator it = routed.entrySet().iterator();
 
-            StringBuffer buf = new StringBuffer();
+            StringBuffer buf = new StringBuffer(40);
             while (it.hasNext())
             {
-                String name = (String)it.next();
-                buf.append(name).append("=").append(routed.get(name)).append(";");
+                Map.Entry e = (Map.Entry)it.next();
+                buf.append(e.getKey()).append('=').append(e.getValue());
+                if (it.hasNext())
+                {
+                    buf.append(';');
+                }
             }
             col[index++] = buf.toString();
         }
@@ -163,7 +164,6 @@ public class AbstractTablePrinter extends PrintWriter
         for (int i = 0; i < cols.length; i++)
         {
             table[0][i] = cols[i];
-
         }
 
         int i = 1;
@@ -171,6 +171,7 @@ public class AbstractTablePrinter extends PrintWriter
         {
             getColumn((ComponentStatistics)iterator.next(), table[i]);
         }
+
         return table;
     }
 

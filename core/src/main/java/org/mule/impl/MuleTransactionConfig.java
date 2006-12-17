@@ -20,16 +20,13 @@ import org.mule.umo.UMOTransactionFactory;
 /**
  * <p/> <code>MuleTransactionConfig</code> defines transaction configuration for a
  * transactional endpoint.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleTransactionConfig implements UMOTransactionConfig
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleTransactionConfig.class);
+    protected static final Log logger = LogFactory.getLog(MuleTransactionConfig.class);
 
     public static final String ACTION_NONE_STRING = "NONE";
     public static final String ACTION_ALWAYS_BEGIN_STRING = "ALWAYS_BEGIN";

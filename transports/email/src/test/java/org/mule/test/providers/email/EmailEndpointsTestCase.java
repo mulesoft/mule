@@ -131,4 +131,21 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
             endpointUri.toString());
         assertEquals(1, endpointUri.getParams().size());
     }
+
+    /**
+     * Added by Lajos on 2006-12-14 per Ross
+     */
+    public void testWithAddressOverrideOnly() throws Exception
+    {
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://?address=test@lotsofmail.org");
+        assertEquals("smtp", endpointUri.getScheme());
+        assertEquals("test@lotsofmail.org", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(-1, endpointUri.getPort());
+        assertNull(endpointUri.getHost());
+        assertNull(endpointUri.getUserInfo());
+        assertEquals("smtp://?address=test@lotsofmail.org", endpointUri.toString());
+        assertEquals(1, endpointUri.getParams().size());
+    }
+
 }

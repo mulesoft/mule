@@ -19,15 +19,12 @@ import org.mule.umo.UMOMessage;
 import java.util.List;
 
 /**
- * <code>InterceptorsInvoker</code> is used trigger an interceptor chain.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>InterceptorsInvoker</code> is used to trigger an interceptor chain.
  */
 
 public class InterceptorsInvoker extends Invocation
 {
-    private List interceptors;
+    private final List interceptors;
     private int cursor = 0;
 
     public InterceptorsInvoker(List interceptors, MuleDescriptor descriptor, UMOMessage message)
@@ -43,13 +40,11 @@ public class InterceptorsInvoker extends Invocation
 
     public UMOMessage execute() throws UMOException
     {
-        UMOMessage message = null;
         if (cursor < interceptors.size())
         {
             UMOInterceptor interceptor = (UMOInterceptor)interceptors.get(cursor);
             incCursor();
-            message = interceptor.intercept(this);
-            return message;
+            return interceptor.intercept(this);
         }
         return getMessage();
     }

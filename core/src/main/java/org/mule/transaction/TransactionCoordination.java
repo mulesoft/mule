@@ -17,47 +17,44 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class TransactionCoordination
 {
-    /** logger used by this class */
-    protected static final transient Log logger = LogFactory.getLog(TransactionCoordination.class);
+    protected static final Log logger = LogFactory.getLog(TransactionCoordination.class);
 
-    private static TransactionCoordination instance;
+    private static volatile TransactionCoordination instance;
 
+    private final ThreadLocal transactions = new ThreadLocal();
     private int txCounter = 0;
-
-    private ThreadLocal transactions = new ThreadLocal();
 
     private TransactionCoordination()
     {
-        txCounter = 0;
+        super();
     }
 
     public static TransactionCoordination getInstance()
     {
         if (instance == null)
         {
-            instance = new TransactionCoordination();
+            setInstance(new TransactionCoordination());
         }
+
         return instance;
     }
 
-    public static void setInstance(TransactionCoordination txSync)
+    public static synchronized void setInstance(TransactionCoordination txSync)
     {
-        if (instance == null || instance.txCounter == 0)
+        if (instance == null)
         {
             instance = txSync;
         }
-        else
+
+        synchronized (instance)
         {
-            throw new IllegalStateException(
-                "there are currently " + instance.txCounter
+            if (instance.txCounter != 0)
+            {
+                throw new IllegalStateException("there are currently " + instance.txCounter
                                 + "transactions associated with this manager, cannot replace the manager");
+            }
         }
     }
 
@@ -79,7 +76,14 @@ public class TransactionCoordination
         finally
         {
             transactions.set(null);
-            decrementCounter();
+
+            synchronized (this)
+            {
+                if (txCounter > 0)
+                {
+                    txCounter--;
+                }
+            }
         }
     }
 
@@ -90,21 +94,18 @@ public class TransactionCoordination
         {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_ALREADY_BOUND));
         }
-        transactions.set(transaction);
-        incrementCounter();
-        logger.debug("Binding new transaction (" + txCounter + ")");
-    }
 
-    private synchronized void decrementCounter()
-    {
-        if (txCounter > 0)
+        transactions.set(transaction);
+
+        synchronized (this)
         {
-            txCounter--;
+            txCounter++;
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Binding new transaction (" + txCounter + ")");
+            }
         }
     }
 
-    private synchronized void incrementCounter()
-    {
-        txCounter++;
-    }
 }

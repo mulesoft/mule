@@ -10,8 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -24,29 +22,26 @@ import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
- * endpoints using the result of the first and the input for the second
- * 
- * @version $Revision$
+ * endpoints using the result of the first and the input for the second.
  */
 
 public class ChainingRouter extends FilteringOutboundRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(ChainingRouter.class);
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
         UMOMessage resultToReturn = null;
-        final int endpointsCount = endpoints.size();
-        if (endpoints == null || endpointsCount == 0)
+        if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
 
-        logger.debug("About to chain " + endpointsCount + " endpoints.");
+        final int endpointsCount = endpoints.size();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("About to chain " + endpointsCount + " endpoints.");
+        }
 
         // need that ref for an error message
         UMOEndpoint endpoint = null;
@@ -60,14 +55,15 @@ public class ChainingRouter extends FilteringOutboundRouter
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);
+
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Sending Chained message '" + i + "': "
                                  + (intermediaryResult == null ? "null" : intermediaryResult.toString()));
                 }
+
                 if (!lastEndpointInChain)
                 {
-
                     UMOMessage localResult = send(session, intermediaryResult, endpoint);
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
@@ -83,6 +79,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                         logger.debug("Received Chain result '" + i + "': "
                                      + (intermediaryResult != null ? intermediaryResult.toString() : "null"));
                     }
+
                     if (intermediaryResult == null)
                     {
                         logger.warn("Chaining router cannot process any further endpoints. "

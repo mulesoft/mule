@@ -10,33 +10,30 @@
 
 package org.mule.impl.container;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
+import java.io.Reader;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
 
-import java.io.Reader;
-import java.util.Map;
+import org.apache.commons.lang.ObjectUtils;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
 
 /**
  * <code>JndiContainerContext</code> is a container implementaiton that exposes a
- * jndi context. What ever properties are set on the container in configuration will
+ * jndi context. Whatever properties are set on the container in configuration will
  * be passed to the initial context.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
  */
 public class JndiContainerContext extends AbstractContainerContext
 {
-    protected Context context;
-    private Map environment;
+    protected volatile Context context;
+    private volatile Map environment;
 
     public JndiContainerContext()
     {
@@ -91,7 +88,7 @@ public class JndiContainerContext extends AbstractContainerContext
         }
         catch (NamingException e)
         {
-            throw new ObjectNotFoundException(key.toString(), e);
+            throw new ObjectNotFoundException(ObjectUtils.toString(key, "null"), e);
         }
     }
 

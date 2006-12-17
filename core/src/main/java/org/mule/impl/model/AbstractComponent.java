@@ -44,9 +44,6 @@ import java.util.List;
 
 /**
  * A base implementation for all UMOComponents in Mule
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractComponent implements UMOComponent
 {

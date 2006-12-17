@@ -33,17 +33,14 @@ import java.util.Map;
  * or transformers set on the Endpoint the clone will have an inconsistent state if
  * the transformers or container properties have not been resolved. This class holds
  * the refernece and is invoked after the container properties/transformers are
- * resolved
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * resolved.
  */
 public class EndpointReference
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(EndpointReference.class);
+    protected static final Log logger = LogFactory.getLog(EndpointReference.class);
 
     private String propertyName;
     private String endpointName;

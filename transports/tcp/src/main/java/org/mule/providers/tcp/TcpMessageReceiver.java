@@ -165,7 +165,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                         Work work = createWork(socket);
                         try
                         {
-                            getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, connector);
+                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
                         }
                         catch (WorkException e)
                         {

@@ -32,7 +32,6 @@ import org.springframework.beans.factory.xml.BeansDtdResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 
@@ -50,17 +49,14 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
     {
         super(beanDefinitionRegistry);
+        // default resource loader
+        setResourceLoader(new MuleResourceLoader());
         // TODO Make this configurable as a property somehow.
         setValidationMode(VALIDATION_DTD);
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
         ((DefaultListableBeanFactory)beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class,
             new TransformerEditor());
-    }
-
-    public ResourceLoader getResourceLoader()
-    {
-        return new MuleResourceLoader();
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException

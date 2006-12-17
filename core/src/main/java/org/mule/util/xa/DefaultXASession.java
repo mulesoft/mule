@@ -285,23 +285,26 @@ public class DefaultXASession implements XAResource
         {
             throw new XAException(XAException.XAER_PROTO);
         }
+
         AbstractTransactionContext context = resourceManager.getTransactionalResource(xid);
         if (context == null)
         {
             throw new XAException(XAException.XAER_NOTA);
         }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Preparing transaction branch " + xid);
         }
+
         if (context.status == Status.STATUS_MARKED_ROLLBACK)
         {
             throw new XAException(XAException.XA_RBROLLBACK);
         }
+
         try
         {
-            int result = resourceManager.prepareTransaction(context);
-            return result;
+            return resourceManager.prepareTransaction(context);
         }
         catch (ResourceManagerException e)
         {

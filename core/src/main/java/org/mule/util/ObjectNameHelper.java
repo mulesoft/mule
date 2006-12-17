@@ -10,8 +10,6 @@
 
 package org.mule.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -26,11 +24,6 @@ public class ObjectNameHelper
     public static final char HASH = '#';
     public static final String CONNECTOR_PREFIX = "connector";
     public static final String ENDPOINT_PREFIX = "endpoint";
-
-    /**
-     * logger used by this class
-     */
-    static Log logger = LogFactory.getLog(ObjectNameHelper.class);
 
     public static String getEndpointName(UMOImmutableEndpoint endpoint)
     {
@@ -55,7 +48,7 @@ public class ObjectNameHelper
             String address = endpoint.getEndpointURI().getAddress();
             // Make sure we include the endpoint scheme in the name
             address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme()
-                                                              + SEPARATOR + address);
+                            + SEPARATOR + address);
             name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
             return ensureUniqueEndpoint(name);
@@ -98,7 +91,7 @@ public class ObjectNameHelper
 
     public static String getConnectorName(UMOConnector connector)
     {
-        if (connector.getName() != null && connector.getName().indexOf("#") == -1)
+        if (connector.getName() != null && connector.getName().indexOf('#') == -1)
         {
             String name = replaceObjectNameChars(connector.getName());
             return ensureUniqueConnector(name);
