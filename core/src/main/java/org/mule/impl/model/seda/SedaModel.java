@@ -11,17 +11,18 @@
 package org.mule.impl.model.seda;
 
 import org.mule.MuleManager;
+import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * A mule component service model that uses Seda principals to achieve high
  * throughput by Quing events for compoonents and processing them concurrently.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SedaModel extends AbstractModel
 {
@@ -29,7 +30,7 @@ public class SedaModel extends AbstractModel
     /**
      * The time out used for taking from the Seda Queue
      */
-    private int queueTimeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
+    private int queueTimeout = MuleManager.getConfiguration().getDefaultSynchronousEventTimeout();
 
     /**
      * Whether components in this model should be pooled or not
@@ -42,6 +43,16 @@ public class SedaModel extends AbstractModel
     protected boolean componentPerRequest = false;
 
     /**
+     * The default pooling config for components managed by this model
+     */
+    protected PoolingProfile poolingProfile;
+
+    /**
+     * the default queue configuration for components managed by this model
+     */
+    protected QueueProfile queueProfile;
+
+    /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
      * 
@@ -50,6 +61,19 @@ public class SedaModel extends AbstractModel
     public String getType()
     {
         return "seda";
+    }
+
+
+    public void initialise() throws InitialisationException
+    {
+        if(queueProfile==null) {
+            queueProfile = new QueueProfile();
+        }
+        if(poolingProfile==null)
+        {
+            poolingProfile = new PoolingProfile();
+        }
+        super.initialise(); 
     }
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
@@ -85,5 +109,26 @@ public class SedaModel extends AbstractModel
     public void setComponentPerRequest(boolean componentPerRequest)
     {
         this.componentPerRequest = componentPerRequest;
+    }
+
+
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
+    }
+
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        this.poolingProfile = poolingProfile;
+    }
+
+    public QueueProfile getQueueProfile()
+    {
+        return queueProfile;
+    }
+
+    public void setQueueProfile(QueueProfile queueProfile)
+    {
+        this.queueProfile = queueProfile;
     }
 }

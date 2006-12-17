@@ -10,6 +10,12 @@
 
 package org.mule.providers.http;
 
+import org.mule.MuleManager;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+
 import org.apache.commons.httpclient.ChunkedInputStream;
 import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
@@ -18,11 +24,6 @@ import org.apache.commons.httpclient.HeaderGroup;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.MuleManager;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
 
 /**
  * A http request wrapper
@@ -188,7 +189,7 @@ public class HttpRequest
         }
         else
         {
-            return MuleManager.getConfiguration().getEncoding();
+            return MuleManager.getConfiguration().getDefaultEncoding();
         }
     }
 

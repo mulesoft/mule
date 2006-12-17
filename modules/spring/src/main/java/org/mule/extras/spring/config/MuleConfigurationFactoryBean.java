@@ -12,9 +12,8 @@ package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.PoolingProfile;
-import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
+
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -47,52 +46,52 @@ public class MuleConfigurationFactoryBean implements FactoryBean
 
     public boolean isSynchronous()
     {
-        return muleConfiguration.isSynchronous();
+        return muleConfiguration.isDefaultSynchronousEndpoints();
     }
 
     public void setSynchronous(boolean synchronous)
     {
-        muleConfiguration.setSynchronous(synchronous);
+        muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
     }
 
-    public String getModel()
-    {
-        return muleConfiguration.getModel();
-    }
-
-    public void setModel(String model)
-    {
-        muleConfiguration.setModel(model);
-    }
+//    public String getModel()
+//    {
+//        return muleConfiguration.getModel();
+//    }
+//
+//    public void setModel(String model)
+//    {
+//        muleConfiguration.setModel(model);
+//    }
 
     public ThreadingProfile getMessageDispatcherThreadingProfile()
     {
-        return muleConfiguration.getMessageDispatcherThreadingProfile();
+        return muleConfiguration.getDefaultMessageDispatcherThreadingProfile();
     }
 
     public void setMessageDispatcherThreadingProfile(ThreadingProfile messageDispatcherThreadingProfile)
     {
-        muleConfiguration.setMessageDispatcherThreadingProfile(messageDispatcherThreadingProfile);
+        muleConfiguration.setDefaultMessageDispatcherThreadingProfile(messageDispatcherThreadingProfile);
     }
 
     public ThreadingProfile getMessageReceiverThreadingProfile()
     {
-        return muleConfiguration.getMessageReceiverThreadingProfile();
+        return muleConfiguration.getDefaultMessageReceiverThreadingProfile();
     }
 
     public void setMessageReceiverThreadingProfile(ThreadingProfile messageReceiverThreadingProfile)
     {
-        muleConfiguration.setMessageReceiverThreadingProfile(messageReceiverThreadingProfile);
+        muleConfiguration.setDefaultMessageReceiverThreadingProfile(messageReceiverThreadingProfile);
     }
 
     public ThreadingProfile getComponentThreadingProfile()
     {
-        return muleConfiguration.getComponentThreadingProfile();
+        return muleConfiguration.getDefaultComponentThreadingProfile();
     }
 
     public void setComponentThreadingProfile(ThreadingProfile componentPoolThreadingProfile)
     {
-        muleConfiguration.setComponentThreadingProfile(componentPoolThreadingProfile);
+        muleConfiguration.setDefaultComponentThreadingProfile(componentPoolThreadingProfile);
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
@@ -105,55 +104,55 @@ public class MuleConfigurationFactoryBean implements FactoryBean
         muleConfiguration.setDefaultThreadingProfile(defaultThreadingProfile);
     }
 
-    public PoolingProfile getPoolingProfile()
-    {
-        return muleConfiguration.getPoolingProfile();
-    }
-
-    public void setPoolingProfile(PoolingProfile poolingProfile)
-    {
-        muleConfiguration.setPoolingProfile(poolingProfile);
-    }
+//    public PoolingProfile getPoolingProfile()
+//    {
+//        return muleConfiguration.getPoolingProfile();
+//    }
+//
+//    public void setPoolingProfile(PoolingProfile poolingProfile)
+//    {
+//        muleConfiguration.setPoolingProfile(poolingProfile);
+//    }
 
     public int getSynchronousEventTimeout()
     {
-        return muleConfiguration.getSynchronousEventTimeout();
+        return muleConfiguration.getDefaultSynchronousEventTimeout();
     }
 
     public void setSynchronousEventTimeout(int synchronousEventTimeout)
     {
-        muleConfiguration.setSynchronousEventTimeout(synchronousEventTimeout);
+        muleConfiguration.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
     }
 
     public boolean isSynchronousReceive()
     {
-        return muleConfiguration.isRemoteSync();
+        return muleConfiguration.isDefaultRemoteSync();
     }
 
     public void setSynchronousReceive(boolean synchronousReceive)
     {
-        muleConfiguration.setRemoteSync(synchronousReceive);
+        muleConfiguration.setDefaultRemoteSync(synchronousReceive);
     }
 
-    public QueueProfile getQueueProfile()
-    {
-        return muleConfiguration.getQueueProfile();
-    }
-
-    public void setQueueProfile(QueueProfile queueProfile)
-    {
-        muleConfiguration.setQueueProfile(queueProfile);
-    }
-
-    public boolean isRecoverableMode()
-    {
-        return muleConfiguration.isRecoverableMode();
-    }
-
-    public void setRecoverableMode(boolean recoverableMode)
-    {
-        muleConfiguration.setRecoverableMode(recoverableMode);
-    }
+//    public QueueProfile getQueueProfile()
+//    {
+//        return muleConfiguration.getQueueProfile();
+//    }
+//
+//    public void setQueueProfile(QueueProfile queueProfile)
+//    {
+//        muleConfiguration.setQueueProfile(queueProfile);
+//    }
+//
+//    public boolean isRecoverableMode()
+//    {
+//        return muleConfiguration.isRecoverableMode();
+//    }
+//
+//    public void setRecoverableMode(boolean recoverableMode)
+//    {
+//        muleConfiguration.setRecoverableMode(recoverableMode);
+//    }
 
     public String getWorkingDirectory()
     {
@@ -175,13 +174,13 @@ public class MuleConfigurationFactoryBean implements FactoryBean
         muleConfiguration.setConfigResources(configResources);
     }
 
-    public String getServerUrl()
-    {
-        return muleConfiguration.getServerUrl();
-    }
-
-    public void setServerUrl(String serverUrl)
-    {
-        muleConfiguration.setServerUrl(serverUrl);
-    }
+//    public String getServerUrl()
+//    {
+//        return muleConfiguration.getServerUrl();
+//    }
+//
+//    public void setServerUrl(String serverUrl)
+//    {
+//        muleConfiguration.setServerUrl(serverUrl);
+//    }
 }

@@ -10,12 +10,6 @@
 
 package org.mule.test.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -51,6 +45,11 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
 
@@ -65,7 +64,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMOManager m = builder.getManager();
         // Disable the admin agent
-        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        //MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         try
         {
             // set global properties

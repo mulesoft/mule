@@ -10,8 +10,6 @@
 
 package org.mule.providers.tcp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -30,6 +28,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -56,7 +57,7 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void sendTestData(int iterations) throws Exception
     {
-        MuleManager.getConfiguration().setSynchronous(false);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
         URI uri = getInDest().getUri();
         for (int i = 0; i < iterations; i++)
         {
@@ -109,7 +110,7 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     public void testDispatchAndReply() throws Exception
     {
-        MuleManager.getConfiguration().setSynchronous(false);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor, new EventCallback()

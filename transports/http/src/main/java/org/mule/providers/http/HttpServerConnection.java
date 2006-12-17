@@ -10,11 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.ChunkedOutputStream;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpParser;
-import org.apache.commons.httpclient.StatusLine;
-import org.apache.commons.io.IOUtils;
 import org.mule.MuleManager;
 
 import java.io.DataOutputStream;
@@ -25,6 +20,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
+
+import org.apache.commons.httpclient.ChunkedOutputStream;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpParser;
+import org.apache.commons.httpclient.StatusLine;
+import org.apache.commons.io.IOUtils;
 
 /**
  * A connection to the SimpleHttpServer.
@@ -39,7 +40,7 @@ public class HttpServerConnection
 
     public HttpServerConnection(final Socket socket) throws IOException
     {
-        this(socket, MuleManager.getConfiguration().getEncoding());
+        this(socket, MuleManager.getConfiguration().getDefaultEncoding());
     }
 
     public HttpServerConnection(final Socket socket, String encoding) throws IOException

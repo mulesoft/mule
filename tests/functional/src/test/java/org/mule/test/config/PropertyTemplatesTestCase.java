@@ -10,15 +10,15 @@
 
 package org.mule.test.config;
 
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.List;
+import java.util.Map;
 
 public class PropertyTemplatesTestCase extends FunctionalTestCase
 {
@@ -30,7 +30,7 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        assertEquals("blah", MuleManager.getConfiguration().getModel());
+        //RM* assertEquals("blah", MuleManager.getConfiguration().getModel());
         assertEquals("blah", MuleManager.getInstance().getModel().getName());
 
         AbstractConnector c = (AbstractConnector)MuleManager.getInstance().lookupConnector("myTestConnector");

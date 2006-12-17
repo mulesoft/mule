@@ -10,13 +10,6 @@
 
 package org.mule.impl.model;
 
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -37,6 +30,14 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
+
+import java.beans.ExceptionListener;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
@@ -83,7 +84,6 @@ public abstract class AbstractModel implements UMOModel
         components = new ConcurrentSkipListMap();
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
-        name = "mule";
     }
 
     /*
@@ -438,7 +438,7 @@ public abstract class AbstractModel implements UMOModel
         }
     }
 
-    public void setComponents(List descriptors) throws UMOException
+    public void setServiceDescriptors(List descriptors) throws UMOException
     {
         for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
         {

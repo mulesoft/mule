@@ -10,15 +10,12 @@
 
 package org.mule.impl.internal.admin;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.transformers.wire.WireFormat;
-import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.transformers.wire.SerializationWireFormat;
+import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -26,6 +23,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleAdminAgent</code> manages the server endpoint that receives Admin and
@@ -42,9 +43,9 @@ public class MuleAdminAgent implements UMOAgent
      */
     protected static Log logger = LogFactory.getLog(MuleAdminAgent.class);
 
-    private String serverEndpoint;
-
     private WireFormat wireFormat;
+
+    private String serverUri;
 
     /**
      * Gets the name of this agent
@@ -73,7 +74,7 @@ public class MuleAdminAgent implements UMOAgent
      */
     public String getDescription()
     {
-        return getName() + ": accepting connections on " + serverEndpoint;
+        return getName() + ": accepting connections on " + serverUri;
     }
 
     public void start() throws UMOException
@@ -107,16 +108,16 @@ public class MuleAdminAgent implements UMOAgent
         {
             wireFormat = new SerializationWireFormat();
         }
-        serverEndpoint = MuleManager.getConfiguration().getServerUrl();
+        //TODO RM* serverUri = MuleManager.getConfiguration().getServerUrl();
         UMOManager manager = MuleManager.getInstance();
 
         try
         {
-            if (StringUtils.isEmpty(serverEndpoint))
+            if (StringUtils.isEmpty(serverUri))
             {
                 // no serverUrl specified, warn a user
-                logger.warn("No serverEndpointUrl specified, MuleAdminAgent will not start. E.g. use "
-                            + "<mule-environment-properties serverUrl=\"tcp://example.com:60504\"/> ");
+                logger.warn("No serverUriUrl specified, MuleAdminAgent will not start. E.g. use "
+                            + "<mule:admin-agent serverUri=\"tcp://example.com:60504\"/> ");
 
                 // abort the agent registration process
                 manager.unregisterAgent(this.getName());
@@ -137,9 +138,9 @@ public class MuleAdminAgent implements UMOAgent
                 }
 
                 // Check to see if we have an endpoint identifier
-                serverEndpoint = MuleManager.getInstance().lookupEndpointIdentifier(serverEndpoint,
-                    serverEndpoint);
-                UMOEndpointURI endpointUri = new MuleEndpointURI(serverEndpoint);
+                serverUri = MuleManager.getInstance().lookupEndpointIdentifier(serverUri,
+                    serverUri);
+                UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
                 UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
                 // If this connector has already been initialised i.e. it's a
                 // pre-existing connector not not reinit
@@ -150,7 +151,7 @@ public class MuleAdminAgent implements UMOAgent
                     manager.registerConnector(connector);
                 }
 
-                logger.info("Registering Admin listener on: " + serverEndpoint);
+                logger.info("Registering Admin listener on: " + serverUri);
                 UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri,
                     wireFormat);
                 manager.getModel().registerComponent(descriptor);
@@ -164,7 +165,7 @@ public class MuleAdminAgent implements UMOAgent
 
     public String toString()
     {
-        return "MuleAdminAgent{" + "serverEndpoint='" + serverEndpoint + "'" + "}";
+        return "MuleAdminAgent{" + "serverUri='" + serverUri + "'" + "}";
     }
 
     public WireFormat getWireFormat()
@@ -175,5 +176,16 @@ public class MuleAdminAgent implements UMOAgent
     public void setWireFormat(WireFormat wireFormat)
     {
         this.wireFormat = wireFormat;
+    }
+
+
+    public String getServerUri()
+    {
+        return serverUri;
+    }
+
+    public void setServerUri(String serverUri)
+    {
+        this.serverUri = serverUri;
     }
 }

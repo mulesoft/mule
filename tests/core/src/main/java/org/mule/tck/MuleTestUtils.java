@@ -10,9 +10,6 @@
 
 package org.mule.tck;
 
-import com.mockobjects.dynamic.Mock;
-
-import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -31,11 +28,11 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -44,6 +41,8 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+
+import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
 
@@ -63,13 +62,15 @@ public class MuleTestUtils
             MuleManager.getInstance().dispose();
         }
         manager = MuleManager.getInstance();
-        if (disableAdminService)
-        {
-            MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
-        }
-        manager.setModel(new SedaModel());
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        //TODO RM*
+//        if (disableAdminService)
+//        {
+//            MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+//        }
+        SedaModel model = new SedaModel();
+        manager.setModel(model);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
 
         return manager;

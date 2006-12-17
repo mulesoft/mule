@@ -32,6 +32,7 @@ import java.util.List;
  */
 public interface UMOModel extends Lifecycle, Initialisable
 {
+    public static final String DEFAULT_MODEL_NAME = "default";
 
     /**
      * Sets the model's name. It is poosible to configure more than one model in a
@@ -143,7 +144,7 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @param descriptors
      * @throws UMOException
      */
-    void setComponents(List descriptors) throws UMOException;
+    void setServiceDescriptors(List descriptors) throws UMOException;
 
     /**
      * The exception strategy to use by components managed by the model. The

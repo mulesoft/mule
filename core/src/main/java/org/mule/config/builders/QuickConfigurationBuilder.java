@@ -17,9 +17,9 @@ import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
@@ -34,7 +34,6 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
-import org.mule.util.StringUtils;
 
 import java.util.Map;
 import java.util.Properties;
@@ -90,7 +89,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     public void disableAdminAgent()
     {
-        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        //RM* MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         if (manager != null)
         {
             try
@@ -130,8 +129,9 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             serverUrl = "";
         }
-        MuleManager.getConfiguration().setServerUrl(serverUrl);
-        MuleManager.getConfiguration().setSynchronous(synchronous);
+        //TODO RM*
+//        MuleManager.getConfiguration().setServerUrl(serverUrl);
+//        MuleManager.getConfiguration().setDefaultSynchronous(synchronous);
         if (!MODEL_NOT_SET.equals(modeltype))
         {
             manager.setModel(ModelFactory.createModel(modeltype));

@@ -10,14 +10,6 @@
 
 package org.mule.tck;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
@@ -33,6 +25,14 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import junit.framework.TestCase;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -155,7 +155,7 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
         MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
-        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        //TODO RM* MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
 
         try
         {

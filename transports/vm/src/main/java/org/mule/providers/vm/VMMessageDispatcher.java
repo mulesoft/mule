@@ -10,12 +10,6 @@
 
 package org.mule.providers.vm;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -32,6 +26,11 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction
@@ -256,8 +255,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (connector.isQueueEvents())
         {
             // use the default queue profile to configure this queue.
-            // Todo We may want to allow users to specify this at the connector level
-            MuleManager.getConfiguration().getQueueProfile().configureQueue(
+            connector.getQueueProfile().configureQueue(
                 endpoint.getEndpointURI().getAddress());
         }
     }

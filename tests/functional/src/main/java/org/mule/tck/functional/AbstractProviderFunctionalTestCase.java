@@ -10,10 +10,7 @@
 
 package org.mule.tck.functional;
 
-import java.util.HashMap;
-
 import org.mule.MuleManager;
-import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -26,6 +23,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.HashMap;
 
 public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTestCase
 {
@@ -45,16 +44,16 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     {
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+//       TODO RM* MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+//            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         manager.setModel(new SedaModel());
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
         // Start the server
-        MuleManager.getConfiguration().setServerUrl("");
+       //TODO RM* MuleManager.getConfiguration().setServerUrl("");
         manager.start();
     }
 

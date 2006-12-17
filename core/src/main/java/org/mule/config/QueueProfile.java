@@ -18,9 +18,6 @@ import org.mule.util.queue.QueueConfiguration;
  * <code>QueueProfile</code> determines how an internal queue for a component will
  * behave
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 
 public class QueueProfile
@@ -83,4 +80,9 @@ public class QueueProfile
         MuleManager.getInstance().getQueueManager().setQueueConfiguration(component, qc);
     }
 
+    public String toString()
+    {
+        return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", persistent="
+               + persistent + "}";
+    }
 }

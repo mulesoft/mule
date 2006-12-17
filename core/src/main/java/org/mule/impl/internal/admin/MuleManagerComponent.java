@@ -10,9 +10,6 @@
 
 package org.mule.impl.internal.admin;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -48,6 +45,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleManagerComponent</code> is a MuleManager interal server component
@@ -202,7 +203,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
             long timeout = MapUtils.getLongValue(action.getProperties(),
                 MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, MuleManager.getConfiguration()
-                    .getSynchronousEventTimeout());
+                    .getDefaultSynchronousEventTimeout());
 
             UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
             result = dispatcher.receive(ep, timeout);
@@ -273,7 +274,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             wireFormat.write(out, result);
-            return out.toString(MuleManager.getConfiguration().getEncoding());
+            return out.toString(MuleManager.getConfiguration().getDefaultEncoding());
         }
         catch (Exception e1)
         {

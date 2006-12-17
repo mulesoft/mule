@@ -25,8 +25,6 @@ import java.util.Properties;
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for
  * most connectors
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
@@ -153,7 +151,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return URLDecoder.decode(string, MuleManager.getConfiguration().getEncoding());
+            return URLDecoder.decode(string, MuleManager.getConfiguration().getDefaultEncoding());
         }
         catch (UnsupportedEncodingException e)
         {

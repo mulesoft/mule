@@ -10,12 +10,13 @@
 
 package org.mule.extras.spring.config;
 
-import java.io.IOException;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
+
+import java.io.IOException;
 
 /**
  * <code>MuleApplicationContext</code> is A Simple extension Application context
@@ -52,16 +53,16 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         return configLocations;
     }
 
-    protected void initBeanDefinitionReader(XmlBeanDefinitionReader xmlBeanDefinitionReader)
-    {
-        super.initBeanDefinitionReader(xmlBeanDefinitionReader);
-    }
-
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory,
-            configLocations.length);
-        initBeanDefinitionReader(beanDefinitionReader);
-        loadBeanDefinitions(beanDefinitionReader);
+        beanFactory.registerBeanDefinition("_MuleManagemenetContextFactoryBean", new RootBeanDefinition(AutowireManagementContextFactoryBean.class, true));
+        beanFactory.registerBeanDefinition("_springContainerContext", new RootBeanDefinition(SpringContainerContextFactoryBean.class, true));
+        beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
+
+        XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        beanDefinitionReader.loadBeanDefinitions(configLocations);
+        //initBeanDefinitionReader(beanDefinitionReader);
+        //loadBeanDefinitions(beanDefinitionReader);
+
     }
 }

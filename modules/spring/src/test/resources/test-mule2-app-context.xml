@@ -5,44 +5,53 @@
        xmlns:mgmt="http://www.mulesource.org/schema/mule/management/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/management/2.0 META-INF/mule-management.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
 
 
 <!-- To do replicate the contents of test-mule-autowire-app-context.xml,test-application-context.xml -->
 
-    <mule:custom-transformer id="new" class="org.mule.X" returnClass="org.goo.Foo">
-        <mule:source-type class="java.lang.String"/>
-        <mule:source-type class="java.lang.StringBuffer"/>
-        <mule:property name="foo"><value>do</value></mule:property>
+    <!--<mgmt:jmx-server id="jmx"/>-->
+
+    <mule:custom-transformer id="ArrayToLenderList" class="org.mule.transformers.simple.ObjectToString"
+                             returnClass="java.lang.String">
+        <mule:source-type class="java.lang.Exception"/>
     </mule:custom-transformer>
 
+    <!--<bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
+        <!--<mule:endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
+    <!--</bean>-->
 
-    <mule:custom-connector id="foo" class="org.mule.tck.testmodels.mule.TestConnector" >
-
-        <mule:exception-strategy >
-            <mule:endpoint address="vm://exception.queue"/>
-        </mule:exception-strategy>
-
-        <mule:dispatcher-threading-profile maxThreadsActive="15"/>
-    </mule:custom-connector>
-
-    <mgmt:jmx-server id="jmx">
-    </mgmt:jmx-server>
+    <!--<bean id="lendersLookup" class="org.mule.routing.MuleEndpointProxy">-->
+        <!--<mule:endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
+                <!--responseTransformers="ArrayToLenderList"/>-->
+    <!--</bean>-->
 
 
+    <bean id="apple" class="org.mule.tck.testmodels.fruit.Apple">
+        <!--<lookup-method name="getCreditProfile" bean="creditProfileLookup"/>-->
+        <!--<lookup-method name="getLenders" bean="lendersLookup"/>-->
+    </bean>
 
-    <mule:endpoint id="myService.inbound" address="tcp://localhost:12345"/>
 
+    <mule:model-seda id="main">
 
-    <mule:model-seda id="foo2">
-        <mule:service id="ddd" implementation="">
+        <mule:service id="LoanBroker" implementation="apple">
             <mule:inbound-router>
-
+                <mule:endpoint address="vm://LoanBrokerRequests"/>
             </mule:inbound-router>
-            <mule:property name="foo"><null/></mule:property>
 
+            <!--<mule:outbound-router>-->
+                <!--<mule:router-static-recipient-list messageProperty="recipients">-->
+                    <!--<mule:reply-to-endpoint address="vm://LoanBrokerQuotes"/>-->
+                <!--</mule:router-static-recipient-list>-->
+            <!--</mule:outbound-router>-->
+
+            <!--<mule:response-router timeout="10000" failOnTimeout="false">-->
+                <!--<mule:endpoint address="vm://LoanBrokerQuotes"/>-->
+                <!--<mule:custom-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+            <!--</mule:response-router>-->
         </mule:service>
+
 
     </mule:model-seda>
 </beans>

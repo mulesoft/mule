@@ -10,8 +10,6 @@
 
 package org.mule.impl.internal.admin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
@@ -33,6 +31,9 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
@@ -352,7 +353,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreMessageNotifications && !MuleManager.getConfiguration().isEnableMessageEvents())
+        if (!ignoreMessageNotifications /** &&  TODO RM* !MuleManager.getConfiguration().isEnableMessageEvents() **/)
         {
             logger.warn("EventLogger agent has been asked to log message notifications, but the MuleManager is configured not to fire Message notifications");
         }

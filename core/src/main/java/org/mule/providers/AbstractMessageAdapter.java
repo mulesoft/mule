@@ -10,8 +10,15 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.MapUtils;
+import org.mule.util.UUID;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -25,15 +32,9 @@ import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.MapUtils;
-import org.mule.util.UUID;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for simple
@@ -50,7 +51,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     protected ConcurrentMap properties = new ConcurrentHashMap();
     protected ConcurrentMap attachments = new ConcurrentHashMap();
-    protected String encoding = MuleManager.getConfiguration().getEncoding();
+    protected String encoding = MuleManager.getConfiguration().getDefaultEncoding();
 
     protected UMOExceptionPayload exceptionPayload;
     protected String id = UUID.getUUID();

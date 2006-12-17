@@ -10,11 +10,6 @@
 
 package org.mule.impl.internal.notifications;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -25,14 +20,22 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkListener;
-import javax.resource.spi.work.WorkManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * <code>ServerNotificationManager</code> manages all server listeners for a Mule
@@ -67,7 +70,7 @@ public class ServerNotificationManager implements Work, Disposable
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingQueue();
         listeners = new CopyOnWriteArrayList();
-        workListener = MuleManager.getConfiguration().getWorkListener();
+        workListener = MuleManager.getConfiguration().getDefaultWorkListener();
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException

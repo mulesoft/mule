@@ -31,37 +31,22 @@ public interface MuleConfigurationServiceMBean
 
     public void setRemoteSync(boolean remoteSync);
 
-    public boolean isRecoverableMode();
-
-    public void setRecoverableMode(boolean recoverableMode);
-
     public String getWorkingDirectory();
 
     public void setWorkingDirectory(String workingDirectory);
 
     public String[] getConfigResources();
 
-    public String getServerUrl();
-
-    public void setServerUrl(String serverUrl);
-
     public int getTransactionTimeout();
 
     public void setTransactionTimeout(int transactionTimeout);
-
-    public boolean isClientMode();
-
-    public void setClientMode(boolean clientMode);
-
-    public boolean isEmbedded();
-
-    public void setEmbedded(boolean embedded);
 
     public String getEncoding();
 
     public void setEncoding(String encoding);
 
-    public boolean isEnableMessageEvents();
+    public String getOSEncoding();
 
-    public void setEnableMessageEvents(boolean enableMessageEvents);
+    public void setOSEncoding(String encoding);
+
 }

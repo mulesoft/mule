@@ -10,13 +10,6 @@
 
 package org.mule.providers.http.filters;
 
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.NoHttpResponseException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.mule.MuleManager;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.PoolingProfile;
@@ -41,6 +34,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.httpclient.HttpConnection;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.NoHttpResponseException;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+
 /**
  * @author Jack Hung
  * @version $Revision$
@@ -55,9 +56,11 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
     {
 
         UMOManager manager = getManager(true);
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+
+        SedaModel model = new SedaModel();
+        model.setPoolingProfile(new PoolingProfile());
+        model.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
         manager.setModel(new SedaModel());
 
         MuleDescriptor descriptor = createInDescriptor("httpIn", EchoComponent.class.getName());

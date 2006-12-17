@@ -9,14 +9,13 @@
  */
 package org.mule.extras.spring.config;
 
-import org.mule.tck.AbstractConfigBuilderTestCase;
-import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.umo.manager.UMOManager;
 import org.mule.MuleManager;
-import org.mule.impl.container.ContainerKeyPair;
+import org.mule.impl.model.seda.SedaModel;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.manager.UMOManager;
 
-public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
+public class SpringNamespaceConfigBuilderTestCase extends FunctionalTestCase
 {
 
     public String getConfigResources()
@@ -33,15 +32,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
     {
         // test container init
         UMOManager manager = MuleManager.getInstance();
-        assertNotNull(manager.getContainerContext());
-
-        Object object = manager.getContainerContext().getComponent(
-            new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
-        assertNotNull(object);
-        assertTrue(object instanceof FruitBowl);
-        FruitBowl bowl = (FruitBowl)object;
-        assertTrue(bowl.hasBanana());
-        assertTrue(bowl.hasApple());
+        assertTrue(manager.getModel() instanceof SedaModel);
     }
 
 }

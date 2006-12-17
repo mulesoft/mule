@@ -10,21 +10,22 @@
 
 package org.mule.transformers.wire;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.util.IOUtils;
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.IOUtils;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO
@@ -87,7 +88,7 @@ public class TransformerPairWireFormat implements WireFormat
                 }
                 else
                 {
-                    bytes = result.toString().getBytes(MuleManager.getConfiguration().getEncoding());
+                    bytes = result.toString().getBytes(MuleManager.getConfiguration().getDefaultEncoding());
                 }
 
                 out.write(bytes);
@@ -102,7 +103,7 @@ public class TransformerPairWireFormat implements WireFormat
                 if (returnClass != null && returnClass.equals(String.class))
                 {
                     String s = (String)outboundTransformer.transform(o);
-                    out.write(s.getBytes(MuleManager.getConfiguration().getEncoding()));
+                    out.write(s.getBytes(MuleManager.getConfiguration().getDefaultEncoding()));
                 }
                 else
                 {

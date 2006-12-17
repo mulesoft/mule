@@ -21,11 +21,11 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
+import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 
 /**
  * <code>MuleRESTReceiverServlet</code> is used for sending a receiving events from
@@ -122,7 +122,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             UMOMessage message = new MuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
-            receiver.routeMessage(message, MuleManager.getConfiguration().isSynchronous());
+            receiver.routeMessage(message, MuleManager.getConfiguration().isDefaultSynchronousEndpoints());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback)

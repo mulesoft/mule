@@ -238,16 +238,17 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         MuleConfiguration config = MuleManager.getConfiguration();
         if (threadingProfile == null)
         {
-            threadingProfile = config.getComponentThreadingProfile();
+            threadingProfile = config.getDefaultComponentThreadingProfile();
         }
-        if (poolingProfile == null)
-        {
-            poolingProfile = config.getPoolingProfile();
-        }
-        if (queueProfile == null)
-        {
-            queueProfile = config.getQueueProfile();
-        }
+        //Todo RM*
+//        if (poolingProfile == null)
+//        {
+//            poolingProfile = config.getPoolingProfile();
+//        }
+//        if (queueProfile == null)
+//        {
+//            queueProfile = config.getQueueProfile();
+//        }
 
         if (exceptionListener == null)
         {

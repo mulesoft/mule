@@ -22,47 +22,40 @@ import org.mule.config.MuleConfiguration;
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
 {
+
+
     private final MuleConfiguration muleConfiguration = MuleManager.getConfiguration();
 
     public boolean isSynchronous()
     {
-        return muleConfiguration.isSynchronous();
+        return muleConfiguration.isDefaultSynchronousEndpoints();
     }
 
     public void setSynchronous(boolean synchronous)
     {
-        muleConfiguration.setSynchronous(synchronous);
+        muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
     }
 
     public int getSynchronousEventTimeout()
     {
-        return muleConfiguration.getSynchronousEventTimeout();
+        return muleConfiguration.getDefaultSynchronousEventTimeout();
     }
 
     public void setSynchronousEventTimeout(int synchronousEventTimeout)
     {
-        muleConfiguration.setSynchronousEventTimeout(synchronousEventTimeout);
+        muleConfiguration.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
     }
 
     public boolean isRemoteSync()
     {
-        return muleConfiguration.isRemoteSync();
+        return muleConfiguration.isDefaultRemoteSync();
     }
 
     public void setRemoteSync(boolean remoteSync)
     {
-        muleConfiguration.setRemoteSync(remoteSync);
+        muleConfiguration.setDefaultRemoteSync(remoteSync);
     }
 
-    public boolean isRecoverableMode()
-    {
-        return muleConfiguration.isRecoverableMode();
-    }
-
-    public void setRecoverableMode(boolean recoverableMode)
-    {
-        muleConfiguration.setRecoverableMode(recoverableMode);
-    }
 
     public String getWorkingDirectory()
     {
@@ -79,15 +72,6 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getConfigResources();
     }
 
-    public String getServerUrl()
-    {
-        return muleConfiguration.getServerUrl();
-    }
-
-    public void setServerUrl(String serverUrl)
-    {
-        muleConfiguration.setServerUrl(serverUrl);
-    }
 
     public int getTransactionTimeout()
     {
@@ -104,38 +88,24 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.isClientMode();
     }
 
-    public void setClientMode(boolean clientMode)
-    {
-        muleConfiguration.setClientMode(clientMode);
-    }
-
-    public boolean isEmbedded()
-    {
-        return muleConfiguration.isEmbedded();
-    }
-
-    public void setEmbedded(boolean embedded)
-    {
-        muleConfiguration.setEmbedded(embedded);
-    }
 
     public String getEncoding()
     {
-        return muleConfiguration.getEncoding();
+        return muleConfiguration.getDefaultEncoding();
     }
 
     public void setEncoding(String encoding)
     {
-        muleConfiguration.setEncoding(encoding);
+        muleConfiguration.setDefaultEncoding(encoding);
     }
 
-    public boolean isEnableMessageEvents()
+    public String getOSEncoding()
     {
-        return muleConfiguration.isEnableMessageEvents();
+        return muleConfiguration.getDefaultOSEncoding();
     }
 
-    public void setEnableMessageEvents(boolean enableMessageEvents)
+    public void setOSEncoding(String encoding)
     {
-        muleConfiguration.setEnableMessageEvents(enableMessageEvents);
+        muleConfiguration.setDefaultOSEncoding(encoding);
     }
 }

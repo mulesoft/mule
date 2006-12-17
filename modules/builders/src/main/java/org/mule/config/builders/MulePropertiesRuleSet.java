@@ -10,6 +10,16 @@
 
 package org.mule.config.builders;
 
+import org.mule.MuleManager;
+import org.mule.MuleServer;
+import org.mule.config.ConfigurationException;
+import org.mule.config.PropertyFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,16 +35,6 @@ import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
 import org.apache.commons.digester.RuleSetBase;
-import org.mule.MuleManager;
-import org.mule.MuleServer;
-import org.mule.config.ConfigurationException;
-import org.mule.config.MuleConfiguration;
-import org.mule.config.PropertyFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 import org.xml.sax.Attributes;
 
 /**
@@ -86,10 +86,10 @@ public class MulePropertiesRuleSet extends RuleSetBase
             public void end(String string, String string1) throws Exception
             {
                 Map props = (Map)digester.peek();
-                if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES))
+                //RM* if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES))
                 {
                     props.putAll(MuleManager.getInstance().getProperties());
-                    props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
+                  //RM*  props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
                 }
                 super.end(string, string1);
 

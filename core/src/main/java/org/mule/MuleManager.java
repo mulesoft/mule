@@ -10,12 +10,6 @@
 
 package org.mule;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.collections.list.CursorableLinkedList;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
@@ -23,7 +17,6 @@ import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
-import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
 import org.mule.impl.internal.notifications.ComponentNotification;
@@ -36,8 +29,6 @@ import org.mule.impl.internal.notifications.ManagementNotification;
 import org.mule.impl.internal.notifications.ManagementNotificationListener;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
-import org.mule.impl.internal.notifications.MessageNotification;
-import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
@@ -64,22 +55,20 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.UUID;
-import org.mule.util.CollectionUtils;
-import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
-import javax.transaction.TransactionManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,8 +76,17 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 import java.util.jar.Manifest;
+
+import javax.transaction.TransactionManager;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.list.CursorableLinkedList;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
@@ -434,7 +432,7 @@ public class MuleManager implements UMOManager
             queueManager = null;
         }
 
-        if (!config.isEmbedded() && startDate > 0)
+        if (startDate > 0)
         {
             if (logger.isInfoEnabled())
             {
@@ -699,11 +697,12 @@ public class MuleManager implements UMOManager
             // Fire message notifications if the option is set. This will fire
             // inbound and outbound message events that can
             // consume resources in high throughput systems
-            if (config.isEnableMessageEvents())
-            {
-                notificationManager.registerEventType(MessageNotification.class,
-                    MessageNotificationListener.class);
-            }
+            //TODO RM*
+//            if (config.isEnableMessageEvents())
+//            {
+//                notificationManager.registerEventType(MessageNotification.class,
+//                    MessageNotificationListener.class);
+//            }
 
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISNG));
             if (id == null)
@@ -721,9 +720,10 @@ public class MuleManager implements UMOManager
                     try
                     {
                         TransactionalQueueManager queueMgr = new TransactionalQueueManager();
-                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(
-                            getConfiguration().getPersistenceStrategy());
-                        queueMgr.setPersistenceStrategy(ps);
+                        //RM* TODO
+//                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(
+//                            getConfiguration().getPersistenceStrategy());
+//                        queueMgr.setPersistenceStrategy(ps);
                         queueManager = queueMgr;
                     }
                     catch (Exception e)
@@ -756,18 +756,18 @@ public class MuleManager implements UMOManager
         String encoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         if (encoding == null)
         {
-            encoding = config.getEncoding();
+            encoding = config.getDefaultEncoding();
             System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
         }
         else
         {
-            config.setEncoding(encoding);
+            config.setDefaultEncoding(encoding);
         }
         // Check we have a valid and supported encoding
-        if (!Charset.isSupported(config.getEncoding()))
+        if (!Charset.isSupported(config.getDefaultEncoding()))
         {
             throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "encoding",
-                config.getEncoding()), this);
+                config.getDefaultEncoding()), this);
         }
     }
 
@@ -776,18 +776,18 @@ public class MuleManager implements UMOManager
         String encoding = System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY);
         if (encoding == null)
         {
-            encoding = config.getOSEncoding();
+            encoding = config.getDefaultOSEncoding();
             System.setProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, encoding);
         }
         else
         {
-            config.setOSEncoding(encoding);
+            config.setDefaultOSEncoding(encoding);
         }
         // Check we have a valid and supported encoding
-        if (!Charset.isSupported(config.getOSEncoding()))
+        if (!Charset.isSupported(config.getDefaultOSEncoding()))
         {
             throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "osEncoding",
-                config.getOSEncoding()), this);
+                config.getDefaultOSEncoding()), this);
         }
     }
 
@@ -799,23 +799,24 @@ public class MuleManager implements UMOManager
             MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, false);
 
         // if endpointUri is blanked out do not setup server components
-        if (StringUtils.isBlank(config.getServerUrl()))
-        {
-            logger.info("Server endpointUri is null, not registering Mule Admin agent");
-            disable = true;
-        }
-
-        if (disable)
-        {
-            unregisterAgent(MuleAdminAgent.AGENT_NAME);
-        }
-        else
-        {
-            if (lookupAgent(MuleAdminAgent.AGENT_NAME) == null)
-            {
-                registerAgent(new MuleAdminAgent());
-            }
-        }
+        //TODO RM* Admin agent should be explicit
+//        if (StringUtils.isBlank(config.getServerUrl()))
+//        {
+//            logger.info("Server endpointUri is null, not registering Mule Admin agent");
+//            disable = true;
+//        }
+//
+//        if (disable)
+//        {
+//            unregisterAgent(MuleAdminAgent.AGENT_NAME);
+//        }
+//        else
+//        {
+//            if (lookupAgent(MuleAdminAgent.AGENT_NAME) == null)
+//            {
+//                registerAgent(new MuleAdminAgent());
+//            }
+//        }
     }
 
     protected void initialiseEndpoints() throws InitialisationException
@@ -859,17 +860,16 @@ public class MuleManager implements UMOManager
             }
             started.set(true);
             starting.set(false);
-            if (!config.isEmbedded())
+
+            if (logger.isInfoEnabled())
             {
-                if (logger.isInfoEnabled())
-                {
-                    logger.info(getStartSplash());
-                }
-                else
-                {
-                    System.out.println(getStartSplash());
-                }
+                logger.info(getStartSplash());
             }
+            else
+            {
+                System.out.println(getStartSplash());
+            }
+
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
         }
     }
@@ -884,7 +884,8 @@ public class MuleManager implements UMOManager
     public void start(String serverUrl) throws UMOException
     {
         // this.createClientListener = createRequestListener;
-        config.setServerUrl(serverUrl);
+        //TODO RM*
+        //config.setServerUrl(serverUrl);
         start();
     }
 

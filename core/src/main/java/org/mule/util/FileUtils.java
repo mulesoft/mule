@@ -10,6 +10,10 @@
 
 package org.mule.util;
 
+import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,16 +22,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URI;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.mule.MuleManager;
-import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
 
 /**
  * <code>FileUtils</code> contains useful methods for dealing with files &
@@ -144,7 +144,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     // TODO Document me!
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException
     {
-        return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
+        return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getDefaultEncoding());
     }
 
     // TODO Document me!

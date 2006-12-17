@@ -10,10 +10,6 @@
 
 package org.mule.extras.client;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -55,6 +51,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -230,7 +232,7 @@ public class MuleClient implements Disposable
         }
         else
         {
-            MuleManager.getConfiguration().setClientMode(true);
+            //TODO RM* MuleManager.getConfiguration().setClientMode(true);
             if (logger.isInfoEnabled())
             {
                 logger.info("There is no manager instance available locally for this client, Creating a new Manager");
@@ -414,7 +416,7 @@ public class MuleClient implements Disposable
             trans = MuleObjectHelper.getTransformer(transformers, ",");
         }
 
-        if (!MuleManager.getConfiguration().isSynchronous())
+        if (!MuleManager.getConfiguration().isDefaultSynchronousEndpoints())
         {
             logger.warn("The mule manager is running synchronously, a null message payload will be returned");
         }

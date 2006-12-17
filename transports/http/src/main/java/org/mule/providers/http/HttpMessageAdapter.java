@@ -10,9 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HeaderElement;
-import org.apache.commons.httpclient.NameValuePair;
 import org.mule.MuleManager;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -22,6 +19,10 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderElement;
+import org.apache.commons.httpclient.NameValuePair;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
@@ -102,7 +103,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         else
         {
-            encoding = MuleManager.getConfiguration().getEncoding();
+            encoding = MuleManager.getConfiguration().getDefaultEncoding();
         }
     }
 

@@ -10,6 +10,19 @@
 
 package org.mule.extras.spring;
 
+import org.mule.MuleManager;
+import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.CoreMessageConstants;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.extras.spring.config.CachedResource;
+import org.mule.extras.spring.config.ReaderInputStream;
+import org.mule.impl.container.AbstractContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.util.ClassUtils;
+
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
@@ -23,19 +36,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
-
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.CoreMessageConstants;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.extras.spring.config.CachedResource;
-import org.mule.extras.spring.config.ReaderInputStream;
-import org.mule.impl.container.AbstractContainerContext;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassUtils;
 
 /**
  * <code>SpringContainerContext</code> is a Spring Context that can expose
@@ -164,7 +164,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
      */
     public void configure(String configurationXmlAsString) throws ContainerException
     {
-        final String encoding = MuleManager.getConfiguration().getEncoding();
+        final String encoding = MuleManager.getConfiguration().getDefaultEncoding();
         try
         {
             BeanFactory bf = new XmlBeanFactory(new CachedResource(configurationXmlAsString, encoding));

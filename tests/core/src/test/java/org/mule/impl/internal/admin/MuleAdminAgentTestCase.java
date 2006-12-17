@@ -31,8 +31,8 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
     public void testEmptyServerUrl() throws Exception
     {
         final String serverEndpoint = "";
-        MuleManager.getConfiguration().setServerUrl(serverEndpoint);
         MuleAdminAgent agent = new MuleAdminAgent();
+        agent.setServerUri(serverEndpoint);
         agent.initialise();
 
         // if it doesn't here fail, it has been registered
@@ -41,8 +41,8 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
     public void testNonEmptyServerUrl() throws Exception
     {
         final String serverEndpoint = "test://12345";
-        MuleManager.getConfiguration().setServerUrl(serverEndpoint);
         MuleAdminAgent agent = new MuleAdminAgent();
+        agent.setServerUri(serverEndpoint);
         agent.initialise();
 
         // if it doesn't here fail, it has been registered

@@ -10,10 +10,6 @@
 
 package org.mule.impl;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -39,6 +35,12 @@ import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -776,7 +778,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         if (synchronous == null)
         {
-            return MuleManager.getConfiguration().isSynchronous();
+            return MuleManager.getConfiguration().isDefaultSynchronousEndpoints();
         }
         return synchronous.booleanValue();
     }
@@ -805,7 +807,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             if (connector == null || connector.isRemoteSyncEnabled())
             {
-                remoteSync = Boolean.valueOf(MuleManager.getConfiguration().isRemoteSync());
+                remoteSync = Boolean.valueOf(MuleManager.getConfiguration().isDefaultRemoteSync());
             }
             else
             {
@@ -824,7 +826,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         if (remoteSyncTimeout == null)
         {
-            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getSynchronousEventTimeout());
+            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getDefaultSynchronousEventTimeout());
         }
         return remoteSyncTimeout.intValue();
     }

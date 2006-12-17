@@ -10,15 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleConfiguration;
@@ -54,6 +45,16 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -252,7 +253,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * to it, it is assumed that the event was dispatched by Mule and will be
      * delivered to any listeners subscribed to the event.
      * 
-     * @param the application event received by the context
+     * @param e the application event received by the context
      */
     public void multicastEvent(ApplicationEvent e)
     {
@@ -560,7 +561,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             }
             if (!manager.isStarted())
             {
-                MuleManager.getConfiguration().setSynchronous(!asynchronous);
+                MuleManager.getConfiguration().setDefaultSynchronousEndpoints(!asynchronous);
                 // register any endpointUri mappings
                 registerEndpointMappings();
             }

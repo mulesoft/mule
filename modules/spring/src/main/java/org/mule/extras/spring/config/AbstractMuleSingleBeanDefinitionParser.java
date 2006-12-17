@@ -9,7 +9,8 @@
  */
 package org.mule.extras.spring.config;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.w3c.dom.Element;
@@ -22,14 +23,22 @@ import java.util.Properties;
  */
 public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     //public static final String ID_ATTRIBUTE = "id";
     //public static final String LOCAL_NAMESPACE = "http://mule.mulesource.org/schema/";
 
-    //Make the registry available to the parsers
-    protected BeanDefinitionRegistry registry;
-    protected Properties attributeMappings = new Properties();
+    protected Properties attributeMappings;
 
+    protected AbstractMuleSingleBeanDefinitionParser()
+    {
+        attributeMappings = new Properties();
+    }
+
+  
 
     protected String extractPropertyName(String attributeName)
     {

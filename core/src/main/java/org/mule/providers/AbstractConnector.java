@@ -10,13 +10,6 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ThreadingProfile;
@@ -47,14 +40,24 @@ import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all connectors
@@ -244,8 +247,9 @@ public abstract class AbstractConnector
         exceptionListener = new DefaultExceptionStrategy();
         dispatchers = new ConcurrentHashMap();
         receivers = new ConcurrentHashMap();
-        connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
-        enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
+        connectionStrategy = MuleManager.getConfiguration().getDefaultConnectionStrategy();
+        //Todo RM*
+        //enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
         supportedProtocols = new ArrayList();
 
         // Always add the default protocol
@@ -711,7 +715,7 @@ public abstract class AbstractConnector
         if (dispatcherThreadingProfile == null)
         {
             dispatcherThreadingProfile = MuleManager.getConfiguration()
-                .getMessageDispatcherThreadingProfile();
+                .getDefaultMessageDispatcherThreadingProfile();
 
         }
         return dispatcherThreadingProfile;
@@ -726,7 +730,7 @@ public abstract class AbstractConnector
     {
         if (receiverThreadingProfile == null)
         {
-            receiverThreadingProfile = MuleManager.getConfiguration().getMessageReceiverThreadingProfile();
+            receiverThreadingProfile = MuleManager.getConfiguration().getDefaultMessageReceiverThreadingProfile();
         }
         return receiverThreadingProfile;
     }

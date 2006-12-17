@@ -10,14 +10,14 @@
 
 package org.mule.config;
 
+import org.mule.MuleManager;
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
-import org.mule.MuleManager;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>ReaderResource</code> is a reader with a description associated with it.
@@ -68,6 +68,6 @@ public class ReaderResource
 
     public static ReaderResource[] parseResources(String configResources) throws IOException
     {
-        return parseResources(configResources, MuleManager.getConfiguration().getEncoding());
+        return parseResources(configResources, MuleManager.getConfiguration().getDefaultEncoding());
     }
 }

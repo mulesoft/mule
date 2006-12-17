@@ -20,8 +20,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
-import org.mule.util.queue.EventFilePersistenceStrategy;
-import org.mule.util.queue.QueuePersistenceStrategy;
 
 import javax.resource.spi.work.WorkListener;
 import java.io.IOException;
@@ -29,9 +27,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Enumeration;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import java.util.Enumeration;
 
 /**
  * <code>MuleConfiguration</code> holds the runtime configuration specific to the
@@ -48,16 +46,6 @@ public class MuleConfiguration
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    /**
-     * The default serverUrl used to receive incoming requests from clients
-     */
-    public static final String DEFAULT_SERVER_URL = "tcp://localhost:60504";
-
-    /**
-     * Specifies that the transformer properties should be obtained from the Mule
-     * Manager properties
-     */
-    public static final String USE_MANAGER_PROPERTIES = "org.mule.useManagerProperties";
 
     /**
      * Specifies whether mule should process messages sysnchonously, i.e. that a
@@ -100,7 +88,6 @@ public class MuleConfiguration
     /**
      * Default value for MAX_OUTSTANDING_MESSAGES_PROPERTY
      */
-    public static final int DEFAULT_MAX_OUTSTANDING_MESSAGES = 1000;
 
     public static final int DEFAULT_TIMEOUT = 10000;
 
@@ -121,21 +108,9 @@ public class MuleConfiguration
      */
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
 
-    /**
-     * Whether Mule should fire message events for every message sent and received
-     */
-    private boolean enableMessageEvents = false;
-
-    /**
-     * Name of the model to use. If blank the first model will be used
-     */
-    private String model = null;
-
     private String encoding = DEFAULT_ENCODING;
 
     private String osEncoding = DEFAULT_OS_ENCODING;
-
-    private PoolingProfile poolingProfile = new PoolingProfile();
 
     /**
      * configuration for the threadpool used by message dispatchers
@@ -151,10 +126,6 @@ public class MuleConfiguration
      * configuration for the threadpool used by component pooling in mule
      */
     private ThreadingProfile componentPoolThreadingProfile = null;
-
-    private QueueProfile queueProfile = new QueueProfile(DEFAULT_MAX_OUTSTANDING_MESSAGES, false);
-
-    private QueuePersistenceStrategy persistenceStrategy = new EventFilePersistenceStrategy();
 
     /**
      * When running sychonously, return events can be received over transports that
@@ -176,12 +147,6 @@ public class MuleConfiguration
     private boolean remoteSync = false;
 
     /**
-     * Determines whether internal vm queues are persistent. If they are, if the
-     * server dies unexpectedly it can resume it's current state and continue
-     * processing
-     */
-    private boolean recoverableMode = false;
-    /**
      * A helper thread pool configuration that is used for all other thread pool
      * configurations
      */
@@ -198,13 +163,6 @@ public class MuleConfiguration
     private String[] configResources = new String[]{};
 
     /**
-     * This is the url used by the server itself to receive incomming requests. This
-     * enables clients such as the Mule Client to marshal remote requests to a
-     * MuleManager instance. The default value is tcp://localhost:61616
-     */
-    private String serverUrl = DEFAULT_SERVER_URL;
-
-    /**
      * The Mule Jar manifest object
      */
     private Manifest manifest = null;
@@ -216,15 +174,19 @@ public class MuleConfiguration
     private boolean clientMode = false;
 
     /**
-     * Whether the server is embedded by another framework and certain stand-alone
-     * features
+     * The unique Id for this ManagementContext
      */
-    private boolean embedded = false;
+    private String id;
 
     /**
-     * The model type to use for component invocations
+     * The cluster Id for this ManagementContext
      */
-    private String modelType = "default";
+    private String clusterId;
+
+    /**
+     * The Domain Id for this ManagementContext
+     */
+    private String domainId;
 
     /**
      * The default connection Strategy used for a connector when one hasn't been
@@ -242,52 +204,42 @@ public class MuleConfiguration
     /**
      * @return true if the model is running synchronously or false otherwise
      */
-    public boolean isSynchronous()
+    public boolean isDefaultSynchronousEndpoints()
     {
         return synchronous;
     }
 
-    public void setSynchronous(boolean synchronous)
+    public void setDefaultSynchronousEndpoints(boolean synchronous)
     {
         this.synchronous = synchronous;
     }
 
-    public String getModel()
-    {
-        return model;
-    }
-
-    public void setModel(String model)
-    {
-        this.model = model;
-    }
-
-    public ThreadingProfile getMessageDispatcherThreadingProfile()
+    public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return getThreadingProfile(messageDispatcherThreadingProfile);
     }
 
-    public void setMessageDispatcherThreadingProfile(ThreadingProfile messageDispatcherThreadingProfile)
+    public void setDefaultMessageDispatcherThreadingProfile(ThreadingProfile messageDispatcherThreadingProfile)
     {
         this.messageDispatcherThreadingProfile = messageDispatcherThreadingProfile;
     }
 
-    public ThreadingProfile getMessageReceiverThreadingProfile()
+    public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
     {
         return getThreadingProfile(messageReceiverThreadingProfile);
     }
 
-    public void setMessageReceiverThreadingProfile(ThreadingProfile messageReceiverThreadingProfile)
+    public void setDefaultMessageReceiverThreadingProfile(ThreadingProfile messageReceiverThreadingProfile)
     {
         this.messageReceiverThreadingProfile = messageReceiverThreadingProfile;
     }
 
-    public ThreadingProfile getComponentThreadingProfile()
+    public ThreadingProfile getDefaultComponentThreadingProfile()
     {
         return getThreadingProfile(componentPoolThreadingProfile);
     }
 
-    public void setComponentThreadingProfile(ThreadingProfile componentPoolThreadingProfile)
+    public void setDefaultComponentThreadingProfile(ThreadingProfile componentPoolThreadingProfile)
     {
         this.componentPoolThreadingProfile = componentPoolThreadingProfile;
     }
@@ -315,58 +267,24 @@ public class MuleConfiguration
         return new ThreadingProfile(defaultThreadingProfile);
     }
 
-    public PoolingProfile getPoolingProfile()
-    {
-        return new PoolingProfile(poolingProfile);
-    }
-
-    public void setPoolingProfile(PoolingProfile poolingProfile)
-    {
-        this.poolingProfile = poolingProfile;
-    }
-
-    public int getSynchronousEventTimeout()
+    public int getDefaultSynchronousEventTimeout()
     {
         return synchronousEventTimeout;
     }
 
-    public void setSynchronousEventTimeout(int synchronousEventTimeout)
+    public void setDefaultSynchronousEventTimeout(int synchronousEventTimeout)
     {
         this.synchronousEventTimeout = synchronousEventTimeout;
     }
 
-    public boolean isRemoteSync()
+    public boolean isDefaultRemoteSync()
     {
         return remoteSync;
     }
 
-    public void setRemoteSync(boolean remoteSync)
+    public void setDefaultRemoteSync(boolean remoteSync)
     {
         this.remoteSync = remoteSync;
-    }
-
-    public QueueProfile getQueueProfile()
-    {
-        return new QueueProfile(queueProfile);
-    }
-
-    public void setQueueProfile(QueueProfile queueProfile)
-    {
-        this.queueProfile = queueProfile;
-    }
-
-    public boolean isRecoverableMode()
-    {
-        return recoverableMode;
-    }
-
-    public void setRecoverableMode(boolean recoverableMode)
-    {
-        this.recoverableMode = recoverableMode;
-        if (recoverableMode)
-        {
-            queueProfile.setPersistent(true);
-        }
     }
 
     public String getWorkingDirectory()
@@ -397,23 +315,6 @@ public class MuleConfiguration
         else
         {
             this.configResources = configResources;
-        }
-    }
-
-    public String getServerUrl()
-    {
-        return serverUrl;
-    }
-
-    public void setServerUrl(String serverUrl)
-    {
-        if (embedded)
-        {
-            serverUrl = null;
-        }
-        else
-        {
-            this.serverUrl = serverUrl;
         }
     }
 
@@ -544,25 +445,6 @@ public class MuleConfiguration
         return clientMode;
     }
 
-    public void setClientMode(boolean clientMode)
-    {
-        this.clientMode = clientMode;
-        if (clientMode)
-        {
-            setServerUrl("");
-        }
-    }
-
-    public QueuePersistenceStrategy getPersistenceStrategy()
-    {
-        return persistenceStrategy;
-    }
-
-    public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy)
-    {
-        this.persistenceStrategy = persistenceStrategy;
-    }
-
     /**
      * Returns a clone of the default Connection strategy. The clone ensures that the
      * connection strategy can be manipulated without affecting other connectors
@@ -570,7 +452,7 @@ public class MuleConfiguration
      * 
      * @return a clone of the default Connection strategy
      */
-    public ConnectionStrategy getConnectionStrategy()
+    public ConnectionStrategy getDefaultConnectionStrategy()
     {
         try
         {
@@ -588,41 +470,17 @@ public class MuleConfiguration
      * 
      * @param connectionStrategy the default strategy to use
      */
-    public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
+    public void setDefaultConnectionStrategy(ConnectionStrategy connectionStrategy)
     {
         this.connectionStrategy = connectionStrategy;
     }
 
-    public boolean isEmbedded()
-    {
-        return embedded;
-    }
-
-    public void setEmbedded(boolean embedded)
-    {
-        this.embedded = embedded;
-        if (embedded)
-        {
-            serverUrl = null;
-        }
-    }
-
-    public String getModelType()
-    {
-        return modelType;
-    }
-
-    public void setModelType(String modelType)
-    {
-        this.modelType = modelType;
-    }
-
-    public String getEncoding()
+    public String getDefaultEncoding()
     {
         return encoding;
     }
 
-    public void setEncoding(String encoding)
+    public void setDefaultEncoding(String encoding)
     {
         if (StringUtils.isEmpty(encoding))
         {
@@ -632,37 +490,58 @@ public class MuleConfiguration
         this.encoding = encoding;
     }
 
-    public String getOSEncoding()
+    public String getDefaultOSEncoding()
     {
         return osEncoding;
     }
 
-    public void setOSEncoding(String osEncoding)
+    public void setDefaultOSEncoding(String osEncoding)
     {
         this.osEncoding = osEncoding;
     }
 
-    public boolean isEnableMessageEvents()
-    {
-        return enableMessageEvents;
-    }
-
-    public void setEnableMessageEvents(boolean enableMessageEvents)
-    {
-        this.enableMessageEvents = enableMessageEvents;
-    }
-
-    public WorkListener getWorkListener()
+    public WorkListener getDefaultWorkListener()
     {
         return workListener;
     }
 
-    public void setWorkListener(WorkListener workListener)
+    public void setDefaultWorkListener(WorkListener workListener)
     {
         if (workListener == null)
         {
             throw new NullPointerException("workListener");
         }
         this.workListener = workListener;
+    }
+
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getClusterId()
+    {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId)
+    {
+        this.clusterId = clusterId;
+    }
+
+    public String getDomainId()
+    {
+        return domainId;
+    }
+
+    public void setDomainId(String domainId)
+    {
+        this.domainId = domainId;
     }
 }

@@ -10,16 +10,11 @@
 
 package org.mule.impl;
 
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
@@ -42,6 +37,12 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -867,7 +868,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         if (encoding == null)
         {
-            encoding = MuleManager.getConfiguration().getEncoding();
+            encoding = MuleManager.getConfiguration().getDefaultEncoding();
         }
         return encoding;
     }

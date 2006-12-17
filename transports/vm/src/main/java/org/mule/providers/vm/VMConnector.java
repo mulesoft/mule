@@ -40,8 +40,6 @@ import java.util.Iterator;
  * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule component to
  * <p/> be accessed from an endpoint
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 
 public class VMConnector extends AbstractServiceEnabledConnector
@@ -63,7 +61,12 @@ public class VMConnector extends AbstractServiceEnabledConnector
         {
             if (queueProfile == null)
             {
-                queueProfile = MuleManager.getConfiguration().getQueueProfile();
+                //create a default QueueProfile
+                queueProfile = new QueueProfile();
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("created default QueueProfile for VM connector: " + queueProfile);
+                }
             }
         }
 

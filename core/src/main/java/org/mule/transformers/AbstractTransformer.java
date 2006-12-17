@@ -10,13 +10,6 @@
 
 package org.mule.transformers;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -28,6 +21,14 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractTransformer</code> Is a base class for all transformers.
@@ -211,7 +212,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         // last resort
         if (encoding == null)
         {
-            encoding = MuleManager.getConfiguration().getEncoding();
+            encoding = MuleManager.getConfiguration().getDefaultEncoding();
         }
 
         if (!isSourceTypeSupported(src.getClass()))
@@ -364,6 +365,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      * 
      * @param type the fully qualified class name
      * @throws ClassNotFoundException is thrown if the class is not on theclasspath
+     * @deprecated Use setSourceTypes(List)
      */
     public void setSourceType(String type) throws ClassNotFoundException
     {
@@ -371,6 +373,22 @@ public abstract class AbstractTransformer implements UMOTransformer
         registerSourceType(clazz);
     }
 
+    /**
+     * Register a list of source types
+     *
+     * @param types a list of fully qualified class names
+     * @throws ClassNotFoundException is thrown if the class is not on theclasspath
+     * @deprecated Use setSourceTypes(List)
+     */
+    public void setSourceTypes(List types) throws ClassNotFoundException
+    {
+        for (Iterator iterator = types.iterator(); iterator.hasNext();)
+        {
+             Class clazz = ClassUtils.loadClass( iterator.next().toString(), getClass());
+            registerSourceType(clazz);
+        }
+
+    }
     /**
      * Where multiple source types are listed, this method only returns the first
      * one. The full list of supported source types can also be obtained using

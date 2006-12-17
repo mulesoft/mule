@@ -10,15 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.digester.AbstractObjectCreationFactory;
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.ObjectCreateRule;
-import org.apache.commons.digester.Rule;
-import org.apache.commons.digester.SetNextRule;
-import org.apache.commons.digester.SetPropertiesRule;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -79,7 +70,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.queue.EventFilePersistenceStrategy;
-import org.xml.sax.Attributes;
 
 import java.beans.ExceptionListener;
 import java.io.InputStream;
@@ -90,6 +80,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.digester.AbstractObjectCreationFactory;
+import org.apache.commons.digester.Digester;
+import org.apache.commons.digester.ObjectCreateRule;
+import org.apache.commons.digester.Rule;
+import org.apache.commons.digester.SetNextRule;
+import org.apache.commons.digester.SetPropertiesRule;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.Attributes;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that builds a
@@ -379,21 +380,21 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
                 if ("default".equals(id))
                 {
                     cfg.setDefaultThreadingProfile(tp);
-                    cfg.setMessageDispatcherThreadingProfile(tp);
-                    cfg.setMessageReceiverThreadingProfile(tp);
-                    cfg.setComponentThreadingProfile(tp);
+                    cfg.setDefaultMessageDispatcherThreadingProfile(tp);
+                    cfg.setDefaultMessageReceiverThreadingProfile(tp);
+                    cfg.setDefaultComponentThreadingProfile(tp);
                 }
                 else if ("messageReceiver".equals(id) || "receiver".equals(id))
                 {
-                    cfg.setMessageReceiverThreadingProfile(tp);
+                    cfg.setDefaultMessageReceiverThreadingProfile(tp);
                 }
                 else if ("messageDispatcher".equals(id) || "dispatcher".equals(id))
                 {
-                    cfg.setMessageDispatcherThreadingProfile(tp);
+                    cfg.setDefaultMessageDispatcherThreadingProfile(tp);
                 }
                 else if ("component".equals(id))
                 {
-                    cfg.setComponentThreadingProfile(tp);
+                    cfg.setDefaultComponentThreadingProfile(tp);
                 }
             }
         });
@@ -553,11 +554,11 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
                 }
                 else if ("receiver".equals(id))
                 {
-                    digester.push(cfg.getMessageReceiverThreadingProfile());
+                    digester.push(cfg.getDefaultMessageReceiverThreadingProfile());
                 }
                 else if ("dispatcher".equals(id))
                 {
-                    digester.push(cfg.getMessageDispatcherThreadingProfile());
+                    digester.push(cfg.getDefaultMessageDispatcherThreadingProfile());
                 }
 
             }
@@ -654,10 +655,10 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
                 if (model == null)
                 {
                     String modelType = attributes.getValue("type");
-                    if (modelType == null)
-                    {
-                        modelType = MuleManager.getConfiguration().getModelType();
-                    }
+//                    if (modelType == null)
+//                    {
+//                        modelType = MuleManager.getConfiguration().getModelType();
+//                    }
                     if (modelType.equalsIgnoreCase("custom"))
                     {
                         String className = attributes.getValue("className");
@@ -806,15 +807,15 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
                 MuleConfiguration cfg = MuleManager.getConfiguration();
                 if ("component".equals(type))
                 {
-                    digester.push(cfg.getComponentThreadingProfile());
+                    digester.push(cfg.getDefaultComponentThreadingProfile());
                 }
                 else if ("messageReceiver".equals(type))
                 {
-                    digester.push(cfg.getComponentThreadingProfile());
+                    digester.push(cfg.getDefaultComponentThreadingProfile());
                 }
                 else if ("messageDispatcher".equals(type))
                 {
-                    digester.push(cfg.getComponentThreadingProfile());
+                    digester.push(cfg.getDefaultComponentThreadingProfile());
                 }
                 else
                 {
@@ -843,7 +844,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
             {
                 // use the default as a template
                 MuleConfiguration cfg = MuleManager.getConfiguration();
-                digester.push(cfg.getPoolingProfile());
+                //RM* digester.push(cfg.getPoolingProfile());
             }
 
             public void end(String s, String s1) throws Exception

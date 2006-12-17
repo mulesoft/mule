@@ -10,8 +10,6 @@
 
 package org.mule.extras.spring.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
@@ -31,6 +29,14 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.beans.ExceptionListener;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
@@ -39,11 +45,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
-
-import java.beans.ExceptionListener;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to
@@ -196,7 +197,7 @@ public class AutowireUMOManagerFactoryBean
         else
         {
             // create a defaultModel
-            model = ModelFactory.createModel(MuleManager.getConfiguration().getModelType());
+            model = ModelFactory.createModel(UMOModel.DEFAULT_MODEL_NAME);
         }
 
         // autowire the model so any ExceptionStrategy or PoolingStrategy beans

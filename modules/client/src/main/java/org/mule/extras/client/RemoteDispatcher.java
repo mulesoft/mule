@@ -10,17 +10,13 @@
 
 package org.mule.extras.client;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.RequestContext;
 import org.mule.impl.MuleSessionHandler;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
@@ -43,6 +39,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * <code>RemoteDispatcher</code> is used to make and receive requests to a remote
@@ -186,7 +188,7 @@ public class RemoteDispatcher implements Disposable
     public UMOMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
     {
         return doToRemote(endpoint, payload, messageProperties, true, MuleManager.getConfiguration()
-            .getSynchronousEventTimeout());
+            .getDefaultSynchronousEventTimeout());
     }
 
     public void dispatchRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
@@ -259,7 +261,7 @@ public class RemoteDispatcher implements Disposable
         AdminNotification action = new AdminNotification(message, AdminNotification.ACTION_INVOKE,
             "mule://" + component);
         UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration()
-            .getSynchronousEventTimeout());
+            .getDefaultSynchronousEventTimeout());
         return result;
     }
 

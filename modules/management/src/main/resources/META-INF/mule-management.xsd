@@ -12,25 +12,24 @@
     <!-- JMX -->
 
     <xsd:element name="jmx-server">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:choice>
-                        <xsd:element name="connector-server" minOccurs="0" maxOccurs="1">
-                            <xsd:complexType>
-                                <xsd:attribute name="url" type="xsd:string" use="required"/>
-                                <xsd:attribute name="rebind" type="xsd:boolean" use="optional" default="true"/>
-                            </xsd:complexType>
-                        </xsd:element>
+                        <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" maxOccurs="1"/>
                     </xsd:choice>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:complexType name="connectorServerType">
+        <xsd:attribute name="url" type="xsd:string" use="required"/>
+        <xsd:attribute name="rebind" type="xsd:boolean" use="optional" default="true"/>
+    </xsd:complexType>
 
     <xsd:element name="jmx-mx4j-adapter">
-        <xsd:complexType>
+        <xsd:complexType  mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="jmxAdaptorUrl" type="xsd:string"/>
@@ -42,7 +41,7 @@
     </xsd:element>
 
     <xsd:element name="jmx-log4j">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                 </xsd:extension>
@@ -51,7 +50,7 @@
     </xsd:element>
 
     <xsd:element name="jmx-default-config">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
@@ -61,7 +60,7 @@
     </xsd:element>
 
     <xsd:element name="jmx-notifications">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
@@ -72,7 +71,7 @@
 
 
     <xsd:element name="log4j-notifications">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="logName" type="xsd:string"/>
@@ -83,7 +82,7 @@
     </xsd:element>
 
     <xsd:element name="chainsaw-notifications">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
@@ -94,7 +93,7 @@
     </xsd:element>
 
     <xsd:element name="publish-notifications">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="endpointAddress" type="xsd:string" use="required"/>
@@ -106,7 +105,7 @@
 
     <!-- Rmi Agent -->
     <xsd:element name="rmi-server">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="serverUri" type="xsd:string"/>
