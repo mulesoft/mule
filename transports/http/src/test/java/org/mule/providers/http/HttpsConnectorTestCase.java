@@ -10,6 +10,8 @@
 
 package org.mule.providers.http;
 
+import java.io.IOException;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.transformers.UMOMessageToHttpResponse;
@@ -20,8 +22,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import java.io.IOException;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

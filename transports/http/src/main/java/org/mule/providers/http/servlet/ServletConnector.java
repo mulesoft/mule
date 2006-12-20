@@ -10,9 +10,9 @@
 
 package org.mule.providers.http.servlet;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
-
 import java.util.Map;
+
+import org.mule.providers.AbstractServiceEnabledConnector;
 
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet

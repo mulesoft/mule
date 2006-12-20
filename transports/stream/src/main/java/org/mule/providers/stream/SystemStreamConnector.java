@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -108,16 +107,6 @@ public class SystemStreamConnector extends StreamConnector
     public UMOConnector getConnector()
     {
         return this;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
-     */
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception

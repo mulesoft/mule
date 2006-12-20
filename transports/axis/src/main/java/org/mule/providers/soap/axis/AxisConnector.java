@@ -10,6 +10,14 @@
 
 package org.mule.providers.soap.axis;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis.client.Call;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
@@ -44,13 +52,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
-
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for Axis

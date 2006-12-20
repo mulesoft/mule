@@ -10,17 +10,12 @@
 
 package org.mule.providers.ssl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCase
 {

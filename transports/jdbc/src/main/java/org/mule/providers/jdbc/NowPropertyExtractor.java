@@ -10,9 +10,9 @@
 
 package org.mule.providers.jdbc;
 
-import org.mule.util.properties.PropertyExtractor;
-
 import java.sql.Timestamp;
+
+import org.mule.util.properties.PropertyExtractor;
 
 /**
  * Recognises the property 'NOW' to mean a TimeStamp with the current time

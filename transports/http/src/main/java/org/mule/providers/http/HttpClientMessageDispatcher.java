@@ -45,12 +45,10 @@ import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
@@ -72,7 +70,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         receiveTransformer = new HttpClientMethodResponseToObject();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (client == null)
         {
@@ -120,26 +118,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
-     */
-    public UMOConnector getConnector()
-    {
-        return connector;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
-     */
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
     /**
      * Make a specific request to the underlying transport
      * 
@@ -152,9 +130,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
-
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
         httpMethod.setDoAuthentication(true);
         if (endpoint.getEndpointURI().getUserInfo() != null

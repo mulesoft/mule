@@ -21,13 +21,9 @@ import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         return createConnector(true);

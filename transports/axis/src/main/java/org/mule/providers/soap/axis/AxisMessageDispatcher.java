@@ -45,7 +45,6 @@ import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -73,7 +72,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (service == null)
         {
@@ -250,6 +249,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
+        
+        // set custom properties
+        Object[] arr = event.getMessage().getPropertyNames().toArray();
+        String head;
+        for (int i = 0; i < arr.length; i++){
+            head = "";
+            String test = (String)arr[i];
+            for (int j = 0; j < 4; j++){
+                head = head + test.charAt(j);
+            }
+            if ((head != null)&&(!head.equals("MULE"))){
+                call.setProperty((String)arr[i], event.getMessage().getProperty((String)arr[i]));
+            }
+        }
+        
         // Set timeout
         call.setTimeout(new Integer(event.getTimeout()));
 
@@ -422,7 +436,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         Call call = new Call(service);
         String uri = endpoint.getEndpointURI().toString();
@@ -496,14 +510,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return new MuleMessage(result, props);
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
     public String parseSoapAction(String soapAction, QName method, UMOEvent event)
     {
-
         UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap();
         UMOMessage msg = event.getMessage();

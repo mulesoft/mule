@@ -10,10 +10,10 @@
 
 package org.mule.impl.container;
 
+import java.rmi.RemoteException;
+
 import javax.ejb.CreateException;
 import javax.ejb.EJBHome;
-
-import java.rmi.RemoteException;
 
 /**
  * <code>DummyHome</code> Test EJB

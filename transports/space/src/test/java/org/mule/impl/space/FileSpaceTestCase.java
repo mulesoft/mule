@@ -10,10 +10,6 @@
 
 package org.mule.impl.space;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class FileSpaceTestCase extends AbstractLocalSpaceTestCase
 {
 
@@ -26,4 +22,5 @@ public class FileSpaceTestCase extends AbstractLocalSpaceTestCase
     {
         return true;
     }
+
 }

@@ -10,12 +10,12 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.service.ConnectorServiceDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.config.MuleProperties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

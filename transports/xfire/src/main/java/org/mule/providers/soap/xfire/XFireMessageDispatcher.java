@@ -18,7 +18,6 @@ import org.mule.providers.FatalConnectException;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -63,7 +62,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (XFireConnector)endpoint.getConnector();
     }
 
-    protected void doConnect(final UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (clientPool == null)
         {
@@ -203,11 +202,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             String head;
             for (int i = 0; i < arr.length; i++){
                 head = "";
-                String test = (String)arr[i];
-                for (int j = 0; j < 4; j++){
-                    head = head + test.charAt(j);
-                }
-                if ((head != null)&&(!head.equals("MULE"))){
+                head = (String)arr[i];
+                if ((head != null)&&(!head.startsWith("MULE"))){
                     client.setProperty((String)arr[i], event.getMessage().getProperty((String)arr[i]));
                 }
             }
@@ -270,7 +266,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         String serviceName = getServiceName(endpoint);
 
@@ -304,11 +300,6 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         {
             return new MuleMessage(response);
         }
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     /**

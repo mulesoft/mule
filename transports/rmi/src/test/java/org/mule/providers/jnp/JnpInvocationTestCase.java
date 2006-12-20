@@ -29,7 +29,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOMessageDispatcher;
 
 /**
  * test RMI object invocations
@@ -75,8 +74,7 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
             "jnp://localhost/TestService?method=reverseString", false);
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
-        UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
+        UMOMessage message = ep.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
         assertEquals("olleh", message.getPayloadAsString());
     }
@@ -85,8 +83,7 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
             "jnp://localhost/TestService?method=upperCaseString", false);
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
-        UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
+        UMOMessage message = ep.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
         assertEquals("HELLO", message.getPayloadAsString());
     }
@@ -94,11 +91,9 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     public void testNoMethodSet() throws Exception
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jnp://localhost/TestService", false);
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
-
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -111,10 +106,9 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     public void testBadMethodName() throws Exception
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jnp://localhost/TestService?method=foo", false);
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -126,10 +120,9 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     {
         UMOEndpoint ep = new MuleEndpoint("jnp://localhost/TestService?method=reverseString", false);
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -141,10 +134,9 @@ public class JnpInvocationTestCase extends FunctionalTestCase
     {
         UMOEndpoint ep = new MuleEndpoint("jnp://localhost/TestService?method=reverseString", false);
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
-        UMOMessageDispatcher dispatcher = jnpConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {

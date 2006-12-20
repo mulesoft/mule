@@ -10,8 +10,6 @@
 
 package org.mule.providers.jms;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
@@ -23,21 +21,20 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import org.apache.commons.collections.MapUtils;
-import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages to JMS
@@ -49,7 +46,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 {
 
     private JmsConnector connector;
-    private Session delegateSession;
     private Session cachedSession;
 
     public JmsMessageDispatcher(UMOImmutableEndpoint endpoint)
@@ -58,18 +54,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (JmsConnector)endpoint.getConnector();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#dispatchEvent(org.mule.MuleEvent,
-     *      org.mule.providers.MuleEndpoint)
-     */
     protected void doDispatch(UMOEvent event) throws Exception
     {
         dispatchMessage(event);
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // template method
     }
@@ -98,6 +88,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             // Retrieve the session from the current transaction.
+            // TODO HH: clean up to use getDelegateSession()
             session = connector.getSessionFromTransaction();
             if (session != null)
             {
@@ -123,6 +114,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     // Retrieve a session from the connector
+                    // TODO HH: clean up to use getDelegateSession()
                     session = connector.getSession(event.getEndpoint());
                     cachedSession = session;
                 }
@@ -130,6 +122,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             else
             {
                 // Retrieve a session from the connector
+                // TODO HH: clean up to use getDelegateSession()
                 session = connector.getSession(event.getEndpoint());
                 if (event.getEndpoint().getTransactionConfig().isTransacted())
                 {
@@ -338,12 +331,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
-     *      org.mule.providers.MuleEndpoint)
-     */
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         UMOMessage message = dispatchMessage(event);
@@ -362,26 +349,27 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
-
         Session session = null;
-        Destination dest = null;
         MessageConsumer consumer = null;
+
         try
         {
-            boolean topic = false;
             String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-            topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
+            boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY
+                .equalsIgnoreCase(resourceInfo));
 
+            JmsSupport support = connector.getJmsSupport();
             session = connector.getSession(false, topic);
-            dest = connector.getJmsSupport().createDestination(session,
-                endpoint.getEndpointURI().getAddress(), topic);
-            consumer = connector.getJmsSupport().createConsumer(session, dest, topic);
+            Destination dest = support.createDestination(session, endpoint.getEndpointURI().getAddress(),
+                topic);
+            consumer = support.createConsumer(session, dest, topic);
 
             try
             {
                 Message message = null;
+
                 if (timeout == RECEIVE_NO_WAIT)
                 {
                     message = consumer.receiveNoWait();
@@ -394,6 +382,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 {
                     message = consumer.receive(timeout);
                 }
+
                 if (message == null)
                 {
                     return null;
@@ -414,46 +403,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             connector.closeQuietly(consumer);
             connector.closeQuietly(session);
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
-     */
-    public synchronized Object getDelegateSession() throws UMOException
-    {
-        try
-        {
-            // Return the session bound to the current transaction
-            // if possible
-            Session session = connector.getSessionFromTransaction();
-            if (session != null)
-            {
-                return session;
-            }
-            // Else create a session for this dispatcher and
-            // use it each time
-            if (delegateSession == null)
-            {
-                delegateSession = connector.getSession(false, false);
-            }
-            return delegateSession;
-        }
-        catch (Exception e)
-        {
-            throw new MuleException(new org.mule.config.i18n.Message("jms", 3), e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getConnector()
-     */
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     protected void doDispose()
@@ -495,7 +444,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // ignored
             }
         }
-
     }
 
 }

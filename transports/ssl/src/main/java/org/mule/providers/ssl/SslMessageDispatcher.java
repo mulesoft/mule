@@ -10,27 +10,26 @@
 
 package org.mule.providers.ssl;
 
+import org.mule.providers.tcp.TcpMessageDispatcher;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
 import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 
-import org.mule.providers.tcp.TcpMessageDispatcher;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over tcp.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class SslMessageDispatcher extends TcpMessageDispatcher
 {
+
     public SslMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);

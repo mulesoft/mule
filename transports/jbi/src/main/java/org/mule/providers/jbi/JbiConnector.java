@@ -10,15 +10,15 @@
 
 package org.mule.providers.jbi;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.umo.UMOException;
-
 import javax.jbi.JBIException;
 import javax.jbi.component.ComponentContext;
 import javax.jbi.component.ComponentLifeCycle;
 import javax.jbi.messaging.DeliveryChannel;
 import javax.jbi.messaging.MessageExchangeFactory;
 import javax.management.ObjectName;
+
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOException;
 
 /**
  * <code>JbiConnector</code> can bind to a Jbi container allowing components to

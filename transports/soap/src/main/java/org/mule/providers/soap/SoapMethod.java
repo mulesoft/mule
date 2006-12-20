@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * A soap method representation where the parameters are named
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A SOAP method representation where the parameters are named
  */
 public class SoapMethod
 {
-
     private QName name;
     private List namedParameters = new ArrayList();
     private QName returnType;

@@ -10,16 +10,16 @@
 
 package org.mule.providers.jms;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will
  * send JMS messages
  */
-public class JmsMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class JmsMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
 
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException

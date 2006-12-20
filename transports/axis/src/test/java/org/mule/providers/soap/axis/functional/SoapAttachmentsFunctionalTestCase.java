@@ -31,10 +31,6 @@ import java.io.File;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-/**
- * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
- * @version $Revision$
- */
 public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     protected void doSetUp() throws Exception

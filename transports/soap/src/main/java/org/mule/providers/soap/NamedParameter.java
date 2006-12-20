@@ -17,14 +17,10 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
 /**
- * Representation of a Named parameter in a soap or XML-RPC call
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Representation of a Named parameter in a SOAP call
  */
 public class NamedParameter
 {
-
     public final int MODE_IN = 0;
     public final int MODE_OUT = 1;
     public final int MODE_INOUT = 2;

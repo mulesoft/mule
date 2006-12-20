@@ -11,6 +11,7 @@
 package org.mule.providers.jms;
 
 import java.util.List;
+
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -19,7 +20,6 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.apache.commons.collections.MapUtils;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.SingleAttemptConnectionStrategy;

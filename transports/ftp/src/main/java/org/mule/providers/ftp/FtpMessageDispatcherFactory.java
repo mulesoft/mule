@@ -10,12 +10,12 @@
 
 package org.mule.providers.ftp;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
-public class FtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class FtpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
 
     /*

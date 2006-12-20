@@ -10,6 +10,9 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPMessage;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
@@ -18,9 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.umo.UMOEvent;
-
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPMessage;
 
 /**
  * <code>MuleSoapHeadersHandler</code> is an Axis handler that can read and write

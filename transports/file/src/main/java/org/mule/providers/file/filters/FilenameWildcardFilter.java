@@ -10,12 +10,12 @@
 
 package org.mule.providers.file.filters;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import org.mule.providers.file.FileConnector;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOMessage;
+
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * <code>FilenameWildcardFilter</code> filters incoming files from a directory,

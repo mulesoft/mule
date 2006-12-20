@@ -38,9 +38,6 @@ import org.apache.commons.lang.StringUtils;
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
  * HttpClient HttpMethod that represents an HttpRequest.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer

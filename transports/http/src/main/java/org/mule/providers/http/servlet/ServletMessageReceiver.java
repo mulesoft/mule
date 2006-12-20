@@ -20,9 +20,6 @@ import org.mule.umo.provider.UMOConnector;
  * <code>ServletMessageReceiver</code> is a receiver that is invoked from a Servlet
  * when an event is received. There is a one-to-one mapping between a
  * ServletMessageReceiver and a servlet in the serving webapp.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ServletMessageReceiver extends AbstractMessageReceiver

@@ -10,6 +10,8 @@
 
 package org.mule.providers.vm;
 
+import java.util.List;
+
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -25,15 +27,9 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
-import java.util.List;
-
 /**
  * <code>VMMessageReceiver</code> is a listener of events from a mule component
- * which then simply <p/> passes the events on to the target component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * which then simply passes the events on to the target component.
  */
 public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {

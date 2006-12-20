@@ -10,11 +10,11 @@
 
 package org.mule.providers.soap.axis.wsdl;
 
-import org.mule.providers.soap.axis.AxisConnector;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.mule.providers.soap.axis.AxisConnector;
 
 /**
  * todo document
@@ -42,8 +42,8 @@ public class AxisWsdlConnector extends AxisConnector
         }
         // This allows the generic WSDL provider to created endpoints using this
         // connector
-        registerSupportedProtocolWithotPrefix("wsdl:http");
-        registerSupportedProtocolWithotPrefix("wsdl:https");
+        registerSupportedProtocolWithoutPrefix("wsdl:http");
+        registerSupportedProtocolWithoutPrefix("wsdl:https");
     }
 
     public String getProtocol()

@@ -10,12 +10,12 @@
 
 package org.mule.providers.jdbc;
 
-import org.apache.commons.lang.StringUtils;
-import org.mule.config.ExceptionReader;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.mule.config.ExceptionReader;
 
 /**
  * Surfaces information about SQLExceptions such as the code and sql state. Also uses

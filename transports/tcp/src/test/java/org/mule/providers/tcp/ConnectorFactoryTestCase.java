@@ -15,11 +15,6 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreate() throws Exception

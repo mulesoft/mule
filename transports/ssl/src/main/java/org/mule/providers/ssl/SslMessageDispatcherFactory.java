@@ -10,20 +10,18 @@
 
 package org.mule.providers.ssl;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>SslMessageDispatcherFactory</code> creates SslMessageDispatcher instances
  * 
  * @see SslMessageDispatcher
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class SslMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class SslMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

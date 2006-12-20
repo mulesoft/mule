@@ -10,14 +10,14 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.axis.AxisEngine;
 import org.apache.axis.ConfigurationException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.SimpleProvider;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>MuleConfigProvider</code> is needed because the Simple Provider does not

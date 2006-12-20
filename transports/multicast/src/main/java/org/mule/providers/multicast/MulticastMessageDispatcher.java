@@ -10,23 +10,21 @@
 
 package org.mule.providers.multicast;
 
-import org.mule.providers.udp.UdpMessageDispatcher;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import org.mule.providers.udp.UdpMessageDispatcher;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
 /**
  * <code>MulticastMessageDispatcher</code> dispatches events to a multicast address
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MulticastMessageDispatcher extends UdpMessageDispatcher
 {
+
     public MulticastMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
@@ -58,4 +56,5 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
         }
         super.doDisconnect();
     }
+
 }

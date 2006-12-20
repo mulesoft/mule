@@ -26,14 +26,14 @@
 
 package org.mule.providers.email.transformers;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
-
-import javax.activation.DataSource;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import javax.activation.DataSource;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public class PlainTextDataSource implements DataSource
 {

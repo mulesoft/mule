@@ -15,13 +15,9 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
+
     public void testCreate() throws Exception
     {
         MuleEndpointURI url = new MuleEndpointURI("ssl://localhost:7877");
@@ -30,4 +26,5 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint.getConnector());
         assertEquals("ssl://localhost:7877", endpoint.getEndpointURI().getAddress());
     }
+
 }

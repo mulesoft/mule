@@ -10,7 +10,13 @@
 
 package org.mule.providers.rmi;
 
+import java.lang.reflect.Method;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.util.List;
+
 import org.apache.commons.collections.MapUtils;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.PollingMessageReceiver;
@@ -19,12 +25,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
-import org.mule.config.MuleProperties;
-
-import java.lang.reflect.Method;
-import java.rmi.RMISecurityManager;
-import java.rmi.Remote;
-import java.util.List;
 
 /**
  * Will repeatedly call a method on a Remote object. If the method takes parameters A

@@ -10,16 +10,16 @@
 
 package org.mule.providers.file;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>FileMessageDispatcherFactory</code> creaes a dispatcher responsible for
  * writing files to disk
  */
-public class FileMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class FileMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /*
      * (non-Javadoc)

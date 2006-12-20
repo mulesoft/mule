@@ -14,11 +14,9 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
 public class OracleJmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
+
     public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new OracleJmsMessageAdapter(payload);
@@ -28,4 +26,5 @@ public class OracleJmsMessageAdapterTestCase extends AbstractMessageAdapterTestC
     {
         return OracleJmsConnectorTestCase.getMessage();
     }
+
 }

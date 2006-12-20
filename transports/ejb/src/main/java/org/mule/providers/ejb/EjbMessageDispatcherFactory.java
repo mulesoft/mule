@@ -10,16 +10,16 @@
 
 package org.mule.providers.ejb;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>EjbMessageDispatcherFactory</code> creates a dispatcher for marshalling
  * requests to an EJB Session bean
  */
-public class EjbMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class EjbMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

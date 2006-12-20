@@ -28,7 +28,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOMessageDispatcher;
 
 /**
  * test RMI object invocations
@@ -74,8 +73,7 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
             "rmi://localhost/TestService?method=reverseString", false);
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
-        UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
+        UMOMessage message = ep.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
         assertEquals("olleh", message.getPayloadAsString());
     }
@@ -84,8 +82,7 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
             "rmi://localhost/TestService?method=upperCaseString", false);
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
-        UMOMessage message = dispatcher.send(getTestEvent("hello", ep));
+        UMOMessage message = ep.send(getTestEvent("hello", ep));
         assertNotNull(message.getPayload());
         assertEquals("HELLO", message.getPayloadAsString());
     }
@@ -93,11 +90,9 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     public void testNoMethodSet() throws Exception
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("rmi://localhost/TestService", false);
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
-
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -110,10 +105,9 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     public void testBadMethodName() throws Exception
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("rmi://localhost/TestService?method=foo", false);
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -125,10 +119,9 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     {
         UMOEndpoint ep = new MuleEndpoint("rmi://localhost/TestService?method=reverseString", false);
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {
@@ -140,10 +133,9 @@ public class RmiInvocationTestCase extends FunctionalTestCase
     {
         UMOEndpoint ep = new MuleEndpoint("rmi://localhost/TestService?method=reverseString", false);
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
-        UMOMessageDispatcher dispatcher = rmiConnector.getDispatcher(ep);
         try
         {
-            dispatcher.send(getTestEvent("hello", ep));
+            ep.send(getTestEvent("hello", ep));
         }
         catch (UMOException e)
         {

@@ -18,10 +18,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * <code>XmppConnector</code> TODO
- * 
- * @author Peter Braswell
- * @author John Evans
- * @version $Revision$
  */
 public class XmppConnector extends AbstractServiceEnabledConnector
 {

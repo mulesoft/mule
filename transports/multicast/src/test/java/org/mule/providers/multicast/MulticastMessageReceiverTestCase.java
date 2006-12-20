@@ -10,8 +10,6 @@
 
 package org.mule.providers.multicast;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -20,13 +18,11 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import com.mockobjects.dynamic.Mock;
 
 public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
@@ -40,7 +36,7 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public UMOEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("multicast://228.2.3.4:10100", true);
-        return endpoint;
+        return new MuleEndpoint("multicast://228.2.3.4:10100", true);
     }
+
 }

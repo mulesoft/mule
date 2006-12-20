@@ -10,9 +10,6 @@
 
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.DataQueue;
-import com.mockobjects.dynamic.Mock;
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
@@ -20,6 +17,10 @@ import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

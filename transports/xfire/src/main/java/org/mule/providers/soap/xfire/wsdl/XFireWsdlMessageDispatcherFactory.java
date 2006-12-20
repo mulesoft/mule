@@ -10,15 +10,15 @@
 
 package org.mule.providers.soap.xfire.wsdl;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates an XFire WSDL Message Dispatcher
  */
-public class XFireWsdlMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class XFireWsdlMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
 
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException

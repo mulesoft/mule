@@ -10,17 +10,15 @@
 
 package org.mule.providers.stream;
 
+import java.io.OutputStream;
+
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.StringUtils;
-
-import java.io.OutputStream;
 
 /**
  * <code>StreamMessageDispatcher</code> is a simple stream dispatcher that obtains
@@ -50,16 +48,6 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
                 ssc.setOutputMessage(outputMessage);
             }
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
-     */
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     /*
@@ -136,14 +124,9 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         throw new UnsupportedOperationException("doReceive");
-    }
-
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     protected void doDispose()
@@ -151,7 +134,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // template method
     }
@@ -160,4 +143,5 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
+
 }

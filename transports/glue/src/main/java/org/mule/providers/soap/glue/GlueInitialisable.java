@@ -10,10 +10,10 @@
 
 package org.mule.providers.soap.glue;
 
+import org.mule.umo.lifecycle.InitialisationException;
+
 import electric.glue.context.ServiceContext;
 import electric.service.IService;
-
-import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>GlueInitialisable</code> can be implemented by a Mule component that will

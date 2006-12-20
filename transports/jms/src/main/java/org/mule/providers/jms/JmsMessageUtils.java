@@ -35,6 +35,7 @@ import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.util.ArrayUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -42,6 +43,47 @@ import org.mule.util.ArrayUtils;
  */
 public class JmsMessageUtils
 {
+    public static final char REPLACEMENT_CHAR = '_';
+
+    /**
+     * Encode a String so that is is a valid JMS header name
+     * 
+     * @param name the String to encode
+     * @return a valid JMS header name
+     */
+    public static String encodeHeader(String name)
+    {
+        if (StringUtils.isEmpty(name))
+        {
+            throw new IllegalArgumentException("Header name to encode must not be null or empty");
+        }
+    
+        int i = 0, length = name.length();
+        while (i < length && Character.isJavaIdentifierPart(name.charAt(i)))
+        {
+            // zip through
+            i++;
+        }
+    
+        if (i == length)
+        {
+            // String is already valid
+            return name;
+        }
+        else
+        {
+            // make a copy, fix up remaining characters
+            StringBuffer sb = new StringBuffer(name);
+            for (int j = i; j < length; j++)
+            {
+                if (!Character.isJavaIdentifierPart(sb.charAt(j)))
+                {
+                    sb.setCharAt(j, REPLACEMENT_CHAR);
+                }
+            }
+            return sb.toString();
+        }
+    }
 
     public static Message toMessage(Object object, Session session) throws JMSException
     {
@@ -333,4 +375,5 @@ public class JmsMessageUtils
         }
         return to;
     }
+
 }

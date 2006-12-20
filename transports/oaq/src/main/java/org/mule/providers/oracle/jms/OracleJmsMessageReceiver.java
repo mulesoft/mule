@@ -10,8 +10,6 @@
 
 package org.mule.providers.oracle.jms;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -19,9 +17,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class OracleJmsMessageReceiver extends TransactedJmsMessageReceiver
 {
 

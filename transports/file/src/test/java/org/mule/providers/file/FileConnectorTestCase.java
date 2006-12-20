@@ -10,13 +10,8 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.util.Properties;
-
 import org.mule.MuleManager;
 import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.providers.file.FileConnector;
-import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
@@ -28,6 +23,9 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.FileUtils;
 
 import com.mockobjects.dynamic.Mock;
+
+import java.io.File;
+import java.util.Properties;
 
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -91,7 +89,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         connector.registerListener(component, endpoint);
         connector.startConnector();
-        connector.getDispatcher(new ImmutableMuleEndpoint("file:/foo", false)).dispatch(event);
+        connector.dispatch(new ImmutableMuleEndpoint("file:/foo", false), event);
 
         session.verify();
     }
@@ -111,7 +109,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         connector.registerListener(component, endpoint);
         connector.startConnector();
-        connector.getDispatcher(new ImmutableMuleEndpoint("file:/foo", false)).send(event);
+        connector.send(new ImmutableMuleEndpoint("file:/foo", false), event);
 
     }
 

@@ -10,11 +10,6 @@
 
 package org.mule.impl.space;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.space.UMOSpace;
@@ -24,8 +19,14 @@ import org.mule.umo.space.UMOSpaceException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * Provides core functionality for all spaces, including listenr management and
+ * Provides core functionality for all spaces, including listener management and
  * Server notification support.
  */
 public abstract class AbstractSpace implements UMOSpace

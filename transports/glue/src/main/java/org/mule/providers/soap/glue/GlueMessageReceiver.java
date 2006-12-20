@@ -10,15 +10,9 @@
 
 package org.mule.providers.soap.glue;
 
-import electric.glue.context.ApplicationContext;
-import electric.glue.context.ServiceContext;
-import electric.registry.Registry;
-import electric.registry.RegistryException;
-import electric.server.http.HTTP;
-import electric.service.virtual.VirtualService;
-import electric.util.Context;
-import electric.util.interceptor.ReceiveThreadContext;
-import electric.util.interceptor.SendThreadContext;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -33,9 +27,15 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import electric.glue.context.ApplicationContext;
+import electric.glue.context.ServiceContext;
+import electric.registry.Registry;
+import electric.registry.RegistryException;
+import electric.server.http.HTTP;
+import electric.service.virtual.VirtualService;
+import electric.util.Context;
+import electric.util.interceptor.ReceiveThreadContext;
+import electric.util.interceptor.SendThreadContext;
 
 /**
  * <code>GlueMessageReceiver</code> is used to receive Glue bounded services for

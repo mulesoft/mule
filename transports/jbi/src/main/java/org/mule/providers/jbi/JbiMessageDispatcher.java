@@ -10,13 +10,6 @@
 
 package org.mule.providers.jbi;
 
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
 import javax.jbi.messaging.InOnly;
@@ -24,6 +17,12 @@ import javax.jbi.messaging.InOut;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
+
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over tcp.
@@ -84,14 +83,9 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         throw new UnsupportedOperationException("doReceive");
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     protected void error(MessageExchange me, Fault fault) throws MessagingException
@@ -107,7 +101,7 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher
         connector.getDeliveryChannel().send(me);
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // no op
     }

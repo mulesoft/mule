@@ -15,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.space.UMOSpace;
@@ -44,7 +43,7 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (SpaceConnector)endpoint.getConnector();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (space == null)
         {
@@ -96,7 +95,7 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         String destination = endpoint.getEndpointURI().toString();
 
@@ -110,12 +109,8 @@ public class SpaceMessageDispatcher extends AbstractMessageDispatcher
         {
             return null;
         }
-        return new MuleMessage(connector.getMessageAdapter(result));
-    }
 
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
+        return new MuleMessage(connector.getMessageAdapter(result));
     }
 
     protected void doDispose()

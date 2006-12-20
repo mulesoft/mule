@@ -10,6 +10,10 @@
 
 package org.mule.providers.jdbc;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -23,10 +27,6 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageAdapter;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a
@@ -141,7 +141,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -216,7 +216,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // template method
     }
@@ -231,6 +231,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
+    // TODO HH: move to connector
     public Object getDelegateSession() throws UMOException
     {
         try

@@ -10,6 +10,8 @@
 
 package org.mule.providers.quartz;
 
+import java.util.Properties;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -20,8 +22,6 @@ import org.mule.util.ClassUtils;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
-
-import java.util.Properties;
 
 /**
  * Creates a connection to a Quartz sheduler. This allows events to be sheduled at

@@ -10,33 +10,30 @@
 
 package org.mule.providers.tcp.protocols;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.providers.tcp.TcpProtocol;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The DefaultProtocol class is an application level tcp protocol that does nothing.
  * Reading is performed in reading the socket until no more bytes are available.
  * Writing simply writes the data to the socket.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
-public class DefaultProtocol implements TcpProtocol
+public class DefaultProtocol extends ByteProtocol
 {
 
     private static final int BUFFER_SIZE = 8192;
 
     private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
 
-    public byte[] read(InputStream is) throws IOException
+    public Serializable read(InputStream is) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE);
 

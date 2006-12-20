@@ -10,6 +10,9 @@
 
 package org.mule.providers.space;
 
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.commons.collections.MapUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -22,9 +25,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
-
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Registers a transacted message listener on a Space.

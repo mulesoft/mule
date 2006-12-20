@@ -27,11 +27,8 @@ import java.util.Properties;
 
 /**
  * A simple transformer for converting an Http GET request into a SOAP request.
- * Usually, you would POST a soap document, but this Transformer can be useful for
- * making simple soap requests
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Usually, you would POST a SOAP document, but this Transformer can be useful for
+ * making simple SOAP requests
  */
 public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
 {

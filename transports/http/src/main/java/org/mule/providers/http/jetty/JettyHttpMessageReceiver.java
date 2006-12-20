@@ -17,9 +17,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
 import org.mule.MuleManager;
+import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.ThreadingProfile;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
@@ -95,7 +95,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             socketListener.setMinThreads(threadsActive - 1);
         }
         socketListener.setMaxThreads(threadsActive);
-        socketListener.setThreadsPriority(tp.getThreadPriority());
+        // thread priorities are evil and gone from ThreadingProfile
+        // (google for priority inversion)
+        // socketListener.setThreadsPriority(tp.getThreadPriority());
 
         httpServer.addListener(socketListener);
 

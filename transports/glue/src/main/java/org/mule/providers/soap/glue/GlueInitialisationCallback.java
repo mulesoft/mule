@@ -10,16 +10,16 @@
 
 package org.mule.providers.soap.glue;
 
-import electric.glue.context.ServiceContext;
-import electric.registry.Registry;
-import electric.registry.RegistryException;
-import electric.service.IService;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.impl.InitialisationCallback;
 import org.mule.umo.lifecycle.InitialisationException;
+
+import electric.glue.context.ServiceContext;
+import electric.registry.Registry;
+import electric.registry.RegistryException;
+import electric.service.IService;
 
 /**
  * <code>GlueInitialisationCallback</code> is invoked when an Glue service

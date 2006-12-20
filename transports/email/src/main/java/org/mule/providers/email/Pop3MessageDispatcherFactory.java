@@ -10,10 +10,10 @@
 
 package org.mule.providers.email;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>Pop3MessageDispatcherFactory</code> creates a Pop3 Message dispatcher. For
@@ -22,7 +22,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * UnsupportedOperationException.
  */
 
-public class Pop3MessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class Pop3MessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

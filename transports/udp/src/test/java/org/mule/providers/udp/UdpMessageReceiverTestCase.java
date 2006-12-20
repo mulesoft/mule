@@ -10,14 +10,14 @@
 
 package org.mule.providers.udp;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.mockobjects.dynamic.Mock;
 
 public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {

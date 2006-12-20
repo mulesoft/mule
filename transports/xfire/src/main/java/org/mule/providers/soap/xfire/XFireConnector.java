@@ -27,9 +27,9 @@ import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.providers.soap.MethodFixInterceptor;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.MethodFixInterceptor;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -69,29 +69,6 @@ public class XFireConnector extends AbstractServiceEnabledConnector
     private String serviceTransport = null;
     private List serverInHandlers = null;
     private List serverOutHandlers = null;
-    
-    private String wsDecryptionFile = null;
-    private String wsSignatureFile = null;
-    
-    public String getWsDecryptionFile()
-    {
-        return wsDecryptionFile;
-    }
-
-    public void setWsDecryptionFile(String wsDecryptionFile)
-    {
-        this.wsDecryptionFile = wsDecryptionFile;
-    }
-
-    public String getWsSignatureFile()
-    {
-        return wsSignatureFile;
-    }
-
-    public void setWsSignatureFile(String wsSignatureFile)
-    {
-        this.wsSignatureFile = wsSignatureFile;
-    }
 
     public XFireConnector()
     {

@@ -10,6 +10,14 @@
 
 package org.mule.providers.soap.axis.wsdl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Service;
 import org.apache.axis.wsdl.gen.Parser;
@@ -19,13 +27,6 @@ import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * Creates and Axis client services from WSDL and invokes it

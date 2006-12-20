@@ -10,8 +10,7 @@
 
 package org.mule.providers.soap.glue;
 
-import electric.glue.context.ThreadContext;
-import electric.service.IService;
+import java.util.Iterator;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.mule.config.MuleProperties;
@@ -19,7 +18,8 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Iterator;
+import electric.glue.context.ThreadContext;
+import electric.service.IService;
 
 /**
  * <code>GlueMessageAdapter</code> wraps a Glue soap request

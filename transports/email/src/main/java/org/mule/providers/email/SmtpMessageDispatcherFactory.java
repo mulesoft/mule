@@ -10,16 +10,16 @@
 
 package org.mule.providers.email;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>SmtpMessageDispatcherFactory</code> creates an instance of an SmtpMessage
  * dispatcher used for sending email events via an SMTP gateway
  */
-public class SmtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class SmtpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /*
      * (non-Javadoc)

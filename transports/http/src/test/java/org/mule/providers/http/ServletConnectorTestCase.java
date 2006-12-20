@@ -14,13 +14,9 @@ import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ServletConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         ServletConnector c = new ServletConnector();
@@ -39,9 +35,14 @@ public class ServletConnectorTestCase extends AbstractConnectorTestCase
         return HttpRequestMessageAdapterTestCase.getMockRequest("test message");
     }
 
+    public void testConnectorMessageDispatcherFactory() throws Exception
+    {
+        // there is no DispatcherFactory for the servlet connector
+    }
+
     public void testConnectorMessageDispatcher() throws Exception
     {
-        // there is no dispatcher for the servlet connector
+        // therefore we have no dispatchers
     }
 
 }

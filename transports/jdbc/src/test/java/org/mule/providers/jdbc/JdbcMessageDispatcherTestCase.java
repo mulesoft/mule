@@ -7,34 +7,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.providers.jdbc;
 
-import com.mockobjects.dynamic.Mock;
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import javax.sql.DataSource;
+import com.mockobjects.dynamic.Mock;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 
 public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 {
 
     public void testCustomResultSetHandlerIsNotIgnored() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
-            "jdbc://select * from test", false);
-        JdbcMessageDispatcher dispatcher = new JdbcMessageDispatcher(ep);
-        JdbcConnector connector = (JdbcConnector) dispatcher.getConnector();
+        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jdbc://select * from test", false);
+        JdbcConnector connector = (JdbcConnector)ep.getConnector();
         connector.setQueryRunner(TestQueryRunner.class.getName());
         connector.setResultSetHandler(TestResultSetHandler.class.getName());
         connector.setDataSource(getDataSource());
         connector.initialise();
-        dispatcher.doReceive(ep, 0);
+        ep.receive(0);
     }
 
     protected DataSource getDataSource()
@@ -48,7 +50,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         mockConnection.expect("commit");
         mockConnection.expect("close");
 
-        return (DataSource) mockDataSource.proxy();
+        return (DataSource)mockDataSource.proxy();
     }
 
     public static final class TestQueryRunner extends QueryRunner
@@ -60,7 +62,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
                             ResultSetHandler resultSetHandler) throws SQLException
         {
             assertTrue("Custom result set handler has been ignored.",
-                       resultSetHandler instanceof TestResultSetHandler);
+                resultSetHandler instanceof TestResultSetHandler);
             return new Object();
         }
     }

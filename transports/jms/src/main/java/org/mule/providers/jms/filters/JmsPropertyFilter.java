@@ -10,15 +10,15 @@
 
 package org.mule.providers.jms.filters;
 
+import java.util.regex.Pattern;
+
+import javax.jms.Message;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
-
-import javax.jms.Message;
-import java.util.regex.Pattern;
 
 public class JmsPropertyFilter implements UMOFilter 
 {

@@ -10,20 +10,18 @@
 
 package org.mule.providers.udp;
 
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.Map;
-
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>UdpMessageDispatcher</code> is responsible for dispatching MuleEvents as
@@ -43,7 +41,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (UdpConnector)endpoint.getConnector();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (!connected.get())
         {
@@ -143,7 +141,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected synchronized UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         DatagramPacket result = receive(socket, (int)timeout);
         if (result == null)
@@ -151,16 +149,6 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             return null;
         }
         return new MuleMessage(connector.getMessageAdapter(result), (Map)null);
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     protected void doDispose()

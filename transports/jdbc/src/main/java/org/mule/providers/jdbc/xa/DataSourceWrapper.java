@@ -10,13 +10,13 @@
 
 package org.mule.providers.jdbc.xa;
 
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
-
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import javax.transaction.TransactionManager;
 
 /**
  * TODO

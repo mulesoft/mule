@@ -27,12 +27,10 @@ import java.util.TreeMap;
 /**
  * <code>SoapServiceFinder</code> finds a the connector service to use by checking
  * the classpath for jars required for each of the soap connector implementations
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SoapServiceFinder implements ConnectorServiceFinder
 {
+
     public ConnectorServiceDescriptor findService(String service, ConnectorServiceDescriptor csd)
         throws ConnectorFactoryException
     {

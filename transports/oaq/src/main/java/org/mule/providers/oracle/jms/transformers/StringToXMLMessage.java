@@ -10,8 +10,6 @@
 
 package org.mule.providers.oracle.jms.transformers;
 
-import javax.jms.Session;
-
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
 
@@ -21,12 +19,13 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
+import javax.jms.Session;
+
 /**
  * Transformer for use with the Oracle Jms Connector. Expects a string containing
  * properly-formed XML. Creates a JMS message whose payload is Oracle's native XML
  * data type.
  * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  * @see XMLMessageToString
  * @see OracleJmsConnector
  * @see <a href="http://otn.oracle.com/pls/db102/">XML DB Developer's Guide</a>

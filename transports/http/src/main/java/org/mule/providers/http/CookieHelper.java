@@ -10,6 +10,9 @@
 
 package org.mule.providers.http;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderElement;
@@ -21,9 +24,6 @@ import org.apache.commons.httpclient.cookie.NetscapeDraftSpec;
 import org.apache.commons.httpclient.cookie.RFC2109Spec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Helper functions for parsing cookie headers

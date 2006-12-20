@@ -22,11 +22,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.URI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class MulticastConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     private MulticastSocket s1 = null;
@@ -126,4 +121,5 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         connector.setBufferSize(1024);
         return connector;
     }
+
 }

@@ -10,13 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.mule.providers.http.servlet.HttpRequestMessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.UMOMessageAdapter;
-
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,6 +20,14 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+
+import org.mule.providers.http.servlet.HttpRequestMessageAdapter;
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

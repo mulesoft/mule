@@ -10,6 +10,8 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import java.lang.reflect.Proxy;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
@@ -25,8 +27,6 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
 import org.mule.providers.soap.axis.AxisServiceProxy;
 import org.mule.umo.UMOSession;
-
-import java.lang.reflect.Proxy;
 
 /**
  * <code>MuleMsgProvider</code> Is an Axis service endpoint that builds services

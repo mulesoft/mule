@@ -10,6 +10,12 @@
 
 package org.mule.providers.space;
 
+import java.util.Properties;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -23,11 +29,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import java.util.Properties;
 
 /**
  * <code>SpaceMessageReceiver</code> registers a listener on a Space, which can be

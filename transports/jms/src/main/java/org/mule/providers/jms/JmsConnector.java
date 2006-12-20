@@ -10,8 +10,6 @@
 
 package org.mule.providers.jms;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -31,6 +29,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.UnhandledException;
+import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ExceptionHelper;
@@ -59,6 +58,8 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used
@@ -134,18 +135,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
      */
     public void doInitialise() throws InitialisationException
     {
-        // when a connection to jms server is lost, we are recycling the connector
-        // need to safely reinitialise these here for proper connection recovery
-        if (dispatchers == null)
-        {
-            dispatchers = new ConcurrentHashMap();
-        }
-        if (receivers == null)
-        {
-            receivers = new ConcurrentHashMap();
-        }
-
         super.doInitialise();
+
         try
         {
             MuleManager.getInstance().registerListener(this, getName());
@@ -381,11 +372,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
-     */
     public Object getSessionFactory(UMOEndpoint endpoint)
     {
         if (endpoint.getTransactionConfig() != null
@@ -396,6 +382,29 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         else
         {
             return connection;
+        }
+    }
+
+    // TODO HH: merge this and the various getSession(..) methods, make clients use
+    // getDelegateSession(..) only
+    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object[] args) throws UMOException
+    {
+        try
+        {
+            // Return the session bound to the current transaction, if possible
+            Session session = this.getSessionFromTransaction();
+            if (session != null)
+            {
+                return session;
+            }
+            else
+            {
+                return this.getSession(false, false);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new MuleException(new org.mule.config.i18n.Message("jms", 3), e);
         }
     }
 
@@ -410,6 +419,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             }
         }
         return null;
+    }
+
+    public Session getSession(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
+        return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
     public Session getSession(boolean transacted, boolean topic) throws JMSException
@@ -464,21 +480,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#getProtocol()
-     */
     public String getProtocol()
     {
         return "jms";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnector#doDispose()
-     */
     protected void doDispose()
     {
         super.doDispose();
@@ -642,13 +648,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void setJndiProviderUrl(String jndiProviderUrl)
     {
         this.jndiProviderUrl = jndiProviderUrl;
-    }
-
-    public Session getSession(UMOImmutableEndpoint endpoint) throws Exception
-    {
-        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
-        return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
     public ConnectionFactory getConnectionFactory()

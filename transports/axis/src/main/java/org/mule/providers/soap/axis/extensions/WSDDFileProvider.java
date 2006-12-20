@@ -10,11 +10,11 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis.ConfigurationException;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.handlers.soap.SOAPService;
-
-import javax.xml.namespace.QName;
 
 /**
  * Override the File provider to stop exceptions being thrown in Axis if the service

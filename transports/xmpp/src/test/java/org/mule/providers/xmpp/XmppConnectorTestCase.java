@@ -14,10 +14,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class XmppConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception

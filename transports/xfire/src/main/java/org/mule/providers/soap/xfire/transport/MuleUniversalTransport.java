@@ -23,6 +23,7 @@ import org.codehaus.xfire.transport.AbstractTransport;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.DefaultEndpoint;
 import org.codehaus.xfire.wsdl11.WSDL11Transport;
+import org.mule.providers.soap.xfire.MuleInvoker;
 
 /**
  * TODO document
@@ -65,7 +66,9 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
      */
     public String getServiceURL(Service service)
     {
-        return "http://localhost/services/" + service.getSimpleName();
+        //return "http://localhost/services/" + service.getSimpleName();
+        String ep = ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
+        return ep + "/" + service.getSimpleName();
     }
 
     public String getTransportURI(Service service)

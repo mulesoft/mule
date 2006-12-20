@@ -14,14 +14,14 @@ import java.util.List;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.client.Client;
+import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
+import org.codehaus.xfire.transport.Transport;
 import org.mule.config.MuleProperties;
+import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 
 public class XFireClientPoolFactory extends BasePoolableObjectFactory
 {

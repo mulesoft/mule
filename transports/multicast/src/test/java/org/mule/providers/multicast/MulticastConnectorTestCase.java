@@ -10,6 +10,8 @@
 
 package org.mule.providers.multicast;
 
+import java.net.DatagramPacket;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -18,15 +20,9 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
-import java.net.DatagramPacket;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         MulticastConnector c = new MulticastConnector();
@@ -101,4 +97,5 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         c.setLoopback(true);
         assertTrue(c.isLoopback());
     }
+
 }

@@ -14,10 +14,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class VMConnectorTestCase extends AbstractConnectorTestCase
 {
 

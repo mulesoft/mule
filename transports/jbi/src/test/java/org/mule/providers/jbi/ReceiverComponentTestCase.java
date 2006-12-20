@@ -12,8 +12,9 @@ package org.mule.providers.jbi;
 
 import org.mule.providers.jbi.components.MuleReceiver;
 import org.mule.tck.AbstractMuleTestCase;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
+
+import java.util.MissingResourceException;
+import java.util.logging.Logger;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.ComponentContext;
@@ -27,15 +28,12 @@ import javax.management.MBeanServer;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
 
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ReceiverComponentTestCase extends AbstractMuleTestCase
 {
+
     public void testX() throws Exception
     {
         ComponentContext ctx = new DummyComponentContext();
@@ -55,123 +53,102 @@ public class ReceiverComponentTestCase extends AbstractMuleTestCase
     {
         public ServiceEndpoint activateEndpoint(QName qName, String string) throws JBIException
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public void deactivateEndpoint(ServiceEndpoint serviceEndpoint) throws JBIException
         {
-            // To change body of implemented methods use File | Settings | File
-            // Templates.
+            // nothing to do
         }
 
         public void registerExternalEndpoint(ServiceEndpoint serviceEndpoint) throws JBIException
         {
-            // To change body of implemented methods use File | Settings | File
-            // Templates.
+            // nothing to do
         }
 
         public void deregisterExternalEndpoint(ServiceEndpoint serviceEndpoint) throws JBIException
         {
-            // To change body of implemented methods use File | Settings | File
-            // Templates.
+            // nothing to do
         }
 
         public ServiceEndpoint resolveEndpointReference(DocumentFragment documentFragment)
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public String getComponentName()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public DeliveryChannel getDeliveryChannel() throws MessagingException
         {
-            return new DummyDeliveryChannel(); // To change body of implemented
-                                                // methods use File | Settings | File
-                                                // Templates.
+            return new DummyDeliveryChannel();
         }
 
         public ServiceEndpoint getEndpoint(QName qName, String string)
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public Document getEndpointDescriptor(ServiceEndpoint serviceEndpoint) throws JBIException
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public ServiceEndpoint[] getEndpoints(QName qName)
         {
-            return new ServiceEndpoint[0]; // To change body of implemented methods
-                                            // use File | Settings | File Templates.
+            return new ServiceEndpoint[0];
         }
 
         public ServiceEndpoint[] getEndpointsForService(QName qName)
         {
-            return new ServiceEndpoint[0]; // To change body of implemented methods
-                                            // use File | Settings | File Templates.
+            return new ServiceEndpoint[0];
         }
 
         public ServiceEndpoint[] getExternalEndpoints(QName qName)
         {
-            return new ServiceEndpoint[0]; // To change body of implemented methods
-                                            // use File | Settings | File Templates.
+            return new ServiceEndpoint[0];
         }
 
         public ServiceEndpoint[] getExternalEndpointsForService(QName qName)
         {
-            return new ServiceEndpoint[0]; // To change body of implemented methods
-                                            // use File | Settings | File Templates.
+            return new ServiceEndpoint[0];
         }
 
         public String getInstallRoot()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public Logger getLogger(String string, String string1) throws MissingResourceException, JBIException
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MBeanNames getMBeanNames()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MBeanServer getMBeanServer()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public InitialContext getNamingContext()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public Object getTransactionManager()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public String getWorkspaceRoot()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
     }
 
@@ -179,62 +156,53 @@ public class ReceiverComponentTestCase extends AbstractMuleTestCase
     {
         public void close() throws MessagingException
         {
-            // To change body of implemented methods use File | Settings | File
-            // Templates.
+            // nothing to do
         }
 
         public MessageExchangeFactory createExchangeFactory()
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MessageExchangeFactory createExchangeFactory(QName qName)
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MessageExchangeFactory createExchangeFactoryForService(QName qName)
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MessageExchangeFactory createExchangeFactory(ServiceEndpoint serviceEndpoint)
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MessageExchange accept() throws MessagingException
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public MessageExchange accept(long l) throws MessagingException
         {
-            return null; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return null;
         }
 
         public void send(MessageExchange messageExchange) throws MessagingException
         {
-            // To change body of implemented methods use File | Settings | File
-            // Templates.
+            // nothing to do
         }
 
         public boolean sendSync(MessageExchange messageExchange) throws MessagingException
         {
-            return false; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return false;
         }
 
         public boolean sendSync(MessageExchange messageExchange, long l) throws MessagingException
         {
-            return false; // To change body of implemented methods use File |
-                            // Settings | File Templates.
+            return false;
         }
     }
+
 }

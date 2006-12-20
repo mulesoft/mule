@@ -10,9 +10,6 @@
 
 package org.mule.providers.http.transformers;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.io.IOUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractTransformer;
@@ -23,12 +20,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.io.IOUtils;
+
 /**
  * <code>HttpClientMethodResponseToObject</code> transforms a http client response
  * to a MuleMessage.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class HttpClientMethodResponseToObject extends AbstractTransformer

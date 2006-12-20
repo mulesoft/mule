@@ -14,12 +14,9 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
- * @version $Revision$
- */
 public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
+
     public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
@@ -34,4 +31,5 @@ public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return null;
     }
+
 }

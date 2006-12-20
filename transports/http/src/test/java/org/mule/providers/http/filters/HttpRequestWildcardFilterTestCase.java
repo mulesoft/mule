@@ -31,8 +31,8 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URI;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpException;
@@ -42,10 +42,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
-/**
- * @author Jack Hung
- * @version $Revision$
- */
 public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
 {
 

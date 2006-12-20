@@ -10,15 +10,15 @@
 
 package org.mule.providers.quartz;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates a QuartzMessageDispatcher instance.
  */
-public class QuartzMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class QuartzMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

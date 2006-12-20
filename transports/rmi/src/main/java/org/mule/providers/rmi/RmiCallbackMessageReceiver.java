@@ -10,21 +10,22 @@
 
 package org.mule.providers.rmi;
 
-import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.ConnectException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.impl.MuleMessage;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
 
 import javax.naming.Context;
-import java.net.InetAddress;
-import java.lang.reflect.Method;
+
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * TODO

@@ -29,9 +29,6 @@ import org.mule.umo.transformer.TransformerException;
 /**
  * Converts an Http Response object to String. Note that the response headers are
  * preserved.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class HttpResponseToString extends AbstractTransformer
 {

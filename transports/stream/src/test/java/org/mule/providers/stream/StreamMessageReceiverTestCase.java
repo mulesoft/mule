@@ -10,8 +10,6 @@
 
 package org.mule.providers.stream;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -22,6 +20,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.mockobjects.dynamic.Mock;
 
 public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {

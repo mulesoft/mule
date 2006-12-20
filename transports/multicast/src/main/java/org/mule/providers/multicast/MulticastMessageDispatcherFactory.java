@@ -10,20 +10,17 @@
 
 package org.mule.providers.multicast;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>MulticastMessageDispatcherFactory</code> creates a dispatcher for
  * broadcasting events over multicast
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class MulticastMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class MulticastMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

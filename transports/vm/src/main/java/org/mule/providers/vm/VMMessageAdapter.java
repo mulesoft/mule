@@ -19,9 +19,6 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  * message. The message adapter allows a Mule event to be read and manipulated like
  * any other object data type from any external system that has a Mule endpoint
  * implementation.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class VMMessageAdapter extends AbstractMessageAdapter
 {

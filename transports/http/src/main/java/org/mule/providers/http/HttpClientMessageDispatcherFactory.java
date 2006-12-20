@@ -10,15 +10,15 @@
 
 package org.mule.providers.http;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates a HttpClientMessageDispatcher to make client requests
  */
-public class HttpClientMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /*
      * (non-Javadoc)

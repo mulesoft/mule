@@ -22,7 +22,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.FileUtils;
 import org.mule.util.MapUtils;
 
@@ -144,30 +143,18 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * There is no associated session for a file connector
-     * 
-     * @throws UMOException
-     */
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
-    /**
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.
      * 
-     * @param endpoint an endpoint a path to a file or directory
      * @param timeout this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing to
      *         receive
      * @throws Exception
      */
 
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
-
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
@@ -269,16 +256,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return event.getMessage();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
-     */
-    public UMOConnector getConnector()
-    {
-        return connector;
-    }
-
     private String generateFilename(UMOMessage message, String pattern)
     {
         if (pattern == null)
@@ -293,7 +270,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         // no op
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // no op
     }

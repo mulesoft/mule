@@ -10,19 +10,16 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>AxisMessageDispatcherFactory</code> creates an AxisMessageDispatcher, used
- * for making soap calls using the Axis stack.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * for making SOAP calls using the Axis stack.
  */
-public class AxisMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class AxisMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

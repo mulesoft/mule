@@ -15,9 +15,6 @@ import org.mule.providers.jms.JmsMessageDispatcher;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
 public class OracleJmsMessageDispatcher extends JmsMessageDispatcher
 {
 
@@ -40,10 +37,10 @@ public class OracleJmsMessageDispatcher extends JmsMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         ((OracleJmsSupport)((JmsConnector)getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getEndpointURI()
             .getParams());
-        return super.doReceive(endpoint, timeout);
+        return super.doReceive(timeout);
     }
 }

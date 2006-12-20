@@ -10,19 +10,16 @@
 
 package org.mule.providers.xmpp;
 
+import java.util.Iterator;
+
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
-import java.util.Iterator;
-
 /**
- * <code>XmppMessageAdapter</code> wraps an Smack XMPP packet
- * 
- * @author Peter Braswell
- * @version $Revision$
+ * <code>XmppMessageAdapter</code> wraps a Smack XMPP packet
  */
 public class XmppMessageAdapter extends AbstractMessageAdapter
 {

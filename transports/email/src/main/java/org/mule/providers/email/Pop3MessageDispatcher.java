@@ -10,14 +10,6 @@
 
 package org.mule.providers.email;
 
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.URLName;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -25,7 +17,14 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
+
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
 
 /**
  * <code>Pop3MessageDispatcher</code> For Pop3 connections the dispatcher can only
@@ -47,9 +46,8 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         this.connector = (Pop3Connector)endpoint.getConnector();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
-
         if (folder == null || !folder.isOpen())
         {
             String inbox = (String)endpoint.getProperty("folder");
@@ -148,7 +146,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected synchronized UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         long t0 = System.currentTimeMillis();
         if (timeout < 0)
@@ -234,14 +232,10 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         return getMessageCount(folder) > 0;
     }
 
+    // TODO HH: move to connector
     public Object getDelegateSession() throws UMOException
     {
         return session;
-    }
-
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     protected void doDispose()

@@ -10,6 +10,8 @@
 
 package org.mule.providers.ftp;
 
+import java.io.FileOutputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.ImmutableMuleEndpoint;
@@ -21,14 +23,7 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.io.FileOutputStream;
-
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
 
@@ -41,12 +36,11 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     public void testClient() throws Exception
     {
-        UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
         FtpConnector c = (FtpConnector)createConnector();
         c.initialise();
-        UMOMessageDispatcher d = c.getDispatcher(endpoint);
+        UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
         UMOEvent e = getTestEvent(new NullPayload(), endpoint);
-        d.dispatch(e);
+        endpoint.dispatch(e);
     }
 
     protected void sendTestData(int iterations) throws Exception

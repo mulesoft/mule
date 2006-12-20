@@ -139,7 +139,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         return event.getMessage();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         FTPClient client = connector.getFtp(endpoint.getEndpointURI());
         connector.releaseFtp(endpoint.getEndpointURI(), client);
@@ -163,10 +163,10 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
-
         FTPClient client = null;
+
         try
         {
 
@@ -225,11 +225,6 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         {
             connector.releaseFtp(endpoint.getEndpointURI(), client);
         }
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     private String generateFilename(UMOMessage message, String pattern)

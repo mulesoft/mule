@@ -19,9 +19,6 @@ import java.util.Properties;
 /**
  * The same as the UrlEndpointbuilder except that all parameters except the first are
  * set as properties on the endpoint and stripped from the endpoint Uri
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class WsdlUrlEndpointBuilder extends AbstractEndpointBuilder
 {

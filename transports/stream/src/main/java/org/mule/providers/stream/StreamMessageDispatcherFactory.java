@@ -10,16 +10,16 @@
 
 package org.mule.providers.stream;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>StreamMessageDispatcherFactory</code> creates a Stream dispatcher suitable
  * for writing to fixed streams such as System.in or System.out.
  */
-public class StreamMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class StreamMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /*
      * (non-Javadoc)

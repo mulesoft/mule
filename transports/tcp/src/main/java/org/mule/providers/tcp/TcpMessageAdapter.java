@@ -10,15 +10,19 @@
 
 package org.mule.providers.tcp;
 
+import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.lang.SerializationUtils;
+
 /**
  * <code>TcpMessageAdapter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class TcpMessageAdapter extends AbstractMessageAdapter
@@ -28,13 +32,25 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = 7229837140160407794L;
 
-    private byte[] message;
+    private Object message;
 
     public TcpMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof byte[])
+        if (message instanceof MuleMessage)
         {
-            this.message = (byte[])message;
+            MuleMessage muleMessage = (MuleMessage)message;
+            Set s = muleMessage.getPropertyNames();
+            Iterator i = s.iterator();
+            while (i.hasNext())
+            {
+                Object o = i.next();
+                this.properties.put(o, muleMessage.getProperty(o.toString()));
+            }
+            this.message = muleMessage.getPayload();
+        }
+        else if (message instanceof Serializable)
+        {
+            this.message = message;
         }
         else
         {
@@ -52,12 +68,26 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        return new String(message, encoding);
+        if (message instanceof byte[])
+        {
+            return new String((byte[])message, encoding);
+        }
+        else
+        {
+            return message.toString();
+        }
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return message;
+        if (message instanceof byte[])
+        {
+            return (byte[])message;
+        }
+        else
+        {
+            return SerializationUtils.serialize((Serializable)message);
+        }
     }
 
     public Object getPayload()

@@ -10,6 +10,10 @@
 
 package org.mule.providers.http;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
@@ -17,10 +21,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests

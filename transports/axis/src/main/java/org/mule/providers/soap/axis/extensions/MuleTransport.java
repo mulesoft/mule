@@ -10,14 +10,14 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.axis.client.Transport;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.soap.axis.AxisConnector;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A container for all Mule supported transports for Axis.

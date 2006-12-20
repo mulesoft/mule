@@ -12,12 +12,11 @@ package org.mule.providers.tcp.protocols;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
-import org.mule.providers.tcp.TcpProtocol;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+import java.io.Serializable;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Map;
@@ -49,11 +48,8 @@ import java.util.Map;
  * limited to insure that unread characters remain on the stream so that all data may
  * be read later.
  * </p>
- * 
- * @author <a href="mailto:rlucente@xecu.net">Rich Lucente</a>
- * @version $Revision$
  */
-public class XmlMessageProtocol implements TcpProtocol
+public class XmlMessageProtocol extends ByteProtocol
 {
     private static String XML_PATTERN = "<?xml";
 
@@ -67,7 +63,7 @@ public class XmlMessageProtocol implements TcpProtocol
      * 
      * @see DefaultProtocol#read(java.io.InputStream)
      */
-    public byte[] read(InputStream is) throws IOException
+    public Serializable read(InputStream is) throws IOException
     {
         // look for existing pushback wrapper for the given stream
         // if not found, create a wrapper
@@ -142,5 +138,4 @@ public class XmlMessageProtocol implements TcpProtocol
     {
         os.write(data);
     }
-
 }

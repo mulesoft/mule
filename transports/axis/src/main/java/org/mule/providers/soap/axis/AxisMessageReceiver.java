@@ -10,6 +10,13 @@
 
 package org.mule.providers.soap.axis;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.rpc.ParameterMode;
+
 import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
@@ -34,13 +41,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.xml.rpc.ParameterMode;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a service

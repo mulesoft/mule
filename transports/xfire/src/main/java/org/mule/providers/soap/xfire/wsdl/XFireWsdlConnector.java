@@ -25,8 +25,8 @@ public class XFireWsdlConnector extends XFireConnector
 
         // This allows the generic WSDL provider to created endpoints using this
         // connector
-        registerSupportedProtocolWithotPrefix("wsdl:http");
-        registerSupportedProtocolWithotPrefix("wsdl:https");
+        registerSupportedProtocolWithoutPrefix("wsdl:http");
+        registerSupportedProtocolWithoutPrefix("wsdl:https");
     }
 
     public String getProtocol()

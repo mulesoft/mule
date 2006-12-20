@@ -10,8 +10,9 @@
 
 package org.mule.impl.container;
 
-import javax.ejb.EJBObject;
 import java.rmi.RemoteException;
+
+import javax.ejb.EJBObject;
 
 /**
  * A test EJB object

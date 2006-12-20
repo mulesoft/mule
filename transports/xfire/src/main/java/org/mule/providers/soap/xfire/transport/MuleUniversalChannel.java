@@ -10,6 +10,18 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,17 +56,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
-
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * The MuleUniversalChannel is an XFire Channel implementation that uses

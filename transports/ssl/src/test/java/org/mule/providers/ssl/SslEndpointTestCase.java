@@ -14,13 +14,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class SslEndpointTestCase extends AbstractMuleTestCase
 {
+
     public void testHostPortUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("ssl://localhost:7856");

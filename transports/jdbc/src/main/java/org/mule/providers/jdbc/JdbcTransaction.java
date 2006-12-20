@@ -10,17 +10,17 @@
 
 package org.mule.providers.jdbc;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionRollbackException;
 import org.mule.umo.TransactionException;
-
-import javax.sql.DataSource;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * TODO

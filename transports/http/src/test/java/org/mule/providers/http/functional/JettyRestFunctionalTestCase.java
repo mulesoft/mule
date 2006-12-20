@@ -9,6 +9,8 @@
  */
 package org.mule.providers.http.functional;
 
+import java.net.URI;
+
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -18,8 +20,6 @@ import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-
-import java.net.URI;
 
 
 public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase

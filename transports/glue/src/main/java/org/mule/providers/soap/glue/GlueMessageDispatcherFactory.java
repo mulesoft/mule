@@ -10,10 +10,10 @@
 
 package org.mule.providers.soap.glue;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>GlueMessageDispatcherFactory</code> Creates a Soap Message dispatcher that
@@ -23,7 +23,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @version $Revision$
  */
 
-public class GlueMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class GlueMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

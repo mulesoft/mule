@@ -10,8 +10,6 @@
 
 package org.mule.providers.jms;
 
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 
@@ -23,6 +21,8 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.mockobjects.dynamic.Mock;
 
 public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {

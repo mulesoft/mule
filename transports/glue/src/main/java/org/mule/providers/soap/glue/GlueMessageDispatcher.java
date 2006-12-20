@@ -10,23 +10,23 @@
 
 package org.mule.providers.soap.glue;
 
-import electric.glue.context.ProxyContext;
-import electric.glue.context.ThreadContext;
-import electric.proxy.IProxy;
-import electric.registry.Registry;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
-import java.util.HashMap;
-import java.util.Map;
+import electric.glue.context.ProxyContext;
+import electric.glue.context.ThreadContext;
+import electric.proxy.IProxy;
+import electric.registry.Registry;
 
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the Glue
@@ -42,7 +42,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         super(endpoint);
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (proxy == null)
         {
@@ -142,7 +142,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         Map props = new HashMap();
         props.putAll(endpoint.getProperties());
@@ -156,11 +156,6 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new ReceiveException(endpoint, timeout, t);
         }
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
     }
 
     protected void doDispose()

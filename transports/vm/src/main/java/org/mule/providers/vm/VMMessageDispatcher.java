@@ -16,13 +16,11 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
@@ -48,16 +46,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         objectToByteArray = new ObjectToByteArray();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
-     */
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
     /**
      * Make a specific request to the underlying transport
      * 
@@ -70,7 +58,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was available
      * @throws Exception if the call to the underlying protocol causes an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         if (!connector.isQueueEvents())
         {
@@ -81,6 +69,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             QueueSession queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+
             if (queue == null)
             {
                 if (logger.isDebugEnabled())
@@ -235,22 +224,12 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         return retMessage;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getConnector()
-     */
-    public UMOConnector getConnector()
-    {
-        return connector;
-    }
-
     protected void doDispose()
     {
         // template method
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (connector.isQueueEvents())
         {

@@ -10,21 +10,21 @@
 
 package org.mule.providers.oracle.jms;
 
-import oracle.jdbc.pool.OracleDataSource;
 import oracle.jdbc.driver.OracleDriver;
+import oracle.jdbc.pool.OracleDataSource;
+
 import org.mule.umo.lifecycle.InitialisationException;
 
-import javax.jms.JMSException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import javax.jms.JMSException;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS
  * implementation based on Advanced Queueing (Oracle AQ).
  * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- * @author henks
  * @see OracleJmsSupport
  * @see org.mule.providers.jms.JmsConnector
  * @see <a href="http://otn.oracle.com/pls/db102/">Streams Advanced Queuing</a>

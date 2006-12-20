@@ -17,11 +17,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 
 /**
- * <code>TcpConnector</code> can bind or sent to a given tcp port on a given host.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- * @version $Revision$
+ * <code>TcpConnector</code> can bind or sent to a given TCP port on a given host.
  */
 public class TcpConnector extends AbstractServiceEnabledConnector
 {

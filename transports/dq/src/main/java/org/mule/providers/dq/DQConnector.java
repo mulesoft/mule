@@ -10,8 +10,6 @@
 
 package org.mule.providers.dq;
 
-import java.util.Map;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -24,6 +22,8 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.DataQueue;
 import com.ibm.as400.access.RecordFormat;
+
+import java.util.Map;
 
 /**
  * <code>DQConnector</code> is a delegate provider that encapsulates an AS400

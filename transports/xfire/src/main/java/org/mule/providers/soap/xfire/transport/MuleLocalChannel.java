@@ -10,6 +10,16 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import org.mule.MuleException;
+import org.mule.impl.message.ExceptionPayload;
+import org.mule.providers.soap.xfire.XFireConnector;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.StringUtils;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,15 +50,6 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Session;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.util.STAXUtils;
-import org.mule.MuleException;
-import org.mule.impl.message.ExceptionPayload;
-import org.mule.providers.soap.xfire.XFireConnector;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.StringUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * TODO document

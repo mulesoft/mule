@@ -10,9 +10,10 @@
 
 package org.mule.providers.jbi;
 
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.umo.UMOMessage;
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
@@ -21,24 +22,19 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import java.io.ByteArrayInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.umo.UMOMessage;
 
 /**
- * Useful for converting message types
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Useful helpers for converting message types
  */
 public class JbiUtils
 {
 
     public static UMOMessage createMessage(NormalizedMessage message) throws MessagingException
     {
-
         Map properties = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {

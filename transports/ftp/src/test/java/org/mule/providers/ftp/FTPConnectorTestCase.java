@@ -10,14 +10,14 @@
 
 package org.mule.providers.ftp;
 
+import java.util.Properties;
+
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import java.util.Properties;
 
 public class FTPConnectorTestCase extends AbstractConnectorTestCase
 {

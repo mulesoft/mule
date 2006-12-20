@@ -10,6 +10,8 @@
 
 package org.mule.providers.tcp;
 
+import java.util.Arrays;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -21,12 +23,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import java.util.Arrays;
-
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class TcpSyncTestCase extends FunctionalTestCase
 {
 

@@ -23,9 +23,6 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * Creates an Xmpp message packet from a UMOMessage
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ObjectToXmppPacket extends AbstractEventAwareTransformer
 {

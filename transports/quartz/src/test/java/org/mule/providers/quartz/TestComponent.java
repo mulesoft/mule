@@ -10,10 +10,10 @@
 
 package org.mule.providers.quartz;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class TestComponent implements Callable
 {

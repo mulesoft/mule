@@ -16,8 +16,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 
-import javax.resource.spi.work.Work;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -25,14 +23,14 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.URI;
 
+import javax.resource.spi.work.Work;
+
 /**
  * <code>MulticastMessageReceiver</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MulticastMessageReceiver extends UdpMessageReceiver
 {
+
     public MulticastMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
@@ -41,8 +39,6 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
 
     protected DatagramSocket createSocket(URI uri, InetAddress inetAddress) throws IOException
     {
-        // SocketAddress sa = new InetSocketAddress(uri.getHost(),
-        // uri.getPort());
         MulticastSocket socket = new MulticastSocket(uri.getPort());
         socket.joinGroup(inetAddress);
         return socket;
@@ -82,4 +78,5 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
         }
         super.doDispose();
     }
+
 }

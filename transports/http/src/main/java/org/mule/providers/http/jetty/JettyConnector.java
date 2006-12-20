@@ -15,13 +15,11 @@ import org.mule.providers.http.HttpConnector;
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet
  * engine.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class JettyConnector extends HttpConnector
 {
+
     public JettyConnector()
     {
         super();

@@ -10,16 +10,16 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates an XFire Messgae dispatcher used for making XFire soap requests using the
  * XFire client.
  */
-public class XFireMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class XFireMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

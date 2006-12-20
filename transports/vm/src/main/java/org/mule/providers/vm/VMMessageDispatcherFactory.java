@@ -10,18 +10,15 @@
 
 package org.mule.providers.vm;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>VMMessageDispatcherFactory</code> creates an in-memory event dispatcher
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-public class VMMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class VMMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /*
      * (non-Javadoc)

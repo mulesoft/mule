@@ -13,15 +13,11 @@ package org.mule.providers.soap;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-import java.util.Iterator;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class SoapMethodTestCase extends AbstractMuleTestCase
 {
     public void testNamedParameterParsing() throws Exception

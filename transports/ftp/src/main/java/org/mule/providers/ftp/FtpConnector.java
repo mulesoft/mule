@@ -10,17 +10,6 @@
 
 package org.mule.providers.ftp;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -33,6 +22,18 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class FtpConnector extends AbstractServiceEnabledConnector
 {
@@ -149,9 +150,6 @@ public class FtpConnector extends AbstractServiceEnabledConnector
         return pool;
     }
 
-    /**
-     * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
-     */
     protected class FtpConnectionFactory implements PoolableObjectFactory
     {
         private UMOEndpointURI uri;

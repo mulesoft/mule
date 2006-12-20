@@ -27,7 +27,6 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.StringUtils;
 
 /**
@@ -46,7 +45,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (SmtpConnector)endpoint.getConnector();
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         if (transport == null)
         {
@@ -152,6 +151,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
+    // TODO HH: move to connector
     public Object getDelegateSession() throws UMOException
     {
         return session;
@@ -169,7 +169,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         throw new UnsupportedOperationException("doReceive");
     }
@@ -209,16 +209,6 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             logger.debug(msg.toString());
         }
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
-     */
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     protected void doDispose()

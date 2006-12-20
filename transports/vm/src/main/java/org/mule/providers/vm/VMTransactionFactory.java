@@ -14,10 +14,6 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class VMTransactionFactory implements UMOTransactionFactory
 {
 

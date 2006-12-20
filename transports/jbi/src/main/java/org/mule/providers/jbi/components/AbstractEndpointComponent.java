@@ -22,9 +22,6 @@ import javax.jbi.JBIException;
 /**
  * A Jbi component that has a Mule muleEndpoint component configured on it. Both the
  * Dispatcher and Receiver components extend this component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractEndpointComponent extends AbstractJbiComponent
 {

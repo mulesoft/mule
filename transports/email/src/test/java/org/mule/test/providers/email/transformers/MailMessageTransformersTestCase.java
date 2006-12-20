@@ -10,8 +10,6 @@
 
 package org.mule.test.providers.email.transformers;
 
-import com.mockobjects.dynamic.Mock;
-
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -29,6 +27,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
+
+import com.mockobjects.dynamic.Mock;
 
 public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 {
@@ -58,6 +58,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
 
+        // TODO HH: is this actually used?
         endpoint.setConnector(new SmtpConnector()
         {
             public UMOMessageDispatcher getDispatcher() throws UMOException

@@ -19,9 +19,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * <code>VMMessageAdapterTestCase</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {

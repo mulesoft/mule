@@ -10,7 +10,9 @@
 
 package org.mule.providers.soap.glue;
 
-import electric.service.IService;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
@@ -19,9 +21,7 @@ import org.mule.providers.soap.ServiceProxy;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import electric.service.IService;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like

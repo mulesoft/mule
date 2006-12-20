@@ -10,7 +10,8 @@
 
 package org.mule.impl.space;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.util.queue.Queue;
@@ -22,8 +23,7 @@ import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
-import java.util.Iterator;
-import java.util.List;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Creates a transaction and persistent local space. This should not be used in a

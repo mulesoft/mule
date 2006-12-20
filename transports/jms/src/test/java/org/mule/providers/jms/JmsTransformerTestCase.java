@@ -10,12 +10,6 @@
 
 package org.mule.providers.jms;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.constraint.IsEqual;
-import com.mockobjects.dynamic.ConstraintMatcher;
-import com.mockobjects.dynamic.FullConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
@@ -23,29 +17,19 @@ import org.apache.commons.collections.IteratorUtils;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.constraint.IsEqual;
+import com.mockobjects.dynamic.ConstraintMatcher;
+import com.mockobjects.dynamic.FullConstraintMatcher;
+import com.mockobjects.dynamic.Mock;
+
 public class JmsTransformerTestCase extends AbstractMuleTestCase
 {
-
-    public void testHeaders()
-    {
-        // already valid headers are returned as-is, so we can assertSame
-        assertSame("identifier", AbstractJmsTransformer.encodeHeader("identifier"));
-        assertSame("_identifier", AbstractJmsTransformer.encodeHeader("_identifier"));
-        assertSame("identifier_", AbstractJmsTransformer.encodeHeader("identifier_"));
-        assertSame("ident_ifier", AbstractJmsTransformer.encodeHeader("ident_ifier"));
-
-        assertEquals("_identifier", AbstractJmsTransformer.encodeHeader("-identifier"));
-        assertEquals("identifier_", AbstractJmsTransformer.encodeHeader("identifier-"));
-        assertEquals("ident_ifier", AbstractJmsTransformer.encodeHeader("ident-ifier"));
-        assertEquals("_ident_ifier_", AbstractJmsTransformer.encodeHeader("-ident_ifier-"));
-        assertEquals("_ident_ifier_", AbstractJmsTransformer.encodeHeader("-ident-ifier-"));
-    }
 
     public void testCustomJMSProperty() throws Exception
     {

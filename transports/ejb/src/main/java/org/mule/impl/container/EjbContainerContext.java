@@ -10,22 +10,19 @@
 
 package org.mule.impl.container;
 
+import java.lang.reflect.Method;
+
+import javax.ejb.EJBHome;
+import javax.naming.NamingException;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
 
-import javax.ejb.EJBHome;
-import javax.naming.NamingException;
-
-import java.lang.reflect.Method;
-
 /**
  * <code>EjbContainerContext</code> is a container implementaiton that allows EJB
  * Session beans to be referenced as Mule managed UMOs
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EjbContainerContext extends RmiContainerContext
 {

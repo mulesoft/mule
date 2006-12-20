@@ -10,10 +10,10 @@
 
 package org.mule.providers.jbi;
 
+import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>TcpMessageDispatcherFactory</code> TODO
@@ -22,7 +22,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @version $Revision$
  */
 
-public class JbiMessageDispatcherFactory implements UMOMessageDispatcherFactory
+public class JbiMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {

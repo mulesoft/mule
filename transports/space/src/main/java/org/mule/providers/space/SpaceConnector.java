@@ -10,6 +10,10 @@
 
 package org.mule.providers.space;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -22,10 +26,6 @@ import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
 import org.mule.util.BeanUtils;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Provides generic connectivity to 'Spaces' that implement the Mule Space API, i.e.

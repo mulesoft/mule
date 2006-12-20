@@ -10,12 +10,13 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.mule.config.MuleProperties;
 import org.mule.util.MapUtils;
 
 import java.util.Collections;
 import java.util.Map;
+
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
  * <code>HttpConstants</code> for request and response headers

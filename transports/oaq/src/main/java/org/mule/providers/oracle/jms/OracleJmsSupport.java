@@ -10,6 +10,11 @@
 
 package org.mule.providers.oracle.jms;
 
+import oracle.jms.AQjmsSession;
+
+import org.mule.providers.jms.Jms102bSupport;
+import org.mule.providers.jms.JmsConnector;
+
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -24,18 +29,11 @@ import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
 
-import oracle.jms.AQjmsSession;
-
-import org.mule.providers.jms.Jms102bSupport;
-import org.mule.providers.jms.JmsConnector;
-
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS
  * implementation based on Advanced Queueing (Oracle AQ). Oracle 9i supports the JMS
  * 1.0.2b specification while Oracle 10g supports JMS 1.1
  * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- * @author henks
  * @see OracleJmsConnector
  * @see org.mule.providers.jms.Jms102bSupport
  * @see <a href="http://otn.oracle.com/pls/db102/">Streams Advanced Queuing</a>

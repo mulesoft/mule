@@ -41,7 +41,6 @@ import java.util.Iterator;
  * <p/> be accessed from an endpoint
  * 
  */
-
 public class VMConnector extends AbstractServiceEnabledConnector
 {
     private boolean queueEvents = false;

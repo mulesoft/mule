@@ -18,11 +18,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception

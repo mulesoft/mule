@@ -10,6 +10,16 @@
 
 package org.mule.providers.http.servlet;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -20,16 +30,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.util.PropertiesUtils;
-import org.mule.MuleManager;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Receives Http requests via a Servlet and routes the to listeners with servlet://

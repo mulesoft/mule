@@ -10,9 +10,6 @@
 
 package org.mule.providers.jms;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
@@ -21,6 +18,9 @@ import javax.jms.TextMessage;
 import org.apache.commons.collections.IteratorUtils;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 public class JmsConnectorTestCase extends AbstractConnectorTestCase
 {

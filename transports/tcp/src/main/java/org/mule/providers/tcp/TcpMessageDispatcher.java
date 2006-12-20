@@ -10,7 +10,6 @@
 
 package org.mule.providers.tcp;
 
-import org.mule.util.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -21,6 +20,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.MapUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -99,7 +99,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
-                byte[] result = receive(connectedSocket, event.getTimeout());
+                Object result = receive(connectedSocket, event.getTimeout());
                 if (result == null)
                 {
                     return null;
@@ -186,14 +186,15 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         bos.flush();
     }
 
-    protected byte[] receive(Socket socket, int timeout) throws IOException
+    protected Object receive(Socket socket, int timeout) throws IOException
     {
         DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         if (timeout >= 0)
         {
             socket.setSoTimeout(timeout);
         }
-        return connector.getTcpProtocol().read(dis);
+        // TODO check if this cast is ok!
+        return (byte[])connector.getTcpProtocol().read(dis);
     }
 
     /**
@@ -208,7 +209,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected synchronized UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         Socket socket = null;
         try
@@ -216,7 +217,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             socket = initSocket(endpoint.getEndpointURI().getAddress());
             try
             {
-                byte[] result = receive(socket, (int)timeout);
+                Object result = receive(socket, (int)timeout);
                 if (result == null)
                 {
                     return null;
@@ -238,16 +239,6 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 socket.close();
             }
         }
-    }
-
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
-    public UMOConnector getConnector()
-    {
-        return connector;
     }
 
     /**
@@ -285,7 +276,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         keepSendSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(), "keepSendSocketOpen",
             connector.isKeepSendSocketOpen());

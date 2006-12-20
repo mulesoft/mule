@@ -10,17 +10,27 @@
 
 package org.mule.providers.jdbc;
 
+import java.sql.Connection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.util.properties.BeanPropertyExtractor;
-import org.mule.util.properties.MapPropertyExtractor;
-import org.mule.util.properties.MessagePropertyExtractor;
-import org.mule.util.properties.PayloadPropertyExtractor;
-import org.mule.util.properties.PropertyExtractor;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
@@ -32,20 +42,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.mule.util.properties.BeanPropertyExtractor;
+import org.mule.util.properties.MapPropertyExtractor;
+import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.PayloadPropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
 
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {

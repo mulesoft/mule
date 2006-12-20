@@ -10,16 +10,31 @@
 
 package org.mule.providers.jms;
 
-import com.mockobjects.constraint.IsInstanceOf;
-import com.mockobjects.dynamic.Mock;
-
 import javax.jms.BytesMessage;
 import javax.jms.TextMessage;
 
 import org.mule.tck.AbstractMuleTestCase;
 
+import com.mockobjects.constraint.IsInstanceOf;
+import com.mockobjects.dynamic.Mock;
+
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
+
+    public void testHeaders()
+    {
+        // already valid headers are returned as-is, so we can assertSame
+        assertSame("identifier", JmsMessageUtils.encodeHeader("identifier"));
+        assertSame("_identifier", JmsMessageUtils.encodeHeader("_identifier"));
+        assertSame("identifier_", JmsMessageUtils.encodeHeader("identifier_"));
+        assertSame("ident_ifier", JmsMessageUtils.encodeHeader("ident_ifier"));
+
+        assertEquals("_identifier", JmsMessageUtils.encodeHeader("-identifier"));
+        assertEquals("identifier_", JmsMessageUtils.encodeHeader("identifier-"));
+        assertEquals("ident_ifier", JmsMessageUtils.encodeHeader("ident-ifier"));
+        assertEquals("_ident_ifier_", JmsMessageUtils.encodeHeader("-ident_ifier-"));
+        assertEquals("_ident_ifier_", JmsMessageUtils.encodeHeader("-ident-ifier-"));
+    }
 
     public void testTextMessageNullContent() throws Exception
     {

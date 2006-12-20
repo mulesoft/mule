@@ -13,7 +13,6 @@ package org.mule.providers.dq;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -98,11 +97,6 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
     /**
      * Make a specific request to the underlying transport
      * 
@@ -115,7 +109,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    protected UMOMessage doReceive(long timeout) throws Exception
     {
         DataQueue dq = new DataQueue(connector.getSystem(), endpoint.getEndpointURI().getAddress());
         DataQueueEntry entry = dq.read((int)timeout);
@@ -134,7 +128,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // template method
     }

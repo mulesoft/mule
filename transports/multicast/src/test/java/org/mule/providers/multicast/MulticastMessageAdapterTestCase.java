@@ -16,13 +16,9 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.net.DatagramPacket;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class MulticastMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
+
     public Object getValidMessage() throws Exception
     {
         return new DatagramPacket("Hello".getBytes(), 5);
@@ -57,4 +53,5 @@ public class MulticastMessageAdapterTestCase extends AbstractMessageAdapterTestC
             // expected
         }
     }
+
 }

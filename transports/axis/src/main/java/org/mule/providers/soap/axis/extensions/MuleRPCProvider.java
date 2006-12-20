@@ -10,6 +10,13 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.holders.Holder;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
@@ -32,12 +39,6 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
 import org.mule.providers.soap.axis.AxisServiceProxy;
 import org.mule.umo.UMOSession;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.holders.Holder;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * <code>MuleProvider</code> Is an Axis service endpoint that builds services from

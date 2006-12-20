@@ -10,6 +10,9 @@
 
 package org.mule.providers.oracle.jms;
 
+import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.umo.provider.UMOConnector;
+
 import com.mockobjects.dynamic.Mock;
 
 import java.util.Enumeration;
@@ -18,12 +21,6 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
 
-import org.mule.tck.providers.AbstractConnectorTestCase;
-import org.mule.umo.provider.UMOConnector;
-
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson </a>
- */
 public class OracleJmsConnectorTestCase extends AbstractConnectorTestCase
 {
 

@@ -20,10 +20,6 @@ import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.xa.ResourceManagerException;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class VMTransaction extends AbstractSingleResourceTransaction
 {
 

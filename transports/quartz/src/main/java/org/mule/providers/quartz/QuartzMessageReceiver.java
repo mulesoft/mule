@@ -10,6 +10,8 @@
 
 package org.mule.providers.quartz;
 
+import java.util.Date;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageReceiver;
@@ -26,8 +28,6 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-
-import java.util.Date;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the

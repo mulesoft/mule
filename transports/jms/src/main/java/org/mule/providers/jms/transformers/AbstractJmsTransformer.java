@@ -28,9 +28,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.StringUtils;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class that should be used for
@@ -40,47 +38,6 @@ import org.mule.util.StringUtils;
 
 public abstract class AbstractJmsTransformer extends AbstractTransformer
 {
-    public static final char REPLACEMENT_CHAR = '_';
-
-    /**
-     * Encode a String so that is is a valid Java identifier
-     * 
-     * @param name the String to encode
-     * @return a valid JMS header name
-     */
-    public static String encodeHeader(String name)
-    {
-        if (StringUtils.isEmpty(name))
-        {
-            throw new IllegalArgumentException("Header name to encode must not be null or empty");
-        }
-
-        int i = 0, length = name.length();
-        while (i < length && Character.isJavaIdentifierPart(name.charAt(i)))
-        {
-            // zip through
-            i++;
-        }
-
-        if (i == length)
-        {
-            // String is already valid
-            return name;
-        }
-        else
-        {
-            // make a copy, fix up remaining characters
-            StringBuffer sb = new StringBuffer(name);
-            for (int j = i; j < length; j++)
-            {
-                if (!Character.isJavaIdentifierPart(sb.charAt(j)))
-                {
-                    sb.setCharAt(j, REPLACEMENT_CHAR);
-                }
-            }
-            return sb.toString();
-        }
-    }
 
     public AbstractJmsTransformer()
     {
@@ -170,19 +127,22 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 // using JMSReplyTo
                 if (!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination))
                 {
+                    // sanitize key as JMS header
+                    key = JmsMessageUtils.encodeHeader(key);
+
                     try
                     {
-                        msg.setObjectProperty(encodeHeader(key), value);
+                        msg.setObjectProperty(key, value);
                     }
                     catch (JMSException e)
                     {
-                        // Various Jms servers have slightly different rules to what
-                        // can be set as an object property on the message
-                        // As such we have to take a hit n' hope approach
+                        // Various JMS servers have slightly different rules to what
+                        // can be set as an object property on the message; therefore
+                        // we have to take a hit n' hope approach
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug("Unable to set property '" + encodeHeader(key) + "' of type "
-                                         + value.getClass().getName() + "': " + e.getMessage());
+                            logger.debug("Unable to set property '" + key + "' of type "
+                                            + value.getClass().getName() + "': " + e.getMessage());
                         }
                     }
                 }
@@ -192,13 +152,9 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
 
     protected Session getSession() throws UMOException
     {
-        // The session can be closed together with the dispatcher, so it is more
-        // reliable to get it from the dispatcher each time
-        UMOImmutableEndpoint endpoint = this.getEndpoint();
         if (endpoint != null)
         {
-            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
-            return (Session)dispatcher.getDelegateSession();
+            return (Session)endpoint.getConnector().getDelegateSession(endpoint);
         }
         else
         {
