@@ -10,25 +10,19 @@
 
 package org.mule.providers.jbi.components;
 
-import java.util.Map;
-
-import javax.jbi.JBIException;
-
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-<<<<<<< .working
 import java.util.Map;
 
-=======
->>>>>>> .merge-right.r4354
 import javax.jbi.JBIException;
 
 /**
  * A Jbi component that has a Mule muleEndpoint component configured on it. Both the
  * Dispatcher and Receiver components extend this component.
+ *
  */
 public abstract class AbstractEndpointComponent extends AbstractJbiComponent
 {

@@ -32,12 +32,15 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 <<<<<<< .working
+<<<<<<< .working
 import java.io.File;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 =======
+=======
+>>>>>>> .merge-right.r4354
 /**
  * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
  * @version $Revision$

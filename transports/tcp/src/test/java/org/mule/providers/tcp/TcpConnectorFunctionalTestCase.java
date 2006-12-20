@@ -10,6 +10,19 @@
 
 package org.mule.providers.tcp;
 
+<<<<<<< .working
+=======
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+>>>>>>> .merge-right.r4354
 import org.mule.MuleManager;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -21,6 +34,7 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
+<<<<<<< .working
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -32,6 +46,8 @@ import java.net.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+=======
+>>>>>>> .merge-right.r4354
 public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     /**

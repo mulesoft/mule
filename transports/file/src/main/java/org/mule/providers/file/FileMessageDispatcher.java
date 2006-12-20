@@ -144,8 +144,12 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
 
     /**
 <<<<<<< .working
+<<<<<<< .working
 =======
 <<<<<<< .working
+=======
+<<<<<<< .working
+>>>>>>> .merge-right.r4354
      * There is no associated session for a file connector
      * 
      * @throws UMOException
@@ -156,9 +160,14 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
+<<<<<<< .working
 >>>>>>> .merge-right.r4354
 =======
 >>>>>>> .merge-right.r3734
+=======
+=======
+>>>>>>> .merge-right.r3734
+>>>>>>> .merge-right.r4354
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.

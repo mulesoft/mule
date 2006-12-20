@@ -10,11 +10,8 @@
 
 package org.mule.providers.http;
 
-<<<<<<< .working
 import org.mule.MuleManager;
 
-=======
->>>>>>> .merge-right.r4354
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,22 +21,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
 
-<<<<<<< .working
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.io.IOUtils;
 
-=======
-import org.apache.commons.httpclient.ChunkedOutputStream;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpParser;
-import org.apache.commons.httpclient.StatusLine;
-import org.apache.commons.io.IOUtils;
-import org.mule.MuleManager;
-
->>>>>>> .merge-right.r4354
 /**
  * A connection to the SimpleHttpServer.
  */

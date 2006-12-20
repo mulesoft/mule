@@ -1,5 +1,3 @@
-<<<<<<< .working
-=======
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition name="dummyProcess"> 
@@ -17,4 +15,3 @@
   <end-state name="end" />
 
 </process-definition>
->>>>>>> .merge-right.r4354
