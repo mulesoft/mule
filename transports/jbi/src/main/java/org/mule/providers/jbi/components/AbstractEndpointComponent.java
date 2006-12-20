@@ -10,13 +10,20 @@
 
 package org.mule.providers.jbi.components;
 
+import java.util.Map;
+
+import javax.jbi.JBIException;
+
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
+<<<<<<< .working
 import java.util.Map;
 
+=======
+>>>>>>> .merge-right.r4354
 import javax.jbi.JBIException;
 
 /**

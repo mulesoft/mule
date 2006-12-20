@@ -10,6 +10,7 @@
 
 package org.mule.providers.http;
 
+<<<<<<< .working
 
 import org.mule.MuleManager;
 
@@ -17,6 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+=======
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+
+>>>>>>> .merge-right.r4354
 import org.apache.commons.httpclient.ChunkedInputStream;
 import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;

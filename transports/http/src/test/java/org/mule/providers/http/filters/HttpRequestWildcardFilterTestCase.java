@@ -10,6 +10,20 @@
 
 package org.mule.providers.http.filters;
 
+<<<<<<< .working
+=======
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.httpclient.HttpConnection;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.NoHttpResponseException;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+>>>>>>> .merge-right.r4354
 import org.mule.MuleManager;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.PoolingProfile;
@@ -30,10 +44,13 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
+<<<<<<< .working
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URI;
 
+=======
+>>>>>>> .merge-right.r4354
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpState;

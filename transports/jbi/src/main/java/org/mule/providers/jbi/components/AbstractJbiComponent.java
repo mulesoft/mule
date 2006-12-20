@@ -10,6 +10,10 @@
 
 package org.mule.providers.jbi.components;
 
+import org.mule.MuleManager;
+import org.mule.config.converters.QNameConverter;
+import org.mule.util.concurrent.WaitableBoolean;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,9 +39,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.converters.QNameConverter;
-import org.mule.util.concurrent.WaitableBoolean;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 

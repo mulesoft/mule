@@ -143,6 +143,22 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
+<<<<<<< .working
+=======
+<<<<<<< .working
+     * There is no associated session for a file connector
+     * 
+     * @throws UMOException
+     */
+    public Object getDelegateSession() throws UMOException
+    {
+        return null;
+    }
+
+    /**
+>>>>>>> .merge-right.r4354
+=======
+>>>>>>> .merge-right.r3734
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.

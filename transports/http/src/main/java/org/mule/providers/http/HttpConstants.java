@@ -10,11 +10,15 @@
 
 package org.mule.providers.http;
 
-import org.mule.config.MuleProperties;
-import org.mule.util.MapUtils;
-
+<<<<<<< .working
+=======
 import java.util.Collections;
 import java.util.Map;
+
+import org.apache.commons.collections.map.CaseInsensitiveMap;
+>>>>>>> .merge-right.r4354
+import org.mule.config.MuleProperties;
+import org.mule.util.MapUtils;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
