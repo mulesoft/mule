@@ -10,10 +10,6 @@
 
 package org.mule.providers.bpm;
 
-import java.util.Map;
-
-import javax.resource.spi.work.Work;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -22,6 +18,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.Map;
+
+import javax.resource.spi.work.Work;
 
 /**
  * Generates an incoming Mule event from an executing workflow process.

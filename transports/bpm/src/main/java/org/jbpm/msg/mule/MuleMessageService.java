@@ -1,12 +1,13 @@
 package org.jbpm.msg.mule;
 
+import org.mule.umo.UMOMessage;
+
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.graph.exe.Token;
 import org.jbpm.msg.Message;
-import org.mule.umo.UMOMessage;
 
 public class MuleMessageService implements org.jbpm.msg.MessageService {
 

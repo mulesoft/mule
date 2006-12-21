@@ -9,9 +9,9 @@
  */
 package org.mule.providers.bpm;
 
-import java.util.Map;
-
 import org.mule.umo.UMOMessage;
+
+import java.util.Map;
 
 public interface MessageService {
 
