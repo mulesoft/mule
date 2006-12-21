@@ -10,6 +10,11 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.mule.MuleManager;
+import org.mule.providers.jms.JmsConnector;
+import org.mule.transaction.XaTransactionFactory;
+import org.mule.umo.UMOTransactionFactory;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.transaction.TransactionManager;
@@ -18,10 +23,6 @@ import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.ActiveMQXAConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
-import org.mule.MuleManager;
-import org.mule.providers.jms.JmsConnector;
-import org.mule.transaction.XaTransactionFactory;
-import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 

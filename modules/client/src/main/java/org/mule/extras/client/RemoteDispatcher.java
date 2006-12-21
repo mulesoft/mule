@@ -31,7 +31,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.util.MuleObjectHelper;
 
@@ -317,21 +316,20 @@ public class RemoteDispatcher implements Disposable
                          + serverEndpoint.toString() + " .Event is: " + event);
         }
 
-        UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(serverEndpoint);
-
         UMOMessage result = null;
 
         try
         {
             if (synchronous)
             {
-                result = dispatcher.send(event);
+                result = endpoint.send(event);
             }
             else
             {
-                dispatcher.dispatch(event);
+                endpoint.dispatch(event);
                 return null;
             }
+
             if (result != null)
             {
                 if (result.getPayload() != null)
@@ -353,12 +351,7 @@ public class RemoteDispatcher implements Disposable
                     }
                     return (UMOMessage)response;
                 }
-                else
-                {
-                    return result;
-                }
             }
-
         }
         catch (Exception e)
         {

@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.providers.file;
 
-import java.io.File;
-
 import org.mule.tck.FunctionalTestCase;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>

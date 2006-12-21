@@ -10,6 +10,11 @@
 
 package org.mule.config;
 
+import org.mule.impl.work.MuleWorkManager;
+import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.concurrent.NamedThreadFactory;
+import org.mule.util.concurrent.WaitPolicy;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
@@ -17,11 +22,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import org.mule.impl.work.MuleWorkManager;
-import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.concurrent.NamedThreadFactory;
-import org.mule.util.concurrent.WaitPolicy;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a
@@ -40,7 +40,7 @@ public class ThreadingProfile
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    public static final int DEFAULT_MAX_THREADS_IDLE = 4;
+    public static final int DEFAULT_MAX_THREADS_IDLE = 1;
 
     /**
      * Default value for MAX_BUFFER_SIZE
@@ -120,7 +120,6 @@ public class ThreadingProfile
         this.threadWaitTimeout = tp.getThreadWaitTimeout();
         this.poolExhaustPolicy = tp.getPoolExhaustedAction();
         this.doThreading = tp.isDoThreading();
-        this.threadPriority = tp.getThreadPriority();
         this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
         this.threadFactory = tp.getThreadFactory();
         this.workManagerFactory = tp.getWorkManagerFactory();
@@ -144,16 +143,6 @@ public class ThreadingProfile
     public long getThreadWaitTimeout()
     {
         return threadWaitTimeout;
-    }
-
-    public int getThreadPriority()
-    {
-        return threadPriority;
-    }
-
-    public void setThreadPriority(int threadPriority)
-    {
-        this.threadPriority = threadPriority;
     }
 
     public int getPoolExhaustedAction()
@@ -291,7 +280,7 @@ public class ThreadingProfile
 
         if (name != null)
         {
-            threadFactory = new NamedThreadFactory(name, threadPriority);
+            threadFactory = new NamedThreadFactory(name);
             pool.setThreadFactory(threadFactory);
         }
 

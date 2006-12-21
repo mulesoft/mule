@@ -10,10 +10,7 @@
 
 package org.mule.test.routing;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
+import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -31,15 +28,15 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.HashMap;
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import java.util.HashMap;
 
 public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 {
+
     public void testLoggingOnlyStrategy() throws Exception
     {
         UMOEvent event = getTestEvent("UncaughtEvent");
@@ -69,11 +66,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getConnector", connector.proxy());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("equals", C.ANY_ARGS, true);
-        connector.expectAndReturn("getDispatcher", "test://dummy", dispatcher.proxy());
-        dispatcher.expect("dispatch", C.isA(UMOEvent.class));
+        endpoint.expect("dispatch", C.isA(MuleEvent.class));
+
         strategy.catchMessage(event.getMessage(), null, false);
 
         endpoint.verify();
@@ -115,12 +110,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getConnector", connector.proxy());
-        endpoint.expectAndReturn("equals", C.ANY_ARGS, true);
 
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
-        dispatcher.expect("send", new Constraint()
+        endpoint.expect("send", new Constraint()
         {
             public boolean eval(Object arg0)
             {
@@ -131,6 +123,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
                 return false;
             }
         });
+
         strategy.catchMessage(event.getMessage(), null, true);
 
         endpoint.verify();
@@ -198,4 +191,5 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);
     }
+
 }

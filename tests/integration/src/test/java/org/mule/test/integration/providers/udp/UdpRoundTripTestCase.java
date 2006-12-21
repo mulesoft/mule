@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.providers.udp;
 
+import org.mule.tck.FunctionalTestCase;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.io.ByteArrayInputStream;
@@ -20,8 +22,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
-import org.mule.tck.FunctionalTestCase;
 
 public class UdpRoundTripTestCase extends FunctionalTestCase
 {

@@ -20,10 +20,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 /**
  * A Seda component runs inside a Seda Model and is responsible for managing a Seda
  * Queue and thread pool for a Mule sevice component. In Seda terms this is
- * equivilent to a stage.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * equivalent to a stage.
  */
 public class OptimisedSedaComponent extends SedaComponent
 {

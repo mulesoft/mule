@@ -10,14 +10,15 @@
 
 package org.mule.providers;
 
+import org.mule.MuleManager;
+import org.mule.umo.provider.UMOConnectable;
+import org.mule.umo.provider.UMOMessageReceiver;
+
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.umo.provider.UMOConnectable;
-import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * TODO document

@@ -10,9 +10,10 @@
 
 package org.mule.interceptors;
 
+import org.mule.umo.Invocation;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.Invocation;
 
 /**
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message

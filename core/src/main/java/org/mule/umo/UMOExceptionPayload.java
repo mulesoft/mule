@@ -10,8 +10,8 @@
 
 package org.mule.umo;
 
-import java.util.Map;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * <code>UMOExceptionPayload</code> is a message payload that contains exception

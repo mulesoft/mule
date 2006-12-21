@@ -10,8 +10,6 @@
 
 package org.mule.components.builder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
@@ -27,12 +25,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A component that will invoke all outbound endpoints configured on the component
  * allow the result of each endpoint invocation to be aggregated to a single message.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractMessageBuilder implements UMODescriptorAware, Callable, MessageBuilder
 {

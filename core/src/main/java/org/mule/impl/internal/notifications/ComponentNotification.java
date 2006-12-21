@@ -21,8 +21,6 @@ import org.mule.umo.manager.UMOServerNotification;
  * 
  * @see org.mule.impl.MuleDescriptor
  * @see org.mule.umo.UMODescriptor
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ComponentNotification extends UMOServerNotification
 {

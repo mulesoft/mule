@@ -18,9 +18,6 @@ import org.mule.umo.lifecycle.Callable;
 /**
  * Creates an optimised Mule proxy for pooling which does away with the reflection
  * and inteception on objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class OptimisedProxyFactory extends CommonsPoolProxyFactory
 {

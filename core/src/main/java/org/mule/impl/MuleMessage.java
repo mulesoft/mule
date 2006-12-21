@@ -18,17 +18,15 @@ import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import javax.activation.DataHandler;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.activation.DataHandler;
+
 /**
  * <code>MuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleMessage implements UMOMessage

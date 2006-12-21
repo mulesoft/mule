@@ -240,7 +240,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         ThreadingProfile tp = MuleManager.getConfiguration().getDefaultThreadingProfile();
         assertEquals(ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
-        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
+        assertEquals(4, tp.getMaxThreadsIdle());
         assertEquals(ThreadingProfile.WHEN_EXHAUSTED_WAIT, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
@@ -248,7 +248,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         tp = MuleManager.getConfiguration().getDefaultComponentThreadingProfile();
         assertEquals(ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
-        assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, tp.getMaxThreadsIdle());
+        assertEquals(4, tp.getMaxThreadsIdle());
         assertEquals(ThreadingProfile.WHEN_EXHAUSTED_WAIT, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 

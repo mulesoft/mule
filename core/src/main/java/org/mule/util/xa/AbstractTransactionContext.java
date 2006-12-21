@@ -10,9 +10,9 @@
 
 package org.mule.util.xa;
 
-import org.safehaus.uuid.UUIDGenerator;
-
 import javax.transaction.Status;
+
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

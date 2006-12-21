@@ -14,12 +14,9 @@ import java.util.Map;
 
 /**
  * Provides a strategy interface for reading information from an exception in a
- * consistent way. For example JMS 1.0.2b Uses linkedExceptions rather that 'cause'
+ * consistent way. For example JMS 1.0.2b uses linkedExceptions rather that 'cause'
  * and SQLExceptions hold additional information that can be extracted using this
- * interface
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * interface.
  */
 public interface ExceptionReader
 {
@@ -37,4 +34,5 @@ public interface ExceptionReader
      * @return a map of the non-stanard information stored on the exception
      */
     public Map getInfo(Throwable t);
+
 }

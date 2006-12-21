@@ -10,8 +10,6 @@
 
 package org.mule.impl.security;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,12 +28,12 @@ import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.StringUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for
  * all security filters, namely configuring the SecurityManager for this instance
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter

@@ -10,21 +10,6 @@
 
 package org.mule.test.integration.providers.jms;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.HashMap;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -53,6 +38,22 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.HashMap;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 /**
  * <code>AbstractJmsTransactionFunctionalTest</code> is a base class for all JMS

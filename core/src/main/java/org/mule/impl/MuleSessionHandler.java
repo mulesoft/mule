@@ -10,12 +10,6 @@
 
 package org.mule.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -27,6 +21,13 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A default session handler used to store and retrieve session information on an
  * event. The MuleSession information is stored as a header on the message (does not
@@ -34,9 +35,6 @@ import org.mule.umo.transformer.UMOTransformer;
  * wire). The session is stored in the "MULE_SESSION" property as String key/value
  * pairs that are Base64 encoded, for example:
  * ID=dfokokdf-3ek3oke-dkfokd;MySessionProp1=Value1;MySessionProp2=Value2
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleSessionHandler implements UMOSessionHandler
 {

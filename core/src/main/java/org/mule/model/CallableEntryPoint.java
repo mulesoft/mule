@@ -10,9 +10,9 @@
 
 package org.mule.model;
 
-import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.model.UMOEntryPoint;
 
 /**
  * A simple Entrypoint for the callable interface

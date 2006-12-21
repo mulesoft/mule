@@ -45,23 +45,6 @@ import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
-<<<<<<< .working
-=======
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.FatalConnectException;
-import org.mule.providers.soap.SoapConstants;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.TemplateParser;
->>>>>>> .merge-right.r4354
 
 /**
  * The XFireMessageDispatcher is used for making Soap client requests to remote

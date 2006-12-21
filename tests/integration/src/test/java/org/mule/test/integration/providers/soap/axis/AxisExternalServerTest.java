@@ -10,19 +10,19 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
-import junit.framework.TestCase;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
+import junit.framework.TestCase;
 
 /**
  * Requires an external Axis server running in Tomcat with the Calculator.jws service

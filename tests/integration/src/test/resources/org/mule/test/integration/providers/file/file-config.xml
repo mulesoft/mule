@@ -7,10 +7,10 @@
 
     <model name="test">
         <mule-descriptor name="mycomponent"
-            implementation="org.mule.tck.functional.FunctionalTestComponent">
+            implementation="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent">
             <inbound-router>
                 <endpoint address="file://./test">
-                    <filter pattern="*.txt" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
+                    <filter pattern="*.data" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
                 </endpoint>
             </inbound-router>
         </mule-descriptor>

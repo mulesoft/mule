@@ -10,15 +10,11 @@
 
 package org.mule.util.queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.queue.QueuePersistenceStrategy.Holder;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
-
-import javax.transaction.xa.XAResource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +23,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.transaction.xa.XAResource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Transactional Queue Manager is responsible for creating and Managing

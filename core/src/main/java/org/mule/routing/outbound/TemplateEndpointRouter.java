@@ -24,8 +24,8 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The template endpoint router allows endpoints to be alered at runtime based on

@@ -10,8 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import java.util.Iterator;
-
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -19,6 +17,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
+
+import java.util.Iterator;
 
 /**
  * <code>EndpointSelector</code> selects the outgoing endpoint based on a

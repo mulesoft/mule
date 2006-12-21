@@ -14,12 +14,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * Code by (c) 2005 P.Oikari. <p/> This class acts as common baseclass for both Rmi &

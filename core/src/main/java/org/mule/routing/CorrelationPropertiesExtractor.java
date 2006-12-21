@@ -11,8 +11,8 @@
 package org.mule.routing;
 
 import org.mule.config.MuleProperties;
-import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.umo.UMOMessage;
+import org.mule.util.properties.MessagePropertyExtractor;
 
 /**
  * <code>CorrelationPropertiesExtractor</code> is a default implementation used for

@@ -10,12 +10,13 @@
 
 package org.mule.test.integration.providers.file;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+
 import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 
 public class FileAppendConnectorTestCase extends FunctionalTestCase
 {

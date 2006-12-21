@@ -10,11 +10,11 @@
 
 package org.mule.umo.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Default exception Handler used when executing work in the work manager

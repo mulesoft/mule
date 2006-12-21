@@ -10,13 +10,6 @@
 
 package org.mule.impl;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
@@ -45,12 +38,16 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
  * Mule UMOs can be initialised as needed from their descriptor.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ImmutableMuleDescriptor implements UMOImmutableDescriptor

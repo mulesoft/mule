@@ -10,9 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.ContainerKeyPair;
@@ -21,6 +18,10 @@ import org.mule.umo.manager.UMOContainerContext;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ContainerReference</code> maintains a container reference for the

@@ -10,11 +10,12 @@
 
 package org.mule.umo.provider;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
+import org.apache.commons.lang.ObjectUtils;
 
 /**
  * <code>ReceiveException</code> is specifically thrown by the Provider receive

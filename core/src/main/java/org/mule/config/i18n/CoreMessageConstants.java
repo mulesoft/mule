@@ -11,11 +11,8 @@
 package org.mule.config.i18n;
 
 /**
- * <code>CoreMessageConstants</code> contians contants for all Mule core exception
- * messages and other string.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>CoreMessageConstants</code> contains contants for all Mule core exception
+ * messages and other strings.
  */
 public interface CoreMessageConstants
 {

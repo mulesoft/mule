@@ -10,16 +10,17 @@
 
 package org.mule.routing.response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.util.properties.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.util.ClassUtils;
+import org.mule.util.properties.PropertyExtractor;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractResponseRouter</code> is a base class for all Response Routers

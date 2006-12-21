@@ -10,9 +10,6 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -29,7 +26,12 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultReplyToHandler</code> is responsible for processing a message
@@ -83,7 +85,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // dispatch the event
         try
         {
-            endpoint.getConnector().getDispatcher(endpoint).dispatch(replyToEvent);
+            endpoint.dispatch(replyToEvent);
             if (logger.isInfoEnabled())
             {
                 logger.info("reply to sent: " + endpoint);

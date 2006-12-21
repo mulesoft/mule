@@ -32,9 +32,6 @@ import java.util.Map;
  * <environment-properties> element in Mule Xml. The latter element may be removed in
  * the future.
  * </ol>
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class PropertiesContainerContext extends AbstractContainerContext
 {

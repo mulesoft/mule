@@ -10,18 +10,19 @@
 
 package org.mule.test.integration.transaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 import org.mule.util.xa.ResourceManagerException;
-import org.objectweb.jotm.Jotm;
 
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.objectweb.jotm.Jotm;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

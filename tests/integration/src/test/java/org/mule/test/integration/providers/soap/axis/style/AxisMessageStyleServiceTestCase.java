@@ -10,6 +10,13 @@
 
 package org.mule.test.integration.providers.soap.axis.style;
 
+import org.mule.config.MuleProperties;
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.SoapMethod;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +26,6 @@ import javax.xml.rpc.ParameterMode;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.commons.lang.StringUtils;
-import org.mule.config.MuleProperties;
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.SoapMethod;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 {

@@ -26,10 +26,10 @@
 
 package org.mule.test.integration.providers.soap.axis.style;
 
+import javax.xml.soap.SOAPEnvelope;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.xml.soap.SOAPEnvelope;
 
 /**
  * Simple message-style service sample.

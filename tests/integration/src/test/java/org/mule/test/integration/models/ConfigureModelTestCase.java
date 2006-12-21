@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.models;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.MuleManager;
 import org.mule.impl.model.direct.DirectModel;
+import org.mule.tck.FunctionalTestCase;
 
 public class ConfigureModelTestCase extends FunctionalTestCase
 {

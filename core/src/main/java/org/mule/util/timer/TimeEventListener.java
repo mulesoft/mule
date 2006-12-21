@@ -15,9 +15,6 @@ import java.util.EventListener;
 /**
  * <code>TimeEventListener</code> provides a method to pass timer events to
  * implementing objects.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface TimeEventListener extends EventListener
 {

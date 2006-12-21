@@ -10,9 +10,6 @@
 
 package org.mule.config;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
@@ -29,16 +26,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
- * useful for detailing with Mule exceptions. This class has 3 core functions - <p/>
+ * useful for dealing with Mule exceptions. This class has 3 core functions - <p/>
  * 1. ErrorCode lookup. A corresponding Mule error code can be found using for a
  * given Mule exception 2. Addtional Error information such as Java doc url for a
  * given exception can be resolved using this class 3. Error code mappings can be
- * looked up by providing the the protocol to map to and the Mule exception
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * looked up by providing the the protocol to map to and the Mule exception.
  */
 
 public class ExceptionHelper

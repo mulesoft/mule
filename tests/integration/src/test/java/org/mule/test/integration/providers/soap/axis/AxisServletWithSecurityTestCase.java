@@ -1,3 +1,4 @@
+
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -10,6 +11,12 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.servlet.MuleReceiverServlet;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,11 +25,6 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.servlet.MuleReceiverServlet;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {

@@ -10,13 +10,13 @@
 
 package org.mule.providers;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object where

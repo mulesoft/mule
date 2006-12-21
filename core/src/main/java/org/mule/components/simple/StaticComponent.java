@@ -22,9 +22,6 @@ import java.io.IOException;
  * A component that will return a static data object as a result. This is useful for
  * testing with expected results. The data returned can be read from a file or set as
  * a property on this component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class StaticComponent implements Callable, Initialisable
 {
@@ -91,7 +88,6 @@ public class StaticComponent implements Callable, Initialisable
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-
         if (data != null)
         {
             return data;
@@ -108,6 +104,7 @@ public class StaticComponent implements Callable, Initialisable
         {
             eventData += postfix;
         }
+
         return eventData;
     }
 }

@@ -18,9 +18,6 @@ import java.util.Properties;
 /**
  * <code>SocketEndpointBuilder</code> builds an endpointUri based on host and port
  * only
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SocketEndpointBuilder extends AbstractEndpointBuilder
 {

@@ -33,9 +33,6 @@ import javax.resource.spi.work.WorkException;
 
 /**
  * <code>WorkExecutor</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface WorkExecutor
 {

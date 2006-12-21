@@ -10,12 +10,13 @@
 
 package org.mule.interceptors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>TimerInterceptor</code> simply times and displays the time taken to

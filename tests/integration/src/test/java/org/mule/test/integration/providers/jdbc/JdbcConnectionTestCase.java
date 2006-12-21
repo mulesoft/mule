@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.hsqldb.jdbc.jdbcDataSource;
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -22,9 +21,11 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.util.HashMap;
+
 import javax.sql.DataSource;
 
-import java.util.HashMap;
+import org.hsqldb.jdbc.jdbcDataSource;
 
 /**
  * This test must be run manually. See the comments inline in testReconnection

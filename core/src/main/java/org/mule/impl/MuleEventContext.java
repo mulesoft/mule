@@ -10,9 +10,6 @@
 
 package org.mule.impl;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -33,7 +30,12 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import java.io.OutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current request.

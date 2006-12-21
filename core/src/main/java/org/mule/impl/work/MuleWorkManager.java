@@ -27,14 +27,12 @@
 
 package org.mule.impl.work;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.ThreadingProfile;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import javax.resource.spi.XATerminator;
 import javax.resource.spi.work.ExecutionContext;
@@ -43,11 +41,13 @@ import javax.resource.spi.work.WorkCompletedException;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MuleWorkManager</code> is a JCA Work manager implementation used to manage
- * thread allocation for Mule components and connectors This code has been adapted
- * from the Geronimo implementation, and the different pool executors have be used
- * directly from Geronimo.
+ * thread allocation for Mule components and connectors. This code has been adapted
+ * from the Geronimo implementation.
  */
 public class MuleWorkManager implements UMOWorkManager
 {
@@ -58,22 +58,13 @@ public class MuleWorkManager implements UMOWorkManager
 
     /**
      * Pool of threads used by this MuleWorkManager in order to process the Work
-     * instances submitted via the doWork methods.
+     * instances submitted via the (do,start,schedule)Work methods.
      */
-    private WorkExecutorPool syncWorkExecutorPool;
+    private volatile WorkExecutorPool workExecutorPool;
 
     /**
-     * Pool of threads used by this MuleWorkManager in order to process the Work
-     * instances submitted via the startWork methods.
+     * Various policies used for work execution
      */
-    private WorkExecutorPool startWorkExecutorPool;
-
-    /**
-     * Pool of threads used by this MuleWorkManager in order to process the Work
-     * instances submitted via the scheduleWork methods.
-     */
-    private WorkExecutorPool scheduledWorkExecutorPool;
-
     private final WorkExecutor scheduleWorkExecutor = new ScheduleWorkExecutor();
     private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
     private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
@@ -92,23 +83,18 @@ public class MuleWorkManager implements UMOWorkManager
         {
             name = "WorkManager#" + hashCode();
         }
-        syncWorkExecutorPool = new NullWorkExecutorPool(profile, name);
-        startWorkExecutorPool = new NullWorkExecutorPool(profile, name);
-        scheduledWorkExecutorPool = new NullWorkExecutorPool(profile, name);
+
+        workExecutorPool = new NullWorkExecutorPool(profile, name);
     }
 
     public void start() throws UMOException
     {
-        syncWorkExecutorPool = syncWorkExecutorPool.start();
-        startWorkExecutorPool = startWorkExecutorPool.start();
-        scheduledWorkExecutorPool = scheduledWorkExecutorPool.start();
+        workExecutorPool = workExecutorPool.start();
     }
 
     public void stop() throws UMOException
     {
-        syncWorkExecutorPool = syncWorkExecutorPool.stop();
-        startWorkExecutorPool = startWorkExecutorPool.stop();
-        scheduledWorkExecutorPool = scheduledWorkExecutorPool.stop();
+        workExecutorPool = workExecutorPool.stop();
     }
 
     public void dispose()
@@ -120,7 +106,6 @@ public class MuleWorkManager implements UMOWorkManager
         catch (UMOException e)
         {
             logger.warn("Error while disposing Work Manager: " + e.getMessage(), e);
-
         }
     }
 
@@ -130,51 +115,6 @@ public class MuleWorkManager implements UMOWorkManager
         return null;
     }
 
-    public int getSyncThreadCount()
-    {
-        return syncWorkExecutorPool.getPoolSize();
-    }
-
-    public int getSyncMaximumPoolSize()
-    {
-        return syncWorkExecutorPool.getMaximumPoolSize();
-    }
-
-    public void setSyncMaximumPoolSize(int maxSize)
-    {
-        syncWorkExecutorPool.setMaximumPoolSize(maxSize);
-    }
-
-    public int getStartThreadCount()
-    {
-        return startWorkExecutorPool.getPoolSize();
-    }
-
-    public int getStartMaximumPoolSize()
-    {
-        return startWorkExecutorPool.getMaximumPoolSize();
-    }
-
-    public void setStartMaximumPoolSize(int maxSize)
-    {
-        startWorkExecutorPool.setMaximumPoolSize(maxSize);
-    }
-
-    public int getScheduledThreadCount()
-    {
-        return scheduledWorkExecutorPool.getPoolSize();
-    }
-
-    public int getScheduledMaximumPoolSize()
-    {
-        return scheduledWorkExecutorPool.getMaximumPoolSize();
-    }
-
-    public void setScheduledMaximumPoolSize(int maxSize)
-    {
-        scheduledWorkExecutorPool.setMaximumPoolSize(maxSize);
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -182,7 +122,7 @@ public class MuleWorkManager implements UMOWorkManager
      */
     public void doWork(Work work) throws WorkException
     {
-        executeWork(new WorkerContext(work), syncWorkExecutor, syncWorkExecutorPool);
+        executeWork(new WorkerContext(work), syncWorkExecutor, workExecutorPool);
     }
 
     /*
@@ -197,7 +137,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, syncWorkExecutor, syncWorkExecutorPool);
+        executeWork(workWrapper, syncWorkExecutor, workExecutorPool);
     }
 
     /*
@@ -209,7 +149,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor, startWorkExecutorPool);
+        executeWork(workWrapper, startWorkExecutor, workExecutorPool);
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
@@ -227,7 +167,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor, startWorkExecutorPool);
+        executeWork(workWrapper, startWorkExecutor, workExecutorPool);
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
@@ -240,7 +180,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor, scheduledWorkExecutorPool);
+        executeWork(workWrapper, scheduleWorkExecutor, workExecutorPool);
     }
 
     /*
@@ -257,7 +197,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor, scheduledWorkExecutorPool);
+        executeWork(workWrapper, scheduleWorkExecutor, workExecutorPool);
     }
 
     /**
@@ -270,9 +210,9 @@ public class MuleWorkManager implements UMOWorkManager
     private void executeWork(WorkerContext work, WorkExecutor workExecutor, Executor pooledExecutor)
         throws WorkException
     {
-        work.workAccepted(this);
         try
         {
+            work.workAccepted(this);
             workExecutor.doExecute(work, pooledExecutor);
             WorkException exception = work.getWorkException();
             if (null != exception)

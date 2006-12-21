@@ -17,9 +17,6 @@ import org.mule.umo.provider.UMOSessionHandler;
 
 /**
  * A session handler that ignores any session information
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class NullSessionHandler implements UMOSessionHandler
 {

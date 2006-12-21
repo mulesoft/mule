@@ -10,12 +10,12 @@
 
 package org.mule.test.integration.providers.email;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EMailFunctionalTestCase extends AbstractMuleTestCase
 {

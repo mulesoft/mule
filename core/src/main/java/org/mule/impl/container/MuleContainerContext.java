@@ -10,10 +10,10 @@
 
 package org.mule.impl.container;
 
-import java.io.Reader;
-
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
+
+import java.io.Reader;
 
 /**
  * <code>MuleContainerContext</code> is a default resolver that doesn't support

@@ -21,10 +21,6 @@ import org.mule.util.FileUtils;
 
 import java.io.IOException;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ErrorHandlerTestDataGenerator
 {
 

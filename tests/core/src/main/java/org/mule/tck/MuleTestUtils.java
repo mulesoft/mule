@@ -48,20 +48,19 @@ import java.util.HashMap;
 
 /**
  * Utilities for creating test and Mock Mule objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleTestUtils
 {
+
     public static UMOManager getManager(boolean disableAdminService) throws Exception
     {
-        UMOManager manager;
         if (MuleManager.isInstanciated())
         {
             MuleManager.getInstance().dispose();
         }
-        manager = MuleManager.getInstance();
+
+        UMOManager manager = MuleManager.getInstance();
+
         //TODO RM*
 //        if (disableAdminService)
 //        {
@@ -79,8 +78,7 @@ public class MuleTestUtils
     public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
     {
         UMOEndpoint endpoint = new MuleEndpoint();
-        // need to build endpoint this way to avoid depenency to any endpoint
-        // jars
+        // need to build endpoint this way to avoid depenency to any endpoint jars
         UMOConnector connector = null;
         connector = (UMOConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
             AbstractMuleTestCase.class).newInstance();
@@ -133,8 +131,8 @@ public class MuleTestUtils
 
     public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
     {
-        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string",
-            String.class.getName())));
+        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class
+            .getName())));
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
@@ -243,4 +241,5 @@ public class MuleTestUtils
     {
         return new Mock(UMOTransactionFactory.class, "umoTransactionFactory");
     }
+
 }

@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
+import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
+
 import java.util.HashMap;
 
 import javax.jms.ConnectionFactory;
@@ -17,9 +21,6 @@ import javax.jms.ConnectionFactory;
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 
 public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {

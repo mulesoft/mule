@@ -14,11 +14,8 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * Thrown by the ServerNotification Manager it unrecognised listeners or events are
+ * Thrown by the ServerNotification Manager if unrecognised listeners or events are
  * passed to the manager
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class NotificationException extends UMOException
 {

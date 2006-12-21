@@ -10,15 +10,15 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jms.Session;
-
 import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
 import org.mule.umo.UMOTransactionFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jms.Session;
 
 public class JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase extends
     ActiveMQJmsTransactionFunctionalTestCase

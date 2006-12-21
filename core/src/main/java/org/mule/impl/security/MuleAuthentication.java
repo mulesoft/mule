@@ -10,17 +10,11 @@
 
 package org.mule.impl.security;
 
-import java.util.Map;
-
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOCredentials;
 
-/**
- * <code>MuleAuthentication</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import java.util.Map;
+
 public class MuleAuthentication implements UMOAuthentication
 {
     private boolean authenticated;

@@ -10,12 +10,12 @@
 
 package org.mule.config;
 
-import javax.naming.Name;
-import javax.naming.NamingException;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.Name;
+import javax.naming.NamingException;
 
 public class NamingExceptionReader implements ExceptionReader
 {

@@ -10,9 +10,6 @@
 
 package org.mule.providers.service;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -38,6 +35,10 @@ import org.mule.util.ObjectFactory;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ConnectorServiceDescriptor</code> describes the necessery information for

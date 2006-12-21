@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 
 /**
  * This class has methods for displaying the EULA and saving the
@@ -183,6 +184,14 @@ public class LicenseHandler
         File muleLib = new File(muleHome, "lib/mule");
         File tempJar = createAckJarFile(licenseType, licenseVersion);
 
+        // First check if the file exists. We do this in case the license.props
+        // has not yet been loaded into the classpath - which might be the case
+        // with the GUI installer.
+        if (licenseJarExists()) 
+        {
+            return;
+        }
+
         if (!muleLib.canWrite()) {
             // If we can't write to MULE_HOME/lib/mule, try MULE_BASE/lib/user
             if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile())) {
@@ -204,6 +213,60 @@ public class LicenseHandler
 
         if (!tempJar.renameTo(newJarFile))
             throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath());
+    }
+
+    /**
+     * This method checks to see if there is a license jar file already. It 
+     * checks both MULE_HOME/lib/mule and, if relevant, MULE_BASE/lib/user.
+     */
+
+    public boolean licenseJarExists()
+    {
+        try 
+        {
+            File muleLib = new File(muleHome, "lib/mule");
+            File testJarFile = new File(muleLib, ackJarName);
+            JarFile jar = null;
+
+            if (testJarFile.exists())
+            {
+                jar = new JarFile(testJarFile);
+            }
+            else
+            {
+                // Not in MULE_HOME/lib/mule, if MULE_BASE is defined
+                // (and therefore != MULE_HOME), check in MULE_BASE/lib/user
+                if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile())) 
+                {
+                    muleLib = new File(muleBase, "lib/user");
+                    testJarFile = new File(muleLib, ackJarName);
+
+                    if (testJarFile.exists())
+                    { 
+                        jar = new JarFile(testJarFile);
+                    }
+                }
+            }
+
+            if (jar != null)
+            {
+                ZipEntry entry = jar.getEntry(ackFileName);
+
+                // The only way this method will return true is if we
+                // find the license.props file in the jar
+                if (entry != null) 
+                {
+                    return true;
+                }
+            }
+        } 
+        catch (Exception e)
+        {
+            System.out.println("Unknown error checking for license jar: " +
+                    e.toString());
+        }
+
+        return false;
     }
 
     /**

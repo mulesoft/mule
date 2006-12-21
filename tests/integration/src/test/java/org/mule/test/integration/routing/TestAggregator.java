@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.routing;
 
-import java.util.Iterator;
-
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.response.ResponseCorrelationAggregator;
@@ -19,6 +17,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
 
 public class TestAggregator extends ResponseCorrelationAggregator
 {

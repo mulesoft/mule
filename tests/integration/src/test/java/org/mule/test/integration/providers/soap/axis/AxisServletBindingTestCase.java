@@ -10,13 +10,14 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
+import org.mule.providers.http.servlet.MuleReceiverServlet;
+import org.mule.test.integration.providers.soap.AbstractSoapFunctionalTestCase;
+
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
-import org.mule.providers.http.servlet.MuleReceiverServlet;
-import org.mule.test.integration.providers.soap.AbstractSoapFunctionalTestCase;
 
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {

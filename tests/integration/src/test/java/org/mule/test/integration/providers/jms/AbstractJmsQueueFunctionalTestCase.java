@@ -10,6 +10,16 @@
 
 package org.mule.test.integration.providers.jms;
 
+import org.mule.MuleManager;
+import org.mule.providers.jms.JmsMessageReceiver;
+import org.mule.tck.functional.EventCallback;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -20,16 +30,6 @@ import javax.jms.QueueConnection;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.TopicConnection;
-
-import org.mule.MuleManager;
-import org.mule.providers.jms.JmsMessageReceiver;
-import org.mule.tck.functional.EventCallback;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {

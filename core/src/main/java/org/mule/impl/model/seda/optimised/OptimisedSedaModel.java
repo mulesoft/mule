@@ -16,11 +16,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 
 /**
- * A mule component service model that uses Seda principals to achieve high
- * throughput by Quing events for compoonents and processing them concurrently.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A Mule component service model that uses Seda principles to achieve high
+ * throughput by queueing events for components and processing them concurrently.
  */
 public class OptimisedSedaModel extends SedaModel
 {

@@ -27,32 +27,29 @@
 
 package org.mule.impl.work;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import org.mule.config.ThreadingProfile;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import org.mule.config.ThreadingProfile;
-import org.mule.util.concurrent.WaitPolicy;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Based class for WorkExecutorPool. Sub-classes define the synchronization policy
- * (should the call block until the end of the work; or when it starts et cetera).
- * 
- * @version $Rev$ $Date$
+ * Base class for WorkExecutorPool. Sub-classes define the synchronization policy
+ * (should the call block until the end of the work or when it starts et cetera).
  */
 public class WorkExecutorPoolImpl implements WorkExecutorPool
 {
-
-    /**
-     * A timed out pooled executor.
-     */
-    private ThreadPoolExecutor pooledExecutor;
-
-    private ThreadingProfile profile;
-
-    private String name;
-
     private static final long SHUTDOWN_TIMEOUT = 5000L;
+
+    private final Log logger = LogFactory.getLog(getClass());
+
+    private final ThreadPoolExecutor pooledExecutor;
+    private final ThreadingProfile profile;
+    private final String name;
 
     /**
      * Creates a pool with the specified minimum and maximum sizes. The Channel used
@@ -66,22 +63,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     {
         this.profile = profile;
         this.name = name;
-        pooledExecutor = profile.createPool(name);
-    }
-
-    /**
-     * Creates a pool with the specified minimum and maximum sizes and using the
-     * specified Channel to enqueue the submitted Work instances.
-     * 
-     * @param queue Queue to be used as the queueing facility of this pool.
-     * @param maxSize Maximum size of the work executor pool.
-     */
-    public WorkExecutorPoolImpl(BlockingQueue queue, int maxSize)
-    {
-        pooledExecutor = new ThreadPoolExecutor(0, maxSize, 60L, TimeUnit.SECONDS, queue);
-        pooledExecutor.setCorePoolSize(maxSize);
-        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy(
-            ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
+        this.pooledExecutor = profile.createPool(name);
     }
 
     /**
@@ -124,25 +106,34 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
 
     public WorkExecutorPool start()
     {
-        throw new IllegalStateException("This pooled executor is already started");
+        throw new IllegalStateException("This WorkExecutorPool is already started");
     }
 
     /**
-     * Stops this pool. Prior to stop this pool, all the enqueued Work instances are
-     * processed, if possible, in the allowed timeout. After what, all threads are
-     * interrupted and waited for. This is an mix orderly / abrupt shutdown.
+     * Stops this pool immediately: all threads are interrupted and waited for.
      */
     public WorkExecutorPool stop()
     {
-        pooledExecutor.shutdownNow();
+        // Cancel currently executing tasks
+        List outstanding = pooledExecutor.shutdownNow();
+
         try
         {
-            pooledExecutor.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS);
+            // Wait a while for existing tasks to terminate
+            if (!pooledExecutor.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                logger.warn("Pool " + name + " did not terminate in time; " + outstanding.size()
+                                + " work items were cancelled.");
+            }
         }
-        catch (InterruptedException e)
+        catch (InterruptedException ie)
         {
-            // Continue
+            // (Re-)Cancel if current thread also interrupted
+            pooledExecutor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
         }
+
         return new NullWorkExecutorPool(profile, name);
     }
 

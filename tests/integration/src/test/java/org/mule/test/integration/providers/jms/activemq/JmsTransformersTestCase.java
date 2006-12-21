@@ -10,6 +10,14 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.mule.impl.RequestContext;
+import org.mule.providers.jms.transformers.AbstractJmsTransformer;
+import org.mule.providers.jms.transformers.JMSMessageToObject;
+import org.mule.providers.jms.transformers.ObjectToJMSMessage;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.compression.CompressionStrategy;
+import org.mule.util.compression.GZipCompression;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
@@ -25,13 +33,6 @@ import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.impl.RequestContext;
-import org.mule.providers.jms.transformers.AbstractJmsTransformer;
-import org.mule.providers.jms.transformers.JMSMessageToObject;
-import org.mule.providers.jms.transformers.ObjectToJMSMessage;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.compression.CompressionStrategy;
-import org.mule.util.compression.GZipCompression;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.

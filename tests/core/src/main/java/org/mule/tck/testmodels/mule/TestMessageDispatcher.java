@@ -13,16 +13,9 @@ package org.mule.tck.testmodels.mule;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.RoutingException;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class TestMessageDispatcher extends AbstractMessageDispatcher
 {
 
@@ -53,17 +46,12 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         return event.getMessage();
     }
 
-    public UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    public UMOMessage doReceive(long timeout) throws Exception
     {
         return null;
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
-    protected void doConnect(UMOImmutableEndpoint endpoint) throws Exception
+    protected void doConnect() throws Exception
     {
         // no op
     }

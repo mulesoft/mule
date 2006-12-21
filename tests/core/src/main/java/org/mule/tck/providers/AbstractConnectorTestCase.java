@@ -19,7 +19,6 @@ import java.util.HashMap;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -30,7 +29,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints
@@ -226,16 +225,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(adapter);
     }
 
-    public void testConnectorMessageDispatcher() throws Exception
+    public void testConnectorMessageDispatcherFactory() throws Exception
     {
         UMOConnector connector = getConnector();
         assertNotNull(connector);
-        assertNotNull(connector.getDispatcherFactory());
-        UMOMessageDispatcher dispatcher = connector.getDispatcher(new ImmutableMuleEndpoint("test",
-            new MuleEndpointURI(getTestEndpointURI()), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0,
-            null, null));
-        assertNotNull(dispatcher);
-        assertEquals(connector, dispatcher.getConnector());
+        
+        UMOMessageDispatcherFactory factory = connector.getDispatcherFactory();
+        assertNotNull(factory);
     }
 
     public void testConnectorInitialise() throws Exception

@@ -10,10 +10,10 @@
 
 package org.mule.model;
 
-import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.umo.model.UMOEntryPoint;
-import org.mule.umo.model.ModelException;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.model.ModelException;
+import org.mule.umo.model.UMOEntryPoint;
+import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
  * An entrypoint resolver that only allows Service objects that implmement the

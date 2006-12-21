@@ -10,10 +10,10 @@
 
 package org.mule.util.xa;
 
-import javax.transaction.xa.Xid;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.transaction.xa.Xid;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

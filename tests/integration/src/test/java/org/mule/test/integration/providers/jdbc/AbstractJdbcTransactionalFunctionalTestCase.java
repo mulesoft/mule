@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
@@ -25,6 +23,8 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.HashMap;
 

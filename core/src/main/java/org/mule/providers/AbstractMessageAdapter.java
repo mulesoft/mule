@@ -20,6 +20,9 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
 import org.mule.util.UUID;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -32,9 +35,6 @@ import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for simple

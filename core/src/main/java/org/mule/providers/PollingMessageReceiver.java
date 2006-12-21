@@ -10,17 +10,15 @@
 
 package org.mule.providers;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import javax.resource.spi.work.Work;
 
 /**
  * <p>
@@ -47,23 +45,61 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     public void doStart() throws UMOException
     {
-        try
-        {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
-        }
-        catch (WorkException e)
-        {
-            stopped.set(true);
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
-        }
+//        // this is the old way of polling, constantly occupying a thread for no good reason
+//        try
+//        {
+//            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
+//        }
+//        catch (WorkException e)
+//        {
+//            stopped.set(true);
+//            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+//        }
+
+        // TODO: handle exceptions & keep the returned ScheduledFuture for cancelling ourselves
+
+        // we use scheduleWithFixedDelay to prevent queue-up of tasks when polling
+        // takes longer than the specified frequency, e.g. when the polled database
+        // or network is slow or returns large amounts of data.
+        connector.getScheduler().scheduleWithFixedDelay(this, STARTUP_DELAY, frequency, TimeUnit.MILLISECONDS);
     }
 
+//    public void run()
+//    {
+//        try
+//        {
+//            Thread.sleep(STARTUP_DELAY);
+//            while (!stopped.get())
+//            {
+//                connected.whenTrue(null);
+//                try
+//                {
+//                    poll();
+//                }
+//                catch (InterruptedException e)
+//                {
+//                    return;
+//                }
+//                catch (Exception e)
+//                {
+//                    handleException(e);
+//                }
+//                Thread.sleep(frequency);
+//            }
+//        }
+//        catch (InterruptedException e)
+//        {
+//            // Exit thread
+//        }
+//    }
+
+    // the new run can safely exit after each poll() since it will be
+    // invoked again by the connector's scheduler
     public void run()
     {
         try
         {
-            Thread.sleep(STARTUP_DELAY);
-            while (!stopped.get())
+            if (!stopped.get())
             {
                 connected.whenTrue(null);
                 try
@@ -78,12 +114,11 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
                 {
                     handleException(e);
                 }
-                Thread.sleep(frequency);
             }
         }
         catch (InterruptedException e)
         {
-            // Exit thread
+            // ignore? re-raise interrupted state?
         }
     }
 

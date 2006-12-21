@@ -18,9 +18,6 @@ import org.mule.umo.manager.UMOServerNotificationListener;
  * <code>UMOManager.fireCustomEvent(..)</code>. Custom notifications can be used
  * by components and other objects such as routers, transformers, agents, etc to
  * communicate a change of state to each other.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface CustomNotificationListener extends UMOServerNotificationListener
 {

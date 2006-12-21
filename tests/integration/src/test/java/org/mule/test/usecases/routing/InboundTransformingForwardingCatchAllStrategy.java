@@ -19,7 +19,7 @@ import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
@@ -29,23 +29,21 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        if (getEndpoint() == null)
+        UMOEndpoint endpoint = this.getEndpoint();
+
+        if (endpoint == null)
         {
             throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message,
                 getEndpoint(), session.getComponent());
         }
         try
         {
-
-            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
-
             message = new MuleMessage(RequestContext.getEventContext().getTransformedMessage(), message);
-
-            UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
+            UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);
 
             if (synchronous)
             {
-                UMOMessage result = dispatcher.send(newEvent);
+                UMOMessage result = endpoint.send(newEvent);
                 if (statistics != null)
                 {
                     statistics.incrementRoutedMessage(getEndpoint());
@@ -54,7 +52,7 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
             }
             else
             {
-                dispatcher.dispatch(newEvent);
+                endpoint.dispatch(newEvent);
                 if (statistics != null)
                 {
                     statistics.incrementRoutedMessage(getEndpoint());
@@ -65,8 +63,7 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
         }
         catch (Exception e)
         {
-            throw new RoutingException(message, getEndpoint(), e);
-
+            throw new RoutingException(message, endpoint, e);
         }
     }
 }

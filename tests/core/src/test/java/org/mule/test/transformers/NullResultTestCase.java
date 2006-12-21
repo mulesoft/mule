@@ -16,9 +16,6 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-/**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
- */
 public class NullResultTestCase extends AbstractTransformerTestCase
 {
 

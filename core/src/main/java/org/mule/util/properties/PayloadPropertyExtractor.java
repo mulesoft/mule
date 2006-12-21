@@ -12,11 +12,12 @@ package org.mule.util.properties;
 
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Checks the payload object for a bean property matching the property name

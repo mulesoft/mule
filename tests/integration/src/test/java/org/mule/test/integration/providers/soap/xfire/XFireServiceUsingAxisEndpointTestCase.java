@@ -10,6 +10,11 @@
 
 package org.mule.test.integration.providers.soap.xfire;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleMessage;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +22,6 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase
 {

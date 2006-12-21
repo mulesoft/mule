@@ -10,9 +10,9 @@
 
 package org.mule.transformers.simple;
 
-import java.io.ObjectStreamConstants;
-
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.ObjectStreamConstants;
 
 /**
  * <code>ByteArrayToObject</code> works in the same way as

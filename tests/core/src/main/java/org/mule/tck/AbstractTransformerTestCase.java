@@ -10,19 +10,16 @@
 
 package org.mule.tck;
 
-import java.util.Arrays;
-
 import org.mule.impl.RequestContext;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import java.util.Arrays;
+
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
+
     protected void doSetUp() throws Exception
     {
         // setup a dummy context for transformers that are event aware

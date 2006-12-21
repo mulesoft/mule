@@ -17,10 +17,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
- *         ConnectorServiceMBean.java 3167 2006-09-22 15:47:04Z holger $
- */
 public interface ConnectorServiceMBean
 {
 
@@ -36,6 +32,7 @@ public interface ConnectorServiceMBean
 
     ExceptionListener getExceptionListener();
 
+    // TODO HH: we should probably get rid of this, the factory is nobody's business
     UMOMessageDispatcherFactory getDispatcherFactory();
 
     void startConnector() throws UMOException;
@@ -45,4 +42,5 @@ public interface ConnectorServiceMBean
     void dispose();
 
     void initialise() throws InitialisationException, RecoverableException;
+
 }

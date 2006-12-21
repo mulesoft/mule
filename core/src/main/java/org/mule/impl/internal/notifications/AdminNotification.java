@@ -18,9 +18,6 @@ import java.util.Map;
 
 /**
  * <code>AdminNotification</code> is used to invoke actions on a remote mule server
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class AdminNotification extends UMOServerNotification

@@ -10,8 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.transaction.TransactionCallback;
@@ -27,6 +25,9 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>OutboundMessageRouter</code> is a container of routers. An

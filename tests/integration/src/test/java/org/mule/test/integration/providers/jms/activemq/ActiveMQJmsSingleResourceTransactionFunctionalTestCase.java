@@ -10,6 +10,13 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
+import org.mule.providers.jms.JmsTransactionFactory;
+import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
+import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
+import org.mule.umo.UMOTransactionFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,12 +25,6 @@ import javax.jms.ConnectionFactory;
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.broker.impl.BrokerContainerFactoryImpl;
 import org.activemq.store.vm.VMPersistenceAdapter;
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.JmsTransactionFactory;
-import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
-import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
-import org.mule.umo.UMOTransactionFactory;
 
 public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends
     AbstractJmsTransactionFunctionalTest

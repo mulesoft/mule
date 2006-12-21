@@ -10,9 +10,6 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -43,15 +40,17 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.io.OutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
  * Receivers provided with Mule. A message receiver enables an endpoint to receive a
  * message from an external system.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 {
@@ -120,10 +119,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
-        workManager = this.connector.createReceiverWorkManager(endpoint.getName());
         try
         {
-            workManager.start();
+            workManager = this.connector.getReceiverWorkManager(endpoint.getName());
         }
         catch (UMOException e)
         {

@@ -10,14 +10,8 @@
 
 package org.mule.routing.outbound;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.util.ClassUtils;
 import org.mule.config.MuleProperties;
-import org.mule.util.properties.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOException;
@@ -26,10 +20,18 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.properties.PropertyExtractor;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks

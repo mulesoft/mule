@@ -18,6 +18,7 @@ import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

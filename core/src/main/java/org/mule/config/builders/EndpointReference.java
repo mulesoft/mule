@@ -10,8 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -26,6 +24,9 @@ import org.mule.util.MuleObjectHelper;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>EndpointReference</code> maintains a endpoint reference. Endpoints are

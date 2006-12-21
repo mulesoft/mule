@@ -10,10 +10,6 @@
 
 package org.mule.routing.response;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
@@ -23,6 +19,10 @@ import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.MapUtils;
 import org.mule.util.concurrent.Latch;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for implementing

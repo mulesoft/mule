@@ -10,8 +10,6 @@
 
 package org.mule.routing.inbound;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.io.IOUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.umo.UMOEvent;
@@ -22,6 +20,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.SerializationException;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * todo document
@@ -56,7 +59,19 @@ public class MessageChunkingAggregator extends CorrelationAggregator
                 UMOEvent event = (UMOEvent)iterator.next();
                 baos.write(event.getMessageAsBytes());
             }
-            UMOMessage message = new MuleMessage(baos.toByteArray(), firstEvent.getMessage());
+            UMOMessage message;
+            // try to deserialize message, since ChunkingRouter might have serialized
+            // the object...
+            try
+            {
+                message = new MuleMessage(SerializationUtils.deserialize(baos.toByteArray()),
+                    firstEvent.getMessage());
+
+            }
+            catch (SerializationException e)
+            {
+                message = new MuleMessage(baos.toByteArray(), firstEvent.getMessage());
+            }
             message.setCorrelationGroupSize(-1);
             message.setCorrelationSequence(-1);
             return message;
@@ -89,7 +104,8 @@ public class MessageChunkingAggregator extends CorrelationAggregator
         {
             UMOEvent event1 = (UMOEvent)o1;
             UMOEvent event2 = (UMOEvent)o2;
-            if (event1.getMessage().getCorrelationSequence() > event2.getMessage().getCorrelationSequence())
+            if (event1.getMessage().getCorrelationSequence() > event2.getMessage()
+                .getCorrelationSequence())
             {
                 return 1;
             }

@@ -10,7 +10,6 @@
 
 package org.mule.transformers.codec;
 
-
 /**
  * Decodes a String containing XML entities into its proper XML representation
  * 
@@ -27,7 +26,7 @@ public class SgmlEntityDecoder extends XmlEntityDecoder
     {
         super();
         logger.warn(this.getClass().getName() + " is deprecated; please use "
-                    + this.getClass().getSuperclass().getName());
+                        + this.getClass().getSuperclass().getName());
     }
 
 }

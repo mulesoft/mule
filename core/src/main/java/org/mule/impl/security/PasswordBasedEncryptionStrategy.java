@@ -14,22 +14,19 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 
+import java.security.GeneralSecurityException;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.KeySpec;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import java.security.GeneralSecurityException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.KeySpec;
-
 /**
- * PRovides password-based encryption using JCE. Users must specify a password and
+ * Provides password-based encryption using JCE. Users must specify a password and
  * optionally a salt and iteration count as well. The default algorithm is
  * PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrategy
 {

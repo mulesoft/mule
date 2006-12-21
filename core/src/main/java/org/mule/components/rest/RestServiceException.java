@@ -14,12 +14,6 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class RestServiceException extends MessagingException
 {
     /**

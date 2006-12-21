@@ -22,9 +22,6 @@ import java.util.Iterator;
 /**
  * Can be used to bridge inbound requests to an outbound router without any
  * processing done inbetween.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class BridgeComponent implements UMODescriptorAware, Callable
 {

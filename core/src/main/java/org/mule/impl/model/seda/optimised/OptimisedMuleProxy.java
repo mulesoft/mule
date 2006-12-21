@@ -10,8 +10,6 @@
 
 package org.mule.impl.model.seda.optimised;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleDescriptor;
@@ -31,16 +29,15 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.model.ModelException;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
- * can be executed in it's own thread.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that can be
+ * executed in its own thread.
  */
 
 public class OptimisedMuleProxy implements MuleProxy
@@ -68,9 +65,6 @@ public class OptimisedMuleProxy implements MuleProxy
     private ObjectPool proxyPool;
 
     private ComponentStatistics stat = null;
-
-    // Never read locally
-    // private QueueSession queueSession = null;
 
     private Callable umo;
 
@@ -160,7 +154,6 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     public void onEvent(QueueSession session, UMOEvent event)
     {
-        // this.queueSession = session;
         this.event = event;
     }
 
@@ -437,9 +430,7 @@ public class OptimisedMuleProxy implements MuleProxy
             }
             else
             {
-                UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(
-                    event.getEndpoint());
-                dispatcher.dispatch(event);
+                event.getEndpoint().dispatch(event);
             }
 
             if (stat.isEnabled())

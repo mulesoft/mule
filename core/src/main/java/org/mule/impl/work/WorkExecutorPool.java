@@ -32,8 +32,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 /**
  * Defines the operations that a pool in charge of the execution of Work instances
  * must expose.
- * 
- * @version $Rev$ $Date$
  */
 public interface WorkExecutorPool extends Executor
 {

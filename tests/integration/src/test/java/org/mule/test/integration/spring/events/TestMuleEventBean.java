@@ -10,12 +10,13 @@
 
 package org.mule.test.integration.spring.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.extras.spring.events.MuleApplicationEvent;
 import org.mule.extras.spring.events.MuleEventListener;
 import org.mule.tck.functional.EventCallback;
 import org.mule.util.StringMessageUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
 
 /**

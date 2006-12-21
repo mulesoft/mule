@@ -10,11 +10,12 @@
 
 package org.mule.transformers.compression;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.IOException;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> TODO

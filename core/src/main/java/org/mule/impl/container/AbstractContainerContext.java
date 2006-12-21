@@ -25,10 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractContainerContext</code> provides base container configuration
- * functions for handling embedded configuration
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * functions for handling embedded configuration.
  */
 public abstract class AbstractContainerContext implements UMOContainerContext
 {

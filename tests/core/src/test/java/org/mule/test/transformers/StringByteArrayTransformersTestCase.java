@@ -17,12 +17,9 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Arrays;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {
+
     public UMOTransformer getTransformer() throws Exception
     {
         return new StringToByteArray();

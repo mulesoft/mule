@@ -20,10 +20,7 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import java.io.Reader;
 
 /**
- * will Load the component form the descriptors' own properties
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Will load the component from the descriptors' own properties.
  */
 public class DescriptorContainerContext extends AbstractContainerContext
 {

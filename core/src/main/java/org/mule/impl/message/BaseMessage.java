@@ -17,9 +17,6 @@ import java.util.Map;
 /**
  * <code>BaseMessage</code> A default message implementation used for messages sent
  * over the wire. client messages should NOT implement UMOMessage.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class BaseMessage implements Serializable
 {

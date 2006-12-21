@@ -10,18 +10,18 @@
 
 package org.mule.test.integration.providers.quartz;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.jobs.MuleClientReceiveJob;
 import org.mule.tck.AbstractMuleTestCase;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

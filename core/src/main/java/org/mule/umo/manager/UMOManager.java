@@ -22,9 +22,9 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.queue.QueueManager;
 
-import javax.transaction.TransactionManager;
-
 import java.util.Map;
+
+import javax.transaction.TransactionManager;
 
 /**
  * <code>UMOManager</code> maintains and provides services for a UMO server

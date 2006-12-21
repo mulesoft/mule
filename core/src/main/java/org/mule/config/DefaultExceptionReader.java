@@ -16,9 +16,6 @@ import java.util.Map;
 /**
  * This is the default exception reader used if there is no specific one registered
  * for the current exception.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public final class DefaultExceptionReader implements ExceptionReader
 {

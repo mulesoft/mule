@@ -24,7 +24,6 @@ import java.util.Properties;
 /**
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for
  * most connectors
- * 
  */
 
 public abstract class AbstractEndpointBuilder implements EndpointBuilder

@@ -10,13 +10,14 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * These notifications are fire when either a message is received via an endpoint, or

@@ -15,12 +15,6 @@ import org.mule.impl.model.AbstractModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 
-/**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class PipelineModel extends AbstractModel
 {
     protected UMOComponent createComponent(UMODescriptor descriptor)

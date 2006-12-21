@@ -10,18 +10,16 @@
 
 package org.mule.components.simple;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * <code>LogComponent</code> Simply logs the content (or content length if it is a
+ * <code>LogComponent</code> simply logs the content (or content length if it is a
  * large message)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class LogComponent implements Callable, LogService
 {
@@ -32,7 +30,7 @@ public class LogComponent implements Callable, LogService
         String contents = context.getMessageAsString();
         String msg = "Message received in component: " + context.getComponentDescriptor().getName();
         msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
-                                                + StringMessageUtils.truncate(contents, 100, true) + "'");
+                        + StringMessageUtils.truncate(contents, 100, true) + "'");
         log(msg);
         return null;
     }

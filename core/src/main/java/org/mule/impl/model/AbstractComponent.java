@@ -10,9 +10,6 @@
 
 package org.mule.impl.model;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -29,18 +26,23 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.concurrent.WaitableBoolean;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A base implementation for all UMOComponents in Mule
@@ -353,18 +355,19 @@ public abstract class AbstractComponent implements UMOComponent
 
         // Dispatching event to an inbound endpoint
         // in the MuleSession#dispatchEvent
-        if (!event.getEndpoint().canReceive())
+        UMOImmutableEndpoint endpoint = event.getEndpoint();
+
+        if (!endpoint.canReceive())
         {
-            UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(
-                event.getEndpoint());
             try
             {
-                dispatcher.dispatch(event);
+                endpoint.dispatch(event);
             }
             catch (Exception e)
             {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
+
             return;
         }
 
@@ -373,6 +376,7 @@ public abstract class AbstractComponent implements UMOComponent
         {
             stats.incReceivedEventASync();
         }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Component: " + descriptor.getName() + " has received asynchronous event on: "

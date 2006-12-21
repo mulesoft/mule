@@ -21,25 +21,22 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
 public class SerializedUMOMessageTransformersTestCase extends AbstractTransformerTestCase
 {
     private UMOMessage testObject = null;
 
     protected void doSetUp() throws Exception
     {
-        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"),
-            MuleTestUtils.getTestSession(), true));
+        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
+            .getTestSession(), true));
     }
 
     protected void doTearDown() throws Exception
@@ -119,12 +116,12 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
         if (src instanceof UMOMessage && result instanceof UMOMessage)
         {
             return ((UMOMessage)src).getPayload().equals(((UMOMessage)result).getPayload())
-                   && ((UMOMessage)src).getProperty("object").equals(
-                       ((UMOMessage)result).getProperty("object"))
-                   && ((UMOMessage)src).getProperty("string").equals(
-                       ((UMOMessage)result).getProperty("string"))
-                   && ((UMOMessage)src).getIntProperty("number", -1) == ((UMOMessage)result).getIntProperty(
-                       "number", -2);
+                            && ((UMOMessage)src).getProperty("object").equals(
+                                ((UMOMessage)result).getProperty("object"))
+                            && ((UMOMessage)src).getProperty("string").equals(
+                                ((UMOMessage)result).getProperty("string"))
+                            && ((UMOMessage)src).getIntProperty("number", -1) == ((UMOMessage)result)
+                                .getIntProperty("number", -2);
         }
         else
         {

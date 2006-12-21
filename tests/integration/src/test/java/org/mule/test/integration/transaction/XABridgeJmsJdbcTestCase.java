@@ -10,14 +10,15 @@
 
 package org.mule.test.integration.transaction;
 
+import org.mule.providers.jdbc.JdbcUtils;
+import org.mule.tck.FunctionalTestCase;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
-import org.mule.providers.jdbc.JdbcUtils;
-import org.mule.tck.FunctionalTestCase;
 
 public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
 {

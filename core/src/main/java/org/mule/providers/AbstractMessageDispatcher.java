@@ -10,20 +10,11 @@
 
 package org.mule.providers;
 
-import java.beans.ExceptionListener;
-import java.io.OutputStream;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkManager;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
@@ -34,7 +25,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.DispatchException;
@@ -44,6 +34,15 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.beans.ExceptionListener;
+import java.io.OutputStream;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p/> <code>AbstractMessageDispatcher</code> provides a default dispatch (client)
@@ -91,10 +90,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         doThreading = profile.isDoThreading();
         if (doThreading)
         {
-            workManager = connector.createDispatcherWorkManager(connector.getName() + ".dispatchers");
             try
             {
-                workManager.start();
+                workManager = connector.getDispatcherWorkManager();
             }
             catch (UMOException e)
             {
@@ -273,25 +271,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpointUri the endpoint URI to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     *             //@deprecated Use receive(UMOImmutableEndpoint endpoint, long
-     *             timeout)
-     */
-    public final UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
-        return receive(new ImmutableMuleEndpoint(endpointUri.toString(), true), timeout);
-    }
-
-    /**
-     * Make a specific request to the underlying transport
-     * 
      * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
@@ -301,33 +280,30 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    public final UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    public final UMOMessage receive(long timeout) throws Exception
     {
         try
         {
-            try
+            // Make sure we are connected
+            connectionStrategy.connect(this);
+            UMOMessage result = doReceive(timeout);
+            if (result != null && connector.isEnableMessageEvents())
             {
-                // Make sure we are connected
-                connectionStrategy.connect(this);
-                UMOMessage result = doReceive(endpoint, timeout);
-                if (result != null && connector.isEnableMessageEvents())
-                {
-                    String component = null;
-                    connector.fireNotification(new MessageNotification(result, endpoint, component,
-                        MessageNotification.MESSAGE_RECEIVED));
-                }
-                return result;
+                String component = null;
+                connector.fireNotification(new MessageNotification(result, endpoint, component,
+                    MessageNotification.MESSAGE_RECEIVED));
             }
-            catch (DispatchException e)
-            {
-                dispose();
-                throw e;
-            }
-            catch (Exception e)
-            {
-                dispose();
-                throw new ReceiveException(endpoint, timeout, e);
-            }
+            return result;
+        }
+        catch (DispatchException e)
+        {
+            dispose();
+            throw e;
+        }
+        catch (Exception e)
+        {
+            dispose();
+            throw new ReceiveException(endpoint, timeout, e);
         }
         finally
         {
@@ -336,7 +312,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 dispose();
             }
         }
-
     }
 
     /*
@@ -394,6 +369,11 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     public UMOConnector getConnector()
     {
         return connector;
+    }
+
+    public UMOImmutableEndpoint getEndpoint()
+    {
+        return endpoint;
     }
 
     /**
@@ -482,7 +462,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
         try
         {
-            doConnect(endpoint);
+            doConnect();
             connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                 ConnectionNotification.CONNECTION_CONNECTED));
         }
@@ -550,7 +530,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected abstract UMOMessage doSend(UMOEvent event) throws Exception;
 
-    protected abstract void doConnect(UMOImmutableEndpoint endpoint) throws Exception;
+    protected abstract void doConnect() throws Exception;
 
     protected abstract void doDisconnect() throws Exception;
 
@@ -566,7 +546,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected abstract UMOMessage doReceive(UMOImmutableEndpoint endpoint, long timeout) throws Exception;
+    protected abstract UMOMessage doReceive(long timeout) throws Exception;
 
     private class Worker implements Work
     {

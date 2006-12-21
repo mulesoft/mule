@@ -10,11 +10,12 @@
 
 package org.mule.routing;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for

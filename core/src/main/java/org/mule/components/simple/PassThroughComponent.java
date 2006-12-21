@@ -15,13 +15,11 @@ import org.mule.umo.lifecycle.Callable;
 
 /**
  * <code>PassThroughComponent</code> will simply return the payload back as the
- * result
- * 
- * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
- * @version $Revision$
+ * result.
  */
 public class PassThroughComponent implements Callable
 {
+
     public Object onCall(UMOEventContext context) throws Exception
     {
         return context.getTransformedMessage();

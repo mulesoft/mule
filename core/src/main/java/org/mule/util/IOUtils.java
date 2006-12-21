@@ -10,6 +10,9 @@
 
 package org.mule.util;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +23,6 @@ import java.security.PrivilegedAction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 // @ThreadSafe
 /**

@@ -10,12 +10,6 @@
 
 package org.mule.test.integration.providers.http;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConnector;
@@ -24,6 +18,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {

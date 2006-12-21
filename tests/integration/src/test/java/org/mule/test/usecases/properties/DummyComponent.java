@@ -10,11 +10,11 @@
 
 package org.mule.test.usecases.properties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.impl.RequestContext;
 import org.mule.routing.outbound.StaticRecipientList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DummyComponent
 {

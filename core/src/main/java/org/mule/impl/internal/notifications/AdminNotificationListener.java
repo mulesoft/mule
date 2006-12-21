@@ -14,11 +14,8 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 
 /**
  * <code>ManagementNotificationListener</code> is an observer interface that
- * objects can use to receive notifications about the stated of the Mule instance and
- * its respources
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * objects can use to receive notifications about the state of the Mule instance and
+ * its resources
  */
 public interface AdminNotificationListener extends UMOServerNotificationListener
 {

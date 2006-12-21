@@ -10,11 +10,11 @@
 
 package org.mule.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils

@@ -10,12 +10,16 @@
 
 package org.mule.test.util.concurrent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import org.mule.util.concurrent.Latch;
+import org.mule.util.concurrent.WaitPolicy;
+
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,13 +29,12 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.concurrent.WaitPolicy;
 
 public class WaitPolicyTestCase extends TestCase
 {
     private ExceptionCollectingThreadGroup _asyncGroup;
     private ThreadPoolExecutor _executor;
+    private Lock _executorLock;
 
     public WaitPolicyTestCase(String name)
     {
@@ -44,6 +47,10 @@ public class WaitPolicyTestCase extends TestCase
 
         // allow 1 active & 1 queued Thread
         _executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1));
+        _executor.prestartAllCoreThreads();
+        // the lock must be fair to guarantee FIFO access to the executor;
+        // 'synchronized' on a monitor is not good enough.
+        _executorLock = new ReentrantLock(true);
         _asyncGroup = new ExceptionCollectingThreadGroup();
         SleepyTask.activeTasks = new AtomicInteger(0);
     }
@@ -55,39 +62,45 @@ public class WaitPolicyTestCase extends TestCase
         super.tearDown();
     }
 
-    // submit the given Runnable to the given ExecutorService, but
-    // do so in a separate thread to avoid blocking the test case
-    // when the Executor's queue is full.
+    // Submit the given Runnable to an ExecutorService, but do so in a separate
+    // thread to avoid blocking the test case when the Executor's queue is full.
     // Returns control to the caller when the thread has been started in
     // order to avoid OS-dependent delays in the control flow.
+    // The submitting thread waits on a fair Lock to guarantee FIFO ordering.
     // At the time of return the Runnable may or may not be in the queue,
     // rejected, running or already finished. :-)
-    private Thread execute(final ExecutorService e, final Runnable r) throws InterruptedException
+    private Thread execute(final Runnable r) throws InterruptedException
     {
         final Latch submitterIsRunning = new Latch();
 
-        Runnable asyncRunnable = new Runnable()
+        Runnable submitterAction = new Runnable()
         {
             public void run()
             {
-                // the synchronized block is REALLY important because otherwise
-                // two asynchronously started submitters might stumble over each
-                // other, submitting their runnables out-of-order and thus
-                // causing test failures.
-                synchronized (e)
+                // signal start of submitter thread
+                submitterIsRunning.countDown();
+
+                // the lock is REALLY important because otherwise two asynchronously
+                // started submitters might stumble over each other, submitting their
+                // runnables out-of-order and thus causing test failures.
+                try
                 {
-                    submitterIsRunning.countDown();
-                    e.execute(r);
+                    _executorLock.lock();
+                    _executor.execute(r);
+                }
+                finally
+                {
+                    _executorLock.unlock();
                 }
             }
         };
 
-        Thread t = new Thread(_asyncGroup, asyncRunnable);
-        t.setDaemon(true);
-        t.start();
+        Thread submitter = new Thread(_asyncGroup, submitterAction);
+        submitter.setDaemon(true);
+        submitter.start();
 
         submitterIsRunning.await();
-        return t;
+        return submitter;
     }
 
     public void testWaitPolicyWithShutdownExecutor() throws Exception
@@ -99,7 +112,7 @@ public class WaitPolicyTestCase extends TestCase
         _executor.shutdown();
 
         // must fail immediately
-        Thread failedThread = this.execute(_executor, new SleepyTask("boo", 1000));
+        Thread failedThread = this.execute(new SleepyTask("boo", 1000));
         Thread.sleep(500);
 
         List exceptions = _asyncGroup.collectedExceptions();
@@ -120,14 +133,14 @@ public class WaitPolicyTestCase extends TestCase
         _executor.setRejectedExecutionHandler(policy);
 
         // task 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
+        this.execute(new SleepyTask("hans", 1000));
 
         // task 2 is queued
-        this.execute(_executor, new SleepyTask("franz", 1000));
+        this.execute(new SleepyTask("franz", 1000));
 
         // task 3 is initially rejected but waits forever
         Runnable s3 = new SleepyTask("beavis", 1000);
-        this.execute(_executor, s3);
+        this.execute(s3);
 
         // at least one task should have been queued
         assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
@@ -150,16 +163,16 @@ public class WaitPolicyTestCase extends TestCase
         _executor.setRejectedExecutionHandler(policy);
 
         // task 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
+        this.execute(new SleepyTask("hans", 1000));
 
         // 2 is queued
-        this.execute(_executor, new SleepyTask("franz", 1000));
+        this.execute(new SleepyTask("franz", 1000));
 
         // 3 is initially rejected but will eventually succeed
         Runnable s3 = new SleepyTask("tweety", 1000);
-        this.execute(_executor, s3);
+        this.execute(s3);
 
-        assertFalse(_executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
+        assertFalse(_executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
         assertEquals(s3, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
@@ -174,14 +187,14 @@ public class WaitPolicyTestCase extends TestCase
         _executor.setRejectedExecutionHandler(policy);
 
         // task 1 runs immediately
-        this.execute(_executor, new SleepyTask("hans", 1000));
+        this.execute(new SleepyTask("hans", 1000));
 
         // 2 is queued
-        this.execute(_executor, new SleepyTask("franz", 1000));
+        this.execute(new SleepyTask("franz", 1000));
 
         // 3 is initially rejected & will retry but should fail quickly
         Runnable s3 = new SleepyTask("butthead", 1000);
-        Thread failedThread = this.execute(_executor, s3);
+        Thread failedThread = this.execute(s3);
         // give failure a chance
         Thread.sleep(failureInterval * 2);
 

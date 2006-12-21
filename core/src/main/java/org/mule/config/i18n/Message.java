@@ -12,12 +12,6 @@ package org.mule.config.i18n;
 
 import java.io.Serializable;
 
-/**
- * <code>Message</code> constructs a
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class Message implements Serializable
 {
     /**

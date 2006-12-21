@@ -25,10 +25,7 @@ import java.util.List;
 
 /**
  * A direct component invokes the service component directly without any threading or
- * pooling, even when the nvocation is asynchronous
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * pooling, even when the invocation is asynchronous
  */
 public class DirectComponent extends AbstractComponent
 {

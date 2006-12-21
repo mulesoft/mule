@@ -20,10 +20,7 @@ import org.mule.util.ObjectPool;
 
 /**
  * <code>AbstractProxyFactory</code> provides common behaviour for creating proxy
- * objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * objects.
  */
 
 public abstract class AbstractProxyFactory implements ObjectFactory

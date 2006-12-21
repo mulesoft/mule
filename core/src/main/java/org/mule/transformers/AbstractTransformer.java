@@ -200,8 +200,8 @@ public abstract class AbstractTransformer implements UMOTransformer
 
         if (src instanceof UMOMessage && !isSourceTypeSupported(UMOMessage.class))
         {
-            src = ((UMOMessage)src).getPayload();
             encoding = ((UMOMessage)src).getEncoding();
+            src = ((UMOMessage)src).getPayload();
         }
 
         if (encoding == null && endpoint != null)
@@ -219,8 +219,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             if (ignoreBadInput)
             {
-                logger
-                    .debug("Source type is incompatible with this transformer. Property 'ignoreBadInput' is set to true so the transformer chain will continue");
+                logger.debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
                 return src;
             }
             else
@@ -250,6 +249,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         }
 
         result = checkReturnClass(result);
+
         if (nextTransformer != null)
         {
             logger.debug("Following transformer in the chain is " + nextTransformer.getName() + " ("

@@ -13,9 +13,6 @@ package org.mule.samples.stockquote;
 /**
  * A stock Quote object that is crated from the xml returned from the
  * http://www.webservicex.net/stockquote.asmx service
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class StockQuote
 {

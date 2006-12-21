@@ -10,13 +10,13 @@
 
 package org.mule.test.integration.providers.soap.glue;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.test.integration.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GlueConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {

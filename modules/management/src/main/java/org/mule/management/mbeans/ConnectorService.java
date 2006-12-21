@@ -18,14 +18,10 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.util.ObjectNameHelper;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
- *         ConnectorService.java 3183 2006-09-23 09:27:47Z rossmason $
- */
 public class ConnectorService implements ConnectorServiceMBean
 {
-    private UMOConnector connector;
-    private String name;
+    private final UMOConnector connector;
+    private final String name;
 
     public ConnectorService(final UMOConnector connector)
     {
@@ -63,6 +59,7 @@ public class ConnectorService implements ConnectorServiceMBean
         return connector.getExceptionListener();
     }
 
+    // TODO HH: we should probably get rid of this, the factory is nobody's business
     public UMOMessageDispatcherFactory getDispatcherFactory()
     {
         return connector.getDispatcherFactory();

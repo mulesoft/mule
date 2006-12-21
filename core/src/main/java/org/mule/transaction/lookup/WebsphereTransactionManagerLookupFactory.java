@@ -10,13 +10,14 @@
 
 package org.mule.transaction.lookup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+
+import java.lang.reflect.Method;
 
 import javax.transaction.TransactionManager;
 
-import java.lang.reflect.Method;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The code borrowed from Spring's

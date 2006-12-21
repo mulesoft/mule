@@ -18,8 +18,6 @@ import org.mule.umo.manager.UMOServerNotification;
  * 
  * @see org.mule.MuleManager
  * @see org.mule.umo.manager.UMOManager
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ManagementNotification extends UMOServerNotification
 {

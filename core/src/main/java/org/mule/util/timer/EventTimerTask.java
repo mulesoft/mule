@@ -18,9 +18,6 @@ import java.util.TimerTask;
  * <code>EventTimerTask</code> is a task that causes TimeEvent to be fired to
  * listening objects when a specific number of milliseconds have passed. This
  * implementation is based on the java.util.TimerTask.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EventTimerTask extends TimerTask
 {

@@ -10,10 +10,10 @@
 
 package org.mule.config.factories;
 
+import org.mule.config.PropertyFactory;
+
 import java.net.InetAddress;
 import java.util.Map;
-
-import org.mule.config.PropertyFactory;
 
 /**
  * Extracts the local hostname from the local system

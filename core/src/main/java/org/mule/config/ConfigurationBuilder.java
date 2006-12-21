@@ -10,17 +10,14 @@
 
 package org.mule.config;
 
-import java.util.Properties;
-
 import org.mule.umo.manager.UMOManager;
+
+import java.util.Properties;
 
 /**
  * <code>ConfigurationBuilder</code> is a Strategy class used to configure a
  * UMOManager instance using different configuration mechanisms, such as for Xml, a
  * script or some other means.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface ConfigurationBuilder
 {

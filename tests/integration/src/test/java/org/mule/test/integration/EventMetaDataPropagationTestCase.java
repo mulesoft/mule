@@ -28,13 +28,14 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

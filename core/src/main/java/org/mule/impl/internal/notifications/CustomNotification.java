@@ -21,8 +21,6 @@ import org.mule.umo.manager.UMOServerNotification;
  * CUSTOM_ACTION_START_RANGE.
  * 
  * @see CustomNotificationListener
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class CustomNotification extends UMOServerNotification
 {

@@ -10,19 +10,17 @@
 
 package org.mule.config.pool;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.pool.PoolableObjectFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.pool.PoolableObjectFactory;
+
 /**
  * <code>CommonsPoolProxyFactory</code> is used to create MuleProxies for use in a
- * proxy pool. This is a jakarta commons-pool implementation.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * proxy pool. This is a Jakarta commons-pool implementation.
  */
 public class CommonsPoolProxyFactory extends AbstractProxyFactory implements PoolableObjectFactory
 {

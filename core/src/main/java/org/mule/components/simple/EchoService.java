@@ -10,10 +10,6 @@
 
 package org.mule.components.simple;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public interface EchoService
 {
     String echo(String echo);

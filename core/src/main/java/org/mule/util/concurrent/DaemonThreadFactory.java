@@ -17,12 +17,7 @@ public class DaemonThreadFactory extends NamedThreadFactory implements ThreadFac
 
     public DaemonThreadFactory(String name)
     {
-        this(name, Thread.NORM_PRIORITY);
-    }
-
-    public DaemonThreadFactory(String name, int priority)
-    {
-        super(name, priority);
+        super(name);
     }
 
     public Thread newThread(Runnable runnable)

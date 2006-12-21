@@ -19,13 +19,16 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.service.ConnectorFactoryException;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -34,14 +37,14 @@ import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -862,4 +865,46 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         return value;
     }
+
+    
+    // TODO the following methods should most likely be lifecycle-enabled
+
+    public void dispatch(UMOEvent event) throws DispatchException
+    {
+        if (connector != null)
+        {
+            connector.dispatch(this, event);
+        }
+        else
+        {
+            // TODO: what?
+        }
+    }
+
+    public UMOMessage receive(long timeout) throws Exception
+    {
+        if (connector != null)
+        {
+            return connector.receive(this, timeout);
+        }
+        else
+        {
+            // TODO: what?
+            return null;
+        }
+    }
+
+    public UMOMessage send(UMOEvent event) throws DispatchException
+    {
+        if (connector != null)
+        {
+            return connector.send(this, event);
+        }
+        else
+        {
+            // TODO: what?
+            return null;
+        }
+    }
+
 }

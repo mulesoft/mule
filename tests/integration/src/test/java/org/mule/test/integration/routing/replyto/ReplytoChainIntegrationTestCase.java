@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.routing.replyto;
 
-import org.activemq.message.ActiveMQTextMessage;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -18,6 +17,8 @@ import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.activemq.message.ActiveMQTextMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

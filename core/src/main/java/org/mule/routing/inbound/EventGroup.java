@@ -10,13 +10,13 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.umo.UMOEvent;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-
-import org.mule.umo.UMOEvent;
 
 /**
  * <code>EventGroup</code> is a holder over events grouped by a common group Id.

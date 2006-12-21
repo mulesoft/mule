@@ -10,6 +10,12 @@
 
 package org.mule.test.integration;
 
+import org.mule.providers.file.filters.FilenameWildcardFilter;
+
+import java.io.File;
+
+import javax.jms.JMSException;
+
 import org.activemq.ActiveMQConnection;
 import org.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
@@ -20,10 +26,6 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.util.Watchdog;
-import org.mule.providers.file.filters.FilenameWildcardFilter;
-
-import javax.jms.JMSException;
-import java.io.File;
 
 /**
  * Will start external test servers needed for the integration tests

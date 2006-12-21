@@ -10,12 +10,12 @@
 
 package org.mule.transformers.simple;
 
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return

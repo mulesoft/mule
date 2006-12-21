@@ -10,12 +10,9 @@
 
 package org.mule.impl;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
 import org.mule.impl.message.ExceptionMessage;
+import org.mule.providers.NullPayload;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
 import org.mule.umo.TransactionException;
@@ -31,21 +28,23 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.routing.RoutingException;
-import org.mule.providers.NullPayload;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
  * Exception Listeners can override. It provides template methods for handling the
  * for base types of exceptions plus allows multimple endpoints to be associated with
- * this exception listener and provides an implementaiton for dispatching exception
+ * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable
 {
@@ -238,7 +237,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 UMOEvent exceptionEvent = new MuleEvent(exceptionMessage, endpoint, new MuleSession(
                     exceptionMessage, new MuleSessionHandler()), true);
                 RequestContext.setEvent(exceptionEvent);
-                endpoint.getConnector().getDispatcher(endpoint).send(exceptionEvent);
+                endpoint.send(exceptionEvent);
 
                 if (logger.isDebugEnabled())
                 {

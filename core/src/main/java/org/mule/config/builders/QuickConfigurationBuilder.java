@@ -41,10 +41,7 @@ import java.util.Properties;
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can be
  * used by clients, configuration scripts or test cases to quickly configure a
- * manager
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * manager.
  */
 public class QuickConfigurationBuilder implements ConfigurationBuilder
 {

@@ -34,9 +34,6 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based
  * encription
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecurityFilter
 {

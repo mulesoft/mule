@@ -38,9 +38,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
  * and logs them and can optionally route them to an endpoint
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractNotificationLoggerAgent implements UMOAgent
 {

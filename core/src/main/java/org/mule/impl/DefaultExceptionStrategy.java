@@ -10,19 +10,17 @@
 
 package org.mule.impl;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.mule.impl.message.ExceptionPayload;
+import org.mule.providers.NullPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.providers.NullPayload;
+
+import org.apache.commons.lang.ObjectUtils;
 
 /**
- * <code>DefaultExceptionStrategy</code> Provides a default exception handling
+ * <code>DefaultExceptionStrategy</code> provides a default exception handling
  * strategy. The class final thus to change exception handling behaviour the user
  * must reimplemented the ExceptionListener Interface
- * 
- * @author Ross Mason
- * @version $Revision$
  */
 
 public class DefaultExceptionStrategy extends AbstractExceptionListener

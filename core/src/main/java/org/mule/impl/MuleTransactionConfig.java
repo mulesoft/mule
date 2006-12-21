@@ -10,12 +10,13 @@
 
 package org.mule.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p/> <code>MuleTransactionConfig</code> defines transaction configuration for a

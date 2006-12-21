@@ -10,8 +10,6 @@
 
 package org.mule.routing.inbound;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -23,6 +21,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.transformer.TransformerException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted

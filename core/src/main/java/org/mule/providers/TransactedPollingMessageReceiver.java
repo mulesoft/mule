@@ -10,13 +10,6 @@
 
 package org.mule.providers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-
-import javax.resource.spi.work.Work;
-
-import java.util.Iterator;
-import java.util.List;
-
 import org.mule.config.ThreadingProfile;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
@@ -25,6 +18,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+
+import java.util.Iterator;
+import java.util.List;
+
+import javax.resource.spi.work.Work;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling

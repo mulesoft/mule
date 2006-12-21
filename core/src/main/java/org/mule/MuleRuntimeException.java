@@ -17,9 +17,6 @@ import org.mule.config.i18n.Message;
  * Mule Server any other runtimes exceptions thrown by Mule code will use or be based
  * on this exception. Runtime exceptions in mule are only ever thrown where the
  * method is not declared to throw an exception and the exception is serious.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleRuntimeException extends RuntimeException
 {

@@ -10,14 +10,9 @@
 
 package org.mule.providers.jbi.components;
 
-<<<<<<< .working
 import org.mule.MuleManager;
 import org.mule.config.converters.QNameConverter;
 import org.mule.util.concurrent.WaitableBoolean;
-=======
-import java.util.HashMap;
-import java.util.Map;
->>>>>>> .merge-right.r4354
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,20 +37,10 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 import javax.xml.namespace.QName;
 
-<<<<<<< .working
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
-=======
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.converters.QNameConverter;
-import org.mule.util.concurrent.WaitableBoolean;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
->>>>>>> .merge-right.r4354
 
 /**
  * A base Jbi component implementation. This is agnostic to any particular Jbi

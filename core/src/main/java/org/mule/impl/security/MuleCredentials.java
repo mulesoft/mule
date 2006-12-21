@@ -10,8 +10,6 @@
 
 package org.mule.impl.security;
 
-import java.util.StringTokenizer;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -22,6 +20,8 @@ import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ArrayUtils;
+
+import java.util.StringTokenizer;
 
 /**
  * <code>MuleCredentials</code> can be used to read and set Mule user information

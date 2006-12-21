@@ -16,9 +16,6 @@ import org.mule.umo.provider.UMOConnectable;
 /**
  * Is fired by a connector when a connection is made, or disconnected of the
  * connection fails.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ConnectionNotification extends UMOServerNotification
 {

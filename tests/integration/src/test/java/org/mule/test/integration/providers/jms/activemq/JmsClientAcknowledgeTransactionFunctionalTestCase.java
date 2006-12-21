@@ -10,11 +10,11 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import javax.jms.Session;
-
 import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.umo.UMOTransactionFactory;
+
+import javax.jms.Session;
 
 public class JmsClientAcknowledgeTransactionFunctionalTestCase extends
     ActiveMQJmsTransactionFunctionalTestCase

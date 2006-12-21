@@ -12,8 +12,11 @@ package org.mule.umo.provider;
 
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -25,9 +28,6 @@ import java.io.OutputStream;
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOConnector extends Disposable, Initialisable
 {
@@ -118,17 +118,6 @@ public interface UMOConnector extends Disposable, Initialisable
     boolean supportsProtocol(String protocol);
 
     /**
-     * The connector can pool dispatchers based on their endpointUri or can ingnore
-     * the endpointUri altogether and use a ThreadLocal or always create new.
-     * 
-     * @param endpoint the endpoint that can be used to key cached dispatchers
-     * @return the component associated with the endpointUri If there is no component
-     *         for the current thread one will be created
-     * @throws UMOException if creation of a component fails
-     */
-    UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException;
-
-    /**
      * @param listener the exception strategy to use with this endpoint
      * @see ExceptionListener
      */
@@ -166,4 +155,64 @@ public interface UMOConnector extends Disposable, Initialisable
     public void stopConnector() throws UMOException;
 
     public boolean isRemoteSyncEnabled();
+
+    /**
+     * If the underlying transport has the notion of a client session when writing to
+     * it, the session should be obtainable using this method. If there is no session
+     * a null will be returned
+     * @param endpoint TODO
+     * 
+     * @return the transport specific session or null if there is no session
+     * @throws UMOException
+     */
+    // TODO HH: fix this description
+    Object getDelegateSession(UMOImmutableEndpoint endpoint) throws UMOException;
+    Object getDelegateSession(UMOImmutableEndpoint endpoint, Object[] args) throws UMOException;
+
+    /**
+     * Dispatches an event from the endpoint to the external system
+     * 
+     * @param event The event to dispatch
+     * @throws DispatchException if the event fails to be dispatched
+     */
+    void dispatch(UMOImmutableEndpoint endpoint, UMOEvent event) throws DispatchException;
+
+    /**
+     * Make a specific request to the underlying transport
+     * 
+     * @param endpointUri the endpoint URI to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     * @deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
+     */
+    UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception;
+
+    /**
+     * Make a specific request to the underlying transport
+     * 
+     * @param endpoint the endpoint to use when connecting to the resource
+     * @param timeout the maximum time the operation should block before returning.
+     *            The call should return immediately if there is data available. If
+     *            no data becomes available before the timeout elapses, null will be
+     *            returned
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was avaialable
+     * @throws Exception if the call to the underlying protocal cuases an exception
+     */
+    UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception;
+
+    /**
+     * Sends an event from the endpoint to the external system
+     * 
+     * @param event The event to send
+     * @return event the response form the external system wrapped in a UMOEvent
+     * @throws DispatchException if the event fails to be dispatched
+     */
+    UMOMessage send(UMOImmutableEndpoint endpoint, UMOEvent event) throws DispatchException;
+
 }

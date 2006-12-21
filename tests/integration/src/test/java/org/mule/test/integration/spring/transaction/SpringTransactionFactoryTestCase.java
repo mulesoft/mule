@@ -10,12 +10,13 @@
 
 package org.mule.test.integration.spring.transaction;
 
-import net.sf.hibernate.SessionFactory;
-
 import org.mule.extras.spring.transaction.SpringTransactionFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
+
+import net.sf.hibernate.SessionFactory;
+
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate.HibernateTransactionManager;
 import org.springframework.orm.hibernate.LocalSessionFactoryBean;

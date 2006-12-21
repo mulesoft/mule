@@ -10,15 +10,16 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
-import org.objectweb.jotm.Current;
-import org.objectweb.jotm.Jotm;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
+
+import org.enhydra.jdbc.standard.StandardXADataSource;
+import org.objectweb.jotm.Current;
+import org.objectweb.jotm.Jotm;
 
 /**
  * @author Guillaume Nodet

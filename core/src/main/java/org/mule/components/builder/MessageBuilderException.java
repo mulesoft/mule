@@ -16,11 +16,8 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 
 /**
- * If thrown by a MEssageBuilder implementation if it cannot build the current
- * message or some other error occurs
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Thrown by a MessageBuilder implementation if it cannot build the current
+ * message or some other error occurs.
  */
 public class MessageBuilderException extends MessagingException
 {

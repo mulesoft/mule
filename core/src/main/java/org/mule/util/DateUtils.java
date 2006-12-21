@@ -10,12 +10,12 @@
 
 package org.mule.util;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * <code>DateUtils</code> contains some useful methods dealing date/time

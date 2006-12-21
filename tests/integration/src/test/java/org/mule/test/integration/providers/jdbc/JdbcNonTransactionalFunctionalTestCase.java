@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
@@ -24,16 +23,38 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
+import java.util.HashMap;
+import java.util.List;
+
 import javax.sql.DataSource;
 
-import java.util.HashMap;
+import org.enhydra.jdbc.standard.StandardDataSource;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
+
+    /*
+     * org.apache.commons.dbutils.ResultSetHandler (called by QueryRunner which is
+     * called by JdbcMessageReceiver) allows either null or a List of 0 rows to be
+     * returned so we check for both.
+     */
+    protected static void assertResultSetEmpty(UMOMessage message)
+    {
+        assertNotNull(message);
+        Object payload = message.getPayload();
+        assertTrue(payload instanceof java.util.List);
+        List list = (List)payload;
+        assertEquals(0, list.size());
+    }
+
+    protected static void assertResultSetNotEmpty(UMOMessage message)
+    {
+        assertNotNull(message);
+        Object payload = message.getPayload();
+        assertTrue(payload instanceof java.util.List);
+        List list = (List)payload;
+        assertFalse(list.isEmpty());
+    }
 
     public void testDirectSql() throws Exception
     {
@@ -41,15 +62,14 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         MuleManager.getInstance().start();
 
         MuleEndpoint muleEndpoint = new MuleEndpoint("jdbc://?sql=SELECT * FROM TEST", true);
-        UMOMessage message;
-
-        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
-        assertNull(message);
+        UMOMessage message = muleEndpoint.receive(1000);
+        assertResultSetEmpty(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                      + "', NULL, NULL)");
-        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
-        assertNotNull(message);
+                        + "', NULL, NULL)");
+
+        message = muleEndpoint.receive(1000);
+        assertResultSetNotEmpty(message);
     }
 
     public void testSend() throws Exception
@@ -77,16 +97,15 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         MuleManager.getInstance().start();
 
         MuleEndpoint muleEndpoint = new MuleEndpoint(DEFAULT_IN_URI, true);
-        UMOMessage message;
+        UMOMessage message = muleEndpoint.receive(1000);
 
-        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
-        assertNotNull(message);
+        assertResultSetEmpty(message);
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                      + "', NULL, NULL)");
-        message = muleEndpoint.getConnector().getDispatcher(muleEndpoint).receive(muleEndpoint, 1000);
-        assertNotNull(message);
+                        + "', NULL, NULL)");
 
+        message = muleEndpoint.receive(1000);
+        assertResultSetNotEmpty(message);
     }
 
     public void testReceiveAndSend() throws Exception
@@ -96,7 +115,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         MuleManager.getInstance().start();
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
-                      + "', NULL, NULL)");
+                        + "', NULL, NULL)");
 
         long t0 = System.currentTimeMillis();
         while (System.currentTimeMillis() - t0 < 20000)
@@ -135,4 +154,5 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         ds.setPassword("");
         return ds;
     }
+
 }

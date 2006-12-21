@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+    <globalConfiguration>
+        <requestFlow>
+    		<handler type="java:org.apache.ws.axis.security.WSDoAllSender">
+    			<parameter name="action" value="Encrypt"/>
+    			<parameter name="user" value="mulealias"/>
+    			<parameter name="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.DefaultWsSecurityCallbackHandler"/>
+    			<parameter name="passwordType" value="PasswordDigest"/>
+    			<parameter name="encryptionPropFile" value="out-encrypted-security.properties"/>
+    		</handler>
+        </requestFlow>
+        <responseFlow>
+            <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler"/>
+    	</responseFlow>
+    </globalConfiguration>
+
+    <transport name="http" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+</deployment>

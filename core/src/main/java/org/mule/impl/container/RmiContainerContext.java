@@ -19,9 +19,6 @@ import javax.naming.NamingException;
 /**
  * <code>RmiContainerContext</code> is a container implementaiton that allows RMi
  * objects to be referenced either as components or properties on components
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class RmiContainerContext extends JndiContainerContext
 {

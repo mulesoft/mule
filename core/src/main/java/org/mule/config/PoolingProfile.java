@@ -17,9 +17,6 @@ import org.mule.util.ObjectPool;
 /**
  * <code>PoolingProfile</code> is a configuration object used to define the object
  * pooling parameters for the component it is associated with.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class PoolingProfile

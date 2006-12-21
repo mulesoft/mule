@@ -10,18 +10,18 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
 
 public class AxisNamedParametersTestCase extends FunctionalTestCase
 {

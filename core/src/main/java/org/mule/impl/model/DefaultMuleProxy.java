@@ -10,8 +10,6 @@
 
 package org.mule.impl.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -45,7 +43,6 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
@@ -53,6 +50,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
@@ -496,9 +496,7 @@ public class DefaultMuleProxy implements MuleProxy
             }
             else
             {
-                UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(
-                    event.getEndpoint());
-                dispatcher.dispatch(event);
+                event.getEndpoint().dispatch(event);
             }
 
             if (stat.isEnabled())

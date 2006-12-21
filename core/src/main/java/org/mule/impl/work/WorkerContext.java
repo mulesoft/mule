@@ -27,8 +27,6 @@
 
 package org.mule.impl.work;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.concurrent.Latch;
 
 import javax.resource.spi.work.ExecutionContext;
@@ -39,6 +37,9 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkRejectedException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>WorkerContext</code> TODO
@@ -205,7 +206,6 @@ public class WorkerContext implements Work
      */
     public synchronized void workAccepted(Object anObject)
     {
-        // isAccepted = true;
         acceptedTime = System.currentTimeMillis();
         workListener.workAccepted(new WorkEvent(anObject, WorkEvent.WORK_ACCEPTED, worker, null));
     }

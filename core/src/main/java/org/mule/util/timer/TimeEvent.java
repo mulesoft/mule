@@ -15,9 +15,6 @@ import java.util.EventObject;
 /**
  * <code>TimeEvent</code> TODO is an event that occurs at a specified number of
  * milliseconds.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TimeEvent extends EventObject
 {

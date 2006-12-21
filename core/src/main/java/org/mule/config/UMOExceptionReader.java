@@ -10,10 +10,10 @@
 
 package org.mule.config;
 
+import org.mule.umo.UMOException;
+
 import java.util.Collections;
 import java.util.Map;
-
-import org.mule.umo.UMOException;
 
 /**
  * Grabs all information from the UMOException type

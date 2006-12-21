@@ -13,12 +13,6 @@ package org.mule.config;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 
-/**
- * <code>ConfigurationException</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ConfigurationException extends MuleException
 {
     /**

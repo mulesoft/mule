@@ -10,12 +10,12 @@
 
 package org.mule.util.queue;
 
-import org.apache.commons.collections.map.ReferenceMap;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 public class CachingPersistenceStrategy implements QueuePersistenceStrategy
 {

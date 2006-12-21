@@ -139,7 +139,7 @@ public class DefaultMuleConnection implements MuleConnection
 
         try
         {
-            return endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
+            return endpoint.receive(timeout);
         }
         catch (Exception e)
         {

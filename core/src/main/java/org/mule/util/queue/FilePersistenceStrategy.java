@@ -10,13 +10,10 @@
 
 package org.mule.util.queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.util.file.DeleteException;
 import org.mule.util.FileUtils;
-import org.safehaus.uuid.UUIDGenerator;
+import org.mule.util.file.DeleteException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +24,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.safehaus.uuid.UUIDGenerator;
 
 public class FilePersistenceStrategy implements QueuePersistenceStrategy
 {

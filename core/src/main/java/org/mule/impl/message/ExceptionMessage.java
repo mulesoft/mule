@@ -21,9 +21,6 @@ import java.util.Iterator;
 /**
  * <code>ExceptionMessage</code> is used by the DefaultComponentExceptionStrategy
  * for wrapping an exception with a message to send via an endpointUri.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ExceptionMessage extends BaseMessage
 {

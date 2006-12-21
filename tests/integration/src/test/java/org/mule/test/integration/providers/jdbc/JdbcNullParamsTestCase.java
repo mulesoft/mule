@@ -10,6 +10,13 @@
 
 package org.mule.test.integration.providers.jdbc;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.NullPayload;
+import org.mule.providers.jdbc.JdbcConnector;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOConnector;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +24,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enhydra.jdbc.standard.StandardDataSource;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.NullPayload;
-import org.mule.providers.jdbc.JdbcConnector;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOConnector;
 
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {

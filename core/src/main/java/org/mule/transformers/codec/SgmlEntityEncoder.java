@@ -26,7 +26,7 @@ public class SgmlEntityEncoder extends XmlEntityEncoder
     {
         super();
         logger.warn(this.getClass().getName() + " is deprecated; please use "
-                    + this.getClass().getSuperclass().getName());
+                        + this.getClass().getSuperclass().getName());
     }
 
 }

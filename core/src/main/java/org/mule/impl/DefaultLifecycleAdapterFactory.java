@@ -18,9 +18,6 @@ import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
  * <code>DefaultLifecycleAdapterFactory</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactory
 {

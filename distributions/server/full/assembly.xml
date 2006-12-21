@@ -51,8 +51,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/echo/dist</directory>
           <outputDirectory>examples/maven/echo</outputDirectory>
           <includes>
-              <include>*.sh</include>
-              <include>*.bat</include>
+              <include>echo*</include>
           </includes>
           <fileMode>744</fileMode>
       </fileSet>
@@ -80,7 +79,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/echo/dist</directory>
           <outputDirectory>examples/ant/echo</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>echo</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -114,7 +113,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/errorhandler/dist</directory>
           <outputDirectory>examples/maven/errorhandler</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>errorhandler</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -151,7 +150,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/errorhandler/dist</directory>
           <outputDirectory>examples/ant/errorhandler</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>errorhandler</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -193,7 +192,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/hello/dist</directory>
           <outputDirectory>examples/maven/hello</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>hello</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -226,7 +225,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/hello/dist</directory>
           <outputDirectory>examples/ant/hello</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>hello</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -264,7 +263,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/dist</directory>
           <outputDirectory>examples/maven/loanbroker</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>loanbroker</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -297,7 +296,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/dist</directory>
           <outputDirectory>examples/ant/loanbroker</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>loanbroker</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -448,7 +447,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/scripting/dist</directory>
           <outputDirectory>examples/maven/scripting</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>scripting</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -477,7 +476,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/scripting/dist</directory>
           <outputDirectory>examples/ant/scripting</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>scripting</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -511,7 +510,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/stockquote/dist</directory>
           <outputDirectory>examples/maven/stockquote</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>stockquote</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -544,7 +543,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/stockquote/dist</directory>
           <outputDirectory>examples/ant/stockquote</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>stockquote</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -586,7 +585,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/voipservice/dist</directory>
           <outputDirectory>examples/maven/voipservice</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>voip</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>
@@ -619,7 +618,7 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/voipservice/dist</directory>
           <outputDirectory>examples/ant/voipservice</outputDirectory>
           <includes>
-              <include>*.sh</include>
+              <include>voip</include>
               <include>*.bat</include>
           </includes>
           <fileMode>744</fileMode>

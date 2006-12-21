@@ -10,21 +10,18 @@
 
 package org.mule.impl;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  * <code>ResponseOutputStream</code> is an output stream associated with the
  * currently received event. Note that if the stream is from a socket the socket is
  * also available on this stream so that the socket state can be validated before
  * writing.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ResponseOutputStream extends BufferedOutputStream

@@ -22,9 +22,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  * <code>DefaultComponentExceptionStrategy</code> is the default exception handler
  * for components. The handler logs errors and will forward the message and exception
  * to an exception endpointUri if one is set on this Exception strategy
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 {
@@ -62,14 +59,15 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
     protected void defaultHandler(Throwable t)
     {
-        // Lazzy initialisation of the component
+        // Lazy initialisation of the component
         // This strategy should be associated with only one component
         // and thus there is no concurrency problem
         if (component == null)
         {
             UMOEvent event = RequestContext.getEvent();
             if (event == null)
-            { // very bad should not happen
+            {
+                // very bad should not happen
                 logger.fatal("The Default Component Exception Strategy has been invoked but there is no current event on the context");
                 logger.fatal("The error is: " + t.getMessage(), t);
             }

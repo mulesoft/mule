@@ -10,25 +10,23 @@
 
 package org.mule.test.transformers;
 
-import java.util.Arrays;
-
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.simple.ByteArrayToHexString;
 import org.mule.transformers.simple.HexStringToByteArray;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-/**
- * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision$
- */
+import java.util.Arrays;
+
 public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {
-    public UMOTransformer getTransformer() throws Exception
+
+    public UMOTransformer getTransformer()
     {
         return new HexStringToByteArray();
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public UMOTransformer getRoundTripTransformer()
     {
         return new ByteArrayToHexString();
     }
@@ -70,7 +68,7 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
     }
 
     // extra test for uppercase output
-    public void testUppercase() throws Exception
+    public void testUppercase() throws TransformerException
     {
         ByteArrayToHexString t = new ByteArrayToHexString();
         t.setUpperCase(true);

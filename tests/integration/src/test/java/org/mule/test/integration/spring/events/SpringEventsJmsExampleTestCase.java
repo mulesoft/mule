@@ -10,14 +10,15 @@
 
 package org.mule.test.integration.spring.events;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

@@ -10,15 +10,6 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import javax.jms.ConnectionFactory;
-
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.broker.impl.BrokerContainerFactoryImpl;
-import org.activemq.store.vm.VMPersistenceAdapter;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -38,6 +29,16 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.concurrent.Latch;
+
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import javax.jms.ConnectionFactory;
+
+import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.broker.impl.BrokerContainerFactoryImpl;
+import org.activemq.store.vm.VMPersistenceAdapter;
 
 /**
  * This test needs the path to an ActiveMQ distribution.

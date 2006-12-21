@@ -13,9 +13,6 @@ package org.mule.config;
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule system
  * properties.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface MuleProperties

@@ -10,6 +10,10 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
+import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +49,6 @@ import javax.naming.Reference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
 
 /**
  * <code>JmsTestUtils</code> contains some helper code necessary to test

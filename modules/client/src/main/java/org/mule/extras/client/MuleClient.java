@@ -765,7 +765,7 @@ public class MuleClient implements Disposable
         UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         try
         {
-            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint).receive(endpoint, timeout);
+            UMOMessage message = endpoint.receive(timeout);
             if (message != null && endpoint.getTransformer() != null)
             {
                 if (endpoint.getTransformer().isSourceTypeSupported(message.getPayload().getClass()))

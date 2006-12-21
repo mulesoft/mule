@@ -10,8 +10,6 @@
 
 package org.mule.tck.functional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -19,6 +17,9 @@ import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>FunctionalTestComponent</code> is a component that can be used by
@@ -33,24 +34,24 @@ public class FunctionalTestComponent implements Callable
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private EventCallback eventCallback;
-    private String returnMessage = null;
+    private Object returnMessage = null;
     private boolean throwException = false;
 
     public Object onCall(UMOEventContext context) throws Exception
     {
         String contents = context.getTransformedMessageAsString();
-        String msg = null;
-        msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                                                + context.getComponentDescriptor().getName()
-                                                + ". Content is: "
-                                                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+        String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
+                        + context.getComponentDescriptor().getName() + ". Content is: "
+                        + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+
         logger.info(msg);
 
         if (eventCallback != null)
         {
             eventCallback.eventReceived(context, this);
         }
-        String replyMessage;
+
+        Object replyMessage;
         if (returnMessage != null)
         {
             replyMessage = returnMessage;
@@ -67,19 +68,19 @@ public class FunctionalTestComponent implements Callable
         {
             throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
         }
+
         return replyMessage;
     }
 
     public Object onReceive(Object data) throws Exception
     {
-        String contents = data.toString();
         UMOEventContext context = RequestContext.getEventContext();
 
-        String msg = null;
-        msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                                                + context.getComponentDescriptor().getName()
-                                                + ". Content is: "
-                                                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+        String contents = data.toString();
+        String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
+                        + context.getComponentDescriptor().getName() + ". Content is: "
+                        + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+
         logger.info(msg);
 
         if (eventCallback != null)
@@ -87,8 +88,7 @@ public class FunctionalTestComponent implements Callable
             eventCallback.eventReceived(context, this);
         }
 
-        String replyMessage;
-
+        Object replyMessage;
         if (returnMessage != null)
         {
             replyMessage = returnMessage;
@@ -119,12 +119,12 @@ public class FunctionalTestComponent implements Callable
         this.eventCallback = eventCallback;
     }
 
-    public String getReturnMessage()
+    public Object getReturnMessage()
     {
         return returnMessage;
     }
 
-    public void setReturnMessage(String returnMessage)
+    public void setReturnMessage(Object returnMessage)
     {
         this.returnMessage = returnMessage;
     }

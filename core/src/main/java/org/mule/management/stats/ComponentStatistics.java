@@ -10,9 +10,9 @@
 
 package org.mule.management.stats;
 
-import java.io.PrintWriter;
-
 import org.mule.management.stats.printers.SimplePrinter;
+
+import java.io.PrintWriter;
 
 public class ComponentStatistics implements Statistics
 {

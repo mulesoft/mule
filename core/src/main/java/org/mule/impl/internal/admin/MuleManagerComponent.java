@@ -38,15 +38,14 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -200,13 +199,12 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
             long timeout = MapUtils.getLongValue(action.getProperties(),
                 MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, MuleManager.getConfiguration()
                     .getDefaultSynchronousEventTimeout());
 
             UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
-            result = dispatcher.receive(ep, timeout);
+            result = endpoint.getConnector().receive(ep, timeout);
             if (result != null)
             {
                 // See if there is a default transformer on the connector

@@ -23,9 +23,6 @@ import java.io.Reader;
  * <code>ReaderResource</code> is a reader with a description associated with it.
  * This is useful for error resolution as the reader description can be included when
  * reporting errors during reading the resource.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ReaderResource
 {

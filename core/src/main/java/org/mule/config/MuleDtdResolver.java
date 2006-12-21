@@ -10,31 +10,29 @@
 
 package org.mule.config;
 
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
  * <code>MuleDtdResolver</code> attempts to locate the mule-configuration.dtd on
- * the classpath, regardless of the DOCTYPE declaration. If the dtd is not found, it
- * defaults to trying to download it using the systemId. <p/> This resolve is
- * responsible for associating an Xsl document if any with the Dtd. It also allows
- * for a delegate Entity resolver and delegate Xsl. This allows Configuration
+ * the classpath, regardless of the DOCTYPE declaration. If the DTD is not found, it
+ * defaults to trying to download it using the systemId. <p/> This resolver is
+ * responsible for associating an XSL document if any with the DTD. It also allows
+ * for a delegate Entity resolver and delegate XSL. This allows Configuration
  * builders to mix Mule Xml configuration with other document based configuration and
  * apply transformers to each of the configuration types (if necessary) before
  * constucting a Mule instance. <p/> Note that its up to the Configuration builder
  * implementation to do the actual transformations this Resolver simply associates
- * Xsl reosurces with dtds
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * XSL resources with DTDs.
  */
 public class MuleDtdResolver implements EntityResolver
 {

@@ -18,9 +18,6 @@ import java.util.Properties;
 /**
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for
  * most connectors
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class UrlEndpointBuilder extends AbstractEndpointBuilder

@@ -10,11 +10,11 @@
 
 package org.mule.transformers.simple;
 
-import java.util.Map;
-
 import org.mule.config.i18n.Message;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Map;
 
 /**
  * <code>MapLookup</code> looks up and returns an object from a Map based on a key.

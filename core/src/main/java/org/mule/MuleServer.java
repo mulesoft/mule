@@ -10,13 +10,6 @@
 
 package org.mule;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
@@ -27,11 +20,17 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MuleServer</code> is a simple application that represents a local Mule
  * Server daemon. It is initialised with a mule-config.xml file.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
 public class MuleServer implements Runnable
 {

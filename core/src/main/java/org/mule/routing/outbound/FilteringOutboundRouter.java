@@ -10,10 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -31,6 +27,10 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.TemplateParser;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter

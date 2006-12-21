@@ -13,6 +13,7 @@ package org.mule.test.integration.spring.events.async;
 import org.mule.extras.spring.events.MuleApplicationEvent;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

@@ -32,20 +32,18 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
+import java.util.NoSuchElementException;
+
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
-import java.util.NoSuchElementException;
 
 /**
  * A Seda component runs inside a Seda Model and is responsible for managing a Seda
  * Queue and thread pool for a Mule sevice component. In Seda terms this is
  * equivilent to a stage.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {

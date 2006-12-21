@@ -39,7 +39,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -508,8 +507,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                         message = new MuleMessage(endpoint.getTransformer().transform(
                             applicationEvent.getSource()), applicationEvent.getProperties());
                     }
-                    UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint);
-                    dispatcher.dispatch(new MuleEvent(message, endpoint, session, false));
+                    endpoint.dispatch(new MuleEvent(message, endpoint, session, false));
                 }
             }
             catch (Exception e1)

@@ -10,6 +10,11 @@
 
 package org.mule.umo;
 
+import org.mule.impl.MuleMessage;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.concurrent.DaemonThreadFactory;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutionException;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
@@ -17,11 +22,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
-
-import org.mule.impl.MuleMessage;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.concurrent.DaemonThreadFactory;
 
 /**
  * <code>FutureMessageResult</code> is an UMOMessage result of a remote invocation

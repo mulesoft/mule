@@ -14,13 +14,18 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * <code>UMOMessageDispatcherFactory</code> is a factory interface for creating a
- * Message Dispatcher for the underlying transport
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UMOMessageDispatcherFactory</code> is a factory interface for managing the
+ * lifecycle of a message dispatcher for the underlying transport.
  */
 public interface UMOMessageDispatcherFactory
 {
     UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException;
+
+    void activate(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher) throws UMOException;
+
+    boolean validate(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher);
+
+    void passivate(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher);
+
+    void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher);
 }

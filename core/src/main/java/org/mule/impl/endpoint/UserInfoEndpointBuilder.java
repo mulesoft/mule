@@ -19,9 +19,6 @@ import java.util.Properties;
  * <code>UserInfoEndpointBuilder</code> builds an endpoint with the userinfo and
  * host details. This endpoint builder is used where endpoints as of the form :
  * xxx://ross:secret@host:1000
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
 {

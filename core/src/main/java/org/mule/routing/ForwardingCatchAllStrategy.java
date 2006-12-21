@@ -17,7 +17,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
@@ -26,9 +26,6 @@ import org.mule.umo.routing.RoutingException;
  * any events not caught by the router this strategy is associated with. Users can
  * assign an endpoint to this strategy to forward all events to. This can be used as
  * a dead letter/error queue.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
@@ -45,19 +42,20 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         }
         try
         {
-            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint());
-
-            if (sendTransformed && getEndpoint().getTransformer() != null)
+            UMOEndpoint endpoint = getEndpoint();
+            
+            if (sendTransformed && endpoint.getTransformer() != null)
             {
                 Object payload = message.getPayload();
-                payload = getEndpoint().getTransformer().transform(payload);
+                payload = endpoint.getTransformer().transform(payload);
                 message = new MuleMessage(payload, message);
             }
-            UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
+
+            UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);
 
             if (synchronous)
             {
-                UMOMessage result = dispatcher.send(newEvent);
+                UMOMessage result = endpoint.send(newEvent);
                 if (statistics != null)
                 {
                     statistics.incrementRoutedMessage(getEndpoint());
@@ -66,7 +64,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
             }
             else
             {
-                dispatcher.dispatch(newEvent);
+                endpoint.dispatch(newEvent);
                 if (statistics != null)
                 {
                     statistics.incrementRoutedMessage(getEndpoint());

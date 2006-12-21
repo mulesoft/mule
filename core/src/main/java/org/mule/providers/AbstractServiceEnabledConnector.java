@@ -41,8 +41,6 @@ import java.util.Properties;
  * a url if the connector has a service descriptor.
  * 
  * @see ConnectorServiceDescriptor
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractServiceEnabledConnector extends AbstractConnector
@@ -103,8 +101,8 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
 
             if (serviceDescriptor.getDispatcherFactory() != null)
             {
-                logger.info("Loading DispatcherFactory: " + serviceDescriptor.getDispatcherFactory());
-                dispatcherFactory = serviceDescriptor.createDispatcherFactory();
+                logger.debug("Loading DispatcherFactory: " + serviceDescriptor.getDispatcherFactory());
+                this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
             }
 
             defaultInboundTransformer = serviceDescriptor.createInboundTransformer();
@@ -112,12 +110,11 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             defaultResponseTransformer = serviceDescriptor.createResponseTransformer();
 
             sessionHandler = serviceDescriptor.createSessionHandler();
-            // set any manager default properties for the connector
-            // these are set on the Manager with a protocol i.e.
-            // jms.specification=1.1
-            // This provides a really convenient way to set properties on object form
-            // unit
-            // tests
+
+            // Set any manager default properties for the connector. These are set on
+            // the Manager with a protocol e.g. jms.specification=1.1
+            // This provides a really convenient way to set properties on an object
+            // from unit tests
             Map props = new HashMap();
             PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
                 getProtocol().toLowerCase(), props);

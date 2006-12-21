@@ -10,11 +10,12 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.providers.jdbc.JdbcTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 
 import javax.sql.DataSource;
+
+import org.enhydra.jdbc.standard.StandardDataSource;
 
 /**
  * @author Guillaume Nodet

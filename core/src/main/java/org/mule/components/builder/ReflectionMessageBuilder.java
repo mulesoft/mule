@@ -20,10 +20,7 @@ import java.util.List;
 
 /**
  * Will try and set the result of an invocation as a bean property on the request
- * message using reflection
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * message using reflection.
  */
 public class ReflectionMessageBuilder extends AbstractMessageBuilder
 {

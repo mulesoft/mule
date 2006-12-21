@@ -18,9 +18,6 @@ import java.util.Map;
 
 /**
  * <code>ExceptionPayload</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class ExceptionPayload implements UMOExceptionPayload

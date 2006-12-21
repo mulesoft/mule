@@ -10,13 +10,14 @@
 
 package org.mule.transformers.simple;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.Serializable;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String

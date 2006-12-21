@@ -15,9 +15,6 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 /**
  * <code>ManagerNotificationListener</code> is an observer interface that objects
  * can implement to receive notifications about secure access requests.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface SecurityNotificationListener extends UMOServerNotificationListener
 {
