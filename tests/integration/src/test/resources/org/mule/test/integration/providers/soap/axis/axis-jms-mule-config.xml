@@ -41,13 +41,17 @@
 
     <model name="test">
         <mule-descriptor name="mycomponent"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:jms://mycomponent">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:jms://mycomponent2">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent2"/>
+            </inbound-router>
             <properties>
                 <list name="serviceInterfaces">
                     <entry value="org.mule.components.simple.EchoService"/>
@@ -57,8 +61,10 @@
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent3"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:jms://mycomponent3">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent3"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent4"

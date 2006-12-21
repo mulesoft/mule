@@ -17,7 +17,6 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -39,72 +38,6 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         return "org/mule/test/integration/test-endpoints-config.xml";
     }
 
-    public void testComponent1Endpoints() throws Exception
-    {
-        // test inbound
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent1");
-        assertNotNull(descriptor);
-        UMOEndpoint endpoint = descriptor.getInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
-        assertTrue(!endpoint.getName().equals("testProvider"));
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-
-        // test outbound
-        endpoint = descriptor.getOutboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("stream", endpoint.getConnector().getProtocol().toLowerCase());
-        assertNotNull(endpoint.getName());
-        assertEquals("System.out", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
-
-    }
-
-    public void testComponent2Endpoints() throws Exception
-    {
-        // test inbound
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent2");
-        assertNotNull(descriptor);
-        UMOEndpoint endpoint = descriptor.getInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
-        assertTrue(!endpoint.getName().equals("testEndpoint"));
-        assertTrue(!endpoint.getConnector().getName().equals("testConnector"));
-        assertEquals("new.queue", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof XmlToObject);
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-
-        assertNull(descriptor.getOutboundEndpoint());
-    }
-
-    public void testComponent3Endpoints() throws Exception
-    {
-        // test inbound
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent3");
-        assertNotNull(descriptor);
-        UMOEndpoint endpoint = descriptor.getInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
-        assertTrue(endpoint.getName().equals("testEndpoint"));
-        assertEquals("another.queue", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-
-        // test outbound
-        endpoint = descriptor.getOutboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertNotNull(endpoint.getName());
-        assertEquals("tcp://localhost:60201", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
-
-    }
 
     public void testComponent3RouterEndpoints() throws Exception
     {
@@ -156,9 +89,6 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(endpoint.getTransformer());
         assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-
-        // test outbound
-        assertNull(descriptor.getOutboundEndpoint());
     }
 
     public void testComponent4RouterEndpoints() throws Exception
@@ -186,23 +116,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
     }
 
-    public void testComponent5Endpoints() throws Exception
-    {
-        // test inbound
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent5");
-        assertNotNull(descriptor);
-        UMOEndpoint endpoint = descriptor.getInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
-        // assertTrue(!provider.getName().equals("testEndpoint"));
-        assertTrue(endpoint.getConnector().getName().equals("testConnector2"));
-        assertEquals("some.queue", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-
-        // test outbound
-        assertNull(descriptor.getOutboundEndpoint());
-    }
+    
 
     public void testComponent5RouterEndpoints() throws Exception
     {
@@ -226,22 +140,6 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("tcp://localhost:45432", endpoint.getEndpointURI().getAddress());
         assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
-    }
-
-    public void testComponent6Endpoints() throws Exception
-    {
-        // test outbound
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent6");
-        assertNotNull(descriptor);
-        UMOEndpoint endpoint = descriptor.getOutboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
-        assertEquals("tcp://localhost:45433", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
-
-        // test inbound
-        assertNull(descriptor.getInboundEndpoint());
     }
 
     public void testEndpointFromURI() throws Exception

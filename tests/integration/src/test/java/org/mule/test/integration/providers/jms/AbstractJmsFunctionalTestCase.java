@@ -62,11 +62,13 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         // pass in other configs using the property below
 
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        SedaModel model = new SedaModel();
+        model.setName("main");
+        model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getInstance().setModel(model);
 
-        MuleManager.getInstance().setModel(new SedaModel());
         callbackCalled = false;
         ConnectionFactory cf = getConnectionFactory();
 

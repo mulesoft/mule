@@ -17,11 +17,8 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.routing.UMOOutboundRouter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
     public void testDescriptorDefaults() throws Exception
@@ -43,11 +40,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
         assertNull(descriptor.getImplementation());
-        assertNull(descriptor.getInboundEndpoint());
-        assertNull(descriptor.getInboundTransformer());
         assertNull(descriptor.getName());
-        assertNull(descriptor.getOutboundEndpoint());
-        assertNull(descriptor.getOutboundTransformer());
         assertEquals(0, descriptor.getProperties().size());
     }
 
@@ -108,16 +101,15 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         UMODescriptor descriptor = getTestDescriptor("Terry", Orange.class.getName());
         TestExceptionStrategy es = new TestExceptionStrategy();
         descriptor.setExceptionListener(es);
-        assertNotNull(descriptor.getOutboundEndpoint());
-        assertNotNull(descriptor.getOutboundEndpoint().getConnector().getExceptionListener());
+        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
+        UMOEndpoint ep = (UMOEndpoint)((UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
+        assertNotNull(ep);
+        assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
         UMOEndpoint endpoint = getTestEndpoint("test2", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        descriptor.setInboundEndpoint(endpoint);
+        descriptor.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
-        assertNotNull(descriptor.getInboundEndpoint().getConnector().getExceptionListener());
-        // assertNotNull(descriptor.getReceiveEndpoint());
-        // assertEquals(descriptor.getReceiveEndpoint(),
-        // endpoint.getEndpointURI());
+        assertNotNull(endpoint.getConnector().getExceptionListener());
     }
 }

@@ -7,8 +7,10 @@
 
     <model name="WebService_Test">
         <mule-descriptor name="ServiceEntryPoint"
-            implementation="org.mule.test.integration.providers.soap.axis.style.DefaultMessageService"
-            inboundEndpoint="axis:http://localhost:8088">
+            implementation="org.mule.test.integration.providers.soap.axis.style.DefaultMessageService">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8088"/>
+            </inbound-router>
             <properties>
                 <property name="style" value="Message" />
                 <property name="serviceNamespace" value=""/>

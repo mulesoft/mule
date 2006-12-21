@@ -15,12 +15,7 @@
             <xsd:complexContent>
                 <xsd:extension base="mule:expressionFilterType">
                     <xsd:choice>
-                        <xsd:element name="namespace" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:complexType>
-                                <xsd:attribute name="prefix" type="xsd:string"/>
-                                <xsd:attribute name="uri" type="xsd:string"/>
-                            </xsd:complexType>
-                        </xsd:element>
+                        <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                         <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:choice>
                     <xsd:attribute name="lenient" type="xsd:boolean" default="true"/>
@@ -29,6 +24,11 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+
+    <xsd:complexType name="namespaceType">
+        <xsd:attribute name="prefix" type="xsd:string" use="required"/>
+        <xsd:attribute name="uri" type="xsd:string" use="required"/>
+    </xsd:complexType>
 
     <xsd:element name="isXml-filter" type="mule:filterType"/>
 

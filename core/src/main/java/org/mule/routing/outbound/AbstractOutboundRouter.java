@@ -337,4 +337,23 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     {
         return false;
     }
+
+    /**
+     * @param name the Endpoint identifier
+     * @return the Endpoint or null if the endpointUri is not registered
+     * @see org.mule.umo.routing.UMOInboundMessageRouter
+     */
+    public UMOEndpoint getEndpoint(String name)
+    {
+        UMOEndpoint endpointDescriptor;
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        {
+            endpointDescriptor = (UMOEndpoint)iterator.next();
+            if (endpointDescriptor.getName().equals(name))
+            {
+                return endpointDescriptor;
+            }
+        }
+        return null;
+    }
 }

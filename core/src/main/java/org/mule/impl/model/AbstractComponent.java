@@ -677,11 +677,6 @@ public abstract class AbstractComponent implements UMOComponent
 
         // Add inbound endpoints
         endpoints.addAll(getDescriptor().getInboundRouter().getEndpoints());
-        // Add the (deprecated) single inbound endpoint.
-        if (getDescriptor().getInboundEndpoint() != null)
-        {
-            endpoints.add(getDescriptor().getInboundEndpoint());
-        }
 
         // Add response endpoints
         if (getDescriptor().getResponseRouter() != null

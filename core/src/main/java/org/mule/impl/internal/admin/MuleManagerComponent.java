@@ -242,7 +242,8 @@ public class MuleManagerComponent implements Callable, Initialisable
 
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setName(MANAGER_COMPONENT_NAME);
-        descriptor.setInboundEndpoint(endpoint);
+
+        descriptor.getInboundRouter().addEndpoint(endpoint);
         descriptor.setImplementation(MuleManagerComponent.class.getName());
         descriptor.setContainerManaged(false);
         Map props = new HashMap();

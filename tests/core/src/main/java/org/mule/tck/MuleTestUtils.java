@@ -22,6 +22,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -39,6 +40,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 
@@ -172,7 +174,9 @@ public class MuleTestUtils
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
         descriptor.setImplementation(implementation);
-        descriptor.setOutboundEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+        UMOOutboundRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+        descriptor.getOutboundRouter().addRouter(router);
         descriptor.initialise();
 
         descriptor.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);

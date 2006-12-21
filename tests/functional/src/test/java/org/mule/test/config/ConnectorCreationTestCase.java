@@ -15,6 +15,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.routing.UMOOutboundRouter;
 
 public class ConnectorCreationTestCase extends AbstractMuleTestCase
 {
@@ -25,8 +26,8 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
         builder.registerEndpoint("test://inbound?createConnector=ALWAYS", "in", true);
         builder.registerEndpoint("test://outbound?createConnector=ALWAYS", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
-        assertTrue(!c.getDescriptor().getInboundEndpoint().getConnector().equals(
-            c.getDescriptor().getOutboundEndpoint().getConnector()));
+        assertTrue(!c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector().equals(
+            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector()));
     }
 
     public void testCreateOnce() throws Exception
@@ -35,9 +36,8 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
         builder.registerEndpoint("test://inbound", "in", true);
         builder.registerEndpoint("test://outbound", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
-        assertEquals(c.getDescriptor().getInboundEndpoint().getConnector(), c.getDescriptor()
-            .getOutboundEndpoint()
-            .getConnector());
+        assertEquals(c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector(),
+            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector());
     }
 
     public void testCreateNeverUsingParamString() throws Exception

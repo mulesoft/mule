@@ -68,23 +68,31 @@
         </mule-descriptor>
 
         <mule-descriptor name="AddressValidationService"
-            inboundEndpoint="AddressValidationReceiver"
             implementation="org.mule.samples.voipservice.service.AddressValidationService">
+            <inbound-router>
+                <endpoint address="AddressValidationReceiver"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="PaymentValidationService"
-            inboundEndpoint="PaymentValidation"
             implementation="org.mule.samples.voipservice.service.PaymentValidationService">
+            <inbound-router>
+                <endpoint address="PaymentValidation"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="CreditAgencyService"
-            inboundEndpoint="CreditAgencyReceiver"
             implementation="org.mule.samples.voipservice.service.CreditAgencyService">
+            <inbound-router>
+                <endpoint address="CreditAgencyReceiver"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="BankAgencyService"
-            inboundEndpoint="BankAgencyReceiver"
             implementation="org.mule.samples.voipservice.service.BankAgencyService">
+            <inbound-router>
+                <endpoint address="BankAgencyReceiver"/>
+            </inbound-router>
         </mule-descriptor>
 
     </model>

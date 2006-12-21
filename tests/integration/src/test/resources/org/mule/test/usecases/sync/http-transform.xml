@@ -51,21 +51,26 @@
         </mule-descriptor>
 
         <mule-descriptor name="HttpService2"
-            implementation="org.mule.components.simple.EchoComponent"
-            inboundEndpoint="httpEndpoint2"
-            inboundTransformer="ByteArrayToSerializable"
-            responseTransformer="SerializableToByteArray ToHttpResponse">
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="httpEndpoint2" transformers="ByteArrayToSerializable"
+                          responseTransformers="SerializableToByteArray ToHttpResponse"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="LocalService"
-            implementation="org.mule.components.simple.NullComponent"
-            inboundEndpoint="vmEndpoint"
-            outboundTransformer="SerializableToByteArray"
-            outboundEndpoint="httpEndpoint2">
+            implementation="org.mule.components.simple.NullComponent">
 
             <inbound-router>
+                <endpoint address="vmEndpoint"/>
                 <router className="org.mule.routing.inbound.ForwardingConsumer"/>
             </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="httpEndpoint2" transformers="SerializableToByteArray"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
 
     </model>

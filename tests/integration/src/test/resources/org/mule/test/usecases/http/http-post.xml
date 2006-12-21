@@ -40,8 +40,10 @@
 
     <model name="model">
         <mule-descriptor name="HttpService"
-            implementation="org.mule.components.simple.EchoComponent"
-            inboundEndpoint="httpService">
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="httpService"/>
+            </inbound-router>
         </mule-descriptor>
     </model>
 

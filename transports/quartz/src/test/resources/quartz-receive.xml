@@ -19,10 +19,11 @@
 
     <model name="quartz">
 
-        <mule-descriptor
-            name="quartzService"
-            implementation="org.mule.providers.quartz.TestComponent"
-            inboundEndpoint="quartz.in">
+        <mule-descriptor name="quartzService" implementation="org.mule.providers.quartz.TestComponent">
+
+            <inbound-router>
+                <endpoint address="quartz.in"/>
+            </inbound-router>
 
         <!--
             we want exactly one TestComponent for this test,

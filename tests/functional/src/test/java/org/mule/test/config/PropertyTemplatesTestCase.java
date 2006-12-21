@@ -16,6 +16,7 @@ import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.routing.UMOOutboundRouter;
 
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
 
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test-from-env-props");
         assertNotNull(d);
-        assertEquals(d.getInboundEndpoint().getEndpointURI().toString(), "test://test.1");
-        assertEquals(d.getOutboundEndpoint().getEndpointURI().toString(), "test://test.2");
+        assertEquals(((UMOEndpoint)d.getInboundRouter().getEndpoints().get(0)).getEndpointURI().toString(), "test://test.1");
+        assertEquals(((UMOEndpoint)((UMOOutboundRouter)d.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0)).getEndpointURI().toString(), "test://test.2");
     }
 
     public void testPropertyWithoutOverrides()

@@ -7,15 +7,21 @@
 
     <model name="test">
 
-       <mule-descriptor name="bridge"
-            inboundEndpoint="vm://bridge.inbound"
-            outboundEndpoint="vm://bridge.outbound"
-            implementation="org.mule.components.simple.BridgeComponent">
+       <mule-descriptor name="bridge" implementation="org.mule.components.simple.BridgeComponent">
+           <inbound-router>
+               <endpoint address="vm://bridge.inbound"/>
+           </inbound-router>
+           <outbound-router>
+               <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                   <endpoint address="vm://bridge.outbound"/>
+               </router>
+           </outbound-router>
         </mule-descriptor>
 
-       <mule-descriptor name="Receiver"
-            inboundEndpoint="vm://bridge.outbound"
-            implementation="org.mule.test.integration.service.TestReceiver">
+       <mule-descriptor name="Receiver" implementation="org.mule.test.integration.service.TestReceiver">
+           <inbound-router>
+               <endpoint address="vm://bridge.outbound"/>
+           </inbound-router>
         </mule-descriptor>
     </model>
 </mule-configuration>

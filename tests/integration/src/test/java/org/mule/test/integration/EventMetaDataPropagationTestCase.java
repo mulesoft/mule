@@ -15,6 +15,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -25,6 +26,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
 
@@ -54,9 +56,10 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, null);
-        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", new MuleEndpointURI(
-            "vm://component1"), new MuleEndpointURI("vm://component2"));
-        c1.getOutboundEndpoint().setTransformer(new DummyTransformer());
+        MuleEndpoint out = new MuleEndpoint("vm://component2", false);
+        out.setTransformer(new DummyTransformer());
+        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", new MuleEndpoint(
+            "vm://component1", true), out);
 
         builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
         return builder;
@@ -65,9 +68,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
     public void testEventMetaDataPropagation() throws UMOException
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("component1");
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), session.getComponent()
-            .getDescriptor()
-            .getInboundEndpoint(), session, true);
+        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOEndpoint)session.getComponent()
+            .getDescriptor().getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
 

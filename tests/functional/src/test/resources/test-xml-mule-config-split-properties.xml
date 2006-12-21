@@ -7,8 +7,11 @@
 
     <!-- Testing mule property types -->
     <mule-descriptor name="testPropertiesComponent"
-        inboundEndpoint="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
         implementation="org.mule.tck.testmodels.fruit.Apple">
+
+        <inbound-router>
+            <endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
+        </inbound-router>
         <properties>
             <property name="test1" value="test1"/>
             <property name="test2" value="test2"/>

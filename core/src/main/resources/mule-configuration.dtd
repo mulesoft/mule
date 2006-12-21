@@ -946,51 +946,17 @@ Jndi
 <!ATTLIST mule-descriptor ref                     CDATA                 #IMPLIED>
 
 <!--
-    The transformer to use when receiving events on the specified inboundProvider.
-    This property is deprecated, please use "inboundRouter" instead (see MULE-506).
--->
-<!ATTLIST mule-descriptor inboundTransformer            CDATA            #IMPLIED>
-
-<!--
-    The transformer to use when receiving events on the specified outboundProvider.
-    This property is deprecated, please use "outboundRouter" instead (see MULE-506).
--->
-<!ATTLIST mule-descriptor outboundTransformer            CDATA            #IMPLIED>
-
-<!--
-    The transformer to use when sending events back.
-    This property is deprecated, please use "responseRouter" instead (see MULE-506).
--->
-<!ATTLIST mule-descriptor responseTransformer            CDATA            #IMPLIED>
-
-<!--
     The class of the object or an object reference of the component being registered as an UMO.
     If the implementation is an object reference then it will be resolved using the component resolver
     configured on the model
 -->
 <!ATTLIST mule-descriptor implementation                CDATA         #REQUIRED>
-<!--
-    The default endpoint that the Mule UMO uses to receive events.
-    This property is deprecated, please use "inboundRouter" instead (see MULE-506).
--->
-<!ATTLIST mule-descriptor inboundEndpoint                CDATA            #IMPLIED>
-
-<!--
-    The default endpoint that the Mule UMO uses to send events.
-    This property is deprecated, please use "outboundRouter" instead (see MULE-506).
--->
-<!ATTLIST mule-descriptor outboundEndpoint                    CDATA            #IMPLIED>
 
 <!--
     The version on the Mule UMO.  This is currently not used by the mule run-time but may
     be used in future
 -->
 <!ATTLIST mule-descriptor version                         NMTOKEN         #IMPLIED>
-
-<!--
-    This property is deprecated, please use "container" instead (see MULE-812).
-<!ATTLIST mule-descriptor containerManaged            (true | false)            "true">
--->
 
 <!--
     If an IoC container is being used this property can be set to determine which container explicitly

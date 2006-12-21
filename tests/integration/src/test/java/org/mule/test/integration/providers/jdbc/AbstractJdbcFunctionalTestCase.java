@@ -55,11 +55,13 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         // Create a new mule manager
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        SedaModel model = new SedaModel();
+        model.setName("main");
+        model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        // Create an empty model
-        manager.setModel(new SedaModel());
+        MuleManager.getInstance().setModel(model);
+
         // Create and register connector
         connector = createConnector();
         MuleManager.getInstance().registerConnector(connector);

@@ -15,6 +15,7 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -88,8 +89,11 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     public UMOComponent initialiseComponent(UMODescriptor descriptor, EventCallback callback)
         throws Exception
     {
-        descriptor.setOutboundEndpoint(createOutboundEndpoint());
-        descriptor.setInboundEndpoint(createInboundEndpoint());
+        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(createOutboundEndpoint());
+        descriptor.getOutboundRouter().addRouter(router);
+
+        descriptor.getInboundRouter().addEndpoint(createInboundEndpoint());
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);

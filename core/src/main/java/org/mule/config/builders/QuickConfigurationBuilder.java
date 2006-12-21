@@ -22,6 +22,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -227,10 +230,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                                                    UMOEndpointURI listenerEndpointUri,
                                                    UMOEndpointURI sendEndpointUri) throws UMOException
     {
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setName(name);
-        descriptor.setImplementationInstance(component);
-
         // Create the endpoints
         UMOEndpoint inboundProvider = null;
         UMOEndpoint outboundProvider = null;
@@ -244,8 +243,39 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             outboundProvider = ConnectorFactory.createEndpoint(sendEndpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
-        descriptor.setInboundEndpoint(inboundProvider);
-        descriptor.setOutboundEndpoint(outboundProvider);
+        return registerComponentInstance(component, name, inboundProvider, outboundProvider);
+    }
+
+
+    /**
+     * Registers a java object as a Umo pcomponent that listens for and sends events
+     * on the given urls. By default the ThreadingProfile for the components will be
+     * set so that there will only be one thread of execution.
+     *
+     * @param component any java object, Mule will it's endpointUri discovery to
+     *            determine which event to invoke based on the evnet payload type
+     * @param name The identifying name of the components. This can be used to later
+     *            unregister it
+     * @param listenerEndpoint The url endpoint to listen to
+     * @param sendEndpoint The url endpointUri to dispatch to
+     * @throws UMOException
+     */
+    public UMODescriptor registerComponentInstance(Object component,
+                                                   String name,
+                                                   UMOEndpoint listenerEndpoint,
+                                                   UMOEndpoint sendEndpoint) throws UMOException
+    {
+        MuleDescriptor descriptor = new MuleDescriptor();
+        descriptor.setName(name);
+        descriptor.setImplementationInstance(component);
+
+
+        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(listenerEndpoint);
+        descriptor.getOutboundRouter().addRouter(router);
+        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.getInboundRouter().addEndpoint(sendEndpoint);
 
         // register the components descriptor
         manager.getModel().registerComponent(descriptor);
@@ -496,8 +526,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             descriptor.getProperties().putAll(properties);
         }
 
-        descriptor.setInboundEndpoint(inboundEndpoint);
-        descriptor.setOutboundEndpoint(outboundEndpoint);
+        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(outboundEndpoint);
+        descriptor.getOutboundRouter().addRouter(router);
+        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
 
         return descriptor;
     }

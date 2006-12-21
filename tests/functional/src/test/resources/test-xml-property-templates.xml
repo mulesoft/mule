@@ -22,9 +22,16 @@
     </connector>
 
     <model name="${model.name}">
-        <mule-descriptor name="${component.name}" implementation="org.mule.components.simple.EchoComponent"
-            inboundEndpoint="${test.inbound.endpoint}"
-            outboundEndpoint="${test.outbound.endpoint}"/>
+        <mule-descriptor name="${component.name}" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="${test.inbound.endpoint}"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="${test.outbound.endpoint}"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
 
         <mule-descriptor name="test2" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>

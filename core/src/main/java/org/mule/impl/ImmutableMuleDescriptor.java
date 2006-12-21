@@ -26,7 +26,6 @@ import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -34,7 +33,6 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.umo.transformer.UMOTransformer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -102,45 +100,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected UMOResponseMessageRouter responseRouter = null;
 
-    /**
-     * The default receive endpoint.
-     * 
-     * @deprecated Please use <code>inboundRouter</code> instead.
-     * @see MULE-506
-     */
-    protected UMOEndpoint inboundEndpoint;
-
-    /**
-     * The transformer for the default receive endpoint.
-     * 
-     * @deprecated Please use <code>inboundRouter</code> instead.
-     * @see MULE-506
-     */
-    protected UMOTransformer inboundTransformer = null;
-
-    /**
-     * The default send endpoint.
-     * 
-     * @deprecated Please use <code>outboundRouter</code> instead.
-     * @see MULE-506
-     */
-    protected UMOEndpoint outboundEndpoint;
-
-    /**
-     * The transformer for the default send Endpoint
-     * 
-     * @deprecated Please use <code>outboundRouter</code> instead.
-     * @see MULE-506
-     */
-    protected UMOTransformer outboundTransformer = null;
-
-    /**
-     * The transformer for the response
-     * 
-     * @deprecated Please use <code>responseRouter</code> instead.
-     * @see MULE-506
-     */
-    protected UMOTransformer responseTransformer = null;
 
     /**
      * The threading profile to use for this component. If this is not set a default
@@ -181,8 +140,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected List initialisationCallbacks = new ArrayList();
 
-    protected String encoding = null;
-
     /**
      * The name of the container that the component implementation resides in If
      * null, the container is not known, if 'none' the component is instanciated from
@@ -201,15 +158,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         inboundRouter = descriptor.getInboundRouter();
         outboundRouter = descriptor.getOutboundRouter();
         responseRouter = descriptor.getResponseRouter();
-        inboundTransformer = descriptor.getInboundTransformer();
-        outboundTransformer = descriptor.getOutboundTransformer();
-        responseTransformer = descriptor.getResponseTransformer();
         implementationReference = descriptor.getImplementation();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
         properties = descriptor.getProperties();
         name = descriptor.getName();
-        encoding = descriptor.getEncoding();
 
         threadingProfile = descriptor.getThreadingProfile();
         poolingProfile = descriptor.getPoolingProfile();
@@ -256,38 +209,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             ((Initialisable)exceptionListener).initialise();
         }
 
-        if (inboundEndpoint != null)
-        {
-            if (inboundTransformer != null)
-            {
-                inboundEndpoint.setTransformer(inboundTransformer);
-            }
-            ((MuleEndpoint)inboundEndpoint).initialise();
-            // If the transformer was set on the endpoint uri, it will only
-            // be initialised when the endpoint is initialised, hence we make
-            // this call here to ensure a consistent state
-            if (inboundTransformer == null)
-            {
-                inboundTransformer = inboundEndpoint.getTransformer();
-            }
-        }
-
-        if (outboundEndpoint != null)
-        {
-            if (outboundTransformer != null)
-            {
-                outboundEndpoint.setTransformer(outboundTransformer);
-            }
-            ((MuleEndpoint)outboundEndpoint).initialise();
-            // If the transformer was set on the endpoint uri, it will only
-            // be initialised when the endpoint is initialised, hence we make
-            // this call here to ensure a consistent state
-            if (outboundTransformer == null)
-            {
-                outboundTransformer = outboundEndpoint.getTransformer();
-            }
-        }
-
         if (exceptionListener instanceof Initialisable)
         {
             ((Initialisable)exceptionListener).initialise();
@@ -327,7 +248,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         if (outboundRouter == null)
         {
             outboundRouter = new OutboundMessageRouter();
-            outboundRouter.addRouter(new OutboundPassThroughRouter(this));
+            outboundRouter.addRouter(new OutboundPassThroughRouter());
         }
         else
         {
@@ -371,15 +292,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return exceptionListener;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformers.HasTransformer#getInboundTransformer()
-     */
-    public UMOTransformer getInboundTransformer()
-    {
-        return inboundTransformer;
-    }
 
     /*
      * (non-Javadoc)
@@ -389,26 +301,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public String getName()
     {
         return name;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.impl.MuleDescriptor#getOutboundTransformer()
-     */
-    public UMOTransformer getOutboundTransformer()
-    {
-        return outboundTransformer;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.impl.MuleDescriptor#getResponseTransformer()
-     */
-    public UMOTransformer getResponseTransformer()
-    {
-        return responseTransformer;
     }
 
     /*
@@ -441,28 +333,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public List getInterceptors()
     {
         return intecerptorList;
-    }
-
-    public String getEncoding()
-    {
-        return encoding;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("name=").append(name);
-        buffer.append(", outbound endpoint=").append(outboundEndpoint);
-        buffer.append(", send transformer=").append(outboundTransformer);
-        buffer.append(", inbound endpointUri=").append(inboundEndpoint);
-        buffer.append(", receive transformer=").append(inboundTransformer);
-        buffer.append(", encoding=").append(encoding);
-        return buffer.toString();
     }
 
     /*
@@ -551,29 +421,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         }
     }
 
-    /**
-     * The inbound Provider to use when receiveing an event. This may get overidden
-     * by the configured behaviour of the inbound router on this component
-     * 
-     * @return the inbound endpoint or null if one is not set
-     * @see org.mule.umo.endpoint.UMOEndpoint
-     */
-    public UMOEndpoint getInboundEndpoint()
-    {
-        return inboundEndpoint;
-    }
-
-    /**
-     * The outbound Provider to use when sending an event. This may get overidden by
-     * the configured behaviour of the outbound router on this component
-     * 
-     * @return the outbound endpoint or null if one is not set
-     * @see org.mule.umo.endpoint.UMOEndpoint
-     */
-    public UMOEndpoint getOutboundEndpoint()
-    {
-        return outboundEndpoint;
-    }
 
     public UMOResponseMessageRouter getResponseRouter()
     {
@@ -601,5 +448,23 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public String getContainer()
     {
         return container;
+    }
+
+
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("ImmutableMuleDescriptor");
+        sb.append("{exceptionListener=").append(exceptionListener);
+        sb.append(", implementationReference=").append(implementationReference);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", properties=").append(properties);
+        sb.append(", version='").append(version).append('\'');
+        sb.append(", threadingProfile=").append(threadingProfile);
+        sb.append(", initialState='").append(initialState).append('\'');
+        sb.append(", singleton=").append(singleton);
+        sb.append(", container='").append(container).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

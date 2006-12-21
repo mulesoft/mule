@@ -96,7 +96,6 @@
         </exception-strategy>
 
         <mule-descriptor name="orangeComponent"
-            inboundEndpoint="Test Queue"
             implementation="orange"
             container="descriptor">
 
@@ -104,6 +103,7 @@
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy>
+                <endpoint address="Test Queue"/>
                 <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>

@@ -46,10 +46,16 @@
 
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
 
-        <mule-descriptor name="testUMO"
-            inboundEndpoint="testEndpoint"
-            outboundEndpoint="test://endpoint.test"
-            implementation="org.mule.tck.testmodels.fruit.Orange">
+        <mule-descriptor name="testUMO" implementation="org.mule.tck.testmodels.fruit.Orange">
+
+            <inbound-router>
+                <endpoint address="testEndpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="test://endpoint.test"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
     </model>
 </mule-configuration>

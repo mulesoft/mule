@@ -62,7 +62,7 @@ public class SpringEventsJmsExampleTestCase extends AbstractMuleTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        MuleManager.getConfiguration().setSynchronous(true);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
         MuleClient client = new MuleClient();
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);

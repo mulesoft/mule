@@ -15,6 +15,9 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -118,8 +121,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
         endpoint.setTransactionConfig(txConfig);
 
-        descriptor.setOutboundEndpoint(outProvider);
-        descriptor.setInboundEndpoint(endpoint);
+        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(outProvider);
+        descriptor.getOutboundRouter().addRouter(router);
+        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.getInboundRouter().addEndpoint(endpoint);
+        
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);

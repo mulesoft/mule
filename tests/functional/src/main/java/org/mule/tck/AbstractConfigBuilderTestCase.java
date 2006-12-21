@@ -334,7 +334,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
         UMOEndpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertNull(descriptor.getOutboundEndpoint());
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
 
         UMOEndpoint outEndpoint = (UMOEndpoint)((UMOOutboundRouter)descriptor.getOutboundRouter()

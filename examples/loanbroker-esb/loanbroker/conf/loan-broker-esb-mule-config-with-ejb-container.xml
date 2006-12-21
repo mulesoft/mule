@@ -177,29 +177,34 @@
         replyTo property which will be used by Mule to route the responses back
         to the LoanBrokerQuotes destination
         -->
-        <mule-descriptor name="Bank1"
-            inboundEndpoint="Bank1"
-            implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+        <mule-descriptor name="Bank1" implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+            <inbound-router>
+                <endpoint address="Bank1"/>
+            </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank2"
-            inboundEndpoint="Bank2"
-            implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+        <mule-descriptor name="Bank2" implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+            <inbound-router>
+                <endpoint address="Bank2"/>
+            </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank3"
-            inboundEndpoint="Bank3"
-            implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+        <mule-descriptor name="Bank3" implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+            <inbound-router>
+                <endpoint address="Bank3"/>
+            </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank4"
-            inboundEndpoint="Bank4"
-            implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+        <mule-descriptor name="Bank4" implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+            <inbound-router>
+                <endpoint address="Bank4"/>
+            </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank5"
-            inboundEndpoint="Bank5"
-            implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+        <mule-descriptor name="Bank5" implementation="org.mule.samples.loanbroker.esb.bank.Bank">
+            <inbound-router>
+                <endpoint address="Bank5"/>
+            </inbound-router>
         </mule-descriptor>
     </model>
 </mule-configuration>

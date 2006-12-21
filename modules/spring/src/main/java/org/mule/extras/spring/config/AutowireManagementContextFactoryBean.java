@@ -182,7 +182,7 @@ public class AutowireManagementContextFactoryBean
         {
             Map.Entry entry = (Map.Entry)temp.entrySet().iterator().next();
             model = (UMOModel)entry.getValue();
-            model.setName(entry.getKey().toString());
+            //model.setName(entry.getKey().toString());
         }
         else
         {

@@ -6,12 +6,17 @@
 
     <model name="model">
         <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.components.simple.NullComponent"
-            inboundEndpoint="tcp://localhost:4444"
-            outboundEndpoint="file://temp/tests/mule">
+            implementation="org.mule.components.simple.NullComponent">
             <inbound-router>
+                <endpoint address="tcp://localhost:4444"/>
                 <router className="org.mule.routing.inbound.ForwardingConsumer"/>
                </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="file://temp/tests/mule"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
     </model>
 

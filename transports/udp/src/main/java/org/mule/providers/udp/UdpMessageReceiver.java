@@ -10,18 +10,6 @@
 
 package org.mule.providers.udp;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.UnknownHostException;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -34,6 +22,18 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.UnknownHostException;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 
 /**
  * <code>UdpMessageReceiver</code> receives UDP message packets.
@@ -103,7 +103,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected UMOTransformer getResponseTransformer() throws InitialisationException
     {
-        UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
+        UMOTransformer transformer = endpoint.getResponseTransformer();
         if (transformer == null)
         {
             return connector.getDefaultResponseTransformer();

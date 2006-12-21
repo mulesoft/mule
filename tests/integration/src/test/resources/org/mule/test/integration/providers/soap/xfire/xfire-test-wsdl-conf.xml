@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Mule_Sample" version="1.0">
     <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
@@ -12,8 +12,10 @@
 
     <model name="test">
         <mule-descriptor name="mycomponent"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="xfire:servlet://mycomponent">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:servlet://mycomponent"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="xfireService" implementation="org.mule.test.integration.service.TestServiceComponent">

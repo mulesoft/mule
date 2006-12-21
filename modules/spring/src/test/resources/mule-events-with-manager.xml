@@ -22,10 +22,15 @@
     </connector>
 
     <model name="echoSample">
-        <mule-descriptor name="EchoUMO"
-            inboundEndpoint="test://in"
-            outboundEndpoint="test://out"
-            implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="EchoUMO" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="test://in"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="test://out"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
     </model>
 </mule-configuration>

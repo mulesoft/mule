@@ -10,12 +10,9 @@
 
 package org.mule.umo;
 
-import org.mule.MuleException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -59,33 +56,11 @@ public interface UMODescriptor extends UMOImmutableDescriptor
     void setExceptionListener(ExceptionListener listener);
 
     /**
-     * The inbound endpointUri to use when receiveing an event.
-     * 
-     * @param endpoint the inbound endpoint to use
-     * @throws MuleException if the Provider is not valid i.e. the proivder is not a
-     *             receiver
-     * @see org.mule.umo.endpoint.UMOEndpoint
-     * @deprecated use setInboundRouter() instead (see MULE-506)
-     */
-    void setInboundEndpoint(UMOEndpoint endpoint) throws MuleException;
-
-    /**
      * sets the identifier for the Mule UMO created from the descriptor
      * 
      * @param newName the identifier for the Mule UMO created from the descriptor
      */
     void setName(String newName);
-
-    /**
-     * The outbound Provider to use when sending an event.
-     * 
-     * @param endpoint the outbound endpoint to use
-     * @throws MuleException if the Provider is not valid i.e. the proivder is a
-     *             receiver
-     * @see UMOEndpoint
-     * @deprecated use setOutboundRouter() instead (see MULE-506)
-     */
-    void setOutboundEndpoint(UMOEndpoint endpoint) throws MuleException;
 
     /**
      * @param props the properties for the descriptor. These will be passed to the
@@ -143,24 +118,6 @@ public interface UMODescriptor extends UMOImmutableDescriptor
     void setResponseRouter(UMOResponseMessageRouter router);
 
     /**
-     * @param transformer the transformer to use.
-     * @see UMOTransformer
-     * @see org.mule.transformers.AbstractTransformer
-     * @deprecated use setInboundRouter() instead (see MULE-506)
-     */
-    void setInboundTransformer(UMOTransformer transformer);
-
-    /**
-     * The transformer to use when sending events or data.
-     * 
-     * @param transformer the transformer to use.
-     * @see UMOTransformer
-     * @see org.mule.transformers.AbstractTransformer
-     * @deprecated use setOutboundRouter() instead (see MULE-506)
-     */
-    void setOutboundTransformer(UMOTransformer transformer);
-
-    /**
      * Determines if only a single instance of this component is created. This is
      * useful when a component hands off event processing to another engine such as
      * Rules processing or Bpel and the processing engine allocates and manages its
@@ -176,8 +133,6 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @param state the initial state of this component
      */
     void setInitialState(String state);
-
-    void setEncoding(String encoding);
 
     /**
      * Sets the name of the contaier where the object for this descriptor resides. If

@@ -22,8 +22,10 @@
     </global-endpoints>
     <model name="test">
         <mule-descriptor name="Calculator"
-            implementation="org.mule.test.integration.providers.soap.axis.Calculator"
-            inboundEndpoint="axis:http://localhost:8088/axis">
+            implementation="org.mule.test.integration.providers.soap.axis.Calculator">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8088/axis"/>
+            </inbound-router>
 
             <properties>
                 <property name="style" value="document"/>

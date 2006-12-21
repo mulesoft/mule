@@ -577,13 +577,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     {
         UMOTransformer transformer = endpoint.getResponseTransformer();
 
-        // no endpoint transformer, so check on component
-        if (transformer == null)
-        {
-            transformer = component.getDescriptor().getResponseTransformer();
-        }
 
-        // still no transformer, so do nothing.
+        // no transformer, so do nothing.
         if (transformer == null)
         {
             return returnMessage;

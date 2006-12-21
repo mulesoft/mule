@@ -45,6 +45,9 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,9 +66,6 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -781,7 +781,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
-            descriptor.setInboundEndpoint(new MuleEndpoint("vm://*", true));
+            descriptor.getInboundRouter().addEndpoint(new MuleEndpoint("vm://*", true));
         }
         else
         {

@@ -11,7 +11,6 @@
 package org.mule.routing.outbound;
 
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -24,8 +23,6 @@ import java.util.List;
  * endpoint without any filtering. This class is used by Mule when a single outbound
  * router is set on a UMODescriptor.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class OutboundPassThroughRouter extends FilteringOutboundRouter
 {
@@ -34,14 +31,6 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
         super();
     }
 
-    public OutboundPassThroughRouter(UMOImmutableDescriptor descriptor)
-    {
-        super();
-        if (descriptor != null && descriptor.getOutboundEndpoint() != null)
-        {
-            addEndpoint(descriptor.getOutboundEndpoint());
-        }
-    }
 
     public void addEndpoint(UMOEndpoint endpoint)
     {

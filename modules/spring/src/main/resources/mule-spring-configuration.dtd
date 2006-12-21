@@ -935,19 +935,6 @@ The ref name of this object if it is to be loaded from a container such as sprin
 Jndi
 -->
 <!ATTLIST mule-descriptor ref                     CDATA                 #IMPLIED>
-
-<!--
-    The transformer to use when receiving events on the specified inboundProvider.
--->
-<!ATTLIST mule-descriptor inboundTransformer            CDATA            #IMPLIED>
-<!--
-    The transformer to use when receiving events on the specified outboundProvider.
--->
-<!ATTLIST mule-descriptor outboundTransformer            CDATA            #IMPLIED>
-<!--
-    The transformer to use when sending events back.
--->
-<!ATTLIST mule-descriptor responseTransformer            CDATA            #IMPLIED>
 <!--
     The class of the object or an object reference of the component being registered as an UMO.
     If the implementation is an object reference then it will be resolved using the component resolver
@@ -955,25 +942,10 @@ Jndi
 -->
 <!ATTLIST mule-descriptor implementation                CDATA         #REQUIRED>
 <!--
-    The default subject that the Mule UMO sends events.
--->
-<!ATTLIST mule-descriptor inboundEndpoint                CDATA            #IMPLIED>
-<!--
-    The default subject that the Mule UMO receive events.
--->
-<!ATTLIST mule-descriptor outboundEndpoint                    CDATA            #IMPLIED>
-<!--
     The version on the Mule UMO.  This is currently not used by the mule run-time but may
     be used in future
 -->
 <!ATTLIST mule-descriptor version                         NMTOKEN         #IMPLIED>
-
-<!--
-    If an IoC container is being used this property can be set to determine if this component
-    is constructed (and contained in) the container or is instanciated by Mule.
-    This is being deprecated in favour of the 'ontainer' property below.
--->
-<!ATTLIST mule-descriptor containerManaged            (true | false)            "true">
 
 <!--
     If an IoC container is being used this property can be set to determine which container explicitly

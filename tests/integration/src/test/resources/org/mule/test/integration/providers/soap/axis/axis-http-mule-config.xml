@@ -8,13 +8,17 @@
     <mule-environment-properties serverUrl=""/>
     <model name="test">
         <mule-descriptor name="mycomponent"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38008/mule">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:38008/mule"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38009/mule/services">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:38009/mule/services"/>
+            </inbound-router>
             <properties>
                 <list name="serviceInterfaces">
                     <entry value="org.mule.components.simple.EchoService"/>
@@ -24,8 +28,10 @@
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent3"
-            implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38009">
+            implementation="org.mule.test.integration.service.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:38009"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent4"

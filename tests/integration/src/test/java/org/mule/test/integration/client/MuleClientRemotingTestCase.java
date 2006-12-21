@@ -50,7 +50,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     {
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setSynchronous(true);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo",

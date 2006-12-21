@@ -46,6 +46,9 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,9 +57,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -878,7 +878,7 @@ public class MuleClient implements Disposable
         throws UMOException
     {
         // as we are bypassing the message transport layer we need to check that
-        UMOEndpoint endpoint = descriptor.getInboundEndpoint();
+        UMOEndpoint endpoint = (UMOEndpoint)descriptor.getInboundRouter().getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformer() != null)

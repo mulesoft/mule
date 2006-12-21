@@ -76,11 +76,13 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
         // in other configs using the property below
 
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        SedaModel model = new SedaModel();
+        model.setName("main");
+        model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-
-        MuleManager.getInstance().setModel(new SedaModel());
+        MuleManager.getInstance().setModel(model);
+        
         callbackCalled = false;
         MuleManager.getInstance().registerConnector(createConnector());
         currentMsg = null;

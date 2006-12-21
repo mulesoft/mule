@@ -21,6 +21,9 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.MessageRedeliveredException;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
+import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
@@ -312,8 +315,12 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         endpoint.setTransactionConfig(txConfig);
 
-        descriptor.setOutboundEndpoint(outProvider);
-        descriptor.setInboundEndpoint(endpoint);
+        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+        router.addEndpoint(outProvider);
+        descriptor.getOutboundRouter().addRouter(router);
+        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.getInboundRouter().addEndpoint(endpoint);
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);

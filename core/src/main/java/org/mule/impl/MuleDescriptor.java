@@ -10,7 +10,6 @@
 
 package org.mule.impl;
 
-import org.mule.MuleException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
@@ -18,11 +17,9 @@ import org.mule.config.ThreadingProfile;
 import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
 
 import java.beans.ExceptionListener;
@@ -62,7 +59,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
      * object
-     * 
+     *
      * @see MuleConfiguration
      */
     public MuleDescriptor()
@@ -77,7 +74,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#setExceptionListener(org.mule.umo.UMOExceptionStrategy)
      */
     public void setExceptionListener(ExceptionListener listener)
@@ -92,7 +89,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#setName(java.lang.String)
      */
     public void setName(String newName)
@@ -104,29 +101,10 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         name = newName;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformers.HasTransformer#setOutboundTransformer(org.mule.umo.transformer.UMOTransformer)
-     */
-    public void setOutboundTransformer(UMOTransformer transformer)
-    {
-        outboundTransformer = transformer;
-    }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMODescriptor#setResponseTransformer(UMOTransformer)
-     */
-    public void setResponseTransformer(UMOTransformer transformer)
-    {
-        responseTransformer = transformer;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getPropertiesForURI(java.util.Properties)
      */
     public void setProperties(Map props)
@@ -152,7 +130,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#setVersion(long)
      */
     public void setVersion(String ver)
@@ -160,57 +138,10 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         version = ver;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMODescriptor#setInboundEndpoint(org.mule.impl.UMOEndpoint)
-     */
-    public void setInboundEndpoint(UMOEndpoint endpoint) throws MuleException
-    {
-        inboundEndpoint = endpoint;
-        if (inboundEndpoint != null)
-        {
-            inboundEndpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-            if (inboundEndpoint.getTransformer() != null)
-            {
-                inboundTransformer = inboundEndpoint.getTransformer();
-            }
-        }
-    }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMODescriptor#setOutboundEndpoint(org.mule.impl.UMO
-     *      ProviderDescriptor)
-     */
-    public void setOutboundEndpoint(UMOEndpoint endpoint) throws MuleException
-    {
-        outboundEndpoint = endpoint;
-        if (outboundEndpoint != null)
-        {
-            outboundEndpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
-            if (outboundEndpoint.getTransformer() != null)
-            {
-                outboundTransformer = outboundEndpoint.getTransformer();
-            }
-        }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformers.HasTransformer#setInboundTransformer(org.mule.umo.transformer.UMOTransformer)
-     */
-    public void setInboundTransformer(UMOTransformer transformer)
-    {
-        inboundTransformer = transformer;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#addinteceptor(org.mule.umo.UMOInterceptor)
      */
     public void addInterceptor(UMOInterceptor inteceptor)
@@ -228,7 +159,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#setPoolingProfile(UMOPoolingProfile)
      */
     public void setPoolingProfile(PoolingProfile poolingProfile)
@@ -243,7 +174,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#setImplementation(java.lang.String)
      */
     public void setImplementation(Object reference)
@@ -291,7 +222,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * Join in a forked process. This can be used to make request/response calls a
      * lot more efficient as independent tasks can be forked, execute concurrently
      * and then join before the request completes
-     * 
+     *
      * @param router the response router for this component
      * @see org.mule.umo.routing.UMOResponseMessageRouter
      */
@@ -305,7 +236,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * useful when a component hands off event processing to another engine such as
      * Rules processing or Bpel and the processing engine allocates and manages its
      * own threads.
-     * 
+     *
      * @param singleton true if this component is a singleton
      */
     public void setSingleton(boolean singleton)
@@ -315,7 +246,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /**
      * Sets the initial state of this component
-     * 
+     *
      * @param state the initial state of this component
      */
     public void setInitialState(String state)
@@ -323,16 +254,12 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.initialState = state;
     }
 
-    public void setEncoding(String encoding)
-    {
-        this.encoding = encoding;
-    }
 
     /**
      * Sets the name of the contaier where the object for this descriptor resides. If
      * this value is 'none' the 'implementaiton' attributed is expected to be a fully
      * qualified class name that will be instanciated.
-     * 
+     *
      * @param containerName the container name, or null if it is not known - in which
      *            case each container will be queried for the component
      *            implementation.

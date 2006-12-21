@@ -10,6 +10,19 @@
 
 package org.mule.extras.acegi;
 
+import org.mule.components.simple.EchoComponent;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.security.MuleSecurityManager;
+import org.mule.providers.http.HttpConstants;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.security.UMOSecurityProvider;
+
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.AuthenticationProvider;
@@ -21,16 +34,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.mule.components.simple.EchoComponent;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
-import org.mule.impl.security.MuleSecurityManager;
-import org.mule.providers.http.HttpConstants;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.security.UMOSecurityProvider;
 
 public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
 {
@@ -49,9 +52,10 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
         manager.setSecurityManager(sm);
-        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(), "echo",
-            "http://localhost:4567", null, null);
-        d.getInboundEndpoint().setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
+        UMOEndpoint ep = new MuleEndpoint("http://localhost:4567", true);
+        ep.setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
+
+        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(), "echo", ep, null, null);
         builder.registerComponent(d);
 
         return builder;

@@ -50,10 +50,15 @@
     </global-endpoints>
 
     <model name="model">
-        <mule-descriptor name="TestReceiverUMO"
-            inboundEndpoint="vm://test.queue"
-            outboundEndpoint="stream://System.out"
-            implementation="org.mule.test.integration.service.TestReceiver">
+        <mule-descriptor name="TestReceiverUMO" implementation="org.mule.test.integration.service.TestReceiver">
+            <inbound-router>
+                <endpoint address="vm://test.queue"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
     </model>
 </mule-configuration>

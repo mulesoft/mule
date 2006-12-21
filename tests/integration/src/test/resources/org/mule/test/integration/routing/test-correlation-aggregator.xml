@@ -38,14 +38,18 @@
         </mule-descriptor>
 
         <mule-descriptor name="QuoteProviderOne"
-            inboundEndpoint="vm://quoteprovider1.queue"
             implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://quoteprovider1.queue"/>
+            </inbound-router>
         </mule-descriptor>
 
         <!-- This is a quotation system -->
         <mule-descriptor name="QuoteProviderTwo"
-            inboundEndpoint="vm://quoteprovider2.queue"
             implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://quoteprovider2.queue"/>
+            </inbound-router>
         </mule-descriptor>
     </model>
 

@@ -15,10 +15,16 @@
     </connector>
 
     <model name="helloSample">
-        <mule-descriptor name="TestUMO"
-            inboundEndpoint="dq://L701QUEUE.DTAQ?lib=/QSYS.LIB"
-            outboundEndpoint="dq://MYQUEUE.DTAQ?transformer=XmlToDQMessage&amp;lib=/QSYS.LIB"
-            implementation="org.mule.components.simple.LogComponent">
+        <mule-descriptor name="TestUMO" implementation="org.mule.components.simple.LogComponent">
+            <inbound-router>
+                <endpoint address="dq://L701QUEUE.DTAQ?lib=/QSYS.LIB"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="dq://MYQUEUE.DTAQ?transformer=XmlToDQMessage&amp;lib=/QSYS.LIB"/>
+                </router>
+            </outbound-router>
+
         </mule-descriptor>
     </model>
 </mule-configuration>

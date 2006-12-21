@@ -101,7 +101,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setSynchronous(false);
+        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
 
         Map props = new HashMap();
         props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");

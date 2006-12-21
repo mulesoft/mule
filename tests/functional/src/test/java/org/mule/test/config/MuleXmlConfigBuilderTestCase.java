@@ -146,15 +146,6 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertTrue(props.get(5) instanceof Apple);
     }
 
-    public void testEndpointURIParamsConfig()
-    {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
-        assertNotNull(d);
-        assertNotNull(d.getInboundEndpoint());
-        assertNotNull(d.getInboundTransformer());
-        assertNotNull(d.getInboundEndpoint().getResponseTransformer());
-    }
-
     public void testTransformerConfig()
     {
         UMOTransformer t = MuleManager.getInstance().lookupTransformer("TestCompressionTransformer");

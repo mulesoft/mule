@@ -18,10 +18,12 @@
 
     <model name="model">
         <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.components.simple.EchoComponent"
-            inboundEndpoint="tcp://localhost:4444/?synchronous=true"
-			inboundTransformer="inboundtransformer"
-            responseTransformer="transformer">
+            implementation="org.mule.components.simple.EchoComponent">
+
+            <inbound-router>
+                <endpoint address="tcp://localhost:4444/" synchronous="true" transformers="inboundtransformer"
+                        responseTransformers="transformer"/>
+            </inbound-router>
         </mule-descriptor>
 
     </model>

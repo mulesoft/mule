@@ -31,8 +31,8 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpException;
@@ -70,7 +70,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
         descriptor.setImplementation(implementation);
-        descriptor.setInboundEndpoint(buildEndpoint(HTTP_LOCALHOST_60198));
+        descriptor.getInboundRouter().addEndpoint(buildEndpoint(HTTP_LOCALHOST_60198));
         return descriptor;
     }
 

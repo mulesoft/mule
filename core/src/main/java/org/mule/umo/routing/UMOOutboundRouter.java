@@ -129,4 +129,11 @@ public interface UMOOutboundRouter extends UMORouter
      */
     public boolean isDynamicEndpoints();
 
+    /**
+     * @param name the Endpoint identifier
+     * @return the Endpoint or null if the endpointUri is not registered
+     * @see org.mule.umo.routing.UMOInboundMessageRouter
+     */
+    public UMOEndpoint getEndpoint(String name);
+
 }
