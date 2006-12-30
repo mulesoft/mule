@@ -34,6 +34,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleServer implements Runnable
 {
+    public static final String CLI_OPTIONS[][] = {
+            { "builder", "true", "Configuration Builder Type" },
+            { "config", "true", "Configuration File" },
+            { "main", "true", "Main Class"},
+            { "mode", "true", "Run Mode"},
+            { "props", "true", "Startup Properties"}
+        };
+
     /**
      * Don't use a class object so the core doesn't depend on mule-module-builders.
      */
@@ -84,7 +92,7 @@ public class MuleServer implements Runnable
     {
         MuleServer server = new MuleServer();
 
-        String config = SystemUtils.getCommandLineOption("-config", args);
+        String config = SystemUtils.getCommandLineOption("-config", args, CLI_OPTIONS);
         // Try default if no config file was given.
         if (config == null)
         {
@@ -108,7 +116,7 @@ public class MuleServer implements Runnable
         }
 
         // Configuration builder
-        String cfgBuilderClassName = SystemUtils.getCommandLineOption("-builder", args);
+        String cfgBuilderClassName = SystemUtils.getCommandLineOption("-builder", args, CLI_OPTIONS);
         if (cfgBuilderClassName != null)
         {
             try
@@ -130,7 +138,7 @@ public class MuleServer implements Runnable
         }
 
         // Startup properties
-        String propertiesFile = SystemUtils.getCommandLineOption("-props", args);
+        String propertiesFile = SystemUtils.getCommandLineOption("-props", args, CLI_OPTIONS);
         if (propertiesFile != null)
         {
             setStartupPropertiesFile(propertiesFile);

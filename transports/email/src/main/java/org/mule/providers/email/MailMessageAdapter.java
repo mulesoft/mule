@@ -10,6 +10,12 @@
 
 package org.mule.providers.email;
 
+import org.mule.config.i18n.Messages;
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.util.StringUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -27,11 +33,6 @@ import javax.mail.Part;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.SystemUtils;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.util.StringUtils;
 
 /**
  * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message.

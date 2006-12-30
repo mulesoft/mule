@@ -10,10 +10,10 @@
 
 package org.mule.test.providers.email;
 
-import javax.mail.internet.InternetAddress;
-
 import org.mule.providers.email.MailUtils;
 import org.mule.tck.AbstractMuleTestCase;
+
+import javax.mail.internet.InternetAddress;
 
 public class MailUtilsTestCase extends AbstractMuleTestCase
 {

@@ -13,9 +13,6 @@ package org.mule.umo.lifecycle;
 /**
  * <code>Initialisable</code> is a lifecycle interface that gets called at the
  * initialise lifecycle stage of the implementing component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface Initialisable
 {

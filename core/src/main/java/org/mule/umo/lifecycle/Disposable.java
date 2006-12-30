@@ -13,9 +13,6 @@ package org.mule.umo.lifecycle;
 /**
  * <code>Disposable</code> is a lifecycle interface that gets called at the dispose
  * lifecycle stage of the implementing component as the component is being destroyed.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface Disposable
 {

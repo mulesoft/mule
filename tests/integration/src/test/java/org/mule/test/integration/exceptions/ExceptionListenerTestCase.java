@@ -19,10 +19,9 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.providers.vm.VMConnector;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transformers.AbstractTransformer;
+import org.mule.test.transformers.FailingTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.transformer.TransformerException;
 
 public class ExceptionListenerTestCase extends FunctionalTestCase
 {
@@ -50,14 +49,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         es.addEndpoint(new MuleEndpoint("vm://error.queue", false));
         builder.getManager().getModel().setExceptionListener(es);
         UMOEndpoint ep = new MuleEndpoint("vm://component1", true);
-        ep.setTransformer(new AbstractTransformer()
-        {
-
-            protected Object doTransform(Object src, String encoding) throws TransformerException
-            {
-                throw new TransformerException(this, new Exception("My transformer is broken"));
-            }
-        });
+        ep.setTransformer(new FailingTransformer());
 
         builder.registerComponent(Object.class.getName(), "component1", ep, new MuleEndpoint(
             "vm://component1.out", false), null);

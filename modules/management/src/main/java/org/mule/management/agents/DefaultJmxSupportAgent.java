@@ -20,10 +20,7 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.UMOAgent;
 
 /**
- * todo document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document.
  */
 public class DefaultJmxSupportAgent implements UMOAgent
 {

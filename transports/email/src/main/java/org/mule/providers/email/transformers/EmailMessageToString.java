@@ -10,11 +10,11 @@
 
 package org.mule.providers.email.transformers;
 
-import javax.mail.Message;
-import javax.mail.internet.MimeMultipart;
-
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import javax.mail.Message;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * <code>EmailMessageToString</code> extracts a java mail Message contents and

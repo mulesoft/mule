@@ -10,8 +10,6 @@
 
 package org.mule.components.script;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -27,6 +25,9 @@ import org.mule.util.monitor.FileMonitor;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractScriptComponent</code> is a component that can execute scripts as

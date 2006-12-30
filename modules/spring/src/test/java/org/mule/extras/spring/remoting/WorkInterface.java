@@ -17,6 +17,4 @@ public interface WorkInterface
     String executeString(String input);
 
     ComplexData executeComplexity(ComplexData input);
-
-    // QueryResult executeQuery(RioQuery query);
 }

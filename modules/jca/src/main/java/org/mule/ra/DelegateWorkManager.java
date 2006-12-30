@@ -10,17 +10,20 @@
 
 package org.mule.ra;
 
+import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
+
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOWorkManager;
-
 /**
- * <code>DelegateWorkManager</code> TODO
+ * <code>DelegateWorkManager</code> is a wrapper around a WorkManager provided by a
+ * JCA container.
  */
 public class DelegateWorkManager implements UMOWorkManager
 {
@@ -64,6 +67,20 @@ public class DelegateWorkManager implements UMOWorkManager
         workManager.scheduleWork(work, l, executionContext, workListener);
     }
 
+    public void execute(Runnable command)
+    {
+        try
+        {
+            this.scheduleWork(new RunnableWorkAdapter(command));
+        }
+        catch (WorkException wex)
+        {
+            // unfortunately RejectedExecutionException is the closest thing we have
+            // as proper RuntimeException
+            throw new RejectedExecutionException(wex);
+        }
+    }
+
     public void start() throws UMOException
     {
         // nothing to do
@@ -77,6 +94,27 @@ public class DelegateWorkManager implements UMOWorkManager
     public void dispose()
     {
         // nothing to do
+    }
+
+    protected static class RunnableWorkAdapter implements Work
+    {
+        private final Runnable command;
+
+        public RunnableWorkAdapter(Runnable command)
+        {
+            super();
+            this.command = command;
+        }
+
+        public void release()
+        {
+            // nothing to do
+        }
+
+        public void run()
+        {
+            command.run();
+        }
     }
 
 }

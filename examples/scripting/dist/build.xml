@@ -24,13 +24,12 @@
 
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
-
-        <get src="${url.maven.repo}/groovy/groovy-all-1.0-jsr/06/groovy-all-1.0-jsr-06.jar"
-             dest="${dir.user.lib}/groovy.jar"
+        <get src="${url.mule-deps.repo}/com/sun/script/groovy/20061114/groovy-20061114-jdk14.jar"
+             dest="${dir.user.lib}/groovy-engine.jar"
              verbose="true"
              usetimestamp="true"/>
-        <get src="${url.mule-deps.repo}/script/jsr223/1.0/jsr223-1.0.jar"
-             dest="${dir.user.lib}/jsr223.jar"
+        <get src="${url.maven.repo}/groovy/groovy-all/1.0-RC-02/groovy-all-1.0-RC-02.jar"
+             dest="${dir.user.lib}/groovy.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>

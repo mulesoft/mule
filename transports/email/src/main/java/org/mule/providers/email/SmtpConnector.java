@@ -10,16 +10,20 @@
 
 package org.mule.providers.email;
 
-import java.util.Properties;
-
-import javax.mail.Authenticator;
-
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.StringUtils;
+
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.URLName;
 
 /**
  * <code>SmtpConnector</code> is used to connect to and send data to an SMTP mail
@@ -271,4 +275,52 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     {
         this.username = username;
     }
+
+    /**
+     * We override the base implementation in Pop3Connector to create a proper
+     * URLName if none was given. This allows javax.mail.Message creation without
+     * access to connection information in the caller (cf. StringToEmailMessage).
+     */
+    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args) throws UMOException
+    {
+        URLName url = (URLName)args;
+
+        // build required URLName unless already provided
+        if (url == null)
+        {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+
+            // Try to get the properties from the endpoint and use the connector
+            // properties if they are not given.
+
+            String host = uri.getHost();
+            if (host == null)
+            {
+                host = this.getHost();
+            }
+
+            int port = uri.getPort();
+            if (port == -1)
+            {
+                port = this.getPort();
+            }
+
+            String username = uri.getUsername();
+            if (StringUtils.isBlank(username))
+            {
+                username = this.getUsername();
+            }
+
+            String password = uri.getPassword();
+            if (StringUtils.isBlank(password))
+            {
+                password = this.getPassword();
+            }
+
+            url = new URLName(this.getProtocol(), host, port, null, username, password);
+        }
+
+        return super.getDelegateSession(endpoint, url);
+    }
+
 }

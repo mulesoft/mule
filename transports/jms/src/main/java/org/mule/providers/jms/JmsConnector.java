@@ -387,7 +387,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     // TODO HH: merge this and the various getSession(..) methods, make clients use
     // getDelegateSession(..) only
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object[] args) throws UMOException
+    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args) throws UMOException
     {
         try
         {

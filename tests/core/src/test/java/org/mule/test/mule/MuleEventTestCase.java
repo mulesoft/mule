@@ -27,12 +27,9 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.util.Properties;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleEventTestCase extends AbstractMuleTestCase
 {
+
     public void testEventInitialise() throws Exception
     {
         String data = "Test Data";
@@ -43,8 +40,8 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
-        assertEquals("Event data should be a byte array 9 bytes in length", 9,
-            event.getTransformedMessageAsBytes().length);
+        assertEquals("Event data should be a byte array 9 bytes in length", 9, event
+            .getTransformedMessageAsBytes().length);
 
         assertEquals("Event data should be a byte array 9 bytes in length", 9,
             event.getMessageAsBytes().length);
@@ -52,7 +49,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         assertEquals("MuleBeanPropertiesRule", event.getMessage().getProperty("MuleBeanPropertiesRule",
             "MuleBeanPropertiesRule"));
-        event.setProperty("Test", "Test1");
+        event.getMessage().setProperty("Test", "Test1");
 
         assertFalse(event.getMessage().getPropertyNames().isEmpty());
         assertEquals("bla2", event.getMessage().getProperty("bla2", "bla2"));
@@ -70,10 +67,10 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
-        assertEquals("Event data should equal 'Transformed Test Data'", "Transformed Test Data",
-            event.getTransformedMessage());
-        assertEquals("Event data should be a byte array 28 bytes in length", 21,
-            event.getTransformedMessageAsBytes().length);
+        assertEquals("Event data should equal 'Transformed Test Data'", "Transformed Test Data", event
+            .getTransformedMessage());
+        assertEquals("Event data should be a byte array 28 bytes in length", 21, event
+            .getTransformedMessageAsBytes().length);
     }
 
     public void testEventRewrite() throws Exception

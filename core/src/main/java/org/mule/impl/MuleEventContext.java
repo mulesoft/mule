@@ -589,151 +589,6 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Gets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().getProperty(...)</code>
-     * 
-     * @param name the property name
-     * @return the property value or null if the property does not exist
-     */
-    public Object getProperty(String name)
-    {
-        return event.getMessage().getProperty(name);
-    }
-
-    /**
-     * Gets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().getProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    public Object getProperty(String name, Object defaultValue)
-    {
-        return event.getMessage().getProperty(name, defaultValue);
-    }
-
-    /**
-     * Gets an Integer property associated with the current event. Calling this
-     * method is equivilent to calling
-     * <code>event.getMessage().getIntProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    public int getIntProperty(String name, int defaultValue)
-    {
-        return event.getMessage().getIntProperty(name, defaultValue);
-    }
-
-    /**
-     * Gets a Long property associated with the current event. Calling this method is
-     * equivilent to calling
-     * <code>event.getMessage().getLongProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    public long getLongProperty(String name, long defaultValue)
-    {
-        return event.getMessage().getLongProperty(name, defaultValue);
-    }
-
-    /**
-     * Gets a Double property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().getDoubleProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    public double getDoubleProperty(String name, double defaultValue)
-    {
-        return event.getMessage().getDoubleProperty(name, defaultValue);
-    }
-
-    /**
-     * Gets a Boolean property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().getbooleanProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    public boolean getBooleanProperty(String name, boolean defaultValue)
-    {
-        return event.getMessage().getBooleanProperty(name, defaultValue);
-    }
-
-    /**
-     * Sets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().setProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    public void setProperty(String name, Object value)
-    {
-        event.getMessage().setProperty(name, value);
-    }
-
-    /**
-     * Sets a Boolean property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().setBooleanProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    public void setBooleanProperty(String name, boolean value)
-    {
-        event.getMessage().setBooleanProperty(name, value);
-    }
-
-    /**
-     * Sets an Integer property associated with the current event. Calling this
-     * method is equivilent to calling
-     * <code>event.getMessage().setIntProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    public void setIntProperty(String name, int value)
-    {
-        event.getMessage().setIntProperty(name, value);
-    }
-
-    /**
-     * Sets a Long property associated with the current event. Calling this method is
-     * equivilent to calling
-     * <code>event.getMessage().setLongProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    public void setLongProperty(String name, long value)
-    {
-        event.getMessage().setLongProperty(name, value);
-    }
-
-    /**
-     * Sets a Double property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().setDoubleProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    public void setDoubleProperty(String name, double value)
-    {
-        event.getMessage().setDoubleProperty(name, value);
-    }
-
-    /**
      * Determines whether the default processing for this event will be executed. By
      * default, the Mule server will route events according to a components
      * configuration. The user can override this behaviour by obtaining a reference
@@ -836,38 +691,6 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * @param name
-     * @return
-     */
-    public String getStringProperty(String name)
-    {
-        Object result = getProperty(name);
-        if (result == null)
-        {
-            return null;
-        }
-        else
-        {
-            return result.toString();
-        }
-    }
-
-    /**
-     * @param name
-     * @param defaultValue
-     * @return
-     */
-    public String getStringProperty(String name, String defaultValue)
-    {
-        String result = getStringProperty(name);
-        if (result == null)
-        {
-            result = defaultValue;
-        }
-        return result;
-    }
-
-    /**
      * Determines whether the event flow is being streamed
      * 
      * @return true if the request should be streamed
@@ -899,4 +722,5 @@ public class MuleEventContext implements UMOEventContext
     {
         return event.toString();
     }
+
 }

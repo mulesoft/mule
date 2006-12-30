@@ -10,6 +10,10 @@
 
 package org.mule.modules.boot;
 
+import org.mule.MuleServer;
+import org.mule.util.ClassUtils;
+import org.mule.util.SystemUtils;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,9 +22,6 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mule.MuleServer;
-import org.mule.util.ClassUtils;
-import org.mule.util.SystemUtils;
 import org.tanukisoftware.wrapper.WrapperManager;
 import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
@@ -42,7 +43,7 @@ public class MuleBootstrap
 
     /**
      * Entry point.
-     *
+     * 
      * @param args command-line arguments
      * @throws Exception in case of any fatal problem
      */
@@ -52,11 +53,14 @@ public class MuleBootstrap
         File muleHome = null;
 
         String muleHomeVar = System.getProperty("mule.home");
-        // Note: we can't use StringUtils.isBlank() here because we don't have that library yet.
-        if (muleHomeVar != null && !muleHomeVar.trim().equals("") && !muleHomeVar.equals("%MULE_HOME%")) {
+        // Note: we can't use StringUtils.isBlank() here because we don't have that
+        // library yet.
+        if (muleHomeVar != null && !muleHomeVar.trim().equals("") && !muleHomeVar.equals("%MULE_HOME%"))
+        {
             muleHome = new File(muleHomeVar).getCanonicalFile();
         }
-        if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory()) {
+        if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory())
+        {
             throw new IllegalArgumentException(
                 "Either MULE_HOME is not set or does not contain a valid directory.");
         }
@@ -64,20 +68,24 @@ public class MuleBootstrap
         File muleBase = null;
 
         String muleBaseVar = System.getProperty("mule.base");
-        if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%")) {
+        if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%"))
+        {
             muleBase = new File(muleBaseVar).getCanonicalFile();
-        } else {
+        }
+        else
+        {
             muleBase = muleHome;
         }
 
-        // Build up a list of libraries from $MULE_HOME/lib/* and add them to the classpath.
+        // Build up a list of libraries from $MULE_HOME/lib/* and add them to the
+        // classpath.
         DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(muleHome, muleBase);
         addLibrariesToClasspath(classPath.getURLs());
 
         // If the license ack file isn't on the classpath, we need to
         // display the EULA and make sure the user accepts it before continuing
-        ClassLoader sys = ClassLoader.getSystemClassLoader();
-        if (ClassUtils.getResource("META-INF/mule/license.props", MuleBootstrap.class) == null) {
+        if (ClassUtils.getResource("META-INF/mule/license.props", MuleBootstrap.class) == null)
+        {
             LicenseHandler licenseHandler = new LicenseHandler(muleHome, muleBase);
             // If the user didn't accept the license, then we have to exit
             // Exiting this way insures that the wrapper won't try again
@@ -88,19 +96,20 @@ public class MuleBootstrap
             }
         }
 
-        // One-time download to get libraries not included in the Mule distribution due
-        // to silly licensing restrictions.
+        // One-time download to get libraries not included in the Mule distribution
+        // due to silly licensing restrictions.
         // 
         // Now we will download these libraries to MULE_BASE/lib/user. In
         // a standard installation, MULE_BASE will be MULE_HOME.
-        if (!ClassUtils.isClassOnPath("javax.activation.DataSource", MuleBootstrap.class)) {
+        if (!ClassUtils.isClassOnPath("javax.activation.DataSource", MuleBootstrap.class))
+        {
             LibraryDownloader downloader = new LibraryDownloader(muleBase);
             addLibrariesToClasspath(downloader.downloadLibraries());
         }
 
         // the core jar has been added dynamically, this construct will run with
         // a new Mule classpath now
-        String mainClassName = SystemUtils.getCommandLineOption("-main", args);
+        String mainClassName = SystemUtils.getCommandLineOption("-main", args, MuleServer.CLI_OPTIONS);
 
         if (mainClassName == null)
         {
@@ -117,7 +126,8 @@ public class MuleBootstrap
     }
 
     private static void addLibrariesToClasspath(List urls)
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
 
         ClassLoader sys = ClassLoader.getSystemClassLoader();
         if (!(sys instanceof URLClassLoader))

@@ -10,6 +10,17 @@
 
 package org.mule.providers.email.transformers;
 
+import org.mule.MuleManager;
+import org.mule.providers.email.MailProperties;
+import org.mule.providers.email.MailUtils;
+import org.mule.providers.email.SmtpConnector;
+import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.MapUtils;
+import org.mule.util.TemplateParser;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,16 +34,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.providers.email.MailProperties;
-import org.mule.providers.email.MailUtils;
-import org.mule.providers.email.SmtpConnector;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.MapUtils;
-import org.mule.util.TemplateParser;
 
 /**
  * <code>StringToEmailMessage</code> will convert a String to a JavaMail Message,
@@ -120,7 +121,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
         try
         {
-            Message email = new MimeMessage((Session)endpoint.getConnector().getDelegateSession(endpoint));
+            Message email = new MimeMessage((Session)endpoint.getConnector().getDelegateSession(endpoint, null));
 
             email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 

@@ -25,16 +25,17 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-		<dependency>
-			<groupId>script</groupId>
-			<artifactId>jsr223</artifactId>
-			<version>1.0</version>
+        <dependency>
+            <groupId>com.sun.script</groupId>
+            <artifactId>groovy</artifactId>
+            <version>20061114</version>
+            <classifier>jdk14</classifier>
             <scope>provided</scope>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>groovy</groupId>
-            <artifactId>groovy-all-1.0-jsr</artifactId>
-            <version>06</version>
+            <artifactId>groovy-all</artifactId>
+            <version>1.0-RC-02</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -123,14 +124,16 @@
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>script</groupId>
-                                    <artifactId>jsr223</artifactId>
-                                    <version>1.0</version>
+                                    <groupId>com.sun.script</groupId>
+                                    <artifactId>groovy</artifactId>
+                                    <version>20061114</version>
+                                    <classifier>jdk14</classifier>
+                                    <destFileName>groovy-engine.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>groovy</groupId>
-                                    <artifactId>groovy-all-1.0-jsr</artifactId>
-                                    <version>06</version>
+                                    <artifactId>groovy-all</artifactId>
+                                    <version>1.0-RC-02</version>
                                     <destFileName>groovy.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>

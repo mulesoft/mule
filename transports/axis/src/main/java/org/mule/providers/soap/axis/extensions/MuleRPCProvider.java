@@ -69,10 +69,10 @@ public class MuleRPCProvider extends RPCProvider
         {
             transUrl = transUrl.substring(0, i);
         }
-        AxisMessageReceiver receiver = (AxisMessageReceiver)connector.getReceiver(transUrl);
+        AxisMessageReceiver receiver = (AxisMessageReceiver)connector.lookupReceiver(transUrl);
         if (receiver == null)
         {
-            receiver = (AxisMessageReceiver)connector.getReceiver(messageContext.getTargetService());
+            receiver = (AxisMessageReceiver)connector.lookupReceiver(messageContext.getTargetService());
         }
         if (receiver == null)
         {

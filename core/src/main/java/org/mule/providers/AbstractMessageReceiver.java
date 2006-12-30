@@ -121,7 +121,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
         try
         {
-            workManager = this.connector.getReceiverWorkManager(endpoint.getName());
+            workManager = this.connector.getReceiverWorkManager("receiver");
         }
         catch (UMOException e)
         {
@@ -325,7 +325,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     {
         if (endpoint == null)
         {
-            throw new IllegalArgumentException("Provider cannot be null");
+            throw new IllegalArgumentException("Endpoint cannot be null");
         }
         this.endpoint = endpoint;
     }
@@ -349,7 +349,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         stop();
         disposing.set(true);
         doDispose();
-        workManager.dispose();
     }
 
     /**
@@ -382,10 +381,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         {
             return;
         }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
         }
+
         if (connecting.compareAndSet(false, true))
         {
             connectionStrategy.connect(this);

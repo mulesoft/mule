@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mule.modules</groupId>
-		<artifactId>mule-modules</artifactId>
-		<version>1.4-SNAPSHOT</version>
-	</parent>
-	<artifactId>mule-module-scripting</artifactId>
-	<name>JSR-223 Scripting</name>
-	<description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>1.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-scripting</artifactId>
+    <name>JSR-223 Scripting</name>
+    <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
-	<dependencies>
+    <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
@@ -23,32 +23,47 @@
         </dependency>
 
         <!-- Used by ScriptConfigurationBuilder -->
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-builders</artifactId>
-			<version>${version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-builders</artifactId>
+            <version>${version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>script</groupId>
-			<artifactId>jsr223</artifactId>
-			<version>1.0</version>
-            <scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>script-api</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+        </dependency>
+
+        <!-- required for script-api and the retrotranslated groovy-engine -->
+        <dependency>
+            <groupId>net.sf.retrotranslator</groupId>
+            <artifactId>retrotranslator-runtime</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 
         <!-- For unit tests only -->
-		<dependency>
-			<groupId>groovy</groupId>
-			<artifactId>groovy-all-1.0-jsr</artifactId>
-			<version>06</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-client</artifactId>
-			<version>${version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.sun.script</groupId>
+            <artifactId>groovy</artifactId>
+            <version>20061114</version>
+            <classifier>jdk14</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.0-RC-02</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
@@ -61,5 +76,5 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>

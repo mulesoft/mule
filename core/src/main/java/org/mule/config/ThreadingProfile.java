@@ -15,8 +15,8 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
@@ -83,7 +83,6 @@ public class ThreadingProfile
     private long threadWaitTimeout = DEFAULT_THREAD_WAIT_TIMEOUT;
     private int poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
     private boolean doThreading = DEFAULT_DO_THREADING;
-    private int threadPriority = Thread.NORM_PRIORITY;
 
     private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
 
@@ -258,14 +257,14 @@ public class ThreadingProfile
 
         if (maxBufferSize > 0 && maxThreadsActive > 1)
         {
-            buffer = new ArrayBlockingQueue(maxBufferSize);
+            buffer = new LinkedBlockingDeque(maxBufferSize);
         }
         else
         {
             buffer = new SynchronousQueue();
         }
 
-        if (maxThreadsActive < maxThreadsIdle)
+        if (maxThreadsIdle > maxThreadsActive)
         {
             maxThreadsIdle = maxThreadsActive;
         }
@@ -278,10 +277,15 @@ public class ThreadingProfile
             pool.setRejectedExecutionHandler(rejectedExecutionHandler);
         }
 
+        ThreadFactory tf = threadFactory;
         if (name != null)
         {
-            threadFactory = new NamedThreadFactory(name);
-            pool.setThreadFactory(threadFactory);
+            tf = new NamedThreadFactory(name); 
+        }
+
+        if (tf != null)
+        {
+            pool.setThreadFactory(tf);
         }
 
         switch (poolExhaustPolicy)
@@ -334,11 +338,11 @@ public class ThreadingProfile
     public String toString()
     {
         return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
-               + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
-               + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout=" + threadWaitTimeout
-               + ", doThreading=" + doThreading + ", threadPriority=" + threadPriority
-               + ", workManagerFactory=" + workManagerFactory + ", rejectedExecutionHandler="
-               + rejectedExecutionHandler + ", threadFactory=" + threadFactory + "}";
+                        + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
+                        + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
+                        + threadWaitTimeout + ", doThreading=" + doThreading + ", workManagerFactory="
+                        + workManagerFactory + ", rejectedExecutionHandler=" + rejectedExecutionHandler
+                        + ", threadFactory=" + threadFactory + "}";
     }
 
     public static interface WorkManagerFactory

@@ -10,12 +10,6 @@
 
 package org.mule.test.providers.email;
 
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.email.Pop3Connector;
@@ -24,6 +18,12 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
 public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
 {

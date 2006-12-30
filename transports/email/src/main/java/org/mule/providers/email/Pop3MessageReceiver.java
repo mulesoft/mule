@@ -10,6 +10,24 @@
 
 package org.mule.providers.email;
 
+import org.mule.MuleManager;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.PollingMessageReceiver;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.routing.RoutingException;
+import org.mule.util.FileUtils;
+import org.mule.util.UUID;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,26 +42,10 @@ import javax.mail.Store;
 import javax.mail.URLName;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
-import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.MuleManager;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Startable;
-import org.mule.umo.lifecycle.Stoppable;
-import org.mule.umo.provider.ReceiveException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.routing.RoutingException;
-import org.mule.util.FileUtils;
-import org.mule.util.UUID;
 
 /**
  * <code>Pop3MessageReceiver</code> polls a POP3 mailbox for messages, removes the
@@ -103,11 +105,11 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
             inbox = Pop3Connector.MAILBOX;
         }
 
-        URLName url = new URLName(endpoint.getEndpointURI().getScheme(), endpoint.getEndpointURI().getHost(),
-            endpoint.getEndpointURI().getPort(), inbox, endpoint.getEndpointURI().getUsername(),
-            endpoint.getEndpointURI().getPassword());
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        URLName url = new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox, uri.getUsername(),
+            uri.getPassword());
 
-        session = MailUtils.createMailSession(url, connector);
+        session = (Session)connector.getDelegateSession(endpoint, url);
         session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);

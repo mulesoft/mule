@@ -14,12 +14,9 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "groovy-builder-config.xml";
@@ -32,4 +29,5 @@ public class GroovyMessageBuilderTestCase extends FunctionalTestCase
         assertNotNull(m);
         assertEquals("Test: A Received B Received", m.getPayloadAsString());
     }
+
 }

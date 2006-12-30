@@ -52,11 +52,12 @@ public class FutureMessageResult extends FutureTask
      * out invocations are GC'ed so the problem is rather unlikely to occur.
      * </ul>
      */
-    private static final Executor DefaultExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory(
-        "MuleDefaultFutureMessageExecutor"));
+    private static final Executor DefaultExecutor = Executors.newSingleThreadExecutor(
+        new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
 
     // @GuardedBy(this)
     private Executor executor;
+
     // @GuardedBy(this)
     private UMOTransformer transformer;
 
@@ -64,31 +65,6 @@ public class FutureMessageResult extends FutureTask
     {
         super(callable);
         this.executor = DefaultExecutor;
-    }
-
-    /**
-     * @deprecated Please use {@link #FutureMessageResult(Callable)} and configure
-     *             e.g with {@link #setExecutor(Executor)} or
-     *             {@link #setTransformer(UMOTransformer)}
-     */
-    public FutureMessageResult(Callable callable, UMOTransformer transformer)
-    {
-        this(callable);
-        this.transformer = transformer;
-    }
-
-    /**
-     * Set a post-invocation transformer.
-     * 
-     * @param t UMOTransformer to be applied to the result of this invocation. May be
-     *            null.
-     */
-    public void setTransformer(UMOTransformer t)
-    {
-        synchronized (this)
-        {
-            this.transformer = t;
-        }
     }
 
     /**
@@ -107,6 +83,20 @@ public class FutureMessageResult extends FutureTask
         synchronized (this)
         {
             this.executor = e;
+        }
+    }
+
+    /**
+     * Set a post-invocation transformer.
+     * 
+     * @param t UMOTransformer to be applied to the result of this invocation. May be
+     *            null.
+     */
+    public void setTransformer(UMOTransformer t)
+    {
+        synchronized (this)
+        {
+            this.transformer = t;
         }
     }
 

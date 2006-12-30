@@ -10,25 +10,23 @@
 
 package org.mule.test.providers.email.transformers;
 
+import org.mule.impl.AlreadyInitialisedException;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.providers.email.transformers.EmailMessageToString;
+import org.mule.providers.email.transformers.StringToEmailMessage;
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.transformer.UMOTransformer;
+
+import com.mockobjects.dynamic.Mock;
+
 import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-
-import org.mule.impl.AlreadyInitialisedException;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.providers.email.SmtpConnector;
-import org.mule.providers.email.transformers.EmailMessageToString;
-import org.mule.providers.email.transformers.StringToEmailMessage;
-import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.transformer.UMOTransformer;
-
-import com.mockobjects.dynamic.Mock;
 
 public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 {
@@ -58,14 +56,6 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
 
-        // TODO HH: is this actually used?
-        endpoint.setConnector(new SmtpConnector()
-        {
-            public UMOMessageDispatcher getDispatcher() throws UMOException
-            {
-                return (UMOMessageDispatcher)mockDispatcher.proxy();
-            }
-        });
         trans.setEndpoint(endpoint);
 
         return trans;

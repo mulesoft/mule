@@ -115,6 +115,11 @@ public class JdmkAgent implements UMOAgent
      */
     public void stop() throws UMOException
     {
+        if (mBeanServer == null)
+        {
+            return;
+        }
+        
         try
         {
             mBeanServer.invoke(adaptorName, "stop", null, null);

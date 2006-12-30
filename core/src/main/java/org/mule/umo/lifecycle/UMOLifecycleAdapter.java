@@ -15,9 +15,6 @@ import org.mule.umo.UMOInterceptor;
 
 /**
  * <code>UMOLifecycleAdapter</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOLifecycleAdapter extends Lifecycle, Initialisable, UMOInterceptor
 {
@@ -26,5 +23,4 @@ public interface UMOLifecycleAdapter extends Lifecycle, Initialisable, UMOInterc
     boolean isDisposed();
 
     UMODescriptor getDescriptor();
-
 }

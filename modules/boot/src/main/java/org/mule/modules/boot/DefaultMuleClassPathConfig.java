@@ -44,11 +44,11 @@ public class DefaultMuleClassPathConfig
             addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_OPT + "/"));
 
             /**
-             * Pick up any local jars, if there are any. Doing this here
-             * insures that any local class that override the global classes
-             * will in fact do so.
+             * Pick up any local jars, if there are any. Doing this here insures that
+             * any local class that override the global classes will in fact do so.
              */
-            try {
+            try
+            {
                 if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile()))
                 {
                     addURL(new URL("file://" + muleBase.getAbsolutePath() + FOLDER_USER + "/"));
@@ -59,8 +59,11 @@ public class DefaultMuleClassPathConfig
                         addURL(jar.toURL());
                     }
                 }
-            } catch (IOException ioe) {
-                System.out.println("Unable to check to see if there are local jars to load: " + ioe.toString());
+            }
+            catch (IOException ioe)
+            {
+                System.out.println("Unable to check to see if there are local jars to load: "
+                                + ioe.toString());
             }
 
             File[] muleJars = listJars(muleHome, FOLDER_USER);
@@ -94,7 +97,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Getter for property 'urls'.
-     *
+     * 
      * @return A copy of 'urls'. Items are java.net.URL
      */
     public List getURLs()
@@ -104,7 +107,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Setter for property 'urls'.
-     *
+     * 
      * @param urls Value to set for property 'urls'.
      */
     public void addURLs(List urls)
@@ -117,7 +120,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Add a URL to Mule's classpath.
-     *
+     * 
      * @param url folder (should end with a slash) or jar path
      */
     public void addURL(URL url)
@@ -127,7 +130,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Find and if necessary filter the jars for classpath.
-     *
+     * 
      * @param muleSubfolder folder under the Mule directory to list
      * @return a list
      */

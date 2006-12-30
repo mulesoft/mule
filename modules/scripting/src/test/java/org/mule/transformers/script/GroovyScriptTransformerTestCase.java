@@ -11,18 +11,14 @@
 package org.mule.transformers.script;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.transformers.script.ScriptTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
 {
+
     public UMOTransformer getTransformer() throws Exception
     {
         ScriptTransformer transformer = new ScriptTransformer();

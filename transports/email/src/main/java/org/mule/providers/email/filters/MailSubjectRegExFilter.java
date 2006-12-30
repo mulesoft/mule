@@ -10,10 +10,10 @@
 
 package org.mule.providers.email.filters;
 
+import org.mule.routing.filters.RegExFilter;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
-
-import org.mule.routing.filters.RegExFilter;
 
 /**
  * <code>MailSubjectRegExFilter</code> applies a regular expression to a Mail

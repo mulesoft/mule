@@ -13,10 +13,7 @@ package org.mule.umo.lifecycle;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>DisposeException</code> is an exception thrown
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>DisposeException</code> TODO (document class)
  */
 
 public class DisposeException extends LifecycleException

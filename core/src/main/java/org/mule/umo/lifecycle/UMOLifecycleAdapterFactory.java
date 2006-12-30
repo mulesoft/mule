@@ -15,11 +15,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
- * <p>
  * <code>UMOLifecycleAdapterFactory</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOLifecycleAdapterFactory
 {

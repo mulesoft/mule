@@ -13,12 +13,9 @@ package org.mule.umo.lifecycle;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>FatalException</code> can be thorwn during initialisation or during
- * execution to indicate that something fatal has occurred and the MuleManage must
- * shutdown
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>FatalException</code> can be thrown during initialisation or during
+ * execution to indicate that something fatal has occurred and the MuleManager must
+ * shutdown.
  */
 public class FatalException extends LifecycleException
 {

@@ -174,6 +174,10 @@ public class Mx4jAgent implements UMOAgent
     /* @see org.mule.umo.lifecycle.Stoppable#stop() */
     public void stop() throws UMOException
     {
+        if (mBeanServer == null)
+        {
+            return;
+        }
         try
         {
             mBeanServer.invoke(adaptorName, "stop", null, null);
@@ -200,7 +204,7 @@ public class Mx4jAgent implements UMOAgent
     protected void unregisterMBeansIfNecessary()
         throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
     {
-        if (mBeanServer.isRegistered(adaptorName))
+        if (mBeanServer != null && mBeanServer.isRegistered(adaptorName))
         {
             mBeanServer.unregisterMBean(adaptorName);
         }

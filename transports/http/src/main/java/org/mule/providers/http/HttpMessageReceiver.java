@@ -10,17 +10,6 @@
 
 package org.mule.providers.http;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.resource.spi.work.Work;
-
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.lang.ObjectUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -38,7 +27,20 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.MapUtils;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.resource.spi.work.Work;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.lang.ObjectUtils;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -225,7 +227,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                     // determine if the request path on this request denotes a
                     // different receiver
-                    AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
+                    // TODO HH: this cast seems to be necessary for routeMessage() - what to do?
+                    AbstractMessageReceiver receiver = (AbstractMessageReceiver)getTargetReceiver(message, endpoint);
 
                     // the respone only needs to be transformed explicitly if
                     // A) the request was not served or B) a null result was returned
@@ -307,7 +310,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected String getRequestPath(UMOMessage message)
     {
         String path = (String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        int i = path.indexOf("?");
+        int i = path.indexOf('?');
         if (i > -1)
         {
             path = path.substring(0, i);
@@ -315,20 +318,20 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return path;
     }
 
-    protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint)
+    protected UMOMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint)
         throws ConnectException
     {
         String path = (String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        int i = path.indexOf("?");
+        int i = path.indexOf('?');
         if (i > -1)
         {
             path = path.substring(0, i);
         }
 
-        StringBuffer requestUri = new StringBuffer();
+        StringBuffer requestUri = new StringBuffer(80);
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
-        requestUri.append(":").append(endpoint.getEndpointURI().getPort());
+        requestUri.append(':').append(endpoint.getEndpointURI().getPort());
 
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
@@ -337,15 +340,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                          + requestUri.toString());
         }
 
-        AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
+        UMOMessageReceiver receiver = connector.lookupReceiver(requestUri.toString());
 
         // If no receiver on the root and there is a request path, look up the
         // received based on the root plus request path
         if (receiver == null && !"/".equals(path))
         {
             // remove anything after the last '/'
-            int x = path.lastIndexOf("/");
-            if (x > 1 && path.indexOf(".") > x)
+            int x = path.lastIndexOf('/');
+            if (x > 1 && path.indexOf('.') > x)
             {
                 requestUri.append(path.substring(0, x));
             }
@@ -361,7 +364,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             // try again
-            receiver = connector.getReceiver(requestUri.toString());
+            receiver = connector.lookupReceiver(requestUri.toString());
             if (receiver == null && logger.isWarnEnabled())
             {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName()

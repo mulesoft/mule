@@ -10,27 +10,28 @@
 
 package org.mule.components.script.jsr223;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.Namespace;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
@@ -54,7 +55,6 @@ public class Scriptable implements Initialisable
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-
         if (scriptEngine == null)
         {
             if (compiledScript == null)
@@ -70,7 +70,7 @@ public class Scriptable implements Initialisable
                     {
                         setScriptEngineName(scriptFile.substring(i + 1));
                         logger.info("Script Engine name not set.  Defaulting to file extension: "
-                                    + getScriptEngineName());
+                                        + getScriptEngineName());
                         scriptEngine = createScriptEngine();
                     }
                 }
@@ -85,6 +85,7 @@ public class Scriptable implements Initialisable
                 scriptEngine = compiledScript.getEngine();
             }
         }
+
         if (compiledScript == null)
         {
             if (script == null)
@@ -194,31 +195,31 @@ public class Scriptable implements Initialisable
         return compileScript(compilable, script);
     }
 
-    protected Object evaluteScript(Namespace namespace) throws ScriptException
+    protected Object evaluteScript(Bindings bindings) throws ScriptException
     {
-        return scriptEngine.eval(scriptText, namespace);
+        return scriptEngine.eval(scriptText, bindings);
     }
 
-    public Object runScript(Namespace namespace) throws ScriptException
+    public Object runScript(Bindings bindings) throws ScriptException
     {
         Object result = null;
         if (compiledScript != null)
         {
-            result = compiledScript.eval(namespace);
+            result = compiledScript.eval(bindings);
         }
         else
         {
-            result = evaluteScript(namespace);
+            result = evaluteScript(bindings);
         }
         return result;
     }
 
-    public Object runScript(CompiledScript compiledScript, Namespace namespace) throws ScriptException
+    public Object runScript(CompiledScript compiledScript, Bindings bindings) throws ScriptException
     {
         Object result = null;
         if (compiledScript != null)
         {
-            result = compiledScript.eval(namespace);
+            result = compiledScript.eval(bindings);
         }
         return result;
     }
@@ -228,4 +229,5 @@ public class Scriptable implements Initialisable
         ScriptEngineManager manager = new ScriptEngineManager();
         return manager.getEngineByName(scriptEngineName);
     }
+
 }

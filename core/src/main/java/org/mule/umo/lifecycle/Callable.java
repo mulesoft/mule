@@ -17,9 +17,6 @@ import org.mule.umo.UMOEventContext;
  * event calls. UMO components do not have to implement this interface, though the
  * <code>onCall</code> method provides an example lifecycle method that is executed
  * when an event is received for the implementing component.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface Callable extends UMOEventListener
 {

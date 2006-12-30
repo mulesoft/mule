@@ -17,9 +17,6 @@ import org.mule.config.i18n.Message;
  * indicate that the error occurred is not fatal and a reactive action can be
  * performed to try and remedy the error. The most common example would be a
  * Connector failing to connect due to a JVM_BIND exception.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class RecoverableException extends InitialisationException
 {

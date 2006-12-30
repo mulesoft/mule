@@ -33,6 +33,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.List;
 
 import javax.resource.spi.XATerminator;
 import javax.resource.spi.work.ExecutionContext;
@@ -57,10 +61,21 @@ public class MuleWorkManager implements UMOWorkManager
     protected static final Log logger = LogFactory.getLog(MuleWorkManager.class);
 
     /**
-     * Pool of threads used by this MuleWorkManager in order to process the Work
+     * Graceful shutdown delay
+     */
+    private static final long SHUTDOWN_TIMEOUT = 5000L;
+
+    /**
+     * The ThreadingProfile used for creation of the underlying ExecutorService
+     */
+    private final ThreadingProfile threadingProfile;
+
+    /**
+     * The actual pool of threads used by this MuleWorkManager to process the Work
      * instances submitted via the (do,start,schedule)Work methods.
      */
-    private volatile WorkExecutorPool workExecutorPool;
+    private volatile ExecutorService workExecutorService;
+    private final String name;
 
     /**
      * Various policies used for work execution
@@ -69,9 +84,6 @@ public class MuleWorkManager implements UMOWorkManager
     private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
     private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
 
-    /**
-     * Create a MuleWorkManager.
-     */
     public MuleWorkManager()
     {
         this(MuleManager.getConfiguration().getDefaultThreadingProfile(), null);
@@ -79,22 +91,53 @@ public class MuleWorkManager implements UMOWorkManager
 
     public MuleWorkManager(ThreadingProfile profile, String name)
     {
+        super();
+
         if (name == null)
         {
             name = "WorkManager#" + hashCode();
         }
 
-        workExecutorPool = new NullWorkExecutorPool(profile, name);
+        this.threadingProfile = profile;
+        this.name = name;
     }
 
-    public void start() throws UMOException
+    public synchronized void start() throws UMOException
     {
-        workExecutorPool = workExecutorPool.start();
+        if (workExecutorService == null)
+        {
+            workExecutorService = threadingProfile.createPool(name);
+        }
     }
 
-    public void stop() throws UMOException
+    public synchronized void stop() throws UMOException
     {
-        workExecutorPool = workExecutorPool.stop();
+        if (workExecutorService != null)
+        {
+            try
+            {
+                // Cancel currently executing tasks
+                List outstanding = workExecutorService.shutdownNow();
+
+                // Wait a while for existing tasks to terminate
+                if (!workExecutorService.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
+                {
+                    logger.warn("Pool " + name + " did not terminate in time; " + outstanding.size()
+                                    + " work items were cancelled.");
+                }
+            }
+            catch (InterruptedException ie)
+            {
+                // (Re-)Cancel if current thread also interrupted
+                workExecutorService.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+            }
+            finally
+            {
+                workExecutorService = null;
+            }
+        }
     }
 
     public void dispose()
@@ -122,7 +165,7 @@ public class MuleWorkManager implements UMOWorkManager
      */
     public void doWork(Work work) throws WorkException
     {
-        executeWork(new WorkerContext(work), syncWorkExecutor, workExecutorPool);
+        executeWork(new WorkerContext(work), syncWorkExecutor);
     }
 
     /*
@@ -137,7 +180,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, syncWorkExecutor, workExecutorPool);
+        executeWork(workWrapper, syncWorkExecutor);
     }
 
     /*
@@ -149,7 +192,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor, workExecutorPool);
+        executeWork(workWrapper, startWorkExecutor);
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
@@ -167,7 +210,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor, workExecutorPool);
+        executeWork(workWrapper, startWorkExecutor);
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
@@ -180,7 +223,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor, workExecutorPool);
+        executeWork(workWrapper, scheduleWorkExecutor);
     }
 
     /*
@@ -197,7 +240,20 @@ public class MuleWorkManager implements UMOWorkManager
     {
         WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
         workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor, workExecutorPool);
+        executeWork(workWrapper, scheduleWorkExecutor);
+    }
+
+    /**
+     * @see Executor#execute(Runnable)
+     */
+    public void execute(Runnable work)
+    {
+        if (workExecutorService == null || workExecutorService.isShutdown())
+        {
+            throw new IllegalStateException("This MuleWorkManager is stopped");
+        }
+
+        workExecutorService.execute(work);
     }
 
     /**
@@ -207,13 +263,17 @@ public class MuleWorkManager implements UMOWorkManager
      * @exception WorkException Indicates that the Work execution has been
      *                unsuccessful.
      */
-    private void executeWork(WorkerContext work, WorkExecutor workExecutor, Executor pooledExecutor)
-        throws WorkException
+    private void executeWork(WorkerContext work, WorkExecutor workExecutor) throws WorkException
     {
+        if (workExecutorService == null || workExecutorService.isShutdown())
+        {
+            throw new IllegalStateException("This MuleWorkManager is stopped");
+        }
+
         try
         {
             work.workAccepted(this);
-            workExecutor.doExecute(work, pooledExecutor);
+            workExecutor.doExecute(work, workExecutorService);
             WorkException exception = work.getWorkException();
             if (null != exception)
             {
@@ -227,4 +287,5 @@ public class MuleWorkManager implements UMOWorkManager
             throw wcj;
         }
     }
+
 }

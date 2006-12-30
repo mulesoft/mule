@@ -25,8 +25,6 @@ import java.io.OutputStream;
  * properties that can be set and retrieved by Mule UMO components.
  * 
  * @see UMOMessage
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEvent
 {
@@ -126,16 +124,6 @@ public interface UMOEvent
     String getId();
 
     /**
-     * Gets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().getProperty(...)</code>
-     * 
-     * @param name the property name
-     * @return the property value or null if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    Object getProperty(String name);
-
-    /**
      * Gets a property associated with the current event. If
      * <code>exhaustiveSearch</code> is true, the endpoint and connector associated
      * with the event will also be searched for the property.
@@ -146,17 +134,6 @@ public interface UMOEvent
      * @return the property value or null if the property does not exist
      */
     Object getProperty(String name, boolean exhaustiveSearch);
-
-    /**
-     * Gets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().getProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    Object getProperty(String name, Object defaultValue);
 
     /**
      * Gets a property associated with the current event. If
@@ -170,131 +147,6 @@ public interface UMOEvent
      * @return the property value or the defaultValue if the property does not exist
      */
     Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch);
-
-    /**
-     * Gets an Integer property associated with the current event. Calling this
-     * method is equivilent to calling
-     * <code>event.getMessage().getIntProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    int getIntProperty(String name, int defaultValue);
-
-    /**
-     * Gets a Long property associated with the current event. Calling this method is
-     * equivilent to calling
-     * <code>event.getMessage().getLongProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    long getLongProperty(String name, long defaultValue);
-
-    /**
-     * Gets a Double property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().getDoubleProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    double getDoubleProperty(String name, double defaultValue);
-
-    /**
-     * Gets a Boolean property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().getbooleanProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getProperty()
-     */
-    boolean getBooleanProperty(String name, boolean defaultValue);
-
-    /**
-     * Gets a String property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().getStringProperty(..., ...)</code>
-     * 
-     * @param name the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated use event.getMessage().getStringProperty()
-     */
-    String getStringProperty(String name, String defaultValue);
-
-    /**
-     * Sets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().setProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setProperty()
-     */
-    void setProperty(String name, Object value);
-
-    /**
-     * Sets a Boolean property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().setBooleanProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setBooleanProperty()
-     */
-    void setBooleanProperty(String name, boolean value);
-
-    /**
-     * Sets an Integer property associated with the current event. Calling this
-     * method is equivilent to calling
-     * <code>event.getMessage().setIntProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setIntProperty()
-     */
-    void setIntProperty(String name, int value);
-
-    /**
-     * Sets a Long property associated with the current event. Calling this method is
-     * equivilent to calling
-     * <code>event.getMessage().setLongProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setLongProperty()
-     */
-    void setLongProperty(String name, long value);
-
-    /**
-     * Sets a Double property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().setDoubleProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setDoubleProperty()
-     */
-    void setDoubleProperty(String name, double value);
-
-    /**
-     * Sets a String property associated with the current event. Calling this method
-     * is equivilent to calling
-     * <code>event.getMessage().setStringProperty(..., ...)</code>
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     * @deprecated use event.getMessage().setStringProperty()
-     */
-    void setStringProperty(String name, String value);
 
     /**
      * Gets the endpoint associated with this event
@@ -388,16 +240,6 @@ public interface UMOEvent
      *         that received the message
      */
     OutputStream getOutputStream();
-
-    /**
-     * Removes a property from the event
-     * 
-     * @param key the property key to remove
-     * @return the removed property or null if the property was not found or if the
-     *         underlying message does not return the removed property
-     * @deprecated use event.getMessage().removeProperty()
-     */
-    Object removeProperty(String key);
 
     /**
      * Determines whether the event flow is being streamed

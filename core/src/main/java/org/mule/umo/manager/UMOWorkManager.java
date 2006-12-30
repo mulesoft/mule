@@ -12,16 +12,15 @@ package org.mule.umo.manager;
 
 import org.mule.umo.lifecycle.Lifecycle;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+
 import javax.resource.spi.work.WorkManager;
 
 /**
- * <code>UMOWorkManager</code> Extends the stanard WorkManager to add lifecycle
- * methods
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>UMOWorkManager</code> extends the standard JCA WorkManager with lifecycle
+ * methods and util.concurrent bridging.
  */
-public interface UMOWorkManager extends WorkManager, Lifecycle
+public interface UMOWorkManager extends WorkManager, Lifecycle, Executor
 {
-    // no methods
+    // no additional methods
 }

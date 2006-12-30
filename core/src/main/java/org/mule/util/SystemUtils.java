@@ -19,6 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -150,22 +155,31 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     }
 
     /**
-     * Returns the value corresponding to the given option from the command line, for
-     * example if the options are "-config mule-config.xml"
-     * getCommandLineOption("config") would return "mule-config.xml" TODO Replace
-     * this functionality with Apache Commons CLI: see MULE-956
+     * Returns the value corresponding to the given option from the command 
+     * line, for example if the options are "-config mule-config.xml"
+     * getCommandLineOption("config") would return "mule-config.xml" 
      */
-    public static String getCommandLineOption(String option, String args[])
+    public static String getCommandLineOption(String option, String args[], String opts[][])
     {
-        List options = Arrays.asList(args);
-        if (options.contains(option))
+        Options options = new Options();
+        for (int i = 0; i < opts.length; i++) 
         {
-            int i = options.indexOf(option);
-            if (i < options.size() - 1)
-            {
-                return options.get(i + 1).toString();
-            }
+            options.addOption(opts[i][0], opts[i][1].equals("true") ? true : false, opts[i][2]);
         }
+
+        CommandLineParser parser = new BasicParser();
+
+        try 
+        {
+            CommandLine line = parser.parse(options, args);
+            return line.getOptionValue(option);
+        }
+        catch (ParseException p)
+        {
+            System.out.println("Unable to parse command line: " + p.toString());
+        }
+
         return null;
     }
+
 }

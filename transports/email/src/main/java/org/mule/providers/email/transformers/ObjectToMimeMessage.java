@@ -10,6 +10,12 @@
 
 package org.mule.providers.email.transformers;
 
+import org.mule.providers.email.MailMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -21,12 +27,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-
-import org.mule.providers.email.MailMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.StringUtils;
 
 /**
  * Transforms a javax.mail.Message to a UMOMessage, with support for attachments

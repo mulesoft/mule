@@ -18,9 +18,6 @@ import org.apache.commons.lang.ObjectUtils;
 
 /**
  * <code>LifecycleException</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class LifecycleException extends UMOException

@@ -10,12 +10,13 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.util.ClassUtils;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
-import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,9 +50,7 @@ public class XStreamFactory
         // We must always register this converter as the Mule Message uses
         // ConcurrentHashMaps, but XStream currently does not support them out of the
         // box.
-        // TODO see MULE-1151 on how to upgrade this code to be XStream-1.2
-        // compliant, maybe for Mule 1.4/2.0.
-        xstream.registerConverter(new XStreamFactory.ConcurrentHashMapConverter(xstream.getClassMapper()), -1);
+        xstream.registerConverter(new XStreamFactory.ConcurrentHashMapConverter(xstream.getMapper()), -1);
 
         if (aliases != null)
         {
@@ -89,7 +88,7 @@ public class XStreamFactory
         {
             String className = aClass.getName();
             return className.equals("java.util.concurrent.ConcurrentHashMap")
-                   || className.equals("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap");
+                            || className.equals("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap");
         }
     }
 

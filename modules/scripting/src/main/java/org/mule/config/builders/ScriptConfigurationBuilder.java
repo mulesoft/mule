@@ -10,12 +10,6 @@
 
 package org.mule.config.builders;
 
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.script.CompiledScript;
-import javax.script.Namespace;
-
 import org.mule.MuleManager;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
@@ -26,6 +20,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.PropertiesUtils;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.script.Bindings;
+import javax.script.CompiledScript;
 
 /**
  * Configures a MuleManager from one or more script files.
@@ -78,14 +78,6 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     public UMOManager configure(String configResources, String startupPropertiesFile)
         throws ConfigurationException
     {
-        // if(!initialised) {
-        // try {
-        // initialise();
-        // initialised = true;
-        // } catch (InitialisationException e) {
-        // throw new ConfigurationException(e);
-        // }
-        // }
         try
         {
             ReaderResource[] readers = ReaderResource.parseResources(configResources);
@@ -104,15 +96,6 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         {
             throw new ConfigurationException(e);
         }
-    }
-
-    /**
-     * @deprecated Please use configure(ReaderResource[] configResources, Properties
-     *             startupProperties) instead.
-     */
-    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
-    {
-        return configure(configResources, null);
     }
 
     /**
@@ -138,8 +121,8 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
                 ReaderResource configResource = configResources[i];
                 setScriptFile(configResource.getDescription());
                 initialise();
-                Namespace ns = getScriptEngine().createNamespace();
-                populateNamespace(ns);
+                Bindings ns = getScriptEngine().createBindings();
+                populateBindings(ns);
                 CompiledScript script = compileScript(configResource.getReader());
                 script.eval(ns);
             }
@@ -161,15 +144,15 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         return manager;
     }
 
-    protected void populateNamespace(Namespace namespace)
+    protected void populateBindings(Bindings bindings)
     {
-        namespace.put("manager", manager);
-        namespace.put("builder", builder);
-
+        bindings.put("manager", manager);
+        bindings.put("builder", builder);
     }
 
     public boolean isConfigured()
     {
         return manager != null;
     }
+
 }

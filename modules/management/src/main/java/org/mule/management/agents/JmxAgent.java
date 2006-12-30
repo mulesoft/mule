@@ -60,6 +60,8 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.StringUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * <code>JmxAgent</code> registers MUle Jmx management beans with an MBean
  * server.
@@ -87,8 +89,8 @@ public class JmxAgent implements UMOAgent
     private Map connectorServerProperties = null;
     private boolean enableStatistics = true;
     private List registeredMBeans = new ArrayList();
-    private boolean serverCreated = false;
-    private boolean initialized = false;
+    private final AtomicBoolean serverCreated = new AtomicBoolean(false);
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
     private JmxSupport jmxSupport;
@@ -134,7 +136,7 @@ public class JmxAgent implements UMOAgent
      */
     public void initialise() throws InitialisationException
     {
-        if (initialized) {
+        if (initialized.get()) {
             return;
         }
         if (!locateServer && !createServer) {
@@ -148,7 +150,7 @@ public class JmxAgent implements UMOAgent
         }
         if (mBeanServer == null && createServer) {
             mBeanServer = MBeanServerFactory.createMBeanServer();
-            serverCreated = true;
+            serverCreated.set(true);
         }
         if (mBeanServer == null) {
             throw new InitialisationException(new Message(Messages.JMX_CANT_LOCATE_CREATE_SERVER), this);
@@ -170,6 +172,7 @@ public class JmxAgent implements UMOAgent
             {
                 if (notification.getAction() == ModelNotification.MODEL_STARTED) {
                     try {
+                        registerWrapperService();
                         registerStatisticsService();
                         registerMuleService();
                         registerConfigurationService();
@@ -187,6 +190,8 @@ public class JmxAgent implements UMOAgent
         try
         {
             UMOManager manager = MuleManager.getInstance();
+
+
             if (StringUtils.isBlank(manager.getId()))
             {
                 // TODO i18n the message properly
@@ -197,7 +202,7 @@ public class JmxAgent implements UMOAgent
         } catch (NotificationException e) {
             throw new InitialisationException(e, this);
         }
-        initialized = true;
+        initialized.compareAndSet(false, true);
     }
 
     /** {@inheritDoc}
@@ -249,11 +254,13 @@ public class JmxAgent implements UMOAgent
                     logger.warn("Failed to unregister MBean: " + objectName + ". Error is: " + e.getMessage());
                 }
             }
-            if (serverCreated) {
+            if (serverCreated.get()) {
                 MBeanServerFactory.releaseMBeanServer(mBeanServer);
             }
             mBeanServer = null;
         }
+
+        initialized.set(true);
     }
 
     /** {@inheritDoc}
@@ -275,6 +282,22 @@ public class JmxAgent implements UMOAgent
     {
         // nothing to do
     }
+
+    /**
+     * Register a Java Service Wrapper agent.
+     * @throws UMOException if registration failed
+     */
+    protected void registerWrapperService() throws UMOException
+    {
+        // WrapperManager to support restarts
+        final WrapperManagerAgent wmAgent = new WrapperManagerAgent();
+        final UMOManager manager = MuleManager.getInstance();
+        if (manager.lookupAgent(wmAgent.getName()) == null)
+        {
+            manager.registerAgent(wmAgent);
+        }
+    }
+
 
     protected void registerStatisticsService() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
