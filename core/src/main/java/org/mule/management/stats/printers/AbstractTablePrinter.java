@@ -12,6 +12,7 @@ package org.mule.management.stats.printers;
 
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.management.stats.SedaComponentStatistics;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -87,9 +88,20 @@ public class AbstractTablePrinter extends PrintWriter
             return;
         }
 
+
         col[0] = stats.getName();
-        col[1] = stats.getComponentPoolMaxSize() + "/" + stats.getComponentPoolAbsoluteMaxSize();
-        col[2] = String.valueOf(stats.getComponentPoolSize());
+        //TODO RM* Handling custom stats objects
+        if(stats instanceof SedaComponentStatistics)
+        {
+            col[1] = ((SedaComponentStatistics)stats).getComponentPoolMaxSize() + "/" 
+                    + ((SedaComponentStatistics)stats).getComponentPoolAbsoluteMaxSize();
+            col[2] = String.valueOf(((SedaComponentStatistics)stats).getComponentPoolSize());
+        }
+        else
+        {
+            col[1] = "-";
+            col[2] = "-";
+        }
         col[3] = String.valueOf(stats.getThreadPoolSize());
         col[4] = String.valueOf(stats.getQueuedEvents());
         col[5] = String.valueOf(stats.getMaxQueueSize());

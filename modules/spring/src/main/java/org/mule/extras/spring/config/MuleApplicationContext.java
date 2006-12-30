@@ -10,13 +10,15 @@
 
 package org.mule.extras.spring.config;
 
+import org.mule.umo.transformer.UMOTransformer;
+
+import java.io.IOException;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
-
-import java.io.IOException;
 
 /**
  * <code>MuleApplicationContext</code> is A Simple extension Application context
@@ -58,8 +60,12 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanFactory.registerBeanDefinition("_MuleManagemenetContextFactoryBean", new RootBeanDefinition(AutowireManagementContextFactoryBean.class, true));
         beanFactory.registerBeanDefinition("_springContainerContext", new RootBeanDefinition(SpringContainerContextFactoryBean.class, true));
         beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
+        beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor(beanFactory));
 
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        //hook in our customheirarchical reader
+        beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
+        
         beanDefinitionReader.loadBeanDefinitions(configLocations);
         //initBeanDefinitionReader(beanDefinitionReader);
         //loadBeanDefinitions(beanDefinitionReader);

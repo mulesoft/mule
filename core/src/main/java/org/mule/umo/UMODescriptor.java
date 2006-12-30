@@ -22,8 +22,6 @@ import java.util.Map;
  * <code>UMODescriptor</code> describes all the properties for a Mule UMO. New Mule
  * Managed components can be initialised as needed from their descriptor.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMODescriptor extends UMOImmutableDescriptor
 {

@@ -107,7 +107,7 @@ public abstract class AbstractComponent implements UMOComponent
             throw new IllegalArgumentException("Descriptor cannot be null");
         }
         this.descriptor = descriptor;
-        this.model = MuleManager.getInstance().getModel();
+        this.model = model;
     }
 
     /**
@@ -130,19 +130,23 @@ public abstract class AbstractComponent implements UMOComponent
 
         this.exceptionListener = descriptor.getExceptionListener();
 
-        // initialise statistics
-        stats = new ComponentStatistics(getName(), descriptor.getPoolingProfile().getMaxActive(),
-            descriptor.getThreadingProfile().getMaxThreadsActive());
+        doInitialise();
 
+        // initialise statistics
+        stats = createStatistics();
         stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
         ((MuleManager)MuleManager.getInstance()).getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
-
-        doInitialise();
+        
         initialised.set(true);
         fireComponentNotification(ComponentNotification.COMPONENT_INITIALISED);
 
+    }
+
+    protected ComponentStatistics createStatistics()
+    {
+        return new ComponentStatistics(getName(), descriptor.getThreadingProfile().getMaxThreadsActive());
     }
 
     protected void fireComponentNotification(int action)

@@ -9,9 +9,9 @@
  */
 package org.mule.config;
 
-import org.mule.extras.spring.config.handlers.AbstractHierarchicalNamespaceHandler;
-import org.mule.extras.spring.config.parsers.SimpleChildDefinitionParser;
+import org.mule.config.parsers.JXPathFilterParser;
 import org.mule.config.parsers.NamespaceDefinitionParser;
+import org.mule.extras.spring.config.handlers.AbstractHierarchicalNamespaceHandler;
 import org.mule.routing.filters.xml.JXPathFilter;
 
 /**
@@ -22,7 +22,7 @@ public class XmlNamespaceHandler extends AbstractHierarchicalNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("jxpath-filter", new SimpleChildDefinitionParser("filter", JXPathFilter.class));
+        registerBeanDefinitionParser("jxpath-filter", new JXPathFilterParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("namespace", new NamespaceDefinitionParser());
     }
 }

@@ -179,8 +179,6 @@ public class MuleTestUtils
         descriptor.getOutboundRouter().addRouter(router);
         descriptor.initialise();
 
-        descriptor.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
-
         return descriptor;
     }
 

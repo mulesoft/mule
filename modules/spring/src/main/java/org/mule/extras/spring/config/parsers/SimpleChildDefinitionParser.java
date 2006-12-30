@@ -11,6 +11,7 @@ package org.mule.extras.spring.config.parsers;
 
 import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.util.ClassUtils;
+
 import org.w3c.dom.Element;
 
 /**
@@ -33,7 +34,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
     {
         if (clazz == null)
         {
-            String cls = element.getAttribute("class");
+            String cls = element.getAttribute(ATTRIBUTE_CLASS);
             try
             {
                 //RM* Todo probably need to use OSGi Loader here
@@ -44,6 +45,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
                 logger.error("could not load class: " + cls, e);
             }
         }
+        element.removeAttribute(ATTRIBUTE_CLASS);
         return clazz;
     }
 

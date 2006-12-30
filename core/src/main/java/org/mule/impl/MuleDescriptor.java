@@ -11,8 +11,6 @@
 package org.mule.impl;
 
 import org.mule.config.MuleConfiguration;
-import org.mule.config.PoolingProfile;
-import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.umo.UMODescriptor;
@@ -155,21 +153,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setInterceptors(List inteceptorList)
     {
         this.intecerptorList = inteceptorList;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#setPoolingProfile(UMOPoolingProfile)
-     */
-    public void setPoolingProfile(PoolingProfile poolingProfile)
-    {
-        this.poolingProfile = poolingProfile;
-    }
-
-    public void setQueueProfile(QueueProfile queueProfile)
-    {
-        this.queueProfile = queueProfile;
     }
 
     /*

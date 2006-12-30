@@ -46,20 +46,19 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
 
     protected void postProcess(BeanDefinitionBuilder builder, Element element)
     {
-        String parentBean = ((Element) element.getParentNode()).getAttribute("id");
+        String parentBean = ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_ID);
         if (StringUtils.isBlank(parentBean))
         {
-            //TODO RM8 remove this
-            throw new RuntimeException();
-            //parentBean = StringUtils.EMPTY + builder.hashCode();
+            logger.info("Bean: " + element.getNodeName() + " has no parent");
+            return;
         }
 
         String name = generateChildBeanName(element);
-        element.setAttribute("id", name);
-        element.setAttribute("name", name);
+        element.setAttribute(ATTRIBUTE_ID, name);
         BeanDefinition parent = registry.getBeanDefinition(parentBean);
 
         String propertyName = getPropertyName(element);
+
         PropertyValue pv;
         pv = parent.getPropertyValues().getPropertyValue(propertyName);
 //        if (pv == null)
@@ -73,11 +72,11 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
 //            {
                 //Object o = pv.getValue();
                 ManagedList l = new ManagedList();
-                //l.add(o);
+               // l.add(o);
                 //parent.getPropertyValues().removePropertyValue(propertyName);
                 pv = new PropertyValue(propertyName + "s", l);
                 parent.getPropertyValues().addPropertyValue(pv);
-            //}
+          //  }
             ((List) pv.getValue()).add(builder.getBeanDefinition());
         }
         else

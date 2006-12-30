@@ -10,6 +10,7 @@
 
 package org.mule.config.pool;
 
+import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
@@ -56,15 +57,15 @@ public class CommonsPoolProxyPool implements ObjectPool
      * @param descriptor the descriptor to use when constructing MuleProxy objects in
      *            the pool
      */
-    public CommonsPoolProxyPool(MuleDescriptor descriptor, ObjectFactory factory)
+    public CommonsPoolProxyPool(MuleDescriptor descriptor, ObjectFactory factory, PoolingProfile pp)
     {
         this.factory = factory;
 
         GenericObjectPool.Config config = new GenericObjectPool.Config();
-        config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
-        config.maxActive = descriptor.getPoolingProfile().getMaxActive();
-        config.maxWait = descriptor.getPoolingProfile().getMaxWait();
-        config.whenExhaustedAction = (byte)descriptor.getPoolingProfile().getExhaustedAction();
+        config.maxIdle = pp.getMaxIdle();
+        config.maxActive = pp.getMaxActive();
+        config.maxWait = pp.getMaxWait();
+        config.whenExhaustedAction = (byte)pp.getExhaustedAction();
 
         init(descriptor, config);
     }

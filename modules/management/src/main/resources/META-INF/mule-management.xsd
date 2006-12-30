@@ -85,6 +85,9 @@
         <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="mule:muleObjectType">
+                    <xsd:choice minOccurs="0" maxOccurs="1">
+                        <xsd:element name="level-mappings" type="mule:propertiesType"/>
+                    </xsd:choice>
                     <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
                     <xsd:attribute name="chainsawPort" type="xsd:int" use="required"/>
                 </xsd:extension>

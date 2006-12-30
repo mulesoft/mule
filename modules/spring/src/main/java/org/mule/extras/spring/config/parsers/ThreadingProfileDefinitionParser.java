@@ -9,8 +9,9 @@
  */
 package org.mule.extras.spring.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.config.ThreadingProfile;
+import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
+
 import org.w3c.dom.Element;
 
 /**
@@ -44,7 +45,21 @@ public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitio
         {
             //If this is one of the default profiles they should just be made available in the contianer
             // and retrieved via the Registry
-            return null;
+            return "defaultThreadingProfile";
+        }
+        else if ("default-receiver-threading-profile".equals(name))
+        {
+            return "defaultReceiverThreadingProfile";
+        }
+        else if ("default-dispatcher-threading-profile".equals(name))
+        {
+            return "defaultDispatcherThreadingProfile";
+        }
+        else if ("default-threading-profile".equals(name))
+        {
+            //If this is one of the default profiles they should just be made available in the contianer
+            // and retrieved via the Registry
+            return "defaultThreadingProfile";
         }
         else
         {

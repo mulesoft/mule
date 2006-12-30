@@ -13,50 +13,39 @@ package org.mule.routing.filters.logic;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
+import java.util.Iterator;
+
 /**
- * <code>OrFilter</code> accepts if the leftFilter or rightFilter filter accept.
+ * <code>OrFilter</code> accepts if any of the filters accept the message
  */
 
-public class OrFilter implements UMOFilter
+public class OrFilter extends AbstractFilterCollection
 {
-    private UMOFilter leftFilter;
-    private UMOFilter rightFilter;
-
-    public OrFilter(UMOFilter leftFilter, UMOFilter rightFilder)
-    {
-        this.leftFilter = leftFilter;
-        this.rightFilter = rightFilder;
-    }
-
     public OrFilter()
     {
         super();
     }
 
-    public void setLeftFilter(UMOFilter leftFilter)
+    /**
+     * @deprecated
+     * @param left
+     * @param right
+     */
+    public OrFilter(UMOFilter left, UMOFilter right)
     {
-        this.leftFilter = leftFilter;
-    }
-
-    public void setRightFilter(UMOFilter rightFilter)
-    {
-        this.rightFilter = rightFilter;
-    }
-
-    public UMOFilter getLeftFilter()
-    {
-        return leftFilter;
-    }
-
-    public UMOFilter getRightFilter()
-    {
-        return rightFilter;
+        super(left, right);
     }
 
     public boolean accept(UMOMessage message)
     {
-        return ((leftFilter != null && leftFilter.accept(message)) || (rightFilter != null && rightFilter
-            .accept(message)));
+        for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
+        {
+            UMOFilter umoFilter = (UMOFilter) iterator.next();
+            if(umoFilter.accept(message))
+            {
+                return true;
+            }
+        }
+        return false;
     }
-
 }

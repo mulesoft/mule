@@ -12,8 +12,6 @@ package org.mule.impl;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.PoolingProfile;
-import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.container.DescriptorContainerContext;
@@ -108,17 +106,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ThreadingProfile threadingProfile;
 
     /**
-     * the pooling configuration used when initialising the component described by
-     * this descriptor.
-     */
-    protected PoolingProfile poolingProfile;
-
-    /**
-     * The queuing profile for events received for this component
-     */
-    protected QueueProfile queueProfile;
-
-    /**
      * Determines whether the component described by this descriptor is hosted in a
      * container. If the value is false the component will not be pooled by Mule.
      * 
@@ -165,8 +152,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         name = descriptor.getName();
 
         threadingProfile = descriptor.getThreadingProfile();
-        poolingProfile = descriptor.getPoolingProfile();
-        queueProfile = descriptor.getQueueProfile();
         exceptionListener = descriptor.getExceptionListener();
         initialState = descriptor.getInitialState();
         singleton = descriptor.isSingleton();
@@ -362,16 +347,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
-    }
-
-    public PoolingProfile getPoolingProfile()
-    {
-        return poolingProfile;
-    }
-
-    public QueueProfile getQueueProfile()
-    {
-        return queueProfile;
     }
 
     public boolean isContainerManaged()

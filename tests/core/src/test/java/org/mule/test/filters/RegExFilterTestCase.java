@@ -20,15 +20,15 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
     {
         // start with default
         RegExFilter filter = new RegExFilter();
-        assertNull(filter.getPattern());
+        assertNull(filter.getExpression());
         assertFalse(filter.accept("No tengo dinero"));
 
         // activate a pattern
-        filter.setPattern("(.*) brown fox");
+        filter.setExpression("(.*) brown fox");
         assertTrue(filter.accept("The quick brown fox"));
 
         // remove pattern again, i.e. block all
-        filter.setPattern(null);
+        filter.setExpression(null);
         assertFalse(filter.accept("oh-oh"));
     }
 
@@ -36,7 +36,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
     {
 
         RegExFilter filter = new RegExFilter("The quick (.*)");
-        assertNotNull(filter.getPattern());
+        assertNotNull(filter.getExpression());
 
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("The quick "));
@@ -44,21 +44,21 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(!filter.accept("he quick brown fox"));
 
-        filter.setPattern("(.*) brown fox");
+        filter.setExpression("(.*) brown fox");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept(" brown fox"));
 
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(!filter.accept("The quick brown fo"));
 
-        filter.setPattern("(.*) brown (.*)");
+        filter.setExpression("(.*) brown (.*)");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("(.*) brown fox"));
 
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(filter.accept("The quick brown fo"));
 
-        filter.setPattern("(.*)");
+        filter.setExpression("(.*)");
         assertTrue(filter.accept("The quick brown fox"));
     }
 }

@@ -10,6 +10,7 @@
 
 package org.mule.test.config;
 
+import org.mule.config.PoolingProfile;
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.config.pool.CommonsPoolProxyPool;
 import org.mule.impl.MuleDescriptor;
@@ -23,7 +24,7 @@ public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase
     {
         MuleDescriptor descriptor = getTestDescriptor("test", "java.lang.Object");
         CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor);
-        CommonsPoolProxyPool pool = new CommonsPoolProxyPool(descriptor, factory);
+        CommonsPoolProxyPool pool = new CommonsPoolProxyPool(descriptor, factory, new PoolingProfile());
         factory.setPool(pool);
 
         Object obj = factory.makeObject();

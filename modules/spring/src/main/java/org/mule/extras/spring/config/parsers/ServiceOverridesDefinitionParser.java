@@ -9,18 +9,18 @@
  */
 package org.mule.extras.spring.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.ManagementContext;
-import org.mule.util.StringUtils;
 import org.mule.config.MuleProperties;
-import org.w3c.dom.Element;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.PropertyValue;
+import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
+import org.mule.util.StringUtils;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * TODO
@@ -56,10 +56,10 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
         builder.setSource(overrides);
     }
 
-    protected void postProcess(RootBeanDefinition beanDefinition, Element element)
+    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
     {
         String parentBean = ((Element) element.getParentNode()).getAttribute("id");
-        beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("id", parentBean + "-" + element.getNodeName()));
+        beanDefinition.getBeanDefinition().getPropertyValues().addPropertyValue(new PropertyValue("id", parentBean + "-" + element.getNodeName()));
     }
 
     protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)

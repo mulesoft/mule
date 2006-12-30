@@ -10,6 +10,7 @@
 
 package org.mule.config.pool;
 
+import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOPoolFactory;
@@ -22,14 +23,14 @@ import org.mule.util.ObjectPool;
  */
 public class CommonsPoolFactory implements UMOPoolFactory
 {
-    public ObjectPool createPool(UMODescriptor descriptor, ObjectFactory factory)
+    public ObjectPool createPool(UMODescriptor descriptor, ObjectFactory factory, PoolingProfile pp)
     {
-        return new CommonsPoolProxyPool((MuleDescriptor)descriptor, factory);
+        return new CommonsPoolProxyPool((MuleDescriptor)descriptor, factory, pp);
     }
 
-    public ObjectPool createPool(UMODescriptor descriptor)
+    public ObjectPool createPool(UMODescriptor descriptor, PoolingProfile pp)
     {
         return new CommonsPoolProxyPool((MuleDescriptor)descriptor, new CommonsPoolProxyFactory(
-            (MuleDescriptor)descriptor));
+            (MuleDescriptor)descriptor), pp);
     }
 }

@@ -18,6 +18,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -462,7 +463,11 @@ public class OptimisedMuleProxy implements MuleProxy
             {
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
-            getStatistics().setComponentPoolSize(proxyPool.getSize());
+            //TODO RM* clean this up
+            if(getStatistics() instanceof SedaComponentStatistics)
+            {
+                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
+            }
         }
     }
 

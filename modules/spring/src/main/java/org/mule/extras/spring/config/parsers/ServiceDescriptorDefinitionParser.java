@@ -11,6 +11,8 @@ package org.mule.extras.spring.config.parsers;
 
 import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.impl.MuleDescriptor;
+
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
@@ -38,4 +40,12 @@ public class ServiceDescriptorDefinitionParser extends AbstractChildBeanDefiniti
         {
             return "serviceDescriptor";
         }
+
+
+    protected void postProcess(BeanDefinitionBuilder builder, Element element)
+    {
+        String name = element.getAttribute("id");
+        builder.addPropertyValue("name", name);
+        super.postProcess(builder, element);
     }
+}

@@ -13,6 +13,7 @@ package org.mule.impl.model.seda;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -22,6 +23,8 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -47,6 +50,8 @@ import javax.resource.spi.work.WorkManager;
  */
 public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {
+    public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
+    public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
     /**
      * Serial version
      */
@@ -85,6 +90,17 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     protected boolean componentPerRequest = false;
 
     /**
+     * the pooling configuration used when initialising the component described by
+     * this descriptor.
+     */
+    protected PoolingProfile poolingProfile;
+
+    /**
+     * The queuing profile for events received for this component
+     */
+    protected QueueProfile queueProfile;
+
+    /**
      * Creates a new SEDA component
      * 
      * @param descriptor The descriptor of the component to creat
@@ -113,10 +129,22 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         // Create thread pool
         ThreadingProfile tp = descriptor.getThreadingProfile();
         workManager = tp.createWorkManager(descriptor.getName());
+        queueProfile = (QueueProfile)descriptor.getProperties().get(QUEUE_PROFILE_PROPERTY);
+        if(queueProfile==null)
+        {
+            queueProfile = ((SedaModel)model).getQueueProfile();
+        }
+
+        poolingProfile = (PoolingProfile)descriptor.getProperties().get(POOLING_PROFILE_PROPERTY);
+        if(poolingProfile==null)
+        {
+            poolingProfile = ((SedaModel)model).getPoolingProfile();
+        }
+
         try
         {
             // Setup event Queue (used for VM execution)
-            descriptor.getQueueProfile().configureQueue(descriptor.getName());
+            queueProfile.configureQueue(descriptor.getName());
         }
         catch (InitialisationException e)
         {
@@ -129,22 +157,28 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
     }
 
+
+    protected ComponentStatistics createStatistics()
+    {
+        return new SedaComponentStatistics(getName(), descriptor.getThreadingProfile().getMaxThreadsActive(), poolingProfile.getMaxActive());
+    }
+
     protected void initialisePool() throws InitialisationException
     {
         try
         {
             // Initialise the proxy pool
-            proxyPool = descriptor.getPoolingProfile().getPoolFactory().createPool(descriptor);
+            proxyPool = getPoolingProfile().getPoolFactory().createPool(descriptor, poolingProfile);
 
-            if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
+            if (getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
             {
-                int threads = descriptor.getPoolingProfile().getMaxActive();
+                int threads = getPoolingProfile().getMaxActive();
                 for (int i = 0; i < threads; i++)
                 {
                     proxyPool.returnObject(proxyPool.borrowObject());
                 }
             }
-            else if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT)
+            else if (getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT)
             {
                 proxyPool.returnObject(proxyPool.borrowObject());
             }
@@ -164,7 +198,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         {
             Object component = lookupComponent();
             MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
-            getStatistics().setComponentPoolSize(-1);
+            ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());
             componentProxy.start();
             return componentProxy;
@@ -306,7 +340,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             if (proxyPool != null)
             {
                 proxy = (MuleProxy)proxyPool.borrowObject();
-                getStatistics().setComponentPoolSize(proxyPool.getSize());
+                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
             }
             else if (componentPerRequest)
             {
@@ -357,7 +391,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
             if (proxyPool != null)
             {
-                getStatistics().setComponentPoolSize(proxyPool.getSize());
+                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
             }
         }
         return result;
@@ -422,7 +456,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                     if (proxyPool != null)
                     {
                         proxy = (MuleProxy)proxyPool.borrowObject();
-                        getStatistics().setComponentPoolSize(proxyPool.getSize());
+                        ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
                     }
                     else if (componentPerRequest)
                     {
@@ -559,4 +593,24 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
     }
 
+
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
+    }
+
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        this.poolingProfile = poolingProfile;
+    }
+
+    public QueueProfile getQueueProfile()
+    {
+        return queueProfile;
+    }
+
+    public void setQueueProfile(QueueProfile queueProfile)
+    {
+        this.queueProfile = queueProfile;
+    }
 }

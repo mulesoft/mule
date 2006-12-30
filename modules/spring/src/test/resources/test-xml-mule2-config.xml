@@ -49,11 +49,9 @@
     <mule:custom-transformer id="TestCompressionTransformer"
                              class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
                              returnClass="java.lang.String">
-        <mule:properties>
-        <mule:property name="beanProperty2" value="12"/>
-        <mule:property name="containerProperty" ref="myString"/>
-        <mule:property name="sourceType" value="java.lang.String"/>
-        </mule:properties>
+        <mule:source-type class="java.lang.String"/>
+        <property name="beanProperty2" value="12"/>
+        <property name="containerProperty" value="myString"/>
     </mule:custom-transformer>
 
     <mule:transformer-no-action id="Default"/>
@@ -68,7 +66,8 @@
     <mule:endpoint id="appleResponseEndpoint" address="test://AppleResponseQueue"/>
     <mule:endpoint id="orangeEndpoint" address="test://orangeQ">
         <mule:properties>
-            <mule:property name="testGlobal" value="value1"/>
+            <property name="beanProperty2" value="12"/>
+            <property name="containerProperty" value="myString"/>
         </mule:properties>
     </mule:endpoint>
 
@@ -80,7 +79,7 @@
     <bean id="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
     <mule:model-seda id="test-model">
-        <mule:entry-point-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+        <mule:custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
 
         <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
             <mule:endpoint address=" test://component.exceptions "/>
@@ -98,8 +97,9 @@
                 <mule:endpoint-ref idref="orangeEndpoint" transformers="TestCompressionTransformer">
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                     <mule:properties>
-                    <mule:property name="testLocal" value="value1"/>
-                </mule:properties>
+
+                        <property name="testLocal" value="value1"/>
+                    </mule:properties>
                 </mule:endpoint-ref>
             </mule:inbound-router>
 
@@ -118,38 +118,38 @@
             <!--<interceptor name="default"/>-->
             <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
 
-            <mule:default-exception-strategy>
+            <mule:default-component-exception-strategy>
                 <mule:endpoint address="test://orange.exceptions"/>
-            </mule:default-exception-strategy>
+            </mule:default-component-exception-strategy>
 
             <mule:properties>
-            <mule:property name="orange">
-                <bean class="org.mule.tck.testmodels.fruit.Orange"/>
-            </mule:property>
+                <property name="orange">
+                    <bean class="org.mule.tck.testmodels.fruit.Orange"/>
+                </property>
 
-            <mule:property name="brand" value="Juicy Baby!"/>
-            <mule:property name="segments" value="9"/>
-            <mule:property name="radius" value="4.21"/>
-            <mule:property name="mapProperties">
-                <map>
-                    <entry key="prop1" value="prop1"/>
-                    <entry key="prop2" value="prop2"/>
-                </map>
-            </mule:property>
-            <mule:property name="listProperties">
-                <list>
-                    <value>prop1</value>
-                    <value>prop2</value>
-                    <value>prop3</value>
-                </list>
-            </mule:property>
-            <mule:property name="arrayProperties">
-                <list>
-                    <value>prop1</value>
-                    <value>prop2</value>
-                    <value>prop3</value>
-                </list>
-            </mule:property>
+                <property name="brand" value="Juicy Baby!"/>
+                <property name="segments" value="9"/>
+                <property name="radius" value="4.21"/>
+                <property name="mapProperties">
+                    <map>
+                        <entry key="prop1" value="prop1"/>
+                        <entry key="prop2" value="prop2"/>
+                    </map>
+                </property>
+                <property name="listProperties">
+                    <list>
+                        <value>prop1</value>
+                        <value>prop2</value>
+                        <value>prop3</value>
+                    </list>
+                </property>
+                <property name="arrayProperties">
+                    <list>
+                        <value>prop1</value>
+                        <value>prop2</value>
+                        <value>prop3</value>
+                    </list>
+                </property>
             </mule:properties>
         </mule:service>
 
@@ -157,18 +157,18 @@
             <mule:inbound-router>
                 <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <mule:endpoint-ref idref="appleInEndpoint"/>
-                <mule:selective-consumer>
+                <mule:selective-consumer-router>
                     <mule:payload-type-filter expectedType="java.lang.String"/>
-                </mule:selective-consumer>
-                <mule:idempotent-receiver/>
+                </mule:selective-consumer-router>
+                <mule:idempotent-receiver-router>
+                </mule:idempotent-receiver-router>
             </mule:inbound-router>
 
             <mule:outbound-router>
                 <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                <mule:filtering-router>
+                <mule:filtering-router transformers="TestCompressionTransformer">
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                     <mule:endpoint address="test://appleQ2" id="TestApple-Out"/>
-                    <mule:preTransform transformers="TestCompressionTransformer"/>
                 </mule:filtering-router>
 
                 <mule:filtering-router>
@@ -181,7 +181,7 @@
             </mule:outbound-router>
 
             <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
-            <mule:default-exception-strategy/>
+            <mule:default-component-exception-strategy/>
         </mule:service>
     </mule:model-seda>
 </beans>

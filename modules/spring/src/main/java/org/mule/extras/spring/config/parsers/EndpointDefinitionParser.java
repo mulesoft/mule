@@ -9,32 +9,33 @@
  */
 package org.mule.extras.spring.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.util.StringUtils;
+import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.endpoint.MalformedEndpointException;
+
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.Assert;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Attr;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.PropertyValue;
-import org.springframework.util.Assert;
-
-import java.util.List;
 
 /**
  * TODO
  */
 public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 {
+
+
+    public EndpointDefinitionParser()
+    {
+        registerAttributeMapping("transformers", "transformer");
+        registerAttributeMapping("responseTransformers", "responseTransformer");
+    }
 
     /**
      * If the endpoint element is decared in the root beens element, this will
@@ -63,8 +64,17 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
      */
     public boolean isCollection(Element element)
     {
+        //Some types take a single endpoint, other take a collection
         Element parent = (Element) element.getParentNode();
         if (parent.getNodeName().equals("beans"))
+        {
+            return false;
+        }
+        else if ("forwardingCatchAllStrategyType".equals(parent.getSchemaTypeInfo().getTypeName()))
+        {
+            return false;
+        }
+        else if ("wireTapType".equals(parent.getSchemaTypeInfo().getTypeName()))
         {
             return false;
         }
@@ -107,25 +117,26 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         postProcess(builder, element);
     }
 
-    protected void postProcess(RootBeanDefinition beanDefinition, Element element)
-    {
-        String parentBean = ((Element) element.getParentNode()).getAttribute("id");
-        if (StringUtils.isBlank(parentBean))
-        {
-            return;
-        }
-        BeanDefinition parent = registry.getBeanDefinition(parentBean);
-        PropertyValue pv = parent.getPropertyValues().getPropertyValue("endpoints");
-        if (pv == null)
-        {
-            pv = new PropertyValue("endpoints", new ManagedList());
-            parent.getPropertyValues().addPropertyValue(pv);
-        }
-        ((List) pv.getValue()).add(beanDefinition);
+//    protected void postProcess(RootBeanDefinition beanDefinition, Element element)
+//    {
+//        String parentBean = ((Element) element.getParentNode()).getAttribute("id");
+//        if (StringUtils.isBlank(parentBean))
+//        {
+//            return;
+//        }
+//        BeanDefinition parent = registry.getBeanDefinition(parentBean);
+//        PropertyValue pv = parent.getPropertyValues().getPropertyValue("endpoints");
+//        if (pv == null)
+//        {
+//            pv = new PropertyValue("endpoints", new ManagedList());
+//            parent.getPropertyValues().addPropertyValue(pv);
+//        }
+//        ((List) pv.getValue()).add(beanDefinition);
+//
+//        //parent.getPropertyValues().addPropertyValue(new PropertyValue(getPropertyName(element), beanDefinition));
+//
+//    }
 
-        //parent.getPropertyValues().addPropertyValue(new PropertyValue(getPropertyName(element), beanDefinition));
-
-    }
 
 
     protected Class getBeanClass(Element element)

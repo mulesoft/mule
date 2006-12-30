@@ -13,57 +13,41 @@ package org.mule.routing.filters.logic;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
+import java.util.Iterator;
+
 /**
  * <code>AndFilter</code> accepts only if the leftFilter and rightFilter filter
  * accept.
  */
 
-public class AndFilter implements UMOFilter
+public class AndFilter extends AbstractFilterCollection
 {
-    private UMOFilter leftFilter;
-    private UMOFilter rightFilter;
 
     public AndFilter()
     {
         super();
     }
 
+    /**
+     * @deprecated
+     * @param left
+     * @param right
+     */
     public AndFilter(UMOFilter left, UMOFilter right)
     {
-        this.leftFilter = left;
-        this.rightFilter = right;
-    }
-
-    public void setLeftFilter(UMOFilter leftFilter)
-    {
-        this.leftFilter = leftFilter;
-    }
-
-    public void setRightFilter(UMOFilter rightFilter)
-    {
-        this.rightFilter = rightFilter;
-    }
-
-    public UMOFilter getLeftFilter()
-    {
-        return leftFilter;
-    }
-
-    public UMOFilter getRightFilter()
-    {
-        return rightFilter;
+        super(left, right);
     }
 
     public boolean accept(UMOMessage message)
     {
-        if (leftFilter != null && rightFilter != null)
+        for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
         {
-            return leftFilter.accept(message) && rightFilter.accept(message);
+            UMOFilter umoFilter = (UMOFilter) iterator.next();
+            if(!umoFilter.accept(message))
+            {
+                return false;
+            }
         }
-        else
-        {
-            return false;
-        }
+        return true;
     }
-
 }

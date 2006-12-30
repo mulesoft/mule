@@ -35,7 +35,6 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
@@ -282,8 +281,6 @@ public class MuleManager implements UMOManager
             try
             {
                 instance = (UMOManager)clazz.newInstance();
-                // HACK hit the model, so it's created and initialized
-                instance.getModel();
             }
             catch (Exception e)
             {
@@ -990,12 +987,6 @@ public class MuleManager implements UMOManager
      */
     public UMOModel getModel()
     {
-        // todo in version two we must not assume the model
-        if (model == null)
-        {
-            model = new SedaModel();
-            model.setName(DEFAULT_MODEL_NAME);
-        }
         return model;
     }
 

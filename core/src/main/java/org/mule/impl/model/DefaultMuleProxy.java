@@ -24,6 +24,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.providers.ReplyToHandler;
@@ -527,7 +528,11 @@ public class DefaultMuleProxy implements MuleProxy
             {
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
-            getStatistics().setComponentPoolSize(proxyPool.getSize());
+            //TODO RM* clean this up
+            if(getStatistics() instanceof SedaComponentStatistics)
+            {
+                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
+            }
         }
     }
 

@@ -39,9 +39,7 @@ public class ComponentStatistics implements Statistics
     private long maxExecutionTime = 0;
     private long averageExecutionTime = 0;
     private boolean enabled = false;
-    private int componentPoolMaxSize = 0;
-    private int componentPoolAbsoluteMaxSize = 0;
-    private int componentPoolSize = 0;
+
     private int threadPoolSize = 0;
     private long samplePeriod = 0;
 
@@ -53,12 +51,11 @@ public class ComponentStatistics implements Statistics
      * 
      * @param name
      */
-    public ComponentStatistics(String name, int componentPoolsize, int threadPoolSize)
+    public ComponentStatistics(String name, int threadPoolSize)
     {
         super();
         this.name = name;
-        this.componentPoolMaxSize = componentPoolsize;
-        this.componentPoolAbsoluteMaxSize = componentPoolMaxSize;
+
         this.threadPoolSize = threadPoolSize;
         clear();
     }
@@ -269,8 +266,6 @@ public class ComponentStatistics implements Statistics
     public synchronized void clear()
     {
 
-        componentPoolSize = 0;
-        componentPoolAbsoluteMaxSize = 0;
         totalExecTime = 0;
         receivedEventSync = 0;
         receivedEventASync = 0;
@@ -335,30 +330,6 @@ public class ComponentStatistics implements Statistics
     {
         this.outboundRouterStat = outboundRouterStat;
         this.outboundRouterStat.setEnabled(enabled);
-    }
-
-    public int getComponentPoolMaxSize()
-    {
-        return componentPoolMaxSize;
-    }
-
-    public int getComponentPoolAbsoluteMaxSize()
-    {
-        return componentPoolAbsoluteMaxSize;
-    }
-
-    public int getComponentPoolSize()
-    {
-        return componentPoolSize;
-    }
-
-    public synchronized void setComponentPoolSize(int componentPoolSize)
-    {
-        this.componentPoolSize = componentPoolSize;
-        if (componentPoolSize > componentPoolAbsoluteMaxSize)
-        {
-            componentPoolAbsoluteMaxSize = componentPoolSize;
-        }
     }
 
     public int getThreadPoolSize()

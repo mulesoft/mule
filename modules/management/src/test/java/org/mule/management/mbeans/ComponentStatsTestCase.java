@@ -10,13 +10,13 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.management.stats.RouterStatistics;
+import org.mule.management.stats.SedaComponentStatistics;
+
 import java.util.Set;
 
 import javax.management.ObjectName;
-
-import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
 
 public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 {
@@ -26,7 +26,7 @@ public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 
         // inbound/outbound router statistics are required
 
-        final ComponentStatistics statistics = new ComponentStatistics("TEST_IN", 0, 0);
+        final SedaComponentStatistics statistics = new SedaComponentStatistics("TEST_IN", 0, 0);
         statistics.setInboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_INBOUND));
         statistics.setOutboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
         ComponentStats stats = new ComponentStats(statistics);

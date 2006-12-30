@@ -49,14 +49,14 @@ public class RegExFilter implements UMOFilter, ObjectFilter
         return (pattern != null ? pattern.matcher(object.toString()).find() : false);
     }
 
-    public String getPattern()
+    public String getExpression()
     {
         return (pattern == null ? null : pattern.pattern());
     }
 
-    public void setPattern(String pattern)
+    public void setExpression(String expression)
     {
-        this.pattern = (pattern != null ? Pattern.compile(pattern) : null);
+        this.pattern = (pattern != null ? Pattern.compile(expression) : null);
     }
 
 }

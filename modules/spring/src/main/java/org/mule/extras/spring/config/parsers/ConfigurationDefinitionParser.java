@@ -11,6 +11,9 @@ package org.mule.extras.spring.config.parsers;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.config.AbstractMuleSingleBeanDefinitionParser;
+
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -19,8 +22,25 @@ import org.w3c.dom.Element;
 public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
 
+    public static final String ATTRIBUTE_SERVER_ID = "serverId";
+    public static final String CONFIG_POSTFIX = ".config";
+
+
+    public ConfigurationDefinitionParser()
+    {
+        registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+    }
+
     protected Class getBeanClass(Element element)
     {
         return MuleConfiguration.class;
+    }
+
+
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        String serverId = element.getAttribute(ATTRIBUTE_SERVER_ID);
+        element.setAttribute(ATTRIBUTE_ID, serverId + CONFIG_POSTFIX);
+        super.doParse(element, parserContext, builder);
     }
 }
