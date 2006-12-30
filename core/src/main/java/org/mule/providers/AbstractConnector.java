@@ -67,11 +67,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-<<<<<<< .working
-
-import org.apache.commons.pool.KeyedObjectPool;
-=======
->>>>>>> .merge-right.r4436
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
