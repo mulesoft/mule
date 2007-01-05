@@ -17,9 +17,6 @@ import org.mule.umo.endpoint.EndpointException;
 /**
  * <code>NoReceiverForEndpointException</code> is thrown when an enpoint is
  * specified for a receiver but no such receiver exists.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class NoReceiverForEndpointException extends EndpointException

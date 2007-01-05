@@ -57,7 +57,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 
-    public void doConnect() throws Exception
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
     {
         Connection con = null;
         try
@@ -74,7 +79,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    public void doDisconnect() throws ConnectException
+    protected void doDisconnect() throws ConnectException
     {
         // noop
     }

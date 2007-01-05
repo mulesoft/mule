@@ -36,7 +36,7 @@ public class Pop3sConnector extends Pop3Connector
         return DEFAULT_POP3S_PORT;
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         System.setProperty("mail." + getProtocol() + ".ssl", "true");

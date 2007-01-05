@@ -13,7 +13,7 @@ package org.mule.providers.email;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -52,7 +52,7 @@ import org.apache.commons.lang.StringUtils;
  * messages and routes them as events into Mule.
  */
 
-public class Pop3MessageReceiver extends PollingMessageReceiver
+public class Pop3MessageReceiver extends AbstractPollingMessageReceiver
     implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
@@ -74,7 +74,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
         this.connector = (Pop3Connector)connector;
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         // TODO refactor inbox discovery logic into a getter method for subclasses to
         // override
@@ -133,12 +133,12 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         // nothing to do here
     }
 
-    public void doStop()
+    protected void doStop()
     {
         if (folder != null)
         {
@@ -146,7 +146,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
         }
     }
 
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         super.doStart();
         folder.addMessageCountListener(this);
@@ -371,7 +371,6 @@ public class Pop3MessageReceiver extends PollingMessageReceiver
 
     protected void doDispose()
     {
-        super.doDispose();
         if (folder != null)
         {
             folder.removeMessageCountListener(this);

@@ -50,7 +50,7 @@ public class OracleJmsConnector extends AbstractOracleJmsConnector
 
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         try
         {

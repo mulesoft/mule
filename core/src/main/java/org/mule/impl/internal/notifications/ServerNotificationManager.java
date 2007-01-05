@@ -20,9 +20,10 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,22 +51,17 @@ public class ServerNotificationManager implements Work, Disposable
 
     public static final String NULL_SUBSCRIPTION = "NULL";
 
-    private Map eventsMap = null;
-    private LinkedBlockingQueue eventQueue;
-    private boolean disposed = false;
+    private Map eventsMap;
+    private BlockingDeque eventQueue;
     private List listeners;
     private WorkListener workListener;
+    private volatile boolean disposed = false;
 
     public ServerNotificationManager()
     {
-        init();
-    }
-
-    private synchronized void init()
-    {
         // listenersMap = new ConcurrentHashMap();
         eventsMap = new ConcurrentHashMap();
-        eventQueue = new LinkedBlockingQueue();
+        eventQueue = new LinkedBlockingDeque();
         listeners = new CopyOnWriteArrayList();
         workListener = MuleManager.getConfiguration().getDefaultWorkListener();
     }
@@ -130,12 +126,6 @@ public class ServerNotificationManager implements Work, Disposable
         }
     }
 
-    public void clear()
-    {
-        listeners.clear();
-        init();
-    }
-
     public void fireEvent(UMOServerNotification notification)
     {
         if (disposed)
@@ -146,24 +136,28 @@ public class ServerNotificationManager implements Work, Disposable
         if (notification instanceof BlockingServerEvent)
         {
             notifyListeners(notification);
-            return;
         }
-        try
+        else
         {
-
-            eventQueue.put(notification);
-
-        }
-        catch (InterruptedException e)
-        {
-            logger.error("Failed to queue notification: " + notification, e);
+            try
+            {
+                eventQueue.put(notification);
+            }
+            catch (InterruptedException e)
+            {
+                logger.error("Failed to queue notification: " + notification, e);
+            }
         }
     }
 
     public void dispose()
     {
         disposed = true;
-        clear();
+        // listenersMap.clear();
+        eventsMap.clear();
+        eventQueue.clear();
+        listeners.clear();
+        workListener = null;
     }
 
     /**
@@ -177,6 +171,7 @@ public class ServerNotificationManager implements Work, Disposable
         {
             return;
         }
+
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
             Listener listener = (Listener)iterator.next();
@@ -203,12 +198,11 @@ public class ServerNotificationManager implements Work, Disposable
      */
     public void run()
     {
-        UMOServerNotification notification = null;
         while (!disposed)
         {
             try
             {
-                notification = (UMOServerNotification)eventQueue.take();
+                UMOServerNotification notification = (UMOServerNotification)eventQueue.take();
                 if (notification != null)
                 {
                     notifyListeners(notification);

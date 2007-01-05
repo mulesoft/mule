@@ -10,8 +10,6 @@
 
 package org.mule.providers.quartz;
 
-import java.util.Properties;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -19,6 +17,9 @@ import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.util.ClassUtils;
+
+import java.util.Properties;
+
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
@@ -59,12 +60,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
 
     private Scheduler scheduler;
 
-    public String getProtocol()
-    {
-        return "quartz";
-    }
-
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         try
@@ -88,6 +84,21 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
             throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X,
                 "Quartz provider"), e);
         }
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
     }
 
     protected void doStart() throws UMOException
@@ -115,6 +126,11 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
         {
             throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "Quartz provider"), this, e);
         }
+    }
+
+    public String getProtocol()
+    {
+        return "quartz";
     }
 
     public SchedulerFactory getFactory()

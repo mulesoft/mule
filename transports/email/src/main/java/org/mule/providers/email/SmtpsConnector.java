@@ -47,9 +47,10 @@ public class SmtpsConnector extends SmtpConnector
         return DEFAULT_SMTPS_PORT;
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
+
         System.setProperty("mail.smtps.ssl", "true");
         System.setProperty("mail.smtps.socketFactory.class", getSocketFactory());
         System.setProperty("mail.smtps.socketFactory.fallback", getSocketFactoryFallback());

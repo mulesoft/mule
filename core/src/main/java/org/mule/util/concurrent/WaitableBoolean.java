@@ -100,7 +100,7 @@ public class WaitableBoolean extends SynchronizedVariable
         }
     }
 
-    public boolean commit(boolean assumedValue, boolean newValue)
+    public boolean compareAndSet(boolean assumedValue, boolean newValue)
     {
         synchronized (_lock)
         {

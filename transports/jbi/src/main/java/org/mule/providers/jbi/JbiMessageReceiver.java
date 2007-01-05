@@ -58,6 +58,11 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work
         deliveryChannel = this.connector.getDeliveryChannel();
     }
 
+    protected void doDispose()
+    {
+        // template method
+    }
+
     public void doConnect() throws Exception
     {
         // nothing to do
@@ -78,6 +83,11 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work
         {
             throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, name), e, this);
         }
+    }
+
+    public void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     public void release()

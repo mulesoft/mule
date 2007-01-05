@@ -201,26 +201,6 @@ public class FileConnector extends AbstractServiceEnabledConnector
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.providers.UMOConnector#stop()
-     */
-    protected synchronized void doStop() throws UMOException
-    {
-        if (outputStream != null)
-        {
-            try
-            {
-                outputStream.close();
-            }
-            catch (IOException e)
-            {
-                logger.warn("Failed to close file output stream on stop: " + e);
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -238,11 +218,6 @@ public class FileConnector extends AbstractServiceEnabledConnector
         this.filenameParser = filenameParser;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnector#doDispose()
-     */
     protected void doDispose()
     {
         try
@@ -252,6 +227,36 @@ public class FileConnector extends AbstractServiceEnabledConnector
         catch (UMOException e)
         {
             logger.error(e.getMessage(), e);
+        }
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        if (outputStream != null)
+        {
+            try
+            {
+                outputStream.close();
+            }
+            catch (IOException e)
+            {
+                logger.warn("Failed to close file output stream on stop: " + e);
+            }
         }
     }
 

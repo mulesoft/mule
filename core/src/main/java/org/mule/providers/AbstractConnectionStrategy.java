@@ -107,7 +107,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         this.doThreading = doThreading;
     }
 
-    public abstract void doConnect(UMOConnectable connectable) throws FatalConnectException;
+    protected abstract void doConnect(UMOConnectable connectable) throws FatalConnectException;
 
     /**
      * Resets any state stored in the retry strategy

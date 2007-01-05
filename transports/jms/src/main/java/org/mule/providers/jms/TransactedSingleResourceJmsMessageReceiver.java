@@ -78,7 +78,12 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
-    public void doConnect() throws Exception
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
     {
         try
         {
@@ -140,28 +145,14 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
-    public void onMessage(Message message)
-    {
-        try
-        {
-            getWorkManager().scheduleWork(new MessageReceiverWorker(message));
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-        }
-    }
-
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         try
         {
             // We ned to register the listener when start is called in order to only
-            // start receiving messages after
-            // start/
+            // start receiving messages after start.
             // If the consumer is null it means that the connection strategy is being
-            // run in a separate thread
-            // And hasn't managed to connect yet.
+            // run in a separate thread and hasn't managed to connect yet.
             if (consumer == null)
             {
                 startOnConnect = true;
@@ -169,7 +160,6 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             else
             {
                 startOnConnect = false;
-
                 this.consumer.setMessageListener(this);
             }
         }
@@ -179,7 +169,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
-    public void doStop() throws UMOException
+    protected void doStop() throws UMOException
     {
         try
         {
@@ -205,6 +195,18 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         consumer = null;
         connector.closeQuietly(session);
         session = null;
+    }
+
+    public void onMessage(Message message)
+    {
+        try
+        {
+            getWorkManager().scheduleWork(new MessageReceiverWorker(message));
+        }
+        catch (Exception e)
+        {
+            handleException(e);
+        }
     }
 
     protected class MessageReceiverWorker implements Work

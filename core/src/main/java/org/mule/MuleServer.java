@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,7 +93,19 @@ public class MuleServer implements Runnable
     {
         MuleServer server = new MuleServer();
 
-        String config = SystemUtils.getCommandLineOption("-config", args, CLI_OPTIONS);
+        Map options = null;
+
+        try 
+        {
+            options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+        }
+        catch (MuleException me)
+        {
+            System.err.println(me.toString());
+            System.exit(1);
+        }
+
+        String config = (String)options.get("config");
         // Try default if no config file was given.
         if (config == null)
         {
@@ -116,7 +129,7 @@ public class MuleServer implements Runnable
         }
 
         // Configuration builder
-        String cfgBuilderClassName = SystemUtils.getCommandLineOption("-builder", args, CLI_OPTIONS);
+        String cfgBuilderClassName = (String)options.get("builder");
         if (cfgBuilderClassName != null)
         {
             try
@@ -138,7 +151,7 @@ public class MuleServer implements Runnable
         }
 
         // Startup properties
-        String propertiesFile = SystemUtils.getCommandLineOption("-props", args, CLI_OPTIONS);
+        String propertiesFile = (String)options.get("props");
         if (propertiesFile != null)
         {
             setStartupPropertiesFile(propertiesFile);

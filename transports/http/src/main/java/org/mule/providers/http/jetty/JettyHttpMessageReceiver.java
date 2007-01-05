@@ -79,7 +79,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI()
@@ -131,7 +131,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         // stop is automativcally called by Mule
     }
@@ -154,7 +154,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         try
         {
@@ -167,7 +167,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    public void doStop() throws UMOException
+    protected void doStop() throws UMOException
     {
         try
         {

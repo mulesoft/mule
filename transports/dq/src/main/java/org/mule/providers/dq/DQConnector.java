@@ -175,7 +175,7 @@ public class DQConnector extends AbstractServiceEnabledConnector
     /**
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         as400System = new AS400(hostname, username, password);
@@ -194,6 +194,11 @@ public class DQConnector extends AbstractServiceEnabledConnector
         }
     }
 
+    protected void doDispose()
+    {
+        // template method
+    }
+
     /**
      * @see org.mule.providers.AbstractConnector#getProtocol()
      */
@@ -205,6 +210,21 @@ public class DQConnector extends AbstractServiceEnabledConnector
     /**
      * @see org.mule.providers.AbstractConnector#stopConnector()
      */
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
 
     protected void doStop() throws UMOException
     {

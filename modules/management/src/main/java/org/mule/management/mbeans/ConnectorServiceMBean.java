@@ -10,12 +10,11 @@
 
 package org.mule.management.mbeans;
 
-import java.beans.ExceptionListener;
-
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
+
+import java.beans.ExceptionListener;
 
 public interface ConnectorServiceMBean
 {
@@ -31,9 +30,6 @@ public interface ConnectorServiceMBean
     String getProtocol();
 
     ExceptionListener getExceptionListener();
-
-    // TODO HH: we should probably get rid of this, the factory is nobody's business
-    UMOMessageDispatcherFactory getDispatcherFactory();
 
     void startConnector() throws UMOException;
 

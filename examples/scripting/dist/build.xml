@@ -28,7 +28,7 @@
              dest="${dir.user.lib}/groovy-engine.jar"
              verbose="true"
              usetimestamp="true"/>
-        <get src="${url.maven.repo}/groovy/groovy-all/1.0-RC-02/groovy-all-1.0-RC-02.jar"
+        <get src="${url.maven.repo}/groovy/groovy-all/1.0/groovy-all-1.0.jar"
              dest="${dir.user.lib}/groovy.jar"
              verbose="true"
              usetimestamp="true"/>

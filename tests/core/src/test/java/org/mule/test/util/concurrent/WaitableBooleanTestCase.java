@@ -99,12 +99,12 @@ public class WaitableBooleanTestCase extends TestCase
 
     public void testCommit()
     {
-        assertTrue(TRUE.commit(true, true));
+        assertTrue(TRUE.compareAndSet(true, true));
         assertTrue(TRUE.get());
-        assertFalse(TRUE.commit(false, true));
-        assertTrue(TRUE.commit(true, false));
+        assertFalse(TRUE.compareAndSet(false, true));
+        assertTrue(TRUE.compareAndSet(true, false));
         assertFalse(TRUE.get());
-        assertTrue(TRUE.commit(false, true));
+        assertTrue(TRUE.compareAndSet(false, true));
         assertTrue(TRUE.get());
     }
 

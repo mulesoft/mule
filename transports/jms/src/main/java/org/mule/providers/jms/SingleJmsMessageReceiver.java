@@ -60,7 +60,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         createConsumer();
         if (startOnConnect)
@@ -69,7 +69,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         closeConsumer();
     }
@@ -113,7 +113,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
     }
 
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         try
         {
@@ -139,7 +139,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
     }
 
-    public void doStop() throws UMOException
+    protected void doStop() throws UMOException
     {
         try
         {
@@ -152,6 +152,11 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         {
             throw new LifecycleException(e, this);
         }
+    }
+
+    protected void doDispose()
+    {
+        // template method
     }
 
     protected void closeConsumer()

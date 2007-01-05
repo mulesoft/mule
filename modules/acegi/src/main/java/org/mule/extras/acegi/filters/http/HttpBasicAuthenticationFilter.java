@@ -57,7 +57,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         this.realm = realm;
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (realm == null)
         {

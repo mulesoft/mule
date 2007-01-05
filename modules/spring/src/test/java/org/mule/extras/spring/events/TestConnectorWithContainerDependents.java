@@ -23,7 +23,7 @@ public class TestConnectorWithContainerDependents extends TestConnector
      * 
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         if (containerProp == null)

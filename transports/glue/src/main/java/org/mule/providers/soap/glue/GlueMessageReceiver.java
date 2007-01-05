@@ -48,7 +48,7 @@ import electric.util.interceptor.SendThreadContext;
 
 public class GlueMessageReceiver extends AbstractMessageReceiver
 {
-    private boolean createServer = false;
+    private final boolean createServer;
 
     public GlueMessageReceiver(UMOConnector connector,
                                UMOComponent component,
@@ -59,7 +59,7 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
         this.createServer = createServer.booleanValue();
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         try
         {
@@ -121,7 +121,7 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         if (createServer)
         {
@@ -135,6 +135,16 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
                 throw new ConnectException(e, this);
             }
         }
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     protected void registerContextHeaders()

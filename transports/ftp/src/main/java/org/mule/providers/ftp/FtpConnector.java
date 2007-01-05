@@ -230,6 +230,26 @@ public class FtpConnector extends AbstractServiceEnabledConnector
         }
     }
 
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
     protected void doStop() throws UMOException
     {
         try

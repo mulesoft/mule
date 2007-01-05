@@ -70,6 +70,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     protected UMOEndpoint endpoint = null;
 
     private InternalMessageListener listener;
+
     /**
      * the connector associated with this receiver
      */
@@ -81,7 +82,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected WaitableBoolean stopped = new WaitableBoolean(true);
 
-    private AtomicBoolean connecting = new AtomicBoolean(false);
+    protected AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Stores the endpointUri that this receiver listens on. This enpoint can be
@@ -116,6 +117,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         setConnector(connector);
         setComponent(component);
         setEndpoint(endpoint);
+
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
@@ -351,15 +353,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         doDispose();
     }
 
-    /**
-     * Template method to dispose any resources associated with this receiver. There
-     * is not need to dispose the connector as this is already done by the framework
-     */
-    protected void doDispose()
-    {
-        // nothing to do
-    }
-
     public UMOEndpointURI getEndpointURI()
     {
         return endpointUri;
@@ -382,13 +375,13 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             return;
         }
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
-        }
-
         if (connecting.compareAndSet(false, true))
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(this + " Attempting to connect to: " + endpoint.getEndpointURI());
+            }
+
             connectionStrategy.connect(this);
             logger.info("Successfully connected to: " + endpoint.getEndpointURI());
             return;
@@ -437,7 +430,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     public final void start() throws UMOException
     {
-        if (stopped.commit(true, false))
+        if (stopped.compareAndSet(true, false))
         {
             if (!connected.get())
             {
@@ -461,7 +454,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             logger.error(e.getMessage(), e);
         }
 
-        if (stopped.commit(false, true))
+        if (stopped.compareAndSet(false, true))
         {
             try
             {
@@ -637,18 +630,14 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         return returnMessage;
     }
 
-    public void doStart() throws UMOException
-    {
-        // nothing to do
-    }
+    protected abstract void doStart() throws UMOException;
 
-    public void doStop() throws UMOException
-    {
-        // nothing to do
-    }
+    protected abstract void doStop() throws UMOException;
 
-    public abstract void doConnect() throws Exception;
+    protected abstract void doConnect() throws Exception;
 
-    public abstract void doDisconnect() throws Exception;
+    protected abstract void doDisconnect() throws Exception;
+
+    protected abstract void doDispose();
 
 }

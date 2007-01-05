@@ -128,12 +128,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         receivers = new ConcurrentHashMap();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
-     */
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
 
@@ -144,6 +139,36 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         catch (NotificationException nex)
         {
             throw new InitialisationException(nex, this);
+        }
+    }
+
+    protected void doDispose()
+    {
+        if (connection != null)
+        {
+            try
+            {
+                connection.close();
+            }
+            catch (JMSException e)
+            {
+                logger.error("Jms connector failed to dispose properly: ", e);
+            }
+            connection = null;
+        }
+
+        if (jndiContext != null)
+        {
+            try
+            {
+                jndiContext.close();
+            }
+            catch (NamingException e)
+            {
+                logger.error("Jms connector failed to dispose properly: ", e);
+            }
+            // need this line to flag for reinitialization in ConnectionStrategy
+            jndiContext = null;
         }
     }
 
@@ -200,10 +225,12 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
     {
         Connection connection;
+
         if (connectionFactory == null)
         {
             connectionFactory = createConnectionFactory();
         }
+
         if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory)
         {
             if (MuleManager.getInstance().getTransactionManager() != null)
@@ -270,7 +297,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         return connection;
     }
 
-    public void doConnect() throws ConnectException
+    protected void doConnect() throws ConnectException
     {
         try
         {
@@ -340,7 +367,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         }
     }
 
-    public void doDisconnect() throws ConnectException
+    protected void doDisconnect() throws ConnectException
     {
         try
         {
@@ -465,7 +492,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         return session;
     }
 
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         if (connection != null)
         {
@@ -480,39 +507,14 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         }
     }
 
+    protected void doStop() throws UMOException
+    {
+        // template method
+    }
+
     public String getProtocol()
     {
         return "jms";
-    }
-
-    protected void doDispose()
-    {
-        super.doDispose();
-        if (connection != null)
-        {
-            try
-            {
-                connection.close();
-            }
-            catch (JMSException e)
-            {
-                logger.error("Jms connector failed to dispose properly: ", e);
-            }
-            connection = null;
-        }
-        if (jndiContext != null)
-        {
-            try
-            {
-                jndiContext.close();
-            }
-            catch (NamingException e)
-            {
-                logger.error("Jms connector failed to dispose properly: ", e);
-            }
-            // need this line to flag for reinitialization in ConnectionStrategy
-            jndiContext = null;
-        }
     }
 
     /**

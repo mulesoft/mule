@@ -18,9 +18,6 @@ import org.mule.umo.MessagingException;
  * <code>MessageTypeNotSupportedException</code> is thrown when a message payload
  * is set on a Message implementation of MessageAdapter which is not of supported
  * type for that message or adapter.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MessageTypeNotSupportedException extends MessagingException

@@ -22,6 +22,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -74,8 +75,18 @@ public class SpaceMessageReceiver extends AbstractMessageReceiver implements Wor
 
     public void doDisconnect() throws ConnectException
     {
-        // Todo How should we disconnect from a Space, maby remove the ref to it
+        // TODO how should we disconnect from a Space, maby remove the ref to it
         // for the connector??
+    }
+
+    public void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    public void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     public void run()

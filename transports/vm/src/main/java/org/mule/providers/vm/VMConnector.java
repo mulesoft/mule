@@ -24,6 +24,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -53,7 +54,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
      * 
      * @see org.mule.providers.AbstractConnector#create()
      */
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         if (queueEvents)
@@ -78,6 +79,31 @@ public class VMConnector extends AbstractServiceEnabledConnector
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X,
                 "Message Adapter: " + serviceDescriptor.getMessageAdapter()), e);
         }
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     /*
@@ -128,16 +154,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
     public String getProtocol()
     {
         return "VM";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnector#doDispose()
-     */
-    protected void doDispose()
-    {
-        // template method
     }
 
     public boolean isQueueEvents()

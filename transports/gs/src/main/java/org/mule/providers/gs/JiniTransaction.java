@@ -89,7 +89,7 @@ public class JiniTransaction extends AbstractSingleResourceTransaction
      * 
      * @throws org.mule.umo.TransactionException
      */
-    public void doBegin() throws TransactionException
+    protected void doBegin() throws TransactionException
     {
         // Do nothing here, the transacted cannot be created until it is bound
         unbound = true;

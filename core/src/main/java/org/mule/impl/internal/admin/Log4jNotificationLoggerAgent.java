@@ -81,7 +81,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         this.logName = logName;
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (logConfigFile != null)
         {

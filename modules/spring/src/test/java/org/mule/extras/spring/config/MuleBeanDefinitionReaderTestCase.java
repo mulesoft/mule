@@ -18,10 +18,14 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.providers.vm.VMConnector;
+import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.tck.AbstractConfigBuilderTestCase;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.routing.UMORouterCatchAllStrategy;
 
 public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -57,6 +61,12 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
         d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         assertNotNull(d);
+        UMORouterCatchAllStrategy strategy = d.getInboundRouter().getCatchAllStrategy();
+        assertTrue(strategy instanceof ForwardingCatchAllStrategy);
+        UMOConnector conn = strategy.getEndpoint().getConnector();
+        assertTrue(conn instanceof TestConnector);
+        assertEquals("dummyConnector2", conn.getName());
+        
         // e = d.getInboundEndpoint();
         // assertNotNull(e);
         // assertEquals(e.getEndpointURI().toString(), MuleManager.getInstance()

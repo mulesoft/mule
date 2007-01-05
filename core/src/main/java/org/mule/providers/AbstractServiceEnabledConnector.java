@@ -52,7 +52,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
 
     protected Properties serviceOverrides;
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         initFromServiceDescriptor();
     }

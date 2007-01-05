@@ -19,6 +19,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -49,7 +50,7 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
         return "space";
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
         if (spaceFactory == null)
@@ -61,6 +62,37 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
             BeanUtils.populateWithoutFail(spaceFactory, spaceProperties, true);
         }
 
+    }
+
+    protected void doDispose()
+    {
+        for (Iterator iterator = spaces.values().iterator(); iterator.hasNext();)
+        {
+            UMOSpace space = (UMOSpace)iterator.next();
+            space.dispose();
+        }
+
+        spaces.clear();
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     public UMOSpace getSpace(String spaceUrl) throws UMOSpaceException
@@ -126,19 +158,6 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
     public void setSpaceProperties(Map spaceProperties)
     {
         this.spaceProperties = spaceProperties;
-    }
-
-    /**
-     * Template method to perform any work when destroying the connectoe
-     */
-    protected void doDispose()
-    {
-        for (Iterator iterator = spaces.values().iterator(); iterator.hasNext();)
-        {
-            UMOSpace space = (UMOSpace)iterator.next();
-            space.dispose();
-        }
-        spaces.clear();
     }
 
     /**

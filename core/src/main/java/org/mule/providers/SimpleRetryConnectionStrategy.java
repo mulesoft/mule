@@ -37,7 +37,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     private int retryCount = 2;
     private long frequency = 2000;
 
-    public void doConnect(UMOConnectable connectable) throws FatalConnectException
+    protected void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
         while (true)
         {

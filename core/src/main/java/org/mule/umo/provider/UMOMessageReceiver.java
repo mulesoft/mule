@@ -24,10 +24,7 @@ import org.mule.umo.lifecycle.Lifecycle;
  * server. Where a listener interface is not availiable the derived
  * <code>UMOMessageReceiver</code> will implement the code necessary to receive
  * data from the external system. For example, the file endpoint will poll a
- * specified directory for it's data.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * specified directory for its data.
  */
 public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
 {

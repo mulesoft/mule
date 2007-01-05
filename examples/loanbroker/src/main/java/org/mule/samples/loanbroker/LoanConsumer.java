@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -32,6 +33,13 @@ import org.mule.util.SystemUtils;
 
 public class LoanConsumer
 {
+    public static final String CLI_OPTIONS[][] = {
+            { "config", "true", "Configuration File" },
+            { "main", "true", "Main Class"},
+            { "req", "true", "Number of loan requests to use"},
+            { "sync", "true", "Whether to run in synchronous mode or not"}
+        };
+
     private static boolean synchronous = false;
 
     private List customers = new ArrayList();
@@ -139,19 +147,21 @@ public class LoanConsumer
         LoanConsumer loanConsumer = null;
         try
         {
-            String config = SystemUtils.getCommandLineOption("-config", args);
+            Map options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+            String config = (String)options.get("config");
+
             if (StringUtils.isNotBlank(config))
             {
                 loanConsumer = new LoanConsumer(config);
 
                 int i = 100;
-                String requests = SystemUtils.getCommandLineOption("-req", args);
+                String requests = (String)options.get("req");
                 if (requests != null)
                 {
                     i = Integer.parseInt(requests);
                 }
 
-                String sync = SystemUtils.getCommandLineOption("-sync", args);
+                String sync = (String)options.get("sync");
                 if (sync != null)
                 {
                     synchronous = Boolean.valueOf(sync).booleanValue();

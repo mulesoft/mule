@@ -35,6 +35,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -78,6 +79,80 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
     protected String queryRunner = DEFAULT_QUERY_RUNNER;
     protected Set queryValueExtractors;
     protected Set propertyExtractors;
+
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+
+        try
+        {
+            // If we have a dataSource, there is no need to initialise
+            // the JndiContext
+            if (dataSource == null)
+            {
+                initJndiContext();
+                createDataSource();
+            }
+            // setup property Extractors for queries
+            if (queryValueExtractors == null)
+            {
+                // Add defaults
+                queryValueExtractors = new HashSet();
+                queryValueExtractors.add(MessagePropertyExtractor.class.getName());
+                queryValueExtractors.add(NowPropertyExtractor.class.getName());
+                queryValueExtractors.add(PayloadPropertyExtractor.class.getName());
+                queryValueExtractors.add(MapPropertyExtractor.class.getName());
+                queryValueExtractors.add(BeanPropertyExtractor.class.getName());
+
+                if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
+                {
+                    queryValueExtractors.add("org.mule.util.properties.Dom4jPropertyExtractor");
+                }
+
+                if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
+                {
+                    queryValueExtractors.add("org.mule.util.properties.JDomPropertyExtractor");
+                }
+            }
+
+            propertyExtractors = new HashSet();
+            for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
+            {
+                String s = (String)iterator.next();
+                propertyExtractors.add(ClassUtils.instanciateClass(s, ClassUtils.NO_ARGS));
+            }
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e,
+                this);
+        }
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
+    }
 
     /*
      * (non-Javadoc)
@@ -143,56 +218,6 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         {
             throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND,
                 this.dataSourceJndiName), this);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
-     */
-    public void doInitialise() throws InitialisationException
-    {
-        super.doInitialise();
-        try
-        {
-            // If we have a dataSource, there is no need to initialise
-            // the JndiContext
-            if (dataSource == null)
-            {
-                initJndiContext();
-                createDataSource();
-            }
-            // setup property Extractors for queries
-            if (queryValueExtractors == null)
-            {
-                // Add defaults
-                queryValueExtractors = new HashSet();
-                queryValueExtractors.add(MessagePropertyExtractor.class.getName());
-                queryValueExtractors.add(NowPropertyExtractor.class.getName());
-                queryValueExtractors.add(PayloadPropertyExtractor.class.getName());
-                queryValueExtractors.add(MapPropertyExtractor.class.getName());
-                queryValueExtractors.add(BeanPropertyExtractor.class.getName());
-                if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
-                {
-                    queryValueExtractors.add("org.mule.util.properties.Dom4jPropertyExtractor");
-                }
-                if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
-                {
-                    queryValueExtractors.add("org.mule.util.properties.JDomPropertyExtractor");
-                }
-            }
-            propertyExtractors = new HashSet();
-            for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
-            {
-                String s = (String)iterator.next();
-                propertyExtractors.add(ClassUtils.instanciateClass(s, ClassUtils.NO_ARGS));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e,
-                this);
         }
     }
 

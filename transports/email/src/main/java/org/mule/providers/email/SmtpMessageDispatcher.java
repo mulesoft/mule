@@ -115,7 +115,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
      * @see org.mule.providers.UMOConnector#dispatch(java.lang.Object,
      *      org.mule.providers.MuleEndpoint)
      */
-    public void doDispatch(UMOEvent event)
+    protected void doDispatch(UMOEvent event)
     {
         try
         {

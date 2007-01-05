@@ -41,6 +41,8 @@
         </connection-strategy>
     </connector>
 
+    <connector name="dummyConnector2" className="org.mule.tck.testmodels.mule.TestConnector" />
+
     <endpoint-identifiers>
         <endpoint-identifier name="AppleQueue" value="test://apple.queue"/>
         <endpoint-identifier name="Banana_Queue" value="test://banana.queue"/>
@@ -101,7 +103,7 @@
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
-                    <endpoint address="test://catch.all"/>
+                    <endpoint connector="dummyConnector2" address="test://catch.all"/>
                 </catch-all-strategy>
                 <endpoint address="Test Queue"/>
                 <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>

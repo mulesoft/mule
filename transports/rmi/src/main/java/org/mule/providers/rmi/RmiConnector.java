@@ -83,6 +83,49 @@ public class RmiConnector extends AbstractJndiConnector
 
     private SecurityManager securityManager = new RMISecurityManager();
 
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+
+        if (securityPolicy != null)
+        {
+            System.setProperty("java.security.policy", securityPolicy);
+        }
+
+        // Set security manager
+        if (securityManager != null)
+        {
+            System.setSecurityManager(securityManager);
+        }
+
+        initJndiContext();
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
+    }
+
     public String getProtocol()
     {
         return "rmi";
@@ -152,23 +195,6 @@ public class RmiConnector extends AbstractJndiConnector
     public void setServerClassName(String serverClassName)
     {
         this.serverClassName = serverClassName;
-    }
-
-    public void doInitialise() throws InitialisationException
-    {
-        super.doInitialise();
-
-        if (securityPolicy != null)
-        {
-            System.setProperty("java.security.policy", securityPolicy);
-        }
-
-        // Set security manager
-        if (securityManager != null)
-        {
-            System.setSecurityManager(securityManager);
-        }
-        initJndiContext();
     }
 
     public SecurityManager getSecurityManager()

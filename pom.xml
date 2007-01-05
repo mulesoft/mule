@@ -99,7 +99,7 @@
             </releases>
         </repository>
         <repository>
-            <id>mule</id>
+            <id>mule-deps</id>
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
             <snapshots>

@@ -109,7 +109,17 @@ public class MuleBootstrap
 
         // the core jar has been added dynamically, this construct will run with
         // a new Mule classpath now
-        String mainClassName = SystemUtils.getCommandLineOption("-main", args, MuleServer.CLI_OPTIONS);
+        String mainClassName = null;
+
+        try
+        {
+            mainClassName = SystemUtils.getCommandLineOption("main", args, MuleServer.CLI_OPTIONS);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+            WrapperManager.stop(-1);
+        }
 
         if (mainClassName == null)
         {

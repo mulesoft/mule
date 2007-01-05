@@ -143,17 +143,11 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
         {
             throw new InitialisationException(e, this);
         }
-
     }
 
-    protected void rewriteProperty(Map props, String name)
+    protected void doDispose()
     {
-        Object temp = null;
-        if (props.containsKey(name))
-        {
-            temp = props.remove(name);
-            props.put("objectServiceFactory." + name, temp);
-        }
+        // template method
     }
 
     public void doConnect() throws Exception
@@ -167,4 +161,24 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         connector.getXfire().getServiceRegistry().unregister(service);
     }
+    
+    public void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    public void doStop() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void rewriteProperty(Map props, String name)
+    {
+        if (props.containsKey(name))
+        {
+            Object temp = props.remove(name);
+            props.put("objectServiceFactory." + name, temp);
+        }
+    }
+
 }

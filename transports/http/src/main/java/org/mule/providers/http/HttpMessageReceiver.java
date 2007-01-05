@@ -60,7 +60,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return new HttpWorker(socket);
     }
 
-    public void doConnect() throws ConnectException
+    protected void doConnect() throws ConnectException
     {
         // If we already have an endpoint listening on this socket don't try and
         // start another serversocket

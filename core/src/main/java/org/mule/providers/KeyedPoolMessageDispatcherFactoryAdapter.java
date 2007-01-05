@@ -10,6 +10,8 @@
 
 package org.mule.providers;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -17,7 +19,14 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
-// TODO HH: explain what this does
+/**
+ * <code>KeyedPoolMessageDispatcherFactoryAdapter</code> adapts a
+ * <code>UMOMessageDispatcherFactory</code> with methods from commons-pool
+ * <code>KeyedPoolableObjectFactory</code>. It is only required for dispatcher
+ * factories that do not inherit from <code>AbstractMessageDispatcherFactory</code>.
+ * 
+ * @see AbstractMessageDispatcherFactory
+ */
 public class KeyedPoolMessageDispatcherFactoryAdapter
     implements UMOMessageDispatcherFactory, KeyedPoolableObjectFactory
 {
@@ -26,6 +35,12 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     public KeyedPoolMessageDispatcherFactoryAdapter(UMOMessageDispatcherFactory factory)
     {
         super();
+
+        if (factory == null)
+        {
+            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "factory").toString());
+        }
+
         this.factory = factory;
     }
 

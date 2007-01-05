@@ -246,7 +246,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         /* nop */
     }
 
-    public void doDispose()
+    protected void doDispose()
     {
         /* nop */
     }

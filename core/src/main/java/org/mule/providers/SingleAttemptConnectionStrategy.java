@@ -16,9 +16,6 @@ import org.mule.umo.provider.UMOConnectable;
 
 /**
  * Attempts to make a connection once and fails if there is an exception
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
 {

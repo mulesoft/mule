@@ -35,7 +35,7 @@ import javax.resource.spi.work.Work;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class TransactedPollingMessageReceiver extends PollingMessageReceiver
+public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
     /** determines whether messages will be received in a transaction template */
     protected boolean receiveMessagesInTransaction = true;

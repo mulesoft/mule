@@ -17,6 +17,7 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -62,10 +63,12 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         super(connector, component, endpoint);
     }
 
-    public void doConnect() throws ConnectException
+    protected void doConnect() throws ConnectException
     {
         disposing.set(false);
+
         URI uri = endpoint.getEndpointURI().getUri();
+
         try
         {
             serverSocket = createSocket(uri);
@@ -85,14 +88,19 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
     }
 
-    public void doDisconnect() throws ConnectException
+    protected void doDisconnect() throws ConnectException
     {
         // this will cause the server thread to quit
         disposing.set(true);
+
         try
         {
             if (serverSocket != null)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Closing: " + serverSocket);
+                }
                 serverSocket.close();
             }
         }
@@ -100,6 +108,16 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             logger.warn("Failed to close server socket: " + e.getMessage(), e);
         }
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     protected ServerSocket createSocket(URI uri) throws Exception
@@ -139,7 +157,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
                     if (logger.isTraceEnabled())
                     {
-                        logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
+                        logger.trace("Accepted: " + serverSocket);
                     }
                 }
                 catch (java.io.InterruptedIOException iie)
@@ -192,10 +210,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             if (serverSocket != null && !serverSocket.isClosed())
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Closing: " + serverSocket);
+                }
                 serverSocket.close();
             }
             serverSocket = null;
-
         }
         catch (Exception e)
         {
@@ -299,10 +320,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
                 while (!socket.isClosed() && !disposing.get())
                 {
-                    Serializable readMsg;
                     try
                     {
-                        readMsg = protocol.read(dataIn);
+                        Serializable readMsg = protocol.read(dataIn);
                         if (readMsg == null)
                         {
                             break;
@@ -313,6 +333,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                         {
                             protocol.write(dataOut, result);
                         }
+
                         dataOut.flush();
                     }
                     catch (SocketTimeoutException e)

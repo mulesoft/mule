@@ -37,6 +37,36 @@ public class SystemStreamConnector extends StreamConnector
         outputStream = System.out;
     }
 
+    protected void doDispose()
+    {
+        // Override as a no-op.
+        // The reason is System.in/out shouldn't be closed.
+        // It is valid for them to remain open (consider, e.g. tail -F).
+        // Trying to close System.in will result in I/O block, and
+        // available() will always return 0 bytes for System.in.
+
+        // There is a scheme to get a ref to System.in via NIO,
+        // e.g. :
+        // FileInputStream fis = new FileInputStream(FileDescriptor.in);
+        // InputStream is = Channels.newInputStream(fis.getChannel);
+        //
+        // It is then possible to register a watchdog thread for the caller
+        // which will interrupt this (now wrapped with NIO) read() call.
+
+        // Well, it isn't absolutely required for the reasons stated above,
+        // just following the KISS principle.
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -137,23 +167,4 @@ public class SystemStreamConnector extends StreamConnector
         this.messageDelayTime = messageDelayTime;
     }
 
-    protected void doDispose()
-    {
-        // Override as a no-op.
-        // The reason is System.in/out shouldn't be closed.
-        // It is valid for them to remain open (consider, e.g. tail -F).
-        // Trying to close System.in will result in I/O block, and
-        // available() will always return 0 bytes for System.in.
-
-        // There is a scheme to get a ref to System.in via NIO,
-        // e.g. :
-        // FileInputStream fis = new FileInputStream(FileDescriptor.in);
-        // InputStream is = Channels.newInputStream(fis.getChannel);
-        //
-        // It is then possible to register a watchdog thread for the caller
-        // which will interrupt this (now wrapped with NIO) read() call.
-
-        // Well, it isn't absolutely required for the reasons stated above,
-        // just following the KISS principle.
-    }
 }

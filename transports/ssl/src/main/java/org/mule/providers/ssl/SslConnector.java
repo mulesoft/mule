@@ -31,9 +31,7 @@ import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 /**
- * <code>TcpConnector</code> can bind or sent to a given tcp port on a given host.
- * 
- * @version $Revision$
+ * <code>SslConnector</code> TODO document
  */
 public class SslConnector extends TcpConnector
 {
@@ -62,7 +60,7 @@ public class SslConnector extends TcpConnector
     private KeyManagerFactory keyManagerFactory = null;
     private boolean requireClientAuthentication = true;
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (getProvider() == null)
         {

@@ -112,7 +112,12 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     }
 
-    public void doConnect() throws Exception
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
     {
         if (connector.isConnected())
         {
@@ -129,7 +134,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         if (connector.isConnected())
         {
@@ -138,7 +143,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     }
 
     /**
-     * The poll method is overrident from the
+     * The poll method is overriden from the {@link TransactedPollingMessageReceiver}
      */
     public void poll() throws Exception
     {

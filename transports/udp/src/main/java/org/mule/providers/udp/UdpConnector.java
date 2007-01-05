@@ -11,6 +11,7 @@
 package org.mule.providers.udp;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOException;
 
 /**
  * <code>UdpConnector</code> can send and receive Mule events as Datagram packets.
@@ -22,6 +23,31 @@ public class UdpConnector extends AbstractServiceEnabledConnector
 
     private int timeout = DEFAULT_SOCKET_TIMEOUT;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
+    }
 
     public String getProtocol()
     {

@@ -10,18 +10,18 @@
 
 package org.mule.util;
 
+import org.mule.MuleException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.ArrayUtils;
@@ -154,32 +154,74 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
     }
 
-    /**
-     * Returns the value corresponding to the given option from the command 
-     * line, for example if the options are "-config mule-config.xml"
-     * getCommandLineOption("config") would return "mule-config.xml" 
-     */
-    public static String getCommandLineOption(String option, String args[], String opts[][])
+    private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException
     {
         Options options = new Options();
-        for (int i = 0; i < opts.length; i++) 
+        for (int i = 0; i < opts.length; i++)
         {
             options.addOption(opts[i][0], opts[i][1].equals("true") ? true : false, opts[i][2]);
         }
 
-        CommandLineParser parser = new BasicParser();
+        BasicParser parser = new BasicParser();
 
-        try 
+        try
         {
-            CommandLine line = parser.parse(options, args);
-            return line.getOptionValue(option);
+            CommandLine line = parser.parse(options, args, true);
+            if (line == null)
+            {
+                throw new MuleException("Unknown error parsing the Mule command line");
+            }
+
+            return line;
         }
         catch (ParseException p)
         {
-            System.out.println("Unable to parse command line: " + p.toString());
+            throw new MuleException("Unable to parse the Mule command line because of: " + p.toString());
+        }
+    }
+
+    /**
+     * Returns the value corresponding to the given option from the command line, for
+     * example if the options are "-config mule-config.xml"
+     * getCommandLineOption("config") would return "mule-config.xml"
+     */
+    public static String getCommandLineOption(String option, String args[], String opts[][])
+        throws MuleException
+    {
+        CommandLine line = parseCommandLine(args, opts);
+        return line.getOptionValue(option);
+    }
+
+    /**
+     * Checks whether a command line option is set. This is useful for command line
+     * options that don't have an argument, like "-cluster", which means that this
+     * Mule instance is part of a cluster.
+     */
+    public static boolean hasCommandLineOption(String option, String args[], String opts[][])
+        throws MuleException
+    {
+        CommandLine line = parseCommandLine(args, opts);
+        return line.hasOption(option);
+    }
+
+    /**
+     * Returns a Map of all options in the command line. The Map is keyed off the
+     * option name. The value will be whatever is present on the command line.
+     * Options that don't have an argument will have the String "true".
+     */
+    public static Map getCommandLineOptions(String args[], String opts[][]) throws MuleException
+    {
+        CommandLine line = parseCommandLine(args, opts);
+        Map ret = new HashMap();
+        Option[] options = line.getOptions();
+
+        for (int i = 0; i < options.length; i++)
+        {
+            Option option = options[i];
+            ret.put(option.getOpt(), option.getValue("true"));
         }
 
-        return null;
+        return ret;
     }
 
 }

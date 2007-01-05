@@ -133,7 +133,7 @@
                                 <artifactItem>
                                     <groupId>groovy</groupId>
                                     <artifactId>groovy-all</artifactId>
-                                    <version>1.0-RC-02</version>
+                                    <version>1.0</version>
                                     <destFileName>groovy.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>

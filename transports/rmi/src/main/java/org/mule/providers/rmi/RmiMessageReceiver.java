@@ -19,7 +19,7 @@ import org.apache.commons.collections.MapUtils;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -33,7 +33,7 @@ import org.mule.util.ClassUtils;
  * that the method takes no parameters
  */
 
-public class RmiMessageReceiver extends PollingMessageReceiver
+public class RmiMessageReceiver extends AbstractPollingMessageReceiver
 {
     protected RmiConnector connector;
 
@@ -53,7 +53,12 @@ public class RmiMessageReceiver extends PollingMessageReceiver
         this.connector = (RmiConnector)connector;
     }
 
-    public void doConnect() throws Exception
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
     {
         System.setProperty("java.security.policy", connector.getSecurityPolicy());
 
@@ -98,7 +103,7 @@ public class RmiMessageReceiver extends PollingMessageReceiver
         invokeMethod = remoteObject.getClass().getMethod(methodName, argTypes);
     }
 
-    public void doDisconnect()
+    protected void doDisconnect()
     {
         invokeMethod = null;
         remoteObject = null;

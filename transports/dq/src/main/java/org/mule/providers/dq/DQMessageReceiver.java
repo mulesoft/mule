@@ -13,7 +13,7 @@ package org.mule.providers.dq;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -28,10 +28,10 @@ import com.ibm.as400.access.RecordFormat;
 /**
  * DQMessageReceiver TODO document
  */
-public class DQMessageReceiver extends PollingMessageReceiver
+public class DQMessageReceiver extends AbstractPollingMessageReceiver
 {
-    private DataQueue dataQueue = null;
-    private RecordFormat format = null;
+    private final DataQueue dataQueue;
+    private final RecordFormat format;
 
     public DQMessageReceiver(UMOConnector connector,
                              UMOComponent component,
@@ -70,7 +70,7 @@ public class DQMessageReceiver extends PollingMessageReceiver
     }
 
     /**
-     * @see org.mule.providers.PollingMessageReceiver#poll()
+     * @see org.mule.providers.AbstractPollingMessageReceiver#poll()
      */
     public final void poll()
     {
@@ -90,7 +90,6 @@ public class DQMessageReceiver extends PollingMessageReceiver
         {
             handleException(e);
         }
-
     }
 
     /**
@@ -108,14 +107,19 @@ public class DQMessageReceiver extends PollingMessageReceiver
         routeMessage(umoMessage);
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
-        // template method
+        // nothing to do               
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
-        // template method
+        // nothing to do               
+    }
+
+    protected void doDispose()
+    {
+        // nothing to do               
     }
 
 }

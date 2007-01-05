@@ -116,7 +116,8 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
-            <version>2.0</version>
+            <version>2.0.2</version>
+            <classifier>nightly20061229</classifier>
         </dependency>
 
         <!-- Used by MuleEventMulticaster -->

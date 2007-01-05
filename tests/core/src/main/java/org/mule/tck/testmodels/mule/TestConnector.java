@@ -49,19 +49,24 @@ public class TestConnector extends AbstractConnector
         });
     }
 
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method
+    }
+
     protected void doDispose()
     {
         // template method
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doConnect() throws Exception
     {
         // template method
     }
 
-    public String getProtocol()
+    protected void doDisconnect() throws Exception
     {
-        return "test";
+        // template method
     }
 
     protected void doStart() throws UMOException
@@ -72,6 +77,11 @@ public class TestConnector extends AbstractConnector
     protected void doStop() throws UMOException
     {
         // template method
+    }
+
+    public String getProtocol()
+    {
+        return "test";
     }
 
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
@@ -89,14 +99,29 @@ public class TestConnector extends AbstractConnector
     {
         UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint)
         {
-            public void doConnect() throws Exception
+            protected void doConnect() throws Exception
             {
                 // nothing to do
             }
 
-            public void doDisconnect() throws Exception
+            protected void doDisconnect() throws Exception
             {
                 // nothing to do
+            }
+
+            protected void doStart() throws UMOException
+            {
+                // nothing to do
+            }
+
+            protected void doStop() throws UMOException
+            {
+                // nothing to do
+            }
+
+            protected void doDispose()
+            {
+                // nothing to do               
             }
         };
         return receiver;

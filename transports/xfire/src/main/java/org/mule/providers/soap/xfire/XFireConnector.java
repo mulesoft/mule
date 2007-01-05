@@ -90,9 +90,10 @@ public class XFireConnector extends AbstractServiceEnabledConnector
         return "xfire";
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
+
         try
         {
             MuleManager.getInstance().registerListener(this);
@@ -152,6 +153,7 @@ public class XFireConnector extends AbstractServiceEnabledConnector
                 serviceFactory = new MuleObjectServiceFactory(xfire.getTransportManager());
             }
         }
+
         if (serviceFactory instanceof ObjectServiceFactory)
         {
             ObjectServiceFactory osf = (ObjectServiceFactory)serviceFactory;
@@ -160,6 +162,31 @@ public class XFireConnector extends AbstractServiceEnabledConnector
                 osf.setTransportManager(xfire.getTransportManager());
             }
         }
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     public XFire getXfire()

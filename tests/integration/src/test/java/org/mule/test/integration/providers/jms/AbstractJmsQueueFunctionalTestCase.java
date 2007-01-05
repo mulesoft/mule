@@ -153,7 +153,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
             super(connector, component, endpoint);
         }
 
-        public void doConnect() throws Exception
+        protected void doConnect() throws Exception
         {
             super.doConnect();
             if (receiverIsUp != null)

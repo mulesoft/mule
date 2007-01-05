@@ -96,6 +96,29 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver {
         public void release() { /*nop*/ }
     }
 
-    public void doConnect() throws Exception { /*nop*/ }
-    public void doDisconnect() throws Exception { /*nop*/ }
+    protected void doConnect() throws Exception
+    {
+        // nothing to do
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // nothing to do
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doDispose()
+    {
+        // nothing to do               
+    }
+
 }

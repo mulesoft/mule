@@ -55,11 +55,10 @@ import org.mule.util.ClassUtils;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for Axis
- * server instance. <p/> Some of the Axis specific service initialisation code was
- * adapted from the Ivory project (http://ivory.codehaus.org). Thanks guys :)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * server instance.
+ * <p>
+ * Some of the Axis specific service initialisation code was adapted from the Ivory
+ * project (http://ivory.codehaus.org). Thanks guys :)
  */
 public class AxisConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener
 {
@@ -93,6 +92,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     private List beanTypes;
     private MuleDescriptor axisDescriptor;
+
     /**
      * These protocols will be set on client invocations. by default Mule uses it's
      * own transports rather that Axis's. This is only because it gives us more
@@ -148,7 +148,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
 
@@ -475,6 +475,21 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         axisServer.stop();
         // UMOModel model = MuleManager.getInstance().getModel();
         // model.unregisterComponent(model.getDescriptor(AXIS_SERVICE_COMPONENT_NAME));
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDispose()
+    {
+        // template method
     }
 
     public String getServerConfig()

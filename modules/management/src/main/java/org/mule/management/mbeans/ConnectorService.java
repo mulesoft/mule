@@ -10,13 +10,12 @@
 
 package org.mule.management.mbeans;
 
-import java.beans.ExceptionListener;
-
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.util.ObjectNameHelper;
+
+import java.beans.ExceptionListener;
 
 public class ConnectorService implements ConnectorServiceMBean
 {
@@ -59,12 +58,6 @@ public class ConnectorService implements ConnectorServiceMBean
         return connector.getExceptionListener();
     }
 
-    // TODO HH: we should probably get rid of this, the factory is nobody's business
-    public UMOMessageDispatcherFactory getDispatcherFactory()
-    {
-        return connector.getDispatcherFactory();
-    }
-
     public void startConnector() throws UMOException
     {
         connector.startConnector();
@@ -84,4 +77,5 @@ public class ConnectorService implements ConnectorServiceMBean
     {
         connector.initialise();
     }
+
 }

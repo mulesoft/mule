@@ -43,7 +43,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        if (!connected.get())
+        if (!connected)
         {
             URI uri = endpoint.getEndpointURI().getUri();
             port = uri.getPort();

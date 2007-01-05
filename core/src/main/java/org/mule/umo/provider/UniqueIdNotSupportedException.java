@@ -18,9 +18,6 @@ import org.mule.config.i18n.Messages;
  * <code>UniqueIdNotSupportedException</code> is thrown by
  * UMOMessageAdapter.getUniqueId() if the underlying message does not support or have
  * a unique identifier.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class UniqueIdNotSupportedException extends MuleRuntimeException

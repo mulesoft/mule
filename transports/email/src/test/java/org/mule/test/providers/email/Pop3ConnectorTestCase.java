@@ -78,7 +78,8 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register null");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
 
         try
@@ -87,7 +88,8 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register null");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
 
         try
@@ -96,8 +98,10 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register null");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
+
         connector.dispose();
     }
 

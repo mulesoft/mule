@@ -10,6 +10,17 @@
 
 package org.mule.providers.http;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractPollingMessageReceiver;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageAdapter;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,24 +32,11 @@ import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * Will poll an http URL and use the response as the input for a service request.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-public class PollingHttpMessageReceiver extends PollingMessageReceiver
+public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
     private URL pollUrl;
 
@@ -74,12 +72,40 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         }
     }
 
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        URL url = null;
+        String connectUrl = (String)endpoint.getProperties().get("connectUrl");
+        if (connectUrl == null)
+        {
+            url = pollUrl;
+        }
+        else
+        {
+            url = new URL(connectUrl);
+        }
+        logger.debug("Using url to connect: " + pollUrl.toString());
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.disconnect();
+    }
+
+    public void doDisconnect() throws Exception
+    {
+        // nothing to do
+    }
+
     public void poll() throws Exception
     {
         HttpURLConnection connection = (HttpURLConnection)pollUrl.openConnection();
 
         int len = 0;
         int bytesWritten = 0;
+
         int contentLength = connection.getContentLength();
         boolean contentLengthNotSet = false;
         if (contentLength < 0)
@@ -87,10 +113,12 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
             contentLength = defaultBufferSize;
             contentLengthNotSet = true;
         }
+
         // TODO this is pretty dangerous for big payloads
-        byte[] buffer = new byte[contentLength];
+        byte[] buffer = new byte[defaultBufferSize];
         ByteArrayOutputStream baos = new ByteArrayOutputStream(contentLength);
         InputStream is = connection.getInputStream();
+
         // Ensure we read all bytes, http connections may be slow
         // to send all bytes in consistent stream. I've only seen
         // this when using Axis...
@@ -119,9 +147,11 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         while (it.hasNext())
         {
             Map.Entry msgHeader = (Map.Entry)it.next();
-            if (msgHeader.getValue() != null)
+            Object key = msgHeader.getKey();
+            Object value = msgHeader.getValue(); 
+            if (key != null && value != null)
             {
-                respHeaders.put(msgHeader.getKey(), ((List)msgHeader.getValue()).get(0));
+                respHeaders.put(key, ((List)value).get(0));
             }
         }
 
@@ -132,25 +162,4 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         routeMessage(message, endpoint.isSynchronous());
     }
 
-    public void doConnect() throws Exception
-    {
-        URL url = null;
-        String connectUrl = (String)endpoint.getProperties().get("connectUrl");
-        if (connectUrl == null)
-        {
-            url = pollUrl;
-        }
-        else
-        {
-            url = new URL(connectUrl);
-        }
-        logger.debug("Using url to connect: " + pollUrl.toString());
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        connection.disconnect();
-    }
-
-    public void doDisconnect() throws Exception
-    {
-        // nothing to do
-    }
 }

@@ -15,7 +15,7 @@ import java.io.PrintStream;
 
 import org.apache.commons.lang.SystemUtils;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -26,7 +26,7 @@ import org.mule.umo.provider.UMOConnector;
  * <code>StreamMessageReceiver</code> is a listener for events from Mule components
  * which then simply passes the events on to the target components.
  */
-public class StreamMessageReceiver extends PollingMessageReceiver
+public class StreamMessageReceiver extends AbstractPollingMessageReceiver
 {
     public static final int DEFAULT_BUFFER_SIZE = 4096;
 
@@ -63,6 +63,11 @@ public class StreamMessageReceiver extends PollingMessageReceiver
                 ssc.setPromptMessage(promptMessage);
             }
         }
+    }
+
+    protected void doDispose()
+    {
+        // template method
     }
 
     public void doConnect() throws Exception

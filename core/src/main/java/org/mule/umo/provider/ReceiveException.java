@@ -20,9 +20,6 @@ import org.apache.commons.lang.ObjectUtils;
 /**
  * <code>ReceiveException</code> is specifically thrown by the Provider receive
  * method if something fails in the underlying transport
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ReceiveException extends UMOException
 {

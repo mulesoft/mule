@@ -51,8 +51,12 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         throws InitialisationException
     {
         super(connector, component, endpoint);
-
         this.connector = (RmiConnector)connector;
+    }
+
+    protected void doDispose()
+    {
+        // template method
     }
 
     /**
@@ -108,7 +112,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
      * 
      * @throws org.mule.providers.ConnectException
      */
-    public void doConnect() throws ConnectException
+    protected void doConnect() throws ConnectException
     {
         try
         {
@@ -132,7 +136,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     /**
      * Unbinds Rmi class from registry
      */
-    public void doDisconnect()
+    protected void doDisconnect()
     {
         logger.debug("Disconnecting...");
 
@@ -146,6 +150,16 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         }
 
         logger.debug("Disconnected successfully.");
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     /**

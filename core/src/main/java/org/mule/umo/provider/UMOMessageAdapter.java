@@ -20,10 +20,7 @@ import javax.activation.DataHandler;
 
 /**
  * <code>UMOMessageAdapter</code> provides a common abstraction of different
- * message implementations provided by different underlying technologies
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * message implementations provided by different underlying technologies.
  */
 public interface UMOMessageAdapter extends Serializable
 {

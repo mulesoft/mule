@@ -31,8 +31,6 @@ import org.mule.util.IOUtils;
 
 /**
  * <code>HttpsConnector</code> provides Https connectivity
- * 
- * @version $Revision$
  */
 public class HttpsConnector extends HttpConnector
 {
@@ -64,7 +62,7 @@ public class HttpsConnector extends HttpConnector
     private KeyManagerFactory keyManagerFactory = null;
     private boolean requireClientAuthentication = false;
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (getProvider() == null)
         {

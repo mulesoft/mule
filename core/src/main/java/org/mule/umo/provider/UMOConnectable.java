@@ -12,9 +12,6 @@ package org.mule.umo.provider;
 
 /**
  * Interface for objects that should connect to a resource.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public interface UMOConnectable
 {

@@ -40,7 +40,7 @@ public class PipelineComponent extends DirectComponent
         super(descriptor, model);
     }
 
-    public void doInitialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
 
         super.doInitialise();

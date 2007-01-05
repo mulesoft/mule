@@ -21,8 +21,6 @@ import java.util.Map;
  * defer the writing of the message payload until there is a stream available to
  * write it to.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see org.mule.providers.streaming.StreamMessageAdapter
  */
 public interface OutputHandler

@@ -15,6 +15,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -66,7 +67,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         responseTransformer = getResponseTransformer();
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         try
         {
@@ -90,7 +91,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         // this will cause the server thread to quit
         disposing.set(true);
@@ -99,6 +100,16 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             socket.close();
         }
 
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
     }
 
     protected UMOTransformer getResponseTransformer() throws InitialisationException

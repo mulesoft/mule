@@ -324,14 +324,14 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.stop();
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         // Tell the axis configuration about our new service.
         connector.getServerProvider().deployService(service.getName(), service);
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         try
         {
@@ -347,7 +347,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         connector.unregisterReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
-    public void doStart() throws UMOException
+    protected void doStart() throws UMOException
     {
         if (service != null)
         {
@@ -355,12 +355,17 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    public void doStop() throws UMOException
+    protected void doStop() throws UMOException
     {
         if (service != null)
         {
             service.stop();
         }
+    }
+
+    protected void doDispose()
+    {
+        // nothing to do               
     }
 
     protected void setOptionIfNotset(SOAPService service, String option, Object value)

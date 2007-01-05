@@ -10,35 +10,57 @@
 
 package org.mule.providers.soap.glue;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * <code>GlueConnector</code> instanciates a Glue soap server and allows beans to
+ * <code>GlueConnector</code> instanciates a Glue SOAP server and allows beans to
  * be dynamically exposed via web services simply by registering with the connector.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class GlueConnector extends AbstractServiceEnabledConnector
 {
-    private List serverEndpoints = new ArrayList();
-    private Map context;
+    private final List serverEndpoints = new CopyOnWriteArrayList();
 
     public GlueConnector()
     {
         super();
         registerSupportedProtocol("http");
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     public String getProtocol()
@@ -82,17 +104,8 @@ public class GlueConnector extends AbstractServiceEnabledConnector
                 return false;
             }
         }
+
         return true;
-    }
-
-    public Map getContext()
-    {
-        return context;
-    }
-
-    public void setContext(Map context)
-    {
-        this.context = context;
     }
 
     public boolean supportsProtocol(String protocol)

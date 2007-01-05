@@ -31,9 +31,6 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.util.concurrent.WaitableBoolean;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
@@ -69,8 +66,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected ConnectionStrategy connectionStrategy;
 
-    protected final WaitableBoolean connected = new WaitableBoolean(false);
-    private final AtomicBoolean connecting = new AtomicBoolean(false);
+    protected volatile boolean connecting = false;
+    protected volatile boolean connected = false;
 
     public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -109,126 +106,49 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     public final void dispatch(UMOEvent event) throws DispatchException
     {
-        try
-        {
-            event.setSynchronous(false);
-            event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-                event.getEndpoint().getEndpointURI().toString());
-            RequestContext.setEvent(event);
-            // Apply Security filter if one is set
-            UMOImmutableEndpoint endpoint = event.getEndpoint();
-            if (endpoint.getSecurityFilter() != null)
-            {
-                try
-                {
-                    endpoint.getSecurityFilter().authenticate(event);
-                }
-                catch (org.mule.umo.security.SecurityException e)
-                {
-                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireNotification(new SecurityNotification(e,
-                        SecurityNotification.ADMIN_EVENT_ACTION_START_RANGE));
-                    connector.handleException(e);
-                    return;
-                }
-                catch (UMOException e)
-                {
-                    dispose();
-                    throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-                }
-            }
-            // the security filter may update the payload so we need to get the
-            // latest event again
-            event = RequestContext.getEvent();
+        event.setSynchronous(false);
+        event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
+            event.getEndpoint().getEndpointURI().toString());
+        RequestContext.setEvent(event);
 
+        // Apply Security filter if one is set
+        UMOImmutableEndpoint endpoint = event.getEndpoint();
+        if (endpoint.getSecurityFilter() != null)
+        {
             try
             {
-                UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-                if (doThreading && !event.isSynchronous() && tx == null)
-                {
-                    workManager.scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
-                }
-                else
-                {
-                    // Make sure we are connected
-                    connectionStrategy.connect(this);
-                    doDispatch(event);
-                    if (connector.isEnableMessageEvents())
-                    {
-                        String component = null;
-                        if (event.getComponent() != null)
-                        {
-                            component = event.getComponent().getDescriptor().getName();
-                        }
-                        connector.fireNotification(new MessageNotification(event.getMessage(),
-                            event.getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
-                    }
-                }
+                endpoint.getSecurityFilter().authenticate(event);
             }
-            catch (DispatchException e)
+            catch (org.mule.umo.security.SecurityException e)
             {
-                dispose();
-                throw e;
+                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                connector.fireNotification(new SecurityNotification(e,
+                    SecurityNotification.ADMIN_EVENT_ACTION_START_RANGE));
+                connector.handleException(e);
+                return;
             }
-            catch (Exception e)
+            catch (UMOException e)
             {
                 dispose();
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        finally
-        {
-            if (connector.isCreateDispatcherPerRequest())
-            {
-                dispose();
-            }
-        }
-    }
+        // the security filter may update the payload so we need to get the
+        // latest event again
+        event = RequestContext.getEvent();
 
-    public final UMOMessage send(UMOEvent event) throws DispatchException
-    {
         try
         {
-            // No point continuing if the component has rolledback the transaction
-            if (isTransactionRollback())
+            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (doThreading && !event.isSynchronous() && tx == null)
             {
-                return event.getMessage();
+                workManager.scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
             }
-            event.setSynchronous(true);
-            event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-                event.getEndpoint().getEndpointURI().toString());
-            RequestContext.setEvent(event);
-            // Apply Security filter if one is set
-            UMOImmutableEndpoint endpoint = event.getEndpoint();
-            if (endpoint.getSecurityFilter() != null)
-            {
-                try
-                {
-                    endpoint.getSecurityFilter().authenticate(event);
-                }
-                catch (org.mule.umo.security.SecurityException e)
-                {
-                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireNotification(new SecurityNotification(e,
-                        SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                    connector.handleException(e);
-                    return event.getMessage();
-                }
-                catch (UMOException e)
-                {
-                    dispose();
-                    throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-                }
-            }
-            // the security filter may update the payload so we need to get the
-            // latest event again
-            event = RequestContext.getEvent();
-            try
+            else
             {
                 // Make sure we are connected
                 connectionStrategy.connect(this);
-
-                UMOMessage result = doSend(event);
+                doDispatch(event);
                 if (connector.isEnableMessageEvents())
                 {
                     String component = null;
@@ -237,34 +157,95 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                         component = event.getComponent().getDescriptor().getName();
                     }
                     connector.fireNotification(new MessageNotification(event.getMessage(),
-                        event.getEndpoint(), component, MessageNotification.MESSAGE_SENT));
+                        event.getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
                 }
-                // Once a dispatcher has done its work we need to romve this property
-                // so that
-                // it is not propagated to the next request
-                if (result != null)
-                {
-                    result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-                }
-                return result;
             }
-            catch (DispatchException e)
+        }
+        catch (DispatchException e)
+        {
+            dispose();
+            throw e;
+        }
+        catch (Exception e)
+        {
+            dispose();
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+        }
+    }
+
+    public final UMOMessage send(UMOEvent event) throws DispatchException
+    {
+        // No point continuing if the component has rolledback the transaction
+        if (isTransactionRollback())
+        {
+            return event.getMessage();
+        }
+
+        event.setSynchronous(true);
+        event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
+            event.getEndpoint().getEndpointURI().toString());
+        RequestContext.setEvent(event);
+
+        // Apply Security filter if one is set
+        UMOImmutableEndpoint endpoint = event.getEndpoint();
+        if (endpoint.getSecurityFilter() != null)
+        {
+            try
             {
-                dispose();
-                throw e;
+                endpoint.getSecurityFilter().authenticate(event);
             }
-            catch (Exception e)
+            catch (org.mule.umo.security.SecurityException e)
+            {
+                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                connector.fireNotification(new SecurityNotification(e,
+                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                connector.handleException(e);
+                return event.getMessage();
+            }
+            catch (UMOException e)
             {
                 dispose();
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        finally
+
+        // the security filter may update the payload so we need to get the
+        // latest event again
+        event = RequestContext.getEvent();
+        try
         {
-            if (connector.isCreateDispatcherPerRequest())
+            // Make sure we are connected
+            connectionStrategy.connect(this);
+
+            UMOMessage result = doSend(event);
+            if (connector.isEnableMessageEvents())
             {
-                dispose();
+                String component = null;
+                if (event.getComponent() != null)
+                {
+                    component = event.getComponent().getDescriptor().getName();
+                }
+                connector.fireNotification(new MessageNotification(event.getMessage(),
+                    event.getEndpoint(), component, MessageNotification.MESSAGE_SENT));
             }
+            // Once a dispatcher has done its work we need to romve this property
+            // so that
+            // it is not propagated to the next request
+            if (result != null)
+            {
+                result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            }
+            return result;
+        }
+        catch (DispatchException e)
+        {
+            dispose();
+            throw e;
+        }
+        catch (Exception e)
+        {
+            dispose();
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
@@ -289,6 +270,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             UMOMessage result = doReceive(timeout);
             if (result != null && connector.isEnableMessageEvents())
             {
+                // TODO HH: WTF is this null?
                 String component = null;
                 connector.fireNotification(new MessageNotification(result, endpoint, component,
                     MessageNotification.MESSAGE_RECEIVED));
@@ -304,13 +286,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             dispose();
             throw new ReceiveException(endpoint, timeout, e);
-        }
-        finally
-        {
-            if (connector.isCreateDispatcherPerRequest())
-            {
-                dispose();
-            }
         }
     }
 
@@ -331,9 +306,20 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         }
     }
 
-    public final boolean isDisposed()
+    public boolean validate()
     {
-        return disposed;
+        // by default a dispatcher can be used unless disposed
+        return !disposed;
+    }
+
+    public void activate()
+    {
+        // nothing to do by default
+    }
+
+    public void passivate()
+    {
+        // nothing to do by default
     }
 
     /**
@@ -435,16 +421,17 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     public synchronized void connect() throws Exception
     {
-        if (connected.get())
+        if (connected)
         {
             return;
         }
 
         if (disposed)
         {
+            // TODO HH: throw IllegalState instead?
             if (logger.isWarnEnabled())
             {
-                logger.warn("Dispatcher has been disposed. Cannot connector resource");
+                logger.warn("Dispatcher has been disposed. Cannot connect to resource");
             }
         }
 
@@ -453,8 +440,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
         }
 
-        if (connecting.compareAndSet(false, true))
+        if (!connecting)
         {
+            connecting = true;
             connectionStrategy.connect(this);
             logger.info("Successfully connected to: " + endpoint.getEndpointURI());
             return;
@@ -480,8 +468,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
         }
 
-        connected.set(true);
-        connecting.set(false);
+        connected = true;
+        connecting = false;
     }
 
     public synchronized void disconnect() throws Exception
@@ -493,7 +481,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
-        connected.set(false);
+        connected = false;
         doDisconnect();
         logger.info("Disconnected from: " + endpoint.getEndpointURI());
     }
@@ -505,7 +493,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     public final boolean isConnected()
     {
-        return connected.get();
+        return connected;
     }
 
     /**

@@ -17,9 +17,6 @@ import org.mule.umo.UMOSession;
 /**
  * An interface used for reading and writing session information to and from the
  * current message.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOSessionHandler
 {

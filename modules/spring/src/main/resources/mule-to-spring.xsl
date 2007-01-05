@@ -202,7 +202,8 @@
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
             <xsl:apply-templates select="@createConnector"/>
-            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers']" mode="addProperties"/>
+            <xsl:apply-templates select="@connector"/>
+            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector']" mode="addProperties"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
             <xsl:apply-templates select="filter"/>
@@ -693,6 +694,13 @@
             <bean class="{@className}">
                 <xsl:apply-templates select="properties"/>
             </bean>
+        </property>
+    </xsl:template>
+
+    <xsl:template match="@connector">
+        <xsl:variable name="val"><xsl:value-of select="."/></xsl:variable>
+        <property name="connector">
+            <ref local="{$val}"/>
         </property>
     </xsl:template>
 

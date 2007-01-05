@@ -28,6 +28,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -46,7 +47,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         super(connector, component, endpoint);
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         try
         {
@@ -69,7 +70,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         }
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         if (xmppConnection != null)
         {
@@ -78,9 +79,19 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         }
     }
 
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
+    }
+
     protected void doDispose()
     {
-        logger.info("Closed Xmpp Listener");
+        // nothing to do
     }
 
     protected Work createWork(Packet message)

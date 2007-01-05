@@ -79,7 +79,7 @@ public abstract class AbstractOracleJmsConnector extends JmsConnector
         return getProtocol().equalsIgnoreCase(protocol) || super.getProtocol().equalsIgnoreCase(protocol);
     }
 
-    public void doConnect() throws ConnectException
+    protected void doConnect() throws ConnectException
     {
         try {
             // Set these to false so that the jndiContext will not be used by the

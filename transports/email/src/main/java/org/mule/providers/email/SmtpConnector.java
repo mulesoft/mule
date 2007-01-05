@@ -10,7 +10,6 @@
 
 package org.mule.providers.email;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -22,14 +21,13 @@ import org.mule.util.StringUtils;
 
 import java.util.Properties;
 
-import javax.mail.Authenticator;
 import javax.mail.URLName;
 
 /**
  * <code>SmtpConnector</code> is used to connect to and send data to an SMTP mail
  * server
  */
-public class SmtpConnector extends AbstractServiceEnabledConnector implements MailConnector
+public class SmtpConnector extends AbstractMailConnector
 {
     public static final String DEFAULT_SMTP_HOST = "localhost";
     public static final int DEFAULT_SMTP_PORT = 25;
@@ -70,13 +68,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
      */
     private Properties customHeaders = new Properties();
 
-    /**
-     * A custom authenticator to be used on any mail sessions created with this
-     * connector This will only be used if user name credentials are set on the
-     * endpoint
-     */
-    private Authenticator authenticator = null;
-
     private String contentType = DEFAULT_CONTENT_TYPE;
 
     public SmtpConnector() throws InitialisationException
@@ -95,49 +86,35 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         throw new UnsupportedOperationException("Listeners cannot be registered on a SMTP endpoint");
     }
 
-    /*
-     * @see org.mule.providers.UMOConnector#start()
-     */
-    public void doStart() throws UMOException
-    {
-        // template method
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#stop()
-     */
-    public void doStop() throws UMOException
-    {
-        // template method
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnector#doDispose()
-     */
     protected void doDispose()
     {
-        try
-        {
-            doStop();
-        }
-        catch (UMOException e)
-        {
-            logger.error(e.getMessage(), e);
-        }
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     public String getProtocol()
     {
         return "smtp";
     }
-
-    // ///////////////////////////////////////////////////////////////////////
-    // Getters and setters
-    // ///////////////////////////////////////////////////////////////////////
 
     /**
      * @return The default from address to use
@@ -211,16 +188,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         this.customHeaders = customHeaders;
     }
 
-    public Authenticator getAuthenticator()
-    {
-        return authenticator;
-    }
-
-    public void setAuthenticator(Authenticator authenticator)
-    {
-        this.authenticator = authenticator;
-    }
-
     public String getContentType()
     {
         return contentType;
@@ -277,11 +244,14 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     }
 
     /**
-     * We override the base implementation in Pop3Connector to create a proper
-     * URLName if none was given. This allows javax.mail.Message creation without
-     * access to connection information in the caller (cf. StringToEmailMessage).
+     * We override the base implementation in AbstractMailConnector to create a
+     * proper URLName if none was given. This allows javax.mail.Message creation
+     * without access to connection information in the caller (see
+     * StringToEmailMessage). This is a workaround for the dependency of
+     * StringToEmailMessage on the connection information which only available in
+     * this class.
      */
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args) throws UMOException
+    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args)
     {
         URLName url = (URLName)args;
 

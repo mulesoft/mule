@@ -12,6 +12,7 @@ package org.mule.providers.http.servlet;
 
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -30,13 +31,29 @@ public class ServletMessageReceiver extends AbstractMessageReceiver
         super(connector, component, endpoint);
     }
 
-    public void doConnect() throws Exception
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
     {
         // nothing to do
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         // nothing to do
     }
+
+    protected void doStart() throws UMOException
+    {
+        // nothing to do
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // nothing to do
+    }
+
 }

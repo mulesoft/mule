@@ -25,7 +25,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.file.FileConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
@@ -34,7 +34,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-public class FtpMessageReceiver extends PollingMessageReceiver
+public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
     protected final FtpConnector connector;
     protected final FilenameFilter filenameFilter;
@@ -169,15 +169,20 @@ public class FtpMessageReceiver extends PollingMessageReceiver
         }
     }
 
-    public void doConnect() throws Exception
+    protected void doConnect() throws Exception
     {
         FTPClient client = connector.getFtp(getEndpointURI());
         connector.releaseFtp(getEndpointURI(), client);
     }
 
-    public void doDisconnect() throws Exception
+    protected void doDisconnect() throws Exception
     {
         // no op
+    }
+
+    protected void doDispose()
+    {
+        // template method
     }
 
     private final class FtpWork implements Work

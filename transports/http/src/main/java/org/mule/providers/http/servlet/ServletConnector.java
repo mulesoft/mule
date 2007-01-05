@@ -10,21 +10,22 @@
 
 package org.mule.providers.http.servlet;
 
-import java.util.Map;
-
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOException;
+
+import java.util.Map;
 
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet
- * engine. It allows the MUleReceiverServlet to look up components interested in requests
- * it receives via the servlet container.
- *
+ * engine. It allows the MUleReceiverServlet to look up components interested in
+ * requests it receives via the servlet container.
+ * 
  * @see MuleReceiverServlet
  */
 
 public class ServletConnector extends AbstractServiceEnabledConnector
 {
-    // The real url that the servlet container is bound on.
+    // The real URL that the servlet container is bound on.
     // If this is not set the wsdl may not be generated correctly
     protected String servletUrl;
 
@@ -33,6 +34,31 @@ public class ServletConnector extends AbstractServiceEnabledConnector
         super();
         registerSupportedProtocol("http");
         registerSupportedProtocol("https");
+    }
+
+    protected void doDispose()
+    {
+        // template method
+    }
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
     }
 
     public String getProtocol()
@@ -54,4 +80,5 @@ public class ServletConnector extends AbstractServiceEnabledConnector
     {
         this.servletUrl = servletUrl;
     }
+
 }
