@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:ManagementContextDefinitionParser.java 4715 2007-01-16 22:55:22Z aperepel $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
