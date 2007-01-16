@@ -22,14 +22,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
- * Code by (c) 2005 P.Oikari. <p/> This class acts as common baseclass for both Rmi &
- * EjbConnector Resolves Jndi root for connector usage
+ * This class acts as common baseclass for both Rmi & EjbConnector Resolves Jndi root for connector usage
  * 
- * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- * @version $Revision$
  */
-
-public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnector
+public abstract class AbstractJndiConnector extends AbstractConnector
 {
     protected String jndiInitialFactory;
 

@@ -21,7 +21,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.FutureMessageResult;
@@ -57,7 +57,7 @@ public class RemoteDispatcher implements Disposable
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(RemoteDispatcher.class);
+    protected static final Log logger = LogFactory.getLog(RemoteDispatcher.class);
 
     /**
      * dispatch destination
@@ -281,7 +281,7 @@ public class RemoteDispatcher implements Disposable
         throws UMOException
     {
 
-        UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint.getEndpointURI(),
+        UMOEndpoint endpoint = TransportFactory.createEndpoint(serverEndpoint.getEndpointURI(),
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setRemoteSync(synchronous);
         updateContext(new MuleMessage(action), endpoint, synchronous);

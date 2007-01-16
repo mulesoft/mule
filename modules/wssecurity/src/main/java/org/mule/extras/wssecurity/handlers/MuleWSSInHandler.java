@@ -39,7 +39,10 @@ import org.mule.umo.security.SecurityException;
 
 public class MuleWSSInHandler extends AbstractWSS4JHandler implements Handler
 {
-    protected static Log log = LogFactory.getLog(MuleWSSInHandler.class.getName());
+    /**
+     * logger used by this class
+     */
+    protected static final Log log = LogFactory.getLog(MuleWSSInHandler.class);
 
     public MuleWSSInHandler()
     {

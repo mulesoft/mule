@@ -34,7 +34,7 @@ import java.util.Set;
  * because previously received message Ids are stored in memory and not persisted.
  * 
  */
-
+//TODO MULE-1300: fix memory leak
 public class IdempotentReceiver extends SelectiveConsumer
 {
     private static String DEFAULT_STORE_PATH = "./idempotent";

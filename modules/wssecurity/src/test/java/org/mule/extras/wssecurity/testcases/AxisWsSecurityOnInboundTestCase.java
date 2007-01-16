@@ -32,7 +32,7 @@ public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Property file containing the Encryption properties
             props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
                        
-            UMOMessage m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo","Test",null);
+            UMOMessage m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String)m.getPayload()).equals("Test"));

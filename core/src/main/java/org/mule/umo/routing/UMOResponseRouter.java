@@ -14,14 +14,11 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>UMOResponseRouter</code> is a router that handles response flow Response
- * Agrregators are used to collect responses that are usually sent to replyTo
+ * <code>UMOResponseRouter</code> is a router that handles response flow. Response
+ * Aggregators are used to collect responses that are usually sent to replyTo
  * endpoints set on outbound routers. When an event is sent out via an outbound
  * router, the response router will block the response flow on an UMOComponent until
  * the Response Router resolves a reply or times out.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOResponseRouter extends UMORouter

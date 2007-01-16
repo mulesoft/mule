@@ -37,7 +37,7 @@ import org.apache.commons.lang.StringUtils;
  * so this forces the pollingFrequency property to zero so no pause occurs in the
  * PollingMessageReceiver class.
  */
-// TODO HH: check how this works with the 1.4 connector scheduler
+// TODO SF: check how this works with the 1.4 connector scheduler
 public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
 {
     protected Socket clientSocket = null;
@@ -49,16 +49,17 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
     public TcpStreamingMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
-        this(connector, component, endpoint, new Long(0));
+        this(connector, component, endpoint, 0);
     }
 
     private TcpStreamingMessageReceiver(UMOConnector connector,
                                         UMOComponent component,
                                         UMOEndpoint endpoint,
-                                        Long frequency) throws InitialisationException
+                                        long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
         protocol = ((TcpConnector)connector).getTcpProtocol();
+        // TODO SF: this seems wrong since 0 is ignored as value
         setFrequency(0);
     }
 
@@ -113,8 +114,9 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
 
     public void poll() throws Exception
     {
+        // TODO SF: this seems wrong since 0 is ignored as value
         setFrequency(0); // make sure this is zero and not overridden via config
-        // TODO check if this cast is ok
+        // TODO SF: check if this cast is ok
         byte[] data = (byte[])protocol.read(dataIn);
         if (data != null)
         {

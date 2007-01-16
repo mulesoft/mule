@@ -10,15 +10,13 @@
 
 package org.mule.providers.vm;
 
-import java.util.Iterator;
-
 import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
@@ -37,17 +35,19 @@ import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 
+import java.util.Iterator;
+
 /**
  * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule component to
  * <p/> be accessed from an endpoint
  * 
  */
-public class VMConnector extends AbstractServiceEnabledConnector
+public class VMConnector extends AbstractConnector
 {
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private Class adapterClass = null;
-    private int queueTimeout = 2000;
+    private int queueTimeout = 1000;
 
     /*
      * (non-Javadoc)
@@ -56,7 +56,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
      */
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
         if (queueEvents)
         {
             if (queueProfile == null)
@@ -191,8 +190,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
             {
                 if (logger.isTraceEnabled())
                 {
-                    // logger.trace("Retrieving queue session from current
-                    // transaction");
+                    logger.trace("Retrieving queue session from current transaction");
                 }
                 return (QueueSession)tx.getResource(qm);
             }
@@ -200,7 +198,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
         if (logger.isTraceEnabled())
         {
-            // logger.trace("Retrieving new queue session from queue manager");
+            logger.trace("Retrieving new queue session from queue manager");
         }
 
         QueueSession session = qm.getQueueSession();

@@ -13,8 +13,7 @@ package org.mule.providers.file;
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.providers.file.FileConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -67,7 +66,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
-        assertNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
+        assertNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp", true);
 
@@ -77,15 +76,15 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         endpoint.setConnector(c);
 
         endpoint.initialise();
-        assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
+        assertNotNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector3", true);
         endpoint.initialise();
-        assertNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
+        assertNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector2", true);
         endpoint.initialise();
-        assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
+        assertNotNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
     }
 }

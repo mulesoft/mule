@@ -13,9 +13,6 @@ package org.mule.extras.pgp;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.security.UMOCredentialsAccessor;
 
-/**
- * @author ariva
- */
 public class FakeCredentialAccessor implements UMOCredentialsAccessor
 {
 

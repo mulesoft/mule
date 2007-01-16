@@ -19,9 +19,6 @@ import org.mule.umo.security.UMOAuthentication;
 import java.io.FileInputStream;
 import java.net.URL;
 
-/**
- * @author ariva
- */
 public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 {
     private PGPSecurityProvider securityProvider;

@@ -31,16 +31,8 @@ import java.net.URI;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(SslConnectorFunctionalTestCase.class);
-
     private int port = 61655;
     private Socket s;
 

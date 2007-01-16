@@ -19,11 +19,8 @@ import java.util.List;
 
 /**
  * <code>UMOResponseMessageRouter</code> is a router that can be used to control
- * how the response in a request/response message flow is created. Main usecase is to
- * aggregate a set of asynchonous events into a single response
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * how the response in a request/response message flow is created. Its main use case
+ * is to aggregate a set of asynchonous events into a single response.
  */
 
 public interface UMOResponseMessageRouter extends UMORouterCollection

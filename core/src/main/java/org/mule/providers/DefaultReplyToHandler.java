@@ -26,8 +26,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -36,20 +35,17 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>DefaultReplyToHandler</code> is responsible for processing a message
  * replyTo header.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class DefaultReplyToHandler implements ReplyToHandler
 {
-    private UMOTransformer transformer;
-
-    private Map endpointCache = new ConcurrentHashMap();
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+    protected static final Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+
+    private volatile UMOTransformer transformer;
+    private final Map endpointCache = new HashMap();
 
     public DefaultReplyToHandler(UMOTransformer transformer)
     {
@@ -62,14 +58,17 @@ public class DefaultReplyToHandler implements ReplyToHandler
         {
             logger.debug("sending reply to: " + returnMessage.getReplyTo());
         }
+
         String replyToEndpoint = replyTo.toString();
 
         // get the endpoint for this url
         UMOEndpoint endpoint = getEndpoint(event, replyToEndpoint);
+
         if (transformer == null)
         {
             transformer = event.getEndpoint().getResponseTransformer();
         }
+
         if (transformer != null)
         {
             endpoint.setTransformer(transformer);
@@ -100,7 +99,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     }
 
-    protected UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
+    protected synchronized UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
     {
         UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null)
@@ -125,4 +124,5 @@ public class DefaultReplyToHandler implements ReplyToHandler
     {
         this.transformer = transformer;
     }
+
 }

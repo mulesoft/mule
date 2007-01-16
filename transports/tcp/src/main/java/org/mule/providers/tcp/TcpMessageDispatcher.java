@@ -193,7 +193,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         {
             socket.setSoTimeout(timeout);
         }
-        // TODO check if this cast is ok!
+        // TODO SF: check if this cast is ok!
         return (byte[])connector.getTcpProtocol().read(dis);
     }
 

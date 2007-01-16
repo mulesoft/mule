@@ -12,9 +12,6 @@ package org.mule.tck.testmodels.fruit;
 
 /**
  * <code>InvalidSatsuma</code> has no discoverable methods
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class InvalidSatsuma implements Fruit
 {

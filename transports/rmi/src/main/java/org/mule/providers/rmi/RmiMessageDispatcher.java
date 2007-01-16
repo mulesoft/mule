@@ -22,17 +22,12 @@ import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
 import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
  * RMI-JRMP.
  */
 public class RmiMessageDispatcher extends AbstractMessageDispatcher
 {
-    protected static Log logger = LogFactory.getLog(RmiMessageDispatcher.class);
-
     private final RmiConnector connector;
     protected volatile Remote remoteObject;
     protected volatile Method invokedMethod;

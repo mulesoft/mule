@@ -26,10 +26,7 @@ import org.apache.commons.lang.SystemUtils;
 
 /**
  * <code>UMOException</code> is the base exception type for the Mule server any
- * other exceptions thrown by Mule code will be based on this exception
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * other exceptions thrown by Mule code will be based on this exception,
  */
 public abstract class UMOException extends Exception
 {

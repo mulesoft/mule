@@ -19,7 +19,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.http.HttpConnector;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -88,7 +88,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
 
     private UMOConnector buildConnector(String urlStr) throws UMOException
     {
-        HttpConnector connector = (HttpConnector)ConnectorFactory.createConnector(new MuleEndpointURI(urlStr));
+        HttpConnector connector = (HttpConnector) TransportFactory.createConnector(new MuleEndpointURI(urlStr));
         connector.getDispatcherThreadingProfile().setDoThreading(false);
         MuleManager.getInstance().registerConnector(connector);
         return connector;

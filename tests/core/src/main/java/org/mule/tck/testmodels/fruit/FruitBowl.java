@@ -10,21 +10,22 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FruitBowl
 {
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(FruitBowl.class);
+    private static final Log logger = LogFactory.getLog(FruitBowl.class);
 
-    private Map bowl = new HashMap();
+    private final Map bowl = Collections.synchronizedMap(new HashMap());
 
     public FruitBowl()
     {

@@ -10,14 +10,6 @@
 
 package org.mule.extras.pgp.filters;
 
-import cryptix.message.LiteralMessage;
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.extras.pgp.PGPAuthentication;
@@ -35,15 +27,24 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
+import cryptix.message.LiteralMessage;
+import cryptix.message.Message;
+import cryptix.message.MessageFactory;
+import cryptix.message.SignedMessage;
+import cryptix.pki.KeyBundle;
+
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
-/**
- * @author ariva
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
-    protected static Log logger = LogFactory.getLog(PGPSecurityFilter.class);
+    /**
+     * logger used by this class
+     */
+    protected static final Log logger = LogFactory.getLog(PGPSecurityFilter.class);
 
     private UMOEncryptionStrategy strategy;
 

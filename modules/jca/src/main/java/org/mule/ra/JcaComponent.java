@@ -25,7 +25,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
@@ -131,7 +130,7 @@ public class JcaComponent implements UMOComponent
         ((MuleManager)MuleManager.getInstance()).getStatistics().remove(stats);
     }
 
-    public synchronized void initialise() throws InitialisationException, RecoverableException
+    public synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {

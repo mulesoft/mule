@@ -30,10 +30,6 @@ import javax.resource.spi.work.Work;
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling
  * and transaction management. Derived implementations of these class must be thread
  * safe as several threads can be started at once for an improveded throuput.
- * 
- * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -46,7 +42,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
                                             final UMOEndpoint endpoint,
-                                            Long frequency) throws InitialisationException
+                                            long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
 
@@ -65,9 +61,10 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         // Connector property overrides any implied value
         useMultipleReceivers = connector.isCreateMultipleTransactedReceivers();
         ThreadingProfile tp = connector.getReceiverThreadingProfile();
+
         if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading())
         {
-            for (int i = 0; i < tp.getMaxThreadsActive(); i++)
+            for (int i = 0; i < connector.getNumberOfConcurrentTransactedReceivers(); i++)
             {
                 super.doStart();
             }
@@ -82,6 +79,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     {
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
             connector.getExceptionListener());
+
         if (receiveMessagesInTransaction)
         {
             // Receive messages and process them in a single transaction
@@ -96,12 +94,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                     {
                         for (Iterator it = messages.iterator(); it.hasNext();)
                         {
-                            Object message = it.next();
-                            if (logger.isTraceEnabled())
-                            {
-                                logger.trace("Received Message: " + message);
-                            }
-                            processMessage(message);
+                            TransactedPollingMessageReceiver.this.processMessage(it.next());
                         }
                     }
                     return null;
@@ -111,22 +104,16 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
         else
         {
-            // Receive messages and launch a worker thread
-            // for each message
+            // Receive messages and launch a worker for each message
             List messages = getMessages();
             if (messages != null && messages.size() > 0)
             {
                 final CountDownLatch countdown = new CountDownLatch(messages.size());
                 for (Iterator it = messages.iterator(); it.hasNext();)
                 {
-                    final Object message = it.next();
-                    if (logger.isTraceEnabled())
-                    {
-                        logger.trace("Received Message: " + message);
-                    }
                     try
                     {
-                        getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, message));
+                        this.getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, it.next()));
                     }
                     catch (Exception e)
                     {
@@ -141,9 +128,9 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     protected class MessageProcessorWorker implements Work, TransactionCallback
     {
-        private TransactionTemplate tt;
-        private Object message;
-        private CountDownLatch latch;
+        private final TransactionTemplate tt;
+        private final Object message;
+        private final CountDownLatch latch;
 
         public MessageProcessorWorker(TransactionTemplate tt, CountDownLatch latch, Object message)
         {
@@ -175,7 +162,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
         public Object doInTransaction() throws Exception
         {
-            processMessage(message);
+            TransactedPollingMessageReceiver.this.processMessage(message);
             return null;
         }
 

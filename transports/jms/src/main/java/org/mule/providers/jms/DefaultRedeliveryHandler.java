@@ -29,7 +29,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(DefaultRedeliveryHandler.class);
+    protected static final Log logger = LogFactory.getLog(DefaultRedeliveryHandler.class);
 
     private Map messages = null;
 

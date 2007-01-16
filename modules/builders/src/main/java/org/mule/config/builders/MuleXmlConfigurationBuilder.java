@@ -88,8 +88,6 @@ import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
 import org.apache.commons.digester.SetNextRule;
 import org.apache.commons.digester.SetPropertiesRule;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -100,11 +98,6 @@ import org.xml.sax.Attributes;
 public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
     implements ConfigurationBuilder
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(MuleXmlConfigurationBuilder.class);
-
     public static final String DEFAULT_ENTRY_POINT_RESOLVER = DynamicEntryPointResolver.class.getName();
     public static final String DEFAULT_LIFECYCLE_ADAPTER = DefaultLifecycleAdapter.class.getName();
     public static final String DEFAULT_ENDPOINT = MuleEndpoint.class.getName();
@@ -140,8 +133,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
 
     protected UMOManager manager;
 
-    private List transformerReferences = new ArrayList();
-    private List endpointReferences = new ArrayList();
+    private final List transformerReferences = new ArrayList();
+    private final List endpointReferences = new ArrayList();
 
     public MuleXmlConfigurationBuilder() throws ConfigurationException
     {

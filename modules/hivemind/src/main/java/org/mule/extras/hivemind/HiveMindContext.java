@@ -20,7 +20,6 @@ import org.apache.hivemind.impl.RegistryBuilder;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 
@@ -118,8 +117,7 @@ public class HiveMindContext extends AbstractContainerContext
     /**
      * Here we build the registry from the standard deployment descriptors location.
      */
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         if (registry == null)
         {
             logger.debug("About to initilise the registry...");

@@ -12,9 +12,6 @@ package org.mule.extras.pgp;
 
 import cryptix.pki.KeyBundle;
 
-/**
- * @author ariva
- */
 public interface PGPKeyRing
 {
     public abstract String getSecretPassphrase();

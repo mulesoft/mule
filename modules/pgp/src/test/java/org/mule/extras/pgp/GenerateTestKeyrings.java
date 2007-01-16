@@ -31,9 +31,6 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
-/**
- * @author ariva
- */
 public class GenerateTestKeyrings
 {
     private static PGPKeyBundle serverPublicKey, serverPrivateKey;

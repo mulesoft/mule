@@ -66,7 +66,7 @@ public class Pop3MessageReceiver extends AbstractPollingMessageReceiver
     public Pop3MessageReceiver(UMOConnector connector,
                                UMOComponent component,
                                UMOEndpoint endpoint,
-                               Long checkFrequency,
+                               long checkFrequency,
                                String backupFolder) throws InitialisationException
     {
         super(connector, component, endpoint, checkFrequency);

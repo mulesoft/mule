@@ -14,6 +14,7 @@ import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -39,9 +40,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(10));
+        super(connector, component, endpoint, AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY);
         this.connector = (VMConnector)connector;
-        receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
+        super.receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
     }
 
     protected void doDispose()

@@ -36,136 +36,185 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 {
     /**
-     * The collection of messages that are ready to be returned to the callee. Keyed
-     * by Message ID
-     */
-    protected ConcurrentMap responseEvents = new ConcurrentHashMap();
-
-    /**
-     * A map of locks used to synchronize operations on an eventGroup or response
-     * message for a given Message ID.
-     */
-    private ConcurrentMap locks = new ConcurrentHashMap();
-
-    /**
-     * Map of EventGroup objects. These represent one or mre messages to be
-     * agregated. These are keyed on Message ID. There will be one responseEvent for
-     * every EventGroup.
+     * A map of EventGroup objects. These represent one or more messages to be
+     * agregated, keyed by message id. There will be one response message for every
+     * EventGroup.
      */
     protected final ConcurrentMap eventGroups = new ConcurrentHashMap();
 
+    /**
+     * A map of locks used to wait for response messages for a given message id
+     */
+    protected ConcurrentMap locks = new ConcurrentHashMap();
+
+    /**
+     * The collection of messages that are ready to be returned to the callee. Keyed
+     * by Message ID
+     */
+    protected ConcurrentMap responseMessages = new ConcurrentHashMap();
+
     public void process(UMOEvent event) throws RoutingException
     {
-        // add new event to an event group (it will create a new group if one does
-        // not exist for the event correlation ID)
-        EventGroup eg = addEvent(event);
-
-        // check to see if the event group is ready to be aggregated
-        if (shouldAggregate(eg))
+        // the correlationId of the event's message
+        final Object groupId = this.getReplyAggregateIdentifier(event.getMessage());
+        if (groupId == null || groupId.equals("-1"))
         {
-            // create the response message
-            UMOMessage returnMessage = aggregateEvents(eg);
-            Object id = eg.getGroupId();
+            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event
+                .getEndpoint());
+        }
 
-            // remove the eventGroup as no further message will be received for this
-            // group once we aggregate
-            removeEventGroup(id);
+        // indicates interleaved EventGroup removal (very rare)
+        boolean miss = false;
 
-            // add the new response message so that it can be collected by the
-            // response Thread
-            UMOMessage previousResult = (UMOMessage)responseEvents.putIfAbsent(id, returnMessage);
-            if (previousResult != null)
+        // spinloop for the EventGroup lookup
+        while (true)
+        {
+            if (miss)
             {
-                // this would indicate that we need a better way to prevent continued
-                // aggregation for a group that is currently being processed. Can
-                // this actually happen?
-                throw new IllegalStateException("Detected duplicate aggregation result message with id: "
-                                                + id);
+                try
+                {
+                    // recommended over Thread.yield()
+                    Thread.sleep(1);
+                }
+                catch (InterruptedException interrupted)
+                {
+                    Thread.currentThread().interrupt();
+                }
             }
 
-            // will get/create a latch for the response Message ID and release it,
-            // notifying other threads that the response message is available
-            Latch l = (Latch)locks.get(id);
-            if (l == null)
+            // check for an existing group first
+            EventGroup group = this.getEventGroupWithId(groupId);
+
+            // does the group exist?
+            if (group == null)
             {
+                // ..apparently not, so create a new one & add it
+                group = this.addEventGroup(this.createEventGroup(event, groupId));
+            }
+
+            // ensure that only one thread at a time evaluates this EventGroup
+            synchronized (group)
+            {
+                // make sure no other thread removed the group in the meantime
+                if (group != this.getEventGroupWithId(groupId))
+                {
+                    // if that is the (rare) case, spin
+                    miss = true;
+                    continue;
+                }
+
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Creating latch for " + id + " in " + this);
+                    logger.debug("Adding event to response aggregator group: " + groupId);
                 }
 
-                l = new Latch();
-                Latch previous = (Latch)locks.putIfAbsent(id, l);
-                if (previous != null)
+                // add the incoming event to the group
+                group.addEvent(event);
+
+                // check to see if the event group is ready to be aggregated
+                if (this.shouldAggregateEvents(group))
                 {
-                    l = previous;
+                    // create the response message
+                    UMOMessage returnMessage = this.aggregateEvents(group);
+
+                    // remove the eventGroup as no further message will be received
+                    // for this
+                    // group once we aggregate
+                    this.removeEventGroup(group);
+
+                    // add the new response message so that it can be collected by
+                    // the
+                    // response Thread
+                    UMOMessage previousResult = (UMOMessage)responseMessages.putIfAbsent(groupId,
+                        returnMessage);
+                    if (previousResult != null)
+                    {
+                        // this would indicate that we need a better way to prevent
+                        // continued
+                        // aggregation for a group that is currently being processed.
+                        // Can
+                        // this actually happen?
+                        throw new IllegalStateException(
+                            "Detected duplicate aggregation result message with id: " + groupId);
+                    }
+
+                    // will get/create a latch for the response Message ID and
+                    // release it,
+                    // notifying other threads that the response message is available
+                    Latch l = (Latch)locks.get(groupId);
+                    if (l == null)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Creating latch for " + groupId + " in " + this);
+                        }
+
+                        l = new Latch();
+                        Latch previous = (Latch)locks.putIfAbsent(groupId, l);
+                        if (previous != null)
+                        {
+                            l = previous;
+                        }
+                    }
+
+                    l.countDown();
                 }
-            }
 
-            l.countDown();
+                // result or not: exit spinloop
+                break;
+            }
         }
     }
 
     /**
-     * Adds the event to an event group. Groups are defined by the correlationId on
-     * the message. If no 'correlation Id' is returned from calling
-     * <code>getReplyAggregateIdentifier()</code> a routing exception will be
-     * thrown
+     * TODO HH: writeme
      * 
-     * @param event the reply event received by the response router
-     * @return The event group for the current event or a new group if the current
-     *         event doesn't belong to an existing group
+     * @param event
+     * @param correlationId
+     * @return
      */
-    protected EventGroup addEvent(UMOEvent event) throws RoutingException
+    protected EventGroup createEventGroup(UMOEvent event, Object groupId)
     {
-        Object cId = getReplyAggregateIdentifier(event.getMessage());
-
-        if (cId == null || cId.equals("-1"))
-        {
-            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(),
-                event.getEndpoint());
-        }
-
         if (logger.isDebugEnabled())
         {
-            logger.debug("Adding event to response aggregator group: " + cId);
+            logger.debug("Creating new event group: " + groupId + " in " + this);
         }
-
-        EventGroup eg = (EventGroup)eventGroups.get(cId);
-        if (eg == null)
-        {
-            eg = createEventGroup(cId, event);
-            EventGroup previous = (EventGroup)eventGroups.putIfAbsent(eg.getGroupId(), eg);
-            if (previous != null)
-            {
-                eg = previous;
-            }
-        }
-
-        eg.addEvent(event);
-
-        return eg;
+        return new EventGroup(groupId);
     }
 
     /**
-     * Creates a new event group with the given Id and can use other properties on
-     * the event Custom implementations can even overload the eventGroup object here
+     * TODO HH: writeme
      * 
-     * @param id The Event group Id for the new Group
-     * @param event the current event
-     * @return a New event group for the incoming event
+     * @param groupId
+     * @return
      */
-    protected EventGroup createEventGroup(Object id, UMOEvent event)
+    protected EventGroup getEventGroupWithId(Object groupId)
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Creating new event group: " + id + " in " + this);
-        }
-        return new EventGroup(id);
+        return (EventGroup)eventGroups.get(groupId);
     }
 
-    protected void removeEventGroup(Object id)
+    /**
+     * TODO HH: writeme
+     * 
+     * @param group
+     * @return
+     */
+    protected EventGroup addEventGroup(EventGroup group)
     {
-        eventGroups.remove(id);
+        EventGroup previous = (EventGroup)eventGroups.putIfAbsent(group.getGroupId(), group);
+        // a parallel thread might have removed the EventGroup already,
+        // therefore we need to validate our current reference
+        return (previous != null ? previous : group);
+    }
+
+    /**
+     * TODO HH: writeme
+     * 
+     * @param group
+     */
+    protected void removeEventGroup(EventGroup group)
+    {
+        eventGroups.remove(group.getGroupId());
     }
 
     /**
@@ -178,7 +227,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
-        Object responseId = getCallResponseAggregateIdentifier(message);
+        Object responseId = this.getCallResponseAggregateIdentifier(message);
 
         if (logger.isDebugEnabled())
         {
@@ -191,7 +240,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             if (logger.isDebugEnabled())
             {
                 logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-                             + responseId + " in " + this);
+                                + responseId + " in " + this);
             }
 
             l = new Latch();
@@ -234,19 +283,23 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
         catch (InterruptedException e)
         {
+            // TODO HH: what should we really do when we are interrupted while
+            // waiting? this relates to the finally block below - should
+            // lock/response message still be removed?
             logger.error(e.getMessage(), e);
         }
         finally
         {
+            // TODO HH: what about other exceptions? is this really correct?
             locks.remove(responseId);
-            result = (UMOMessage)responseEvents.remove(responseId);
+            result = (UMOMessage)responseMessages.remove(responseId);
         }
 
         if (!resultAvailable)
         {
             if (logger.isTraceEnabled())
             {
-                logger.trace("Current responses are: \n" + MapUtils.toString(responseEvents, true));
+                logger.trace("Current responses are: \n" + MapUtils.toString(responseMessages, true));
             }
 
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
@@ -262,7 +315,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         if (logger.isDebugEnabled())
         {
             logger.debug("remaining locks  : " + locks.keySet());
-            logger.debug("remaining results: " + responseEvents.keySet());
+            logger.debug("remaining results: " + responseMessages.keySet());
         }
 
         return result;
@@ -277,7 +330,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * @param events
      * @return true if the event gorep is ready for aggregation
      */
-    protected abstract boolean shouldAggregate(EventGroup events);
+    protected abstract boolean shouldAggregateEvents(EventGroup events);
 
     /**
      * This method is invoked if the shouldAggregate method is called and returns

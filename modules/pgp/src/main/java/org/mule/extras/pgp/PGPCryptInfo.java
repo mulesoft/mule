@@ -12,12 +12,8 @@ package org.mule.extras.pgp;
 
 import cryptix.pki.KeyBundle;
 
-/**
- * @author ariva
- */
 public class PGPCryptInfo
 {
-
     KeyBundle keyBundle;
     boolean signRequested;
 

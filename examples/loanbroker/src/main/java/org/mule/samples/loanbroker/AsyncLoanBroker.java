@@ -25,7 +25,7 @@ public class AsyncLoanBroker implements LoanBroker
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AsyncLoanBroker.class);
+    protected static final Log logger = LogFactory.getLog(AsyncLoanBroker.class);
 
     private static final AtomicInteger quotes = new AtomicInteger(0);
     private static final AtomicInteger requests = new AtomicInteger(0);

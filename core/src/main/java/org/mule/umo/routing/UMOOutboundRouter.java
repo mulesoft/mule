@@ -25,8 +25,6 @@ import java.util.List;
  * set on the individual Outbound Router.
  * 
  * @see UMOOutboundMessageRouter
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOOutboundRouter extends UMORouter

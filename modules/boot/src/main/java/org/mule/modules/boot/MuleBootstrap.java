@@ -65,7 +65,7 @@ public class MuleBootstrap
                 "Either MULE_HOME is not set or does not contain a valid directory.");
         }
 
-        File muleBase = null;
+        File muleBase;
 
         String muleBaseVar = System.getProperty("mule.base");
         if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%"))

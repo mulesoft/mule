@@ -10,15 +10,15 @@
 
 package org.mule.test.util;
 
+import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
-
 import org.apache.commons.lang.SystemUtils;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
 
 public class StringMessageUtilsTestCase extends TestCase
 {
@@ -41,7 +41,7 @@ public class StringMessageUtilsTestCase extends TestCase
         result = StringMessageUtils.toString(test);
         assertEquals("Bert", result);
 
-        test = new Object[]{"foo", "bar"};
+        test = new String[]{"foo", "bar"};
         result = StringMessageUtils.toString(test);
         assertEquals("{foo,bar}", result);
 
@@ -51,21 +51,21 @@ public class StringMessageUtilsTestCase extends TestCase
 
         // create an array that is too long to be printed
         test = new byte[StringMessageUtils.MAX_ELEMENTS + 100];
-        for (int i = 0; i < ((byte[])test).length; i++)
+        for (int i = 0; i < ((byte[]) test).length; i++)
         {
-            ((byte[])test)[i] = (byte)i;
+            ((byte[]) test)[i] = (byte) i;
         }
 
         // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
         result = StringMessageUtils.toString(test);
-        assertTrue(((String)result).endsWith("[..]}"));
-        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String)result, ","));
+        assertTrue(((String) result).endsWith("[..]}"));
+        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String) result, ","));
 
         test = new long[]{5068875495743534L, 457635546759674L};
         result = StringMessageUtils.toString(test);
         assertEquals("{5068875495743534,457635546759674}", result);
 
-        test = new double[]{1.1, 2.02};
+        test = new double[] {1.1, 2.02};
         result = StringMessageUtils.toString(test);
         assertEquals("{1.1,2.02}", result);
 
@@ -73,13 +73,13 @@ public class StringMessageUtilsTestCase extends TestCase
         test = new ArrayList(100);
         for (int i = 0; i < 100; i++)
         {
-            ((Collection)test).add(new Integer(i));
+            ((Collection) test).add(new Integer(i));
         }
 
         // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
         result = StringMessageUtils.toString(test);
-        assertTrue(((String)result).endsWith("[..]]"));
-        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String)result, ","));
+        assertTrue(((String) result).endsWith("[..]]"));
+        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String) result, ","));
 
     }
 

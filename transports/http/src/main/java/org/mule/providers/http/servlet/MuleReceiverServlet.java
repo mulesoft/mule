@@ -10,6 +10,18 @@
 
 package org.mule.providers.http.servlet;
 
+import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.service.TransportFactory;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.provider.NoReceiverForEndpointException;
+import org.mule.util.PropertiesUtils;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -18,18 +30,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.util.PropertiesUtils;
 
 /**
  * Receives Http requests via a Servlet and routes the to listeners with servlet://
@@ -54,7 +54,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         String servletConnectorName = servletConfig.getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
         if(servletConnectorName==null)
         {
-            connector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
+            connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
             if (connector == null)
             {
                 throw new ServletException(new Message("http", 9).toString());

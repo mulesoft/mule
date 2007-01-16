@@ -93,7 +93,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
             this.eventthreshold = eventthreshold;
         }
 
-        protected boolean shouldResequence(EventGroup events)
+        protected boolean shouldResequenceEvents(EventGroup events)
         {
             eventCount++;
             if (eventCount == eventthreshold)

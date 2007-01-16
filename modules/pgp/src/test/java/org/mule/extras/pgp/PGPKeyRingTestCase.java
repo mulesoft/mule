@@ -16,9 +16,6 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import java.net.URL;
 
-/**
- * @author ariva
- */
 public class PGPKeyRingTestCase extends AbstractMuleTestCase
 {
     private PGPKeyRing keyManager;

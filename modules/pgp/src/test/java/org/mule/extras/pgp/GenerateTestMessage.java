@@ -30,9 +30,6 @@ import java.security.cert.CertificateException;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-/**
- * @author ariva
- */
 public class GenerateTestMessage
 {
     private static ExtendedKeyStore clientPublicRing, clientPrivateRing;

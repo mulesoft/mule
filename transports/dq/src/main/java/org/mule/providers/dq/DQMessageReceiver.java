@@ -36,7 +36,7 @@ public class DQMessageReceiver extends AbstractPollingMessageReceiver
     public DQMessageReceiver(UMOConnector connector,
                              UMOComponent component,
                              UMOEndpoint endpoint,
-                             Long frequency,
+                             long frequency,
                              DataQueue pDq,
                              AS400 pAs400) throws InitialisationException
     {

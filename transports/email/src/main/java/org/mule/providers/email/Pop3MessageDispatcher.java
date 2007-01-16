@@ -13,7 +13,6 @@ package org.mule.providers.email;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -35,10 +34,7 @@ import javax.mail.URLName;
 public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 {
     private Pop3Connector connector;
-
     private Folder folder;
-
-    private Session session = null;
 
     public Pop3MessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -61,7 +57,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
             URLName url = new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox,
                 uri.getUsername(), uri.getPassword());
 
-            session = (Session)connector.getDelegateSession(endpoint, url);
+            Session session = (Session)connector.getDelegateSession(endpoint, url);
             session.setDebug(logger.isDebugEnabled());
 
             Store store = session.getStore(url);
@@ -106,7 +102,6 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
                     folder.close(true);
                 }
             }
-            session = null;
         }
         catch (Exception e)
         {
@@ -134,17 +129,16 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * Make a specific request to the underlying transport Endpoint can be in the
+     * Make a specific request to the underlying transport. Endpoint can be in the
      * form of pop3://username:password@pop3.lotsofmail.org
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
      *            returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
      *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     * @throws Exception if the call to the underlying protocal causes an exception
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {
@@ -230,12 +224,6 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     protected boolean hasMessages(Folder folder) throws MessagingException
     {
         return getMessageCount(folder) > 0;
-    }
-
-    // TODO HH: move to connector
-    public Object getDelegateSession() throws UMOException
-    {
-        return session;
     }
 
     protected void doDispose()

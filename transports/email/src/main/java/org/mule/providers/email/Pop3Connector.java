@@ -13,6 +13,7 @@ package org.mule.providers.email;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
@@ -48,29 +49,35 @@ public class Pop3Connector extends AbstractMailConnector
         this.setCreateDispatcherPerRequest(true);
     }
 
+
+    protected void doInitialise() throws InitialisationException
+    {
+        //template method, nothing to do
+    }
+
     protected void doDispose()
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doConnect() throws Exception
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doDisconnect() throws Exception
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doStart() throws UMOException
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doStop() throws UMOException
     {
-        // template method
+        // template method, nothing to do
     }
 
     /**

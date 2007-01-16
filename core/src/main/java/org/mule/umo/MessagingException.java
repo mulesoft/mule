@@ -20,10 +20,7 @@ import java.util.Map;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when
- * errors specific to Message processing occur.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * errors specific to Message processing occur..
  */
 
 public class MessagingException extends UMOException
@@ -32,10 +29,11 @@ public class MessagingException extends UMOException
      * Serial version
      */
     private static final long serialVersionUID = 6941498759267936649L;
+
     /**
      * The UMOMessage being processed when the error occurred
      */
-    protected transient UMOMessage umoMessage = null;
+    protected transient final UMOMessage umoMessage;
 
     public MessagingException(Message message, UMOMessage umoMessage)
     {

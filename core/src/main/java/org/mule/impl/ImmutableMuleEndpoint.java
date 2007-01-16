@@ -17,8 +17,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorFactoryException;
+import org.mule.providers.service.TransportFactory;
+import org.mule.providers.service.TransportFactoryException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
@@ -161,7 +161,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * determines if a new connector should be created for this endpoint
      */
-    protected int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+    protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
 
     /**
      * Default ctor
@@ -547,7 +547,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public static UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
     {
-        return ConnectorFactory.createEndpoint(uri, type);
+        return TransportFactory.createEndpoint(uri, type);
     }
 
     public static UMOEndpoint getEndpointFromUri(String uri)
@@ -644,14 +644,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             {
                 try
                 {
-                    connector = ConnectorFactory.getOrCreateConnectorByProtocol(this);
+                    connector = TransportFactory.getOrCreateConnectorByProtocol(this);
                     if (connector == null)
                     {
                         throw new InitialisationException(new Message(
                             Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
                     }
                 }
-                catch (ConnectorFactoryException e)
+                catch (TransportFactoryException e)
                 {
                     throw new InitialisationException(new Message(
                         Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);

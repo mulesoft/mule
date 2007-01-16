@@ -19,8 +19,6 @@ import org.mule.umo.routing.RoutingException;
  * <code>TestResponseAggregator</code> is a mock response Agrregator object used
  * for testing configuration
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TestResponseAggregator extends ResponseCorrelationAggregator
 {

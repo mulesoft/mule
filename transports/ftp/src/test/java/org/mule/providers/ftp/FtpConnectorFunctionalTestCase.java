@@ -10,10 +10,6 @@
 
 package org.mule.providers.ftp;
 
-import java.io.FileOutputStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
@@ -24,15 +20,14 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.io.FileOutputStream;
+
 public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-
     protected static final String USERNAME = "mule";
     protected static final String PASSWORD = "mulepwd";
     protected static final String HOSTNAME = "localhost";
     protected static final String ADDRESS = "test";
-
-    protected static Log logger = LogFactory.getLog(FtpConnectorFunctionalTestCase.class);
 
     public void testClient() throws Exception
     {

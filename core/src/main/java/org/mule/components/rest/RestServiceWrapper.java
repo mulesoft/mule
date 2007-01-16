@@ -24,7 +24,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
 
@@ -142,8 +141,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.errorExpression = errorExpression;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         if (serviceUrl == null && !urlFromMessage)
         {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);

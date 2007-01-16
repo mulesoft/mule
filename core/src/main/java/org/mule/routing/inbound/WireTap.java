@@ -22,15 +22,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  * in the "endpoint" property. This can be a logical destination of a URI. <p/> A
  * filter can be applied to this router so that only events matching a criteria will
  * be tapped.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class WireTap extends SelectiveConsumer
 {
-    private String endpoint;
-
-    private UMOImmutableEndpoint tap;
+    private volatile String endpoint;
+    private volatile UMOImmutableEndpoint tap;
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
@@ -47,7 +43,6 @@ public class WireTap extends SelectiveConsumer
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-
         try
         {
             event.getSession().dispatchEvent(event.getMessage(), tap);
@@ -76,4 +71,5 @@ public class WireTap extends SelectiveConsumer
             }
         }
     }
+
 }

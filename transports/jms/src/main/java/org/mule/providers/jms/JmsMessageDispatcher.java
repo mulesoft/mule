@@ -88,7 +88,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             // Retrieve the session from the current transaction.
-            // TODO HH: clean up to use getDelegateSession()
+            // TODO AP: clean up to use getDelegateSession()
             session = connector.getSessionFromTransaction();
             if (session != null)
             {
@@ -114,7 +114,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     // Retrieve a session from the connector
-                    // TODO HH: clean up to use getDelegateSession()
+                    // TODO AP: clean up to use getDelegateSession()
                     session = connector.getSession(event.getEndpoint());
                     cachedSession = session;
                 }
@@ -122,7 +122,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             else
             {
                 // Retrieve a session from the connector
-                // TODO HH: clean up to use getDelegateSession()
+                // TODO AP: clean up to use getDelegateSession()
                 session = connector.getSession(event.getEndpoint());
                 if (event.getEndpoint().getTransactionConfig().isTransacted())
                 {
@@ -340,7 +340,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be

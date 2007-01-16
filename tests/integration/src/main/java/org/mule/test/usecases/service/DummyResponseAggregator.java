@@ -17,10 +17,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.StringMessageUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DummyResponseAggregator extends ResponseCorrelationAggregator
 {
 

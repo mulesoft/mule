@@ -25,7 +25,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         String result;
 
         Class componentType = array.getClass().getComponentType();
-        if (componentType.equals(Object.class))
+        if (Object.class.isAssignableFrom(componentType))
         {
             result = ArrayUtils.toString((ArrayUtils.subarray((Object[])array, 0, maxElements)));
         }

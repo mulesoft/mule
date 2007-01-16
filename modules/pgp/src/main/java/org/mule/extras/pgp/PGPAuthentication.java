@@ -10,19 +10,15 @@
 
 package org.mule.extras.pgp;
 
-import java.util.Map;
+import org.mule.umo.security.UMOAuthentication;
 
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
 
-import org.mule.umo.security.UMOAuthentication;
+import java.util.Map;
 
-/**
- * @author ariva
- */
 public class PGPAuthentication implements UMOAuthentication
 {
-
     boolean authenticated = false;
     private String userName;
     private Message message;

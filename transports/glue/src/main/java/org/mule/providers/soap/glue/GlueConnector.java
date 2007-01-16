@@ -10,10 +10,11 @@
 
 package org.mule.providers.soap.glue;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +29,7 @@ import java.util.List;
  * be dynamically exposed via web services simply by registering with the connector.
  */
 
-public class GlueConnector extends AbstractServiceEnabledConnector
+public class GlueConnector extends AbstractConnector
 {
     private final List serverEndpoints = new CopyOnWriteArrayList();
 
@@ -36,6 +37,12 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         super();
         registerSupportedProtocol("http");
+    }
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
     }
 
     protected void doDispose()

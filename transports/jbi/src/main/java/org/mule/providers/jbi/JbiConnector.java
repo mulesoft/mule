@@ -10,8 +10,9 @@
 
 package org.mule.providers.jbi;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.ComponentContext;
@@ -24,12 +25,18 @@ import javax.management.ObjectName;
  * <code>JbiConnector</code> can bind to a JBI container allowing components to
  * send events via Mule.
  */
-public class JbiConnector extends AbstractServiceEnabledConnector implements ComponentLifeCycle
+public class JbiConnector extends AbstractConnector implements ComponentLifeCycle
 {
     private ObjectName extensionMBeanName;
     private ComponentContext context;
     private DeliveryChannel deliveryChannel;
     private MessageExchangeFactory exchangeFactory;
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
+    }
 
     protected void doDispose()
     {

@@ -70,7 +70,8 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     public TransactedJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(0));
+        // TODO AP: check how frequency=0 works with the scheduler, see setFrequency(long)
+        super(connector, component, endpoint, 0);
         this.connector = (JmsConnector)connector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 

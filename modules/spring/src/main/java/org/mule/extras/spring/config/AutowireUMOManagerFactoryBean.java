@@ -79,7 +79,7 @@ public class AutowireUMOManagerFactoryBean
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AutowireUMOManagerFactoryBean.class);
+    protected static final Log logger = LogFactory.getLog(AutowireUMOManagerFactoryBean.class);
 
     public static final String MULE_ENVIRONMENT_PROPERTIES_BEAN_NAME = "muleEnvironmentProperties";
     public static final String MULE_ENDPOINT_IDENTIFIERS_BEAN_NAME = "muleEndpointIdentifiers";

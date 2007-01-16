@@ -33,12 +33,12 @@ public class TemplateParser
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(TemplateParser.class);
+    protected static final Log logger = LogFactory.getLog(TemplateParser.class);
 
-    private Pattern pattern = null;
-    private int pre = 1;
-    private int post = 1;
-    private String style = null;
+    private final Pattern pattern;
+    private final int pre;
+    private final int post;
+    private final String style;
 
     public static TemplateParser createAntStyleParser()
     {
@@ -56,10 +56,13 @@ public class TemplateParser
         {
             pattern = Pattern.compile("\\$\\{[^\\}]+\\}");
             pre = 2;
+            post = 1;
         }
         else if (SQUARE_TEMPLATE_STYLE.equals(style))
         {
             pattern = Pattern.compile("\\[[^\\]]+\\]");
+            pre = 1;
+            post = 1;
         }
         else
         {
@@ -121,9 +124,9 @@ public class TemplateParser
 
             if (value == null)
             {
-                if (logger.isWarnEnabled())
+                if (logger.isDebugEnabled())
                 {
-                    logger.warn("Value " + propname + " not found in context");
+                    logger.debug("Value " + propname + " not found in context");
                 }
             }
             else

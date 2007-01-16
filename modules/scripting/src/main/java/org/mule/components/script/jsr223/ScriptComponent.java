@@ -14,7 +14,6 @@ import org.mule.MuleManager;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.MuleLogger;
 
 import javax.script.Bindings;
@@ -27,8 +26,7 @@ public class ScriptComponent extends Scriptable implements Callable
 {
     private Bindings bindings;
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         super.initialise();
         bindings = getScriptEngine().createBindings();
     }

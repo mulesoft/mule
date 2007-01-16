@@ -10,6 +10,27 @@
 
 package org.mule.providers.jdbc;
 
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.providers.AbstractConnector;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.properties.BeanPropertyExtractor;
+import org.mule.util.properties.MapPropertyExtractor;
+import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.PayloadPropertyExtractor;
+import org.mule.util.properties.PropertyExtractor;
+
 import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -28,28 +49,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.properties.BeanPropertyExtractor;
-import org.mule.util.properties.MapPropertyExtractor;
-import org.mule.util.properties.MessagePropertyExtractor;
-import org.mule.util.properties.PayloadPropertyExtractor;
-import org.mule.util.properties.PropertyExtractor;
 
-public class JdbcConnector extends AbstractServiceEnabledConnector
+public class JdbcConnector extends AbstractConnector
 {
     // These are properties that can be overridden on the Receiver by the endpoint
     // declaration
@@ -82,8 +83,6 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
-
         try
         {
             // If we have a dataSource, there is no need to initialise

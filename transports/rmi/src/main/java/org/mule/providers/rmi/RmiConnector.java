@@ -10,18 +10,6 @@
 
 package org.mule.providers.rmi;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.URL;
-import java.rmi.NotBoundException;
-import java.rmi.RMISecurityManager;
-import java.rmi.Remote;
-import java.util.List;
-
-import javax.naming.NamingException;
-
-import org.apache.commons.collections.MapUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -38,6 +26,19 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.URL;
+import java.rmi.NotBoundException;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.util.List;
+
+import javax.naming.NamingException;
+
+import org.apache.commons.collections.MapUtils;
 
 /**
  * <code>RmiConnector</code> can bind or send to a given RMI port on a given host.
@@ -85,7 +86,6 @@ public class RmiConnector extends AbstractJndiConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
 
         if (securityPolicy != null)
         {

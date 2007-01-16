@@ -10,10 +10,10 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import java.util.EventObject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.EventObject;
 
 public class Banana implements Fruit
 {
@@ -25,7 +25,7 @@ public class Banana implements Fruit
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(Banana.class);
+    private static final Log logger = LogFactory.getLog(Banana.class);
 
     private boolean peeled = false;
     private boolean bitten = false;
@@ -38,7 +38,7 @@ public class Banana implements Fruit
     public void peelEvent(EventObject e)
     {
         logger.debug("Banana got peel event in peelEvent(EventObject)! Event says: "
-                     + e.getSource().toString());
+                        + e.getSource().toString());
         peel();
     }
 

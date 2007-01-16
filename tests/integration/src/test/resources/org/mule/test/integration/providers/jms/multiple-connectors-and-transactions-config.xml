@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule-configuration id="IBML-Bus-mule-instance" version="1.0">
+
+    <mule-environment-properties serverUrl="tcp://localhost:60504" synchronous="true" transactionTimeout="30000"/>
+
+    <!--
+      Mule connectors for IBML Bus
+    -->
+    <!-- JMS connection -->
+    <connector name="jmsConnector1" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="jndiProviderUrl" value="tcp://localhost:61616"/>
+            <property name="specification" value="1.1"/>
+            <property name="jndiDestinations" value="false"/>
+            <property name="maxRedelivery" value="2"/>
+        </properties>
+        <!-- thread profile -->
+        <threading-profile maxThreadsActive="5" maxThreadsIdle="1" threadTTL="60000" poolExhaustedAction="WAIT"/>
+        <!-- retry profile -->
+        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+            <properties>
+                <property name="retryCount" value="4"/>
+                <property name="frequency" value="10000"/>
+                <property name="doThreading" value="false"/>
+            </properties>
+        </connection-strategy>
+    </connector>
+
+    <connector name="jmsConnector2" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="jndiProviderUrl" value="tcp://localhost:61616"/>
+            <property name="specification" value="1.1"/>
+            <property name="jndiDestinations" value="false"/>
+            <property name="maxRedelivery" value="2"/>
+        </properties>
+
+        <threading-profile maxThreadsActive="5" maxThreadsIdle="1" threadTTL="60000" poolExhaustedAction="WAIT"/>
+
+        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+            <properties>
+                <property name="retryCount" value="4"/>
+                <property name="frequency" value="10000"/>
+                <property name="doThreading" value="false"/>
+            </properties>
+        </connection-strategy>
+    </connector>
+
+    <!-- Endpoints -->
+    <endpoint-identifiers>
+        <endpoint-identifier name="endpoint1" value="jms://cn=endpoint1?connector=jmsConnector1"/>
+        <endpoint-identifier name="endpoint2" value="jms://cn=endpoint2?connector=jmsConnector2"/>
+        <endpoint-identifier name="endpoint3" value="jms://cn=endpoint3?connector=jmsConnector2"/>
+    </endpoint-identifiers>
+
+    <model name="bus-instance">
+        <mule-descriptor name="service1" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="endpoint1" type="receiver" synchronous="true">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router matchAll="true">
+                <router className="org.mule.routing.outbound.StaticRecipientList" enableCorrelation="ALWAYS">
+                    <properties>
+                        <list name="recipients">
+                            <entry value="jms://cn=endpoint3?connector=jmsConnector1"/>
+                        </list>
+                    </properties>
+                </router>
+            </outbound-router>
+
+        </mule-descriptor>
+
+
+        <mule-descriptor name="service2" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="endpoint2" type="receiver" synchronous="true">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+
+            <outbound-router matchAll="true">
+                <router className="org.mule.routing.outbound.StaticRecipientList" enableCorrelation="ALWAYS">
+                    <properties>
+                        <list name="recipients">
+                            <entry value="jms://cn=endpoint3?connector=jmsConnector2"/>
+                        </list>
+                    </properties>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

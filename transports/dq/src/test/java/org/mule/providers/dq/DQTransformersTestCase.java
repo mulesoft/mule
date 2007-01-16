@@ -15,10 +15,6 @@ import org.mule.providers.dq.transformers.XmlToDQMessage;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.UMOTransformer;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DQTransformersTestCase extends AbstractTransformerTestCase
 {
     public UMOTransformer getTransformer() throws Exception

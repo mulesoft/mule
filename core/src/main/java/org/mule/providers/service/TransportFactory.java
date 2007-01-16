@@ -15,7 +15,7 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -41,23 +41,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ConnectorFactory</code> can be used for generically creating endpoints
+ * <code>TransportFactory</code> can be used for generically creating endpoints
  * from an url. Note that for some endpoints, the url alone is not enough to create
  * the endpoint if a connector for the endpoint has not already been configured with
  * the Mule Manager.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class ConnectorFactory
+public class TransportFactory
 {
     public static final String PROVIDER_SERVICES_PATH = "org/mule/providers";
 
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(ConnectorFactory.class);
+    protected static final Log logger = LogFactory.getLog(TransportFactory.class);
 
     public static final int GET_OR_CREATE_CONNECTOR = 0;
     public static final int ALWAYS_CREATE_CONNECTOR = 1;
@@ -86,7 +84,7 @@ public class ConnectorFactory
                 connector = MuleManager.getInstance().lookupConnector(uri.getConnectorName());
                 if (connector == null)
                 {
-                    throw new ConnectorFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
+                    throw new TransportFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
                         "Connector: " + uri.getConnectorName()));
                 }
             }
@@ -102,14 +100,14 @@ public class ConnectorFactory
         }
         catch (Exception e)
         {
-            throw new ConnectorFactoryException(e);
+            throw new TransportFactoryException(e);
         }
 
         if (connector == null)
         {
             Message m = new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", "Uri: " + uri);
             m.setNextMessage(new Message(Messages.X_IS_NULL, "connector"));
-            throw new ConnectorFactoryException(m);
+            throw new TransportFactoryException(m);
 
         }
 
@@ -145,10 +143,10 @@ public class ConnectorFactory
      * @param cnn
      * @param type 0=inbound, 1=outbound, 2=response
      * @return
-     * @throws ConnectorFactoryException
+     * @throws TransportFactoryException
      */
     private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, int type)
-        throws ConnectorFactoryException
+        throws TransportFactoryException
     {
         UMOTransformer trans = null;
         String transId = null;
@@ -169,16 +167,16 @@ public class ConnectorFactory
             }
             catch (MuleException e)
             {
-                throw new ConnectorFactoryException(e);
+                throw new TransportFactoryException(e);
             }
         }
         else
         {
             // Get connector specific overrides to set on the descriptor
             Properties overrides = new Properties();
-            if (cnn instanceof AbstractServiceEnabledConnector)
+            if (cnn instanceof AbstractConnector)
             {
-                Map so = ((AbstractServiceEnabledConnector)cnn).getServiceOverrides();
+                Map so = ((AbstractConnector)cnn).getServiceOverrides();
                 if (so != null)
                 {
                     overrides.putAll(so);
@@ -187,7 +185,7 @@ public class ConnectorFactory
 
             String scheme = url.getSchemeMetaInfo();
 
-            ConnectorServiceDescriptor csd = getServiceDescriptor(scheme, overrides);
+            TransportServiceDescriptor csd = getServiceDescriptor(scheme, overrides);
             if (type == 0)
             {
                 trans = csd.createInboundTransformer();
@@ -215,19 +213,19 @@ public class ConnectorFactory
      * 
      * @param url the MuleEndpointURI url to create the connector with
      * @return a new Connector
-     * @throws ConnectorFactoryException
+     * @throws TransportFactoryException
      */
-    public static UMOConnector createConnector(UMOEndpointURI url) throws ConnectorFactoryException
+    public static UMOConnector createConnector(UMOEndpointURI url) throws TransportFactoryException
     {
         String scheme = url.getSchemeMetaInfo();
 
         UMOConnector connector = null;
-        ConnectorServiceDescriptor csd = getServiceDescriptor(scheme);
+        TransportServiceDescriptor csd = getServiceDescriptor(scheme);
         // Make sure we can create the endpoint/connector using this service
         // method
         if (csd.getServiceError() != null)
         {
-            throw new ConnectorServiceException(Message.createStaticMessage(csd.getServiceError()));
+            throw new TransportServiceException(Message.createStaticMessage(csd.getServiceError()));
         }
 
         // If this is a fineder service, lets find it before trying to create it
@@ -241,34 +239,34 @@ public class ConnectorFactory
             if (csd.getConnectorFactory() != null)
             {
                 ObjectFactory factory = (ObjectFactory)ClassUtils.loadClass(csd.getConnectorFactory(),
-                    ConnectorFactory.class).newInstance();
+                    TransportFactory.class).newInstance();
                 connector = (UMOConnector)factory.create();
             }
             else
             {
                 if (csd.getConnector() != null)
                 {
-                    connector = (UMOConnector)ClassUtils.loadClass(csd.getConnector(), ConnectorFactory.class)
+                    connector = (UMOConnector)ClassUtils.loadClass(csd.getConnector(), TransportFactory.class)
                         .newInstance();
-                    if (connector instanceof AbstractServiceEnabledConnector)
+                    if (connector instanceof AbstractConnector)
                     {
-                        ((AbstractServiceEnabledConnector)connector).initialiseFromUrl(url);
+                        ((AbstractConnector)connector).initialiseFromUrl(url);
                     }
                 }
                 else
                 {
-                    throw new ConnectorFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                    throw new TransportFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                         "Connector", scheme));
                 }
             }
         }
-        catch (ConnectorFactoryException e)
+        catch (TransportFactoryException e)
         {
             throw e;
         }
         catch (Exception e)
         {
-            throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint",
+            throw new TransportFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint",
                 url), e);
         }
 
@@ -289,23 +287,23 @@ public class ConnectorFactory
         return connector;
     }
 
-    public static ConnectorServiceDescriptor getServiceDescriptor(String protocol)
-        throws ConnectorFactoryException
+    public static TransportServiceDescriptor getServiceDescriptor(String protocol)
+        throws TransportFactoryException
     {
         return getServiceDescriptor(protocol, null);
     }
 
-    public static ConnectorServiceDescriptor getServiceDescriptor(String protocol, Properties overrides)
-        throws ConnectorFactoryException
+    public static TransportServiceDescriptor getServiceDescriptor(String protocol, Properties overrides)
+        throws TransportFactoryException
     {
-        ConnectorServiceDescriptor csd = (ConnectorServiceDescriptor)csdCache.get(new CSDKey(protocol,
+        TransportServiceDescriptor csd = (TransportServiceDescriptor)csdCache.get(new CSDKey(protocol,
             overrides));
         if (csd == null)
         {
 
             String location = SpiUtils.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
             InputStream is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol + ".properties",
-                ConnectorFactory.class);
+                TransportFactory.class);
 
 
             // TODO RM: this can be removed in Mule 2.0
@@ -313,7 +311,7 @@ public class ConnectorFactory
             {
                 //The legacy connector decriptors did did not use file extensions
                 is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol,
-                ConnectorFactory.class);
+                TransportFactory.class);
                 if(is==null)
                 {
                     logger.warn("The transport " + protocol + " is using a legacy style of descriptor. This needs to be updated."
@@ -326,24 +324,24 @@ public class ConnectorFactory
                 {
                     Properties props = new Properties();
                     props.load(is);
-                    csd = new ConnectorServiceDescriptor(protocol, location, props);
+                    csd = new TransportServiceDescriptor(protocol, location, props);
                     // set any overides on the descriptor
                     csd.setOverrides(overrides);
                     if (csd.getServiceFinder() != null)
                     {
-                        ConnectorServiceFinder finder = csd.createServiceFinder();
+                        TransportServiceFinder finder = csd.createServiceFinder();
                         csd = finder.findService(protocol, csd);
                     }
                     csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
                 }
                 else
                 {
-                    throw new ConnectorServiceNotFoundException(location + "/" + protocol);
+                    throw new TransportServiceNotFoundException(location + "/" + protocol);
                 }
             }
             catch (IOException e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_ENDPOINT_FROM_LOCATION_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_TO_ENDPOINT_FROM_LOCATION_X,
                     location + "/" + protocol), e);
             }
         }
@@ -351,25 +349,25 @@ public class ConnectorFactory
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri)
-        throws ConnectorFactoryException
+        throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(uri, uri.getCreateConnector());
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint)
-        throws ConnectorFactoryException
+        throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector());
     }
 
     private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create)
-        throws ConnectorFactoryException
+        throws TransportFactoryException
     {
         UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
-        if (ConnectorFactory.ALWAYS_CREATE_CONNECTOR == create
-            || (connector == null && create == ConnectorFactory.GET_OR_CREATE_CONNECTOR))
+        if (ALWAYS_CREATE_CONNECTOR == create
+            || (connector == null && create == GET_OR_CREATE_CONNECTOR))
         {
-            connector = ConnectorFactory.createConnector(uri);
+            connector = createConnector(uri);
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
@@ -378,11 +376,11 @@ public class ConnectorFactory
             }
             catch (Exception e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
                     "Connector"), e);
             }
         }
-        else if (create == ConnectorFactory.NEVER_CREATE_CONNECTOR && connector == null)
+        else if (create == NEVER_CREATE_CONNECTOR && connector == null)
         {
             logger.warn("There is no connector for protocol: " + uri.getScheme()
                         + " and 'createConnector' is set to NEVER.  Returning null");

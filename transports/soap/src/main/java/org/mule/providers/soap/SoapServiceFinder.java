@@ -12,11 +12,11 @@ package org.mule.providers.soap;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorFactoryException;
-import org.mule.providers.service.ConnectorServiceDescriptor;
-import org.mule.providers.service.ConnectorServiceException;
-import org.mule.providers.service.ConnectorServiceFinder;
+import org.mule.providers.service.TransportFactory;
+import org.mule.providers.service.TransportFactoryException;
+import org.mule.providers.service.TransportServiceDescriptor;
+import org.mule.providers.service.TransportServiceException;
+import org.mule.providers.service.TransportServiceFinder;
 import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 
@@ -28,11 +28,11 @@ import java.util.TreeMap;
  * <code>SoapServiceFinder</code> finds a the connector service to use by checking
  * the classpath for jars required for each of the soap connector implementations
  */
-public class SoapServiceFinder implements ConnectorServiceFinder
+public class SoapServiceFinder implements TransportServiceFinder
 {
 
-    public ConnectorServiceDescriptor findService(String service, ConnectorServiceDescriptor csd)
-        throws ConnectorFactoryException
+    public TransportServiceDescriptor findService(String service, TransportServiceDescriptor csd)
+        throws TransportFactoryException
     {
         Map finders = new TreeMap();
         PropertiesUtils.getPropertiesWithPrefix(csd.getProperties(), "finder.class", finders);
@@ -45,7 +45,7 @@ public class SoapServiceFinder implements ConnectorServiceFinder
             {
                 ClassUtils.loadClass(entry.getValue().toString(), getClass());
                 String protocol = getProtocolFromKey(entry.getKey().toString());
-                return ConnectorFactory.getServiceDescriptor(protocol);
+                return TransportFactory.getServiceDescriptor(protocol);
             }
             catch (ClassNotFoundException e1)
             {
@@ -53,7 +53,7 @@ public class SoapServiceFinder implements ConnectorServiceFinder
                     ")").append(", ");
             }
         }
-        throw new ConnectorServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X,
+        throw new TransportServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X,
             buf.toString()));
     }
 

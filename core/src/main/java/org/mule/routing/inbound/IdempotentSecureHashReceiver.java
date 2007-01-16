@@ -32,10 +32,6 @@ import java.security.NoSuchAlgorithmException;
  * the message does not support unique identifiers. This implementation provides for
  * a persistent store of message hash values via the underlying file system and is
  * suitable in failover environments.
- * 
- * @author <a href="mailto:rlucente@xecu.net">Rich Lucente</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class IdempotentSecureHashReceiver extends IdempotentReceiver

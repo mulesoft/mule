@@ -11,9 +11,9 @@
 package org.mule.impl.endpoint;
 
 import org.mule.MuleManager;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorFactoryException;
-import org.mule.providers.service.ConnectorServiceDescriptor;
+import org.mule.providers.service.TransportFactory;
+import org.mule.providers.service.TransportFactoryException;
+import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
@@ -60,7 +60,7 @@ public class MuleEndpointURI implements UMOEndpointURI
     private String connectorName;
     private String transformers;
     private String responseTransformers;
-    private int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+    private int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
     private String uriString;
@@ -155,12 +155,12 @@ public class MuleEndpointURI implements UMOEndpointURI
         try
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
-            ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(scheme);
+            TransportServiceDescriptor csd = TransportFactory.getServiceDescriptor(scheme);
             EndpointBuilder builder = csd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
         }
-        catch (ConnectorFactoryException e)
+        catch (TransportFactoryException e)
         {
             throw new MalformedEndpointException(e);
         }

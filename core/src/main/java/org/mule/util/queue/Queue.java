@@ -12,9 +12,6 @@ package org.mule.util.queue;
 
 /**
  * <code>Queue</code> TODO
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public interface Queue
 {

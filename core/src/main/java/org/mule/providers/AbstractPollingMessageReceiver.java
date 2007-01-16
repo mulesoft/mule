@@ -10,6 +10,8 @@
 
 package org.mule.providers;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -18,6 +20,10 @@ import org.mule.umo.provider.UMOConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.resource.spi.work.Work;
 
@@ -32,101 +38,77 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     public static final long DEFAULT_POLL_FREQUENCY = 1000;
     public static final long STARTUP_DELAY = 1000;
 
-    protected long frequency = DEFAULT_POLL_FREQUENCY;
-    protected ScheduledFuture schedule;
+    protected volatile long frequency = DEFAULT_POLL_FREQUENCY;
+
+    // @GuardedBy(this)
+    protected final List schedules = new ArrayList();
 
     public AbstractPollingMessageReceiver(UMOConnector connector,
-                                  UMOComponent component,
-                                  final UMOEndpoint endpoint,
-                                  Long frequency) throws InitialisationException
+                                          UMOComponent component,
+                                          final UMOEndpoint endpoint,
+                                          long frequency) throws InitialisationException
     {
         super(connector, component, endpoint);
-        this.frequency = frequency.longValue();
+        this.setFrequency(frequency);
     }
 
     protected void doStart() throws UMOException
     {
-        // TODO HH: this is the old way of polling, constantly occupying a thread for no good reason
-//        try
-//        {
-//            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, connector);
-//        }
-//        catch (WorkException e)
-//        {
-//            stopped.set(true);
-//            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
-//        }
-
-        // we use scheduleWithFixedDelay to prevent queue-up of tasks when polling
-        // takes longer than the specified frequency, e.g. when the polled database
-        // or network is slow or returns large amounts of data.
-        schedule = connector.getScheduler().scheduleWithFixedDelay(this, STARTUP_DELAY, frequency, TimeUnit.MILLISECONDS);
+        try
+        {
+            synchronized (this)
+            {
+                // we use scheduleWithFixedDelay to prevent queue-up of tasks when
+                // polling takes longer than the specified frequency, e.g. when the
+                // polled database or network is slow or returns large amounts of
+                // data.
+                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this,
+                    STARTUP_DELAY, frequency, TimeUnit.MILLISECONDS);
+                schedules.add(schedule);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.stop();
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), ex, this);
+        }
     }
 
     protected void doStop() throws UMOException
     {
-        // cancel our schedule, but be gentle:
-        // do not interrupt when polling is in progress
-        schedule.cancel(false);
-    }
-
-    // TODO HH: remove this when done
-//    public void run()
-//    {
-//        try
-//        {
-//            Thread.sleep(STARTUP_DELAY);
-//            while (!stopped.get())
-//            {
-//                connected.whenTrue(null);
-//                try
-//                {
-//                    poll();
-//                }
-//                catch (InterruptedException e)
-//                {
-//                    return;
-//                }
-//                catch (Exception e)
-//                {
-//                    handleException(e);
-//                }
-//                Thread.sleep(frequency);
-//            }
-//        }
-//        catch (InterruptedException e)
-//        {
-//            // Exit thread
-//        }
-//    }
-
-    // the new run can safely exit after each poll() since it will be
-    // invoked again by the connector's scheduler
-    // TODO HH: verify exception handling
-    public void run()
-    {
-        try
+        // cancel our schedules gently: do not interrupt when polling is in progress
+        synchronized (this)
         {
-            if (!stopped.get())
+            for (Iterator i = schedules.iterator(); i.hasNext();)
             {
-                connected.whenTrue(null);
-                try
-                {
-                    poll();
-                }
-                catch (InterruptedException e)
-                {
-                    return;
-                }
-                catch (Exception e)
-                {
-                    handleException(e);
-                }
+                ScheduledFuture schedule = (ScheduledFuture)i.next();
+                schedule.cancel(false);
+                i.remove();
             }
         }
-        catch (InterruptedException e)
+    }
+
+    // the run() method will exit after each poll() since it will be invoked again
+    // by the scheduler
+    public void run()
+    {
+        if (!stopped.get())
         {
-            // ignore? re-raise interrupted state?
+            try
+            {
+                // make sure we are connected, wait if necessary
+                connected.whenTrue(null);
+                this.poll();
+            }
+            catch (InterruptedException e)
+            {
+                // stop polling
+                this.stop();
+            }
+            catch (Exception e)
+            {
+                handleException(e);
+            }
         }
     }
 
@@ -135,21 +117,23 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         this.stop();
     }
 
-    public void setFrequency(long l)
+    public long getFrequency()
     {
-        if (l <= 0)
+        return frequency;
+    }
+
+    // TODO a nifty thing would be on-the-fly adjustment (via JMX?) of the
+    // polling frequency by rescheduling without explicit stop()
+    public void setFrequency(long value)
+    {
+        if (value <= 0)
         {
             frequency = DEFAULT_POLL_FREQUENCY;
         }
         else
         {
-            frequency = l;
+            frequency = value;
         }
-    }
-
-    public long getFrequency()
-    {
-        return frequency;
     }
 
     public abstract void poll() throws Exception;

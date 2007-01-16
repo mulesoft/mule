@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.UMOAgent;
 
 /**
@@ -119,8 +118,7 @@ public class RmiRegistryAgent implements UMOAgent
         // nothing to do
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         // nothing to do
     }
 

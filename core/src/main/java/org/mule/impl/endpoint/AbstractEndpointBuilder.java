@@ -11,7 +11,7 @@
 package org.mule.impl.endpoint;
 
 import org.mule.MuleManager;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
@@ -35,7 +35,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String responseTransformers;
     protected String userInfo;
 
-    protected int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+    protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
 
     public UMOEndpointURI build(URI uri) throws MalformedEndpointException
     {
@@ -62,7 +62,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         connectorName = null;
         transformers = null;
         responseTransformers = null;
-        createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+        createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
         return ep;
     }
 
@@ -96,31 +96,31 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             if ("0".equals(create))
             {
-                this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
             }
             else if ("1".equals(create))
             {
-                this.createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.ALWAYS_CREATE_CONNECTOR;
             }
             else if ("2".equals(create))
             {
-                this.createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.NEVER_CREATE_CONNECTOR;
             }
             else if ("IF_NEEDED".equals(create))
             {
-                this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
             }
             else if ("ALWAYS".equals(create))
             {
-                this.createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.ALWAYS_CREATE_CONNECTOR;
             }
             else if ("NEVER".equals(create))
             {
-                this.createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
+                this.createConnector = TransportFactory.NEVER_CREATE_CONNECTOR;
             }
             else if (connectorName == null)
             {
-                this.createConnector = ConnectorFactory.USE_CONNECTOR;
+                this.createConnector = TransportFactory.USE_CONNECTOR;
                 connectorName = create;
             }
 

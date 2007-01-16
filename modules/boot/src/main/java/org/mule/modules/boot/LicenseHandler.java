@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.channels.FileChannel;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -146,6 +147,7 @@ public class LicenseHandler
         catch (Exception e)
         {
             System.out.println(e);
+            e.printStackTrace();
         }
 
         return true;
@@ -212,11 +214,40 @@ public class LicenseHandler
         // Now we have a directory to create the jar to, so let's rename
         // the temporary one
         File newJarFile = new File(muleLib, ackJarName);
+
         if (newJarFile.exists())
             throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath()
                             + " a file with this name already exists!");
 
         if (!tempJar.renameTo(newJarFile))
+        {
+            // Make sure the file is still there - sometimes renaming
+            // claims to have faild when it actually works
+
+            if (!tempJar.exists()) return;
+
+            FileChannel srcChannel = null;
+            FileChannel destChannel = null;
+
+            try
+            {
+                srcChannel = new FileInputStream(tempJar.getAbsolutePath()).getChannel();
+                destChannel = new FileOutputStream(newJarFile).getChannel();
+                destChannel.transferFrom(srcChannel, 0, srcChannel.size());
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath(), e);
+            }
+            finally
+            {
+                try { if (srcChannel != null) srcChannel.close(); } catch (Exception e1) { }
+                try { if (destChannel != null) destChannel.close(); } catch (Exception e2) { }
+                try { tempJar.delete(); } catch (Exception e3) { }
+            }
+        }
+
+        if (!newJarFile.exists())
             throw new Exception("Unable to rename temporary jar to " + newJarFile.getAbsolutePath());
     }
 
@@ -283,7 +314,8 @@ public class LicenseHandler
     {
         File tempJar = File.createTempFile(ackJarName, null);
         File licenseFile = new File(muleHome, licenseFileName);
-        JarOutputStream newJar = null;
+        JarOutputStream newJar;
+        FileOutputStream fos;
 
         String ackData = "LicenseType=" + licenseType + "\n";
         ackData += "LicenseVersion=" + licenseVersion + "\n";
@@ -291,7 +323,8 @@ public class LicenseHandler
 
         try
         {
-            newJar = new JarOutputStream(new FileOutputStream(tempJar));
+            fos = new FileOutputStream(tempJar);
+            newJar = new JarOutputStream(fos);
         }
         catch (IOException ioe)
         {
@@ -318,6 +351,9 @@ public class LicenseHandler
                 newJar.write(buffer, 0, bytesRead);
             }
 
+            // wait till the physical file is written and released by the OS
+            newJar.flush();
+            fos.getFD().sync();
         }
         catch (IOException ioe)
         {

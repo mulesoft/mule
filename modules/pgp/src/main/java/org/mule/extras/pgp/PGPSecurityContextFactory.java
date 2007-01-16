@@ -14,9 +14,6 @@ import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityContextFactory;
 
-/**
- * @author ariva
- */
 public class PGPSecurityContextFactory implements UMOSecurityContextFactory
 {
 

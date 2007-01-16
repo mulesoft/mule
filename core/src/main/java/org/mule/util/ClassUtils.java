@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is useful for loading resources and classes in a fault tolerant manner
@@ -34,6 +36,20 @@ import java.util.List;
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
     public static final Object[] NO_ARGS = new Object[]{};
+
+    private static final Map wrapperToPrimitiveMap = new HashMap();
+    static
+    {
+        wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
+        wrapperToPrimitiveMap.put(Byte.class, Byte.TYPE);
+        wrapperToPrimitiveMap.put(Character.class, Character.TYPE);
+        wrapperToPrimitiveMap.put(Short.class, Short.TYPE);
+        wrapperToPrimitiveMap.put(Integer.class, Integer.TYPE);
+        wrapperToPrimitiveMap.put(Long.class, Long.TYPE);
+        wrapperToPrimitiveMap.put(Double.class, Double.TYPE);
+        wrapperToPrimitiveMap.put(Float.class, Float.TYPE);
+        wrapperToPrimitiveMap.put(Void.TYPE, Void.TYPE);
+    }
 
     public static boolean isConcrete(Class clazz)
     {
@@ -292,7 +308,16 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             args = new Class[0];
         }
+
+        // try the arguments as given
         Constructor ctor = getConstructor(clazz, args);
+
+        if (ctor == null)
+        {
+            // try again but adapt value classes to primitives
+            ctor = getConstructor(clazz, wrappersToPrimitives(args));
+        }
+
         if (ctor == null)
         {
             StringBuffer argsString = new StringBuffer(100);
@@ -301,7 +326,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 argsString.append(args[i].getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor with matching arg params: "
-                                            + argsString);
+                            + argsString);
         }
 
         return ctor.newInstance(constructorArgs);
@@ -435,7 +460,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 if (!ignore.contains(method.getName()))
                 {
                     if ((method.getReturnType().getName().equals("void") && voidOk)
-                        || !method.getReturnType().getName().equals("void"))
+                                    || !method.getReturnType().getName().equals("void"))
                     {
                         result.add(method);
                     }
@@ -521,4 +546,32 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         return true;
     }
+
+    public static Class wrapperToPrimitive(Class wrapper)
+    {
+        return (Class)MapUtils.getObject(wrapperToPrimitiveMap, wrapper, wrapper);
+    }
+
+    public static Class[] wrappersToPrimitives(Class[] wrappers)
+    {
+        if (wrappers == null)
+        {
+            return null;
+        }
+
+        if (wrappers.length == 0)
+        {
+            return wrappers;
+        }
+
+        Class[] primitives = new Class[wrappers.length];
+
+        for (int i = 0; i < wrappers.length; i++)
+        {
+            primitives[i] = (Class)MapUtils.getObject(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
+        }
+
+        return primitives;
+    }
+
 }

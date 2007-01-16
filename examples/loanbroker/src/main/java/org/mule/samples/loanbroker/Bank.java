@@ -33,7 +33,7 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(Bank.class);
+    protected static final Log logger = LogFactory.getLog(Bank.class);
 
     private String bankName;
     private String endpoint = "";

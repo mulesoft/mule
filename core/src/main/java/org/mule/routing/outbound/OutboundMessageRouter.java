@@ -26,26 +26,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>OutboundMessageRouter</code> is a container of routers. An
  * OutboundMessageRouter must have atleast one router. By default the first matching
  * router is used to route an event though it is possible to match on all routers
  * meaning that the message will get sent over all matching routers.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
- * @version $Revision$
  */
 
 public class OutboundMessageRouter extends AbstractRouterCollection implements UMOOutboundMessageRouter
 {
-
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(OutboundMessageRouter.class);
 
     public OutboundMessageRouter()
     {

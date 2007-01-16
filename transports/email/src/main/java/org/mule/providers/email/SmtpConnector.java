@@ -70,10 +70,11 @@ public class SmtpConnector extends AbstractMailConnector
 
     private String contentType = DEFAULT_CONTENT_TYPE;
 
-    public SmtpConnector() throws InitialisationException
-    {
-        initFromServiceDescriptor();
-    }
+    //todo RM*: This doesn't look right. The init should be done in the super class in initialise
+//    public SmtpConnector() throws InitialisationException
+//    {
+//        initFromServiceDescriptor();
+//    }
 
     /*
      * (non-Javadoc)
@@ -86,29 +87,35 @@ public class SmtpConnector extends AbstractMailConnector
         throw new UnsupportedOperationException("Listeners cannot be registered on a SMTP endpoint");
     }
 
+
+    protected void doInitialise() throws InitialisationException
+    {
+        //template method, nothing to do
+    }
+
     protected void doDispose()
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doConnect() throws Exception
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doDisconnect() throws Exception
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doStart() throws UMOException
     {
-        // template method
+        // template method, nothing to do
     }
 
     protected void doStop() throws UMOException
     {
-        // template method
+        // template method, nothing to do
     }
 
     public String getProtocol()

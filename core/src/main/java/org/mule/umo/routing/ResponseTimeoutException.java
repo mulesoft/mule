@@ -19,8 +19,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
  * in a given timeout in the Response Router.
  * 
  * @see org.mule.umo.routing.UMOResponseRouter
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ResponseTimeoutException extends RoutingException
 {

@@ -16,9 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 
-/**
- * @author ariva
- */
 public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
     private KeyBasedEncryptionStrategy kbStrategy;

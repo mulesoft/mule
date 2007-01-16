@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -24,80 +26,53 @@ import java.util.List;
  */
 public class DefaultMuleClassPathConfig
 {
-    protected static final String FOLDER_MULE = "/lib/mule";
-    protected static final String FOLDER_OPT = "/lib/opt";
-    protected static final String FOLDER_USER = "/lib/user";
+    protected static final String MULE_DIR = "/lib/mule";
+    protected static final String USER_DIR = "/lib/user";
+    protected static final String OPT_DIR = "/lib/opt";
 
-    private List urls = new LinkedList();
+    private List urls = new ArrayList();
 
     /**
      * Constructs a new DefaultMuleClassPathConfig.
+     * @param muleHome Mule home directory
+     * @param muleBase Mule base directory
      */
     public DefaultMuleClassPathConfig(File muleHome, File muleBase)
     {
+        /**
+         * Pick up any local jars, if there are any. Doing this here insures that any
+         * local class that override the global classes will in fact do so.
+         */
         try
         {
-            // if trailing slash is specified, the folder will be added (e.g. for
-            // properties files)
-            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_USER + "/"));
-            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_MULE + "/"));
-            addURL(new URL("file://" + muleHome.getAbsolutePath() + FOLDER_OPT + "/"));
-
-            /**
-             * Pick up any local jars, if there are any. Doing this here insures that
-             * any local class that override the global classes will in fact do so.
-             */
-            try
+            if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile()))
             {
-                if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile()))
-                {
-                    addURL(new URL("file://" + muleBase.getAbsolutePath() + FOLDER_USER + "/"));
-                    File[] muleJars = listJars(muleBase, FOLDER_USER);
-                    for (int i = 0; i < muleJars.length; i++)
-                    {
-                        File jar = muleJars[i];
-                        addURL(jar.toURL());
-                    }
-                }
+                File userOverrideDir = new File(muleBase, USER_DIR);
+                this.addFile(userOverrideDir);
+                this.addFiles(this.listJars(userOverrideDir));
             }
-            catch (IOException ioe)
-            {
-                System.out.println("Unable to check to see if there are local jars to load: "
-                                + ioe.toString());
-            }
-
-            File[] muleJars = listJars(muleHome, FOLDER_USER);
-            for (int i = 0; i < muleJars.length; i++)
-            {
-                File jar = muleJars[i];
-                addURL(jar.toURL());
-            }
-
-            muleJars = listJars(muleHome, FOLDER_MULE);
-            for (int i = 0; i < muleJars.length; i++)
-            {
-                File jar = muleJars[i];
-                addURL(jar.toURL());
-            }
-
-            muleJars = listJars(muleHome, FOLDER_OPT);
-            for (int i = 0; i < muleJars.length; i++)
-            {
-                File jar = muleJars[i];
-                addURL(jar.toURL());
-            }
-
         }
-        catch (MalformedURLException e)
+        catch (IOException ioe)
         {
-            throw new RuntimeException("Failed to construct a classpath URL", e);
+            System.out.println("Unable to check to see if there are local jars to load: " + ioe.toString());
         }
 
+        File userDir = new File(muleHome, USER_DIR);
+        this.addFile(userDir);
+        this.addFiles(this.listJars(userDir));
+
+        File muleDir = new File(muleHome, MULE_DIR);
+        this.addFile(muleDir);
+        this.addFiles(this.listJars(muleDir));
+
+        File optDir = new File(muleHome, OPT_DIR);
+        this.addFile(optDir);
+        this.addFiles(this.listJars(optDir));
     }
 
     /**
      * Getter for property 'urls'.
-     * 
+     *
      * @return A copy of 'urls'. Items are java.net.URL
      */
     public List getURLs()
@@ -107,7 +82,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Setter for property 'urls'.
-     * 
+     *
      * @param urls Value to set for property 'urls'.
      */
     public void addURLs(List urls)
@@ -120,7 +95,7 @@ public class DefaultMuleClassPathConfig
 
     /**
      * Add a URL to Mule's classpath.
-     * 
+     *
      * @param url folder (should end with a slash) or jar path
      */
     public void addURL(URL url)
@@ -128,16 +103,33 @@ public class DefaultMuleClassPathConfig
         this.urls.add(url);
     }
 
+    public void addFiles(List files)
+    {
+        for (Iterator i = files.iterator(); i.hasNext();)
+        {
+            this.addFile((File)i.next());
+        }
+    }
+
+    public void addFile(File jar)
+    {
+        try
+        {
+            this.addURL(jar.getAbsoluteFile().toURI().toURL());
+        }
+        catch (MalformedURLException mux)
+        {
+            throw new RuntimeException("Failed to construct a classpath URL", mux);
+        }
+    }
+
     /**
      * Find and if necessary filter the jars for classpath.
-     * 
-     * @param muleSubfolder folder under the Mule directory to list
-     * @return a list
+     *
+     * @return a list of {@link File}s
      */
-    protected File[] listJars(File muleDir, String muleSubfolder)
+    protected List listJars(File path)
     {
-        File path = new File(muleDir, muleSubfolder);
-
         File[] jars = path.listFiles(new FileFilter()
         {
             public boolean accept(File pathname)
@@ -153,6 +145,7 @@ public class DefaultMuleClassPathConfig
             }
         });
 
-        return jars == null ? new File[0] : jars;
+        return jars == null ? Collections.EMPTY_LIST : Arrays.asList(jars);
     }
+
 }

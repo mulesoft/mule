@@ -11,12 +11,13 @@
 package org.mule.tck.testmodels.fruit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FruitLover
 {
-    private List eatList = new ArrayList();
-    private String catchphrase;
+    private final List eatList = Collections.synchronizedList(new ArrayList());
+    private final String catchphrase;
 
     public FruitLover(String catchphrase)
     {

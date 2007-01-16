@@ -16,10 +16,9 @@ import java.util.List;
 
 /**
  * <code>UMORouterCollection</code> defines the interface for a MessageRouter that
- * manages more than one router.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * manages more than one router. A {@link UMORouterCatchAllStrategy} can be set on
+ * this router to route unwanted or unfiltered events. If a catch strategy is not
+ * set, the router just returns null.
  */
 
 public interface UMORouterCollection

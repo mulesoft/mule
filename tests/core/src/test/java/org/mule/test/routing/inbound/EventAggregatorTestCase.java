@@ -74,7 +74,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
             this.eventThreshold = eventThreshold;
         }
 
-        protected boolean shouldAggregate(EventGroup events)
+        protected boolean shouldAggregateEvents(EventGroup events)
         {
             eventCount++;
             if (eventCount == eventThreshold)

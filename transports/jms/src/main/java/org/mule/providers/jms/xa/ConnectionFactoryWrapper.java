@@ -50,10 +50,13 @@ import org.apache.commons.logging.LogFactory;
 public class ConnectionFactoryWrapper
     implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
 {
+    /**
+     * logger used by this class
+     */
+    protected static final Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
 
-    protected Object factory;
-    protected TransactionManager tm;
-    protected static Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
+    protected final Object factory;
+    protected final TransactionManager tm;
 
     public ConnectionFactoryWrapper(Object factory, TransactionManager tm)
     {
@@ -267,8 +270,8 @@ public class ConnectionFactoryWrapper
                         {
                             logger.debug("Enlisting resource in xa transaction: " + xares);
                         }
-                        XAResource xares = (XAResource)Proxy.newProxyInstance(
-                            XAResource.class.getClassLoader(), new Class[]{XAResource.class},
+                        XAResource xares = (XAResource)Proxy.newProxyInstance(XAResource.class
+                            .getClassLoader(), new Class[]{XAResource.class},
                             new XAResourceInvocationHandler());
                         tx.enlistResource(xares);
                     }

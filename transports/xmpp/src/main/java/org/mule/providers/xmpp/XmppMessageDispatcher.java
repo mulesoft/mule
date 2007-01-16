@@ -10,12 +10,6 @@
 
 package org.mule.providers.xmpp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.GroupChat;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -24,6 +18,11 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.GroupChat;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Message;
+
 /**
  * <code>XmppMessageDispatcher</code> allows Mule events to be sent and received
  * over Xmpp
@@ -31,18 +30,10 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class XmppMessageDispatcher extends AbstractMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(XmppMessageDispatcher.class);
-
-    private XmppConnector connector;
-
-    private XMPPConnection xmppConnection = null;
-
-    private Chat chat;
-
-    private GroupChat groupChat;
+    private final XmppConnector connector;
+    private volatile XMPPConnection xmppConnection = null;
+    private volatile Chat chat;
+    private volatile GroupChat groupChat;
 
     public XmppMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -91,9 +82,11 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         sendMessage(event);
+
         if (useRemoteSync(event))
         {
-            Message response = null;
+            Message response;
+
             if (groupChat != null)
             {
                 response = groupChat.nextMessage(event.getTimeout());
@@ -105,7 +98,10 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
             if (response != null)
             {
-                logger.debug("Got a response from chat: " + chat);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Got a response from chat: " + chat);
+                }
                 return new MuleMessage(connector.getMessageAdapter(response));
             }
         }
@@ -134,6 +130,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
                 chat = new Chat(xmppConnection, recipient);
             }
         }
+
         Object msgObj = event.getMessage().getPayload();
         Message message;
         // avoid duplicate transformation
@@ -159,9 +156,10 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         {
             groupChat.sendMessage(message);
         }
+
         if (logger.isDebugEnabled())
         {
-            logger.debug("packet successfully sent");
+            logger.debug("Packet successfully sent");
         }
     }
 

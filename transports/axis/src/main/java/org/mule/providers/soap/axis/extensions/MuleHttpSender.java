@@ -57,9 +57,7 @@ import org.apache.commons.logging.Log;
  * the Axis implementation is not extensible so this class is a copy of it with
  * modifications. The enhancements made are to allow for asynchronous Http method
  * calls which Mule initiates when the endpoint is asynchronous.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ *
  * @deprecated Use the UniversalSender instead
  */
 public class MuleHttpSender extends BasicHandler
@@ -69,7 +67,7 @@ public class MuleHttpSender extends BasicHandler
      */
     private static final long serialVersionUID = -1730816323289419500L;
 
-    protected static Log log = LogFactory.getLog(HTTPSender.class.getName());
+    protected static final Log log = LogFactory.getLog(HTTPSender.class.getName());
 
     private static final String ACCEPT_HEADERS = HTTPConstants.HEADER_ACCEPT
                                                  // limit to the types that are

@@ -28,5 +28,5 @@ public interface Initialisable
      *             instance to shutdown
      * @throws RecoverableException if an error occurs that can be recovered from
      */
-    void initialise() throws InitialisationException, RecoverableException;
+    void initialise() throws InitialisationException;
 }

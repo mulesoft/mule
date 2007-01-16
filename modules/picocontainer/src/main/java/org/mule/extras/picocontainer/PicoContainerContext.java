@@ -18,7 +18,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
@@ -169,8 +168,7 @@ public class PicoContainerContext extends AbstractContainerContext
         return ScriptedContainerBuilderFactory.getBuilderClassName(extension);
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         if (configFile == null)
         {
             return;

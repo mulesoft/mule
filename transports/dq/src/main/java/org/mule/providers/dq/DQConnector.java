@@ -12,7 +12,7 @@ package org.mule.providers.dq;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -31,7 +31,7 @@ import java.util.Map;
  * connection. The Message Queue location is the provider endpoint.
  */
 
-public class DQConnector extends AbstractServiceEnabledConnector
+public class DQConnector extends AbstractConnector
 {
     public static final String LIB_PROPERTY = "lib";
     public static final String RECORD_DESCRIPTOR_PROPERTY = "recordDescriptor";
@@ -177,7 +177,6 @@ public class DQConnector extends AbstractServiceEnabledConnector
      */
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
         as400System = new AS400(hostname, username, password);
         if (recordFormat != null)
         {

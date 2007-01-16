@@ -15,16 +15,16 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 
-import net.sf.hibernate.SessionFactory;
-
+import org.hibernate.SessionFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate.HibernateTransactionManager;
-import org.springframework.orm.hibernate.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
 
-    protected void dotearDown() throws Exception
+    // @Override
+    protected void doTearDown() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)

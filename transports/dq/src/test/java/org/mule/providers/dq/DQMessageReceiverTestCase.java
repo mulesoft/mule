@@ -22,10 +22,6 @@ import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.DataQueue;
 import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     public UMOMessageReceiver getMessageReceiver() throws Exception
@@ -33,9 +29,8 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         getManager(true);
         Mock mockComponent = new Mock(UMOComponent.class);
         AS400 system = ((DQConnector)endpoint.getConnector()).getSystem();
-        return new DQMessageReceiver((AbstractConnector)endpoint.getConnector(),
-            (UMOComponent)mockComponent.proxy(), endpoint, new Long(1000), new DataQueue(system,
-                "/QSYS.LIB/L701QUEUE.DTAQ"), system);
+        return new DQMessageReceiver((AbstractConnector)endpoint.getConnector(), (UMOComponent)mockComponent
+            .proxy(), endpoint, 1000, new DataQueue(system, "/QSYS.LIB/L701QUEUE.DTAQ"), system);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

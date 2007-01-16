@@ -12,8 +12,8 @@ package org.mule.providers.soap.axis;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorServiceDescriptor;
+import org.mule.providers.service.TransportFactory;
+import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
@@ -72,7 +72,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
-        ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor("soap");
+        TransportServiceDescriptor csd = TransportFactory.getServiceDescriptor("soap");
         assertEquals("axis", csd.getProtocol());
         assertEquals("org.mule.providers.soap.axis.AxisConnector", csd.getConnector());
 

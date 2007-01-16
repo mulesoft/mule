@@ -17,9 +17,6 @@ import org.mule.umo.routing.RoutingException;
  * <code>InboundPassThroughRouter</code> allows intbound routing over all
  * registered endpoints without any filtering. This class is used by Mule when a
  * specific inbound router has not been configured on a UMODescriptor.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class InboundPassThroughRouter extends SelectiveConsumer

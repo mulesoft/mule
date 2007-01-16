@@ -14,9 +14,6 @@ import org.mule.util.ObjectFactory;
 
 /**
  * <code>BananaFactory</code> is a test factory that creates Bananas
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class BananaFactory implements ObjectFactory
 {

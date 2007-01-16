@@ -25,18 +25,18 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can
  * invoke a callback method once the object time has expired. If the object does
- * expire it is removed from this monitor
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * expire it is removed from this monitor.
  */
+
+// TODO we should probably rewrite this with ScheduledExecutor for stability IF we
+// need it; right now this class is unused
 
 public class ExpiryMonitor extends TimerTask implements Disposable
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(ExpiryMonitor.class);
+    protected static final Log logger = LogFactory.getLog(ExpiryMonitor.class);
 
     private Timer timer;
     private Map monitors;

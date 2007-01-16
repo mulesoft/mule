@@ -81,9 +81,13 @@
                     <groupId>activemq</groupId>
                     <artifactId>activemq</artifactId>
                     <version>3.2.4</version>
-                    <!-- These transitive dependencies are not found on ibiblio and cause
-                    the build to fail. -->
+                    <!-- These transitive dependencies are either just plain wrong or
+                        not found on ibiblio, causing the build to fail -->
                     <exclusions>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>activemq-core</artifactId>
+                        </exclusion>
                         <exclusion>
                             <groupId>activemq</groupId>
                             <artifactId>activemq-core-test</artifactId>
@@ -152,7 +156,13 @@
                     <groupId>activemq</groupId>
                     <artifactId>activemq</artifactId>
                     <version>3.2.4</version>
+                    <!-- These transitive dependencies are either just plain wrong or
+                        not found on ibiblio, causing the build to fail -->
                     <exclusions>
+                        <exclusion>
+                            <groupId>activemq</groupId>
+                            <artifactId>activemq-core</artifactId>
+                        </exclusion>
                         <exclusion>
                             <groupId>activemq</groupId>
                             <artifactId>activemq-core-test</artifactId>
@@ -382,22 +392,47 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <!-- mule-module-spring does not pull in spring-hibernate2, therefore we
-            have to include it for the tests. spring-2.0-all supports hibernate3 OOTB,
-            so we should probably upgrade to that. -->
+        
+        <!-- need to re-add hsqldb -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-hibernate2</artifactId>
-            <version>2.0</version>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.7.3.0</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- The spring-hibernate2 dependency pulls in hibernate-2.1.8 -->
-        
+        <!-- mule-module-spring does not pull in Hibernate, therefore we
+            have to include it for the tests. The list of exclusions is
+            the same as in tranport-bpm -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.0.1</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.1.3</version>
+            <exclusions>
+                <!-- We need commons-collections 3.2 -->
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <!-- We've already got the geronimo-jta spec -->
+                <exclusion>
+                    <groupId>javax.transaction</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+                <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-attrs</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>

@@ -18,9 +18,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event
  * cannot be found. This can be caused if there is no (or no matching) endpoint for
  * the event to route through.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class RoutePathNotFoundException extends RoutingException
 {

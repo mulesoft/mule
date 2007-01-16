@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractResponseRouter implements UMOResponseRouter
 {
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     private RouterStatistics routerStatistics;
 

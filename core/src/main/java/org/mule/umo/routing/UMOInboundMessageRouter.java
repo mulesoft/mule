@@ -18,10 +18,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.List;
 
 /**
- * <code>InboundRouterCollection</code> manages a collection of inbound routers
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>InboundRouterCollection</code> manages a collection of inbound routers.
  */
 
 public interface UMOInboundMessageRouter extends UMORouterCollection

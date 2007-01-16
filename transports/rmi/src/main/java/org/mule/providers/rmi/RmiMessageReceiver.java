@@ -10,21 +10,22 @@
 
 package org.mule.providers.rmi;
 
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractPollingMessageReceiver;
+import org.mule.providers.ConnectException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.util.ClassUtils;
+
 import java.lang.reflect.Method;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
 import java.util.List;
 
 import org.apache.commons.collections.MapUtils;
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.ConnectException;
-import org.mule.providers.AbstractPollingMessageReceiver;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ClassUtils;
 
 /**
  * Will repeatedly call a method on a Remote object. If the method takes parameters A
@@ -46,7 +47,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     public RmiMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              Long frequency) throws InitialisationException
+                              long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
 

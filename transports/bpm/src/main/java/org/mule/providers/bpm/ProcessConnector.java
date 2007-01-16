@@ -13,7 +13,7 @@ package org.mule.providers.bpm;
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -26,7 +26,7 @@ import java.util.Map;
  * external or embedded Business Process Management System (BPMS). It also allows
  * executing processes to generate Mule events.
  */
-public class ProcessConnector extends AbstractServiceEnabledConnector implements MessageService
+public class ProcessConnector extends AbstractConnector implements MessageService
 {
 
     /** The underlying BPMS */
@@ -76,7 +76,6 @@ public class ProcessConnector extends AbstractServiceEnabledConnector implements
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
         if (bpms == null)
         {
             throw new InitialisationException(

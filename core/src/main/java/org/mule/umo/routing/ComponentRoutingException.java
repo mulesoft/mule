@@ -19,10 +19,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 /**
  * <code>ComponentRoutingException</code> is thrown due to a routing exception
  * between the endpoint the event was received on and the component receiving the
- * event
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * event.
  */
 public class ComponentRoutingException extends RoutingException
 {

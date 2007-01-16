@@ -29,12 +29,12 @@ import org.mule.umo.security.CryptoFailureException;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
-/**
- * @author ariva
- */
 public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
 {
-    protected static Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
+    /**
+     * logger used by this class
+     */
+    protected static final Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
 
     private PGPKeyRing keyManager;
 

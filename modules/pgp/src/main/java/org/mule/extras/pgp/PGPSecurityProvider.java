@@ -25,9 +25,6 @@ import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
-/**
- * @author ariva
- */
 public class PGPSecurityProvider implements UMOSecurityProvider
 {
     private String name = "PGPSecurityProvider";

@@ -20,8 +20,6 @@ import org.mule.umo.routing.RoutingException;
  * be received for a single invocation the ResponseCorrelationaggregator should be
  * used.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SingleResponseRouter extends AbstractResponseAggregator
 {
@@ -36,13 +34,14 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      * @param events
      * @return true if the event group size is 1 or greater
      */
-    protected boolean shouldAggregate(EventGroup events)
+    protected boolean shouldAggregateEvents(EventGroup events)
     {
         int size = events.expectedSize();
         if (size > 1)
         {
             logger.warn("Correlation Group Size is not 1. The SingleResponse Aggregator will only handle single replyTo events for a response router.  If there will be multiple events for a single request use the 'ResponseCorrelationAggregator'");
         }
+        // TODO HH: this seems wrong, should use size()?
         return true;
     }
 

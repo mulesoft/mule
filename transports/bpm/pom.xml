@@ -51,6 +51,11 @@
             <artifactId>hibernate</artifactId>
             <version>3.1.3</version>
             <exclusions>
+                <!-- We need commons-collections 3.2 -->
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
                 <!-- We've already got the geronimo-jta spec -->
                 <exclusion>
                     <groupId>javax.transaction</groupId>

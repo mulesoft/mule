@@ -39,15 +39,13 @@ import org.mule.util.StringUtils;
  *             verify whether your configuration will work with
  *             org.mule.config.builders.MuleXmlConfigurationBuilder as this class is
  *             deprecated and is soon to be removed.
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuilder
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleClasspathConfigurationBuilder.class);
+    protected static final Log logger = LogFactory.getLog(MuleClasspathConfigurationBuilder.class);
 
     public static final String MULE_CONFIGURATION_RESOURCE = "mule-config.xml";
 

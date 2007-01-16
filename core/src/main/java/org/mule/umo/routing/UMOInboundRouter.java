@@ -20,8 +20,6 @@ import org.mule.umo.UMOEvent;
  * UMOInboundMessageRouter implementation.
  * 
  * @see UMOInboundMessageRouter
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOInboundRouter extends UMORouter

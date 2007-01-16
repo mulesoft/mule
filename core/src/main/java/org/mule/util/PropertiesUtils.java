@@ -68,17 +68,31 @@ public class PropertiesUtils
      * 
      * @param property a key/value pair
      * @return String of the property value or a "masked" String that hides the
-     *         contents.
+     *         contents, or <code>null</code> if the property, its key or its value
+     *         is <code>null</code>.
      */
     public static String maskedPropertyValue(Map.Entry property)
     {
-        if (maskedProperties.contains(property.getKey()))
+        if (property == null)
+        {
+            return null;
+        }
+
+        Object key = property.getKey();
+        Object value = property.getValue();
+
+        if (key == null || value == null)
+        {
+            return null;
+        }
+
+        if (maskedProperties.contains(key))
         {
             return ("*****");
         }
         else
         {
-            return property.getValue().toString();
+            return value.toString();
         }
     }
 
@@ -137,31 +151,6 @@ public class PropertiesUtils
 
         }
         return props;
-    }
-
-    /**
-     * Will create a map of properties where the names have a prefix
-     * 
-     * @param props the source set of properties
-     * @param prefix the prefix to filter on
-     * @return and new Map containing the filtered list of properties or an empty map
-     *         if no properties matched the prefix
-     * @deprecated use void getPropertiesWithPrefix(Map props, String prefix, Map
-     *             newProps)
-     */
-    public static Map getPropertiesWithPrefix(Map props, String prefix)
-    {
-        Map newProps = new HashMap();
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry)iterator.next();
-            Object key = entry.getKey();
-            if (key.toString().startsWith(prefix))
-            {
-                newProps.put(key, entry.getValue());
-            }
-        }
-        return newProps;
     }
 
     /**

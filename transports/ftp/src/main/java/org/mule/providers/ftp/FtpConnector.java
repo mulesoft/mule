@@ -12,7 +12,7 @@ package org.mule.providers.ftp;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.SimpleFilenameParser;
 import org.mule.umo.UMOComponent;
@@ -20,6 +20,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -35,7 +36,7 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
-public class FtpConnector extends AbstractServiceEnabledConnector
+public class FtpConnector extends AbstractConnector
 {
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILENAME = "filename";
@@ -228,6 +229,12 @@ public class FtpConnector extends AbstractServiceEnabledConnector
             FTPClient client = (FTPClient)obj;
             client.setReaderThread(false);
         }
+    }
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
     }
 
     protected void doDispose()

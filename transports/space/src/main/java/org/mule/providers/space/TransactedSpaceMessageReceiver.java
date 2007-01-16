@@ -39,7 +39,8 @@ public class TransactedSpaceMessageReceiver extends TransactedPollingMessageRece
                                           UMOComponent component,
                                           final UMOEndpoint endpoint) throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(0));
+        // TODO HH: check how frequency=0 works with the scheduler, see setFrequency(long)
+        super(connector, component, endpoint, 0);
         this.connector = (SpaceConnector)connector;
         this.frequency = MapUtils.getLongValue(endpoint.getProperties(), "frequency", 100000L);
     }

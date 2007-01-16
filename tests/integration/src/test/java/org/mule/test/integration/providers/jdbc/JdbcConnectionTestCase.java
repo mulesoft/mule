@@ -29,8 +29,6 @@ import org.hsqldb.jdbc.jdbcDataSource;
 
 /**
  * This test must be run manually. See the comments inline in testReconnection
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
 {

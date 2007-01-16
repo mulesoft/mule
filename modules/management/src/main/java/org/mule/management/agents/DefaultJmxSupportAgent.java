@@ -16,7 +16,6 @@ import java.util.Map;
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.UMOAgent;
 
 /**
@@ -104,8 +103,7 @@ public class DefaultJmxSupportAgent implements UMOAgent
      * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
      *             can be recovered from
      */
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
 
         try
         {

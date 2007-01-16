@@ -10,15 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.List;
-
-import org.codehaus.xfire.DefaultXFire;
-import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.annotations.AnnotationServiceFactory;
-import org.codehaus.xfire.annotations.WebAnnotations;
-import org.codehaus.xfire.service.Service;
-import org.codehaus.xfire.service.ServiceFactory;
-import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
@@ -26,7 +17,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.MethodFixInterceptor;
@@ -40,10 +31,20 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.SystemUtils;
 
+import java.util.List;
+
+import org.codehaus.xfire.DefaultXFire;
+import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.annotations.AnnotationServiceFactory;
+import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.service.Service;
+import org.codehaus.xfire.service.ServiceFactory;
+import org.codehaus.xfire.service.binding.ObjectServiceFactory;
+
 /**
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
  */
-public class XFireConnector extends AbstractServiceEnabledConnector
+public class XFireConnector extends AbstractConnector
     implements ModelNotificationListener
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
@@ -92,7 +93,6 @@ public class XFireConnector extends AbstractServiceEnabledConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
 
         try
         {

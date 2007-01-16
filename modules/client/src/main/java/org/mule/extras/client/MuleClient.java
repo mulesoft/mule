@@ -26,7 +26,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -91,7 +91,7 @@ public class MuleClient implements Disposable
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleClient.class);
+    protected static final Log logger = LogFactory.getLog(MuleClient.class);
 
     /**
      * the local UMOManager instance
@@ -899,7 +899,7 @@ public class MuleClient implements Disposable
         {
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
-            connector = ConnectorFactory.createConnector(defaultEndpointUri);
+            connector = TransportFactory.createConnector(defaultEndpointUri);
             manager.registerConnector(connector);
             connector.startConnector();
             endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector, null,

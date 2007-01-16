@@ -60,11 +60,11 @@ public class MessageChunkingTestCase extends FunctionalTestCase
     {
         final AtomicInteger messagePartsCount = new AtomicInteger(0);
         final Latch chunkingReceiverLatch = new Latch();
-        final TestObject testObject = new TestObject("Test String", true, 99);
+        final SimpleSerializableObject simpleSerializableObject = new SimpleSerializableObject("Test String", true, 99);
 
         // find number of chunks
         final int parts = (int)Math
-            .ceil((SerializationUtils.serialize(testObject).length / (double)2));
+            .ceil((SerializationUtils.serialize(simpleSerializableObject).length / (double)2));
 
         // Listen to events fired by the ChunkingReceiver component
         MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener()
@@ -79,12 +79,12 @@ public class MessageChunkingTestCase extends FunctionalTestCase
                 Object reply = ((FunctionalTestNotification)notification).getEventContext()
                     .getMessage().getPayload();
                 // Check if Object is of Correct Type
-                assertTrue(reply instanceof TestObject);
-                TestObject replyTestObject = (TestObject)reply;
+                assertTrue(reply instanceof SimpleSerializableObject);
+                SimpleSerializableObject replySimpleSerializableObject = (SimpleSerializableObject)reply;
                 // Check that Contents are Identical
-                assertEquals(testObject.b, replyTestObject.b);
-                assertEquals(testObject.i, replyTestObject.i);
-                assertEquals(testObject.s, replyTestObject.s);
+                assertEquals(simpleSerializableObject.b, replySimpleSerializableObject.b);
+                assertEquals(simpleSerializableObject.i, replySimpleSerializableObject.i);
+                assertEquals(simpleSerializableObject.s, replySimpleSerializableObject.s);
                 chunkingReceiverLatch.countDown();
             }
         }, "ChunkingReceiver");
@@ -105,7 +105,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         }, "ChunkingReceiver");
 
         MuleClient client = new MuleClient();
-        client.dispatch("vm://inbound.channel", testObject, null);
+        client.dispatch("vm://inbound.channel", simpleSerializableObject, null);
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
         // Ensure we processed expected number of message parts

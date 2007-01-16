@@ -30,7 +30,7 @@ public class Orange implements Fruit, Callable
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(Orange.class);
+    private static final Log logger = LogFactory.getLog(Orange.class);
 
     private boolean bitten = false;
     private Integer segments = new Integer(10);

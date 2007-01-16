@@ -10,6 +10,10 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.config.MuleProperties;
+import org.mule.providers.soap.MuleSoapHeaders;
+import org.mule.umo.UMOEvent;
+
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;
 
@@ -18,16 +22,10 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.config.MuleProperties;
-import org.mule.providers.soap.MuleSoapHeaders;
-import org.mule.umo.UMOEvent;
 
 /**
  * <code>MuleSoapHeadersHandler</code> is an Axis handler that can read and write
- * Mule header properties to a Soap message
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Mule header properties to a SOAP message.
  */
 public class MuleSoapHeadersHandler extends BasicHandler
 {
@@ -39,7 +37,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);
+    protected static final Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);
 
     public void invoke(MessageContext msgContext) throws AxisFault
     {
@@ -55,7 +53,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("After Client Request, Message is:\n"
-                                     + msgContext.getRequestMessage().getSOAPPartAsString());
+                                        + msgContext.getRequestMessage().getSOAPPartAsString());
                     }
                 }
                 else
@@ -64,7 +62,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("After Client Response, Message is:\n"
-                                     + msgContext.getRequestMessage().getSOAPPartAsString());
+                                        + msgContext.getRequestMessage().getSOAPPartAsString());
                     }
                 }
             }
@@ -76,7 +74,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("After Server Request, Message is:\n"
-                                     + msgContext.getRequestMessage().getSOAPPartAsString());
+                                        + msgContext.getRequestMessage().getSOAPPartAsString());
                     }
                 }
                 else
@@ -85,7 +83,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("After Server Response, Message is:\n"
-                                     + msgContext.getRequestMessage().getSOAPPartAsString());
+                                        + msgContext.getRequestMessage().getSOAPPartAsString());
                     }
                 }
             }
@@ -146,13 +144,13 @@ public class MuleSoapHeadersHandler extends BasicHandler
         }
         if (headers.getCorrelationGroup() != null)
         {
-            msgContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                headers.getCorrelationGroup());
+            msgContext.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, headers
+                .getCorrelationGroup());
         }
         if (headers.getCorrelationSequence() != null)
         {
-            msgContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                headers.getCorrelationSequence());
+            msgContext.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, headers
+                .getCorrelationSequence());
         }
 
         if (headers.getReplyTo() != null)
@@ -191,7 +189,8 @@ public class MuleSoapHeadersHandler extends BasicHandler
         {
             return;
         }
-        MuleSoapHeaders headers = (MuleSoapHeaders)msgContext.getProperty(MuleSoapHeaders.ENV_REQUEST_HEADERS);
+        MuleSoapHeaders headers = (MuleSoapHeaders)msgContext
+            .getProperty(MuleSoapHeaders.ENV_REQUEST_HEADERS);
 
         if (headers == null)
         {

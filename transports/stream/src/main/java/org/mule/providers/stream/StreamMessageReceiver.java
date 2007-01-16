@@ -37,7 +37,7 @@ public class StreamMessageReceiver extends AbstractPollingMessageReceiver
     public StreamMessageReceiver(UMOConnector connector,
                                  UMOComponent component,
                                  UMOEndpoint endpoint,
-                                 Long checkFrequency) throws InitialisationException
+                                 long checkFrequency) throws InitialisationException
     {
         super(connector, component, endpoint, checkFrequency);
 

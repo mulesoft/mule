@@ -19,11 +19,11 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,9 +53,9 @@ public class TransformerPairWireFormat implements WireFormat
         }
         else
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try
             {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 IOUtils.copy(in, baos);
                 return inboundTransformer.transform(baos.toByteArray());
             }
@@ -70,19 +70,21 @@ public class TransformerPairWireFormat implements WireFormat
     {
         if (outboundTransformer == null)
         {
-            throw new NullPointerException(
-                new Message(Messages.X_IS_NULL, "outboundTransformer").getMessage());
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "outboundTransformer")
+                .getMessage());
         }
         try
         {
             Class returnClass = outboundTransformer.getReturnClass();
             if (returnClass == null)
             {
-                logger.warn("No return class was set on transformer: " + outboundTransformer + ". Attempting to work out" +
-                        "how to treat the result transformation");
+                logger.warn("No return class was set on transformer: " + outboundTransformer
+                                + ". Attempting to work out how to treat the result transformation");
+
                 Object result = outboundTransformer.transform(o);
+
                 byte[] bytes;
-                if(result instanceof byte[])
+                if (result instanceof byte[])
                 {
                     bytes = (byte[])result;
                 }
@@ -98,18 +100,14 @@ public class TransformerPairWireFormat implements WireFormat
                 byte[] b = (byte[])outboundTransformer.transform(o);
                 out.write(b);
             }
+            else if (returnClass.equals(String.class))
+            {
+                String s = (String)outboundTransformer.transform(o);
+                out.write(s.getBytes(MuleManager.getConfiguration().getDefaultEncoding()));
+            }
             else
             {
-                if (returnClass != null && returnClass.equals(String.class))
-                {
-                    String s = (String)outboundTransformer.transform(o);
-                    out.write(s.getBytes(MuleManager.getConfiguration().getDefaultEncoding()));
-                }
-                else
-                {
-                    throw new TransformerException(
-                        new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()));
-                }
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()));
             }
         }
         catch (IOException e)
@@ -137,4 +135,5 @@ public class TransformerPairWireFormat implements WireFormat
     {
         this.outboundTransformer = outboundTransformer;
     }
+
 }

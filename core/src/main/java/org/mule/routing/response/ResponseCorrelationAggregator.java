@@ -29,7 +29,7 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
      * @param events
      * @return true if the event group is ready of aggregation
      */
-    protected boolean shouldAggregate(EventGroup events)
+    protected boolean shouldAggregateEvents(EventGroup events)
     {
         int expected = events.expectedSize();
         int current = events.size();
@@ -57,9 +57,10 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
      * @param event the current event
      * @return a new event group of a fixed size
      */
-    protected EventGroup createEventGroup(Object id, UMOEvent event)
+    // @Override
+    protected EventGroup createEventGroup(UMOEvent event, Object id)
     {
-        int groupSize = event.getMessage().getCorrelationGroupSize();
-        return new EventGroup(id, groupSize);
+        return new EventGroup(id, event.getMessage().getCorrelationGroupSize());
     }
+
 }

@@ -49,6 +49,7 @@ public class TransactionCoordination
             instance = txSync;
         }
 
+        // TODO this lock is different from whatever other places use
         synchronized (instance)
         {
             if (instance.txCounter != 0)

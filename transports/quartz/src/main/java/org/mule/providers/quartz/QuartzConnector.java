@@ -12,7 +12,7 @@ package org.mule.providers.quartz;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
@@ -28,7 +28,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * Creates a connection to a Quartz sheduler. This allows events to be sheduled at
  * specific times, with repeated occurences.
  */
-public class QuartzConnector extends AbstractServiceEnabledConnector
+public class QuartzConnector extends AbstractConnector
 {
 
     public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
@@ -62,7 +62,6 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
         try
         {
             if (scheduler == null)

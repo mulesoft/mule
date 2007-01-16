@@ -10,11 +10,12 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Apple implements Fruit, Callable
 {
@@ -26,7 +27,7 @@ public class Apple implements Fruit, Callable
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(Apple.class);
+    private static final Log logger = LogFactory.getLog(Apple.class);
 
     private boolean bitten = false;
     private boolean washed = false;
@@ -54,7 +55,7 @@ public class Apple implements Fruit, Callable
     public Object onCall(UMOEventContext context) throws UMOException
     {
         logger.debug("Apple received an event in UMOCallable.onEvent! Event says: "
-                     + context.getMessageAsString());
+                        + context.getMessageAsString());
         wash();
         return null;
     }

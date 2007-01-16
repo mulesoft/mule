@@ -10,19 +10,26 @@
 
 package org.mule.providers.udp;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>UdpConnector</code> can send and receive Mule events as Datagram packets.
  */
-public class UdpConnector extends AbstractServiceEnabledConnector
+public class UdpConnector extends AbstractConnector
 {
     public static final int DEFAULT_SOCKET_TIMEOUT = 5000;
     public static final int DEFAULT_BUFFER_SIZE = 64 * 1024;
 
     private int timeout = DEFAULT_SOCKET_TIMEOUT;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
+    }
 
     protected void doDispose()
     {

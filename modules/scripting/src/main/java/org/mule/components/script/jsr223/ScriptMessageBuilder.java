@@ -16,7 +16,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -58,8 +57,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         return result;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         scriptable.initialise();
     }
 

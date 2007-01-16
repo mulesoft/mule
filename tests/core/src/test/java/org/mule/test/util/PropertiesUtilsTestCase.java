@@ -10,13 +10,15 @@
 
 package org.mule.test.util;
 
+import org.mule.util.MapUtils;
+import org.mule.util.PropertiesUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.mule.util.MapUtils;
-import org.mule.util.PropertiesUtils;
+import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 
 public class PropertiesUtilsTestCase extends TestCase
 {
@@ -72,6 +74,24 @@ public class PropertiesUtilsTestCase extends TestCase
         assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
         assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
         assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
+    }
+
+    public void testMaskedProperties()
+    {
+        // test nulls
+        assertNull(PropertiesUtils.maskedPropertyValue(null));
+        assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry(null, "value")));
+        assertNull(PropertiesUtils.maskedPropertyValue(new DefaultMapEntry("key", null)));
+
+        // try non-masked value
+        Map.Entry property = new DefaultMapEntry("secretname", "secret");
+        assertTrue("secret".equals(PropertiesUtils.maskedPropertyValue(property)));
+
+        // now mask value
+        PropertiesUtils.registerMaskedPropertyName("secretname");
+        String masked = PropertiesUtils.maskedPropertyValue(property);
+        assertFalse("secret".equals(masked));
+        assertTrue(masked.startsWith("*"));
     }
 
 }

@@ -46,7 +46,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                                String readStmt,
                                String ackStmt) throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(((JdbcConnector)connector).getPollingFrequency()));
+        super(connector, component, endpoint, ((JdbcConnector)connector).getPollingFrequency());
 
         this.receiveMessagesInTransaction = false;
         this.connector = (JdbcConnector)connector;

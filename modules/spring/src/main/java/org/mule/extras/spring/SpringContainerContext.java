@@ -26,8 +26,6 @@ import org.mule.util.ClassUtils;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -44,11 +42,6 @@ import org.springframework.core.io.InputStreamResource;
 public class SpringContainerContext extends AbstractContainerContext implements BeanFactoryAware
 {
     public static final String SPRING_DOCTYPE_REF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n";
-
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(SpringContainerContext.class);
 
     /**
      * the application contect to use when resolving components

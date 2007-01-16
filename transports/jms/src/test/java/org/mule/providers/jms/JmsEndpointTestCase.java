@@ -11,9 +11,9 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.service.TransportFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
 
 public class JmsEndpointTestCase extends AbstractMuleTestCase
 {
@@ -109,7 +109,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUsername());
         assertEquals("password", url.getPassword());
-        assertEquals(ConnectorFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
+        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
         assertEquals("jms://user:password@?address=/myQueues/myQueue&createConnector=ALWAYS", url.toString());
     }
 
@@ -121,7 +121,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUsername());
         assertEquals("password", url.getPassword());
-        assertEquals(ConnectorFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
+        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
         assertEquals("jms://user:password@myQueues/myQueue?createConnector=ALWAYS", url.toString());
     }
 }

@@ -108,6 +108,10 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 }
                 filename = generateFilename(message, outPattern);
             }
+            else if(endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN) != null){
+                String outPattern = (String)endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
+                filename = generateFilename(message, outPattern);
+            }
 
             if (filename == null)
             {

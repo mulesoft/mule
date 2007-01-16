@@ -13,10 +13,6 @@ package org.mule.providers.dq;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class DQConnectorTestCase extends AbstractConnectorTestCase
 {
 
@@ -43,4 +39,5 @@ public class DQConnectorTestCase extends AbstractConnectorTestCase
     {
         return "dq://L701QUEUE.DTAQ?lib=/QSYS.LIB";
     }
+
 }

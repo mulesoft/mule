@@ -13,7 +13,7 @@ package org.mule.impl.internal.admin;
 import org.mule.MuleManager;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
@@ -141,7 +141,7 @@ public class MuleAdminAgent implements UMOAgent
                 serverUri = MuleManager.getInstance().lookupEndpointIdentifier(serverUri,
                     serverUri);
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
-                UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
+                UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri);
                 // If this connector has already been initialised i.e. it's a
                 // pre-existing connector not not reinit
                 if (manager.lookupConnector(connector.getName()) == null)

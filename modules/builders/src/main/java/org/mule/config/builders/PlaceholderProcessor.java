@@ -36,27 +36,26 @@ import java.util.Properties;
  * ${property.name} and are used to swap in property values registered with the Mule
  * container instance when the configuration is loaded. This is a helper class used
  * for parsing these tags.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class PlaceholderProcessor
 {
     public static final String MULE_ENCRYPTION_PROPERTIES = "org.mule.config.encryption.properties";
     public static final String DEFAULT_ENCRYPTION_PROPERTIES_FILE = "mule-encryption.properties";
+
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(PlaceholderProcessor.class);
+    protected static final Log logger = LogFactory.getLog(PlaceholderProcessor.class);
 
     private static boolean strategiesLoaded = false;
 
-    private Map types = new HashMap();
-    private Map schemes = new HashMap();
-    private TemplateParser parser = TemplateParser.createAntStyleParser();
+    private final Map types;
+    private final Map schemes = new HashMap();
+    private final TemplateParser parser = TemplateParser.createAntStyleParser();
 
     public PlaceholderProcessor()
     {
+        types = new HashMap();
         types.put("PBE", PasswordBasedEncryptionStrategy.class.getName());
     }
 

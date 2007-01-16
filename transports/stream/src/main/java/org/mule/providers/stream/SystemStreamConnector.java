@@ -10,13 +10,14 @@
 
 package org.mule.providers.stream;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * <code>SystemStreamConnector</code> connects to the System streams in and out by
@@ -35,6 +36,12 @@ public class SystemStreamConnector extends StreamConnector
         super();
         inputStream = System.in;
         outputStream = System.out;
+    }
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
     }
 
     protected void doDispose()

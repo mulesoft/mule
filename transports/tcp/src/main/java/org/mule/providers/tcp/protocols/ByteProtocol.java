@@ -32,9 +32,9 @@ public abstract class ByteProtocol implements TcpProtocol
         {
             write(os, (byte[])data);
         }
-        if (data instanceof Serializable)
+        else
         {
-            write(os, SerializationUtils.serialize((Serializable)data));
+            write(os, SerializationUtils.serialize(data));
         }
     }
 }

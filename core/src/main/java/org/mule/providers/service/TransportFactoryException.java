@@ -11,27 +11,26 @@
 package org.mule.providers.service;
 
 import org.mule.config.i18n.Message;
+import org.mule.umo.endpoint.EndpointException;
 
 /**
- * <code>ConnectorServiceException</code> is thrown if a ProviderServicedescriptor
- * has a service error set. This is usually because the endpoint/connector cannot be
- * created from a service descriptor
+ * <code>TransportFactoryException</code> is thrown by the endpoint factory if the
+ * endpoint service cannot be found in the META-INF/services directory or if any part
+ * of the endpoint cannot be instanciated.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class ConnectorServiceException extends ConnectorFactoryException
+public class TransportFactoryException extends EndpointException
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 5377271625492627661L;
+    private static final long serialVersionUID = -4166766364690837213L;
 
     /**
      * @param message the exception message
      */
-    public ConnectorServiceException(Message message)
+    public TransportFactoryException(Message message)
     {
         super(message);
     }
@@ -40,8 +39,13 @@ public class ConnectorServiceException extends ConnectorFactoryException
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public ConnectorServiceException(Message message, Throwable cause)
+    public TransportFactoryException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public TransportFactoryException(Throwable cause)
+    {
+        super(cause);
     }
 }

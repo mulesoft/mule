@@ -10,6 +10,22 @@
 
 package org.mule.ra;
 
+import org.mule.MuleManager;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
+import org.mule.config.ThreadingProfile;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.AbstractConnector;
+import org.mule.providers.service.TransportFactory;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.ClassUtils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -28,21 +44,6 @@ import javax.transaction.xa.XAResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ConfigurationException;
-import org.mule.config.ThreadingProfile;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.ClassUtils;
 
 /**
  * <code>MuleResourceAdapter</code> TODO
@@ -156,7 +157,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 UMOEndpointURI uri = new MuleEndpointURI(((MuleActivationSpec)activationSpec).getEndpoint());
-                UMOEndpoint endpoint = ConnectorFactory.createEndpoint(uri,
+                UMOEndpoint endpoint = TransportFactory.createEndpoint(uri,
                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
 
                 ((AbstractConnector)endpoint.getConnector()).getReceiverThreadingProfile()

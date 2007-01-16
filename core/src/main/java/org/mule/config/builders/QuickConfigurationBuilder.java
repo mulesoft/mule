@@ -21,7 +21,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -235,12 +235,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         UMOEndpoint outboundProvider = null;
         if (listenerEndpointUri != null)
         {
-            inboundProvider = ConnectorFactory.createEndpoint(listenerEndpointUri,
+            inboundProvider = TransportFactory.createEndpoint(listenerEndpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         }
         if (sendEndpointUri != null)
         {
-            outboundProvider = ConnectorFactory.createEndpoint(sendEndpointUri,
+            outboundProvider = TransportFactory.createEndpoint(sendEndpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         return registerComponentInstance(component, name, inboundProvider, outboundProvider);
@@ -487,12 +487,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         UMOEndpoint outboundEndpoint = null;
         if (inboundEndpointUri != null)
         {
-            inboundEndpoint = ConnectorFactory.createEndpoint(inboundEndpointUri,
+            inboundEndpoint = TransportFactory.createEndpoint(inboundEndpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         }
         if (outboundEndpointUri != null)
         {
-            outboundEndpoint = ConnectorFactory.createEndpoint(outboundEndpointUri,
+            outboundEndpoint = TransportFactory.createEndpoint(outboundEndpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         return createDescriptor(implementation, name, inboundEndpoint, outboundEndpoint, properties);

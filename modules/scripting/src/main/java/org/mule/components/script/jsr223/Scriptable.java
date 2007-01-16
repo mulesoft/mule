@@ -14,7 +14,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -53,8 +52,7 @@ public class Scriptable implements Initialisable
     private ScriptEngine scriptEngine;
     private String scriptEngineName;
 
-    public void initialise() throws InitialisationException, RecoverableException
-    {
+    public void initialise() throws InitialisationException {
         if (scriptEngine == null)
         {
             if (compiledScript == null)

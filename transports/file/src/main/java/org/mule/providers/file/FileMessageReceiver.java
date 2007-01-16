@@ -55,12 +55,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                                String readDir,
                                String moveDir,
                                String moveToPattern,
-                               Long frequency) throws InitialisationException
+                               long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
+
         this.readDir = readDir;
         this.moveDir = moveDir;
         this.moveToPattern = moveToPattern;
+
         if (endpoint.getFilter() instanceof FilenameFilter)
         {
             filenameFilter = (FilenameFilter)endpoint.getFilter();

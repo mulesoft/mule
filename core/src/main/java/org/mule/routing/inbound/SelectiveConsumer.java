@@ -19,7 +19,9 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
+import org.mule.umo.routing.UMORouterCollection;
 import org.mule.umo.transformer.TransformerException;
 
 import org.apache.commons.logging.Log;
@@ -28,63 +30,63 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted
  * events. The filtering is performed by a <code>UMOFilter</code> that can be set
- * on the router. If the event does not match the filter a
- * <code>UMOROutnerCatchAllStrategy</code> can be set on this router to route
- * unwanted events. If a catch strategy is not set the router just returns null.
+ * on the router.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * @see UMOInboundRouter
+ * @see UMOInboundMessageRouter
+ * @see UMORouterCollection
  */
 
 public class SelectiveConsumer implements UMOInboundRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
-    private UMOFilter filter;
-    private boolean transformFirst = true;
-
-    private RouterStatistics routerStatistics;
+    private volatile UMOFilter filter;
+    private volatile boolean transformFirst = true;
+    private volatile RouterStatistics routerStatistics;
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
-        logger.debug("Attempting to route event");
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Attempting to route event: " + event.getId());
+        }
+
         if (filter == null)
         {
             return true;
         }
-        UMOMessage message;
+
+        UMOMessage message = event.getMessage();
+
         if (transformFirst)
         {
             try
             {
                 Object payload = event.getTransformedMessage();
-                message = new MuleMessage(payload, event.getMessage());
+                message = new MuleMessage(payload, message);
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
-                    event.getMessage(), event.getEndpoint(), e);
+                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), event
+                    .getMessage(), event.getEndpoint(), e);
             }
         }
-        else
-        {
-            message = event.getMessage();
-        }
+
         boolean result = filter.accept(message);
+
         if (logger.isDebugEnabled())
         {
-            logger.debug((result ? "Event passed filter " : "Event did not pass filter ")
-                         + filter.getClass().getName());
+            logger.debug("Event " + event.getId() + (result ? " passed filter " : " did not pass filter ")
+                            + filter.getClass().getName());
         }
+
         return result;
     }
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        if (isMatch(event))
+        if (this.isMatch(event))
         {
             return new UMOEvent[]{event};
         }
@@ -123,4 +125,5 @@ public class SelectiveConsumer implements UMOInboundRouter
     {
         return routerStatistics;
     }
+
 }

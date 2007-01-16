@@ -72,25 +72,25 @@ public interface UMOConnector extends Disposable, Initialisable
     boolean isDisposing();
 
     /**
-     * Gets a <code>UMOMessageAdapter</code> from the connector for the given
+     * Gets a {@link UMOMessageAdapter} from the connector for the given
      * message (data)
      * 
      * @param message the data with which to initialise the
-     *            <code>UMOMessageAdapter</code>
-     * @return the <code>UMOMessageAdapter</code> for the endpoint
+     *            {@link UMOMessageAdapter}
+     * @return the {@link UMOMessageAdapter} for the endpoint
      * @throws MessagingException if the message parameter is not supported
      * @see UMOMessageAdapter
      */
     UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException;
 
     /**
-     * Gets a <code>UMOStreamMessageAdapter</code> from the connector for the given
+     * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
      * message. This Adapter will correctly handle data streaming for this type of
      * connector
      * 
      * @param in the input stream to read the data from
      * @param out the outputStream to write data to. This can be null.
-     * @return the <code>UMOStreamMessageAdapter</code> for the endpoint
+     * @return the {@link UMOStreamMessageAdapter} for the endpoint
      * @throws MessagingException if the message parameter is not supported
      * @see UMOStreamMessageAdapter
      */

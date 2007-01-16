@@ -10,6 +10,25 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.WriterMessageAdapter;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,24 +64,6 @@ import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.WriterMessageAdapter;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.soap.SoapConstants;
-import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.w3c.dom.Document;
 
 /**
@@ -74,19 +75,12 @@ import org.w3c.dom.Document;
  * <li>Currently there is no HttpSession support. This will be fixed when Session
  * support is added to the Http Connector</li>
  * </ol>
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class AxisServiceComponent implements Initialisable, Callable
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
-
-    private static Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
+    protected static final Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
+    private static final Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
 
     public static final String INIT_PROPERTY_TRANSPORT_NAME = "transport.name";
     public static final String INIT_PROPERTY_USE_SECURITY = "use-servlet-security";
@@ -158,8 +152,8 @@ public class AxisServiceComponent implements Initialisable, Callable
             if (!"servlet".equalsIgnoreCase(context.getEndpointURI().getSchemeMetaInfo()))
             {
                 String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
-                             + "://" + context.getEndpointURI().getHost() + ":"
-                             + context.getEndpointURI().getPort();
+                                + "://" + context.getEndpointURI().getHost() + ":"
+                                + context.getEndpointURI().getPort();
                 uri += context.getMessageAsString();
                 endpointUri = new MuleEndpointURI(uri);
             }
@@ -271,7 +265,8 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     protected void processAxisFault(AxisFault fault)
     {
-        org.w3c.dom.Element runtimeException = fault.lookupFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
+        org.w3c.dom.Element runtimeException = fault
+            .lookupFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
         if (runtimeException != null)
         {
             exceptionLog.info(Messages.getMessage("axisFault00"), fault);
@@ -325,7 +320,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "400");
             response.write("<h2>" + Messages.getMessage("error00") + ":  "
-                           + Messages.getMessage("invokeGet00") + "</h2>");
+                            + Messages.getMessage("invokeGet00") + "</h2>");
             response.write("<p>" + Messages.getMessage("noMethod01") + "</p>");
         }
         else
@@ -473,7 +468,8 @@ public class AxisServiceComponent implements Initialisable, Callable
 
         try
         {
-            response.write("<table width=\"400\"><tr><th>Mule Component Services</th><th>Axis Services</th></tr><tr><td width=\"200\" valign=\"top\">");
+            response
+                .write("<table width=\"400\"><tr><th>Mule Component Services</th><th>Axis Services</th></tr><tr><td width=\"200\" valign=\"top\">");
             i = engine.getConfig().getDeployedServices();
             listServices(i, response);
             response.write("</td><td width=\"200\" valign=\"top\">");
@@ -633,7 +629,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         catch (AxisFault fault)
         {
             logger.error(fault.toString() + " target service is: " + msgContext.getTargetService()
-                         + ". Event is: " + context.toString(), fault);
+                            + ". Event is: " + context.toString(), fault);
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = msgContext.getResponseMessage();
@@ -750,16 +746,17 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             logger.debug("MessageContext:" + msgContext);
             logger.debug("HEADER_CONTENT_TYPE:"
-                         + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
+                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
             logger.debug("HEADER_CONTENT_LOCATION:"
-                         + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
+                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETLOCATION:" +
             // String.valueOf(getWebInfPath()));
             // logger.debug("HTTPConstants.MC_HTTP_SERVLETPATHINFO:" +
             // req.getPathInfo());
-            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
+            logger
+                .debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
             logger.debug("Constants.MC_REMOTE_ADDR:" + endpointUri.getHost());
             // logger.debug("configPath:" + String.valueOf(getWebInfPath()));
         }

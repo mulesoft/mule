@@ -34,7 +34,7 @@ import org.mule.util.StringMessageUtils;
  */
 public class JmsReplyToHandler extends DefaultReplyToHandler
 {
-    private JmsConnector connector;
+    private final JmsConnector connector;
 
     public JmsReplyToHandler(JmsConnector connector, UMOTransformer transformer)
     {
@@ -83,6 +83,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                                                + "Please report your application server or JMS vendor name and version "
                                                                + "to dev<_at_>mule.codehaus.org or http://mule.mulesource.org/jira"));
             }
+            // TODO MULE-1304 and friends
             boolean topic = replyToDestination instanceof Topic;
             session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);

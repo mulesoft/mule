@@ -13,13 +13,9 @@ package org.mule.extras.pgp;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 
-/**
- * @author ariva
- */
 public class PGPSecurityContext implements UMOSecurityContext
 {
-
-    PGPAuthentication authentication;
+    private volatile PGPAuthentication authentication;
 
     public PGPSecurityContext(PGPAuthentication authentication)
     {

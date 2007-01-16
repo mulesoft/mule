@@ -17,9 +17,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>UMOOutboundMessageRouter</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOOutboundMessageRouter extends UMORouterCollection

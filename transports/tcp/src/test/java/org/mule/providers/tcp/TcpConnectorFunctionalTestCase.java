@@ -29,16 +29,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(TcpConnectorFunctionalTestCase.class);
-
     private Socket s;
     private int port = 61655;
 

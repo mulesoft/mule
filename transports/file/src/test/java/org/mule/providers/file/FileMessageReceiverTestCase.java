@@ -10,10 +10,7 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
@@ -21,6 +18,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
+
+import java.io.File;
 
 public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
@@ -48,7 +47,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         move.deleteOnExit();
 
         return new FileMessageReceiver(endpoint.getConnector(), (UMOComponent)mockComponent.proxy(),
-            endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, new Long(1000));
+            endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 
     public UMOEndpoint getEndpoint() throws Exception

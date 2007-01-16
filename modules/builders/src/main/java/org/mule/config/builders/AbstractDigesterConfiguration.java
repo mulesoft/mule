@@ -36,9 +36,6 @@ import org.xml.sax.SAXParseException;
 
 /**
  * A base classs for configuration schemes that use digester to parse the documents.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractDigesterConfiguration
 {
@@ -48,7 +45,7 @@ public abstract class AbstractDigesterConfiguration
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     protected Digester digester;
     protected List containerReferences = new ArrayList();

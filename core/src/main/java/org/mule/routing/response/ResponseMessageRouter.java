@@ -26,27 +26,15 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>ResponseMessageRouter</code> is a router that can be used to control how
  * the response in a request/response message flow is created. Main usecase is to
  * aggregate a set of asynchonous events into a single response
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ResponseMessageRouter extends AbstractRouterCollection implements UMOResponseMessageRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(ResponseMessageRouter.class);
-
-    private List endpoints = new CopyOnWriteArrayList();
-
-    private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
+    private volatile List endpoints = new CopyOnWriteArrayList();
+    private volatile int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
 
     public ResponseMessageRouter()
     {

@@ -48,9 +48,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     public FtpMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              Long frequency) throws InitialisationException
+                              long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
+
         this.connector = (FtpConnector)connector;
 
         if (endpoint.getFilter() instanceof FilenameFilter)

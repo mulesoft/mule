@@ -11,7 +11,7 @@
 package org.mule.providers.space;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
@@ -24,7 +24,7 @@ public class SpaceConnectorFactoryTestCase extends AbstractMuleTestCase
     public void testCreateFromFactory() throws Exception
     {
         MuleEndpointURI url = new MuleEndpointURI(getEndpointURI());
-        UMOEndpoint endpoint = ConnectorFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOEndpoint endpoint = TransportFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertTrue(endpoint.getConnector() instanceof SpaceConnector);

@@ -23,11 +23,8 @@ import org.mule.umo.transformer.TransformerException;
 import java.util.Iterator;
 
 /**
- * <code>BankQuotesAggregator</code> receives a number of quotes and selectes the
+ * <code>BankQuotesAggregator</code> receives a number of quotes and selects the
  * lowest
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class BankQuotesAggregator extends CorrelationAggregator
 {
@@ -79,16 +76,16 @@ public class BankQuotesAggregator extends CorrelationAggregator
     }
 
     /**
-     * Determines if the event group is ready to be aggregated. if the group is ready
-     * to be aggregated (this is entirely up to the application. it could be
-     * determined by volume, last modified time or some oher criteria based on the
-     * last event received)
+     * Determines if the event group is ready to be aggregated; this is entirely up
+     * to the application. It could be determined by volume, last modified time or
+     * some oher criteria based on the last event received.
      * 
-     * @param events
+     * @param events event group to examine
      * @return true if the events are ready to be aggregated
      */
-    protected boolean shouldAggregate(EventGroup events)
+    protected boolean shouldAggregateEvents(EventGroup events)
     {
-        return super.shouldAggregate(events);
+        return super.shouldAggregateEvents(events);
     }
+
 }

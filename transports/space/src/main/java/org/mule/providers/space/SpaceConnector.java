@@ -10,14 +10,9 @@
 
 package org.mule.providers.space;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -28,12 +23,18 @@ import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
 import org.mule.util.BeanUtils;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Provides generic connectivity to 'Spaces' that implement the Mule Space API, i.e.
  * Gigaspaces, JCache implementations, Rio can be accessed as well as a mule file,
  * Journal or VM space.
  */
-public class SpaceConnector extends AbstractServiceEnabledConnector
+public class SpaceConnector extends AbstractConnector
 {
     private UMOSpaceFactory spaceFactory;
     private Map spaceProperties;
@@ -52,7 +53,6 @@ public class SpaceConnector extends AbstractServiceEnabledConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        super.doInitialise();
         if (spaceFactory == null)
         {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "spaceFactory"), this);

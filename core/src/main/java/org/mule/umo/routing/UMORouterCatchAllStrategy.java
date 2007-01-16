@@ -16,9 +16,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>UMORouterCatchAllStrategy</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMORouterCatchAllStrategy

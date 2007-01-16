@@ -10,8 +10,6 @@
 
 package org.mule.samples.voipservice.routers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
@@ -25,17 +23,11 @@ import org.mule.umo.transformer.TransformerException;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author Binildas Christudas
- */
 public class PaymentValidationResponseAggregator extends ResponseCorrelationAggregator
 {
 
-    protected static transient Log logger = LogFactory.getLog(PaymentValidationResponseAggregator.class);
-
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
-
         UMOEvent event = null;
         boolean one = false;
         boolean two = false;
@@ -47,10 +39,12 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
             {
                 event = (UMOEvent)iterator.next();
                 creditProfileTO = (CreditProfileTO)event.getTransformedMessage();
+
                 if (creditProfileTO.getCreditScore() >= CreditProfileTO.CREDIT_LIMIT)
                 {
                     one = true;
                 }
+
                 if (creditProfileTO.getCreditAuthorisedStatus() == CreditProfileTO.CREDIT_AUTHORISED)
                 {
                     two = true;
@@ -62,18 +56,13 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
             throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"),
                 new MuleMessage(events, (Map)null), null, e);
         }
+
         if (one && two && creditProfileTO != null)
         {
             creditProfileTO.setValid(true);
         }
+
         return new MuleMessage(creditProfileTO, event.getMessage());
     }
 
-    protected boolean shouldAggregate(EventGroup events)
-    {
-
-        boolean shouldAggregate = super.shouldAggregate(events);
-        logger.info("--- *** --- shouldAggregate = " + shouldAggregate + " --- *** ---");
-        return shouldAggregate;
-    }
 }

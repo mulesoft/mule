@@ -30,18 +30,21 @@ public class MuleMessageProtocol extends DefaultProtocol
     public Serializable read(InputStream is) throws IOException
     {
         byte[] tmp = (byte[])super.read(is);
+
         if (tmp == null)
         {
             return null;
         }
-        MuleMessage msg = (MuleMessage)SerializationUtils.deserialize((byte[])tmp);
-        return msg;
+        else
+        {
+            return (MuleMessage)SerializationUtils.deserialize(tmp);
+        }
     }
 
     public void write(OutputStream os, byte[] data) throws IOException
     {
         MuleMessage msg = (MuleMessage)RequestContext.getEvent().getMessage();
-        data = SerializationUtils.serialize((Serializable)msg);
+        data = SerializationUtils.serialize(msg);
         super.write(os, data);
     }
 }

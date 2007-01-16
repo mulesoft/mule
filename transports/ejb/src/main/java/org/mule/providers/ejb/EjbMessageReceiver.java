@@ -10,8 +10,6 @@
 
 package org.mule.providers.ejb;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.rmi.RmiMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -27,15 +25,15 @@ import org.mule.umo.provider.UMOConnector;
 
 public class EjbMessageReceiver extends RmiMessageReceiver
 {
-    protected transient Log logger = LogFactory.getLog(EjbMessageReceiver.class);
 
     public EjbMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              Long frequency) throws InitialisationException
+                              long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
 
         this.connector = (EjbConnector)connector;
     }
+
 }

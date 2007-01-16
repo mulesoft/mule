@@ -13,14 +13,12 @@ package org.mule.providers.service;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ConnectorServiceNotFoundException</code> is thorown if no matching service
+ * <code>TransportServiceNotFoundException</code> is thorown if no matching service
  * endpoint descriptor is found for the connector protocol.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class ConnectorServiceNotFoundException extends ConnectorFactoryException
+public class TransportServiceNotFoundException extends TransportFactoryException
 {
     /**
      * Serial version
@@ -30,7 +28,7 @@ public class ConnectorServiceNotFoundException extends ConnectorFactoryException
     /**
      * @param location the path of the service
      */
-    public ConnectorServiceNotFoundException(String location)
+    public TransportServiceNotFoundException(String location)
     {
         super(Message.createStaticMessage(location));
     }
@@ -39,7 +37,7 @@ public class ConnectorServiceNotFoundException extends ConnectorFactoryException
      * @param location the path of the service
      * @param cause the exception that cause this exception to be thrown
      */
-    public ConnectorServiceNotFoundException(String location, Throwable cause)
+    public TransportServiceNotFoundException(String location, Throwable cause)
     {
         super(Message.createStaticMessage(location), cause);
     }

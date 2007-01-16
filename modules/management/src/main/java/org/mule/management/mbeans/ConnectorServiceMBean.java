@@ -12,7 +12,6 @@ package org.mule.management.mbeans;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 
 import java.beans.ExceptionListener;
 
@@ -37,6 +36,6 @@ public interface ConnectorServiceMBean
 
     void dispose();
 
-    void initialise() throws InitialisationException, RecoverableException;
+    void initialise() throws InitialisationException;
 
 }

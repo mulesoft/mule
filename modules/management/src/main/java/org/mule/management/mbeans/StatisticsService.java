@@ -23,9 +23,6 @@ import org.mule.umo.manager.UMOManager;
 
 /**
  * <code>StatisicsService</code> exposes Mule processing statistics
- * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
- * @version $Revision$
  */
 public class StatisticsService implements StatisticsServiceMBean
 {
@@ -37,7 +34,7 @@ public class StatisticsService implements StatisticsServiceMBean
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(StatisticsService.class);
+    protected static final Log logger = LogFactory.getLog(StatisticsService.class);
 
     private AllStatistics stats = new AllStatistics();
     private MuleManager manager = null;

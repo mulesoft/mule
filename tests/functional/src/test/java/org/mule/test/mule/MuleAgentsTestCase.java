@@ -15,6 +15,10 @@ import org.mule.management.agents.Mx4jAgent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import java.util.List;
+
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
     private UMOManager manager;
@@ -25,6 +29,14 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         manager = getManager(true);
+    }
+
+
+    protected void doTearDown () throws Exception {
+        if (manager != null)
+        {
+            manager.dispose();
+        }
     }
 
     public void testRemoveNonExistentAgent() throws Exception
@@ -54,4 +66,24 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         // should not throw an exception
     }
 
+    /**
+     * Should not bark when the MBeanServer is injected and
+     * {@code locateServer} and {@code createServer} both
+     * set to false.
+     */
+    public void testJmxAgentInjectedMBeanServer() throws Exception
+    {
+        manager.setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
+        JmxAgent jmxAgent = new JmxAgent();
+        List servers = MBeanServerFactory.findMBeanServer(null);
+        MBeanServer server = null;
+        server = servers == null || servers.isEmpty()
+                ? MBeanServerFactory.createMBeanServer()
+                : (MBeanServer) servers.get(0);
+        jmxAgent.setCreateServer(false);
+        jmxAgent.setLocateServer(false);
+        jmxAgent.setMBeanServer(server);
+        manager.registerAgent(jmxAgent);
+        manager.start();
+    }
 }

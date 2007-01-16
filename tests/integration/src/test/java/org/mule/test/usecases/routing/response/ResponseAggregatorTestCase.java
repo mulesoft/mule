@@ -18,11 +18,6 @@ import org.mule.umo.UMOMessage;
 
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
 public class ResponseAggregatorTestCase extends FunctionalTestCase
 {
 
@@ -48,6 +43,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         final UMOMessage message = event.getMessage();
         final String id = message.getUniqueId();
         message.setCorrelationId(id);
+        message.setCorrelationGroupSize(1);
         aggregator.process(event);
 
         aggregator.getResponse(message);
@@ -63,7 +59,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     {
         public Map getResponseEvents()
         {
-            return this.responseEvents;
+            return this.responseMessages;
         }
     }
 }

@@ -10,8 +10,9 @@
 
 package org.mule.providers.http.servlet;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Map;
 
@@ -23,7 +24,7 @@ import java.util.Map;
  * @see MuleReceiverServlet
  */
 
-public class ServletConnector extends AbstractServiceEnabledConnector
+public class ServletConnector extends AbstractConnector
 {
     // The real URL that the servlet container is bound on.
     // If this is not set the wsdl may not be generated correctly
@@ -34,6 +35,12 @@ public class ServletConnector extends AbstractServiceEnabledConnector
         super();
         registerSupportedProtocol("http");
         registerSupportedProtocol("https");
+    }
+
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method, nothing to do
     }
 
     protected void doDispose()

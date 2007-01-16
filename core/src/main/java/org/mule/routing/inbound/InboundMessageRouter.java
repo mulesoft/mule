@@ -29,27 +29,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>InboundMessageRouter</code> is a collection of routers that will be
- * invoked when an event is received It is responsible for manageing a collection of
+ * invoked when an event is received. It is responsible for managing a collection of
  * routers and also executing the routing logic. Each router must match against the
  * current event for the event to be routed.
- *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
- * @version $Revision$
  */
 
 public class InboundMessageRouter extends AbstractRouterCollection implements UMOInboundMessageRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(InboundMessageRouter.class);
-
-    private List endpoints = new CopyOnWriteArrayList();
+    private final List endpoints = new CopyOnWriteArrayList();
 
     public InboundMessageRouter()
     {
@@ -240,14 +229,14 @@ public class InboundMessageRouter extends AbstractRouterCollection implements UM
     {
         if (endpoints != null)
         {
-            this.endpoints.clear();
-            this.endpoints.addAll(endpoints);
-
             // Force all endpoints' type to RECEIVER just in case.
-            for (Iterator it = this.endpoints.iterator(); it.hasNext();)
+            for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
                 ((UMOEndpoint)it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
             }
+
+            this.endpoints.clear();
+            this.endpoints.addAll(endpoints);
         }
         else
         {

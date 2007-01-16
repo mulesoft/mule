@@ -20,7 +20,7 @@ import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.TransportFactory;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
@@ -320,7 +320,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint(
             "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertEquals(ConnectorFactory.ALWAYS_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
+        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }

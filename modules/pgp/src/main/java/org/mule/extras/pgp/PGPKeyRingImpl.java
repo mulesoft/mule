@@ -25,12 +25,9 @@ import org.mule.util.IOUtils;
 import cryptix.pki.ExtendedKeyStore;
 import cryptix.pki.KeyBundle;
 
-/**
- * @author ariva
- */
 public class PGPKeyRingImpl implements PGPKeyRing
 {
-    protected static Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
+    protected static final Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
 
     private String publicKeyRingFileName;
 

@@ -11,7 +11,7 @@
 package org.mule.providers.email;
 
 import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractConnector;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Properties;
@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
  * Abstract superclass for mail connectors. Provides Mule with an Authenticator
  * object and other shared functionality like e.g. Session creation.
  */
-public abstract class AbstractMailConnector extends AbstractServiceEnabledConnector
+public abstract class AbstractMailConnector extends AbstractConnector
 {
 
     /**

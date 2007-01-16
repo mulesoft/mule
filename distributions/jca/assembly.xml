@@ -31,7 +31,7 @@ Assembly descriptor for the Mule JCA distribution.
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-axis</include>
-        		<include>org.mule.transports:mule-transport-bpm</include>
+                <include>org.mule.transports:mule-transport-bpm</include>
                 <include>org.mule.transports:mule-transport-dq</include>
                 <include>org.mule.transports:mule-transport-ejb</include>
                 <include>org.mule.transports:mule-transport-email</include>
@@ -81,12 +81,32 @@ Assembly descriptor for the Mule JCA distribution.
             <outputDirectory>/</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                <!-- Transaction manager will usually be provided by the container -->
-                <!--<exclude>org.mule.modules:mule-module-jotm</exclude>-->
-                <!-- 3rd-party libs -->
+                <!-- Transaction manager will be provided by the container -->
+                <exclude>org.mule.modules:mule-module-jotm</exclude>
+                <exclude>jotm:jotm</exclude>
+                <exclude>jotm:jotm_jrmp_stubs</exclude>
+                <exclude>howl:howl-logger</exclude>
+                <exclude>org.objectweb.carol:carol</exclude>
+
+                <!-- Specs -->
                 <exclude>javax.activation:activation</exclude>
                 <exclude>javax.mail:mail</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-ejb_2.1_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-servlet_2.4_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-j2ee-connector_1.5_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-j2ee-management_1.0_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-jaxrpc_1.1_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-jms_1.1_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-jta_1.0.1B_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-qname_1.1_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-saaj_1.1_spec</exclude>
+                <exclude>org.apache.geronimo.specs:geronimo-servlet_2.4_spec</exclude>
+
+                <!-- Required for tests only -->
                 <exclude>junit:junit</exclude>
+                <exclude>nanocontainer:nanocontainer-testmodel</exclude>
+                <exclude>picocontainer:picocontainer-tck</exclude>
+
                 <!-- Examples -->
                 <exclude>org.mule.examples:mule-example-echo</exclude>
                 <exclude>org.mule.examples:mule-example-errorhandler</exclude>

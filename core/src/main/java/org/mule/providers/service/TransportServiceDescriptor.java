@@ -41,35 +41,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ConnectorServiceDescriptor</code> describes the necessery information for
+ * <code>TransportServiceDescriptor</code> describes the necessery information for
  * creating a connector from a service descriptor. A service descriptor should be
  * located at META-INF/services/org/mule/providers/<protocol> where protocol is the
- * protocol of the connector to be created The service descriptor is on the form ok
- * key value pairs and supports the following properties <b>connector</b>=org.mule.umo.providers.AbstractServiceEnabledConnector -
- * The connector class <b>conector.factory</b>=org.mule.util.ObjectFactory - A
- * connector factory class to use, this is used instead of the 'connector' property
- * if set <b>dispatcher.factory</b>=org.mule.umo.providers.UMOMessageDispatcherFactory -
- * tHe dispatcher factory class to use <b>message.adapter</b>=org.mule.umo.providers.UMOMessageAdapter -
- * The message adater class to use <b>message.receiver</b>=org.mule.umo.providers.UMOMessageReceiver -
- * The message receiver class to use <b>service.error</b>= This should only be set
- * if the connector described cannot be created directly from this descriptor. In the
- * case of Jms this would be set as the JmsConnector also needs Jndi information.
- * <b>inbound.transformer</b>=org.mule.umo.UMOTransformer - The default inbound
- * transformer to use by endpoints if no other is set <b>outbound.transformer</b>=org.mule.umo.UMOTransformer -
- * The default outbound transformer to use by endpoints if no other is set Any other
- * properties set in the descriptor are made available using the getParams() method
- * on this discriptor.
+ * protocol of the connector to be created The service descriptor is in the form of
+ * string key value pairs and supports a number of properties, descriptions of which
+ * can be found here: http://www.muledocs.org/Transport+Service+Descriptors.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class ConnectorServiceDescriptor
+public class TransportServiceDescriptor
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(ConnectorServiceDescriptor.class);
+    protected static final Log logger = LogFactory.getLog(TransportServiceDescriptor.class);
 
     private String protocol;
     private String serviceLocation;
@@ -94,9 +80,9 @@ public class ConnectorServiceDescriptor
     private UMOTransformer outboundTransformer;
     private UMOTransformer responseTransformer;
     // private EndpointBuilder endpointBuilderImpl;
-    private ConnectorServiceFinder connectorServiceFinder;
+    private TransportServiceFinder transportServiceFinder;
 
-    public ConnectorServiceDescriptor(String protocol, String serviceLocation, Properties props)
+    public TransportServiceDescriptor(String protocol, String serviceLocation, Properties props)
     {
         this.protocol = protocol;
         this.serviceLocation = serviceLocation;
@@ -165,7 +151,7 @@ public class ConnectorServiceDescriptor
         if (temp != null)
         {
             serviceFinder = temp;
-            connectorServiceFinder = null;
+            transportServiceFinder = null;
         }
     }
 
@@ -262,9 +248,9 @@ public class ConnectorServiceDescriptor
         return transactionFactory;
     }
 
-    public ConnectorServiceFinder getConnectorServiceFinder()
+    public TransportServiceFinder getConnectorServiceFinder()
     {
-        return connectorServiceFinder;
+        return transportServiceFinder;
     }
 
     public String getSessionHandler()
@@ -272,26 +258,26 @@ public class ConnectorServiceDescriptor
         return sessionHandler;
     }
 
-    public ConnectorServiceFinder createServiceFinder() throws ConnectorServiceException
+    public TransportServiceFinder createServiceFinder() throws TransportServiceException
     {
         if (serviceFinder == null)
         {
             return null;
         }
-        if (connectorServiceFinder == null)
+        if (transportServiceFinder == null)
         {
             try
             {
-                connectorServiceFinder = (ConnectorServiceFinder)ClassUtils.instanciateClass(serviceFinder,
+                transportServiceFinder = (TransportServiceFinder)ClassUtils.instanciateClass(serviceFinder,
                     ClassUtils.NO_ARGS);
             }
             catch (Exception e)
             {
-                throw new ConnectorServiceException(new Message(Messages.CANT_INSTANCIATE_FINDER_X,
+                throw new TransportServiceException(new Message(Messages.CANT_INSTANCIATE_FINDER_X,
                     serviceFinder), e);
             }
         }
-        return connectorServiceFinder;
+        return transportServiceFinder;
     }
 
     public String getDefaultResponseTransformer()
@@ -299,13 +285,13 @@ public class ConnectorServiceDescriptor
         return defaultResponseTransformer;
     }
 
-    public UMOMessageAdapter createMessageAdapter(Object message) throws ConnectorServiceException
+    public UMOMessageAdapter createMessageAdapter(Object message) throws TransportServiceException
     {
         return createMessageAdapter(message, messageAdapter);
     }
 
     public UMOStreamMessageAdapter createStreamMessageAdapter(InputStream in, OutputStream out)
-        throws ConnectorServiceException
+        throws TransportServiceException
     {
         if (getStreamMessageAdapter() == null)
         {
@@ -316,7 +302,7 @@ public class ConnectorServiceDescriptor
                              + streamMessageAdapter);
             }
             // If the stream.message.adapter is not set streaming should not be used
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                 "stream.message.adapter", getProtocol() + " service descriptor"));
         }
         try
@@ -334,13 +320,13 @@ public class ConnectorServiceDescriptor
         }
         catch (Exception e)
         {
-            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                 "Message Adapter", streamMessageAdapter), e);
         }
     }
 
     protected UMOMessageAdapter createMessageAdapter(Object message, String clazz)
-        throws ConnectorServiceException
+        throws TransportServiceException
     {
         if (message == null)
         {
@@ -354,18 +340,18 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                     "Message Adapter", clazz), e);
             }
         }
         else
         {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                 "Message Adapter", getProtocol()));
         }
     }
 
-    public UMOSessionHandler createSessionHandler() throws ConnectorServiceException
+    public UMOSessionHandler createSessionHandler() throws TransportServiceException
     {
         if (getSessionHandler() == null)
         {
@@ -383,7 +369,7 @@ public class ConnectorServiceDescriptor
         }
         catch (Throwable e)
         {
-            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                 "SessionHandler", sessionHandler), e);
         }
     }
@@ -396,10 +382,10 @@ public class ConnectorServiceDescriptor
         return createMessageReceiver(connector, component, endpoint, null);
     }
 
-    public UMOMessageReceiver
-
-    createMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, Object[] args)
-        throws UMOException
+    public UMOMessageReceiver createMessageReceiver(UMOConnector connector,
+                                                    UMOComponent component,
+                                                    UMOEndpoint endpoint,
+                                                    Object[] args) throws UMOException
     {
         String receiverClass = messageReceiver;
 
@@ -414,7 +400,8 @@ public class ConnectorServiceDescriptor
 
         if (receiverClass != null)
         {
-            Object[] newArgs = null;
+            Object[] newArgs;
+
             if (args != null && args.length != 0)
             {
                 newArgs = new Object[3 + args.length];
@@ -423,9 +410,11 @@ public class ConnectorServiceDescriptor
             {
                 newArgs = new Object[3];
             }
+
             newArgs[0] = connector;
             newArgs[1] = component;
             newArgs[2] = endpoint;
+
             if (args != null && args.length != 0)
             {
                 System.arraycopy(args, 0, newArgs, 3, newArgs.length - 3);
@@ -437,19 +426,19 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                     "Message Receiver", getProtocol()), e);
             }
 
         }
         else
         {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                 "Message Receiver", getProtocol()));
         }
     }
 
-    public UMOMessageDispatcherFactory createDispatcherFactory() throws ConnectorServiceException
+    public UMOMessageDispatcherFactory createDispatcherFactory() throws TransportServiceException
     {
         if (dispatcherFactory != null)
         {
@@ -460,18 +449,18 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                     "Message Dispatcher Factory", dispatcherFactory), e);
             }
         }
         else
         {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                 "Message Dispatcher Factory", getProtocol()));
         }
     }
 
-    public UMOTransactionFactory createTransactionFactory() throws ConnectorServiceException
+    public UMOTransactionFactory createTransactionFactory() throws TransportServiceException
     {
         if (transactionFactory != null)
         {
@@ -482,7 +471,7 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                     "Transaction Factory", transactionFactory), e);
             }
         }
@@ -492,7 +481,7 @@ public class ConnectorServiceDescriptor
         }
     }
 
-    public UMOConnector createConnector(String protocol) throws ConnectorServiceException
+    public UMOConnector createConnector(String protocol) throws TransportServiceException
     {
 
         UMOConnector connector;
@@ -500,7 +489,7 @@ public class ConnectorServiceDescriptor
         // method
         if (getServiceError() != null)
         {
-            throw new ConnectorServiceException(Message.createStaticMessage(getServiceError()));
+            throw new TransportServiceException(Message.createStaticMessage(getServiceError()));
         }
         // if there is a factory, use it
         try
@@ -508,30 +497,30 @@ public class ConnectorServiceDescriptor
             if (getConnectorFactory() != null)
             {
                 ObjectFactory factory = (ObjectFactory)ClassUtils.loadClass(getConnectorFactory(),
-                    ConnectorFactory.class).newInstance();
+                    TransportFactory.class).newInstance();
                 connector = (UMOConnector)factory.create();
             }
             else
             {
                 if (getConnector() != null)
                 {
-                    connector = (UMOConnector)ClassUtils.loadClass(getConnector(), ConnectorFactory.class)
+                    connector = (UMOConnector)ClassUtils.loadClass(getConnector(), TransportFactory.class)
                         .newInstance();
                 }
                 else
                 {
-                    throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                    throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                         "Connector", getProtocol()));
                 }
             }
         }
-        catch (ConnectorServiceException e)
+        catch (TransportServiceException e)
         {
             throw e;
         }
         catch (Exception e)
         {
-            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector",
+            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector",
                 getConnector()), e);
 
         }
@@ -543,7 +532,7 @@ public class ConnectorServiceDescriptor
         return connector;
     }
 
-    public UMOTransformer createInboundTransformer() throws ConnectorFactoryException
+    public UMOTransformer createInboundTransformer() throws TransportFactoryException
     {
         if (inboundTransformer != null)
         {
@@ -560,14 +549,14 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
                     "inbound", getDefaultInboundTransformer()), e);
             }
         }
         return null;
     }
 
-    public UMOTransformer createOutboundTransformer() throws ConnectorFactoryException
+    public UMOTransformer createOutboundTransformer() throws TransportFactoryException
     {
         if (outboundTransformer != null)
         {
@@ -584,14 +573,14 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
                     "outbound", getDefaultOutboundTransformer()), e);
             }
         }
         return null;
     }
 
-    public UMOTransformer createResponseTransformer() throws ConnectorFactoryException
+    public UMOTransformer createResponseTransformer() throws TransportFactoryException
     {
         if (responseTransformer != null)
         {
@@ -608,14 +597,14 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
                     "response", getDefaultResponseTransformer()), e);
             }
         }
         return null;
     }
 
-    public EndpointBuilder createEndpointBuilder() throws ConnectorFactoryException
+    public EndpointBuilder createEndpointBuilder() throws TransportFactoryException
     {
         if (endpointBuilder == null)
         {
@@ -632,7 +621,7 @@ public class ConnectorServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X,
+                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X,
                     "Endpoint Builder: " + getEndpointBuilder()), e);
             }
         }
@@ -644,118 +633,118 @@ public class ConnectorServiceDescriptor
         {
             return true;
         }
-        if (!(o instanceof ConnectorServiceDescriptor))
+        if (!(o instanceof TransportServiceDescriptor))
         {
             return false;
         }
 
-        final ConnectorServiceDescriptor connectorServiceDescriptor = (ConnectorServiceDescriptor)o;
+        final TransportServiceDescriptor transportServiceDescriptor = (TransportServiceDescriptor)o;
 
         if (connector != null
-                        ? !connector.equals(connectorServiceDescriptor.connector)
-                        : connectorServiceDescriptor.connector != null)
+                        ? !connector.equals(transportServiceDescriptor.connector)
+                        : transportServiceDescriptor.connector != null)
         {
             return false;
         }
         if (connectorFactory != null
-                        ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory)
-                        : connectorServiceDescriptor.connectorFactory != null)
+                        ? !connectorFactory.equals(transportServiceDescriptor.connectorFactory)
+                        : transportServiceDescriptor.connectorFactory != null)
         {
             return false;
         }
         if (defaultInboundTransformer != null
-                        ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer)
-                        : connectorServiceDescriptor.defaultInboundTransformer != null)
+                        ? !defaultInboundTransformer.equals(transportServiceDescriptor.defaultInboundTransformer)
+                        : transportServiceDescriptor.defaultInboundTransformer != null)
         {
             return false;
         }
         if (defaultOutboundTransformer != null
-                        ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer)
-                        : connectorServiceDescriptor.defaultOutboundTransformer != null)
+                        ? !defaultOutboundTransformer.equals(transportServiceDescriptor.defaultOutboundTransformer)
+                        : transportServiceDescriptor.defaultOutboundTransformer != null)
         {
             return false;
         }
         if (defaultResponseTransformer != null
-                        ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer)
-                        : connectorServiceDescriptor.defaultResponseTransformer != null)
+                        ? !defaultResponseTransformer.equals(transportServiceDescriptor.defaultResponseTransformer)
+                        : transportServiceDescriptor.defaultResponseTransformer != null)
         {
             return false;
         }
         if (dispatcherFactory != null
-                        ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory)
-                        : connectorServiceDescriptor.dispatcherFactory != null)
+                        ? !dispatcherFactory.equals(transportServiceDescriptor.dispatcherFactory)
+                        : transportServiceDescriptor.dispatcherFactory != null)
         {
             return false;
         }
         if (endpointBuilder != null
-                        ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder)
-                        : connectorServiceDescriptor.endpointBuilder != null)
+                        ? !endpointBuilder.equals(transportServiceDescriptor.endpointBuilder)
+                        : transportServiceDescriptor.endpointBuilder != null)
         {
             return false;
         }
         if (messageAdapter != null
-                        ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter)
-                        : connectorServiceDescriptor.messageAdapter != null)
+                        ? !messageAdapter.equals(transportServiceDescriptor.messageAdapter)
+                        : transportServiceDescriptor.messageAdapter != null)
         {
             return false;
         }
         if (messageReceiver != null
-                        ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver)
-                        : connectorServiceDescriptor.messageReceiver != null)
+                        ? !messageReceiver.equals(transportServiceDescriptor.messageReceiver)
+                        : transportServiceDescriptor.messageReceiver != null)
         {
             return false;
         }
         if (properties != null
-                        ? !properties.equals(connectorServiceDescriptor.properties)
-                        : connectorServiceDescriptor.properties != null)
+                        ? !properties.equals(transportServiceDescriptor.properties)
+                        : transportServiceDescriptor.properties != null)
         {
             return false;
         }
         if (protocol != null
-                        ? !protocol.equals(connectorServiceDescriptor.protocol)
-                        : connectorServiceDescriptor.protocol != null)
+                        ? !protocol.equals(transportServiceDescriptor.protocol)
+                        : transportServiceDescriptor.protocol != null)
         {
             return false;
         }
         if (serviceError != null
-                        ? !serviceError.equals(connectorServiceDescriptor.serviceError)
-                        : connectorServiceDescriptor.serviceError != null)
+                        ? !serviceError.equals(transportServiceDescriptor.serviceError)
+                        : transportServiceDescriptor.serviceError != null)
         {
             return false;
         }
         if (serviceFinder != null
-                        ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder)
-                        : connectorServiceDescriptor.serviceFinder != null)
+                        ? !serviceFinder.equals(transportServiceDescriptor.serviceFinder)
+                        : transportServiceDescriptor.serviceFinder != null)
         {
             return false;
         }
         if (serviceLocation != null
-                        ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation)
-                        : connectorServiceDescriptor.serviceLocation != null)
+                        ? !serviceLocation.equals(transportServiceDescriptor.serviceLocation)
+                        : transportServiceDescriptor.serviceLocation != null)
         {
             return false;
         }
         if (sessionHandler != null
-                        ? !sessionHandler.equals(connectorServiceDescriptor.sessionHandler)
-                        : connectorServiceDescriptor.sessionHandler != null)
+                        ? !sessionHandler.equals(transportServiceDescriptor.sessionHandler)
+                        : transportServiceDescriptor.sessionHandler != null)
         {
             return false;
         }
         if (streamMessageAdapter != null
-                        ? !streamMessageAdapter.equals(connectorServiceDescriptor.streamMessageAdapter)
-                        : connectorServiceDescriptor.streamMessageAdapter != null)
+                        ? !streamMessageAdapter.equals(transportServiceDescriptor.streamMessageAdapter)
+                        : transportServiceDescriptor.streamMessageAdapter != null)
         {
             return false;
         }
         if (transactedMessageReceiver != null
-                        ? !transactedMessageReceiver.equals(connectorServiceDescriptor.transactedMessageReceiver)
-                        : connectorServiceDescriptor.transactedMessageReceiver != null)
+                        ? !transactedMessageReceiver.equals(transportServiceDescriptor.transactedMessageReceiver)
+                        : transportServiceDescriptor.transactedMessageReceiver != null)
         {
             return false;
         }
         if (transactionFactory != null
-                        ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory)
-                        : connectorServiceDescriptor.transactionFactory != null)
+                        ? !transactionFactory.equals(transportServiceDescriptor.transactionFactory)
+                        : transportServiceDescriptor.transactionFactory != null)
         {
             return false;
         }

@@ -422,8 +422,8 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public String toString()
     {
-        return "Transformer{" + "name='" + name + "'" + ", returnClass=" + ignoreBadInput + ", returnClass="
-                        + ignoreBadInput + ", sourceTypes=" + sourceTypes + "}";
+        return "Transformer{" + "name='" + name + "'" + ", ignoreBadInput=" + ignoreBadInput + ", returnClass="
+                        + returnClass + ", sourceTypes=" + sourceTypes + "}";
     }
 
     public boolean isAcceptNull()

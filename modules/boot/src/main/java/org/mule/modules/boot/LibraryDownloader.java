@@ -133,7 +133,7 @@ public class LibraryDownloader
         if (sourceFile.exists())
         {
             System.out.print("Copying from local repository " + sourceFile.getAbsolutePath() + " ...");
-            File destinationFile = new File(new File(muleHome, DefaultMuleClassPathConfig.FOLDER_USER)
+            File destinationFile = new File(new File(muleHome, DefaultMuleClassPathConfig.USER_DIR)
                 .getCanonicalFile(), destinationFileName).getCanonicalFile();
             FileUtils.copyFile(sourceFile, destinationFile);
             System.out.println("done");
@@ -154,7 +154,7 @@ public class LibraryDownloader
             client.executeMethod(hostConfig, httpMethod, httpState);
             if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
             {
-                File destinationFile = new File(new File(muleHome, DefaultMuleClassPathConfig.FOLDER_USER),
+                File destinationFile = new File(new File(muleHome, DefaultMuleClassPathConfig.USER_DIR),
                     destinationFileName);
                 FileUtils.copyStreamToFile(httpMethod.getResponseBodyAsStream(), destinationFile);
                 System.out.println("done");

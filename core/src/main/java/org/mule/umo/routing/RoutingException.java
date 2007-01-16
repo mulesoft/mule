@@ -21,8 +21,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  * Routing exceptions are only thrown for InboundMessageRouter and
  * OutboundMessageRouter and deriving types. Mule itself does not throw routing
  * exceptions when routing internal events.
- * 
- * @version $Revision$
  */
 public class RoutingException extends MessagingException
 {
@@ -31,7 +29,7 @@ public class RoutingException extends MessagingException
      */
     private static final long serialVersionUID = 2478458847072048645L;
 
-    protected transient UMOImmutableEndpoint endpoint;
+    protected transient final UMOImmutableEndpoint endpoint;
 
     public RoutingException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
