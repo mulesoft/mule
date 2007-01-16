@@ -9,7 +9,8 @@
  */
 package org.mule.extras.spring.config.parsers;
 
-import org.mule.ManagementContext;
+// TODO MERGE this class is in the management module
+//import org.mule.ManagementContext;
 import org.mule.config.MuleProperties;
 import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.util.StringUtils;
@@ -30,7 +31,10 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
 
     protected Class getBeanClass(Element element)
     {
-        return ManagementContext.class;
+        // TODO MERGE this class is in the management module, most probably this is an error
+        // and a different class should be returned.
+        //return ManagementContext.class;
+        return null;
     }
 
 

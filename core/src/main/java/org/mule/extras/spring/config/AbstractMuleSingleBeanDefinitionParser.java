@@ -88,7 +88,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
                 name = attribute.getNodeName();
             }
 
-            if (ID_ATTRIBUTE.equals(name))
+            if (AbstractBeanDefinitionParser.ID_ATTRIBUTE.equals(name))
             {
                 continue;
             }

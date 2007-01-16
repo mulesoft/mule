@@ -11,8 +11,9 @@ package org.mule.extras.spring.config.handlers;
 
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
-import org.mule.extras.spring.config.BeanDefinitionParserAware;
-import org.mule.extras.spring.config.MuleXmlBeanDefinitionParser;
+// TODO MERGE missing
+//import org.mule.extras.spring.config.BeanDefinitionParserAware;
+//import org.mule.extras.spring.config.MuleXmlBeanDefinitionParser;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.springframework.beans.FatalBeanException;
@@ -31,7 +32,8 @@ import java.util.Properties;
 /**
  * todo document
  */
-public abstract class AbstractNamespaceHandler implements NamespaceHandler, BeanDefinitionParserAware
+// TODO MERGE missing
+public abstract class AbstractNamespaceHandler implements NamespaceHandler//, BeanDefinitionParserAware
 {
 
     public static final String BASE_DEFINITION_PARSER_LOCATION = "META-INF/services/org/mule/config/";
@@ -47,7 +49,8 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler, Bean
      */
     private final Map parsers = new HashMap();
 
-    private MuleXmlBeanDefinitionParser rootParser;
+    // TODO MERGE missing
+    //private MuleXmlBeanDefinitionParser rootParser;
 
     protected AbstractNamespaceHandler(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -73,9 +76,11 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler, Bean
 
         return parser;
     }
-    public void setBeanDefinitionParser(MuleXmlBeanDefinitionParser parser) {
-        this.rootParser = parser;
-    }
+
+    // TODO MERGE missing
+    //public void setBeanDefinitionParser(MuleXmlBeanDefinitionParser parser) {
+    //    this.rootParser = parser;
+    //}
 
     protected void registerBeanDefinitionParsers() throws ConfigurationException {
 
@@ -85,9 +90,10 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler, Bean
                 Map.Entry entry = (Map.Entry) iterator.next();
                 BeanDefinitionParser parser = null;
                 parser = (BeanDefinitionParser) ClassUtils.instanciateClass(entry.getValue().toString(), ClassUtils.NO_ARGS);
-                if(parser instanceof BeanDefinitionParserAware) {
-                    ((BeanDefinitionParserAware)parser).setBeanDefinitionParser(this.rootParser);
-                }
+                // TODO MERGE missing
+                //if(parser instanceof BeanDefinitionParserAware) {
+                //    ((BeanDefinitionParserAware)parser).setBeanDefinitionParser(this.rootParser);
+                //}
                 registerBeanDefinitionParser(entry.getKey().toString(), parser);
             }
         } catch (Exception e) {
