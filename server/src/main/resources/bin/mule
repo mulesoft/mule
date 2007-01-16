@@ -24,13 +24,13 @@ fi
 # Application
 if [ "$MULE_APP" = "" ]
 then
-	MULE_APP="mule"
-	MULE_APP_LONG="Mule"
+    MULE_APP="mule"
+    MULE_APP_LONG="Mule"
 else
-	if [ "$MULE_APP_LONG" = "" ]
-	then
-		MULE_APP_LONG=${MULE_APP}
-	fi
+    if [ "$MULE_APP_LONG" = "" ]
+    then
+        MULE_APP_LONG=${MULE_APP}
+    fi
 fi
 APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
@@ -193,45 +193,38 @@ case "$DIST_OS" in
 esac
 
 ######################################################################
-# Patched for Mule
+# Patched for Mule (MULE-1288)
 ######################################################################
 
 # Resolve the architecture
-PROC_ARCH=`uname -p | tr [:upper:] [:lower:] | tr -d [:blank:]`
+PROC_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
 while :
 do
-	case "$PROC_ARCH" in
-	    'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
-	        DIST_ARCH="x86"
-	        break;;
-	    'ip27')
-	        DIST_ARCH="mips"
-	        break;;
-	    'power' | 'powerpc' | 'power_pc' | 'ppc64')
-	        DIST_ARCH="ppc"
-	        break;;
-	    'pa_risc' | 'pa-risc')
-	        DIST_ARCH="parisc"
-	        break;;
-	    'sun4u' | 'sparcv9' | 'sparc')
-	        DIST_ARCH="sparc"
-	        break;;
-	    '9000/800')
-	        DIST_ARCH="parisc"
-	        break;;
-	    *)
-			if [ "$DIST_ARCH" = "" ]
-			then
-			    echo "Processor type $PROC_ARCH not recognized.  Falling back on machine hardware name (uname -m)"
-			    DIST_ARCH="unknown"
-			    PROC_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
-			else
-			    echo "Neither the processor type (uname -p) nor the machine hardware type (uname -m) were recognized."
-			    echo "Please report this message along with your machine's processor/architecture."
-			    exit 1
-			fi
-	        ;;
-	esac
+    case "$PROC_ARCH" in
+        'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
+            DIST_ARCH="x86"
+            break;;
+        'ip27')
+            DIST_ARCH="mips"
+            break;;
+        'power' | 'powerpc' | 'power_pc' | 'ppc64')
+            DIST_ARCH="ppc"
+            break;;
+        'pa_risc' | 'pa-risc')
+            DIST_ARCH="parisc"
+            break;;
+        'sun4u' | 'sparcv9' | 'sparc')
+            DIST_ARCH="sparc"
+            break;;
+        '9000/800')
+            DIST_ARCH="parisc"
+            break;;
+        *)
+            echo "Your machine's hardware type (uname -m) was not recognized by the Service Wrapper as a supported platform."
+            echo "Please report this message along with your machine's processor/architecture."
+            exit 1
+            ;;
+    esac
 done
 ######################################################################
 
@@ -365,10 +358,10 @@ checkUser() {
                 RUN_AS_GROUP=`groups $RUN_AS_USER | awk '{print $3}' | tail -1`
                 if [ "X$RUN_AS_GROUP" = "X" ]
                 then
-                	##########################################################
-					# Patched for Mule
+                    ##########################################################
+                    # Patched for Mule (MULE-1289)
                     RUN_AS_GROUP=$RUN_AS_USER
-                	##########################################################
+                    ##########################################################
                 fi
                 touch $LOCKFILE
                 chown $RUN_AS_USER:$RUN_AS_GROUP $LOCKFILE
@@ -410,10 +403,10 @@ getpid() {
                 #  common is during system startup after an unclean shutdown.
                 # The ps statement below looks for the specific wrapper command running as
                 #  the pid.  If it is not found then the pid file is considered to be stale.
-				######################################################################
-				# TODO: ps -o args gets truncated to 80 columns on Solaris which makes
-				# this test fail if the path is too long.
-				######################################################################
+                ######################################################################
+                # TODO: ps -o args gets truncated to 80 columns on Solaris which makes
+                # this test fail if the path is too long.
+                ######################################################################
                 pidtest=`$PSEXE -p $pid -o args | grep $WRAPPER_CMD | tail -1`
                 if [ "X$pidtest" = "X" ]
                 then
@@ -626,7 +619,7 @@ case "$1" in
         # Change back to the original startup directory.
         cd $STARTUP_DIR
 
-		# Call this script recursively with the "console" parameter.
+        # Call this script recursively with the "console" parameter.
         $REALPATH console $*
         ######################################################################
         ;;

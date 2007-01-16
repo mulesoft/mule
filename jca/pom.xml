@@ -47,6 +47,20 @@
         </plugins>
     </build>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mule-deps-plugins</id>
+            <name>Mule Plugin Repository (All)</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
     <!--
         HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project object never
         sees it as a module nor dependency, and assembly inclusion filters then just skip it.
